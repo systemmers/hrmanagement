@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>직원 등록 - 인사카드 관리 시스템</title>
+
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* CSS 변수 */
+        :root {
+            --color-pure-black: #000000;
+            --color-pure-white: #ffffff;
+            --color-gray-25: #fcfcfc;
+            --color-gray-50: #f9f9f9;
+            --color-gray-75: #f6f6f6;
+            --color-gray-100: #f1f1f1;
+            --color-gray-200: #e4e4e4;
+            --color-gray-300: #d1d1d1;
+            --color-gray-400: #b4b4b4;
+            --color-gray-500: #888888;
+            --color-gray-600: #6b6b6b;
+            --color-gray-700: #515151;
+            --color-gray-800: #343434;
+            --color-gray-900: #1a1a1a;
+
+            --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            --text-2xs: 0.6875rem;
+            --text-xs: 0.75rem;
+            --text-sm: 0.8125rem;
+            --text-base: 0.875rem;
+            --text-md: 0.9375rem;
+            --text-lg: 1rem;
+            --text-xl: 1.125rem;
+            --text-2xl: 1.25rem;
+            --text-3xl: 1.5rem;
+            --text-4xl: 2rem;
+
+            --space-0-5: 0.125rem;
+            --space-1: 0.25rem;
+            --space-1-5: 0.375rem;
+            --space-2: 0.5rem;
+            --space-2-5: 0.625rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+
+            --radius-xs: 0.1875rem;
+            --radius-sm: 0.25rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            --radius-2xl: 1rem;
+
+            --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 8px 25px rgba(0, 0, 0, 0.15);
+
+            --transition-fast: 120ms cubic-bezier(0.4, 0.0, 0.2, 1);
+            --transition-normal: 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+            --transition-slow: 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            font-size: var(--text-base);
+            line-height: 1.6;
+            color: var(--color-gray-900);
+            background-color: var(--color-gray-25);
+            overflow-x: hidden;
+        }
+
+        /* 헤더 */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background-color: var(--color-pure-white);
+            border-bottom: 1px solid var(--color-gray-200);
+            display: flex;
+            align-items: center;
+            padding: 0 var(--space-6);
+            z-index: 100;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .header-logo {
+            width: 36px;
+            height: 36px;
+            background-color: var(--color-gray-900);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-pure-white);
+            font-weight: 700;
+            font-size: var(--text-lg);
+        }
+
+        .header-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--color-gray-900);
+        }
+
+        /* 메인 컨테이너 */
+        .main-container {
+            margin-top: 64px;
+            padding: var(--space-8);
+            display: flex;
+            justify-content: center;
+            min-height: calc(100vh - 64px);
+        }
+
+        .form-wrapper {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* 페이지 헤더 */
+        .page-header {
+            margin-bottom: var(--space-8);
+        }
+
+        .page-title {
+            font-size: var(--text-3xl);
+            font-weight: 700;
+            color: var(--color-gray-900);
+            margin-bottom: var(--space-2);
+        }
+
+        .page-description {
+            font-size: var(--text-sm);
+            color: var(--color-gray-600);
+        }
+
+        /* 폼 섹션 */
+        .form-section {
+            background-color: var(--color-pure-white);
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+
+        .section-title {
+            font-size: var(--text-xl);
+            font-weight: 600;
+            color: var(--color-gray-900);
+            margin-bottom: var(--space-5);
+            padding-bottom: var(--space-3);
+            border-bottom: 1px solid var(--color-gray-200);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-5);
+        }
+
+        .form-grid.single-column {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--color-gray-700);
+            margin-bottom: var(--space-2);
+        }
+
+        .form-label.required::after {
+            content: ' *';
+            color: #ef4444;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-2-5) var(--space-3);
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-family: var(--font-family);
+            transition: all var(--transition-fast);
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--color-gray-900);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-input.error,
+        .form-select.error {
+            border-color: #ef4444;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-error {
+            font-size: var(--text-xs);
+            color: #ef4444;
+            margin-top: var(--space-1);
+            display: none;
+        }
+
+        .form-error.show {
+            display: block;
+        }
+
+        .form-help {
+            font-size: var(--text-xs);
+            color: var(--color-gray-500);
+            margin-top: var(--space-1);
+        }
+
+        /* 사진 업로드 */
+        .photo-upload {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .photo-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: var(--color-gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 2px solid var(--color-gray-300);
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-preview i {
+            font-size: var(--text-4xl);
+            color: var(--color-gray-400);
+        }
+
+        .photo-upload-btn {
+            display: inline-block;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* 라디오 버튼 */
+        .radio-group {
+            display: flex;
+            gap: var(--space-5);
+            margin-top: var(--space-2);
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            cursor: pointer;
+            font-size: var(--text-sm);
+            color: var(--color-gray-700);
+        }
+
+        .radio-label input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* 버튼 */
+        .btn {
+            padding: var(--space-2-5) var(--space-5);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--color-gray-900);
+            color: var(--color-pure-white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-gray-800);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:disabled {
+            background-color: var(--color-gray-400);
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: var(--color-pure-white);
+            color: var(--color-gray-700);
+            border: 1px solid var(--color-gray-300);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--color-gray-50);
+            border-color: var(--color-gray-400);
+        }
+
+        /* 액션 영역 */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-3);
+            padding-top: var(--space-6);
+        }
+
+        /* 토스트 */
+        .toast-container {
+            position: fixed;
+            top: var(--space-4);
+            right: var(--space-4);
+            z-index: 1000;
+        }
+
+        .toast {
+            background-color: var(--color-gray-900);
+            color: var(--color-pure-white);
+            padding: var(--space-4) var(--space-5);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-xl);
+            margin-bottom: var(--space-3);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.success {
+            background-color: #10b981;
+        }
+
+        .toast.error {
+            background-color: #ef4444;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* 반응형 */
+        @media (max-width: 767px) {
+            .main-container {
+                padding: var(--space-4);
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-title {
+                display: none;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="app-header">
+        <a href="demo_layout.html" class="header-brand">
+            <div class="header-logo">HR</div>
+            <h1 class="header-title">인사카드 관리 시스템</h1>
+        </a>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <div class="main-container">
+        <div class="form-wrapper">
+            <div class="page-header">
+                <h1 class="page-title">직원 등록</h1>
+                <p class="page-description">새로운 직원의 기본 정보를 등록합니다</p>
+            </div>
+
+            <form id="employeeForm">
+                <!-- 섹션 1: 기본 정보 -->
+                <div class="form-section">
+                    <h2 class="section-title">기본 정보</h2>
+
+                    <div class="form-grid single-column">
+                        <div class="form-group">
+                            <label class="form-label">직원 사진</label>
+                            <div class="photo-upload">
+                                <div class="photo-preview" id="photoPreview">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <label for="photoInput" class="btn btn-secondary photo-upload-btn">
+                                        <i class="fas fa-upload"></i>
+                                        <span>사진 선택</span>
+                                    </label>
+                                    <input type="file" id="photoInput" class="file-input" accept="image/*">
+                                    <p class="form-help">JPG, PNG 형식 (최대 2MB)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nameInput" class="form-label required">성명</label>
+                            <input type="text" id="nameInput" class="form-input" placeholder="홍길동" required>
+                            <span class="form-error" id="nameError">성명을 입력해주세요</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phoneInput" class="form-label required">휴대폰</label>
+                            <input type="tel" id="phoneInput" class="form-input" placeholder="010-1234-5678" required>
+                            <span class="form-error" id="phoneError">올바른 전화번호를 입력해주세요</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emailInput" class="form-label required">회사 이메일</label>
+                            <input type="email" id="emailInput" class="form-input" placeholder="hong@company.com" required>
+                            <span class="form-error" id="emailError">올바른 이메일을 입력해주세요</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="personalEmailInput" class="form-label">개인 이메일</label>
+                            <input type="email" id="personalEmailInput" class="form-input" placeholder="hong@gmail.com">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="addressInput" class="form-label">주소</label>
+                            <input type="text" id="addressInput" class="form-input" placeholder="서울특별시 강남구 테헤란로 123">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 섹션 2: 소속 정보 -->
+                <div class="form-section">
+                    <h2 class="section-title">소속 정보</h2>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="departmentInput" class="form-label required">소속 부서</label>
+                            <select id="departmentInput" class="form-select" required>
+                                <option value="">선택하세요</option>
+                                <option value="개발팀">개발팀</option>
+                                <option value="디자인팀">디자인팀</option>
+                                <option value="마케팅팀">마케팅팀</option>
+                                <option value="영업팀">영업팀</option>
+                                <option value="관리팀">관리팀</option>
+                            </select>
+                            <span class="form-error" id="departmentError">부서를 선택해주세요</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="positionInput" class="form-label required">직급</label>
+                            <select id="positionInput" class="form-select" required>
+                                <option value="">선택하세요</option>
+                                <option value="사원">사원</option>
+                                <option value="대리">대리</option>
+                                <option value="과장">과장</option>
+                                <option value="차장">차장</option>
+                                <option value="부장">부장</option>
+                            </select>
+                            <span class="form-error" id="positionError">직급을 선택해주세요</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="hireDateInput" class="form-label required">입사일</label>
+                            <input type="date" id="hireDateInput" class="form-input" required>
+                            <span class="form-error" id="hireDateError">입사일을 선택해주세요</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label required">고용 형태</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="employmentType" value="정규직" checked>
+                                    <span>정규직</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="employmentType" value="계약직">
+                                    <span>계약직</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="employmentType" value="인턴">
+                                    <span>인턴</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="workplaceInput" class="form-label">근무지</label>
+                            <input type="text" id="workplaceInput" class="form-input" placeholder="서울 본사">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 액션 버튼 -->
+                <div class="form-actions">
+                    <a href="demo_layout.html" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        <span>취소</span>
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        <span>저장</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 토스트 알림 컨테이너 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // 전화번호 자동 하이픈
+        const phoneInput = document.getElementById('phoneInput');
+        phoneInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            if (value.length > 3 && value.length <= 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3);
+            } else if (value.length > 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7, 11);
+            }
+            e.target.value = value;
+        });
+
+        // 사진 업로드 프리뷰
+        const photoInput = document.getElementById('photoInput');
+        const photoPreview = document.getElementById('photoPreview');
+        let photoData = '';
+
+        photoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 2 * 1024 * 1024) {
+                    showToast('파일 크기는 2MB 이하여야 합니다', 'error');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    photoData = event.target.result;
+                    photoPreview.innerHTML = `<img src="${photoData}" alt="Preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 폼 검증
+        function validateField(field, errorId, validator) {
+            const errorEl = document.getElementById(errorId);
+            if (!validator(field.value)) {
+                field.classList.add('error');
+                errorEl.classList.add('show');
+                return false;
+            } else {
+                field.classList.remove('error');
+                errorEl.classList.remove('show');
+                return true;
+            }
+        }
+
+        // 검증 함수들
+        const validators = {
+            name: (value) => value.trim().length > 0,
+            phone: (value) => /^010-\d{4}-\d{4}$/.test(value),
+            email: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+            department: (value) => value !== '',
+            position: (value) => value !== '',
+            hireDate: (value) => value !== ''
+        };
+
+        // blur 이벤트로 검증
+        document.getElementById('nameInput').addEventListener('blur', (e) => {
+            validateField(e.target, 'nameError', validators.name);
+        });
+
+        document.getElementById('phoneInput').addEventListener('blur', (e) => {
+            validateField(e.target, 'phoneError', validators.phone);
+        });
+
+        document.getElementById('emailInput').addEventListener('blur', (e) => {
+            validateField(e.target, 'emailError', validators.email);
+        });
+
+        document.getElementById('departmentInput').addEventListener('change', (e) => {
+            validateField(e.target, 'departmentError', validators.department);
+        });
+
+        document.getElementById('positionInput').addEventListener('change', (e) => {
+            validateField(e.target, 'positionError', validators.position);
+        });
+
+        document.getElementById('hireDateInput').addEventListener('change', (e) => {
+            validateField(e.target, 'hireDateError', validators.hireDate);
+        });
+
+        // 폼 제출
+        document.getElementById('employeeForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // 모든 필드 검증
+            const nameValid = validateField(document.getElementById('nameInput'), 'nameError', validators.name);
+            const phoneValid = validateField(document.getElementById('phoneInput'), 'phoneError', validators.phone);
+            const emailValid = validateField(document.getElementById('emailInput'), 'emailError', validators.email);
+            const departmentValid = validateField(document.getElementById('departmentInput'), 'departmentError', validators.department);
+            const positionValid = validateField(document.getElementById('positionInput'), 'positionError', validators.position);
+            const hireDateValid = validateField(document.getElementById('hireDateInput'), 'hireDateError', validators.hireDate);
+
+            if (!nameValid || !phoneValid || !emailValid || !departmentValid || !positionValid || !hireDateValid) {
+                showToast('필수 항목을 모두 입력해주세요', 'error');
+                return;
+            }
+
+            // 데이터 수집
+            const employeeData = {
+                id: Date.now(),
+                name: document.getElementById('nameInput').value,
+                photo: photoData || `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70) + 1}`,
+                phone: document.getElementById('phoneInput').value,
+                email: document.getElementById('emailInput').value,
+                personalEmail: document.getElementById('personalEmailInput').value,
+                address: document.getElementById('addressInput').value,
+                department: document.getElementById('departmentInput').value,
+                position: document.getElementById('positionInput').value,
+                hireDate: document.getElementById('hireDateInput').value,
+                employmentType: document.querySelector('input[name="employmentType"]:checked').value,
+                workplace: document.getElementById('workplaceInput').value,
+                status: 'active'
+            };
+
+            // LocalStorage에 저장
+            let employees = JSON.parse(localStorage.getItem('employees') || '[]');
+            employees.push(employeeData);
+            localStorage.setItem('employees', JSON.stringify(employees));
+
+            showToast('직원이 성공적으로 등록되었습니다', 'success');
+
+            setTimeout(() => {
+                window.location.href = 'demo_layout.html';
+            }, 1500);
+        });
+
+        // 토스트 알림
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

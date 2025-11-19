@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}직원 관리 - 인사카드 관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-row">
+        <h1 class="page-title">직원 관리</h1>
+        <div class="page-actions">
+            <button class="btn btn-secondary">
+                <i class="fas fa-download"></i>
+                <span>내보내기</span>
+            </button>
+            <a href="{{ url_for('employee.new') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>직원 등록</span>
+            </a>
+        </div>
+    </div>
+    <p class="page-description">총 {{ total_count }}명의 직원 정보를 관리합니다</p>
+</div>
+
+<!-- 대시보드 통계 -->
+<div class="dashboard-grid">
+    <div class="stat-card">
+        <div class="stat-label">총 직원 수</div>
+        <div class="stat-value" id="totalCount">{{ total_count }}</div>
+        <div class="stat-change">전체 인원</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">활성 직원</div>
+        <div class="stat-value" id="activeCount">{{ active_count }}</div>
+        <div class="stat-change">정상 근무 중</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">대기 중</div>
+        <div class="stat-value" id="warningCount">{{ warning_count }}</div>
+        <div class="stat-change">업데이트 필요</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">만료 예정</div>
+        <div class="stat-value" id="expiredCount">{{ expired_count }}</div>
+        <div class="stat-change">조치 필요</div>
+    </div>
+</div>
+
+<!-- 직원 카드 그리드 -->
+<div class="employee-grid" id="employeeGrid">
+    {% for employee in employees %}
+    <div class="employee-card" data-id="{{ employee.id }}" onclick="window.location.href='{{ url_for('employee.detail', id=employee.id) }}'">
+        <div class="employee-status {{ employee.status }}"></div>
+
+        {% if employee.photo %}
+        <img src="{{ url_for('static', filename='uploads/' + employee.photo) }}"
+             alt="{{ employee.name }}"
+             class="employee-photo"
+             onerror="this.src='https://i.pravatar.cc/150?img={{ employee.id % 70 }}'">
+        {% else %}
+        <img src="https://i.pravatar.cc/150?img={{ employee.id % 70 }}"
+             alt="{{ employee.name }}"
+             class="employee-photo">
+        {% endif %}
+
+        <h3 class="employee-name">{{ employee.name }}</h3>
+        <p class="employee-position">
+            {{ employee.department.name if employee.department else '미배정' }} · {{ employee.position.name if employee.position else '미정' }}
+        </p>
+
+        <div class="employee-meta">
+            <div class="employee-meta-item">
+                <i class="fas fa-calendar"></i>
+                <span>입사일: {{ employee.hire_date.strftime('%Y-%m-%d') if employee.hire_date else '미정' }}</span>
+            </div>
+            <div class="employee-meta-item">
+                <i class="fas fa-phone"></i>
+                <span>{{ employee.phone if employee.phone else '연락처 없음' }}</span>
+            </div>
+        </div>
+
+        <div class="employee-actions" onclick="event.stopPropagation()">
+            <button class="btn btn-secondary btn-small"
+                    onclick="window.location.href='{{ url_for('employee.detail', id=employee.id) }}'">
+                <i class="fas fa-eye"></i>
+                <span>보기</span>
+            </button>
+            <button class="btn btn-secondary btn-small"
+                    onclick="window.location.href='{{ url_for('employee.edit', id=employee.id) }}'">
+                <i class="fas fa-edit"></i>
+                <span>수정</span>
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if employees|length == 0 %}
+<div style="text-align: center; padding: var(--space-16); color: var(--color-gray-500);">
+    <i class="fas fa-users" style="font-size: var(--text-4xl); margin-bottom: var(--space-4);"></i>
+    <p style="font-size: var(--text-lg);">등록된 직원이 없습니다.</p>
+    <p style="font-size: var(--text-sm); margin-top: var(--space-2);">
+        <a href="{{ url_for('employee.new') }}" class="btn btn-primary" style="margin-top: var(--space-4);">
+            <i class="fas fa-plus"></i>
+            <span>첫 직원 등록하기</span>
+        </a>
+    </p>
+</div>
+{% endif %}
+{% endblock %}
