@@ -6,14 +6,32 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{% block title %}인사카드 관리 시스템{% endblock %}</title>
 
+    <!-- Resource Hints -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="//i.pravatar.cc">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Font Awesome 6.4.0 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Awesome 6.4.0 with SRI -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer">
+
+    <!-- CSS Variables -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}">
 
     <!-- 메인 스타일시트 -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Forms 스타일시트 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
 
     {% block extra_css %}{% endblock %}
 </head>
@@ -26,18 +44,21 @@
             <h1 class="header-title">인사카드 관리 시스템</h1>
         </div>
 
-        <div class="header-search">
+        <div class="header-search" role="search">
             <i class="fas fa-search header-search-icon"></i>
             <input type="text"
                    id="headerSearchInput"
                    data-search="employee"
                    class="header-search-input"
-                   placeholder="직원 검색 (이름, 부서, 직급)">
+                   placeholder="직원 검색 (이름, 부서, 직급)"
+                   aria-label="직원 검색"
+                   aria-describedby="header-search-help">
+            <span id="header-search-help" class="sr-only">직원의 이름, 부서 또는 직급을 입력하여 검색하세요</span>
         </div>
 
         <div class="header-actions">
             <div class="header-user">
-                <div class="header-user-avatar">{{ current_user.name[0] }}</div>
+                <div class="header-user-avatar">{{ current_user.name | first_char }}</div>
                 <span class="header-user-name">{{ current_user.name }}</span>
             </div>
             <a href="{{ url_for('auth.logout') }}" class="btn-logout">
@@ -91,7 +112,7 @@
 
                 <div class="sidebar-footer">
                     <div class="user-info">
-                        <div class="user-avatar">{{ current_user.name[0] }}</div>
+                        <div class="user-avatar">{{ current_user.name | first_char }}</div>
                         <div class="user-details">
                             <div class="user-name">{{ current_user.name }}</div>
                             <div class="user-role">시스템 관리자</div>
@@ -121,7 +142,7 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div data-flash-message="{{ message }}" data-flash-category="{{ category }}" style="display: none;"></div>
+                <div data-flash-message="{{ message }}" data-flash-category="{{ category }}" role="alert" aria-live="polite" style="display: none;"></div>
             {% endfor %}
         {% endif %}
     {% endwith %}

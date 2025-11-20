@@ -1,0 +1,50 @@
+{% macro render_text(form_field, label, required=False, help_text='') %}
+<div class="form-group">
+    <label for="{{ form_field.id }}" class="form-label {% if required %}required{% endif %}">{{ label }}</label>
+    {{ form_field(class="form-input", **({'aria-required': 'true', 'aria-describedby': form_field.id + '-error'} if required else {})) }}
+    {% if form_field.errors %}
+    <span id="{{ form_field.id }}-error" class="error-message" role="alert">
+        {% for error in form_field.errors %}
+            {{ error }}
+        {% endfor %}
+    </span>
+    {% endif %}
+    {% if help_text %}
+    <span class="form-help">{{ help_text }}</span>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro render_select(form_field, label, help_text='') %}
+<div class="form-group">
+    <label for="{{ form_field.id }}" class="form-label">{{ label }}</label>
+    {{ form_field(class="form-select") }}
+    {% if form_field.errors %}
+    <span class="error-message" role="alert">
+        {% for error in form_field.errors %}
+            {{ error }}
+        {% endfor %}
+    </span>
+    {% endif %}
+    {% if help_text %}
+    <span class="form-help">{{ help_text }}</span>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro render_textarea(form_field, label, help_text='') %}
+<div class="form-group">
+    <label for="{{ form_field.id }}" class="form-label">{{ label }}</label>
+    {{ form_field(class="form-textarea") }}
+    {% if form_field.errors %}
+    <span class="error-message" role="alert">
+        {% for error in form_field.errors %}
+            {{ error }}
+        {% endfor %}
+    </span>
+    {% endif %}
+    {% if help_text %}
+    <span class="form-help">{{ help_text }}</span>
+    {% endif %}
+</div>
+{% endmacro %}

@@ -96,6 +96,54 @@ class Employee(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    @property
+    def status_display(self):
+        """상태를 한글로 표시"""
+        status_map = {
+            'active': '정상',
+            'warning': '주의',
+            'expired': '만료'
+        }
+        return status_map.get(self.status, '알 수 없음')
+
+    @property
+    def status_class(self):
+        """상태에 따른 CSS 클래스"""
+        return self.status
+
+    @property
+    def get_work_duration(self):
+        """근무 기간을 일수로 계산"""
+        if not self.hire_date:
+            return 0
+        today = datetime.utcnow().date()
+        delta = today - self.hire_date
+        return delta.days
+
+    @property
+    def get_work_duration_display(self):
+        """근무 기간을 년/월/일로 표시"""
+        if not self.hire_date:
+            return '-'
+
+        today = datetime.utcnow().date()
+        delta = today - self.hire_date
+        days = delta.days
+
+        years = days // 365
+        months = (days % 365) // 30
+        remaining_days = (days % 365) % 30
+
+        parts = []
+        if years > 0:
+            parts.append(f'{years}년')
+        if months > 0:
+            parts.append(f'{months}개월')
+        if remaining_days > 0 or not parts:
+            parts.append(f'{remaining_days}일')
+
+        return ' '.join(parts)
+
     def __repr__(self):
         return f'<Employee {self.name}>'
 

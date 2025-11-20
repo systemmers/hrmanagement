@@ -32,6 +32,10 @@ class Config:
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
 
+    # 템플릿 캐싱
+    TEMPLATES_AUTO_RELOAD = False
+    SEND_FILE_MAX_AGE_DEFAULT = 31536000  # 1년 (정적 파일 캐시)
+
 
 class DevelopmentConfig(Config):
     """개발 환경 설정"""
@@ -46,6 +50,10 @@ class DevelopmentConfig(Config):
     # 디버그 툴바
     DEBUG_TB_ENABLED = True
     DEBUG_TB_INTERCEPT_REDIRECTS = False
+
+    # 템플릿 자동 리로드 (개발환경)
+    TEMPLATES_AUTO_RELOAD = True
+    SEND_FILE_MAX_AGE_DEFAULT = 0  # 캐시 비활성화
 
 
 class ProductionConfig(Config):

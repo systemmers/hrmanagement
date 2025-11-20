@@ -47,18 +47,23 @@
 <!-- 직원 카드 그리드 -->
 <div class="employee-grid" id="employeeGrid">
     {% for employee in employees %}
-    <div class="employee-card" data-id="{{ employee.id }}" onclick="window.location.href='{{ url_for('employee.detail', id=employee.id) }}'">
+    <a href="{{ url_for('employee.detail', id=employee.id) }}"
+       class="employee-card"
+       data-id="{{ employee.id }}"
+       aria-label="{{ employee.name }} 직원 상세 정보 보기">
         <div class="employee-status {{ employee.status }}"></div>
 
         {% if employee.photo %}
         <img src="{{ url_for('static', filename='uploads/' + employee.photo) }}"
              alt="{{ employee.name }}"
              class="employee-photo"
+             loading="lazy"
              onerror="this.src='https://i.pravatar.cc/150?img={{ employee.id % 70 }}'">
         {% else %}
         <img src="https://i.pravatar.cc/150?img={{ employee.id % 70 }}"
              alt="{{ employee.name }}"
-             class="employee-photo">
+             class="employee-photo"
+             loading="lazy">
         {% endif %}
 
         <h3 class="employee-name">{{ employee.name }}</h3>
@@ -89,7 +94,7 @@
                 <span>수정</span>
             </button>
         </div>
-    </div>
+    </a>
     {% endfor %}
 </div>
 

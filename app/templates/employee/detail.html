@@ -1,134 +1,18 @@
 {% extends "base.html" %}
+{% from "components/page_header.html" import render as page_header %}
+{% from "components/status_badge.html" import render as status_badge %}
 
 {% block title %}{{ employee.name }} - 인사카드 관리 시스템{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div class="page-title-row">
-        <h1 class="page-title">{{ employee.name }}</h1>
-        <div class="page-actions">
-            <a href="{{ url_for('employee.index') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i>
-                <span>목록</span>
-            </a>
-            <a href="{{ url_for('employee.edit', id=employee.id) }}" class="btn btn-primary">
-                <i class="fas fa-edit"></i>
-                <span>수정</span>
-            </a>
-        </div>
-    </div>
-    <p class="page-description">직원 상세 정보</p>
-</div>
-
-<style>
-    .detail-container {
-        background-color: var(--color-pure-white);
-        border-radius: var(--radius-lg);
-        padding: var(--space-8);
-        box-shadow: var(--shadow-sm);
-    }
-
-    .detail-header {
-        display: flex;
-        align-items: center;
-        gap: var(--space-6);
-        padding-bottom: var(--space-6);
-        margin-bottom: var(--space-6);
-        border-bottom: 2px solid var(--color-gray-200);
-    }
-
-    .detail-photo {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid var(--color-gray-200);
-    }
-
-    .detail-basic {
-        flex: 1;
-    }
-
-    .detail-name {
-        font-size: var(--text-3xl);
-        font-weight: 700;
-        color: var(--color-gray-900);
-        margin-bottom: var(--space-2);
-    }
-
-    .detail-position {
-        font-size: var(--text-lg);
-        color: var(--color-gray-600);
-        margin-bottom: var(--space-3);
-    }
-
-    .detail-status {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-2);
-        padding: var(--space-1) var(--space-3);
-        border-radius: var(--radius-md);
-        font-size: var(--text-sm);
-        font-weight: 500;
-    }
-
-    .detail-status.active {
-        background-color: #d1fae5;
-        color: #065f46;
-    }
-
-    .detail-status.warning {
-        background-color: #fef3c7;
-        color: #92400e;
-    }
-
-    .detail-status.expired {
-        background-color: #fee2e2;
-        color: #991b1b;
-    }
-
-    .detail-section {
-        margin-bottom: var(--space-6);
-    }
-
-    .detail-section-title {
-        font-size: var(--text-xl);
-        font-weight: 600;
-        color: var(--color-gray-900);
-        margin-bottom: var(--space-4);
-    }
-
-    .detail-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-4);
-    }
-
-    .detail-item {
-        padding: var(--space-3);
-        background-color: var(--color-gray-50);
-        border-radius: var(--radius-md);
-    }
-
-    .detail-label {
-        font-size: var(--text-xs);
-        color: var(--color-gray-600);
-        margin-bottom: var(--space-1);
-    }
-
-    .detail-value {
-        font-size: var(--text-base);
-        color: var(--color-gray-900);
-        font-weight: 500;
-    }
-
-    .detail-actions {
-        display: flex;
-        gap: var(--space-3);
-        padding-top: var(--space-6);
-        border-top: 1px solid var(--color-gray-200);
-    }
-</style>
+{{ page_header(
+    title=employee.name,
+    description='직원 상세 정보',
+    actions=[
+        {'url': url_for('employee.index'), 'icon': 'fa-arrow-left', 'text': '목록', 'class': 'btn-secondary'},
+        {'url': url_for('employee.edit', id=employee.id), 'icon': 'fa-edit', 'text': '수정', 'class': 'btn-primary'}
+    ]
+) }}
 
 <div class="detail-container">
     <div class="detail-header">
@@ -136,11 +20,13 @@
         <img src="{{ url_for('static', filename='uploads/' + employee.photo) }}"
              alt="{{ employee.name }}"
              class="detail-photo"
+             loading="lazy"
              onerror="this.src='https://i.pravatar.cc/150?img={{ employee.id % 70 }}'">
         {% else %}
         <img src="https://i.pravatar.cc/150?img={{ employee.id % 70 }}"
              alt="{{ employee.name }}"
-             class="detail-photo">
+             class="detail-photo"
+             loading="lazy">
         {% endif %}
 
         <div class="detail-basic">
@@ -148,15 +34,7 @@
             <p class="detail-position">
                 {{ employee.department.name if employee.department else '미배정' }} · {{ employee.position.name if employee.position else '미정' }}
             </p>
-            <span class="detail-status {{ employee.status }}">
-                {% if employee.status == 'active' %}
-                    <i class="fas fa-check-circle"></i> 정상
-                {% elif employee.status == 'warning' %}
-                    <i class="fas fa-exclamation-triangle"></i> 주의
-                {% else %}
-                    <i class="fas fa-times-circle"></i> 만료
-                {% endif %}
-            </span>
+            {{ status_badge(employee.status) }}
         </div>
     </div>
 
@@ -209,10 +87,17 @@
             <i class="fas fa-edit"></i>
             <span>수정하기</span>
         </a>
-        <button onclick="deleteEmployee({{ employee.id }}, '{{ employee.name }}')" class="btn btn-secondary" style="margin-left: auto; border-color: #ef4444; color: #ef4444;">
+        <button class="btn btn-secondary btn-delete"
+                data-employee-id="{{ employee.id }}"
+                data-employee-name="{{ employee.name }}"
+                style="margin-left: auto; border-color: #ef4444; color: #ef4444;">
             <i class="fas fa-trash"></i>
             <span>삭제</span>
         </button>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/employee.js') }}"></script>
 {% endblock %}

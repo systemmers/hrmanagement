@@ -3,6 +3,7 @@
 직원 목록/등록/상세/수정/삭제
 """
 import os
+import imghdr
 from flask import render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
@@ -12,10 +13,36 @@ from app.models import Employee, Department, Position
 from app import db
 
 
+# 파일 업로드 상수
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+
+
 def allowed_file(filename):
     """파일 확장자 검증"""
     return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def validate_image(file):
+    """이미지 파일 검증 (MIME 타입 및 크기)"""
+    # 파일 크기 체크
+    file.seek(0, os.SEEK_END)
+    size = file.tell()
+    file.seek(0)
+
+    if size > MAX_FILE_SIZE:
+        return False, '파일 크기는 5MB를 초과할 수 없습니다.'
+
+    # MIME 타입 검증 (실제 이미지 파일인지 확인)
+    header = file.read(512)
+    file.seek(0)
+    format = imghdr.what(None, header)
+
+    if not format or format not in ALLOWED_EXTENSIONS:
+        return False, '허용되지 않는 파일 형식입니다. (PNG, JPG, GIF만 가능)'
+
+    return True, None
 
 
 @employee_bp.route('/')
@@ -65,9 +92,20 @@ def new():
         # 사진 업로드 처리
         if form.photo.data:
             file = form.photo.data
-            if file and allowed_file(file.filename):
+            if file.filename:
+                # 파일 확장자 검증
+                if not allowed_file(file.filename):
+                    flash('허용되지 않는 파일 형식입니다. (PNG, JPG, GIF만 가능)', 'error')
+                    return redirect(url_for('employee.new'))
+
+                # 파일 크기 및 MIME 타입 검증
+                is_valid, error_message = validate_image(file)
+                if not is_valid:
+                    flash(error_message, 'error')
+                    return redirect(url_for('employee.new'))
+
+                # 안전한 파일명 생성
                 filename = secure_filename(file.filename)
-                # 고유 파일명 생성
                 import uuid
                 ext = filename.rsplit('.', 1)[1].lower()
                 unique_filename = f"{uuid.uuid4().hex}.{ext}"
@@ -125,13 +163,25 @@ def edit(id):
         # 사진 업로드 처리
         if form.photo.data:
             file = form.photo.data
-            if file and allowed_file(file.filename):
+            if file.filename:
+                # 파일 확장자 검증
+                if not allowed_file(file.filename):
+                    flash('허용되지 않는 파일 형식입니다. (PNG, JPG, GIF만 가능)', 'error')
+                    return redirect(url_for('employee.edit', id=employee.id))
+
+                # 파일 크기 및 MIME 타입 검증
+                is_valid, error_message = validate_image(file)
+                if not is_valid:
+                    flash(error_message, 'error')
+                    return redirect(url_for('employee.edit', id=employee.id))
+
                 # 기존 사진 삭제
                 if employee.photo:
                     old_photo = os.path.join(current_app.config['UPLOAD_FOLDER'], employee.photo)
                     if os.path.exists(old_photo):
                         os.remove(old_photo)
 
+                # 안전한 파일명 생성
                 filename = secure_filename(file.filename)
                 import uuid
                 ext = filename.rsplit('.', 1)[1].lower()

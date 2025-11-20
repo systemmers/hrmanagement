@@ -1,0 +1,16 @@
+{% macro render(status, display_text='', show_icon=True) %}
+{% set status_config = {
+    'active': {'text': '정상', 'icon': 'fa-check-circle'},
+    'warning': {'text': '주의', 'icon': 'fa-exclamation-triangle'},
+    'expired': {'text': '만료', 'icon': 'fa-times-circle'}
+} %}
+{% set config = status_config.get(status, status_config['active']) %}
+{% set text = display_text if display_text else config.text %}
+
+<span class="status-badge status-{{ status }}">
+    {% if show_icon %}
+    <i class="fas {{ config.icon }}"></i>
+    {% endif %}
+    {{ text }}
+</span>
+{% endmacro %}
