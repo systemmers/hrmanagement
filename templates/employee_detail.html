@@ -962,16 +962,27 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>{{ employee.hireDate }}</td>
-                                    <td><span class="badge badge-info">신규채용</span></td>
-                                    <td>-</td>
-                                    <td>{{ employee.department }}</td>
-                                    <td>-</td>
-                                    <td>{{ employee.position }}</td>
-                                    <td>-</td>
-                                    <td>신입사원</td>
-                                </tr>
+                                {% if promotion_list %}
+                                    {% for promo in promotion_list|sort(attribute='effective_date', reverse=True) %}
+                                    <tr>
+                                        <td>{{ promo.effective_date }}</td>
+                                        <td><span class="badge badge-{% if promo.promotion_type == '신규채용' %}info{% elif promo.promotion_type == '승진' %}success{% else %}secondary{% endif %}">{{ promo.promotion_type }}</span></td>
+                                        <td>{{ promo.from_department or '-' }}</td>
+                                        <td>{{ promo.to_department }}</td>
+                                        <td>{{ promo.from_position or '-' }}</td>
+                                        <td>{{ promo.to_position }}</td>
+                                        <td>{{ promo.job_role or '-' }}</td>
+                                        <td>{{ promo.reason or '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="8" class="table-empty">
+                                            <i class="fas fa-arrow-up"></i>
+                                            <p>등록된 인사이동 정보가 없습니다</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>
@@ -1002,12 +1013,27 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="8" class="table-empty">
-                                        <i class="fas fa-chart-line"></i>
-                                        <p>등록된 인사고과 정보가 없습니다</p>
-                                    </td>
-                                </tr>
+                                {% if evaluation_list %}
+                                    {% for eval in evaluation_list|sort(attribute='year', reverse=True) %}
+                                    <tr>
+                                        <td>{{ eval.year }}년</td>
+                                        <td>{% if eval.q1_grade %}<span class="badge badge-{% if eval.q1_grade in ['S', 'A'] %}success{% elif eval.q1_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q1_grade }}</span>{% else %}-{% endif %}</td>
+                                        <td>{% if eval.q2_grade %}<span class="badge badge-{% if eval.q2_grade in ['S', 'A'] %}success{% elif eval.q2_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q2_grade }}</span>{% else %}-{% endif %}</td>
+                                        <td>{% if eval.q3_grade %}<span class="badge badge-{% if eval.q3_grade in ['S', 'A'] %}success{% elif eval.q3_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q3_grade }}</span>{% else %}-{% endif %}</td>
+                                        <td>{% if eval.q4_grade %}<span class="badge badge-{% if eval.q4_grade in ['S', 'A'] %}success{% elif eval.q4_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q4_grade }}</span>{% else %}-{% endif %}</td>
+                                        <td>{% if eval.overall_grade %}<strong><span class="badge badge-{% if eval.overall_grade in ['S', 'A'] %}success{% elif eval.overall_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.overall_grade }}</span></strong>{% else %}-{% endif %}</td>
+                                        <td>{{ eval.salary_negotiation or '-' }}</td>
+                                        <td>{{ eval.note or '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="8" class="table-empty">
+                                            <i class="fas fa-chart-line"></i>
+                                            <p>등록된 인사고과 정보가 없습니다</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>
@@ -1036,12 +1062,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="6" class="table-empty">
-                                        <i class="fas fa-book"></i>
-                                        <p>등록된 교육훈련 정보가 없습니다</p>
-                                    </td>
-                                </tr>
+                                {% if training_list %}
+                                    {% for train in training_list|sort(attribute='training_date', reverse=True) %}
+                                    <tr>
+                                        <td>{{ train.training_date }}</td>
+                                        <td>{{ train.training_name }}</td>
+                                        <td>{{ train.institution }}</td>
+                                        <td>{{ train.hours }}시간</td>
+                                        <td><span class="badge badge-{% if train.completion_status == '이수' %}success{% else %}danger{% endif %}">{{ train.completion_status }}</span></td>
+                                        <td>{{ train.note or '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="table-empty">
+                                            <i class="fas fa-book"></i>
+                                            <p>등록된 교육훈련 정보가 없습니다</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>
@@ -1067,27 +1106,27 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <div class="info-label">출근일수</div>
-                            <div class="info-value empty">정보 없음</div>
+                            <div class="info-value{% if not attendance_summary or attendance_summary.total_work_days == 0 %} empty{% endif %}">{{ attendance_summary.total_work_days if attendance_summary and attendance_summary.total_work_days > 0 else '정보 없음' }}{% if attendance_summary and attendance_summary.total_work_days > 0 %}일{% endif %}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">결근일수</div>
-                            <div class="info-value">0일</div>
+                            <div class="info-value">{{ attendance_summary.total_absent_days if attendance_summary else 0 }}일</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">지각횟수</div>
-                            <div class="info-value">0회</div>
+                            <div class="info-value">{{ attendance_summary.total_late_count if attendance_summary else 0 }}회</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">조퇴횟수</div>
-                            <div class="info-value">0회</div>
+                            <div class="info-value">{{ attendance_summary.total_early_leave if attendance_summary else 0 }}회</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">연차사용</div>
-                            <div class="info-value">0일</div>
+                            <div class="info-value">{{ attendance_summary.total_annual_used if attendance_summary else 0 }}일</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">연차잔여</div>
-                            <div class="info-value highlight">15일</div>
+                            <div class="info-value highlight">{{ benefit.annual_leave_remaining if benefit else 15 }}일</div>
                         </div>
                     </div>
                 </div>

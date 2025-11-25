@@ -7,7 +7,8 @@ from models import (
     Employee, EmployeeRepository, ClassificationOptionsRepository,
     EducationRepository, CareerRepository, CertificateRepository,
     FamilyMemberRepository, LanguageRepository, MilitaryServiceRepository,
-    SalaryRepository, BenefitRepository, ContractRepository, SalaryHistoryRepository
+    SalaryRepository, BenefitRepository, ContractRepository, SalaryHistoryRepository,
+    PromotionRepository, EvaluationRepository, TrainingRepository, AttendanceRepository
 )
 import os
 
@@ -32,6 +33,12 @@ salary_repo = SalaryRepository(app.config['SALARIES_JSON'])
 benefit_repo = BenefitRepository(app.config['BENEFITS_JSON'])
 contract_repo = ContractRepository(app.config['CONTRACTS_JSON'])
 salary_history_repo = SalaryHistoryRepository(app.config['SALARY_HISTORY_JSON'])
+
+# Phase 3: 인사평가 기능 저장소 초기화
+promotion_repo = PromotionRepository(app.config['PROMOTIONS_JSON'])
+evaluation_repo = EvaluationRepository(app.config['EVALUATIONS_JSON'])
+training_repo = TrainingRepository(app.config['TRAININGS_JSON'])
+attendance_repo = AttendanceRepository(app.config['ATTENDANCE_JSON'])
 
 
 @app.route('/')
@@ -106,6 +113,12 @@ def employee_detail(employee_id):
     contract = contract_repo.get_by_employee_id(employee_id)
     salary_history_list = salary_history_repo.get_by_employee_id(employee_id)
 
+    # Phase 3: 인사평가 기능 데이터 조회
+    promotion_list = promotion_repo.get_by_employee_id(employee_id)
+    evaluation_list = evaluation_repo.get_by_employee_id(employee_id)
+    training_list = training_repo.get_by_employee_id(employee_id)
+    attendance_summary = attendance_repo.get_summary_by_employee(employee_id, 2025)
+
     return render_template('employee_detail.html',
                            employee=employee,
                            education_list=education_list,
@@ -117,7 +130,11 @@ def employee_detail(employee_id):
                            salary=salary,
                            benefit=benefit,
                            contract=contract,
-                           salary_history_list=salary_history_list)
+                           salary_history_list=salary_history_list,
+                           promotion_list=promotion_list,
+                           evaluation_list=evaluation_list,
+                           training_list=training_list,
+                           attendance_summary=attendance_summary)
 
 
 @app.route('/employees/new', methods=['GET'])

@@ -921,3 +921,203 @@ class ClassificationOptionsRepository:
             return True
         return False
 
+
+# ========================================
+# Phase 3: 인사평가 기능 모델 및 Repository
+# ========================================
+
+class Promotion:
+    """인사이동/승진 모델"""
+
+    def __init__(self, id: int, employee_id: int, effective_date: str,
+                 promotion_type: str, from_department: Optional[str],
+                 to_department: str, from_position: Optional[str],
+                 to_position: str, job_role: Optional[str] = None,
+                 reason: Optional[str] = None):
+        self.id = id
+        self.employee_id = employee_id
+        self.effective_date = effective_date
+        self.promotion_type = promotion_type
+        self.from_department = from_department
+        self.to_department = to_department
+        self.from_position = from_position
+        self.to_position = to_position
+        self.job_role = job_role
+        self.reason = reason
+
+    def to_dict(self) -> Dict:
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'effective_date': self.effective_date,
+            'promotion_type': self.promotion_type,
+            'from_department': self.from_department,
+            'to_department': self.to_department,
+            'from_position': self.from_position,
+            'to_position': self.to_position,
+            'job_role': self.job_role,
+            'reason': self.reason
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'Promotion':
+        return cls(**data)
+
+
+class Evaluation:
+    """인사고과 모델"""
+
+    def __init__(self, id: int, employee_id: int, year: int,
+                 q1_grade: Optional[str] = None, q2_grade: Optional[str] = None,
+                 q3_grade: Optional[str] = None, q4_grade: Optional[str] = None,
+                 overall_grade: Optional[str] = None,
+                 salary_negotiation: Optional[str] = None,
+                 note: Optional[str] = None):
+        self.id = id
+        self.employee_id = employee_id
+        self.year = year
+        self.q1_grade = q1_grade
+        self.q2_grade = q2_grade
+        self.q3_grade = q3_grade
+        self.q4_grade = q4_grade
+        self.overall_grade = overall_grade
+        self.salary_negotiation = salary_negotiation
+        self.note = note
+
+    def to_dict(self) -> Dict:
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'year': self.year,
+            'q1_grade': self.q1_grade,
+            'q2_grade': self.q2_grade,
+            'q3_grade': self.q3_grade,
+            'q4_grade': self.q4_grade,
+            'overall_grade': self.overall_grade,
+            'salary_negotiation': self.salary_negotiation,
+            'note': self.note
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'Evaluation':
+        return cls(**data)
+
+
+class Training:
+    """교육훈련 모델"""
+
+    def __init__(self, id: int, employee_id: int, training_date: str,
+                 training_name: str, institution: str, hours: int,
+                 completion_status: str, note: Optional[str] = None):
+        self.id = id
+        self.employee_id = employee_id
+        self.training_date = training_date
+        self.training_name = training_name
+        self.institution = institution
+        self.hours = hours
+        self.completion_status = completion_status
+        self.note = note
+
+    def to_dict(self) -> Dict:
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'training_date': self.training_date,
+            'training_name': self.training_name,
+            'institution': self.institution,
+            'hours': self.hours,
+            'completion_status': self.completion_status,
+            'note': self.note
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'Training':
+        return cls(**data)
+
+
+class Attendance:
+    """근태현황 모델"""
+
+    def __init__(self, id: int, employee_id: int, year: int, month: int,
+                 work_days: int, absent_days: int, late_count: int,
+                 early_leave_count: int, annual_leave_used: int):
+        self.id = id
+        self.employee_id = employee_id
+        self.year = year
+        self.month = month
+        self.work_days = work_days
+        self.absent_days = absent_days
+        self.late_count = late_count
+        self.early_leave_count = early_leave_count
+        self.annual_leave_used = annual_leave_used
+
+    def to_dict(self) -> Dict:
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'year': self.year,
+            'month': self.month,
+            'work_days': self.work_days,
+            'absent_days': self.absent_days,
+            'late_count': self.late_count,
+            'early_leave_count': self.early_leave_count,
+            'annual_leave_used': self.annual_leave_used
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'Attendance':
+        return cls(**data)
+
+
+class PromotionRepository(BaseRelationRepository):
+    """인사이동/승진 데이터 저장소"""
+
+    def __init__(self, json_file_path: str):
+        super().__init__(json_file_path, Promotion)
+
+
+class EvaluationRepository(BaseRelationRepository):
+    """인사고과 데이터 저장소"""
+
+    def __init__(self, json_file_path: str):
+        super().__init__(json_file_path, Evaluation)
+
+
+class TrainingRepository(BaseRelationRepository):
+    """교육훈련 데이터 저장소"""
+
+    def __init__(self, json_file_path: str):
+        super().__init__(json_file_path, Training)
+
+
+class AttendanceRepository(BaseRelationRepository):
+    """근태현황 데이터 저장소"""
+
+    def __init__(self, json_file_path: str):
+        super().__init__(json_file_path, Attendance)
+
+    def get_by_employee_year(self, employee_id: int, year: int) -> List[Attendance]:
+        """직원 ID와 연도로 근태 정보 조회"""
+        data = self._load_data()
+        return [self.model_class.from_dict(item) for item in data
+                if item.get('employee_id') == employee_id and item.get('year') == year]
+
+    def get_summary_by_employee(self, employee_id: int, year: int) -> Dict:
+        """직원의 연간 근태 요약"""
+        records = self.get_by_employee_year(employee_id, year)
+        if not records:
+            return {
+                'total_work_days': 0,
+                'total_absent_days': 0,
+                'total_late_count': 0,
+                'total_early_leave': 0,
+                'total_annual_used': 0
+            }
+        return {
+            'total_work_days': sum(r.work_days for r in records),
+            'total_absent_days': sum(r.absent_days for r in records),
+            'total_late_count': sum(r.late_count for r in records),
+            'total_early_leave': sum(r.early_leave_count for r in records),
+            'total_annual_used': sum(r.annual_leave_used for r in records)
+        }
+

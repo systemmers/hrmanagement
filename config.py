@@ -28,6 +28,12 @@ class Config:
     CONTRACTS_JSON = os.path.join(DATA_DIR, 'contracts.json')
     SALARY_HISTORY_JSON = os.path.join(DATA_DIR, 'salary_history.json')
 
+    # Phase 3: 인사평가 기능 데이터 파일 경로
+    PROMOTIONS_JSON = os.path.join(DATA_DIR, 'promotions.json')
+    EVALUATIONS_JSON = os.path.join(DATA_DIR, 'evaluations.json')
+    TRAININGS_JSON = os.path.join(DATA_DIR, 'trainings.json')
+    ATTENDANCE_JSON = os.path.join(DATA_DIR, 'attendance.json')
+
     # Flask 설정
     DEBUG = True
     TESTING = False
