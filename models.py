@@ -97,7 +97,8 @@ class Education:
     """학력 모델"""
 
     def __init__(self, id: int, employee_id: int, school: str, degree: str,
-                 major: str, graduation_year: str, graduation_status: str = None):
+                 major: str, graduation_year: str, graduation_status: str = None,
+                 gpa: Optional[str] = None, note: Optional[str] = None):
         self.id = id
         self.employee_id = employee_id
         self.school = school
@@ -105,6 +106,8 @@ class Education:
         self.major = major
         self.graduation_year = graduation_year
         self.graduation_status = graduation_status
+        self.gpa = gpa
+        self.note = note
 
     def to_dict(self) -> Dict:
         return {
@@ -114,7 +117,9 @@ class Education:
             'degree': self.degree,
             'major': self.major,
             'graduation_year': self.graduation_year,
-            'graduation_status': self.graduation_status
+            'graduation_status': self.graduation_status,
+            'gpa': self.gpa,
+            'note': self.note
         }
 
     @classmethod
@@ -126,7 +131,8 @@ class Career:
     """경력 모델"""
 
     def __init__(self, id: int, employee_id: int, company: str, position: str,
-                 duty: str, start_date: str, end_date: str, is_current: bool = False):
+                 duty: str, start_date: str, end_date: str, is_current: bool = False,
+                 department: Optional[str] = None, salary: Optional[int] = None):
         self.id = id
         self.employee_id = employee_id
         self.company = company
@@ -135,6 +141,8 @@ class Career:
         self.start_date = start_date
         self.end_date = end_date
         self.is_current = is_current
+        self.department = department
+        self.salary = salary
 
     def to_dict(self) -> Dict:
         return {
@@ -145,7 +153,9 @@ class Career:
             'duty': self.duty,
             'start_date': self.start_date,
             'end_date': self.end_date,
-            'is_current': self.is_current
+            'is_current': self.is_current,
+            'department': self.department,
+            'salary': self.salary
         }
 
     @classmethod
@@ -249,7 +259,8 @@ class MilitaryService:
     def __init__(self, id: int, employee_id: int, status: str,
                  branch: Optional[str] = None, rank: Optional[str] = None,
                  start_date: Optional[str] = None, end_date: Optional[str] = None,
-                 exemption_reason: Optional[str] = None):
+                 exemption_reason: Optional[str] = None,
+                 duty: Optional[str] = None, specialty: Optional[str] = None):
         self.id = id
         self.employee_id = employee_id
         self.status = status
@@ -258,6 +269,8 @@ class MilitaryService:
         self.start_date = start_date
         self.end_date = end_date
         self.exemption_reason = exemption_reason
+        self.duty = duty
+        self.specialty = specialty
 
     def to_dict(self) -> Dict:
         return {
@@ -268,7 +281,9 @@ class MilitaryService:
             'rank': self.rank,
             'start_date': self.start_date,
             'end_date': self.end_date,
-            'exemption_reason': self.exemption_reason
+            'exemption_reason': self.exemption_reason,
+            'duty': self.duty,
+            'specialty': self.specialty
         }
 
     @classmethod

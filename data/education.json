@@ -6,7 +6,9 @@
     "degree": "bachelor",
     "major": "컴퓨터공학",
     "graduation_year": "2010",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.8/4.3",
+    "note": null
   },
   {
     "id": 2,
@@ -15,7 +17,9 @@
     "degree": "master",
     "major": "소프트웨어공학",
     "graduation_year": "2012",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "4.0/4.3",
+    "note": "우수논문상 수상"
   },
   {
     "id": 3,
@@ -24,7 +28,9 @@
     "degree": "bachelor",
     "major": "시각디자인",
     "graduation_year": "2015",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.9/4.5",
+    "note": "졸업작품 최우수상"
   },
   {
     "id": 4,
@@ -33,7 +39,9 @@
     "degree": "bachelor",
     "major": "소프트웨어학과",
     "graduation_year": "2021",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.7/4.5",
+    "note": null
   },
   {
     "id": 5,
@@ -42,7 +50,9 @@
     "degree": "bachelor",
     "major": "경영학과",
     "graduation_year": "2006",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.6/4.3",
+    "note": null
   },
   {
     "id": 6,
@@ -51,7 +61,9 @@
     "degree": "master",
     "major": "경영학(MBA)",
     "graduation_year": "2010",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.9/4.3",
+    "note": "마케팅 전공"
   },
   {
     "id": 7,
@@ -60,7 +72,9 @@
     "degree": "bachelor",
     "major": "경영학과",
     "graduation_year": "2001",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.5/4.5",
+    "note": null
   },
   {
     "id": 8,
@@ -69,7 +83,9 @@
     "degree": "bachelor",
     "major": "컴퓨터공학과",
     "graduation_year": "2022",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "4.1/4.5",
+    "note": "총장 표창"
   },
   {
     "id": 9,
@@ -78,7 +94,9 @@
     "degree": "bachelor",
     "major": "디자인학부",
     "graduation_year": "2010",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.8/4.5",
+    "note": null
   },
   {
     "id": 10,
@@ -87,7 +105,9 @@
     "degree": "bachelor",
     "major": "미디어커뮤니케이션학과",
     "graduation_year": "2018",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.6/4.5",
+    "note": null
   },
   {
     "id": 11,
@@ -96,7 +116,9 @@
     "degree": "bachelor",
     "major": "컴퓨터공학과",
     "graduation_year": "2014",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.7/4.3",
+    "note": null
   },
   {
     "id": 12,
@@ -105,7 +127,9 @@
     "degree": "bachelor",
     "major": "경영학과",
     "graduation_year": "2005",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.8/4.5",
+    "note": null
   },
   {
     "id": 13,
@@ -114,7 +138,9 @@
     "degree": "master",
     "major": "인사조직",
     "graduation_year": "2009",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "4.0/4.3",
+    "note": "인사관리 전공"
   },
   {
     "id": 14,
@@ -123,7 +149,9 @@
     "degree": "bachelor",
     "major": "정보컴퓨터공학부",
     "graduation_year": "2023",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.9/4.5",
+    "note": null
   },
   {
     "id": 15,
@@ -132,7 +160,9 @@
     "degree": "bachelor",
     "major": "시각디자인학과",
     "graduation_year": "2020",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.7/4.5",
+    "note": null
   },
   {
     "id": 16,
@@ -141,7 +171,9 @@
     "degree": "bachelor",
     "major": "경영학과",
     "graduation_year": "2013",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.4/4.5",
+    "note": null
   },
   {
     "id": 17,
@@ -150,7 +182,9 @@
     "degree": "bachelor",
     "major": "미디어커뮤니케이션학과",
     "graduation_year": "2022",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.6/4.5",
+    "note": null
   },
   {
     "id": 18,
@@ -159,7 +193,9 @@
     "degree": "bachelor",
     "major": "컴퓨터공학과",
     "graduation_year": "2009",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.9/4.3",
+    "note": "성적우수 장학생"
   },
   {
     "id": 19,
@@ -168,7 +204,9 @@
     "degree": "master",
     "major": "인공지능",
     "graduation_year": "2011",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "4.1/4.3",
+    "note": "AI연구실"
   },
   {
     "id": 20,
@@ -177,7 +215,9 @@
     "degree": "bachelor",
     "major": "산업디자인학과",
     "graduation_year": "2016",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.8/4.5",
+    "note": null
   },
   {
     "id": 21,
@@ -186,7 +226,9 @@
     "degree": "bachelor",
     "major": "경영학과",
     "graduation_year": "2020",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.5/4.5",
+    "note": null
   },
   {
     "id": 22,
@@ -195,7 +237,9 @@
     "degree": "bachelor",
     "major": "광고홍보학과",
     "graduation_year": "2017",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.6/4.5",
+    "note": null
   },
   {
     "id": 23,
@@ -204,7 +248,9 @@
     "degree": "bachelor",
     "major": "컴퓨터공학과",
     "graduation_year": "2023",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.8/4.5",
+    "note": null
   },
   {
     "id": 24,
@@ -213,7 +259,9 @@
     "degree": "bachelor",
     "major": "회계학과",
     "graduation_year": "2015",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.9/4.5",
+    "note": "CPA 준비"
   },
   {
     "id": 25,
@@ -222,7 +270,9 @@
     "degree": "bachelor",
     "major": "커뮤니케이션디자인학과",
     "graduation_year": "2019",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.7/4.5",
+    "note": null
   },
   {
     "id": 26,
@@ -231,7 +281,9 @@
     "degree": "bachelor",
     "major": "경영학과",
     "graduation_year": "2011",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.6/4.5",
+    "note": null
   },
   {
     "id": 27,
@@ -240,7 +292,9 @@
     "degree": "bachelor",
     "major": "미디어커뮤니케이션학부",
     "graduation_year": "2022",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.5/4.5",
+    "note": null
   },
   {
     "id": 28,
@@ -249,7 +303,9 @@
     "degree": "bachelor",
     "major": "컴퓨터학부",
     "graduation_year": "2016",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.8/4.5",
+    "note": null
   },
   {
     "id": 29,
@@ -258,6 +314,8 @@
     "degree": "bachelor",
     "major": "경영학과",
     "graduation_year": "2021",
-    "graduation_status": "graduated"
+    "graduation_status": "graduated",
+    "gpa": "3.4/4.5",
+    "note": null
   }
 ]

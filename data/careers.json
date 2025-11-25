@@ -7,7 +7,9 @@
     "duty": "웹 애플리케이션 개발",
     "start_date": "2012-03",
     "end_date": "2016-02",
-    "is_current": false
+    "is_current": false,
+    "department": "개발1팀",
+    "salary": 45000000
   },
   {
     "id": 2,
@@ -17,7 +19,9 @@
     "duty": "프론트엔드 개발",
     "start_date": "2016-03",
     "end_date": "2020-02",
-    "is_current": false
+    "is_current": false,
+    "department": "FE플랫폼팀",
+    "salary": 65000000
   },
   {
     "id": 3,
@@ -27,7 +31,9 @@
     "duty": "UI/UX 디자인",
     "start_date": "2015-08",
     "end_date": "2021-04",
-    "is_current": false
+    "is_current": false,
+    "department": "디자인실",
+    "salary": 55000000
   },
   {
     "id": 4,
@@ -37,7 +43,9 @@
     "duty": "브랜드 마케팅",
     "start_date": "2010-03",
     "end_date": "2015-07",
-    "is_current": false
+    "is_current": false,
+    "department": "마케팅본부",
+    "salary": 50000000
   },
   {
     "id": 5,
@@ -47,7 +55,9 @@
     "duty": "디지털 마케팅 전략",
     "start_date": "2015-08",
     "end_date": "2019-07",
-    "is_current": false
+    "is_current": false,
+    "department": "마케팅전략팀",
+    "salary": 72000000
   },
   {
     "id": 6,
@@ -57,7 +67,9 @@
     "duty": "법인영업",
     "start_date": "2001-09",
     "end_date": "2008-02",
-    "is_current": false
+    "is_current": false,
+    "department": "영업1본부",
+    "salary": 42000000
   },
   {
     "id": 7,
@@ -67,7 +79,9 @@
     "duty": "B2B 영업",
     "start_date": "2008-03",
     "end_date": "2014-02",
-    "is_current": false
+    "is_current": false,
+    "department": "기업사업부",
+    "salary": 68000000
   },
   {
     "id": 8,
@@ -77,7 +91,9 @@
     "duty": "기업영업팀장",
     "start_date": "2014-03",
     "end_date": "2018-02",
-    "is_current": false
+    "is_current": false,
+    "department": "기업고객본부",
+    "salary": 85000000
   },
   {
     "id": 9,
@@ -87,7 +103,9 @@
     "duty": "그래픽 디자인",
     "start_date": "2010-09",
     "end_date": "2015-10",
-    "is_current": false
+    "is_current": false,
+    "department": "디자인센터",
+    "salary": 48000000
   },
   {
     "id": 10,
@@ -97,7 +115,9 @@
     "duty": "브랜드 디자인",
     "start_date": "2015-11",
     "end_date": "2020-10",
-    "is_current": false
+    "is_current": false,
+    "department": "브랜드디자인팀",
+    "salary": 65000000
   },
   {
     "id": 11,
@@ -107,7 +127,9 @@
     "duty": "서버 개발",
     "start_date": "2014-09",
     "end_date": "2018-08",
-    "is_current": false
+    "is_current": false,
+    "department": "서버개발팀",
+    "salary": 55000000
   },
   {
     "id": 12,
@@ -117,7 +139,9 @@
     "duty": "백엔드 시스템 개발",
     "start_date": "2018-09",
     "end_date": "2021-08",
-    "is_current": false
+    "is_current": false,
+    "department": "코어뱅킹팀",
+    "salary": 85000000
   },
   {
     "id": 13,
@@ -127,7 +151,9 @@
     "duty": "인사관리",
     "start_date": "2009-03",
     "end_date": "2014-03",
-    "is_current": false
+    "is_current": false,
+    "department": "인사팀",
+    "salary": 45000000
   },
   {
     "id": 14,
@@ -137,7 +163,9 @@
     "duty": "인사기획",
     "start_date": "2014-04",
     "end_date": "2019-03",
-    "is_current": false
+    "is_current": false,
+    "department": "인사기획팀",
+    "salary": 65000000
   },
   {
     "id": 15,
@@ -147,7 +175,9 @@
     "duty": "법인영업",
     "start_date": "2013-09",
     "end_date": "2017-02",
-    "is_current": false
+    "is_current": false,
+    "department": "법인영업부",
+    "salary": 42000000
   },
   {
     "id": 16,
@@ -157,7 +187,9 @@
     "duty": "기업보험 영업",
     "start_date": "2017-03",
     "end_date": "2021-02",
-    "is_current": false
+    "is_current": false,
+    "department": "기업영업팀",
+    "salary": 55000000
   },
   {
     "id": 17,
@@ -167,7 +199,9 @@
     "duty": "시스템 개발",
     "start_date": "2011-09",
     "end_date": "2015-06",
-    "is_current": false
+    "is_current": false,
+    "department": "SI사업부",
+    "salary": 50000000
   },
   {
     "id": 18,
@@ -177,7 +211,9 @@
     "duty": "결제 시스템 개발",
     "start_date": "2015-07",
     "end_date": "2020-06",
-    "is_current": false
+    "is_current": false,
+    "department": "결제플랫폼팀",
+    "salary": 90000000
   },
   {
     "id": 19,
@@ -187,7 +223,9 @@
     "duty": "게임 UI 디자인",
     "start_date": "2016-09",
     "end_date": "2019-11",
-    "is_current": false
+    "is_current": false,
+    "department": "UI디자인실",
+    "salary": 52000000
   },
   {
     "id": 20,
@@ -197,7 +235,9 @@
     "duty": "UI/UX 디자인",
     "start_date": "2019-12",
     "end_date": "2021-11",
-    "is_current": false
+    "is_current": false,
+    "department": "UX센터",
+    "salary": 68000000
   },
   {
     "id": 21,
@@ -207,7 +247,9 @@
     "duty": "광고기획",
     "start_date": "2017-09",
     "end_date": "2019-04",
-    "is_current": false
+    "is_current": false,
+    "department": "광고기획팀",
+    "salary": 45000000
   },
   {
     "id": 22,
@@ -217,7 +259,9 @@
     "duty": "브랜드 마케팅",
     "start_date": "2019-05",
     "end_date": "2021-04",
-    "is_current": false
+    "is_current": false,
+    "department": "브랜드전략팀",
+    "salary": 58000000
   },
   {
     "id": 23,
@@ -227,7 +271,9 @@
     "duty": "외부감사",
     "start_date": "2015-09",
     "end_date": "2019-08",
-    "is_current": false
+    "is_current": false,
+    "department": "감사본부",
+    "salary": 70000000
   },
   {
     "id": 24,
@@ -237,7 +283,9 @@
     "duty": "내부통제 컨설팅",
     "start_date": "2019-09",
     "end_date": "2021-10",
-    "is_current": false
+    "is_current": false,
+    "department": "컨설팅본부",
+    "salary": 85000000
   },
   {
     "id": 25,
@@ -247,7 +295,9 @@
     "duty": "매장영업",
     "start_date": "2011-09",
     "end_date": "2015-08",
-    "is_current": false
+    "is_current": false,
+    "department": "영업1팀",
+    "salary": 38000000
   },
   {
     "id": 26,
@@ -257,7 +307,9 @@
     "duty": "MD기획",
     "start_date": "2015-09",
     "end_date": "2020-08",
-    "is_current": false
+    "is_current": false,
+    "department": "MD기획팀",
+    "salary": 52000000
   },
   {
     "id": 27,
@@ -267,7 +319,9 @@
     "duty": "모바일 앱 개발",
     "start_date": "2016-09",
     "end_date": "2019-06",
-    "is_current": false
+    "is_current": false,
+    "department": "모바일개발팀",
+    "salary": 52000000
   },
   {
     "id": 28,
@@ -277,6 +331,8 @@
     "duty": "iOS 앱 개발",
     "start_date": "2019-07",
     "end_date": "2021-06",
-    "is_current": false
+    "is_current": false,
+    "department": "클라이언트팀",
+    "salary": 75000000
   }
 ]

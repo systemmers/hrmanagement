@@ -7,7 +7,9 @@
     "rank": "병장",
     "start_date": "2005-03-01",
     "end_date": "2007-03-01",
-    "exemption_reason": null
+    "exemption_reason": null,
+    "duty": "통신병",
+    "specialty": "통신"
   },
   {
     "id": 2,
@@ -17,7 +19,9 @@
     "rank": "병장",
     "start_date": "2016-02-22",
     "end_date": "2018-02-21",
-    "exemption_reason": null
+    "exemption_reason": null,
+    "duty": "정비병",
+    "specialty": "항공정비"
   },
   {
     "id": 3,
@@ -27,7 +31,9 @@
     "rank": "병장",
     "start_date": "1998-03-02",
     "end_date": "2000-05-01",
-    "exemption_reason": null
+    "exemption_reason": null,
+    "duty": "운전병",
+    "specialty": "수송"
   },
   {
     "id": 4,
@@ -37,7 +43,9 @@
     "rank": "상병",
     "start_date": "2007-06-01",
     "end_date": "2009-06-30",
-    "exemption_reason": null
+    "exemption_reason": null,
+    "duty": "갑판병",
+    "specialty": "함정"
   },
   {
     "id": 5,
@@ -47,7 +55,9 @@
     "rank": "병장",
     "start_date": "2011-07-04",
     "end_date": "2013-04-03",
-    "exemption_reason": null
+    "exemption_reason": null,
+    "duty": "전산병",
+    "specialty": "정보통신"
   },
   {
     "id": 6,
@@ -57,7 +67,9 @@
     "rank": "병장",
     "start_date": "2019-03-04",
     "end_date": "2020-12-03",
-    "exemption_reason": null
+    "exemption_reason": null,
+    "duty": "보병",
+    "specialty": "상륙"
   },
   {
     "id": 7,
@@ -67,7 +79,9 @@
     "rank": "병장",
     "start_date": "2010-01-04",
     "end_date": "2011-10-03",
-    "exemption_reason": null
+    "exemption_reason": null,
+    "duty": "행정병",
+    "specialty": "행정"
   },
   {
     "id": 8,
@@ -77,7 +91,9 @@
     "rank": "병장",
     "start_date": "2006-02-06",
     "end_date": "2008-02-05",
-    "exemption_reason": null
+    "exemption_reason": null,
+    "duty": "전산운용병",
+    "specialty": "정보체계"
   },
   {
     "id": 9,
@@ -87,7 +103,9 @@
     "rank": "이병",
     "start_date": "2018-08-20",
     "end_date": "2021-05-19",
-    "exemption_reason": null
+    "exemption_reason": null,
+    "duty": "사회복무요원",
+    "specialty": "행정지원"
   },
   {
     "id": 10,
@@ -97,7 +115,9 @@
     "rank": null,
     "start_date": null,
     "end_date": null,
-    "exemption_reason": "건강상 이유"
+    "exemption_reason": "건강상 이유",
+    "duty": null,
+    "specialty": null
   },
   {
     "id": 11,
@@ -107,7 +127,9 @@
     "rank": "병장",
     "start_date": "2015-06-01",
     "end_date": "2017-03-01",
-    "exemption_reason": null
+    "exemption_reason": null,
+    "duty": "포병",
+    "specialty": "포병"
   },
   {
     "id": 12,
@@ -117,7 +139,9 @@
     "rank": "병장",
     "start_date": "2018-01-08",
     "end_date": "2019-10-07",
-    "exemption_reason": null
+    "exemption_reason": null,
+    "duty": "통신병",
+    "specialty": "함정통신"
   },
   {
     "id": 13,
@@ -127,6 +151,8 @@
     "rank": "병장",
     "start_date": "2017-09-04",
     "end_date": "2019-06-03",
-    "exemption_reason": null
+    "exemption_reason": null,
+    "duty": "보병",
+    "specialty": "보병"
   }
 ]
