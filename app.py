@@ -8,7 +8,8 @@ from models import (
     EducationRepository, CareerRepository, CertificateRepository,
     FamilyMemberRepository, LanguageRepository, MilitaryServiceRepository,
     SalaryRepository, BenefitRepository, ContractRepository, SalaryHistoryRepository,
-    PromotionRepository, EvaluationRepository, TrainingRepository, AttendanceRepository
+    PromotionRepository, EvaluationRepository, TrainingRepository, AttendanceRepository,
+    InsuranceRepository, ProjectRepository, AwardRepository, AssetRepository
 )
 import os
 
@@ -39,6 +40,12 @@ promotion_repo = PromotionRepository(app.config['PROMOTIONS_JSON'])
 evaluation_repo = EvaluationRepository(app.config['EVALUATIONS_JSON'])
 training_repo = TrainingRepository(app.config['TRAININGS_JSON'])
 attendance_repo = AttendanceRepository(app.config['ATTENDANCE_JSON'])
+
+# Phase 4: 부가 기능 저장소 초기화
+insurance_repo = InsuranceRepository(app.config['INSURANCES_JSON'])
+project_repo = ProjectRepository(app.config['PROJECTS_JSON'])
+award_repo = AwardRepository(app.config['AWARDS_JSON'])
+asset_repo = AssetRepository(app.config['ASSETS_JSON'])
 
 
 @app.route('/')
@@ -119,6 +126,12 @@ def employee_detail(employee_id):
     training_list = training_repo.get_by_employee_id(employee_id)
     attendance_summary = attendance_repo.get_summary_by_employee(employee_id, 2025)
 
+    # Phase 4: 부가 기능 데이터 조회
+    insurance = insurance_repo.get_by_employee_id(employee_id)
+    project_list = project_repo.get_by_employee_id(employee_id)
+    award_list = award_repo.get_by_employee_id(employee_id)
+    asset_list = asset_repo.get_by_employee_id(employee_id)
+
     return render_template('employee_detail.html',
                            employee=employee,
                            education_list=education_list,
@@ -134,7 +147,11 @@ def employee_detail(employee_id):
                            promotion_list=promotion_list,
                            evaluation_list=evaluation_list,
                            training_list=training_list,
-                           attendance_summary=attendance_summary)
+                           attendance_summary=attendance_summary,
+                           insurance=insurance,
+                           project_list=project_list,
+                           award_list=award_list,
+                           asset_list=asset_list)
 
 
 @app.route('/employees/new', methods=['GET'])

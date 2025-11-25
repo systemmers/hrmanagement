@@ -458,23 +458,23 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <div class="info-label">4대보험</div>
-                            <div class="info-value"><span class="badge badge-success">가입</span></div>
+                            <div class="info-value">{% if insurance and (insurance.national_pension or insurance.health_insurance or insurance.employment_insurance or insurance.industrial_accident) %}<span class="badge badge-success">가입</span>{% else %}<span class="badge badge-secondary">미가입</span>{% endif %}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">건강보험</div>
-                            <div class="info-value"><span class="badge badge-success">가입</span></div>
+                            <div class="info-value">{% if insurance and insurance.health_insurance %}<span class="badge badge-success">가입</span>{% else %}<span class="badge badge-secondary">미가입</span>{% endif %}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">국민연금</div>
-                            <div class="info-value"><span class="badge badge-success">가입</span></div>
+                            <div class="info-value">{% if insurance and insurance.national_pension %}<span class="badge badge-success">가입</span>{% else %}<span class="badge badge-secondary">미가입</span>{% endif %}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">고용보험</div>
-                            <div class="info-value"><span class="badge badge-success">가입</span></div>
+                            <div class="info-value">{% if insurance and insurance.employment_insurance %}<span class="badge badge-success">가입</span>{% else %}<span class="badge badge-secondary">미가입</span>{% endif %}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">산재보험</div>
-                            <div class="info-value"><span class="badge badge-success">가입</span></div>
+                            <div class="info-value">{% if insurance and insurance.industrial_accident %}<span class="badge badge-success">가입</span>{% else %}<span class="badge badge-secondary">미가입</span>{% endif %}</div>
                         </div>
                     </div>
                 </div>
@@ -795,12 +795,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="6" class="table-empty">
-                                        <i class="fas fa-project-diagram"></i>
-                                        <p>등록된 프로젝트 정보가 없습니다</p>
-                                    </td>
-                                </tr>
+                                {% if project_list %}
+                                    {% for project in project_list %}
+                                    <tr>
+                                        <td>{{ project.project_name }}</td>
+                                        <td>{{ project.start_date }} ~ {{ project.end_date }}</td>
+                                        <td>{{ project.duration }}</td>
+                                        <td>{{ project.duty }}</td>
+                                        <td>{{ project.role }}</td>
+                                        <td>{{ project.client }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="table-empty">
+                                            <i class="fas fa-project-diagram"></i>
+                                            <p>등록된 프로젝트 정보가 없습니다</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>
@@ -827,12 +840,23 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="4" class="table-empty">
-                                        <i class="fas fa-trophy"></i>
-                                        <p>등록된 수상내역이 없습니다</p>
-                                    </td>
-                                </tr>
+                                {% if award_list %}
+                                    {% for award in award_list|sort(attribute='award_date', reverse=True) %}
+                                    <tr>
+                                        <td>{{ award.award_date }}</td>
+                                        <td>{{ award.award_name }}</td>
+                                        <td>{{ award.institution }}</td>
+                                        <td>{{ award.note or '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="table-empty">
+                                            <i class="fas fa-trophy"></i>
+                                            <p>등록된 수상내역이 없습니다</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>
@@ -1154,12 +1178,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="6" class="table-empty">
-                                        <i class="fas fa-laptop"></i>
-                                        <p>등록된 비품지급 정보가 없습니다</p>
-                                    </td>
-                                </tr>
+                                {% if asset_list %}
+                                    {% for asset in asset_list|sort(attribute='issue_date', reverse=True) %}
+                                    <tr>
+                                        <td>{{ asset.issue_date }}</td>
+                                        <td>{{ asset.item_name }}</td>
+                                        <td>{{ asset.model }}</td>
+                                        <td>{{ asset.serial_number }}</td>
+                                        <td><span class="badge badge-{% if asset.status == '사용중' %}success{% elif asset.status == '반납' %}secondary{% else %}danger{% endif %}">{{ asset.status }}</span></td>
+                                        <td>{{ asset.note or '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="table-empty">
+                                            <i class="fas fa-laptop"></i>
+                                            <p>등록된 비품지급 정보가 없습니다</p>
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>

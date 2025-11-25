@@ -1,0 +1,422 @@
+[
+  {
+    "id": 1,
+    "employee_id": 1,
+    "issue_date": "2020-03-15",
+    "item_name": "노트북",
+    "model": "MacBook Pro 14",
+    "serial_number": "UXD735266",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 2,
+    "employee_id": 1,
+    "issue_date": "2020-03-15",
+    "item_name": "마우스",
+    "model": "로지텍 MX Master 3",
+    "serial_number": "3YIR-9599",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 3,
+    "employee_id": 1,
+    "issue_date": "2020-03-22",
+    "item_name": "헤드셋",
+    "model": "Sony WH-1000XM4",
+    "serial_number": "757C-5047",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 4,
+    "employee_id": 2,
+    "issue_date": "2021-05-20",
+    "item_name": "노트북",
+    "model": "Dell XPS 15",
+    "serial_number": "HLQ550034",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 5,
+    "employee_id": 3,
+    "issue_date": "2022-01-10",
+    "item_name": "노트북",
+    "model": "ThinkPad X1 Carbon",
+    "serial_number": "KWR723678",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 6,
+    "employee_id": 4,
+    "issue_date": "2019-08-12",
+    "item_name": "노트북",
+    "model": "Dell XPS 15",
+    "serial_number": "NNF190457",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 7,
+    "employee_id": 5,
+    "issue_date": "2018-03-25",
+    "item_name": "노트북",
+    "model": "MacBook Pro 14",
+    "serial_number": "QJJ762793",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 8,
+    "employee_id": 5,
+    "issue_date": "2018-04-01",
+    "item_name": "모니터",
+    "model": "LG 27UK850 27인치",
+    "serial_number": "A4PI-5785",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 9,
+    "employee_id": 5,
+    "issue_date": "2018-03-25",
+    "item_name": "헤드셋",
+    "model": "Jabra Evolve2 75",
+    "serial_number": "FX93-7995",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 10,
+    "employee_id": 6,
+    "issue_date": "2023-02-14",
+    "item_name": "노트북",
+    "model": "Dell XPS 15",
+    "serial_number": "PFR315096",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 11,
+    "employee_id": 7,
+    "issue_date": "2020-11-30",
+    "item_name": "노트북",
+    "model": "MacBook Pro 16",
+    "serial_number": "AMJ428492",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 12,
+    "employee_id": 8,
+    "issue_date": "2022-07-18",
+    "item_name": "노트북",
+    "model": "ThinkPad X1 Carbon",
+    "serial_number": "TTZ167297",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 13,
+    "employee_id": 8,
+    "issue_date": "2022-08-02",
+    "item_name": "모니터",
+    "model": "삼성 C34F791 34인치",
+    "serial_number": "1NF4-2801",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 14,
+    "employee_id": 9,
+    "issue_date": "2021-09-05",
+    "item_name": "노트북",
+    "model": "Dell XPS 15",
+    "serial_number": "KSF964506",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 15,
+    "employee_id": 10,
+    "issue_date": "2019-04-22",
+    "item_name": "노트북",
+    "model": "LG gram 17",
+    "serial_number": "OQJ989329",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 16,
+    "employee_id": 10,
+    "issue_date": "2019-05-20",
+    "item_name": "마우스",
+    "model": "로지텍 MX Anywhere 3",
+    "serial_number": "W8UZ-7732",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 17,
+    "employee_id": 11,
+    "issue_date": "2023-06-01",
+    "item_name": "노트북",
+    "model": "ThinkPad X1 Carbon",
+    "serial_number": "CBU655312",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 18,
+    "employee_id": 11,
+    "issue_date": "2023-06-21",
+    "item_name": "헤드셋",
+    "model": "Jabra Evolve2 75",
+    "serial_number": "GAQS-2977",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 19,
+    "employee_id": 12,
+    "issue_date": "2022-10-15",
+    "item_name": "노트북",
+    "model": "LG gram 17",
+    "serial_number": "YDS874331",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 20,
+    "employee_id": 13,
+    "issue_date": "2021-03-08",
+    "item_name": "노트북",
+    "model": "MacBook Pro 14",
+    "serial_number": "IPI545224",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 21,
+    "employee_id": 14,
+    "issue_date": "2023-01-20",
+    "item_name": "노트북",
+    "model": "LG gram 17",
+    "serial_number": "BFW599644",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 22,
+    "employee_id": 14,
+    "issue_date": "2023-01-31",
+    "item_name": "모니터",
+    "model": "LG 27UK850 27인치",
+    "serial_number": "O6FE-2333",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 23,
+    "employee_id": 15,
+    "issue_date": "2020-07-12",
+    "item_name": "노트북",
+    "model": "MacBook Pro 14",
+    "serial_number": "WMW489299",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 24,
+    "employee_id": 15,
+    "issue_date": "2020-08-01",
+    "item_name": "모니터",
+    "model": "삼성 C34F791 34인치",
+    "serial_number": "H5G7-4430",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 25,
+    "employee_id": 15,
+    "issue_date": "2020-07-17",
+    "item_name": "키보드",
+    "model": "로지텍 MX Keys",
+    "serial_number": "WASF-6314",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 26,
+    "employee_id": 16,
+    "issue_date": "2021-12-03",
+    "item_name": "노트북",
+    "model": "Dell XPS 15",
+    "serial_number": "SJF324110",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 27,
+    "employee_id": 16,
+    "issue_date": "2021-12-23",
+    "item_name": "모니터",
+    "model": "Dell U2722D 27인치",
+    "serial_number": "B8C6-4252",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 28,
+    "employee_id": 17,
+    "issue_date": "2022-08-27",
+    "item_name": "노트북",
+    "model": "ThinkPad X1 Carbon",
+    "serial_number": "YOD715200",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 29,
+    "employee_id": 18,
+    "issue_date": "2021-05-16",
+    "item_name": "노트북",
+    "model": "ThinkPad X1 Carbon",
+    "serial_number": "QPJ821437",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 30,
+    "employee_id": 19,
+    "issue_date": "2023-03-09",
+    "item_name": "노트북",
+    "model": "MacBook Pro 14",
+    "serial_number": "RYO600508",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 31,
+    "employee_id": 19,
+    "issue_date": "2023-03-11",
+    "item_name": "헤드셋",
+    "model": "Bose 700",
+    "serial_number": "F5NP-3222",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 32,
+    "employee_id": 20,
+    "issue_date": "2021-11-24",
+    "item_name": "노트북",
+    "model": "ThinkPad X1 Carbon",
+    "serial_number": "LCM548336",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 33,
+    "employee_id": 20,
+    "issue_date": "2021-12-18",
+    "item_name": "모니터",
+    "model": "LG 27UK850 27인치",
+    "serial_number": "A2CS-9925",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 34,
+    "employee_id": 20,
+    "issue_date": "2021-12-08",
+    "item_name": "키보드",
+    "model": "Apple Magic Keyboard",
+    "serial_number": "IJB0-5868",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 35,
+    "employee_id": 21,
+    "issue_date": "2022-06-13",
+    "item_name": "노트북",
+    "model": "Dell XPS 15",
+    "serial_number": "WES199790",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 36,
+    "employee_id": 22,
+    "issue_date": "2020-09-18",
+    "item_name": "노트북",
+    "model": "MacBook Pro 14",
+    "serial_number": "NCI236744",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 37,
+    "employee_id": 23,
+    "issue_date": "2023-04-05",
+    "item_name": "노트북",
+    "model": "LG gram 17",
+    "serial_number": "EFA677039",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 38,
+    "employee_id": 23,
+    "issue_date": "2023-04-23",
+    "item_name": "모니터",
+    "model": "Dell U2722D 27인치",
+    "serial_number": "LUXI-5679",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 39,
+    "employee_id": 24,
+    "issue_date": "2021-07-28",
+    "item_name": "노트북",
+    "model": "ThinkPad X1 Carbon",
+    "serial_number": "DTC721244",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 40,
+    "employee_id": 24,
+    "issue_date": "2021-08-01",
+    "item_name": "사무용품",
+    "model": "모니터 암",
+    "serial_number": "HAU3-3175",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 41,
+    "employee_id": 25,
+    "issue_date": "2022-12-11",
+    "item_name": "노트북",
+    "model": "MacBook Pro 16",
+    "serial_number": "LWH522274",
+    "status": "사용중",
+    "note": null
+  },
+  {
+    "id": 42,
+    "employee_id": 25,
+    "issue_date": "2022-12-12",
+    "item_name": "모니터",
+    "model": "Dell U2722D 27인치",
+    "serial_number": "B2FG-4882",
+    "status": "사용중",
+    "note": null
+  }
+]

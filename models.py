@@ -1121,3 +1121,180 @@ class AttendanceRepository(BaseRelationRepository):
             'total_annual_used': sum(r.annual_leave_used for r in records)
         }
 
+
+
+# ========================================
+# Phase 4: 부가 기능 모델 및 Repository
+# ========================================
+
+class Insurance:
+    """4대보험 모델"""
+
+    def __init__(self, id: int, employee_id: int,
+                 national_pension: bool = True,
+                 health_insurance: bool = True,
+                 employment_insurance: bool = True,
+                 industrial_accident: bool = True,
+                 national_pension_rate: float = 4.5,
+                 health_insurance_rate: float = 3.545,
+                 long_term_care_rate: float = 0.9182,
+                 employment_insurance_rate: float = 0.9):
+        self.id = id
+        self.employee_id = employee_id
+        self.national_pension = national_pension
+        self.health_insurance = health_insurance
+        self.employment_insurance = employment_insurance
+        self.industrial_accident = industrial_accident
+        self.national_pension_rate = national_pension_rate
+        self.health_insurance_rate = health_insurance_rate
+        self.long_term_care_rate = long_term_care_rate
+        self.employment_insurance_rate = employment_insurance_rate
+
+    def to_dict(self) -> Dict:
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'national_pension': self.national_pension,
+            'health_insurance': self.health_insurance,
+            'employment_insurance': self.employment_insurance,
+            'industrial_accident': self.industrial_accident,
+            'national_pension_rate': self.national_pension_rate,
+            'health_insurance_rate': self.health_insurance_rate,
+            'long_term_care_rate': self.long_term_care_rate,
+            'employment_insurance_rate': self.employment_insurance_rate
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'Insurance':
+        return cls(**data)
+
+
+class Project:
+    """유사사업 참여경력 모델"""
+
+    def __init__(self, id: int, employee_id: int,
+                 project_name: str, start_date: str, end_date: str,
+                 duration: str, role: str, duty: str, client: str):
+        self.id = id
+        self.employee_id = employee_id
+        self.project_name = project_name
+        self.start_date = start_date
+        self.end_date = end_date
+        self.duration = duration
+        self.role = role
+        self.duty = duty
+        self.client = client
+
+    def to_dict(self) -> Dict:
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'project_name': self.project_name,
+            'start_date': self.start_date,
+            'end_date': self.end_date,
+            'duration': self.duration,
+            'role': self.role,
+            'duty': self.duty,
+            'client': self.client
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'Project':
+        return cls(**data)
+
+
+class Award:
+    """수상내역 모델"""
+
+    def __init__(self, id: int, employee_id: int,
+                 award_date: str, award_name: str,
+                 institution: str, note: Optional[str] = None):
+        self.id = id
+        self.employee_id = employee_id
+        self.award_date = award_date
+        self.award_name = award_name
+        self.institution = institution
+        self.note = note
+
+    def to_dict(self) -> Dict:
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'award_date': self.award_date,
+            'award_name': self.award_name,
+            'institution': self.institution,
+            'note': self.note
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'Award':
+        return cls(**data)
+
+
+class Asset:
+    """비품지급 모델"""
+
+    def __init__(self, id: int, employee_id: int,
+                 issue_date: str, item_name: str, model: str,
+                 serial_number: str, status: str,
+                 note: Optional[str] = None):
+        self.id = id
+        self.employee_id = employee_id
+        self.issue_date = issue_date
+        self.item_name = item_name
+        self.model = model
+        self.serial_number = serial_number
+        self.status = status
+        self.note = note
+
+    def to_dict(self) -> Dict:
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'issue_date': self.issue_date,
+            'item_name': self.item_name,
+            'model': self.model,
+            'serial_number': self.serial_number,
+            'status': self.status,
+            'note': self.note
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'Asset':
+        return cls(**data)
+
+
+class InsuranceRepository(BaseRelationRepository):
+    """4대보험 데이터 저장소"""
+
+    def __init__(self, json_file_path: str):
+        super().__init__(json_file_path, Insurance)
+
+    def get_by_employee_id(self, employee_id: int) -> Optional[Insurance]:
+        """직원 ID로 4대보험 정보 조회 (단일 객체 반환)"""
+        data = self._load_data()
+        for item in data:
+            if item.get('employee_id') == employee_id:
+                return self.model_class.from_dict(item)
+        return None
+
+
+class ProjectRepository(BaseRelationRepository):
+    """유사사업 참여경력 데이터 저장소"""
+
+    def __init__(self, json_file_path: str):
+        super().__init__(json_file_path, Project)
+
+
+class AwardRepository(BaseRelationRepository):
+    """수상내역 데이터 저장소"""
+
+    def __init__(self, json_file_path: str):
+        super().__init__(json_file_path, Award)
+
+
+class AssetRepository(BaseRelationRepository):
+    """비품지급 데이터 저장소"""
+
+    def __init__(self, json_file_path: str):
+        super().__init__(json_file_path, Asset)

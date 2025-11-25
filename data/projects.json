@@ -1,0 +1,178 @@
+[
+  {
+    "id": 1,
+    "employee_id": 1,
+    "project_name": "IoT 관제 시스템",
+    "start_date": "2018-01",
+    "end_date": "2018-09",
+    "duration": "9개월",
+    "role": "개발자",
+    "duty": "프로젝트 총괄",
+    "client": "한국전력공사"
+  },
+  {
+    "id": 2,
+    "employee_id": 1,
+    "project_name": "AI 챗봇 시스템 구축",
+    "start_date": "2018-01",
+    "end_date": "2019-01",
+    "duration": "13개월",
+    "role": "설계자",
+    "duty": "개발 리드",
+    "client": "KB국민은행"
+  },
+  {
+    "id": 3,
+    "employee_id": 1,
+    "project_name": "IoT 관제 시스템",
+    "start_date": "2019-02",
+    "end_date": "2020-05",
+    "duration": "16개월",
+    "role": "개발자",
+    "duty": "품질관리",
+    "client": "한국전력공사"
+  },
+  {
+    "id": 4,
+    "employee_id": 8,
+    "project_name": "ERP 시스템 고도화",
+    "start_date": "2022-03",
+    "end_date": "2023-02",
+    "duration": "12개월",
+    "role": "개발자",
+    "duty": "백엔드 개발",
+    "client": "LG전자"
+  },
+  {
+    "id": 5,
+    "employee_id": 8,
+    "project_name": "ERP 시스템 고도화",
+    "start_date": "2018-02",
+    "end_date": "2018-08",
+    "duration": "7개월",
+    "role": "아키텍트",
+    "duty": "프로젝트 총괄",
+    "client": "LG전자"
+  },
+  {
+    "id": 6,
+    "employee_id": 8,
+    "project_name": "공공데이터 포털 개선",
+    "start_date": "2022-01",
+    "end_date": "2022-11",
+    "duration": "11개월",
+    "role": "PL",
+    "duty": "시스템 설계",
+    "client": "행정안전부"
+  },
+  {
+    "id": 7,
+    "employee_id": 10,
+    "project_name": "공공데이터 포털 개선",
+    "start_date": "2018-03",
+    "end_date": "2019-07",
+    "duration": "17개월",
+    "role": "개발자",
+    "duty": "개발 리드",
+    "client": "행정안전부"
+  },
+  {
+    "id": 8,
+    "employee_id": 10,
+    "project_name": "AI 챗봇 시스템 구축",
+    "start_date": "2018-02",
+    "end_date": "2019-03",
+    "duration": "14개월",
+    "role": "아키텍트",
+    "duty": "프로젝트 총괄",
+    "client": "KB국민은행"
+  },
+  {
+    "id": 9,
+    "employee_id": 10,
+    "project_name": "스마트시티 플랫폼 구축",
+    "start_date": "2022-03",
+    "end_date": "2022-11",
+    "duration": "9개월",
+    "role": "PL",
+    "duty": "시스템 설계",
+    "client": "서울특별시"
+  },
+  {
+    "id": 10,
+    "employee_id": 15,
+    "project_name": "AI 챗봇 시스템 구축",
+    "start_date": "2019-06",
+    "end_date": "2020-10",
+    "duration": "17개월",
+    "role": "설계자",
+    "duty": "백엔드 개발",
+    "client": "KB국민은행"
+  },
+  {
+    "id": 11,
+    "employee_id": 16,
+    "project_name": "ERP 시스템 고도화",
+    "start_date": "2022-03",
+    "end_date": "2022-09",
+    "duration": "7개월",
+    "role": "PM",
+    "duty": "백엔드 개발",
+    "client": "LG전자"
+  },
+  {
+    "id": 12,
+    "employee_id": 16,
+    "project_name": "AI 챗봇 시스템 구축",
+    "start_date": "2023-05",
+    "end_date": "2024-05",
+    "duration": "13개월",
+    "role": "PL",
+    "duty": "품질관리",
+    "client": "KB국민은행"
+  },
+  {
+    "id": 13,
+    "employee_id": 17,
+    "project_name": "AI 챗봇 시스템 구축",
+    "start_date": "2021-06",
+    "end_date": "2022-03",
+    "duration": "10개월",
+    "role": "PM",
+    "duty": "백엔드 개발",
+    "client": "KB국민은행"
+  },
+  {
+    "id": 14,
+    "employee_id": 18,
+    "project_name": "클라우드 마이그레이션",
+    "start_date": "2020-03",
+    "end_date": "2021-07",
+    "duration": "17개월",
+    "role": "QA",
+    "duty": "품질관리",
+    "client": "삼성SDS"
+  },
+  {
+    "id": 15,
+    "employee_id": 20,
+    "project_name": "모바일 뱅킹 앱 개발",
+    "start_date": "2023-01",
+    "end_date": "2023-12",
+    "duration": "12개월",
+    "role": "QA",
+    "duty": "프론트엔드 개발",
+    "client": "신한은행"
+  },
+  {
+    "id": 16,
+    "employee_id": 20,
+    "project_name": "전자상거래 플랫폼",
+    "start_date": "2018-03",
+    "end_date": "2019-01",
+    "duration": "11개월",
+    "role": "설계자",
+    "duty": "백엔드 개발",
+    "client": "CJ대한통운"
+  }
+]

@@ -34,6 +34,12 @@ class Config:
     TRAININGS_JSON = os.path.join(DATA_DIR, 'trainings.json')
     ATTENDANCE_JSON = os.path.join(DATA_DIR, 'attendance.json')
 
+    # Phase 4: 부가 기능 데이터 파일 경로
+    INSURANCES_JSON = os.path.join(DATA_DIR, 'insurances.json')
+    PROJECTS_JSON = os.path.join(DATA_DIR, 'projects.json')
+    AWARDS_JSON = os.path.join(DATA_DIR, 'awards.json')
+    ASSETS_JSON = os.path.join(DATA_DIR, 'assets.json')
+
     # Flask 설정
     DEBUG = True
     TESTING = False
