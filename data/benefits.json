@@ -1,0 +1,252 @@
+[
+  {
+    "id": 1,
+    "employee_id": 1,
+    "year": 2025,
+    "annual_leave_granted": 15,
+    "annual_leave_used": 2,
+    "annual_leave_remaining": 13,
+    "severance_type": "DB형",
+    "severance_method": "퇴직연금"
+  },
+  {
+    "id": 2,
+    "employee_id": 2,
+    "year": 2025,
+    "annual_leave_granted": 20,
+    "annual_leave_used": 5,
+    "annual_leave_remaining": 15,
+    "severance_type": "DC형",
+    "severance_method": "퇴직금"
+  },
+  {
+    "id": 3,
+    "employee_id": 3,
+    "year": 2025,
+    "annual_leave_granted": 15,
+    "annual_leave_used": 4,
+    "annual_leave_remaining": 11,
+    "severance_type": "DC형",
+    "severance_method": "퇴직연금"
+  },
+  {
+    "id": 4,
+    "employee_id": 4,
+    "year": 2025,
+    "annual_leave_granted": 17,
+    "annual_leave_used": 7,
+    "annual_leave_remaining": 10,
+    "severance_type": "DB형",
+    "severance_method": "퇴직연금"
+  },
+  {
+    "id": 5,
+    "employee_id": 5,
+    "year": 2025,
+    "annual_leave_granted": 20,
+    "annual_leave_used": 9,
+    "annual_leave_remaining": 11,
+    "severance_type": "IRP",
+    "severance_method": "퇴직연금"
+  },
+  {
+    "id": 6,
+    "employee_id": 6,
+    "year": 2025,
+    "annual_leave_granted": 19,
+    "annual_leave_used": 3,
+    "annual_leave_remaining": 16,
+    "severance_type": "DC형",
+    "severance_method": "퇴직금"
+  },
+  {
+    "id": 7,
+    "employee_id": 7,
+    "year": 2025,
+    "annual_leave_granted": 16,
+    "annual_leave_used": 9,
+    "annual_leave_remaining": 7,
+    "severance_type": "IRP",
+    "severance_method": "퇴직연금"
+  },
+  {
+    "id": 8,
+    "employee_id": 8,
+    "year": 2025,
+    "annual_leave_granted": 19,
+    "annual_leave_used": 0,
+    "annual_leave_remaining": 19,
+    "severance_type": "DB형",
+    "severance_method": "퇴직연금"
+  },
+  {
+    "id": 9,
+    "employee_id": 9,
+    "year": 2025,
+    "annual_leave_granted": 12,
+    "annual_leave_used": 1,
+    "annual_leave_remaining": 11,
+    "severance_type": "DC형",
+    "severance_method": "퇴직금"
+  },
+  {
+    "id": 10,
+    "employee_id": 10,
+    "year": 2025,
+    "annual_leave_granted": 12,
+    "annual_leave_used": 0,
+    "annual_leave_remaining": 12,
+    "severance_type": "DB형",
+    "severance_method": "퇴직연금"
+  },
+  {
+    "id": 11,
+    "employee_id": 11,
+    "year": 2025,
+    "annual_leave_granted": 11,
+    "annual_leave_used": 0,
+    "annual_leave_remaining": 11,
+    "severance_type": "IRP",
+    "severance_method": "퇴직연금"
+  },
+  {
+    "id": 12,
+    "employee_id": 12,
+    "year": 2025,
+    "annual_leave_granted": 11,
+    "annual_leave_used": 9,
+    "annual_leave_remaining": 2,
+    "severance_type": "DB형",
+    "severance_method": "퇴직금"
+  },
+  {
+    "id": 13,
+    "employee_id": 13,
+    "year": 2025,
+    "annual_leave_granted": 14,
+    "annual_leave_used": 8,
+    "annual_leave_remaining": 6,
+    "severance_type": "IRP",
+    "severance_method": "퇴직금"
+  },
+  {
+    "id": 14,
+    "employee_id": 14,
+    "year": 2025,
+    "annual_leave_granted": 16,
+    "annual_leave_used": 2,
+    "annual_leave_remaining": 14,
+    "severance_type": "DC형",
+    "severance_method": "퇴직연금"
+  },
+  {
+    "id": 15,
+    "employee_id": 15,
+    "year": 2025,
+    "annual_leave_granted": 13,
+    "annual_leave_used": 2,
+    "annual_leave_remaining": 11,
+    "severance_type": "DC형",
+    "severance_method": "퇴직연금"
+  },
+  {
+    "id": 16,
+    "employee_id": 16,
+    "year": 2025,
+    "annual_leave_granted": 11,
+    "annual_leave_used": 9,
+    "annual_leave_remaining": 2,
+    "severance_type": "IRP",
+    "severance_method": "퇴직금"
+  },
+  {
+    "id": 17,
+    "employee_id": 17,
+    "year": 2025,
+    "annual_leave_granted": 17,
+    "annual_leave_used": 6,
+    "annual_leave_remaining": 11,
+    "severance_type": "DB형",
+    "severance_method": "퇴직금"
+  },
+  {
+    "id": 18,
+    "employee_id": 18,
+    "year": 2025,
+    "annual_leave_granted": 16,
+    "annual_leave_used": 4,
+    "annual_leave_remaining": 12,
+    "severance_type": "DC형",
+    "severance_method": "퇴직연금"
+  },
+  {
+    "id": 19,
+    "employee_id": 19,
+    "year": 2025,
+    "annual_leave_granted": 16,
+    "annual_leave_used": 4,
+    "annual_leave_remaining": 12,
+    "severance_type": "DB형",
+    "severance_method": "퇴직연금"
+  },
+  {
+    "id": 20,
+    "employee_id": 20,
+    "year": 2025,
+    "annual_leave_granted": 19,
+    "annual_leave_used": 10,
+    "annual_leave_remaining": 9,
+    "severance_type": "DB형",
+    "severance_method": "퇴직연금"
+  },
+  {
+    "id": 21,
+    "employee_id": 21,
+    "year": 2025,
+    "annual_leave_granted": 15,
+    "annual_leave_used": 1,
+    "annual_leave_remaining": 14,
+    "severance_type": "DB형",
+    "severance_method": "퇴직금"
+  },
+  {
+    "id": 22,
+    "employee_id": 22,
+    "year": 2025,
+    "annual_leave_granted": 18,
+    "annual_leave_used": 5,
+    "annual_leave_remaining": 13,
+    "severance_type": "IRP",
+    "severance_method": "퇴직금"
+  },
+  {
+    "id": 23,
+    "employee_id": 23,
+    "year": 2025,
+    "annual_leave_granted": 16,
+    "annual_leave_used": 5,
+    "annual_leave_remaining": 11,
+    "severance_type": "DC형",
+    "severance_method": "퇴직금"
+  },
+  {
+    "id": 24,
+    "employee_id": 24,
+    "year": 2025,
+    "annual_leave_granted": 20,
+    "annual_leave_used": 3,
+    "annual_leave_remaining": 17,
+    "severance_type": "DC형",
+    "severance_method": "퇴직연금"
+  },
+  {
+    "id": 25,
+    "employee_id": 25,
+    "year": 2025,
+    "annual_leave_granted": 16,
+    "annual_leave_used": 3,
+    "annual_leave_remaining": 13,
+    "severance_type": "DC형",
+    "severance_method": "퇴직금"
+  }
+]

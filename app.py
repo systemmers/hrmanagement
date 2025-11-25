@@ -6,7 +6,8 @@ from config import config
 from models import (
     Employee, EmployeeRepository, ClassificationOptionsRepository,
     EducationRepository, CareerRepository, CertificateRepository,
-    FamilyMemberRepository, LanguageRepository, MilitaryServiceRepository
+    FamilyMemberRepository, LanguageRepository, MilitaryServiceRepository,
+    SalaryRepository, BenefitRepository, ContractRepository, SalaryHistoryRepository
 )
 import os
 
@@ -25,6 +26,12 @@ certificate_repo = CertificateRepository(app.config['CERTIFICATES_JSON'])
 family_repo = FamilyMemberRepository(app.config['FAMILY_MEMBERS_JSON'])
 language_repo = LanguageRepository(app.config['LANGUAGES_JSON'])
 military_repo = MilitaryServiceRepository(app.config['MILITARY_JSON'])
+
+# Phase 2: 핵심 기능 저장소 초기화
+salary_repo = SalaryRepository(app.config['SALARIES_JSON'])
+benefit_repo = BenefitRepository(app.config['BENEFITS_JSON'])
+contract_repo = ContractRepository(app.config['CONTRACTS_JSON'])
+salary_history_repo = SalaryHistoryRepository(app.config['SALARY_HISTORY_JSON'])
 
 
 @app.route('/')
@@ -93,6 +100,12 @@ def employee_detail(employee_id):
     language_list = language_repo.get_by_employee_id(employee_id)
     military = military_repo.get_by_employee_id(employee_id)
 
+    # Phase 2: 핵심 기능 데이터 조회
+    salary = salary_repo.get_by_employee_id(employee_id)
+    benefit = benefit_repo.get_by_employee_id(employee_id)
+    contract = contract_repo.get_by_employee_id(employee_id)
+    salary_history_list = salary_history_repo.get_by_employee_id(employee_id)
+
     return render_template('employee_detail.html',
                            employee=employee,
                            education_list=education_list,
@@ -100,7 +113,11 @@ def employee_detail(employee_id):
                            certificate_list=certificate_list,
                            family_list=family_list,
                            language_list=language_list,
-                           military=military)
+                           military=military,
+                           salary=salary,
+                           benefit=benefit,
+                           contract=contract,
+                           salary_history_list=salary_history_list)
 
 
 @app.route('/employees/new', methods=['GET'])

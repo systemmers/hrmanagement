@@ -307,23 +307,27 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <div class="info-label">계약형태</div>
-                            <div class="info-value">{{ get_employment_type_label(employee.employment_type) }}</div>
+                            <div class="info-value{% if not contract %} empty{% endif %}">{{ contract.contract_type if contract else (get_employment_type_label(employee.employment_type) if employee.employment_type else '정보 없음') }}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">계약기간</div>
-                            <div class="info-value{% if not employee.contract_period %} empty{% endif %}">{{ employee.contract_period or '무기한' }}</div>
+                            <div class="info-value{% if not contract and not employee.contract_period %} empty{% endif %}">{{ contract.contract_period if contract else (employee.contract_period or '무기한') }}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">계약시작일</div>
-                            <div class="info-value">{{ employee.hireDate }}</div>
+                            <div class="info-value">{{ contract.contract_date if contract else employee.hireDate }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">직원유형</div>
+                            <div class="info-value{% if not contract %} empty{% endif %}">{{ contract.employee_type if contract else '정보 없음' }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">근무형태</div>
+                            <div class="info-value{% if not contract %} empty{% endif %}">{{ contract.work_type if contract else '정보 없음' }}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">시용기간 종료</div>
                             <div class="info-value{% if not employee.probation_end %} empty{% endif %}">{{ employee.probation_end or '정보 없음' }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">근로시간</div>
-                            <div class="info-value">주 40시간</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">근무시간</div>
@@ -360,39 +364,39 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <div class="info-label">급여형태</div>
-                            <div class="info-value">월급제</div>
+                            <div class="info-value{% if not salary %} empty{% endif %}">{{ salary.salary_type if salary else '정보 없음' }}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">기본급</div>
-                            <div class="info-value empty">정보 없음</div>
+                            <div class="info-value{% if not salary %} empty{% endif %}">{{ '{:,}'.format(salary.base_salary) if salary else '정보 없음' }}{% if salary %}원{% endif %}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">직책수당</div>
-                            <div class="info-value empty">정보 없음</div>
+                            <div class="info-value{% if not salary %} empty{% endif %}">{{ '{:,}'.format(salary.position_allowance) if salary else '정보 없음' }}{% if salary %}원{% endif %}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">식대</div>
-                            <div class="info-value empty">정보 없음</div>
+                            <div class="info-value{% if not salary %} empty{% endif %}">{{ '{:,}'.format(salary.meal_allowance) if salary else '정보 없음' }}{% if salary %}원{% endif %}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">교통비</div>
-                            <div class="info-value empty">정보 없음</div>
+                            <div class="info-value{% if not salary %} empty{% endif %}">{{ '{:,}'.format(salary.transportation_allowance) if salary else '정보 없음' }}{% if salary %}원{% endif %}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">총 급여</div>
-                            <div class="info-value empty">정보 없음</div>
+                            <div class="info-value{% if not salary %} empty{% endif %}">{{ '{:,}'.format(salary.total_salary) if salary else '정보 없음' }}{% if salary %}원{% endif %}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">급여지급일</div>
-                            <div class="info-value">매월 25일</div>
+                            <div class="info-value{% if not salary %} empty{% endif %}">{{ '매월 ' ~ salary.payment_day ~ '일' if salary else '정보 없음' }}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">급여지급방법</div>
-                            <div class="info-value">계좌이체</div>
+                            <div class="info-value{% if not salary %} empty{% endif %}">{{ salary.payment_method if salary else '정보 없음' }}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">급여계좌</div>
-                            <div class="info-value empty">정보 없음</div>
+                            <div class="info-value{% if not salary %} empty{% endif %}">{{ salary.bank_account if salary else '정보 없음' }}</div>
                         </div>
                     </div>
                 </div>
@@ -408,30 +412,30 @@
                 <div class="card-header">
                     <h3 class="card-title">
                         <i class="fas fa-umbrella-beach"></i>
-                        연차 및 복리후생
+                        연차 및 복리후생 {% if benefit %}({{ benefit.year }}년){% endif %}
                     </h3>
                 </div>
                 <div class="card-body">
                     <div class="info-grid">
                         <div class="info-item">
                             <div class="info-label">연차 발생일수</div>
-                            <div class="info-value">15일</div>
+                            <div class="info-value{% if not benefit %} empty{% endif %}">{{ (benefit.annual_leave_granted|string ~ '일') if benefit else '정보 없음' }}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">연차 사용일수</div>
-                            <div class="info-value">0일</div>
+                            <div class="info-value{% if not benefit %} empty{% endif %}">{{ (benefit.annual_leave_used|string ~ '일') if benefit else '정보 없음' }}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">연차 잔여일수</div>
-                            <div class="info-value highlight">15일</div>
+                            <div class="info-value{% if not benefit %} empty{% else %} highlight{% endif %}">{{ (benefit.annual_leave_remaining|string ~ '일') if benefit else '정보 없음' }}</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">퇴직금</div>
-                            <div class="info-value">적용</div>
+                            <div class="info-label">퇴직금 유형</div>
+                            <div class="info-value{% if not benefit %} empty{% endif %}">{{ benefit.severance_type if benefit else '정보 없음' }}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">퇴직금 적립방법</div>
-                            <div class="info-value">사내적립</div>
+                            <div class="info-value{% if not benefit %} empty{% endif %}">{{ benefit.severance_method if benefit else '정보 없음' }}</div>
                         </div>
                     </div>
                 </div>
@@ -900,16 +904,27 @@
                                     <th>상여금</th>
                                     <th>총액</th>
                                     <th>계약기간</th>
-                                    <th>비고</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                {% if salary_history_list %}
+                                    {% for history in salary_history_list|sort(attribute='contract_year', reverse=True) %}
+                                    <tr>
+                                        <td>{{ history.contract_year }}년</td>
+                                        <td>{{ '{:,}'.format(history.annual_salary) }}원</td>
+                                        <td>{{ '{:,}'.format(history.bonus) }}원</td>
+                                        <td><strong>{{ '{:,}'.format(history.total_amount) }}원</strong></td>
+                                        <td>{{ history.contract_period }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
                                 <tr>
-                                    <td colspan="6" class="table-empty">
+                                    <td colspan="5" class="table-empty">
                                         <i class="fas fa-coins"></i>
                                         <p>등록된 연봉계약 정보가 없습니다</p>
                                     </td>
                                 </tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>

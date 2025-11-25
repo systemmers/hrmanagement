@@ -291,6 +291,138 @@ class MilitaryService:
         return cls(**data)
 
 
+class Salary:
+    """급여 정보 모델"""
+
+    def __init__(self, id: int, employee_id: int, salary_type: str,
+                 base_salary: int, position_allowance: int, meal_allowance: int,
+                 transportation_allowance: int, total_salary: int,
+                 payment_day: int, payment_method: str, bank_account: str):
+        self.id = id
+        self.employee_id = employee_id
+        self.salary_type = salary_type
+        self.base_salary = base_salary
+        self.position_allowance = position_allowance
+        self.meal_allowance = meal_allowance
+        self.transportation_allowance = transportation_allowance
+        self.total_salary = total_salary
+        self.payment_day = payment_day
+        self.payment_method = payment_method
+        self.bank_account = bank_account
+
+    def to_dict(self) -> Dict:
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'salary_type': self.salary_type,
+            'base_salary': self.base_salary,
+            'position_allowance': self.position_allowance,
+            'meal_allowance': self.meal_allowance,
+            'transportation_allowance': self.transportation_allowance,
+            'total_salary': self.total_salary,
+            'payment_day': self.payment_day,
+            'payment_method': self.payment_method,
+            'bank_account': self.bank_account
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'Salary':
+        return cls(**data)
+
+
+class Benefit:
+    """복리후생/연차 정보 모델"""
+
+    def __init__(self, id: int, employee_id: int, year: int,
+                 annual_leave_granted: int, annual_leave_used: int,
+                 annual_leave_remaining: int, severance_type: str,
+                 severance_method: str):
+        self.id = id
+        self.employee_id = employee_id
+        self.year = year
+        self.annual_leave_granted = annual_leave_granted
+        self.annual_leave_used = annual_leave_used
+        self.annual_leave_remaining = annual_leave_remaining
+        self.severance_type = severance_type
+        self.severance_method = severance_method
+
+    def to_dict(self) -> Dict:
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'year': self.year,
+            'annual_leave_granted': self.annual_leave_granted,
+            'annual_leave_used': self.annual_leave_used,
+            'annual_leave_remaining': self.annual_leave_remaining,
+            'severance_type': self.severance_type,
+            'severance_method': self.severance_method
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'Benefit':
+        return cls(**data)
+
+
+class Contract:
+    """근로계약 정보 모델"""
+
+    def __init__(self, id: int, employee_id: int, contract_date: str,
+                 contract_type: str, contract_period: str,
+                 employee_type: str, work_type: str):
+        self.id = id
+        self.employee_id = employee_id
+        self.contract_date = contract_date
+        self.contract_type = contract_type
+        self.contract_period = contract_period
+        self.employee_type = employee_type
+        self.work_type = work_type
+
+    def to_dict(self) -> Dict:
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'contract_date': self.contract_date,
+            'contract_type': self.contract_type,
+            'contract_period': self.contract_period,
+            'employee_type': self.employee_type,
+            'work_type': self.work_type
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'Contract':
+        return cls(**data)
+
+
+class SalaryHistory:
+    """연봉계약 이력 모델"""
+
+    def __init__(self, id: int, employee_id: int, contract_year: int,
+                 annual_salary: int, bonus: int, total_amount: int,
+                 contract_period: str):
+        self.id = id
+        self.employee_id = employee_id
+        self.contract_year = contract_year
+        self.annual_salary = annual_salary
+        self.bonus = bonus
+        self.total_amount = total_amount
+        self.contract_period = contract_period
+
+    def to_dict(self) -> Dict:
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'contract_year': self.contract_year,
+            'annual_salary': self.annual_salary,
+            'bonus': self.bonus,
+            'total_amount': self.total_amount,
+            'contract_period': self.contract_period
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'SalaryHistory':
+        return cls(**data)
+
+
 class EmployeeRepository:
     """직원 데이터 저장소 (JSON 파일 기반)"""
     
@@ -574,6 +706,58 @@ class MilitaryServiceRepository(BaseRelationRepository):
             if item.get('employee_id') == employee_id:
                 return self.model_class.from_dict(item)
         return None
+
+
+class SalaryRepository(BaseRelationRepository):
+    """급여 정보 데이터 저장소"""
+
+    def __init__(self, json_file_path: str):
+        super().__init__(json_file_path, Salary)
+
+    def get_by_employee_id(self, employee_id: int) -> Optional[Salary]:
+        """직원 ID로 급여 정보 조회 (단일 객체 반환)"""
+        data = self._load_data()
+        for item in data:
+            if item.get('employee_id') == employee_id:
+                return self.model_class.from_dict(item)
+        return None
+
+
+class BenefitRepository(BaseRelationRepository):
+    """복리후생/연차 데이터 저장소"""
+
+    def __init__(self, json_file_path: str):
+        super().__init__(json_file_path, Benefit)
+
+    def get_by_employee_id(self, employee_id: int) -> Optional[Benefit]:
+        """직원 ID로 복리후생 정보 조회 (단일 객체 반환)"""
+        data = self._load_data()
+        for item in data:
+            if item.get('employee_id') == employee_id:
+                return self.model_class.from_dict(item)
+        return None
+
+
+class ContractRepository(BaseRelationRepository):
+    """근로계약 데이터 저장소"""
+
+    def __init__(self, json_file_path: str):
+        super().__init__(json_file_path, Contract)
+
+    def get_by_employee_id(self, employee_id: int) -> Optional[Contract]:
+        """직원 ID로 근로계약 정보 조회 (단일 객체 반환)"""
+        data = self._load_data()
+        for item in data:
+            if item.get('employee_id') == employee_id:
+                return self.model_class.from_dict(item)
+        return None
+
+
+class SalaryHistoryRepository(BaseRelationRepository):
+    """연봉계약 이력 데이터 저장소"""
+
+    def __init__(self, json_file_path: str):
+        super().__init__(json_file_path, SalaryHistory)
 
 
 class ClassificationOptionsRepository:

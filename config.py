@@ -21,7 +21,13 @@ class Config:
     FAMILY_MEMBERS_JSON = os.path.join(DATA_DIR, 'family_members.json')
     LANGUAGES_JSON = os.path.join(DATA_DIR, 'languages.json')
     MILITARY_JSON = os.path.join(DATA_DIR, 'military.json')
-    
+
+    # Phase 2: 핵심 기능 데이터 파일 경로
+    SALARIES_JSON = os.path.join(DATA_DIR, 'salaries.json')
+    BENEFITS_JSON = os.path.join(DATA_DIR, 'benefits.json')
+    CONTRACTS_JSON = os.path.join(DATA_DIR, 'contracts.json')
+    SALARY_HISTORY_JSON = os.path.join(DATA_DIR, 'salary_history.json')
+
     # Flask 설정
     DEBUG = True
     TESTING = False
