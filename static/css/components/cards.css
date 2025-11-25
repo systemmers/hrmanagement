@@ -1,0 +1,175 @@
+/* ========================================
+   카드 컴포넌트 스타일
+   - 인사카드 정보 카드
+   ======================================== */
+
+.card {
+    background: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-gray-200);
+    margin-bottom: var(--space-6);
+    overflow: hidden;
+    transition: box-shadow var(--transition-normal);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.card-header {
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--color-gray-200);
+    background: var(--color-gray-25);
+}
+
+.card-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-gray-900);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.card-title i {
+    color: #2563eb;
+}
+
+.card-body {
+    padding: var(--space-6);
+}
+
+/* 콘텐츠 섹션 */
+.content-section {
+    margin-bottom: var(--space-8);
+    scroll-margin-top: 80px;
+}
+
+.section-title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-gray-900);
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-3);
+    border-bottom: 2px solid var(--color-gray-200);
+}
+
+/* 정보 그리드 */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-5);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.info-label {
+    font-size: var(--text-sm);
+    color: var(--color-gray-600);
+    font-weight: 500;
+}
+
+.info-value {
+    font-size: var(--text-base);
+    color: var(--color-gray-900);
+    font-weight: 400;
+}
+
+.info-value.highlight {
+    color: #2563eb;
+    font-weight: 600;
+}
+
+.info-value.empty {
+    color: var(--color-gray-400);
+    font-style: italic;
+}
+
+/* 플레이스홀더 카드 */
+.placeholder-card .card-body {
+    padding: var(--space-8);
+}
+
+.placeholder-content {
+    text-align: center;
+    color: var(--color-gray-500);
+}
+
+.placeholder-content i {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-3);
+    opacity: 0.5;
+}
+
+.placeholder-content p {
+    font-size: var(--text-base);
+    margin-bottom: var(--space-1);
+}
+
+.placeholder-content small {
+    font-size: var(--text-sm);
+    color: var(--color-gray-400);
+}
+
+/* 섹션 그리드 */
+.section-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--space-6);
+}
+
+/* 배지 */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-gray {
+    background: var(--color-gray-200);
+    color: var(--color-gray-700);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .card-body {
+        padding: var(--space-4);
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-grid {
+        grid-template-columns: 1fr;
+    }
+}

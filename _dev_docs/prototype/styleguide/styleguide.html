@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAL London College of Fashion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5a97f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .screen {
+            width: 100%;
+            max-width: 1400px;
+            aspect-ratio: 16 / 9;
+            border: 2px solid #1a1a1a;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4a2c5a 0%, #8b4a6b 30%, #d67a4a 70%, #f5a97f 100%);
+            background-size: 200% 200%;
+            position: relative;
+            overflow: hidden;
+            padding: 40px;
+            display: flex;
+            justify-content: space-between;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 텍스처 효과 */
+        .screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.03) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.03) 4px);
+            pointer-events: none;
+        }
+
+        .left-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 1;
+        }
+
+        .logo-section {
+            color: white;
+        }
+
+        .logo-main {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .logo-sub {
+            font-size: 14px;
+            font-weight: 300;
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+
+        .bottom-left {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .smc-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+        }
+
+        .smc-text {
+            font-size: 48px;
+            font-weight: 700;
+        }
+
+        .icon-sun {
+            width: 24px;
+            height: 24px;
+            border: 2px solid white;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .icon-sun::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .time-section {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            color: white;
+            font-size: 14px;
+            font-weight: 300;
+            margin-left: 36px;
+        }
+
+        .time-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .time-separator {
+            opacity: 0.6;
+        }
+
+        .realtime-text {
+            font-size: 48px;
+            font-weight: 700;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .right-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 400px;
+            z-index: 1;
+        }
+
+        .widget {
+            background: rgba(20, 20, 20, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            color: white;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .widget-title {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .widget-arrow {
+            width: 20px;
+            height: 20px;
+            border-right: 2px solid white;
+            border-top: 2px solid white;
+            transform: rotate(45deg);
+        }
+
+        .widget-icon {
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+        }
+
+        .widget-content {
+            font-size: 14px;
+        }
+
+        .widget-label {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .widget-main-text {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .widget-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .widget-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 40%;
+            background: #f5a97f;
+            border-radius: 1px;
+        }
+
+        .progress-label {
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .widget-footer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .widget-footer-text {
+            font-size: 11px;
+            flex: 1;
+        }
+
+        .widget-date {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .widget-time {
+            font-size: 14px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="screen">
+        <div class="left-section">
+            <div class="logo-section">
+                <div class="logo-main">ual:</div>
+                <div class="logo-sub">london college<br>of fashion</div>
+            </div>
+
+            <div class="bottom-left">
+                <div class="smc-section">
+                    <div class="smc-text">SMC</div>
+                    <div class="icon-sun"></div>
+                </div>
+                <div class="time-section">
+                    <div class="time-item">06:29 <span class="time-separator">•</span> BST</div>
+                    <div class="time-item">01:43 EDT</div>
+                    <div class="time-item">18:02 CST</div>
+                </div>
+                <div class="realtime-text">REAL:TIME</div>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <!-- INFO Widget -->
+            <div class="widget">
+                <div class="widget-header">
+                    <div class="widget-title">INFO</div>
+                    <div class="widget-arrow"></div>
+                    <div class="widget-icon"></div>
+                </div>
+            </div>
+
+            <!-- CONCEPT LAB Widget -->
+            <div class="widget">
+                <div class="widget-header">
+                    <div class="widget-title">CONCEPT LAB</div>
+                    <div class="widget-arrow"></div>
+                    <div class="widget-icon"></div>
+                </div>
+                <div class="widget-content">
+                    <div class="widget-label">Current</div>
+                    <div class="widget-row">
+                        <div class="widget-main-text">FUTURE DIRECTIONS</div>
+                        <div class="widget-date">6 Projects</div>
+                    </div>
+                </div>
+                <div class="widget-footer">
+                    <div class="icon-sun"></div>
+                </div>
+            </div>
+
+            <!-- SCREENING ROOM Widget -->
+            <div class="widget">
+                <div class="widget-header">
+                    <div class="widget-title">SCREENING ROOM</div>
+                    <div class="widget-arrow"></div>
+                    <div class="widget-icon"></div>
+                </div>
+                <div class="widget-content">
+                    <div class="widget-label">Current</div>
+                    <div class="widget-row">
+                        <div class="widget-main-text">LCF X AGENCY ELEVEN</div>
+                        <div class="widget-date">04:22/06:13</div>
+                    </div>
+                </div>
+                <div class="widget-progress">
+                    <div class="icon-sun"></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="progress-label">New exhibition</div>
+                </div>
+            </div>
+
+            <!-- EVENTS Widget -->
+            <div class="widget">
+                <div class="widget-header">
+                    <div class="widget-title">EVENTS</div>
+                    <div class="widget-arrow"></div>
+                    <div class="widget-icon"></div>
+                </div>
+                <div class="widget-content">
+                    <div class="widget-row">
+                        <div class="widget-label">Archway Tour:</div>
+                        <div class="widget-date">17March</div>
+                    </div>
+                    <div class="widget-row">
+                        <div class="widget-main-text">Foundation Diploma in Art and Design</div>
+                        <div class="widget-time">2:45pm</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

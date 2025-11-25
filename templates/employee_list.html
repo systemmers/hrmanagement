@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}직원 목록 - 인사카드 관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-row">
+        <h1 class="page-title">직원 목록</h1>
+        <div class="page-actions">
+            <div class="view-toggle-group">
+                <button class="view-toggle-btn active" data-view="list" onclick="toggleEmployeeView('list')" title="목록형 보기">
+                    <i class="fas fa-list"></i>
+                </button>
+                <button class="view-toggle-btn" data-view="card" onclick="toggleEmployeeView('card')" title="카드형 보기">
+                    <i class="fas fa-th"></i>
+                </button>
+            </div>
+            <a href="{{ url_for('employee_new') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>직원 등록</span>
+            </a>
+        </div>
+    </div>
+    <p class="page-description">총 {{ employees|length }}명의 직원이 있습니다.</p>
+</div>
+
+<!-- 필터 바 -->
+<div class="filter-bar">
+    <div class="filter-group">
+        <label class="filter-label">부서</label>
+        <select multiple class="filter-select" id="filter-department" data-filter="department">
+            <option value="">전체</option>
+            {% for dept in classification_options.departments %}
+            <option value="{{ dept }}" {% if dept in request.args.getlist('department') %}selected{% endif %}>{{ dept }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter-group">
+        <label class="filter-label">직급</label>
+        <select multiple class="filter-select" id="filter-position" data-filter="position">
+            <option value="">전체</option>
+            {% for pos in classification_options.positions %}
+            <option value="{{ pos }}" {% if pos in request.args.getlist('position') %}selected{% endif %}>{{ pos }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter-group">
+        <label class="filter-label">상태</label>
+        <div class="filter-checkboxes">
+            {% for status in classification_options.statuses %}
+            <label class="filter-checkbox-label">
+                <input type="checkbox" class="filter-checkbox" 
+                       data-filter="status" 
+                       value="{{ status.value }}"
+                       {% if status.value in request.args.getlist('status') %}checked{% endif %}>
+                <span>{{ status.label }}</span>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+    <button class="btn btn-secondary filter-reset" onclick="resetFilters()">
+        <i class="fas fa-redo"></i>
+        <span>초기화</span>
+    </button>
+</div>
+
+<!-- 활성 필터 표시 -->
+<div class="active-filters" id="active-filters">
+    {% if request.args.getlist('department') %}
+        {% for dept in request.args.getlist('department') %}
+        <span class="filter-tag">
+            부서: {{ dept }}
+            <button onclick="removeFilter('department', '{{ dept }}')">×</button>
+        </span>
+        {% endfor %}
+    {% endif %}
+    {% if request.args.getlist('position') %}
+        {% for pos in request.args.getlist('position') %}
+        <span class="filter-tag">
+            직급: {{ pos }}
+            <button onclick="removeFilter('position', '{{ pos }}')">×</button>
+        </span>
+        {% endfor %}
+    {% endif %}
+    {% if request.args.getlist('status') %}
+        {% for status_val in request.args.getlist('status') %}
+            {% for status in classification_options.statuses %}
+                {% if status.value == status_val %}
+                <span class="filter-tag">
+                    상태: {{ status.label }}
+                    <button onclick="removeFilter('status', '{{ status_val }}')">×</button>
+                </span>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+</div>
+
+<!-- 목록형 뷰 -->
+<div class="table-container" id="list-view">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>이름</th>
+                <th>부서</th>
+                <th>직급</th>
+                <th>입사일</th>
+                <th>전화번호</th>
+                <th>이메일</th>
+                <th>상태</th>
+                <th>작업</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in employees %}
+            <tr>
+                <td>{{ employee.id }}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <img src="{{ employee.photo }}" alt="{{ employee.name }}" 
+                             style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                        <span>{{ employee.name }}</span>
+                    </div>
+                </td>
+                <td>{{ employee.department }}</td>
+                <td>{{ employee.position }}</td>
+                <td>{{ employee.hireDate }}</td>
+                <td>{{ employee.phone }}</td>
+                <td>{{ employee.email }}</td>
+                <td>
+                    <span class="badge {{ get_status_badge_class(employee.status) }}">
+                        {{ get_status_text(employee.status) }}
+                    </span>
+                </td>
+                <td>
+                    <div class="table-actions">
+                        <a href="{{ url_for('employee_detail', employee_id=employee.id) }}" class="btn-icon" title="상세">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ url_for('employee_edit', employee_id=employee.id) }}" class="btn-icon" title="수정">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- 카드형 뷰 -->
+<div class="employee-grid" id="card-view" style="display: none;">
+    {% for employee in employees %}
+    <div class="employee-card" onclick="window.location.href='{{ url_for('employee_detail', employee_id=employee.id) }}'">
+        <div class="employee-status {{ employee.status }}"></div>
+        <img src="{{ employee.photo }}" alt="{{ employee.name }}" class="employee-photo">
+        <h3 class="employee-name">{{ employee.name }}</h3>
+        <p class="employee-position">{{ employee.department }} · {{ employee.position }}</p>
+        <div class="employee-meta">
+            <div class="employee-meta-item">
+                <i class="fas fa-calendar"></i>
+                <span>입사일: {{ employee.hireDate }}</span>
+            </div>
+            <div class="employee-meta-item">
+                <i class="fas fa-phone"></i>
+                <span>{{ employee.phone }}</span>
+            </div>
+        </div>
+        <div class="employee-actions" onclick="event.stopPropagation()">
+            <a href="{{ url_for('employee_detail', employee_id=employee.id) }}" class="btn btn-secondary btn-small">
+                <i class="fas fa-eye"></i>
+                <span>보기</span>
+            </a>
+            <a href="{{ url_for('employee_edit', employee_id=employee.id) }}" class="btn btn-secondary btn-small">
+                <i class="fas fa-edit"></i>
+                <span>수정</span>
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if employees|length == 0 %}
+<div class="empty-state">
+    <i class="fas fa-users" style="font-size: 4rem; color: var(--color-gray-400); margin-bottom: 1rem;"></i>
+    <p style="color: var(--color-gray-600);">등록된 직원이 없습니다.</p>
+</div>
+{% endif %}
+{% endblock %}
+

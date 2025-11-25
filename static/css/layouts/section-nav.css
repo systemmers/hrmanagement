@@ -1,0 +1,97 @@
+/* ========================================
+   섹션 네비게이션 스타일
+   - 인사카드 상세 페이지 좌측 섹션 메뉴
+   ======================================== */
+
+.section-nav {
+    width: 250px;
+    background: var(--color-pure-white);
+    border-right: 1px solid var(--color-gray-200);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.section-nav-header {
+    padding: var(--space-6);
+    border-bottom: 1px solid var(--color-gray-200);
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    color: var(--color-pure-white);
+}
+
+.section-nav-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+}
+
+.section-nav-subtitle {
+    font-size: var(--text-sm);
+    opacity: 0.9;
+}
+
+.section-nav-menu {
+    padding: var(--space-4) 0;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.section-nav-group {
+    margin-bottom: var(--space-6);
+}
+
+.section-nav-group-title {
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.section-nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-5);
+    color: var(--color-gray-700);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    transition: all var(--transition-normal);
+    cursor: pointer;
+    border-left: 3px solid transparent;
+}
+
+.section-nav-item:hover {
+    background: var(--color-gray-50);
+    color: #2563eb;
+}
+
+.section-nav-item.active {
+    background: var(--color-gray-50);
+    color: #2563eb;
+    border-left-color: #2563eb;
+    font-weight: 600;
+}
+
+.section-nav-item i {
+    width: 20px;
+    text-align: center;
+    font-size: var(--text-base);
+}
+
+/* 반응형 */
+@media (max-width: 1200px) {
+    .section-nav {
+        width: 220px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .section-nav {
+        display: none;
+    }
+}

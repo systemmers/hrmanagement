@@ -1,0 +1,263 @@
+/**
+ * 반응형 스타일 - 태블릿 및 모바일 대응
+ * 인사카드 프로토타입
+ */
+
+/* ========================================
+   태블릿 (1024px 이하)
+   ======================================== */
+@media (max-width: 1024px) {
+    /* 그리드 조정 */
+    .section-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    /* 직원 헤더 */
+    .employee-header-content {
+        gap: var(--space-4);
+    }
+
+    .employee-photo {
+        width: 100px;
+        height: 100px;
+        font-size: 2.5rem;
+    }
+
+    .employee-name {
+        font-size: var(--text-2xl);
+    }
+
+    .employee-stats {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+}
+
+/* ========================================
+   모바일 (768px 이하)
+   ======================================== */
+@media (max-width: 768px) {
+    /* 사이드바 숨김 */
+    .sidebar-container {
+        transform: translateX(-100%);
+        transition: transform var(--transition-base);
+    }
+
+    .sidebar-container.mobile-open {
+        transform: translateX(0);
+    }
+
+    /* 사이드바가 펼쳐진 상태에서도 전체 너비 유지 */
+    .sidebar-container.mobile-open {
+        width: 280px;
+    }
+
+    /* 메인 콘텐츠 전체 너비 */
+    .main-content-wrapper {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    /* 햄버거 메뉴 표시 */
+    .hamburger-menu {
+        display: block;
+    }
+
+    /* 사이드바 오버레이 표시 */
+    body.sidebar-open .sidebar-overlay {
+        display: block;
+    }
+
+    /* 직원 헤더 */
+    .employee-header {
+        padding: var(--space-6);
+    }
+
+    .employee-header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .employee-photo {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+
+    .employee-name {
+        font-size: var(--text-xl);
+    }
+
+    .employee-name-en {
+        font-size: var(--text-base);
+    }
+
+    .employee-meta {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    .employee-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-3);
+        padding-top: var(--space-4);
+    }
+
+    /* 컨테이너 패딩 축소 */
+    .container {
+        padding: var(--space-4);
+    }
+
+    /* 카드 */
+    .card-header {
+        padding: var(--space-4);
+    }
+
+    .card-body {
+        padding: var(--space-4);
+    }
+
+    /* 그리드 축소 */
+    .section-grid {
+        gap: var(--space-4);
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
+
+    /* 테이블 반응형 */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        min-width: 600px;
+    }
+
+    th, td {
+        padding: var(--space-2) var(--space-3);
+        font-size: var(--text-xs);
+    }
+}
+
+/* ========================================
+   소형 모바일 (480px 이하)
+   ======================================== */
+@media (max-width: 480px) {
+    /* 컨테이너 패딩 더 축소 */
+    .container {
+        padding: var(--space-3);
+    }
+
+    /* 직원 헤더 */
+    .employee-header {
+        padding: var(--space-4);
+        margin-bottom: var(--space-4);
+    }
+
+    .employee-photo {
+        width: 64px;
+        height: 64px;
+        font-size: 1.5rem;
+    }
+
+    .employee-name {
+        font-size: var(--text-lg);
+    }
+
+    .employee-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-value {
+        font-size: var(--text-lg);
+    }
+
+    /* 카드 */
+    .card-header {
+        padding: var(--space-3);
+    }
+
+    .card-body {
+        padding: var(--space-3);
+    }
+
+    .card-title {
+        font-size: var(--text-base);
+    }
+
+    /* 그리드 */
+    .section-grid,
+    .info-grid {
+        gap: var(--space-3);
+    }
+
+    /* 테이블 더 작게 */
+    table {
+        min-width: 500px;
+    }
+
+    th, td {
+        padding: var(--space-2);
+    }
+}
+
+/* ========================================
+   인쇄 스타일
+   ======================================== */
+@media print {
+    /* 사이드바 숨김 */
+    .sidebar-container,
+    .hamburger-menu,
+    .sidebar-overlay {
+        display: none !important;
+    }
+
+    /* 메인 콘텐츠 전체 너비 */
+    .main-content-wrapper {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    /* 그림자 제거 */
+    .card,
+    .employee-header {
+        box-shadow: none;
+        border: 1px solid var(--color-gray-300);
+    }
+
+    /* 배경 제거 */
+    body {
+        background: white;
+    }
+
+    /* 색상 조정 */
+    .employee-header {
+        background: white !important;
+        color: black !important;
+        border: 2px solid var(--color-gray-900);
+    }
+
+    .employee-name,
+    .employee-name-en,
+    .meta-item,
+    .stat-label,
+    .stat-value {
+        color: black !important;
+    }
+
+    /* 페이지 나누기 */
+    .card {
+        page-break-inside: avoid;
+    }
+
+    .employee-header {
+        page-break-after: avoid;
+    }
+}

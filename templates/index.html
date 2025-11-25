@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}대시보드 - 인사카드 관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-row">
+        <h1 class="page-title">직원 관리</h1>
+        <div class="page-actions">
+            <button class="btn btn-secondary" onclick="window.print()">
+                <i class="fas fa-download"></i>
+                <span>내보내기</span>
+            </button>
+            <a href="{{ url_for('employee_new') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>직원 등록</span>
+            </a>
+        </div>
+    </div>
+    <p class="page-description">총 {{ stats.total }}명의 직원 정보를 관리합니다</p>
+</div>
+
+<!-- 대시보드 통계 -->
+<div class="dashboard-grid">
+    <div class="stat-card">
+        <div class="stat-label">총 직원 수</div>
+        <div class="stat-value">{{ stats.total }}</div>
+        <div class="stat-change">전체 인원</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">활성 직원</div>
+        <div class="stat-value">{{ stats.active }}</div>
+        <div class="stat-change">{{ stats.active_rate }}% · 정상 근무 중</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">대기 중</div>
+        <div class="stat-value">{{ stats.warning }}</div>
+        <div class="stat-change">{{ stats.warning_rate }}% · 업데이트 필요</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">만료 예정</div>
+        <div class="stat-value">{{ stats.expired }}</div>
+        <div class="stat-change">{{ stats.expired_rate }}% · 조치 필요</div>
+    </div>
+
+    <!-- 개발예정 항목 -->
+    <div class="stat-card">
+        <div class="stat-label">퇴직 예정</div>
+        <div class="stat-value">{{ stats.retirement }}</div>
+        <div class="stat-change">{{ stats.retirement_rate }}% · 조치 필요</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">입퇴사율</div>
+        <div class="stat-value">{{ stats.turnover_rate }}%</div>
+        <div class="stat-change">최근 1년 기준</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">근무 중</div>
+        <div class="stat-value">{{ stats.working }}</div>
+        <div class="stat-change">{{ stats.working_rate }}% · 현재 근무</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">휴가</div>
+        <div class="stat-value">{{ stats.vacation }}</div>
+        <div class="stat-change">{{ stats.vacation_rate }}% · 연차 사용</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">반차</div>
+        <div class="stat-value">{{ stats.half_day }}</div>
+        <div class="stat-change">{{ stats.half_day_rate }}% · 반차 사용</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">병가</div>
+        <div class="stat-value">{{ stats.sick_leave }}</div>
+        <div class="stat-change">{{ stats.sick_leave_rate }}% · 병가 사용</div>
+    </div>
+
+
+</div>
+
+<!-- 추가 정보 섹션 -->
+<div class="dashboard-info-section">
+    <!-- 부서별 통계 -->
+    <div class="info-card">
+        <div class="info-card-header">
+            <h3 class="info-card-title">
+                <i class="fas fa-building"></i>
+                부서별 현황
+            </h3>
+        </div>
+        <div class="info-card-content">
+            {% if dept_stats %}
+            <div class="dept-stats-list">
+                {% for dept, count in dept_stats.items() %}
+                <div class="dept-stat-item">
+                    <span class="dept-name">{{ dept }}</span>
+                    <span class="dept-count">{{ count }}명</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-message">부서 정보가 없습니다.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 최근 등록 직원 -->
+    <div class="info-card">
+        <div class="info-card-header">
+            <h3 class="info-card-title">
+                <i class="fas fa-user-plus"></i>
+                최근 등록 직원
+            </h3>
+            <a href="{{ url_for('employee_list') }}" class="info-card-link">전체 보기</a>
+        </div>
+        <div class="info-card-content">
+            {% if recent_employees %}
+            <div class="recent-employees-list">
+                {% for employee in recent_employees %}
+                <div class="recent-employee-item" onclick="window.location.href='{{ url_for('employee_detail', employee_id=employee.id) }}'">
+                    <img src="{{ employee.photo }}" alt="{{ employee.name }}" class="recent-employee-photo">
+                    <div class="recent-employee-info">
+                        <div class="recent-employee-name">{{ employee.name }}</div>
+                        <div class="recent-employee-meta">{{ employee.department }} · {{ employee.position }}</div>
+                    </div>
+                    <div class="recent-employee-date">{{ employee.hireDate }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-message">등록된 직원이 없습니다.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if stats.total == 0 %}
+<div class="empty-state">
+    <i class="fas fa-users" style="font-size: 4rem; color: var(--color-gray-400); margin-bottom: 1rem;"></i>
+    <p style="color: var(--color-gray-600);">등록된 직원이 없습니다.</p>
+    <a href="{{ url_for('employee_new') }}" class="btn btn-primary" style="margin-top: 1rem;">
+        <i class="fas fa-plus"></i>
+        <span>첫 직원 등록하기</span>
+    </a>
+</div>
+{% endif %}
+{% endblock %}

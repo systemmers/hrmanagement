@@ -1,0 +1,263 @@
+[
+  {
+    "id": 1,
+    "employee_id": 1,
+    "school": "서울대학교",
+    "degree": "bachelor",
+    "major": "컴퓨터공학",
+    "graduation_year": "2010",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 2,
+    "employee_id": 1,
+    "school": "한국과학기술원(KAIST)",
+    "degree": "master",
+    "major": "소프트웨어공학",
+    "graduation_year": "2012",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 3,
+    "employee_id": 2,
+    "school": "홍익대학교",
+    "degree": "bachelor",
+    "major": "시각디자인",
+    "graduation_year": "2015",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 4,
+    "employee_id": 3,
+    "school": "성균관대학교",
+    "degree": "bachelor",
+    "major": "소프트웨어학과",
+    "graduation_year": "2021",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 5,
+    "employee_id": 4,
+    "school": "연세대학교",
+    "degree": "bachelor",
+    "major": "경영학과",
+    "graduation_year": "2006",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 6,
+    "employee_id": 4,
+    "school": "서울대학교",
+    "degree": "master",
+    "major": "경영학(MBA)",
+    "graduation_year": "2010",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 7,
+    "employee_id": 5,
+    "school": "고려대학교",
+    "degree": "bachelor",
+    "major": "경영학과",
+    "graduation_year": "2001",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 8,
+    "employee_id": 6,
+    "school": "이화여자대학교",
+    "degree": "bachelor",
+    "major": "컴퓨터공학과",
+    "graduation_year": "2022",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 9,
+    "employee_id": 7,
+    "school": "중앙대학교",
+    "degree": "bachelor",
+    "major": "디자인학부",
+    "graduation_year": "2010",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 10,
+    "employee_id": 8,
+    "school": "한양대학교",
+    "degree": "bachelor",
+    "major": "미디어커뮤니케이션학과",
+    "graduation_year": "2018",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 11,
+    "employee_id": 9,
+    "school": "서강대학교",
+    "degree": "bachelor",
+    "major": "컴퓨터공학과",
+    "graduation_year": "2014",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 12,
+    "employee_id": 10,
+    "school": "숙명여자대학교",
+    "degree": "bachelor",
+    "major": "경영학과",
+    "graduation_year": "2005",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 13,
+    "employee_id": 10,
+    "school": "서울대학교",
+    "degree": "master",
+    "major": "인사조직",
+    "graduation_year": "2009",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 14,
+    "employee_id": 11,
+    "school": "부산대학교",
+    "degree": "bachelor",
+    "major": "정보컴퓨터공학부",
+    "graduation_year": "2023",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 15,
+    "employee_id": 12,
+    "school": "국민대학교",
+    "degree": "bachelor",
+    "major": "시각디자인학과",
+    "graduation_year": "2020",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 16,
+    "employee_id": 13,
+    "school": "아주대학교",
+    "degree": "bachelor",
+    "major": "경영학과",
+    "graduation_year": "2013",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 17,
+    "employee_id": 14,
+    "school": "건국대학교",
+    "degree": "bachelor",
+    "major": "미디어커뮤니케이션학과",
+    "graduation_year": "2022",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 18,
+    "employee_id": 15,
+    "school": "포항공과대학교(POSTECH)",
+    "degree": "bachelor",
+    "major": "컴퓨터공학과",
+    "graduation_year": "2009",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 19,
+    "employee_id": 15,
+    "school": "서울대학교",
+    "degree": "master",
+    "major": "인공지능",
+    "graduation_year": "2011",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 20,
+    "employee_id": 16,
+    "school": "경희대학교",
+    "degree": "bachelor",
+    "major": "산업디자인학과",
+    "graduation_year": "2016",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 21,
+    "employee_id": 17,
+    "school": "인하대학교",
+    "degree": "bachelor",
+    "major": "경영학과",
+    "graduation_year": "2020",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 22,
+    "employee_id": 18,
+    "school": "동국대학교",
+    "degree": "bachelor",
+    "major": "광고홍보학과",
+    "graduation_year": "2017",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 23,
+    "employee_id": 19,
+    "school": "세종대학교",
+    "degree": "bachelor",
+    "major": "컴퓨터공학과",
+    "graduation_year": "2023",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 24,
+    "employee_id": 20,
+    "school": "가톨릭대학교",
+    "degree": "bachelor",
+    "major": "회계학과",
+    "graduation_year": "2015",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 25,
+    "employee_id": 21,
+    "school": "단국대학교",
+    "degree": "bachelor",
+    "major": "커뮤니케이션디자인학과",
+    "graduation_year": "2019",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 26,
+    "employee_id": 22,
+    "school": "이화여자대학교",
+    "degree": "bachelor",
+    "major": "경영학과",
+    "graduation_year": "2011",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 27,
+    "employee_id": 23,
+    "school": "한국외국어대학교",
+    "degree": "bachelor",
+    "major": "미디어커뮤니케이션학부",
+    "graduation_year": "2022",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 28,
+    "employee_id": 24,
+    "school": "숭실대학교",
+    "degree": "bachelor",
+    "major": "컴퓨터학부",
+    "graduation_year": "2016",
+    "graduation_status": "graduated"
+  },
+  {
+    "id": 29,
+    "employee_id": 25,
+    "school": "명지대학교",
+    "degree": "bachelor",
+    "major": "경영학과",
+    "graduation_year": "2021",
+    "graduation_status": "graduated"
+  }
+]

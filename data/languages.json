@@ -1,0 +1,272 @@
+[
+  {
+    "id": 1,
+    "employee_id": 1,
+    "language": "영어",
+    "level": "advanced",
+    "test_name": "TOEIC",
+    "score": "950",
+    "acquired_date": "2019-06-15"
+  },
+  {
+    "id": 2,
+    "employee_id": 1,
+    "language": "일본어",
+    "level": "intermediate",
+    "test_name": "JLPT",
+    "score": "N2",
+    "acquired_date": "2018-12-02"
+  },
+  {
+    "id": 3,
+    "employee_id": 2,
+    "language": "영어",
+    "level": "intermediate",
+    "test_name": "TOEIC",
+    "score": "785",
+    "acquired_date": "2020-03-21"
+  },
+  {
+    "id": 4,
+    "employee_id": 3,
+    "language": "영어",
+    "level": "intermediate",
+    "test_name": "TOEIC",
+    "score": "820",
+    "acquired_date": "2021-08-15"
+  },
+  {
+    "id": 5,
+    "employee_id": 4,
+    "language": "영어",
+    "level": "advanced",
+    "test_name": "TOEIC",
+    "score": "920",
+    "acquired_date": "2018-05-20"
+  },
+  {
+    "id": 6,
+    "employee_id": 4,
+    "language": "중국어",
+    "level": "intermediate",
+    "test_name": "HSK",
+    "score": "5급",
+    "acquired_date": "2019-11-10"
+  },
+  {
+    "id": 7,
+    "employee_id": 5,
+    "language": "영어",
+    "level": "advanced",
+    "test_name": "TOEIC",
+    "score": "880",
+    "acquired_date": "2017-04-08"
+  },
+  {
+    "id": 8,
+    "employee_id": 5,
+    "language": "중국어",
+    "level": "advanced",
+    "test_name": "HSK",
+    "score": "6급",
+    "acquired_date": "2016-09-25"
+  },
+  {
+    "id": 9,
+    "employee_id": 6,
+    "language": "영어",
+    "level": "intermediate",
+    "test_name": "TOEIC",
+    "score": "750",
+    "acquired_date": "2022-01-10"
+  },
+  {
+    "id": 10,
+    "employee_id": 7,
+    "language": "영어",
+    "level": "intermediate",
+    "test_name": "TOEIC",
+    "score": "810",
+    "acquired_date": "2019-08-22"
+  },
+  {
+    "id": 11,
+    "employee_id": 8,
+    "language": "영어",
+    "level": "intermediate",
+    "test_name": "TOEIC",
+    "score": "795",
+    "acquired_date": "2021-06-15"
+  },
+  {
+    "id": 12,
+    "employee_id": 9,
+    "language": "영어",
+    "level": "advanced",
+    "test_name": "TOEIC",
+    "score": "905",
+    "acquired_date": "2020-02-28"
+  },
+  {
+    "id": 13,
+    "employee_id": 10,
+    "language": "영어",
+    "level": "advanced",
+    "test_name": "TOEIC",
+    "score": "890",
+    "acquired_date": "2018-07-12"
+  },
+  {
+    "id": 14,
+    "employee_id": 11,
+    "language": "영어",
+    "level": "intermediate",
+    "test_name": "TOEIC",
+    "score": "760",
+    "acquired_date": "2022-11-05"
+  },
+  {
+    "id": 15,
+    "employee_id": 12,
+    "language": "영어",
+    "level": "beginner",
+    "test_name": "TOEIC",
+    "score": "620",
+    "acquired_date": "2021-09-18"
+  },
+  {
+    "id": 16,
+    "employee_id": 13,
+    "language": "영어",
+    "level": "advanced",
+    "test_name": "TOEIC",
+    "score": "870",
+    "acquired_date": "2020-04-25"
+  },
+  {
+    "id": 17,
+    "employee_id": 14,
+    "language": "영어",
+    "level": "intermediate",
+    "test_name": "TOEIC",
+    "score": "780",
+    "acquired_date": "2022-05-30"
+  },
+  {
+    "id": 18,
+    "employee_id": 15,
+    "language": "영어",
+    "level": "advanced",
+    "test_name": "TOEIC",
+    "score": "940",
+    "acquired_date": "2019-10-15"
+  },
+  {
+    "id": 19,
+    "employee_id": 15,
+    "language": "일본어",
+    "level": "advanced",
+    "test_name": "JLPT",
+    "score": "N1",
+    "acquired_date": "2017-07-02"
+  },
+  {
+    "id": 20,
+    "employee_id": 16,
+    "language": "영어",
+    "level": "intermediate",
+    "test_name": "TOEIC",
+    "score": "805",
+    "acquired_date": "2020-08-10"
+  },
+  {
+    "id": 21,
+    "employee_id": 17,
+    "language": "영어",
+    "level": "intermediate",
+    "test_name": "TOEIC",
+    "score": "745",
+    "acquired_date": "2021-12-20"
+  },
+  {
+    "id": 22,
+    "employee_id": 18,
+    "language": "영어",
+    "level": "intermediate",
+    "test_name": "TOEIC",
+    "score": "830",
+    "acquired_date": "2020-06-08"
+  },
+  {
+    "id": 23,
+    "employee_id": 19,
+    "language": "영어",
+    "level": "intermediate",
+    "test_name": "TOEIC",
+    "score": "770",
+    "acquired_date": "2022-09-25"
+  },
+  {
+    "id": 24,
+    "employee_id": 20,
+    "language": "영어",
+    "level": "advanced",
+    "test_name": "TOEIC",
+    "score": "915",
+    "acquired_date": "2019-03-18"
+  },
+  {
+    "id": 25,
+    "employee_id": 21,
+    "language": "영어",
+    "level": "intermediate",
+    "test_name": "TOEIC",
+    "score": "790",
+    "acquired_date": "2021-07-22"
+  },
+  {
+    "id": 26,
+    "employee_id": 22,
+    "language": "영어",
+    "level": "advanced",
+    "test_name": "TOEIC",
+    "score": "860",
+    "acquired_date": "2019-11-30"
+  },
+  {
+    "id": 27,
+    "employee_id": 22,
+    "language": "중국어",
+    "level": "intermediate",
+    "test_name": "HSK",
+    "score": "4급",
+    "acquired_date": "2020-05-15"
+  },
+  {
+    "id": 28,
+    "employee_id": 23,
+    "language": "영어",
+    "level": "intermediate",
+    "test_name": "TOEIC",
+    "score": "800",
+    "acquired_date": "2022-04-10"
+  },
+  {
+    "id": 29,
+    "employee_id": 24,
+    "language": "영어",
+    "level": "advanced",
+    "test_name": "TOEIC",
+    "score": "885",
+    "acquired_date": "2020-01-25"
+  },
+  {
+    "id": 30,
+    "employee_id": 25,
+    "language": "영어",
+    "level": "intermediate",
+    "test_name": "TOEIC",
+    "score": "755",
+    "acquired_date": "2021-10-08"
+  }
+]

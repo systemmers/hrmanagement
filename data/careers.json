@@ -1,0 +1,282 @@
+[
+  {
+    "id": 1,
+    "employee_id": 1,
+    "company": "삼성SDS",
+    "position": "주임",
+    "duty": "웹 애플리케이션 개발",
+    "start_date": "2012-03",
+    "end_date": "2016-02",
+    "is_current": false
+  },
+  {
+    "id": 2,
+    "employee_id": 1,
+    "company": "네이버",
+    "position": "선임",
+    "duty": "프론트엔드 개발",
+    "start_date": "2016-03",
+    "end_date": "2020-02",
+    "is_current": false
+  },
+  {
+    "id": 3,
+    "employee_id": 2,
+    "company": "크래프톤",
+    "position": "디자이너",
+    "duty": "UI/UX 디자인",
+    "start_date": "2015-08",
+    "end_date": "2021-04",
+    "is_current": false
+  },
+  {
+    "id": 4,
+    "employee_id": 4,
+    "company": "LG전자",
+    "position": "대리",
+    "duty": "브랜드 마케팅",
+    "start_date": "2010-03",
+    "end_date": "2015-07",
+    "is_current": false
+  },
+  {
+    "id": 5,
+    "employee_id": 4,
+    "company": "카카오",
+    "position": "과장",
+    "duty": "디지털 마케팅 전략",
+    "start_date": "2015-08",
+    "end_date": "2019-07",
+    "is_current": false
+  },
+  {
+    "id": 6,
+    "employee_id": 5,
+    "company": "현대자동차",
+    "position": "주임",
+    "duty": "법인영업",
+    "start_date": "2001-09",
+    "end_date": "2008-02",
+    "is_current": false
+  },
+  {
+    "id": 7,
+    "employee_id": 5,
+    "company": "SK텔레콤",
+    "position": "과장",
+    "duty": "B2B 영업",
+    "start_date": "2008-03",
+    "end_date": "2014-02",
+    "is_current": false
+  },
+  {
+    "id": 8,
+    "employee_id": 5,
+    "company": "KT",
+    "position": "차장",
+    "duty": "기업영업팀장",
+    "start_date": "2014-03",
+    "end_date": "2018-02",
+    "is_current": false
+  },
+  {
+    "id": 9,
+    "employee_id": 7,
+    "company": "NHN",
+    "position": "디자이너",
+    "duty": "그래픽 디자인",
+    "start_date": "2010-09",
+    "end_date": "2015-10",
+    "is_current": false
+  },
+  {
+    "id": 10,
+    "employee_id": 7,
+    "company": "우아한형제들",
+    "position": "시니어 디자이너",
+    "duty": "브랜드 디자인",
+    "start_date": "2015-11",
+    "end_date": "2020-10",
+    "is_current": false
+  },
+  {
+    "id": 11,
+    "employee_id": 9,
+    "company": "라인플러스",
+    "position": "개발자",
+    "duty": "서버 개발",
+    "start_date": "2014-09",
+    "end_date": "2018-08",
+    "is_current": false
+  },
+  {
+    "id": 12,
+    "employee_id": 9,
+    "company": "토스",
+    "position": "시니어 개발자",
+    "duty": "백엔드 시스템 개발",
+    "start_date": "2018-09",
+    "end_date": "2021-08",
+    "is_current": false
+  },
+  {
+    "id": 13,
+    "employee_id": 10,
+    "company": "롯데그룹",
+    "position": "주임",
+    "duty": "인사관리",
+    "start_date": "2009-03",
+    "end_date": "2014-03",
+    "is_current": false
+  },
+  {
+    "id": 14,
+    "employee_id": 10,
+    "company": "CJ그룹",
+    "position": "과장",
+    "duty": "인사기획",
+    "start_date": "2014-04",
+    "end_date": "2019-03",
+    "is_current": false
+  },
+  {
+    "id": 15,
+    "employee_id": 13,
+    "company": "한화생명",
+    "position": "주임",
+    "duty": "법인영업",
+    "start_date": "2013-09",
+    "end_date": "2017-02",
+    "is_current": false
+  },
+  {
+    "id": 16,
+    "employee_id": 13,
+    "company": "삼성화재",
+    "position": "대리",
+    "duty": "기업보험 영업",
+    "start_date": "2017-03",
+    "end_date": "2021-02",
+    "is_current": false
+  },
+  {
+    "id": 17,
+    "employee_id": 15,
+    "company": "SKC&C",
+    "position": "개발자",
+    "duty": "시스템 개발",
+    "start_date": "2011-09",
+    "end_date": "2015-06",
+    "is_current": false
+  },
+  {
+    "id": 18,
+    "employee_id": 15,
+    "company": "쿠팡",
+    "position": "시니어 개발자",
+    "duty": "결제 시스템 개발",
+    "start_date": "2015-07",
+    "end_date": "2020-06",
+    "is_current": false
+  },
+  {
+    "id": 19,
+    "employee_id": 16,
+    "company": "엔씨소프트",
+    "position": "디자이너",
+    "duty": "게임 UI 디자인",
+    "start_date": "2016-09",
+    "end_date": "2019-11",
+    "is_current": false
+  },
+  {
+    "id": 20,
+    "employee_id": 16,
+    "company": "넥슨",
+    "position": "시니어 디자이너",
+    "duty": "UI/UX 디자인",
+    "start_date": "2019-12",
+    "end_date": "2021-11",
+    "is_current": false
+  },
+  {
+    "id": 21,
+    "employee_id": 18,
+    "company": "제일기획",
+    "position": "AE",
+    "duty": "광고기획",
+    "start_date": "2017-09",
+    "end_date": "2019-04",
+    "is_current": false
+  },
+  {
+    "id": 22,
+    "employee_id": 18,
+    "company": "이노션",
+    "position": "선임 AE",
+    "duty": "브랜드 마케팅",
+    "start_date": "2019-05",
+    "end_date": "2021-04",
+    "is_current": false
+  },
+  {
+    "id": 23,
+    "employee_id": 20,
+    "company": "삼일회계법인",
+    "position": "회계사",
+    "duty": "외부감사",
+    "start_date": "2015-09",
+    "end_date": "2019-08",
+    "is_current": false
+  },
+  {
+    "id": 24,
+    "employee_id": 20,
+    "company": "한영회계법인",
+    "position": "시니어 회계사",
+    "duty": "내부통제 컨설팅",
+    "start_date": "2019-09",
+    "end_date": "2021-10",
+    "is_current": false
+  },
+  {
+    "id": 25,
+    "employee_id": 22,
+    "company": "현대백화점",
+    "position": "주임",
+    "duty": "매장영업",
+    "start_date": "2011-09",
+    "end_date": "2015-08",
+    "is_current": false
+  },
+  {
+    "id": 26,
+    "employee_id": 22,
+    "company": "롯데백화점",
+    "position": "대리",
+    "duty": "MD기획",
+    "start_date": "2015-09",
+    "end_date": "2020-08",
+    "is_current": false
+  },
+  {
+    "id": 27,
+    "employee_id": 24,
+    "company": "NHN",
+    "position": "개발자",
+    "duty": "모바일 앱 개발",
+    "start_date": "2016-09",
+    "end_date": "2019-06",
+    "is_current": false
+  },
+  {
+    "id": 28,
+    "employee_id": 24,
+    "company": "당근마켓",
+    "position": "iOS 개발자",
+    "duty": "iOS 앱 개발",
+    "start_date": "2019-07",
+    "end_date": "2021-06",
+    "is_current": false
+  }
+]

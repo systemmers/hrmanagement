@@ -1,0 +1,214 @@
+/**
+ * 레이아웃 스타일 - 페이지 구조 및 그리드 시스템
+ * 인사카드 프로토타입
+ */
+
+/* ========================================
+   페이지 래퍼
+   ======================================== */
+.page-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ========================================
+   사이드바
+   ======================================== */
+.sidebar-container {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 280px;
+    background: white;
+    border-right: 1px solid var(--color-gray-200);
+    transition: width var(--transition-base);
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1000;
+}
+
+.sidebar-container.collapsed {
+    width: 50px;
+}
+
+.sidebar-container.collapsed .nav-link span,
+.sidebar-container.collapsed .nav-section-title {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* 사이드바 토글 버튼 */
+.sidebar-toggle {
+    position: sticky;
+    top: 0;
+    background: var(--color-gray-75);
+    border: none;
+    border-bottom: 1px solid var(--color-gray-200);
+    padding: var(--space-3);
+    width: 100%;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+    z-index: 10;
+}
+
+.sidebar-toggle:hover {
+    background: var(--color-gray-100);
+}
+
+.sidebar-toggle i {
+    color: var(--color-gray-700);
+    font-size: var(--text-lg);
+}
+
+/* 사이드바 네비게이션 */
+.sidebar-nav {
+    padding: var(--space-4);
+}
+
+.nav-section {
+    margin-bottom: var(--space-6);
+}
+
+.nav-section-title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-gray-700);
+    margin-bottom: var(--space-3);
+    padding: 0 var(--space-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    color: var(--color-gray-600);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    position: relative;
+    font-size: var(--text-sm);
+}
+
+.nav-link i {
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.nav-link span {
+    transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+
+.nav-link:hover {
+    background: var(--color-gray-50);
+    color: var(--color-primary);
+}
+
+.nav-link.active {
+    background: var(--color-gray-100);
+    color: var(--color-primary);
+    font-weight: 500;
+}
+
+.nav-link.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--color-primary);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+/* ========================================
+   메인 콘텐츠
+   ======================================== */
+.main-content-wrapper {
+    margin-left: 280px;
+    flex: 1;
+    transition: margin-left var(--transition-base);
+    width: calc(100% - 280px);
+}
+
+.sidebar-container.collapsed + .hamburger-menu + .main-content-wrapper,
+.sidebar-container.collapsed ~ .main-content-wrapper {
+    margin-left: 50px;
+    width: calc(100% - 50px);
+}
+
+/* 컨테이너 */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--space-6);
+}
+
+/* ========================================
+   그리드 시스템
+   ======================================== */
+.section-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--space-6);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-5);
+}
+
+/* ========================================
+   콘텐츠 섹션
+   ======================================== */
+.content-sections {
+    display: block;
+}
+
+.content-sections > section {
+    margin-bottom: var(--space-8);
+}
+
+/* ========================================
+   햄버거 메뉴 (모바일용)
+   ======================================== */
+.hamburger-menu {
+    display: none;
+    position: fixed;
+    top: var(--space-4);
+    left: var(--space-4);
+    z-index: 999;
+    background: white;
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+}
+
+.hamburger-menu i {
+    color: var(--color-gray-700);
+    font-size: var(--text-lg);
+}
+
+/* 사이드바 오버레이 (모바일용) */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+body.sidebar-open {
+    overflow: hidden;
+}

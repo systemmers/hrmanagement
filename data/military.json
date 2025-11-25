@@ -1,0 +1,132 @@
+[
+  {
+    "id": 1,
+    "employee_id": 1,
+    "status": "completed",
+    "branch": "army",
+    "rank": "병장",
+    "start_date": "2005-03-01",
+    "end_date": "2007-03-01",
+    "exemption_reason": null
+  },
+  {
+    "id": 2,
+    "employee_id": 3,
+    "status": "completed",
+    "branch": "airforce",
+    "rank": "병장",
+    "start_date": "2016-02-22",
+    "end_date": "2018-02-21",
+    "exemption_reason": null
+  },
+  {
+    "id": 3,
+    "employee_id": 5,
+    "status": "completed",
+    "branch": "army",
+    "rank": "병장",
+    "start_date": "1998-03-02",
+    "end_date": "2000-05-01",
+    "exemption_reason": null
+  },
+  {
+    "id": 4,
+    "employee_id": 7,
+    "status": "completed",
+    "branch": "navy",
+    "rank": "상병",
+    "start_date": "2007-06-01",
+    "end_date": "2009-06-30",
+    "exemption_reason": null
+  },
+  {
+    "id": 5,
+    "employee_id": 9,
+    "status": "completed",
+    "branch": "army",
+    "rank": "병장",
+    "start_date": "2011-07-04",
+    "end_date": "2013-04-03",
+    "exemption_reason": null
+  },
+  {
+    "id": 6,
+    "employee_id": 11,
+    "status": "completed",
+    "branch": "marine",
+    "rank": "병장",
+    "start_date": "2019-03-04",
+    "end_date": "2020-12-03",
+    "exemption_reason": null
+  },
+  {
+    "id": 7,
+    "employee_id": 13,
+    "status": "completed",
+    "branch": "army",
+    "rank": "병장",
+    "start_date": "2010-01-04",
+    "end_date": "2011-10-03",
+    "exemption_reason": null
+  },
+  {
+    "id": 8,
+    "employee_id": 15,
+    "status": "completed",
+    "branch": "airforce",
+    "rank": "병장",
+    "start_date": "2006-02-06",
+    "end_date": "2008-02-05",
+    "exemption_reason": null
+  },
+  {
+    "id": 9,
+    "employee_id": 17,
+    "status": "completed",
+    "branch": "auxiliary",
+    "rank": "이병",
+    "start_date": "2018-08-20",
+    "end_date": "2021-05-19",
+    "exemption_reason": null
+  },
+  {
+    "id": 10,
+    "employee_id": 19,
+    "status": "exempted",
+    "branch": null,
+    "rank": null,
+    "start_date": null,
+    "end_date": null,
+    "exemption_reason": "건강상 이유"
+  },
+  {
+    "id": 11,
+    "employee_id": 21,
+    "status": "completed",
+    "branch": "army",
+    "rank": "병장",
+    "start_date": "2015-06-01",
+    "end_date": "2017-03-01",
+    "exemption_reason": null
+  },
+  {
+    "id": 12,
+    "employee_id": 23,
+    "status": "completed",
+    "branch": "navy",
+    "rank": "병장",
+    "start_date": "2018-01-08",
+    "end_date": "2019-10-07",
+    "exemption_reason": null
+  },
+  {
+    "id": 13,
+    "employee_id": 25,
+    "status": "completed",
+    "branch": "army",
+    "rank": "병장",
+    "start_date": "2017-09-04",
+    "end_date": "2019-06-03",
+    "exemption_reason": null
+  }
+]
