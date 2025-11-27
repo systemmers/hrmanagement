@@ -15,6 +15,7 @@ class Employee:
                  name_en: Optional[str] = None, birth_date: Optional[str] = None,
                  gender: Optional[str] = None, address: Optional[str] = None,
                  emergency_contact: Optional[str] = None, emergency_relation: Optional[str] = None,
+                 rrn: Optional[str] = None,  # 주민등록번호 (마스킹)
                  # 확장 필드 - 소속정보
                  employee_number: Optional[str] = None, team: Optional[str] = None,
                  job_title: Optional[str] = None, work_location: Optional[str] = None,
@@ -39,6 +40,7 @@ class Employee:
         self.address = address
         self.emergency_contact = emergency_contact
         self.emergency_relation = emergency_relation
+        self.rrn = rrn  # 주민등록번호 (마스킹)
         # 확장 필드 - 소속정보
         self.employee_number = employee_number
         self.team = team
@@ -68,7 +70,7 @@ class Employee:
         # 확장 필드가 있으면 추가
         extended_fields = [
             'name_en', 'birth_date', 'gender', 'address', 'emergency_contact', 'emergency_relation',
-            'employee_number', 'team', 'job_title', 'work_location', 'internal_phone', 'company_email',
+            'rrn', 'employee_number', 'team', 'job_title', 'work_location', 'internal_phone', 'company_email',
             'employment_type', 'contract_period', 'probation_end', 'resignation_date'
         ]
         for field in extended_fields:
@@ -85,7 +87,7 @@ class Employee:
         # 확장 필드
         extended_fields = [
             'name_en', 'birth_date', 'gender', 'address', 'emergency_contact', 'emergency_relation',
-            'employee_number', 'team', 'job_title', 'work_location', 'internal_phone', 'company_email',
+            'rrn', 'employee_number', 'team', 'job_title', 'work_location', 'internal_phone', 'company_email',
             'employment_type', 'contract_period', 'probation_end', 'resignation_date'
         ]
         # 유효한 필드만 추출
@@ -425,22 +427,36 @@ class SalaryHistory:
 
 class EmployeeRepository:
     """직원 데이터 저장소 (JSON 파일 기반)"""
-    
-    def __init__(self, json_file_path: str):
+
+    def __init__(self, json_file_path: str, extended_json_path: str = None):
         self.json_file_path = json_file_path
+        self.extended_json_path = extended_json_path
         self._ensure_data_file()
-    
+
     def _ensure_data_file(self):
         """데이터 파일이 없으면 생성"""
         if not os.path.exists(self.json_file_path):
             os.makedirs(os.path.dirname(self.json_file_path), exist_ok=True)
             self._save_data([])
-    
+
     def _load_data(self) -> List[Dict]:
-        """JSON 파일에서 데이터 로드"""
+        """JSON 파일에서 데이터 로드 (기본 + 확장 병합)"""
         try:
             with open(self.json_file_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                base_data = json.load(f)
+
+            # 확장 데이터가 있으면 병합
+            if self.extended_json_path and os.path.exists(self.extended_json_path):
+                with open(self.extended_json_path, 'r', encoding='utf-8') as f:
+                    extended_data = json.load(f)
+
+                # ID를 기준으로 병합
+                extended_dict = {item['id']: item for item in extended_data}
+                for item in base_data:
+                    if item['id'] in extended_dict:
+                        item.update(extended_dict[item['id']])
+
+            return base_data
         except (FileNotFoundError, json.JSONDecodeError):
             return []
     
@@ -1298,3 +1314,102 @@ class AssetRepository(BaseRelationRepository):
 
     def __init__(self, json_file_path: str):
         super().__init__(json_file_path, Asset)
+
+
+# ========================================
+# Phase 5: 급여 지급 이력 모델 및 Repository
+# ========================================
+
+class SalaryPayment:
+    """급여 지급 이력 모델"""
+
+    def __init__(self, id: int, employee_id: int,
+                 payment_date: str, payment_period: str,
+                 base_salary: int, allowances: int, gross_pay: int,
+                 insurance: int, income_tax: int, total_deduction: int,
+                 net_pay: int, note: Optional[str] = None):
+        self.id = id
+        self.employee_id = employee_id
+        self.payment_date = payment_date      # 지급일 (예: "2025-01-25")
+        self.payment_period = payment_period  # 지급기간 (예: "2025-01")
+        self.base_salary = base_salary        # 기본급
+        self.allowances = allowances          # 각종수당 합계
+        self.gross_pay = gross_pay            # 총지급액
+        self.insurance = insurance            # 4대보험 공제
+        self.income_tax = income_tax          # 소득세 공제
+        self.total_deduction = total_deduction  # 총공제액
+        self.net_pay = net_pay                # 실지급액
+        self.note = note
+
+    def to_dict(self) -> Dict:
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'payment_date': self.payment_date,
+            'payment_period': self.payment_period,
+            'base_salary': self.base_salary,
+            'allowances': self.allowances,
+            'gross_pay': self.gross_pay,
+            'insurance': self.insurance,
+            'income_tax': self.income_tax,
+            'total_deduction': self.total_deduction,
+            'net_pay': self.net_pay,
+            'note': self.note
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'SalaryPayment':
+        return cls(**data)
+
+
+class SalaryPaymentRepository(BaseRelationRepository):
+    """급여 지급 이력 데이터 저장소"""
+
+    def __init__(self, json_file_path: str):
+        super().__init__(json_file_path, SalaryPayment)
+
+
+# ========================================
+# Phase 6: 첨부파일 모델 및 Repository
+# ========================================
+
+class Attachment:
+    """첨부파일 모델"""
+
+    def __init__(self, id: int, employee_id: int,
+                 file_name: str, file_path: str, file_type: str,
+                 file_size: int, category: str, upload_date: str,
+                 note: Optional[str] = None):
+        self.id = id
+        self.employee_id = employee_id
+        self.file_name = file_name        # 원본 파일명 (예: "이력서.pdf")
+        self.file_path = file_path        # 저장 경로 (예: "/static/uploads/emp_1/이력서.pdf")
+        self.file_type = file_type        # 파일 형식 (예: "pdf", "jpg", "png")
+        self.file_size = file_size        # 파일 크기 (bytes)
+        self.category = category          # 서류 분류 (예: "이력서", "학력증명", "경력증명")
+        self.upload_date = upload_date    # 업로드 일자
+        self.note = note
+
+    def to_dict(self) -> Dict:
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'file_name': self.file_name,
+            'file_path': self.file_path,
+            'file_type': self.file_type,
+            'file_size': self.file_size,
+            'category': self.category,
+            'upload_date': self.upload_date,
+            'note': self.note
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'Attachment':
+        return cls(**data)
+
+
+class AttachmentRepository(BaseRelationRepository):
+    """첨부파일 데이터 저장소"""
+
+    def __init__(self, json_file_path: str):
+        super().__init__(json_file_path, Attachment)

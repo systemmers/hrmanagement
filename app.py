@@ -9,15 +9,19 @@ from models import (
     FamilyMemberRepository, LanguageRepository, MilitaryServiceRepository,
     SalaryRepository, BenefitRepository, ContractRepository, SalaryHistoryRepository,
     PromotionRepository, EvaluationRepository, TrainingRepository, AttendanceRepository,
-    InsuranceRepository, ProjectRepository, AwardRepository, AssetRepository
+    InsuranceRepository, ProjectRepository, AwardRepository, AssetRepository,
+    SalaryPaymentRepository, AttachmentRepository
 )
 import os
 
 app = Flask(__name__)
 app.config.from_object(config['development'])
 
-# 직원 저장소 초기화
-employee_repo = EmployeeRepository(app.config['EMPLOYEES_JSON'])
+# 직원 저장소 초기화 (기본 + 확장 데이터 병합)
+employee_repo = EmployeeRepository(
+    app.config['EMPLOYEES_JSON'],
+    app.config['EMPLOYEES_EXTENDED_JSON']
+)
 # 분류 옵션 저장소 초기화
 classification_repo = ClassificationOptionsRepository(app.config['CLASSIFICATION_OPTIONS_JSON'])
 
@@ -46,6 +50,12 @@ insurance_repo = InsuranceRepository(app.config['INSURANCES_JSON'])
 project_repo = ProjectRepository(app.config['PROJECTS_JSON'])
 award_repo = AwardRepository(app.config['AWARDS_JSON'])
 asset_repo = AssetRepository(app.config['ASSETS_JSON'])
+
+# Phase 5: 급여 지급 이력 저장소 초기화
+salary_payment_repo = SalaryPaymentRepository(app.config['SALARY_PAYMENTS_JSON'])
+
+# Phase 6: 첨부파일 저장소 초기화
+attachment_repo = AttachmentRepository(app.config['ATTACHMENTS_JSON'])
 
 
 @app.route('/')
@@ -132,6 +142,12 @@ def employee_detail(employee_id):
     award_list = award_repo.get_by_employee_id(employee_id)
     asset_list = asset_repo.get_by_employee_id(employee_id)
 
+    # Phase 5: 급여 지급 이력 조회
+    salary_payment_list = salary_payment_repo.get_by_employee_id(employee_id)
+
+    # Phase 6: 첨부파일 조회
+    attachment_list = attachment_repo.get_by_employee_id(employee_id)
+
     return render_template('employee_detail.html',
                            employee=employee,
                            education_list=education_list,
@@ -151,7 +167,9 @@ def employee_detail(employee_id):
                            insurance=insurance,
                            project_list=project_list,
                            award_list=award_list,
-                           asset_list=asset_list)
+                           asset_list=asset_list,
+                           salary_payment_list=salary_payment_list,
+                           attachment_list=attachment_list)
 
 
 @app.route('/employees/new', methods=['GET'])
@@ -192,7 +210,14 @@ def employee_edit(employee_id):
     if not employee:
         flash('직원을 찾을 수 없습니다.', 'error')
         return redirect(url_for('index'))
-    return render_template('employee_form.html', employee=employee, action='update')
+
+    # Phase 6: 첨부파일 조회
+    attachment_list = attachment_repo.get_by_employee_id(employee_id)
+
+    return render_template('employee_form.html',
+                           employee=employee,
+                           action='update',
+                           attachment_list=attachment_list)
 
 
 @app.route('/employees/<int:employee_id>/update', methods=['POST'])

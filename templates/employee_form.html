@@ -6,10 +6,11 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/cards.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/employee-form.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/right-sidebar.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="form-page-layout">
+<div class="form-page-layout-with-sidebar">
     <!-- 좌측: 섹션 네비게이션 -->
     <aside class="section-nav" id="sectionNav">
         <div class="section-nav-header">
@@ -565,6 +566,8 @@
             </div>
         </form>
     </main>
+
+    {% include 'partials/_attachment_sidebar.html' %}
 </div>
 
 <!-- 모바일 메뉴 토글 -->

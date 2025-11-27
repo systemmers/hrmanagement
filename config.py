@@ -28,6 +28,9 @@ class Config:
     CONTRACTS_JSON = os.path.join(DATA_DIR, 'contracts.json')
     SALARY_HISTORY_JSON = os.path.join(DATA_DIR, 'salary_history.json')
 
+    # Phase 5: 급여 지급 이력 데이터 파일 경로
+    SALARY_PAYMENTS_JSON = os.path.join(DATA_DIR, 'salary_payments.json')
+
     # Phase 3: 인사평가 기능 데이터 파일 경로
     PROMOTIONS_JSON = os.path.join(DATA_DIR, 'promotions.json')
     EVALUATIONS_JSON = os.path.join(DATA_DIR, 'evaluations.json')
@@ -39,6 +42,9 @@ class Config:
     PROJECTS_JSON = os.path.join(DATA_DIR, 'projects.json')
     AWARDS_JSON = os.path.join(DATA_DIR, 'awards.json')
     ASSETS_JSON = os.path.join(DATA_DIR, 'assets.json')
+
+    # Phase 6: 첨부파일 데이터 파일 경로
+    ATTACHMENTS_JSON = os.path.join(DATA_DIR, 'attachments.json')
 
     # Flask 설정
     DEBUG = True

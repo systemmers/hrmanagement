@@ -183,7 +183,7 @@
                         </div>
                         <div class="info-item">
                             <div class="info-label">주민등록번호</div>
-                            <div class="info-value empty">***-*******</div>
+                            <div class="info-value{% if not employee.rrn %} empty{% endif %}">{{ employee.rrn or '정보 없음' }}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">생년월일</div>
@@ -517,9 +517,9 @@
                                     <td>{{ edu.graduation_year }}</td>
                                     <td>{{ edu.major }}</td>
                                     <td>{{ edu.major }}</td>
-                                    <td class="empty">-</td>
+                                    <td>{{ edu.gpa or '-' }}</td>
                                     <td><span class="badge badge-success">졸업</span></td>
-                                    <td>-</td>
+                                    <td>{{ edu.note or '-' }}</td>
                                 </tr>
                                 {% endfor %}
                                 {% else %}
@@ -572,10 +572,10 @@
                                     <td>{{ career.start_date }}</td>
                                     <td>{{ career.end_date or '재직중' }}</td>
                                     <td>-</td>
-                                    <td>-</td>
+                                    <td>{{ career.department or '-' }}</td>
                                     <td>{{ career.position or '-' }}</td>
                                     <td>{{ career.duty or '-' }}</td>
-                                    <td class="empty">-</td>
+                                    <td>{{ '{:,}'.format(career.salary) if career.salary else '-' }}{% if career.salary %}원{% endif %}</td>
                                 </tr>
                                 {% endfor %}
                                 {% else %}
@@ -733,7 +733,11 @@
                         </div>
                         <div class="info-item">
                             <div class="info-label">보직</div>
-                            <div class="info-value empty">정보 없음</div>
+                            <div class="info-value{% if not military.duty %} empty{% endif %}">{{ military.duty or '정보 없음' }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">병과</div>
+                            <div class="info-value{% if not military.specialty %} empty{% endif %}">{{ military.specialty or '정보 없음' }}</div>
                         </div>
                         {% if military.exemption_reason %}
                         <div class="info-item">
@@ -946,6 +950,61 @@
                                     <td colspan="5" class="table-empty">
                                         <i class="fas fa-coins"></i>
                                         <p>등록된 연봉계약 정보가 없습니다</p>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 급여 지급 이력 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-money-bill-wave"></i>
+                        급여 지급 이력
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>지급일</th>
+                                    <th>지급기간</th>
+                                    <th>기본급</th>
+                                    <th>수당</th>
+                                    <th>총지급액</th>
+                                    <th>4대보험</th>
+                                    <th>소득세</th>
+                                    <th>공제합계</th>
+                                    <th>실지급액</th>
+                                    <th>비고</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if salary_payment_list %}
+                                    {% for payment in salary_payment_list|sort(attribute='payment_date', reverse=True) %}
+                                    <tr>
+                                        <td>{{ payment.payment_date }}</td>
+                                        <td>{{ payment.payment_period }}</td>
+                                        <td>{{ '{:,}'.format(payment.base_salary) }}원</td>
+                                        <td>{{ '{:,}'.format(payment.allowances) }}원</td>
+                                        <td>{{ '{:,}'.format(payment.gross_pay) }}원</td>
+                                        <td>{{ '{:,}'.format(payment.insurance) }}원</td>
+                                        <td>{{ '{:,}'.format(payment.income_tax) }}원</td>
+                                        <td>{{ '{:,}'.format(payment.total_deduction) }}원</td>
+                                        <td><strong>{{ '{:,}'.format(payment.net_pay) }}원</strong></td>
+                                        <td>{{ payment.note or '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="10" class="table-empty">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                        <p>등록된 급여 지급 정보가 없습니다</p>
                                     </td>
                                 </tr>
                                 {% endif %}
@@ -1217,29 +1276,7 @@
 {% endblock %}
 
 {% block sidebar_right %}
-<!-- 우측 파일 사이드바 -->
-<aside class="right-sidebar">
-    <div class="right-sidebar-header">
-        <h2 class="right-sidebar-title">개인 첨부서류</h2>
-    </div>
-    <div class="right-sidebar-content">
-        <div class="file-upload-area" id="fileUploadArea">
-            <div class="file-upload-icon">
-                <i class="fas fa-cloud-upload-alt"></i>
-            </div>
-            <div class="file-upload-text">파일을 드래그하거나 클릭하여 업로드</div>
-            <div class="file-upload-hint">PDF, DOC, XLS, JPG (최대 10MB)</div>
-        </div>
-
-        <div id="fileList">
-            <!-- 샘플 파일 카드들 -->
-            <div class="empty-state-small">
-                <i class="fas fa-folder-open"></i>
-                <p>등록된 첨부파일이 없습니다</p>
-            </div>
-        </div>
-    </div>
-</aside>
+{% include 'partials/_attachment_sidebar.html' %}
 {% endblock %}
 
 {% block extra_js %}

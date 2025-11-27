@@ -366,3 +366,55 @@ select.form-input {
         justify-content: center;
     }
 }
+
+/* ========================================
+   3단 레이아웃 (수정 모드 - 첨부파일 사이드바 포함)
+   - 섹션 네비게이션 + 폼 콘텐츠 + 첨부파일 사이드바
+   ======================================== */
+.form-page-layout-with-sidebar {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+    gap: 0;
+}
+
+.form-page-layout-with-sidebar .section-nav {
+    width: 220px;
+    flex-shrink: 0;
+}
+
+.form-page-layout-with-sidebar .form-main-content {
+    flex: 1;
+    min-width: 0;
+    padding: var(--space-6);
+    overflow-y: auto;
+    background-color: var(--color-gray-25);
+}
+
+.form-page-layout-with-sidebar .right-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+}
+
+/* 3단 레이아웃 반응형 */
+@media (max-width: 1200px) {
+    .form-page-layout-with-sidebar .right-sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    .form-page-layout-with-sidebar .form-main-content {
+        padding: var(--space-4);
+    }
+}
+
+@media (max-width: 768px) {
+    .form-page-layout-with-sidebar {
+        flex-direction: column;
+    }
+
+    .form-page-layout-with-sidebar .section-nav {
+        width: 100%;
+    }
+}
