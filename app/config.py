@@ -12,6 +12,15 @@ class Config:
     BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     DATA_DIR = os.path.join(BASE_DIR, 'data')
 
+    # AI 서비스 설정 (Gemini API)
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+
+    # Google Cloud 설정 (Vertex AI, Document AI)
+    GOOGLE_APPLICATION_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+    GOOGLE_PROJECT_ID = os.environ.get('GOOGLE_PROJECT_ID')
+    GOOGLE_LOCATION = os.environ.get('GOOGLE_LOCATION', 'asia-northeast3')
+    DOCUMENTAI_PROCESSOR_ID = os.environ.get('DOCUMENTAI_PROCESSOR_ID')
+
     # SQLAlchemy 설정
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         f'sqlite:///{os.path.join(BASE_DIR, "instance", "hrmanagement.db")}'

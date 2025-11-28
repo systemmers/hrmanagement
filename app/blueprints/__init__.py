@@ -11,6 +11,7 @@ def register_blueprints(app):
     from .employees import employees_bp
     from .classification import classification_bp
     from .api import api_bp
+    from .ai_test import ai_test_bp
 
     # 메인 페이지 (/, /search)
     app.register_blueprint(main_bp)
@@ -23,3 +24,6 @@ def register_blueprints(app):
 
     # REST API (/api/*)
     app.register_blueprint(api_bp, url_prefix='/api')
+
+    # AI 테스트 (프로토타입) (/ai-test/*)
+    app.register_blueprint(ai_test_bp)
