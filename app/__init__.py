@@ -13,8 +13,8 @@ def create_app(config_name=None):
         config_name = os.environ.get('FLASK_ENV', 'development')
 
     app = Flask(__name__,
-                template_folder='../templates',
-                static_folder='../static')
+                template_folder='templates',
+                static_folder='static')
 
     # 설정 로드
     from .config import config

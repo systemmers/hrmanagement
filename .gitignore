@@ -67,6 +67,19 @@ htmlcov/
 *.sqlite3
 data/backup/
 *.backup
+instance/
+
+# Uploads
+uploads/
+
+# GCP Credentials (NEVER commit)
+*-*-*.json
+!package*.json
+aipkey.md
+
+# Temp files
+nul
+=*
 
 # Temporary files
 *~
