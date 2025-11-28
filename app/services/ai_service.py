@@ -40,7 +40,7 @@ class AIService:
             location=current_app.config.get('GOOGLE_LOCATION', 'asia-northeast3'),
             credentials_path=current_app.config.get('GOOGLE_APPLICATION_CREDENTIALS'),
             processor_id=current_app.config.get('DOCUMENTAI_PROCESSOR_ID'),
-            model_name='gemini-1.5-flash',
+            model_name='gemini-2.0-flash',
             max_tokens=4096,
             temperature=0.1
         )
