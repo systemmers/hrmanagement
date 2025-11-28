@@ -24,6 +24,15 @@ def create_app(config_name=None):
     from .database import db
     db.init_app(app)
 
+    # SQLAlchemy 모델 import (테이블 생성 전 필수)
+    from .models import (
+        Employee, Education, Career, Certificate, FamilyMember,
+        Language, MilitaryService, Salary, Benefit, Contract,
+        SalaryHistory, Promotion, Evaluation, Training, Attendance,
+        Insurance, Project, Award, Asset, SalaryPayment, Attachment,
+        ClassificationOption
+    )
+
     # 테이블 생성 (개발 환경)
     with app.app_context():
         db.create_all()

@@ -1,0 +1,135 @@
+"""
+Base Repository 클래스
+
+SQLAlchemy 기반 공통 CRUD 기능을 제공합니다.
+"""
+from typing import List, Optional, Dict, Any, Type
+from app.database import db
+
+
+class BaseRepository:
+    """기본 Repository 클래스"""
+
+    def __init__(self, model_class: Type[db.Model]):
+        """
+        Args:
+            model_class: SQLAlchemy 모델 클래스
+        """
+        self.model_class = model_class
+
+    def get_all(self) -> List[Dict]:
+        """모든 레코드 조회"""
+        records = self.model_class.query.all()
+        return [record.to_dict() for record in records]
+
+    def get_by_id(self, record_id: Any) -> Optional[Dict]:
+        """ID로 레코드 조회"""
+        record = self.model_class.query.get(record_id)
+        return record.to_dict() if record else None
+
+    def create(self, data: Dict) -> Dict:
+        """새 레코드 생성"""
+        record = self.model_class.from_dict(data)
+        db.session.add(record)
+        db.session.commit()
+        return record.to_dict()
+
+    def update(self, record_id: Any, data: Dict) -> Optional[Dict]:
+        """레코드 수정"""
+        record = self.model_class.query.get(record_id)
+        if not record:
+            return None
+
+        # 데이터 업데이트
+        for key, value in data.items():
+            # camelCase를 snake_case로 변환
+            snake_key = self._camel_to_snake(key)
+            if hasattr(record, snake_key):
+                setattr(record, snake_key, value)
+
+        db.session.commit()
+        return record.to_dict()
+
+    def delete(self, record_id: Any) -> bool:
+        """레코드 삭제"""
+        record = self.model_class.query.get(record_id)
+        if not record:
+            return False
+
+        db.session.delete(record)
+        db.session.commit()
+        return True
+
+    def _camel_to_snake(self, name: str) -> str:
+        """camelCase를 snake_case로 변환"""
+        result = []
+        for char in name:
+            if char.isupper():
+                result.append('_')
+                result.append(char.lower())
+            else:
+                result.append(char)
+        return ''.join(result).lstrip('_')
+
+
+class BaseRelationRepository(BaseRepository):
+    """
+    관계형 데이터 Repository 기본 클래스
+
+    Employee와 1:N 관계를 가진 모델용 Repository입니다.
+    """
+
+    def get_by_employee_id(self, employee_id: str) -> List[Dict]:
+        """특정 직원의 모든 레코드 조회"""
+        records = self.model_class.query.filter_by(employee_id=employee_id).all()
+        return [record.to_dict() for record in records]
+
+    def delete_by_employee_id(self, employee_id: str) -> int:
+        """특정 직원의 모든 레코드 삭제"""
+        count = self.model_class.query.filter_by(employee_id=employee_id).delete()
+        db.session.commit()
+        return count
+
+    def create_for_employee(self, employee_id: str, data: Dict) -> Dict:
+        """특정 직원에게 레코드 추가"""
+        data['employeeId'] = employee_id
+        return self.create(data)
+
+
+class BaseOneToOneRepository(BaseRepository):
+    """
+    1:1 관계 데이터 Repository 기본 클래스
+
+    Employee와 1:1 관계를 가진 모델용 Repository입니다.
+    """
+
+    def get_by_employee_id(self, employee_id: str) -> Optional[Dict]:
+        """특정 직원의 레코드 조회 (1:1)"""
+        record = self.model_class.query.filter_by(employee_id=employee_id).first()
+        return record.to_dict() if record else None
+
+    def save_for_employee(self, employee_id: str, data: Dict) -> Dict:
+        """특정 직원의 레코드 저장 (upsert)"""
+        record = self.model_class.query.filter_by(employee_id=employee_id).first()
+
+        if record:
+            # 기존 레코드 업데이트
+            for key, value in data.items():
+                snake_key = self._camel_to_snake(key)
+                if hasattr(record, snake_key):
+                    setattr(record, snake_key, value)
+            db.session.commit()
+            return record.to_dict()
+        else:
+            # 새 레코드 생성
+            data['employeeId'] = employee_id
+            return self.create(data)
+
+    def delete_by_employee_id(self, employee_id: str) -> bool:
+        """특정 직원의 레코드 삭제"""
+        record = self.model_class.query.filter_by(employee_id=employee_id).first()
+        if record:
+            db.session.delete(record)
+            db.session.commit()
+            return True
+        return False
