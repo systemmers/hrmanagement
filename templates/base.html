@@ -41,7 +41,7 @@
 
         <div class="header-search">
             <i class="fas fa-search header-search-icon"></i>
-            <form action="{{ url_for('search') }}" method="get">
+            <form action="{{ url_for('main.search') }}" method="get">
                 <input type="text" name="q" class="header-search-input" 
                        placeholder="직원 검색 (이름, 부서, 직급)" 
                        value="{{ search_query or '' }}">
@@ -74,11 +74,11 @@
                     <!-- 조회 섹션 -->
                     <div class="nav-section">
                         <h2 class="nav-section-title">조회</h2>
-                        <a href="{{ url_for('index') }}" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+                        <a href="{{ url_for('main.index') }}" class="nav-item {% if request.endpoint == 'main.index' %}active{% endif %}">
                             <i class="fas fa-home"></i>
                             <span>대시보드</span>
                         </a>
-                        <a href="{{ url_for('employee_list') }}" class="nav-item {% if request.endpoint == 'employee_list' %}active{% endif %}">
+                        <a href="{{ url_for('employees.employee_list') }}" class="nav-item {% if request.endpoint == 'employees.employee_list' %}active{% endif %}">
                             <i class="fas fa-users"></i>
                             <span>직원 목록</span>
                         </a>
@@ -87,7 +87,7 @@
                     <!-- 입력 섹션 -->
                     <div class="nav-section">
                         <h2 class="nav-section-title">입력</h2>
-                        <a href="{{ url_for('employee_new') }}" class="nav-item {% if request.endpoint == 'employee_new' %}active{% endif %}">
+                        <a href="{{ url_for('employees.employee_new') }}" class="nav-item {% if request.endpoint == 'employees.employee_new' %}active{% endif %}">
                             <i class="fas fa-user-plus"></i>
                             <span>직원 등록</span>
                         </a>
@@ -96,7 +96,7 @@
                     <!-- 설정 섹션 -->
                     <div class="nav-section">
                         <h2 class="nav-section-title">설정</h2>
-                        <a href="{{ url_for('classification_options_page') }}" class="nav-item {% if request.endpoint == 'classification_options_page' %}active{% endif %}">
+                        <a href="{{ url_for('classification.classification_options_page') }}" class="nav-item {% if request.endpoint == 'classification.classification_options_page' %}active{% endif %}">
                             <i class="fas fa-cog"></i>
                             <span>분류 옵션 관리</span>
                         </a>

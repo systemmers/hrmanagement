@@ -71,14 +71,14 @@
         <div class="form-page-header">
             <h1 class="form-page-title">{% if employee %}직원 정보 수정{% else %}신규 직원 등록{% endif %}</h1>
             <div class="form-page-actions">
-                <a href="{% if employee %}{{ url_for('employee_detail', employee_id=employee.id) }}{% else %}{{ url_for('index') }}{% endif %}" class="btn btn-secondary">
+                <a href="{% if employee %}{{ url_for('employees.employee_detail', employee_id=employee.id) }}{% else %}{{ url_for('main.index') }}{% endif %}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                     <span>취소</span>
                 </a>
             </div>
         </div>
 
-        <form method="POST" action="{% if employee %}{{ url_for('employee_update', employee_id=employee.id) }}{% else %}{{ url_for('employee_create') }}{% endif %}" class="employee-form" id="employeeForm">
+        <form method="POST" action="{% if employee %}{{ url_for('employees.employee_update', employee_id=employee.id) }}{% else %}{{ url_for('employees.employee_create') }}{% endif %}" class="employee-form" id="employeeForm">
 
             <!-- 섹션 1: 개인 기본정보 -->
             <section class="form-section" id="personal-info">
@@ -562,7 +562,7 @@
                     <span class="required">*</span> 표시는 필수 입력 항목입니다.
                 </div>
                 <div class="form-submit-actions">
-                    <a href="{% if employee %}{{ url_for('employee_detail', employee_id=employee.id) }}{% else %}{{ url_for('index') }}{% endif %}" class="btn btn-secondary btn-lg">
+                    <a href="{% if employee %}{{ url_for('employees.employee_detail', employee_id=employee.id) }}{% else %}{{ url_for('main.index') }}{% endif %}" class="btn btn-secondary btn-lg">
                         <i class="fas fa-times"></i>
                         <span>취소</span>
                     </a>

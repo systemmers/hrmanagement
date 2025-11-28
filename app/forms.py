@@ -10,7 +10,9 @@ from wtforms.validators import DataRequired, Email, Length, Optional, Regexp
 
 def load_classification_options():
     """classification_options.json에서 선택 옵션 로드 (SSOT)"""
-    options_path = os.path.join(os.path.dirname(__file__), 'data', 'classification_options.json')
+    # app/ 패키지 기준 경로 설정
+    base_dir = os.path.dirname(os.path.dirname(__file__))
+    options_path = os.path.join(base_dir, 'data', 'classification_options.json')
     with open(options_path, 'r', encoding='utf-8') as f:
         return json.load(f)
 

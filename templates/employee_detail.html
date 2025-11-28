@@ -99,11 +99,11 @@
         <div class="detail-page-header">
             <h1 class="detail-page-title">직원 상세 정보</h1>
             <div class="detail-page-actions">
-                <a href="{{ url_for('employee_list') }}" class="btn btn-secondary">
+                <a href="{{ url_for('employees.employee_list') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                     <span>목록으로</span>
                 </a>
-                <a href="{{ url_for('employee_edit', employee_id=employee.id) }}" class="btn btn-primary">
+                <a href="{{ url_for('employees.employee_edit', employee_id=employee.id) }}" class="btn btn-primary">
                     <i class="fas fa-edit"></i>
                     <span>수정</span>
                 </a>

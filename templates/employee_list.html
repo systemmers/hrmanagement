@@ -15,7 +15,7 @@
                     <i class="fas fa-th"></i>
                 </button>
             </div>
-            <a href="{{ url_for('employee_new') }}" class="btn btn-primary">
+            <a href="{{ url_for('employees.employee_new') }}" class="btn btn-primary">
                 <i class="fas fa-plus"></i>
                 <span>직원 등록</span>
             </a>
@@ -135,10 +135,10 @@
                 </td>
                 <td>
                     <div class="table-actions">
-                        <a href="{{ url_for('employee_detail', employee_id=employee.id) }}" class="btn-icon" title="상세">
+                        <a href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}" class="btn-icon" title="상세">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <a href="{{ url_for('employee_edit', employee_id=employee.id) }}" class="btn-icon" title="수정">
+                        <a href="{{ url_for('employees.employee_edit', employee_id=employee.id) }}" class="btn-icon" title="수정">
                             <i class="fas fa-edit"></i>
                         </a>
                     </div>
@@ -152,7 +152,7 @@
 <!-- 카드형 뷰 -->
 <div class="employee-grid" id="card-view" style="display: none;">
     {% for employee in employees %}
-    <div class="employee-card" onclick="window.location.href='{{ url_for('employee_detail', employee_id=employee.id) }}'">
+    <div class="employee-card" onclick="window.location.href='{{ url_for('employees.employee_detail', employee_id=employee.id) }}'">
         <div class="employee-status {{ employee.status }}"></div>
         <img src="{{ employee.photo }}" alt="{{ employee.name }}" class="employee-photo">
         <h3 class="employee-name">{{ employee.name }}</h3>
@@ -168,11 +168,11 @@
             </div>
         </div>
         <div class="employee-actions" onclick="event.stopPropagation()">
-            <a href="{{ url_for('employee_detail', employee_id=employee.id) }}" class="btn btn-secondary btn-small">
+            <a href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}" class="btn btn-secondary btn-small">
                 <i class="fas fa-eye"></i>
                 <span>보기</span>
             </a>
-            <a href="{{ url_for('employee_edit', employee_id=employee.id) }}" class="btn btn-secondary btn-small">
+            <a href="{{ url_for('employees.employee_edit', employee_id=employee.id) }}" class="btn btn-secondary btn-small">
                 <i class="fas fa-edit"></i>
                 <span>수정</span>
             </a>

@@ -6,6 +6,7 @@ import os
 from datetime import datetime
 from typing import List, Optional, Dict
 
+
 class Employee:
     """직원 모델"""
 
@@ -459,17 +460,17 @@ class EmployeeRepository:
             return base_data
         except (FileNotFoundError, json.JSONDecodeError):
             return []
-    
+
     def _save_data(self, data: List[Dict]):
         """JSON 파일에 데이터 저장"""
         with open(self.json_file_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
-    
+
     def get_all(self) -> List[Employee]:
         """모든 직원 조회"""
         data = self._load_data()
         return [Employee.from_dict(item) for item in data]
-    
+
     def get_by_id(self, employee_id: int) -> Optional[Employee]:
         """ID로 직원 조회"""
         data = self._load_data()
@@ -477,63 +478,63 @@ class EmployeeRepository:
             if item['id'] == employee_id:
                 return Employee.from_dict(item)
         return None
-    
+
     def create(self, employee: Employee) -> Employee:
         """직원 생성"""
         data = self._load_data()
-        
+
         # 새 ID 생성
         if data:
             employee.id = max(item['id'] for item in data) + 1
         else:
             employee.id = 1
-        
+
         data.append(employee.to_dict())
         self._save_data(data)
         return employee
-    
+
     def update(self, employee_id: int, employee: Employee) -> Optional[Employee]:
         """직원 수정"""
         data = self._load_data()
-        
+
         for i, item in enumerate(data):
             if item['id'] == employee_id:
                 employee.id = employee_id
                 data[i] = employee.to_dict()
                 self._save_data(data)
                 return employee
-        
+
         return None
-    
+
     def delete(self, employee_id: int) -> bool:
         """직원 삭제"""
         data = self._load_data()
         original_length = len(data)
-        
+
         data = [item for item in data if item['id'] != employee_id]
-        
+
         if len(data) < original_length:
             self._save_data(data)
             return True
         return False
-    
+
     def search(self, query: str) -> List[Employee]:
         """직원 검색 (이름, 부서, 직급)"""
         all_employees = self.get_all()
         query = query.lower()
-        
+
         return [
             emp for emp in all_employees
             if query in emp.name.lower() or
                query in emp.department.lower() or
                query in emp.position.lower()
         ]
-    
+
     def filter_by_status(self, status: str) -> List[Employee]:
         """상태별 필터링"""
         all_employees = self.get_all()
         return [emp for emp in all_employees if emp.status == status]
-    
+
     def get_statistics(self) -> Dict:
         """통계 정보 조회"""
         employees = self.get_all()
@@ -541,12 +542,12 @@ class EmployeeRepository:
         active = len([e for e in employees if e.status == 'active'])
         warning = len([e for e in employees if e.status == 'warning'])
         expired = len([e for e in employees if e.status == 'expired'])
-        
+
         # 기존 통계
         active_rate = round((active / total * 100) if total > 0 else 0, 1)
         warning_rate = round((warning / total * 100) if total > 0 else 0, 1)
         expired_rate = round((expired / total * 100) if total > 0 else 0, 1)
-        
+
         # 개발예정 항목 (임시 목 데이터)
         retirement = 0  # 퇴직 예정 직원 수
         retirement_rate = 0.0  # 퇴직 예정률
@@ -559,7 +560,7 @@ class EmployeeRepository:
         half_day_rate = 0.0  # 반차 비율
         sick_leave = 0  # 병가 사용
         sick_leave_rate = 0.0  # 병가 비율
-        
+
         return {
             # 기존 통계
             'total': total,
@@ -582,36 +583,36 @@ class EmployeeRepository:
             'sick_leave': sick_leave,
             'sick_leave_rate': sick_leave_rate
         }
-    
+
     def get_department_statistics(self) -> Dict[str, int]:
         """부서별 통계 조회"""
         employees = self.get_all()
         dept_stats = {}
-        
+
         for emp in employees:
             dept = emp.department
             dept_stats[dept] = dept_stats.get(dept, 0) + 1
-        
+
         return dept_stats
-    
+
     def get_recent_employees(self, limit: int = 5) -> List[Employee]:
         """최근 등록 직원 조회 (ID 기준 내림차순)"""
         employees = self.get_all()
         sorted_employees = sorted(employees, key=lambda e: e.id, reverse=True)
         return sorted_employees[:limit]
-    
+
     def filter_by_department(self, department: str) -> List[Employee]:
         """부서별 필터링"""
         all_employees = self.get_all()
         return [emp for emp in all_employees if emp.department == department]
-    
+
     def filter_by_position(self, position: str) -> List[Employee]:
         """직급별 필터링"""
         all_employees = self.get_all()
         return [emp for emp in all_employees if emp.position == position]
-    
-    def filter_employees(self, department: Optional[str] = None, 
-                        position: Optional[str] = None, 
+
+    def filter_employees(self, department: Optional[str] = None,
+                        position: Optional[str] = None,
                         status: Optional[str] = None,
                         departments: Optional[List[str]] = None,
                         positions: Optional[List[str]] = None,
@@ -619,31 +620,31 @@ class EmployeeRepository:
         """다중 필터 조합 지원"""
         all_employees = self.get_all()
         filtered = all_employees
-        
+
         # 단일 부서 필터
         if department:
             filtered = [emp for emp in filtered if emp.department == department]
-        
+
         # 다중 부서 필터
         if departments:
             filtered = [emp for emp in filtered if emp.department in departments]
-        
+
         # 단일 직급 필터
         if position:
             filtered = [emp for emp in filtered if emp.position == position]
-        
+
         # 다중 직급 필터
         if positions:
             filtered = [emp for emp in filtered if emp.position in positions]
-        
+
         # 단일 상태 필터
         if status:
             filtered = [emp for emp in filtered if emp.status == status]
-        
+
         # 다중 상태 필터
         if statuses:
             filtered = [emp for emp in filtered if emp.status in statuses]
-        
+
         return filtered
 
 
@@ -778,11 +779,11 @@ class SalaryHistoryRepository(BaseRelationRepository):
 
 class ClassificationOptionsRepository:
     """분류 옵션 데이터 저장소 (JSON 파일 기반)"""
-    
+
     def __init__(self, json_file_path: str):
         self.json_file_path = json_file_path
         self._ensure_data_file()
-    
+
     def _ensure_data_file(self):
         """데이터 파일이 없으면 기본값으로 생성"""
         if not os.path.exists(self.json_file_path):
@@ -797,7 +798,7 @@ class ClassificationOptionsRepository:
                 ]
             }
             self._save_data(default_data)
-    
+
     def _load_data(self) -> Dict:
         """JSON 파일에서 데이터 로드"""
         try:
@@ -809,31 +810,31 @@ class ClassificationOptionsRepository:
                 "positions": [],
                 "statuses": []
             }
-    
+
     def _save_data(self, data: Dict):
         """JSON 파일에 데이터 저장"""
         with open(self.json_file_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
-    
+
     def get_all(self) -> Dict:
         """모든 옵션 조회"""
         return self._load_data()
-    
+
     def get_departments(self) -> List[str]:
         """부서 목록 조회"""
         data = self._load_data()
         return data.get('departments', [])
-    
+
     def get_positions(self) -> List[str]:
         """직급 목록 조회"""
         data = self._load_data()
         return data.get('positions', [])
-    
+
     def get_statuses(self) -> List[Dict]:
         """상태 목록 조회"""
         data = self._load_data()
         return data.get('statuses', [])
-    
+
     def add_department(self, department: str) -> bool:
         """부서 추가"""
         data = self._load_data()
@@ -844,7 +845,7 @@ class ClassificationOptionsRepository:
             self._save_data(data)
             return True
         return False
-    
+
     def update_department(self, old_department: str, new_department: str) -> bool:
         """부서 수정"""
         data = self._load_data()
@@ -856,7 +857,7 @@ class ClassificationOptionsRepository:
             self._save_data(data)
             return True
         return False
-    
+
     def delete_department(self, department: str) -> bool:
         """부서 삭제"""
         data = self._load_data()
@@ -867,7 +868,7 @@ class ClassificationOptionsRepository:
             self._save_data(data)
             return True
         return False
-    
+
     def add_position(self, position: str) -> bool:
         """직급 추가"""
         data = self._load_data()
@@ -878,7 +879,7 @@ class ClassificationOptionsRepository:
             self._save_data(data)
             return True
         return False
-    
+
     def update_position(self, old_position: str, new_position: str) -> bool:
         """직급 수정"""
         data = self._load_data()
@@ -890,7 +891,7 @@ class ClassificationOptionsRepository:
             self._save_data(data)
             return True
         return False
-    
+
     def delete_position(self, position: str) -> bool:
         """직급 삭제"""
         data = self._load_data()
@@ -901,7 +902,7 @@ class ClassificationOptionsRepository:
             self._save_data(data)
             return True
         return False
-    
+
     def add_status(self, value: str, label: str) -> bool:
         """상태 추가"""
         data = self._load_data()
@@ -912,7 +913,7 @@ class ClassificationOptionsRepository:
             self._save_data(data)
             return True
         return False
-    
+
     def update_status(self, old_value: str, new_value: str, new_label: str) -> bool:
         """상태 수정"""
         data = self._load_data()
@@ -925,7 +926,7 @@ class ClassificationOptionsRepository:
                 self._save_data(data)
                 return True
         return False
-    
+
     def delete_status(self, value: str) -> bool:
         """상태 삭제"""
         data = self._load_data()
