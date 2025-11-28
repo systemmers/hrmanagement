@@ -20,6 +20,14 @@ def create_app(config_name=None):
     from .config import config
     app.config.from_object(config[config_name])
 
+    # 데이터베이스 초기화
+    from .database import db
+    db.init_app(app)
+
+    # 테이블 생성 (개발 환경)
+    with app.app_context():
+        db.create_all()
+
     # 확장 초기화
     from .extensions import init_extensions
     init_extensions(app)

@@ -11,6 +11,11 @@ class Config:
     # 데이터 파일 경로 (app/ 패키지 기준)
     BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     DATA_DIR = os.path.join(BASE_DIR, 'data')
+
+    # SQLAlchemy 설정
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+        f'sqlite:///{os.path.join(BASE_DIR, "instance", "hrmanagement.db")}'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     EMPLOYEES_JSON = os.path.join(DATA_DIR, 'employees.json')
     CLASSIFICATION_OPTIONS_JSON = os.path.join(DATA_DIR, 'classification_options.json')
 
