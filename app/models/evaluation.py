@@ -12,54 +12,42 @@ class Evaluation(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, index=True)
-    evaluation_period = db.Column(db.String(50), nullable=True)
-    evaluation_date = db.Column(db.String(20), nullable=True)
-    evaluator = db.Column(db.String(100), nullable=True)
-    performance_score = db.Column(db.Float, default=0.0)
-    competency_score = db.Column(db.Float, default=0.0)
-    overall_score = db.Column(db.Float, default=0.0)
-    grade = db.Column(db.String(10), nullable=True)
-    strengths = db.Column(db.Text, nullable=True)
-    improvements = db.Column(db.Text, nullable=True)
-    goals = db.Column(db.Text, nullable=True)
-    feedback = db.Column(db.Text, nullable=True)
+    year = db.Column(db.Integer, nullable=True)
+    q1_grade = db.Column(db.String(10), nullable=True)
+    q2_grade = db.Column(db.String(10), nullable=True)
+    q3_grade = db.Column(db.String(10), nullable=True)
+    q4_grade = db.Column(db.String(10), nullable=True)
+    overall_grade = db.Column(db.String(10), nullable=True)
+    salary_negotiation = db.Column(db.String(100), nullable=True)
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 camelCase 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환"""
         return {
             'id': self.id,
             'employeeId': self.employee_id,
-            'evaluationPeriod': self.evaluation_period,
-            'evaluationDate': self.evaluation_date,
-            'evaluator': self.evaluator,
-            'performanceScore': self.performance_score,
-            'competencyScore': self.competency_score,
-            'overallScore': self.overall_score,
-            'grade': self.grade,
-            'strengths': self.strengths,
-            'improvements': self.improvements,
-            'goals': self.goals,
-            'feedback': self.feedback,
+            'year': self.year,
+            'q1Grade': self.q1_grade,
+            'q2Grade': self.q2_grade,
+            'q3Grade': self.q3_grade,
+            'q4Grade': self.q4_grade,
+            'overallGrade': self.overall_grade,
+            'salaryNegotiation': self.salary_negotiation,
             'note': self.note,
         }
 
     @classmethod
     def from_dict(cls, data):
-        """camelCase 딕셔너리에서 모델 생성"""
+        """딕셔너리에서 모델 생성"""
         return cls(
-            employee_id=data.get('employeeId'),
-            evaluation_period=data.get('evaluationPeriod'),
-            evaluation_date=data.get('evaluationDate'),
-            evaluator=data.get('evaluator'),
-            performance_score=data.get('performanceScore', 0.0),
-            competency_score=data.get('competencyScore', 0.0),
-            overall_score=data.get('overallScore', 0.0),
-            grade=data.get('grade'),
-            strengths=data.get('strengths'),
-            improvements=data.get('improvements'),
-            goals=data.get('goals'),
-            feedback=data.get('feedback'),
+            employee_id=data.get('employee_id') or data.get('employeeId'),
+            year=data.get('year'),
+            q1_grade=data.get('q1_grade') or data.get('q1Grade'),
+            q2_grade=data.get('q2_grade') or data.get('q2Grade'),
+            q3_grade=data.get('q3_grade') or data.get('q3Grade'),
+            q4_grade=data.get('q4_grade') or data.get('q4Grade'),
+            overall_grade=data.get('overall_grade') or data.get('overallGrade'),
+            salary_negotiation=data.get('salary_negotiation') or data.get('salaryNegotiation'),
             note=data.get('note'),
         )
 

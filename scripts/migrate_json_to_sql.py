@@ -30,18 +30,6 @@ def load_json(file_path):
     return []
 
 
-def camel_to_snake(name):
-    """camelCase를 snake_case로 변환"""
-    result = []
-    for char in name:
-        if char.isupper():
-            result.append('_')
-            result.append(char.lower())
-        else:
-            result.append(char)
-    return ''.join(result).lstrip('_')
-
-
 def migrate_employees(app):
     """직원 데이터 마이그레이션"""
     print("  - employees.json 마이그레이션...")
@@ -253,46 +241,356 @@ def migrate_military_service(app):
     return count
 
 
-def migrate_generic(app, json_key, model_class, field_mapping=None, name=''):
-    """
-    범용 마이그레이션 함수
-
-    Args:
-        json_key: config의 JSON 파일 경로 키
-        model_class: SQLAlchemy 모델 클래스
-        field_mapping: JSON 필드명 -> 모델 필드명 매핑 (optional)
-        name: 로그 출력용 이름
-    """
-    print(f"  - {json_key} 마이그레이션...")
-    file_path = app.config.get(json_key)
-    if not file_path:
-        print(f"    설정 없음, 건너뜀")
-        return 0
-
-    data = load_json(file_path)
-    if not data:
-        print(f"    데이터 없음")
-        return 0
-
+def migrate_salary(app):
+    """급여 데이터 마이그레이션 (1:1)"""
+    print("  - salaries.json 마이그레이션...")
+    data = load_json(app.config.get('SALARIES_JSON', ''))
     count = 0
-    for item in data:
-        # 필드 매핑 적용
-        mapped_item = {}
-        for json_key_name, value in item.items():
-            if field_mapping and json_key_name in field_mapping:
-                model_key = field_mapping[json_key_name]
-            else:
-                model_key = json_key_name
-            mapped_item[model_key] = value
 
-        # 모델 인스턴스 생성
-        try:
-            record = model_class(**mapped_item)
-            db.session.add(record)
-            count += 1
-        except Exception as e:
-            print(f"    경고: {item} - {e}")
-            continue
+    for item in data:
+        record = Salary(
+            employee_id=item.get('employee_id'),
+            salary_type=item.get('salary_type'),
+            base_salary=item.get('base_salary', 0),
+            position_allowance=item.get('position_allowance', 0),
+            meal_allowance=item.get('meal_allowance', 0),
+            transportation_allowance=item.get('transportation_allowance', 0),
+            total_salary=item.get('total_salary', 0),
+            payment_day=item.get('payment_day', 25),
+            payment_method=item.get('payment_method'),
+            bank_account=item.get('bank_account'),
+            note=item.get('note'),
+        )
+        db.session.add(record)
+        count += 1
+
+    db.session.commit()
+    print(f"    {count}건 완료")
+    return count
+
+
+def migrate_benefit(app):
+    """복리후생 데이터 마이그레이션 (1:1)"""
+    print("  - benefits.json 마이그레이션...")
+    data = load_json(app.config.get('BENEFITS_JSON', ''))
+    count = 0
+
+    for item in data:
+        record = Benefit(
+            employee_id=item.get('employee_id'),
+            year=item.get('year'),
+            annual_leave_granted=item.get('annual_leave_granted', 0),
+            annual_leave_used=item.get('annual_leave_used', 0),
+            annual_leave_remaining=item.get('annual_leave_remaining', 0),
+            severance_type=item.get('severance_type'),
+            severance_method=item.get('severance_method'),
+            note=item.get('note'),
+        )
+        db.session.add(record)
+        count += 1
+
+    db.session.commit()
+    print(f"    {count}건 완료")
+    return count
+
+
+def migrate_contract(app):
+    """계약 데이터 마이그레이션 (1:1)"""
+    print("  - contracts.json 마이그레이션...")
+    data = load_json(app.config.get('CONTRACTS_JSON', ''))
+    count = 0
+
+    for item in data:
+        record = Contract(
+            employee_id=item.get('employee_id'),
+            contract_date=item.get('contract_date'),
+            contract_type=item.get('contract_type'),
+            contract_period=item.get('contract_period'),
+            employee_type=item.get('employee_type'),
+            work_type=item.get('work_type'),
+            note=item.get('note'),
+        )
+        db.session.add(record)
+        count += 1
+
+    db.session.commit()
+    print(f"    {count}건 완료")
+    return count
+
+
+def migrate_insurance(app):
+    """보험 데이터 마이그레이션 (1:1)"""
+    print("  - insurances.json 마이그레이션...")
+    data = load_json(app.config.get('INSURANCES_JSON', ''))
+    count = 0
+
+    for item in data:
+        record = Insurance(
+            employee_id=item.get('employee_id'),
+            national_pension=item.get('national_pension', True),
+            health_insurance=item.get('health_insurance', True),
+            employment_insurance=item.get('employment_insurance', True),
+            industrial_accident=item.get('industrial_accident', True),
+            national_pension_rate=item.get('national_pension_rate', 4.5),
+            health_insurance_rate=item.get('health_insurance_rate', 3.545),
+            long_term_care_rate=item.get('long_term_care_rate', 0.9182),
+            employment_insurance_rate=item.get('employment_insurance_rate', 0.9),
+            note=item.get('note'),
+        )
+        db.session.add(record)
+        count += 1
+
+    db.session.commit()
+    print(f"    {count}건 완료")
+    return count
+
+
+def migrate_salary_history(app):
+    """연봉 계약 이력 마이그레이션"""
+    print("  - salary_history.json 마이그레이션...")
+    data = load_json(app.config.get('SALARY_HISTORY_JSON', ''))
+    count = 0
+
+    for item in data:
+        record = SalaryHistory(
+            employee_id=item.get('employee_id'),
+            contract_year=item.get('contract_year'),
+            annual_salary=item.get('annual_salary', 0),
+            bonus=item.get('bonus', 0),
+            total_amount=item.get('total_amount', 0),
+            contract_period=item.get('contract_period'),
+            note=item.get('note'),
+        )
+        db.session.add(record)
+        count += 1
+
+    db.session.commit()
+    print(f"    {count}건 완료")
+    return count
+
+
+def migrate_promotion(app):
+    """발령/인사이동 마이그레이션"""
+    print("  - promotions.json 마이그레이션...")
+    data = load_json(app.config.get('PROMOTIONS_JSON', ''))
+    count = 0
+
+    for item in data:
+        record = Promotion(
+            employee_id=item.get('employee_id'),
+            effective_date=item.get('effective_date'),
+            promotion_type=item.get('promotion_type'),
+            from_department=item.get('from_department'),
+            to_department=item.get('to_department'),
+            from_position=item.get('from_position'),
+            to_position=item.get('to_position'),
+            job_role=item.get('job_role'),
+            reason=item.get('reason'),
+            note=item.get('note'),
+        )
+        db.session.add(record)
+        count += 1
+
+    db.session.commit()
+    print(f"    {count}건 완료")
+    return count
+
+
+def migrate_evaluation(app):
+    """인사평가 마이그레이션"""
+    print("  - evaluations.json 마이그레이션...")
+    data = load_json(app.config.get('EVALUATIONS_JSON', ''))
+    count = 0
+
+    for item in data:
+        record = Evaluation(
+            employee_id=item.get('employee_id'),
+            year=item.get('year'),
+            q1_grade=item.get('q1_grade'),
+            q2_grade=item.get('q2_grade'),
+            q3_grade=item.get('q3_grade'),
+            q4_grade=item.get('q4_grade'),
+            overall_grade=item.get('overall_grade'),
+            salary_negotiation=item.get('salary_negotiation'),
+            note=item.get('note'),
+        )
+        db.session.add(record)
+        count += 1
+
+    db.session.commit()
+    print(f"    {count}건 완료")
+    return count
+
+
+def migrate_training(app):
+    """교육 이력 마이그레이션"""
+    print("  - trainings.json 마이그레이션...")
+    data = load_json(app.config.get('TRAININGS_JSON', ''))
+    count = 0
+
+    for item in data:
+        record = Training(
+            employee_id=item.get('employee_id'),
+            training_date=item.get('training_date'),
+            training_name=item.get('training_name'),
+            institution=item.get('institution'),
+            hours=item.get('hours', 0),
+            completion_status=item.get('completion_status'),
+            note=item.get('note'),
+        )
+        db.session.add(record)
+        count += 1
+
+    db.session.commit()
+    print(f"    {count}건 완료")
+    return count
+
+
+def migrate_attendance(app):
+    """근태 마이그레이션 (월별)"""
+    print("  - attendance.json 마이그레이션...")
+    data = load_json(app.config.get('ATTENDANCE_JSON', ''))
+    count = 0
+
+    for item in data:
+        record = Attendance(
+            employee_id=item.get('employee_id'),
+            year=item.get('year'),
+            month=item.get('month'),
+            work_days=item.get('work_days', 0),
+            absent_days=item.get('absent_days', 0),
+            late_count=item.get('late_count', 0),
+            early_leave_count=item.get('early_leave_count', 0),
+            annual_leave_used=item.get('annual_leave_used', 0),
+            note=item.get('note'),
+        )
+        db.session.add(record)
+        count += 1
+
+    db.session.commit()
+    print(f"    {count}건 완료")
+    return count
+
+
+def migrate_project(app):
+    """프로젝트 마이그레이션"""
+    print("  - projects.json 마이그레이션...")
+    data = load_json(app.config.get('PROJECTS_JSON', ''))
+    count = 0
+
+    for item in data:
+        record = Project(
+            employee_id=item.get('employee_id'),
+            project_name=item.get('project_name'),
+            start_date=item.get('start_date'),
+            end_date=item.get('end_date'),
+            duration=item.get('duration'),
+            role=item.get('role'),
+            duty=item.get('duty'),
+            client=item.get('client'),
+            note=item.get('note'),
+        )
+        db.session.add(record)
+        count += 1
+
+    db.session.commit()
+    print(f"    {count}건 완료")
+    return count
+
+
+def migrate_award(app):
+    """수상 마이그레이션"""
+    print("  - awards.json 마이그레이션...")
+    data = load_json(app.config.get('AWARDS_JSON', ''))
+    count = 0
+
+    for item in data:
+        record = Award(
+            employee_id=item.get('employee_id'),
+            award_date=item.get('award_date'),
+            award_name=item.get('award_name'),
+            institution=item.get('institution'),
+            note=item.get('note'),
+        )
+        db.session.add(record)
+        count += 1
+
+    db.session.commit()
+    print(f"    {count}건 완료")
+    return count
+
+
+def migrate_asset(app):
+    """자산 마이그레이션"""
+    print("  - assets.json 마이그레이션...")
+    data = load_json(app.config.get('ASSETS_JSON', ''))
+    count = 0
+
+    for item in data:
+        record = Asset(
+            employee_id=item.get('employee_id'),
+            issue_date=item.get('issue_date'),
+            item_name=item.get('item_name'),
+            model=item.get('model'),
+            serial_number=item.get('serial_number'),
+            status=item.get('status'),
+            note=item.get('note'),
+        )
+        db.session.add(record)
+        count += 1
+
+    db.session.commit()
+    print(f"    {count}건 완료")
+    return count
+
+
+def migrate_salary_payment(app):
+    """급여 지급 마이그레이션"""
+    print("  - salary_payments.json 마이그레이션...")
+    data = load_json(app.config.get('SALARY_PAYMENTS_JSON', ''))
+    count = 0
+
+    for item in data:
+        record = SalaryPayment(
+            employee_id=item.get('employee_id'),
+            payment_date=item.get('payment_date'),
+            payment_period=item.get('payment_period'),
+            base_salary=item.get('base_salary', 0),
+            allowances=item.get('allowances', 0),
+            gross_pay=item.get('gross_pay', 0),
+            insurance=item.get('insurance', 0),
+            income_tax=item.get('income_tax', 0),
+            total_deduction=item.get('total_deduction', 0),
+            net_pay=item.get('net_pay', 0),
+            note=item.get('note'),
+        )
+        db.session.add(record)
+        count += 1
+
+    db.session.commit()
+    print(f"    {count}건 완료")
+    return count
+
+
+def migrate_attachment(app):
+    """첨부파일 마이그레이션"""
+    print("  - attachments.json 마이그레이션...")
+    data = load_json(app.config.get('ATTACHMENTS_JSON', ''))
+    count = 0
+
+    for item in data:
+        record = Attachment(
+            employee_id=item.get('employee_id'),
+            file_name=item.get('file_name'),
+            file_path=item.get('file_path'),
+            file_type=item.get('file_type'),
+            file_size=item.get('file_size', 0),
+            category=item.get('category'),
+            upload_date=item.get('upload_date'),
+            note=item.get('note'),
+        )
+        db.session.add(record)
+        count += 1
 
     db.session.commit()
     print(f"    {count}건 완료")
@@ -361,7 +659,7 @@ def main():
         # 분류 옵션
         total += migrate_classification_options(app)
 
-        # 관계형 데이터 (커스텀 매핑 필요)
+        # Phase 1 관계형 데이터
         total += migrate_education(app)
         total += migrate_career(app)
         total += migrate_certificate(app)
@@ -369,23 +667,23 @@ def main():
         total += migrate_language(app)
         total += migrate_military_service(app)
 
-        # 1:1 관계 데이터 (JSON과 모델 필드가 대응)
-        total += migrate_generic(app, 'SALARIES_JSON', Salary, name='salaries')
-        total += migrate_generic(app, 'BENEFITS_JSON', Benefit, name='benefits')
-        total += migrate_generic(app, 'CONTRACTS_JSON', Contract, name='contracts')
-        total += migrate_generic(app, 'INSURANCES_JSON', Insurance, name='insurances')
+        # Phase 1 1:1 관계 데이터
+        total += migrate_salary(app)
+        total += migrate_benefit(app)
+        total += migrate_contract(app)
+        total += migrate_insurance(app)
 
         # Phase 2-6 데이터
-        total += migrate_generic(app, 'SALARY_HISTORY_JSON', SalaryHistory, name='salary_history')
-        total += migrate_generic(app, 'PROMOTIONS_JSON', Promotion, name='promotions')
-        total += migrate_generic(app, 'EVALUATIONS_JSON', Evaluation, name='evaluations')
-        total += migrate_generic(app, 'TRAININGS_JSON', Training, name='trainings')
-        total += migrate_generic(app, 'ATTENDANCE_JSON', Attendance, name='attendance')
-        total += migrate_generic(app, 'PROJECTS_JSON', Project, name='projects')
-        total += migrate_generic(app, 'AWARDS_JSON', Award, name='awards')
-        total += migrate_generic(app, 'ASSETS_JSON', Asset, name='assets')
-        total += migrate_generic(app, 'SALARY_PAYMENTS_JSON', SalaryPayment, name='salary_payments')
-        total += migrate_generic(app, 'ATTACHMENTS_JSON', Attachment, name='attachments')
+        total += migrate_salary_history(app)
+        total += migrate_promotion(app)
+        total += migrate_evaluation(app)
+        total += migrate_training(app)
+        total += migrate_attendance(app)
+        total += migrate_project(app)
+        total += migrate_award(app)
+        total += migrate_asset(app)
+        total += migrate_salary_payment(app)
+        total += migrate_attachment(app)
 
         print("\n" + "=" * 60)
         print(f"마이그레이션 완료! 총 {total}건의 레코드 마이그레이션됨")
@@ -397,7 +695,24 @@ def main():
         print(f"   - 학력 수: {Education.query.count()}")
         print(f"   - 경력 수: {Career.query.count()}")
         print(f"   - 자격증 수: {Certificate.query.count()}")
-        print(f"   - 분류 옵션 수: {ClassificationOption.query.count()}")
+        print(f"   - 가족 수: {FamilyMember.query.count()}")
+        print(f"   - 어학 수: {Language.query.count()}")
+        print(f"   - 병역 수: {MilitaryService.query.count()}")
+        print(f"   - 급여정보 수: {Salary.query.count()}")
+        print(f"   - 복리후생 수: {Benefit.query.count()}")
+        print(f"   - 계약정보 수: {Contract.query.count()}")
+        print(f"   - 보험정보 수: {Insurance.query.count()}")
+        print(f"   - 연봉이력 수: {SalaryHistory.query.count()}")
+        print(f"   - 발령이력 수: {Promotion.query.count()}")
+        print(f"   - 평가이력 수: {Evaluation.query.count()}")
+        print(f"   - 교육이력 수: {Training.query.count()}")
+        print(f"   - 근태정보 수: {Attendance.query.count()}")
+        print(f"   - 프로젝트 수: {Project.query.count()}")
+        print(f"   - 수상이력 수: {Award.query.count()}")
+        print(f"   - 자산배정 수: {Asset.query.count()}")
+        print(f"   - 급여지급 수: {SalaryPayment.query.count()}")
+        print(f"   - 첨부파일 수: {Attachment.query.count()}")
+        print(f"   - 분류옵션 수: {ClassificationOption.query.count()}")
 
 
 if __name__ == '__main__':

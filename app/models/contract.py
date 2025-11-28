@@ -12,51 +12,36 @@ class Contract(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, unique=True, index=True)
+    contract_date = db.Column(db.String(20), nullable=True)
     contract_type = db.Column(db.String(50), nullable=True)
-    contract_start = db.Column(db.String(20), nullable=True)
-    contract_end = db.Column(db.String(20), nullable=True)
-    probation_period = db.Column(db.Integer, default=0)
-    probation_end = db.Column(db.String(20), nullable=True)
-    working_hours = db.Column(db.String(100), nullable=True)
-    work_location = db.Column(db.String(200), nullable=True)
-    job_duties = db.Column(db.Text, nullable=True)
-    special_conditions = db.Column(db.Text, nullable=True)
-    renewal_count = db.Column(db.Integer, default=0)
+    contract_period = db.Column(db.String(50), nullable=True)
+    employee_type = db.Column(db.String(50), nullable=True)
+    work_type = db.Column(db.String(50), nullable=True)
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 camelCase 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환"""
         return {
             'id': self.id,
             'employeeId': self.employee_id,
+            'contractDate': self.contract_date,
             'contractType': self.contract_type,
-            'contractStart': self.contract_start,
-            'contractEnd': self.contract_end,
-            'probationPeriod': self.probation_period,
-            'probationEnd': self.probation_end,
-            'workingHours': self.working_hours,
-            'workLocation': self.work_location,
-            'jobDuties': self.job_duties,
-            'specialConditions': self.special_conditions,
-            'renewalCount': self.renewal_count,
+            'contractPeriod': self.contract_period,
+            'employeeType': self.employee_type,
+            'workType': self.work_type,
             'note': self.note,
         }
 
     @classmethod
     def from_dict(cls, data):
-        """camelCase 딕셔너리에서 모델 생성"""
+        """딕셔너리에서 모델 생성 (snake_case 지원)"""
         return cls(
-            employee_id=data.get('employeeId'),
-            contract_type=data.get('contractType'),
-            contract_start=data.get('contractStart'),
-            contract_end=data.get('contractEnd'),
-            probation_period=data.get('probationPeriod', 0),
-            probation_end=data.get('probationEnd'),
-            working_hours=data.get('workingHours'),
-            work_location=data.get('workLocation'),
-            job_duties=data.get('jobDuties'),
-            special_conditions=data.get('specialConditions'),
-            renewal_count=data.get('renewalCount', 0),
+            employee_id=data.get('employee_id') or data.get('employeeId'),
+            contract_date=data.get('contract_date') or data.get('contractDate'),
+            contract_type=data.get('contract_type') or data.get('contractType'),
+            contract_period=data.get('contract_period') or data.get('contractPeriod'),
+            employee_type=data.get('employee_type') or data.get('employeeType'),
+            work_type=data.get('work_type') or data.get('workType'),
             note=data.get('note'),
         )
 

@@ -12,45 +12,45 @@ class Insurance(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, unique=True, index=True)
-    national_pension_number = db.Column(db.String(50), nullable=True)
-    national_pension_start = db.Column(db.String(20), nullable=True)
-    health_insurance_number = db.Column(db.String(50), nullable=True)
-    health_insurance_start = db.Column(db.String(20), nullable=True)
-    employment_insurance_number = db.Column(db.String(50), nullable=True)
-    employment_insurance_start = db.Column(db.String(20), nullable=True)
-    industrial_insurance_number = db.Column(db.String(50), nullable=True)
-    industrial_insurance_start = db.Column(db.String(20), nullable=True)
+    national_pension = db.Column(db.Boolean, default=True)
+    health_insurance = db.Column(db.Boolean, default=True)
+    employment_insurance = db.Column(db.Boolean, default=True)
+    industrial_accident = db.Column(db.Boolean, default=True)
+    national_pension_rate = db.Column(db.Float, default=4.5)
+    health_insurance_rate = db.Column(db.Float, default=3.545)
+    long_term_care_rate = db.Column(db.Float, default=0.9182)
+    employment_insurance_rate = db.Column(db.Float, default=0.9)
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 camelCase 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환"""
         return {
             'id': self.id,
             'employeeId': self.employee_id,
-            'nationalPensionNumber': self.national_pension_number,
-            'nationalPensionStart': self.national_pension_start,
-            'healthInsuranceNumber': self.health_insurance_number,
-            'healthInsuranceStart': self.health_insurance_start,
-            'employmentInsuranceNumber': self.employment_insurance_number,
-            'employmentInsuranceStart': self.employment_insurance_start,
-            'industrialInsuranceNumber': self.industrial_insurance_number,
-            'industrialInsuranceStart': self.industrial_insurance_start,
+            'nationalPension': self.national_pension,
+            'healthInsurance': self.health_insurance,
+            'employmentInsurance': self.employment_insurance,
+            'industrialAccident': self.industrial_accident,
+            'nationalPensionRate': self.national_pension_rate,
+            'healthInsuranceRate': self.health_insurance_rate,
+            'longTermCareRate': self.long_term_care_rate,
+            'employmentInsuranceRate': self.employment_insurance_rate,
             'note': self.note,
         }
 
     @classmethod
     def from_dict(cls, data):
-        """camelCase 딕셔너리에서 모델 생성"""
+        """딕셔너리에서 모델 생성 (snake_case 지원)"""
         return cls(
-            employee_id=data.get('employeeId'),
-            national_pension_number=data.get('nationalPensionNumber'),
-            national_pension_start=data.get('nationalPensionStart'),
-            health_insurance_number=data.get('healthInsuranceNumber'),
-            health_insurance_start=data.get('healthInsuranceStart'),
-            employment_insurance_number=data.get('employmentInsuranceNumber'),
-            employment_insurance_start=data.get('employmentInsuranceStart'),
-            industrial_insurance_number=data.get('industrialInsuranceNumber'),
-            industrial_insurance_start=data.get('industrialInsuranceStart'),
+            employee_id=data.get('employee_id') or data.get('employeeId'),
+            national_pension=data.get('national_pension', True) if 'national_pension' in data else data.get('nationalPension', True),
+            health_insurance=data.get('health_insurance', True) if 'health_insurance' in data else data.get('healthInsurance', True),
+            employment_insurance=data.get('employment_insurance', True) if 'employment_insurance' in data else data.get('employmentInsurance', True),
+            industrial_accident=data.get('industrial_accident', True) if 'industrial_accident' in data else data.get('industrialAccident', True),
+            national_pension_rate=data.get('national_pension_rate') or data.get('nationalPensionRate', 4.5),
+            health_insurance_rate=data.get('health_insurance_rate') or data.get('healthInsuranceRate', 3.545),
+            long_term_care_rate=data.get('long_term_care_rate') or data.get('longTermCareRate', 0.9182),
+            employment_insurance_rate=data.get('employment_insurance_rate') or data.get('employmentInsuranceRate', 0.9),
             note=data.get('note'),
         )
 

@@ -15,42 +15,45 @@ class SalaryPayment(db.Model):
     payment_date = db.Column(db.String(20), nullable=True, index=True)
     payment_period = db.Column(db.String(50), nullable=True)
     base_salary = db.Column(db.Integer, default=0)
-    total_allowances = db.Column(db.Integer, default=0)
-    total_deductions = db.Column(db.Integer, default=0)
-    net_salary = db.Column(db.Integer, default=0)
-    payment_method = db.Column(db.String(50), nullable=True)
-    payment_status = db.Column(db.String(50), nullable=True)
+    allowances = db.Column(db.Integer, default=0)
+    gross_pay = db.Column(db.Integer, default=0)
+    insurance = db.Column(db.Integer, default=0)
+    income_tax = db.Column(db.Integer, default=0)
+    total_deduction = db.Column(db.Integer, default=0)
+    net_pay = db.Column(db.Integer, default=0)
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 camelCase 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환"""
         return {
             'id': self.id,
             'employeeId': self.employee_id,
             'paymentDate': self.payment_date,
             'paymentPeriod': self.payment_period,
             'baseSalary': self.base_salary,
-            'totalAllowances': self.total_allowances,
-            'totalDeductions': self.total_deductions,
-            'netSalary': self.net_salary,
-            'paymentMethod': self.payment_method,
-            'paymentStatus': self.payment_status,
+            'allowances': self.allowances,
+            'grossPay': self.gross_pay,
+            'insurance': self.insurance,
+            'incomeTax': self.income_tax,
+            'totalDeduction': self.total_deduction,
+            'netPay': self.net_pay,
             'note': self.note,
         }
 
     @classmethod
     def from_dict(cls, data):
-        """camelCase 딕셔너리에서 모델 생성"""
+        """딕셔너리에서 모델 생성"""
         return cls(
-            employee_id=data.get('employeeId'),
-            payment_date=data.get('paymentDate'),
-            payment_period=data.get('paymentPeriod'),
-            base_salary=data.get('baseSalary', 0),
-            total_allowances=data.get('totalAllowances', 0),
-            total_deductions=data.get('totalDeductions', 0),
-            net_salary=data.get('netSalary', 0),
-            payment_method=data.get('paymentMethod'),
-            payment_status=data.get('paymentStatus'),
+            employee_id=data.get('employee_id') or data.get('employeeId'),
+            payment_date=data.get('payment_date') or data.get('paymentDate'),
+            payment_period=data.get('payment_period') or data.get('paymentPeriod'),
+            base_salary=data.get('base_salary') or data.get('baseSalary', 0),
+            allowances=data.get('allowances', 0),
+            gross_pay=data.get('gross_pay') or data.get('grossPay', 0),
+            insurance=data.get('insurance', 0),
+            income_tax=data.get('income_tax') or data.get('incomeTax', 0),
+            total_deduction=data.get('total_deduction') or data.get('totalDeduction', 0),
+            net_pay=data.get('net_pay') or data.get('netPay', 0),
             note=data.get('note'),
         )
 
