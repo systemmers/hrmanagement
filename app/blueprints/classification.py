@@ -1,0 +1,17 @@
+"""
+분류 옵션 관리 Blueprint
+
+분류 옵션 관리 페이지를 제공합니다.
+"""
+from flask import Blueprint, render_template
+
+from ..extensions import classification_repo
+
+classification_bp = Blueprint('classification', __name__)
+
+
+@classification_bp.route('/classification-options')
+def classification_options_page():
+    """분류 옵션 관리 페이지"""
+    options = classification_repo.get_all()
+    return render_template('classification_options.html', classification_options=options)
