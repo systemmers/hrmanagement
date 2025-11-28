@@ -16,7 +16,7 @@ def index():
     stats = employee_repo.get_statistics()
     dept_stats = employee_repo.get_department_statistics()
     recent_employees = employee_repo.get_recent_employees(limit=5)
-    classification_options = classification_repo.get_all()
+    classification_options = classification_repo.get_all_options()
     return render_template('index.html',
                            stats=stats,
                            dept_stats=dept_stats,
@@ -55,7 +55,7 @@ def search():
 
     dept_stats = employee_repo.get_department_statistics()
     recent_employees = employee_repo.get_recent_employees(limit=5)
-    classification_options = classification_repo.get_all()
+    classification_options = classification_repo.get_all_options()
     return render_template('index.html',
                            employees=employees,
                            stats=stats,

@@ -23,17 +23,17 @@ class Promotion(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'effectiveDate': self.effective_date,
-            'promotionType': self.promotion_type,
-            'fromDepartment': self.from_department,
-            'toDepartment': self.to_department,
-            'fromPosition': self.from_position,
-            'toPosition': self.to_position,
-            'jobRole': self.job_role,
+            'employee_id': self.employee_id,
+            'effective_date': self.effective_date,
+            'promotion_type': self.promotion_type,
+            'from_department': self.from_department,
+            'to_department': self.to_department,
+            'from_position': self.from_position,
+            'to_position': self.to_position,
+            'job_role': self.job_role,
             'reason': self.reason,
             'note': self.note,
         }

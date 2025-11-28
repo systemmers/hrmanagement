@@ -22,17 +22,17 @@ class FamilyMember(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 camelCase 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
+            'employee_id': self.employee_id,
             'relation': self.relation,
             'name': self.name,
-            'birthDate': self.birth_date,
+            'birth_date': self.birth_date,
             'occupation': self.occupation,
             'contact': self.contact,
-            'isCohabitant': self.is_cohabitant,
-            'isDependent': self.is_dependent,
+            'is_cohabitant': self.is_cohabitant,
+            'is_dependent': self.is_dependent,
             'note': self.note,
         }
 

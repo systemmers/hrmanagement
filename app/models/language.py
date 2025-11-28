@@ -21,16 +21,16 @@ class Language(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 camelCase 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'languageName': self.language_name,
-            'examName': self.exam_name,
+            'employee_id': self.employee_id,
+            'language_name': self.language_name,
+            'exam_name': self.exam_name,
             'score': self.score,
             'level': self.level,
-            'acquisitionDate': self.acquisition_date,
-            'expiryDate': self.expiry_date,
+            'acquisition_date': self.acquisition_date,
+            'expiry_date': self.expiry_date,
             'note': self.note,
         }
 

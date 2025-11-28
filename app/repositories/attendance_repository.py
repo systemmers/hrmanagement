@@ -34,3 +34,38 @@ class AttendanceRepository(BaseRelationRepository):
         ).order_by(Attendance.date).all()
 
         return [record.to_dict() for record in records]
+
+    def get_summary_by_employee(self, employee_id: int, year: int) -> Dict:
+        """특정 직원의 연간 근태 요약 (snake_case)"""
+        records = Attendance.query.filter(
+            Attendance.employee_id == employee_id,
+            Attendance.year == year
+        ).all()
+
+        if not records:
+            return {
+                'year': year,
+                'total_work_days': 0,
+                'total_absent_days': 0,
+                'total_late_count': 0,
+                'total_early_leave_count': 0,
+                'total_annual_leave_used': 0
+            }
+
+        return {
+            'year': year,
+            'total_work_days': sum(r.work_days or 0 for r in records),
+            'total_absent_days': sum(r.absent_days or 0 for r in records),
+            'total_late_count': sum(r.late_count or 0 for r in records),
+            'total_early_leave_count': sum(r.early_leave_count or 0 for r in records),
+            'total_annual_leave_used': sum(r.annual_leave_used or 0 for r in records)
+        }
+
+    def get_by_employee_and_year(self, employee_id: int, year: int) -> List[Dict]:
+        """특정 직원의 연간 월별 근태 조회"""
+        records = Attendance.query.filter(
+            Attendance.employee_id == employee_id,
+            Attendance.year == year
+        ).order_by(Attendance.month).all()
+
+        return [record.to_dict() for record in records]

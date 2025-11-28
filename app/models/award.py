@@ -18,12 +18,12 @@ class Award(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'awardDate': self.award_date,
-            'awardName': self.award_name,
+            'employee_id': self.employee_id,
+            'award_date': self.award_date,
+            'award_name': self.award_name,
             'institution': self.institution,
             'note': self.note,
         }

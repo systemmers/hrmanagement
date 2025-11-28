@@ -20,14 +20,14 @@ class Asset(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'issueDate': self.issue_date,
-            'itemName': self.item_name,
+            'employee_id': self.employee_id,
+            'issue_date': self.issue_date,
+            'item_name': self.item_name,
             'model': self.model,
-            'serialNumber': self.serial_number,
+            'serial_number': self.serial_number,
             'status': self.status,
             'note': self.note,
         }

@@ -20,15 +20,15 @@ class SalaryHistory(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'contractYear': self.contract_year,
-            'annualSalary': self.annual_salary,
+            'employee_id': self.employee_id,
+            'contract_year': self.contract_year,
+            'annual_salary': self.annual_salary,
             'bonus': self.bonus,
-            'totalAmount': self.total_amount,
-            'contractPeriod': self.contract_period,
+            'total_amount': self.total_amount,
+            'contract_period': self.contract_period,
             'note': self.note,
         }
 

@@ -23,18 +23,23 @@ class MilitaryService(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 camelCase 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'militaryStatus': self.military_status,
-            'serviceType': self.service_type,
+            'employee_id': self.employee_id,
+            'status': self.military_status,  # 템플릿: military.status
+            'military_status': self.military_status,
+            'service_type': self.service_type,
             'branch': self.branch,
             'rank': self.rank,
-            'enlistmentDate': self.enlistment_date,
-            'dischargeDate': self.discharge_date,
-            'dischargeReason': self.discharge_reason,
-            'exemptionReason': self.exemption_reason,
+            'start_date': self.enlistment_date,  # 템플릿: military.start_date
+            'end_date': self.discharge_date,  # 템플릿: military.end_date
+            'enlistment_date': self.enlistment_date,
+            'discharge_date': self.discharge_date,
+            'discharge_reason': self.discharge_reason,
+            'exemption_reason': self.exemption_reason,
+            'duty': self.service_type,  # 템플릿: military.duty (service_type 매핑)
+            'specialty': None,  # 템플릿: military.specialty
             'note': self.note,
         }
 

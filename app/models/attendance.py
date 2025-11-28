@@ -22,17 +22,17 @@ class Attendance(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
+            'employee_id': self.employee_id,
             'year': self.year,
             'month': self.month,
-            'workDays': self.work_days,
-            'absentDays': self.absent_days,
-            'lateCount': self.late_count,
-            'earlyLeaveCount': self.early_leave_count,
-            'annualLeaveUsed': self.annual_leave_used,
+            'work_days': self.work_days,
+            'absent_days': self.absent_days,
+            'late_count': self.late_count,
+            'early_leave_count': self.early_leave_count,
+            'annual_leave_used': self.annual_leave_used,
             'note': self.note,
         }
 

@@ -110,14 +110,53 @@ class EmployeeRepository(BaseRepository):
 
         return {status or '미지정': count for status, count in result}
 
-    def _generate_new_id(self) -> str:
-        """새 직원 ID 생성 (EMP001 형식)"""
+    def get_statistics(self) -> Dict:
+        """직원 통계 정보"""
+        total = Employee.query.count()
+        active = Employee.query.filter_by(status='재직').count()
+        on_leave = Employee.query.filter_by(status='휴직').count()
+        resigned = Employee.query.filter_by(status='퇴사').count()
+
+        return {
+            'total': total,
+            'active': active,
+            'onLeave': on_leave,
+            'resigned': resigned
+        }
+
+    def get_department_statistics(self) -> Dict[str, int]:
+        """부서별 통계 정보"""
+        result = db.session.query(
+            Employee.department,
+            db.func.count(Employee.id)
+        ).group_by(Employee.department).all()
+
+        return {dept or '미지정': count for dept, count in result}
+
+    def get_recent_employees(self, limit: int = 5) -> List[Dict]:
+        """최근 입사 직원"""
+        employees = Employee.query.filter(
+            Employee.hire_date.isnot(None)
+        ).order_by(Employee.hire_date.desc()).limit(limit).all()
+        return [emp.to_dict() for emp in employees]
+
+    def filter_employees(self, department: str = None, position: str = None, status: str = None) -> List[Dict]:
+        """다중 필터링"""
+        query = Employee.query
+
+        if department:
+            query = query.filter(Employee.department == department)
+        if position:
+            query = query.filter(Employee.position == position)
+        if status:
+            query = query.filter(Employee.status == status)
+
+        employees = query.order_by(Employee.id).all()
+        return [emp.to_dict() for emp in employees]
+
+    def _generate_new_id(self) -> int:
+        """새 직원 ID 생성 (Integer 자동 증가)"""
         last_employee = Employee.query.order_by(Employee.id.desc()).first()
         if last_employee:
-            try:
-                # EMP001 형식에서 숫자 추출
-                num = int(last_employee.id.replace('EMP', ''))
-                return f'EMP{num + 1:03d}'
-            except (ValueError, AttributeError):
-                pass
-        return 'EMP001'
+            return last_employee.id + 1
+        return 1

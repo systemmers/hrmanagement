@@ -20,15 +20,15 @@ class Contract(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'contractDate': self.contract_date,
-            'contractType': self.contract_type,
-            'contractPeriod': self.contract_period,
-            'employeeType': self.employee_type,
-            'workType': self.work_type,
+            'employee_id': self.employee_id,
+            'contract_date': self.contract_date,
+            'contract_type': self.contract_type,
+            'contract_period': self.contract_period,
+            'employee_type': self.employee_type,
+            'work_type': self.work_type,
             'note': self.note,
         }
 

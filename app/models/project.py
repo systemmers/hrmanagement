@@ -22,13 +22,13 @@ class Project(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'projectName': self.project_name,
-            'startDate': self.start_date,
-            'endDate': self.end_date,
+            'employee_id': self.employee_id,
+            'project_name': self.project_name,
+            'start_date': self.start_date,
+            'end_date': self.end_date,
             'duration': self.duration,
             'role': self.role,
             'duty': self.duty,

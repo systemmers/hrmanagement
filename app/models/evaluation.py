@@ -22,17 +22,17 @@ class Evaluation(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
+            'employee_id': self.employee_id,
             'year': self.year,
-            'q1Grade': self.q1_grade,
-            'q2Grade': self.q2_grade,
-            'q3Grade': self.q3_grade,
-            'q4Grade': self.q4_grade,
-            'overallGrade': self.overall_grade,
-            'salaryNegotiation': self.salary_negotiation,
+            'q1_grade': self.q1_grade,
+            'q2_grade': self.q2_grade,
+            'q3_grade': self.q3_grade,
+            'q4_grade': self.q4_grade,
+            'overall_grade': self.overall_grade,
+            'salary_negotiation': self.salary_negotiation,
             'note': self.note,
         }
 

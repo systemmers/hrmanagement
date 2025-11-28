@@ -20,15 +20,15 @@ class Training(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'trainingDate': self.training_date,
-            'trainingName': self.training_name,
+            'employee_id': self.employee_id,
+            'training_date': self.training_date,
+            'training_name': self.training_name,
             'institution': self.institution,
             'hours': self.hours,
-            'completionStatus': self.completion_status,
+            'completion_status': self.completion_status,
             'note': self.note,
         }
 

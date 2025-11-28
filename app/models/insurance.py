@@ -23,18 +23,18 @@ class Insurance(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'nationalPension': self.national_pension,
-            'healthInsurance': self.health_insurance,
-            'employmentInsurance': self.employment_insurance,
-            'industrialAccident': self.industrial_accident,
-            'nationalPensionRate': self.national_pension_rate,
-            'healthInsuranceRate': self.health_insurance_rate,
-            'longTermCareRate': self.long_term_care_rate,
-            'employmentInsuranceRate': self.employment_insurance_rate,
+            'employee_id': self.employee_id,
+            'national_pension': self.national_pension,
+            'health_insurance': self.health_insurance,
+            'employment_insurance': self.employment_insurance,
+            'industrial_accident': self.industrial_accident,
+            'national_pension_rate': self.national_pension_rate,
+            'health_insurance_rate': self.health_insurance_rate,
+            'long_term_care_rate': self.long_term_care_rate,
+            'employment_insurance_rate': self.employment_insurance_rate,
             'note': self.note,
         }
 

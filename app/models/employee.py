@@ -65,7 +65,7 @@ class Employee(db.Model):
     insurance = db.relationship('Insurance', backref='employee', uselist=False, cascade='all, delete-orphan')
 
     def to_dict(self):
-        """템플릿 호환성을 위한 camelCase 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case + hireDate 호환)"""
         return {
             'id': self.id,
             'name': self.name,
@@ -73,26 +73,42 @@ class Employee(db.Model):
             'department': self.department,
             'position': self.position,
             'status': self.status,
-            'hireDate': self.hire_date,
+            'hire_date': self.hire_date,
+            'hireDate': self.hire_date,  # 템플릿 호환용
             'phone': self.phone,
             'email': self.email,
-            'englishName': self.english_name,
-            'chineseName': self.chinese_name,
-            'birthDate': self.birth_date,
-            'lunarBirth': self.lunar_birth,
+            'name_en': self.english_name,  # 템플릿: employee.name_en
+            'english_name': self.english_name,
+            'chinese_name': self.chinese_name,
+            'birth_date': self.birth_date,
+            'lunar_birth': self.lunar_birth,
             'gender': self.gender,
-            'mobilePhone': self.mobile_phone,
-            'homePhone': self.home_phone,
+            'mobile_phone': self.mobile_phone,
+            'home_phone': self.home_phone,
             'address': self.address,
-            'detailedAddress': self.detailed_address,
-            'postalCode': self.postal_code,
-            'residentNumber': self.resident_number,
+            'detailed_address': self.detailed_address,
+            'postal_code': self.postal_code,
+            'resident_number': self.resident_number,
+            'rrn': self.resident_number,  # 템플릿: employee.rrn
             'nationality': self.nationality,
-            'bloodType': self.blood_type,
+            'blood_type': self.blood_type,
             'religion': self.religion,
             'hobby': self.hobby,
             'specialty': self.specialty,
-            'disabilityInfo': self.disability_info,
+            'disability_info': self.disability_info,
+            # 템플릿에서 사용하는 추가 필드들 (None 기본값)
+            'internal_phone': None,
+            'company_email': None,
+            'emergency_contact': None,
+            'emergency_relation': None,
+            'team': self.department,
+            'job_title': self.position,
+            'employee_number': None,
+            'employment_type': None,
+            'work_location': None,
+            'contract_period': None,
+            'probation_end': None,
+            'resignation_date': None,
         }
 
     @classmethod

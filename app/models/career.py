@@ -23,18 +23,21 @@ class Career(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 camelCase 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'companyName': self.company_name,
+            'employee_id': self.employee_id,
+            'company_name': self.company_name,
+            'company': self.company_name,  # 템플릿: career.company
             'department': self.department,
             'position': self.position,
-            'jobDescription': self.job_description,
-            'startDate': self.start_date,
-            'endDate': self.end_date,
-            'resignationReason': self.resignation_reason,
-            'isCurrent': self.is_current,
+            'job_description': self.job_description,
+            'duty': self.job_description,  # 템플릿: career.duty
+            'start_date': self.start_date,
+            'end_date': self.end_date,
+            'resignation_reason': self.resignation_reason,
+            'is_current': self.is_current,
+            'salary': None,  # 템플릿: career.salary (모델에 없음)
             'note': self.note,
         }
 

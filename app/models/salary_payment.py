@@ -24,19 +24,19 @@ class SalaryPayment(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'paymentDate': self.payment_date,
-            'paymentPeriod': self.payment_period,
-            'baseSalary': self.base_salary,
+            'employee_id': self.employee_id,
+            'payment_date': self.payment_date,
+            'payment_period': self.payment_period,
+            'base_salary': self.base_salary,
             'allowances': self.allowances,
-            'grossPay': self.gross_pay,
+            'gross_pay': self.gross_pay,
             'insurance': self.insurance,
-            'incomeTax': self.income_tax,
-            'totalDeduction': self.total_deduction,
-            'netPay': self.net_pay,
+            'income_tax': self.income_tax,
+            'total_deduction': self.total_deduction,
+            'net_pay': self.net_pay,
             'note': self.note,
         }
 

@@ -21,16 +21,16 @@ class Benefit(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
+            'employee_id': self.employee_id,
             'year': self.year,
-            'annualLeaveGranted': self.annual_leave_granted,
-            'annualLeaveUsed': self.annual_leave_used,
-            'annualLeaveRemaining': self.annual_leave_remaining,
-            'severanceType': self.severance_type,
-            'severanceMethod': self.severance_method,
+            'annual_leave_granted': self.annual_leave_granted,
+            'annual_leave_used': self.annual_leave_used,
+            'annual_leave_remaining': self.annual_leave_remaining,
+            'severance_type': self.severance_type,
+            'severance_method': self.severance_method,
             'note': self.note,
         }
 

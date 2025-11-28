@@ -21,16 +21,16 @@ class Attachment(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'fileName': self.file_name,
-            'filePath': self.file_path,
-            'fileType': self.file_type,
-            'fileSize': self.file_size,
+            'employee_id': self.employee_id,
+            'file_name': self.file_name,
+            'file_path': self.file_path,
+            'file_type': self.file_type,
+            'file_size': self.file_size,
             'category': self.category,
-            'uploadDate': self.upload_date,
+            'upload_date': self.upload_date,
             'note': self.note,
         }
 

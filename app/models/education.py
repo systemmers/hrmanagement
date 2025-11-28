@@ -23,18 +23,25 @@ class Education(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 camelCase 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
+        # graduation_date에서 연도 추출
+        graduation_year = None
+        if self.graduation_date:
+            graduation_year = self.graduation_date[:4] if len(self.graduation_date) >= 4 else self.graduation_date
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'schoolType': self.school_type,
-            'schoolName': self.school_name,
+            'employee_id': self.employee_id,
+            'school_type': self.school_type,
+            'school_name': self.school_name,
+            'school': self.school_name,  # 템플릿: edu.school
             'major': self.major,
             'degree': self.degree,
-            'admissionDate': self.admission_date,
-            'graduationDate': self.graduation_date,
-            'graduationStatus': self.graduation_status,
+            'admission_date': self.admission_date,
+            'graduation_date': self.graduation_date,
+            'graduation_year': graduation_year,  # 템플릿: edu.graduation_year
+            'graduation_status': self.graduation_status,
             'location': self.location,
+            'gpa': None,  # 템플릿: edu.gpa (모델에 없음)
             'note': self.note,
         }
 

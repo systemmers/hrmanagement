@@ -21,15 +21,15 @@ class Certificate(db.Model):
     note = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
-        """템플릿 호환성을 위한 camelCase 딕셔너리 반환"""
+        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
             'id': self.id,
-            'employeeId': self.employee_id,
-            'certificateName': self.certificate_name,
-            'issuingOrganization': self.issuing_organization,
-            'certificateNumber': self.certificate_number,
-            'acquisitionDate': self.acquisition_date,
-            'expiryDate': self.expiry_date,
+            'employee_id': self.employee_id,
+            'certificate_name': self.certificate_name,
+            'issuing_organization': self.issuing_organization,
+            'certificate_number': self.certificate_number,
+            'acquisition_date': self.acquisition_date,
+            'expiry_date': self.expiry_date,
             'grade': self.grade,
             'note': self.note,
         }
