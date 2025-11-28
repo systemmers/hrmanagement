@@ -9,30 +9,73 @@ ENV/
 env/
 .venv/
 
-# IDE
+# IDE & Editor
 .idea/
 .vscode/
 *.swp
 *.swo
+*.sublime-project
+*.sublime-workspace
+.history/
+.fleet/
+
+# IDE specific settings
+.vscode/settings.json
+.vscode/launch.json
+.idea/workspace.xml
 
 # Environment
 .env
 .env.local
 *.env
+.envrc
+.direnv/
+local_settings.py
 
-# Logs
+# Logs & Debugging
 *.log
+*.log.*
+debug.log
+logs/
 
-# OS
+# OS & System
 .DS_Store
 Thumbs.db
+Thumbs.db.bak
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+*.tmp
 
-# Build
+# Build & Dist
 dist/
 build/
 *.egg-info/
+*.egg/
+wheels/
+.tox/
+.coverage.*
 
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Database & Data
+*.db
+*.sqlite
+*.sqlite3
+data/backup/
+*.backup
+
+# Temporary files
+*~
+.~*
+
+# Node (향후 확장 대비)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Scripts folder
+scripts/__pycache__/

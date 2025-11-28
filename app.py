@@ -172,6 +172,42 @@ def employee_detail(employee_id):
                            attachment_list=attachment_list)
 
 
+def extract_employee_from_form(form_data, employee_id=0):
+    """폼 데이터에서 Employee 객체 생성 (SSOT 헬퍼 함수)"""
+    return Employee(
+        id=employee_id,
+        # 기본 필드
+        name=form_data.get('name', ''),
+        photo=form_data.get('photo') or 'https://i.pravatar.cc/150',
+        department=form_data.get('department', ''),
+        position=form_data.get('position', ''),
+        status=form_data.get('status', 'active'),
+        hireDate=form_data.get('hireDate', ''),
+        phone=form_data.get('phone', ''),
+        email=form_data.get('email', ''),
+        # 확장 필드 - 개인정보
+        name_en=form_data.get('name_en') or None,
+        birth_date=form_data.get('birth_date') or None,
+        gender=form_data.get('gender') or None,
+        address=form_data.get('address') or None,
+        emergency_contact=form_data.get('emergency_contact') or None,
+        emergency_relation=form_data.get('emergency_relation') or None,
+        rrn=form_data.get('rrn') or None,
+        # 확장 필드 - 소속정보
+        employee_number=form_data.get('employee_number') or None,
+        team=form_data.get('team') or None,
+        job_title=form_data.get('job_title') or None,
+        work_location=form_data.get('work_location') or None,
+        internal_phone=form_data.get('internal_phone') or None,
+        company_email=form_data.get('company_email') or None,
+        # 확장 필드 - 계약정보
+        employment_type=form_data.get('employment_type') or None,
+        contract_period=form_data.get('contract_period') or None,
+        probation_end=form_data.get('probation_end') or None,
+        resignation_date=form_data.get('resignation_date') or None
+    )
+
+
 @app.route('/employees/new', methods=['GET'])
 def employee_new():
     """직원 등록 폼"""
@@ -182,22 +218,12 @@ def employee_new():
 def employee_create():
     """직원 등록 처리"""
     try:
-        employee = Employee(
-            id=0,  # 자동 생성
-            name=request.form.get('name', ''),
-            photo=request.form.get('photo', 'https://i.pravatar.cc/150'),
-            department=request.form.get('department', ''),
-            position=request.form.get('position', ''),
-            status=request.form.get('status', 'active'),
-            hireDate=request.form.get('hireDate', ''),
-            phone=request.form.get('phone', ''),
-            email=request.form.get('email', '')
-        )
-        
+        employee = extract_employee_from_form(request.form, employee_id=0)
+
         created_employee = employee_repo.create(employee)
         flash(f'{created_employee.name} 직원이 등록되었습니다.', 'success')
         return redirect(url_for('employee_detail', employee_id=created_employee.id))
-    
+
     except Exception as e:
         flash(f'직원 등록 중 오류가 발생했습니다: {str(e)}', 'error')
         return redirect(url_for('employee_new'))
@@ -224,18 +250,8 @@ def employee_edit(employee_id):
 def employee_update(employee_id):
     """직원 수정 처리"""
     try:
-        employee = Employee(
-            id=employee_id,
-            name=request.form.get('name', ''),
-            photo=request.form.get('photo', 'https://i.pravatar.cc/150'),
-            department=request.form.get('department', ''),
-            position=request.form.get('position', ''),
-            status=request.form.get('status', 'active'),
-            hireDate=request.form.get('hireDate', ''),
-            phone=request.form.get('phone', ''),
-            email=request.form.get('email', '')
-        )
-        
+        employee = extract_employee_from_form(request.form, employee_id=employee_id)
+
         updated_employee = employee_repo.update(employee_id, employee)
         if updated_employee:
             flash(f'{updated_employee.name} 직원 정보가 수정되었습니다.', 'success')
@@ -243,7 +259,7 @@ def employee_update(employee_id):
         else:
             flash('직원을 찾을 수 없습니다.', 'error')
             return redirect(url_for('index'))
-    
+
     except Exception as e:
         flash(f'직원 수정 중 오류가 발생했습니다: {str(e)}', 'error')
         return redirect(url_for('employee_edit', employee_id=employee_id))
@@ -633,5 +649,5 @@ def utility_processor():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5200)
 
