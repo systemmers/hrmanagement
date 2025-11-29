@@ -42,6 +42,12 @@ salary_payment_repo = None
 # Phase 6: 첨부파일 저장소
 attachment_repo = None
 
+# Phase 1-1: 사용자 인증 저장소
+user_repo = None
+
+# Phase 1-5: 조직 구조 저장소
+organization_repo = None
+
 
 def init_extensions(app):
     """앱 컨텍스트에서 저장소 초기화"""
@@ -52,6 +58,7 @@ def init_extensions(app):
     global promotion_repo, evaluation_repo, training_repo, attendance_repo
     global insurance_repo, project_repo, award_repo, asset_repo
     global salary_payment_repo, attachment_repo
+    global user_repo, organization_repo
 
     # SQLAlchemy 기반 Repository import
     from .repositories import (
@@ -99,3 +106,11 @@ def init_extensions(app):
 
     # Phase 6: 첨부파일 저장소 초기화
     attachment_repo = AttachmentRepository()
+
+    # Phase 1-1: 사용자 인증 저장소 초기화
+    from .repositories.user_repository import UserRepository
+    user_repo = UserRepository()
+
+    # Phase 1-5: 조직 구조 저장소 초기화
+    from .repositories.organization_repository import OrganizationRepository
+    organization_repo = OrganizationRepository()

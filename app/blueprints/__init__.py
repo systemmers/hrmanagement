@@ -12,6 +12,14 @@ def register_blueprints(app):
     from .classification import classification_bp
     from .api import api_bp
     from .ai_test import ai_test_bp
+    from .auth import auth_bp
+    from .admin import admin_bp
+
+    # 인증 관련 (/auth/*)
+    app.register_blueprint(auth_bp)
+
+    # 관리자 기능 (/admin/*)
+    app.register_blueprint(admin_bp)
 
     # 메인 페이지 (/, /search)
     app.register_blueprint(main_bp)

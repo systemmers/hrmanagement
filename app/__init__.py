@@ -49,6 +49,10 @@ def create_app(config_name=None):
     from .utils.template_helpers import register_template_utils
     register_template_utils(app)
 
+    # 인증 컨텍스트 프로세서
+    from .utils.context_processors import register_context_processors
+    register_context_processors(app)
+
     # 에러 핸들러
     register_error_handlers(app)
 
@@ -57,6 +61,11 @@ def create_app(config_name=None):
 
 def register_error_handlers(app):
     """에러 핸들러 등록"""
+
+    @app.errorhandler(403)
+    def forbidden_error(error):
+        """403 에러 핸들러"""
+        return render_template('403.html'), 403
 
     @app.errorhandler(404)
     def not_found_error(error):

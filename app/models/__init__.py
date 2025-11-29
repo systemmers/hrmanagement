@@ -25,6 +25,8 @@ from .asset import Asset
 from .salary_payment import SalaryPayment
 from .attachment import Attachment
 from .classification_option import ClassificationOption
+from .user import User
+from .organization import Organization
 
 __all__ = [
     'Employee',
@@ -49,4 +51,6 @@ __all__ = [
     'SalaryPayment',
     'Attachment',
     'ClassificationOption',
+    'User',
+    'Organization',
 ]

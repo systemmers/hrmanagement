@@ -6,11 +6,13 @@ REST API Blueprint
 from flask import Blueprint, jsonify, request
 
 from ..extensions import classification_repo
+from ..utils.decorators import login_required, admin_required
 
 api_bp = Blueprint('api', __name__)
 
 
 @api_bp.route('/classification-options', methods=['GET'])
+@login_required
 def get_classification_options():
     """분류 옵션 조회"""
     options = classification_repo.get_all()
@@ -20,6 +22,7 @@ def get_classification_options():
 # ===== 부서 관리 API =====
 
 @api_bp.route('/classification-options/departments', methods=['POST'])
+@admin_required
 def add_department():
     """부서 추가"""
     data = request.get_json()
@@ -35,6 +38,7 @@ def add_department():
 
 
 @api_bp.route('/classification-options/departments/<old_department>', methods=['PUT'])
+@admin_required
 def update_department(old_department):
     """부서 수정"""
     data = request.get_json()
@@ -50,6 +54,7 @@ def update_department(old_department):
 
 
 @api_bp.route('/classification-options/departments/<department>', methods=['DELETE'])
+@admin_required
 def delete_department(department):
     """부서 삭제"""
     if classification_repo.delete_department(department):
@@ -61,6 +66,7 @@ def delete_department(department):
 # ===== 직급 관리 API =====
 
 @api_bp.route('/classification-options/positions', methods=['POST'])
+@admin_required
 def add_position():
     """직급 추가"""
     data = request.get_json()
@@ -76,6 +82,7 @@ def add_position():
 
 
 @api_bp.route('/classification-options/positions/<old_position>', methods=['PUT'])
+@admin_required
 def update_position(old_position):
     """직급 수정"""
     data = request.get_json()
@@ -91,6 +98,7 @@ def update_position(old_position):
 
 
 @api_bp.route('/classification-options/positions/<position>', methods=['DELETE'])
+@admin_required
 def delete_position(position):
     """직급 삭제"""
     if classification_repo.delete_position(position):
@@ -102,6 +110,7 @@ def delete_position(position):
 # ===== 상태 관리 API =====
 
 @api_bp.route('/classification-options/statuses', methods=['POST'])
+@admin_required
 def add_status():
     """상태 추가"""
     data = request.get_json()
@@ -118,6 +127,7 @@ def add_status():
 
 
 @api_bp.route('/classification-options/statuses/<old_value>', methods=['PUT'])
+@admin_required
 def update_status(old_value):
     """상태 수정"""
     data = request.get_json()
@@ -134,6 +144,7 @@ def update_status(old_value):
 
 
 @api_bp.route('/classification-options/statuses/<value>', methods=['DELETE'])
+@admin_required
 def delete_status(value):
     """상태 삭제"""
     if classification_repo.delete_status(value):

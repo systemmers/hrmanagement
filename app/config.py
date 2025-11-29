@@ -65,6 +65,11 @@ class Config:
     DEBUG = True
     TESTING = False
 
+    # 세션 설정
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    PERMANENT_SESSION_LIFETIME = 86400  # 24시간
+
     # WTForms 설정
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
