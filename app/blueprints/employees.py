@@ -196,7 +196,11 @@ def employee_detail(employee_id):
 @manager_or_admin_required
 def employee_new():
     """직원 등록 폼"""
-    return render_template('employee_form.html', employee=None, action='create')
+    classification_options = classification_repo.get_all_options()
+    return render_template('employee_form.html',
+                           employee=None,
+                           action='create',
+                           classification_options=classification_options)
 
 
 @employees_bp.route('/employees', methods=['POST'])
@@ -231,10 +235,14 @@ def employee_edit(employee_id):
     # Phase 6: 첨부파일 조회
     attachment_list = attachment_repo.get_by_employee_id(employee_id)
 
+    # 분류 옵션 조회
+    classification_options = classification_repo.get_all_options()
+
     return render_template('employee_form.html',
                            employee=employee,
                            action='update',
-                           attachment_list=attachment_list)
+                           attachment_list=attachment_list,
+                           classification_options=classification_options)
 
 
 @employees_bp.route('/employees/<int:employee_id>/update', methods=['POST'])

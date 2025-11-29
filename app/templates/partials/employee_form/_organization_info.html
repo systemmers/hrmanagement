@@ -53,17 +53,29 @@
                     <label for="position" class="form-label">직급 <span class="required">*</span></label>
                     <select id="position" name="position" class="form-input" required>
                         <option value="">선택하세요</option>
-                        {% for pos in ['인턴', '사원', '주임', '대리', '과장', '차장', '부장', '이사', '상무', '전무', '대표'] %}
-                        <option value="{{ pos }}" {% if employee and employee.position == pos %}selected{% endif %}>{{ pos }}</option>
-                        {% endfor %}
+                        {% if classification_options and classification_options.positions %}
+                            {% for pos in classification_options.positions %}
+                            <option value="{{ pos.value }}" {% if employee and employee.position == pos.value %}selected{% endif %}>{{ pos.label }}</option>
+                            {% endfor %}
+                        {% else %}
+                            {% for pos in ['인턴', '사원', '주임', '대리', '과장', '차장', '부장', '이사', '상무', '전무', '대표'] %}
+                            <option value="{{ pos }}" {% if employee and employee.position == pos %}selected{% endif %}>{{ pos }}</option>
+                            {% endfor %}
+                        {% endif %}
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="job_title" class="form-label">직책</label>
-                    <input type="text" id="job_title" name="job_title" class="form-input"
-                           value="{{ employee.job_title if employee and employee.job_title else '' }}"
-                           placeholder="팀장, 파트장 등">
+                    <select id="job_title" name="job_title" class="form-input">
+                        <option value="">선택하세요</option>
+                        {% if classification_options and classification_options.job_titles %}
+                            {% for jt in classification_options.job_titles %}
+                            <option value="{{ jt.value }}" {% if employee and employee.job_title == jt.value %}selected{% endif %}>{{ jt.label }}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                    <small class="form-help">직책이 없으면 선택하지 않아도 됩니다</small>
                 </div>
 
                 <div class="form-group">

@@ -27,11 +27,16 @@ class ClassificationOptionsRepository(BaseRepository):
         """재직상태 목록 조회"""
         return self._get_by_category('status')
 
+    def get_job_titles(self) -> List[Dict]:
+        """직책 목록 조회"""
+        return self._get_by_category('job_title')
+
     def get_all_options(self) -> Dict[str, List[Dict]]:
         """모든 분류 옵션 조회"""
         return {
             'departments': self.get_departments(),
             'positions': self.get_positions(),
+            'job_titles': self.get_job_titles(),
             'statuses': self.get_statuses()
         }
 
@@ -47,6 +52,10 @@ class ClassificationOptionsRepository(BaseRepository):
         """재직상태 추가"""
         return self._add_option('status', value, label)
 
+    def add_job_title(self, value: str, label: str = None) -> Dict:
+        """직책 추가"""
+        return self._add_option('job_title', value, label)
+
     def remove_department(self, value: str) -> bool:
         """부서 삭제"""
         return self._remove_option('department', value)
@@ -58,6 +67,10 @@ class ClassificationOptionsRepository(BaseRepository):
     def remove_status(self, value: str) -> bool:
         """재직상태 삭제"""
         return self._remove_option('status', value)
+
+    def remove_job_title(self, value: str) -> bool:
+        """직책 삭제"""
+        return self._remove_option('job_title', value)
 
     def update_sort_order(self, category: str, value: str, sort_order: int) -> bool:
         """정렬 순서 수정"""
