@@ -27,6 +27,7 @@ from .attachment import Attachment
 from .classification_option import ClassificationOption
 from .user import User
 from .organization import Organization
+from .system_setting import SystemSetting
 
 __all__ = [
     'Employee',
@@ -53,4 +54,5 @@ __all__ = [
     'ClassificationOption',
     'User',
     'Organization',
+    'SystemSetting',
 ]
