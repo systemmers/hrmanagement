@@ -1,149 +1,42 @@
 /**
  * Employee Form Page JavaScript
- * - 섹션 네비게이션 스크롤 스파이
- * - 스무스 스크롤 네비게이션
- * - 모바일 메뉴 토글
+ * - 섹션 네비게이션 (SectionNav 컴포넌트 사용)
  * - 동적 필드 추가/삭제
  * - 사진 미리보기
+ * - 폼 유효성 검사
  */
 
+import { SectionNav } from '../components/section-nav.js';
+
 document.addEventListener('DOMContentLoaded', () => {
-    initScrollSpy();
-    initSmoothScroll();
-    initMobileNav();
+    initSectionNavigation();
     initDynamicFields();
     initPhotoPreview();
     initFormValidation();
 });
 
 /**
- * 스크롤 스파이 - IntersectionObserver를 사용한 현재 섹션 감지
+ * 섹션 네비게이션 초기화
  */
-function initScrollSpy() {
-    const sections = document.querySelectorAll('.form-section');
-    const navItems = document.querySelectorAll('.section-nav-item');
-
-    if (sections.length === 0 || navItems.length === 0) return;
-
-    const observerOptions = {
-        root: document.querySelector('.form-main-content'),
-        rootMargin: '-100px 0px -50% 0px',
-        threshold: 0
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const sectionId = entry.target.id;
-
-                navItems.forEach(item => {
-                    item.classList.remove('active');
-                });
-
-                const activeNavItem = document.querySelector(`.section-nav-item[href="#${sectionId}"]`);
-                if (activeNavItem) {
-                    activeNavItem.classList.add('active');
-                }
-            }
-        });
-    }, observerOptions);
-
-    sections.forEach(section => {
-        observer.observe(section);
-    });
-}
-
-/**
- * 스무스 스크롤 - 네비게이션 클릭 시 부드러운 스크롤
- */
-function initSmoothScroll() {
-    const navItems = document.querySelectorAll('.section-nav-item');
-
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            const targetId = item.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
-
-            if (targetSection) {
-                const mainContent = document.querySelector('.form-main-content');
-
-                if (mainContent) {
-                    const offsetTop = targetSection.offsetTop - 80;
-                    mainContent.scrollTo({
-                        top: offsetTop,
-                        behavior: 'smooth'
-                    });
-                } else {
-                    targetSection.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-
-                closeMobileNav();
-            }
-        });
-    });
-}
-
-/**
- * 모바일 네비게이션 토글
- */
-function initMobileNav() {
-    const toggleBtn = document.getElementById('mobileNavToggle');
-    const sectionNav = document.getElementById('sectionNav');
-    const overlay = document.getElementById('sectionNavOverlay');
-
-    if (!toggleBtn || !sectionNav) return;
-
-    toggleBtn.addEventListener('click', () => {
-        sectionNav.classList.toggle('mobile-active');
-        if (overlay) {
-            overlay.classList.toggle('active');
-        }
-
-        const icon = toggleBtn.querySelector('i');
-        if (icon) {
-            icon.classList.toggle('fa-bars');
-            icon.classList.toggle('fa-times');
-        }
+function initSectionNavigation() {
+    const sectionNav = new SectionNav({
+        sectionSelector: '.form-section',
+        navItemSelector: '.section-nav-item',
+        scrollContainerSelector: '.form-main-content',
+        navId: 'sectionNav',
+        overlayId: 'sectionNavOverlay',
+        toggleBtnId: 'mobileNavToggle',
+        scrollOffset: 80,
+        rootMargin: '-100px 0px -50% 0px'
     });
 
-    if (overlay) {
-        overlay.addEventListener('click', closeMobileNav);
-    }
-}
-
-/**
- * 모바일 네비게이션 닫기
- */
-function closeMobileNav() {
-    const sectionNav = document.getElementById('sectionNav');
-    const overlay = document.getElementById('sectionNavOverlay');
-    const toggleBtn = document.getElementById('mobileNavToggle');
-
-    if (sectionNav) {
-        sectionNav.classList.remove('mobile-active');
-    }
-    if (overlay) {
-        overlay.classList.remove('active');
-    }
-    if (toggleBtn) {
-        const icon = toggleBtn.querySelector('i');
-        if (icon) {
-            icon.classList.remove('fa-times');
-            icon.classList.add('fa-bars');
-        }
-    }
+    sectionNav.init();
 }
 
 /**
  * 동적 필드 추가/삭제 (학력, 경력, 자격증, 가족)
  */
 function initDynamicFields() {
-    // 학력 추가
     const addEducationBtn = document.getElementById('addEducation');
     if (addEducationBtn) {
         addEducationBtn.addEventListener('click', () => {
@@ -151,7 +44,6 @@ function initDynamicFields() {
         });
     }
 
-    // 경력 추가
     const addCareerBtn = document.getElementById('addCareer');
     if (addCareerBtn) {
         addCareerBtn.addEventListener('click', () => {
@@ -159,7 +51,6 @@ function initDynamicFields() {
         });
     }
 
-    // 자격증 추가
     const addCertificateBtn = document.getElementById('addCertificate');
     if (addCertificateBtn) {
         addCertificateBtn.addEventListener('click', () => {
@@ -167,7 +58,6 @@ function initDynamicFields() {
         });
     }
 
-    // 가족 추가
     const addFamilyBtn = document.getElementById('addFamily');
     if (addFamilyBtn) {
         addFamilyBtn.addEventListener('click', () => {
@@ -175,7 +65,6 @@ function initDynamicFields() {
         });
     }
 
-    // 삭제 버튼 이벤트 (이벤트 위임)
     document.addEventListener('click', (e) => {
         if (e.target.closest('.btn-remove')) {
             const item = e.target.closest('.dynamic-item');
@@ -184,7 +73,6 @@ function initDynamicFields() {
                 if (list.querySelectorAll('.dynamic-item').length > 1) {
                     item.remove();
                 } else {
-                    // 마지막 항목은 삭제하지 않고 값만 초기화
                     const inputs = item.querySelectorAll('input, select');
                     inputs.forEach(input => {
                         if (input.tagName === 'SELECT') {
@@ -201,6 +89,8 @@ function initDynamicFields() {
 
 /**
  * 동적 항목 추가
+ * @param {string} listId - 목록 요소 ID
+ * @param {string} template - HTML 템플릿
  */
 function addDynamicItem(listId, template) {
     const list = document.getElementById(listId);
@@ -216,13 +106,12 @@ function addDynamicItem(listId, template) {
     newItem.setAttribute('data-index', newIndex);
 
     list.appendChild(newItem);
-
-    // 새 항목으로 스크롤
     newItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 /**
  * 학력 템플릿
+ * @returns {string} HTML 템플릿
  */
 function getEducationTemplate() {
     return `
@@ -261,6 +150,7 @@ function getEducationTemplate() {
 
 /**
  * 경력 템플릿
+ * @returns {string} HTML 템플릿
  */
 function getCareerTemplate() {
     return `
@@ -292,6 +182,7 @@ function getCareerTemplate() {
 
 /**
  * 자격증 템플릿
+ * @returns {string} HTML 템플릿
  */
 function getCertificateTemplate() {
     return `
@@ -323,6 +214,7 @@ function getCertificateTemplate() {
 
 /**
  * 가족 템플릿
+ * @returns {string} HTML 템플릿
  */
 function getFamilyTemplate() {
     return `
@@ -371,7 +263,6 @@ function initPhotoPreview() {
         const url = e.target.value.trim();
 
         if (url) {
-            // URL 유효성 검사 (간단한 검사)
             const img = new Image();
             img.onload = () => {
                 photoPreview.innerHTML = `<img src="${url}" alt="프로필 사진" id="previewImage">`;
@@ -433,7 +324,6 @@ function initFormValidation() {
         }
     });
 
-    // 입력 시 invalid 클래스 제거
     form.addEventListener('input', (e) => {
         if (e.target.classList.contains('invalid') && e.target.value.trim()) {
             e.target.classList.remove('invalid');

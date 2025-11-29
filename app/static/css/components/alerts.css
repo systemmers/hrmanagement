@@ -1,0 +1,194 @@
+/**
+ * Alert Component Styles
+ * 알림, 토스트, 플래시 메시지 컴포넌트
+ */
+
+/* 기본 알림 */
+.alert {
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+}
+
+.alert-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-title {
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+}
+
+.alert-message {
+    font-size: var(--text-sm);
+}
+
+.alert-success {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.alert-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+.alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.alert-info {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+}
+
+/* 플래시 메시지 */
+.flash-messages {
+    position: fixed;
+    top: var(--space-4);
+    right: var(--space-4);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.flash-message {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    animation: slideIn 0.3s ease-out;
+}
+
+.flash-message.success {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.flash-message.error {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.flash-message.warning {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.flash-message.info {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.flash-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity var(--transition-fast);
+}
+
+.flash-close:hover {
+    opacity: 1;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* 토스트 메시지 */
+.toast-container {
+    position: fixed;
+    bottom: var(--space-4);
+    right: var(--space-4);
+    z-index: 1100;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--space-2);
+}
+
+.toast {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 280px;
+    max-width: 400px;
+    animation: toastIn 0.3s ease-out;
+}
+
+.toast.success {
+    background-color: #166534;
+    color: var(--color-pure-white);
+}
+
+.toast.error {
+    background-color: #991b1b;
+    color: var(--color-pure-white);
+}
+
+.toast.warning {
+    background-color: #92400e;
+    color: var(--color-pure-white);
+}
+
+.toast.info {
+    background-color: #1e40af;
+    color: var(--color-pure-white);
+}
+
+@keyframes toastIn {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 인라인 알림 */
+.inline-alert {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.inline-alert-success {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.inline-alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+}

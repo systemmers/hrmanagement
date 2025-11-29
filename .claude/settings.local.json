@@ -9,7 +9,9 @@
       "Bash(curl:*)",
       "mcp__context7__resolve-library-id",
       "mcp__context7__get-library-docs",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(del \"D:\\projects\\hrmanagement\\app\\static\\js\\main.js\")",
+      "Bash(ls -la \"D:\\projects\\hrmanagement\\app\\templates\\partials\"\" 2>/dev/null || echo \"Directory check \")"
     ],
     "deny": [],
     "ask": []

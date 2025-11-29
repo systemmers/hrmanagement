@@ -1,0 +1,326 @@
+{#
+    직원 상세 - 이력 및 경력 섹션들
+    섹션 7-11: 학력, 경력, 자격증, 언어능력, 병역/프로젝트/수상
+#}
+{% from 'macros/_info_display.html' import card_header, section_title, info_item %}
+
+{# 섹션 7: 학력정보 #}
+<section id="education-info" class="content-section">
+    {{ section_title('학력정보') }}
+    <div class="card">
+        {{ card_header('학력정보', 'fas fa-graduation-cap') }}
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>학력구분</th>
+                            <th>학교명</th>
+                            <th>졸업년월</th>
+                            <th>학부/학과</th>
+                            <th>전공</th>
+                            <th>학점</th>
+                            <th>졸업유무</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if education_list %}
+                        {% for edu in education_list %}
+                        <tr>
+                            <td>{{ get_degree_label(edu.degree) }}</td>
+                            <td>{{ edu.school }}</td>
+                            <td>{{ edu.graduation_year }}</td>
+                            <td>{{ edu.major }}</td>
+                            <td>{{ edu.major }}</td>
+                            <td>{{ edu.gpa or '-' }}</td>
+                            <td><span class="badge badge-success">졸업</span></td>
+                            <td>{{ edu.note or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="table-empty">
+                                <i class="fas fa-graduation-cap"></i>
+                                <p>등록된 학력정보가 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# 섹션 8: 경력정보 #}
+<section id="career-info" class="content-section">
+    {{ section_title('경력정보') }}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-briefcase"></i>
+                경력정보 (입사 전)
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>직장명</th>
+                            <th>입사일</th>
+                            <th>퇴사일</th>
+                            <th>경력</th>
+                            <th>부서</th>
+                            <th>직급</th>
+                            <th>담당업무</th>
+                            <th>연봉</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if career_list %}
+                        {% for career in career_list %}
+                        <tr>
+                            <td>{{ career.company }}</td>
+                            <td>{{ career.start_date }}</td>
+                            <td>{{ career.end_date or '재직중' }}</td>
+                            <td>-</td>
+                            <td>{{ career.department or '-' }}</td>
+                            <td>{{ career.position or '-' }}</td>
+                            <td>{{ career.duty or '-' }}</td>
+                            <td>{{ '{:,}'.format(career.salary) if career.salary else '-' }}{% if career.salary %}원{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="table-empty">
+                                <i class="fas fa-briefcase"></i>
+                                <p>등록된 경력정보가 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-summary">
+                <strong>총 경력:</strong> {% if career_list %}{{ career_list|length }}개사{% else %}정보 없음{% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{# 섹션 9: 자격증 및 면허 #}
+<section id="certificate-info" class="content-section">
+    {{ section_title('자격증 및 면허') }}
+    <div class="card">
+        {{ card_header('자격증 및 면허', 'fas fa-certificate') }}
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>구분</th>
+                            <th>종류</th>
+                            <th>등급/점수</th>
+                            <th>발행처</th>
+                            <th>취득일</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if certificate_list %}
+                        {% for cert in certificate_list %}
+                        <tr>
+                            <td>자격증</td>
+                            <td>{{ cert.name }}</td>
+                            <td>{{ cert.certificate_number or '-' }}</td>
+                            <td>{{ cert.issuer }}</td>
+                            <td>{{ cert.acquired_date }}</td>
+                            <td>{% if cert.expiry_date %}만료: {{ cert.expiry_date }}{% else %}-{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="table-empty">
+                                <i class="fas fa-certificate"></i>
+                                <p>등록된 자격증 정보가 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# 섹션 10: 언어능력 #}
+<section id="language-info" class="content-section">
+    {{ section_title('언어능력') }}
+    <div class="card">
+        {{ card_header('언어능력', 'fas fa-language') }}
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>언어</th>
+                            <th>수준</th>
+                            <th>시험명</th>
+                            <th>점수</th>
+                            <th>취득일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if language_list %}
+                        {% for lang in language_list %}
+                        <tr>
+                            <td>{{ lang.language }}</td>
+                            <td>{{ get_level_label(lang.level) }}</td>
+                            <td>{{ lang.test_name or '-' }}</td>
+                            <td>{{ lang.score or '-' }}</td>
+                            <td>{{ lang.acquired_date or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="table-empty">
+                                <i class="fas fa-language"></i>
+                                <p>등록된 언어능력 정보가 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# 섹션 11: 병역/프로젝트/수상 #}
+<section id="military-info" class="content-section">
+    {{ section_title('병역 / 프로젝트 / 수상') }}
+
+    {# 병역정보 #}
+    <div class="card">
+        {{ card_header('병역정보', 'fas fa-medal') }}
+        <div class="card-body">
+            <div class="info-grid">
+                {% if military %}
+                {{ info_item('병역구분', get_military_status_label(military.status)) }}
+                {{ info_item('군별', get_branch_label(military.branch)) }}
+                <div class="info-item">
+                    <div class="info-label">복무기간</div>
+                    <div class="info-value{% if not military.start_date %} empty{% endif %}">
+                        {% if military.start_date %}{{ military.start_date }} ~ {{ military.end_date or '복무중' }}{% else %}정보 없음{% endif %}
+                    </div>
+                </div>
+                {{ info_item('계급', military.rank) }}
+                {{ info_item('보직', military.duty) }}
+                {{ info_item('병과', military.specialty) }}
+                {% if military.exemption_reason %}
+                {{ info_item('면제사유', military.exemption_reason) }}
+                {% endif %}
+                {% else %}
+                {{ info_item('병역구분', none) }}
+                {{ info_item('군별', none) }}
+                {{ info_item('복무기간', none) }}
+                {{ info_item('계급', none) }}
+                {{ info_item('보직', none) }}
+                {{ info_item('병과', none) }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# 유사사업 참여경력 #}
+    <div class="card" style="margin-top: var(--space-4);">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-project-diagram"></i>
+                유사사업 참여경력
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>사업명</th>
+                            <th>참여기간</th>
+                            <th>기간</th>
+                            <th>담당업무</th>
+                            <th>역할/직책</th>
+                            <th>발주처</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if project_list %}
+                        {% for project in project_list %}
+                        <tr>
+                            <td>{{ project.project_name }}</td>
+                            <td>{{ project.start_date }} ~ {{ project.end_date }}</td>
+                            <td>{{ project.duration }}</td>
+                            <td>{{ project.duty }}</td>
+                            <td>{{ project.role }}</td>
+                            <td>{{ project.client }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="table-empty">
+                                <i class="fas fa-project-diagram"></i>
+                                <p>등록된 프로젝트 정보가 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {# 수상내역 #}
+    <div class="card" style="margin-top: var(--space-4);">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-trophy"></i>
+                수상내역
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>수상일</th>
+                            <th>수상명</th>
+                            <th>수여기관</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if award_list %}
+                        {% for award in award_list|sort(attribute='award_date', reverse=True) %}
+                        <tr>
+                            <td>{{ award.award_date }}</td>
+                            <td>{{ award.award_name }}</td>
+                            <td>{{ award.institution }}</td>
+                            <td>{{ award.note or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="table-empty">
+                                <i class="fas fa-trophy"></i>
+                                <p>등록된 수상내역이 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

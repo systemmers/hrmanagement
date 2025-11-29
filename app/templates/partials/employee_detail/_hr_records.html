@@ -1,0 +1,341 @@
+{#
+    직원 상세 - 인사기록 섹션들
+    섹션 12-14: 근로계약 및 연봉, 인사이동 및 고과, 근태 및 비품
+#}
+{% from 'macros/_info_display.html' import card_header, section_title, info_item %}
+
+{# 섹션 12: 근로계약 및 연봉 #}
+<section id="employment-contract" class="content-section">
+    {{ section_title('근로계약 및 연봉') }}
+
+    {# 근로계약 이력 #}
+    <div class="card">
+        {{ card_header('근로계약 이력', 'fas fa-file-signature') }}
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>계약일</th>
+                            <th>계약구분</th>
+                            <th>계약기간 시작</th>
+                            <th>계약기간 종료</th>
+                            <th>계약기간</th>
+                            <th>직원구분</th>
+                            <th>근무형태</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ employee.hireDate }}</td>
+                            <td><span class="badge badge-success">정규직</span></td>
+                            <td>{{ employee.hireDate }}</td>
+                            <td>-</td>
+                            <td>{{ calculate_tenure(employee.hireDate) }}</td>
+                            <td>정규직</td>
+                            <td>전일제</td>
+                            <td>신규입사</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {# 연봉계약 이력 #}
+    <div class="card" style="margin-top: var(--space-4);">
+        {{ card_header('연봉계약 이력', 'fas fa-coins') }}
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>계약연도</th>
+                            <th>연봉</th>
+                            <th>상여금</th>
+                            <th>총액</th>
+                            <th>계약기간</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if salary_history_list %}
+                        {% for history in salary_history_list|sort(attribute='contract_year', reverse=True) %}
+                        <tr>
+                            <td>{{ history.contract_year }}년</td>
+                            <td>{{ '{:,}'.format(history.annual_salary) }}원</td>
+                            <td>{{ '{:,}'.format(history.bonus) }}원</td>
+                            <td><strong>{{ '{:,}'.format(history.total_amount) }}원</strong></td>
+                            <td>{{ history.contract_period }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="table-empty">
+                                <i class="fas fa-coins"></i>
+                                <p>등록된 연봉계약 정보가 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {# 급여 지급 이력 #}
+    <div class="card" style="margin-top: var(--space-4);">
+        {{ card_header('급여 지급 이력', 'fas fa-money-bill-wave') }}
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>지급일</th>
+                            <th>지급기간</th>
+                            <th>기본급</th>
+                            <th>수당</th>
+                            <th>총지급액</th>
+                            <th>4대보험</th>
+                            <th>소득세</th>
+                            <th>공제합계</th>
+                            <th>실지급액</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if salary_payment_list %}
+                        {% for payment in salary_payment_list|sort(attribute='payment_date', reverse=True) %}
+                        <tr>
+                            <td>{{ payment.payment_date }}</td>
+                            <td>{{ payment.payment_period }}</td>
+                            <td>{{ '{:,}'.format(payment.base_salary) }}원</td>
+                            <td>{{ '{:,}'.format(payment.allowances) }}원</td>
+                            <td>{{ '{:,}'.format(payment.gross_pay) }}원</td>
+                            <td>{{ '{:,}'.format(payment.insurance) }}원</td>
+                            <td>{{ '{:,}'.format(payment.income_tax) }}원</td>
+                            <td>{{ '{:,}'.format(payment.total_deduction) }}원</td>
+                            <td><strong>{{ '{:,}'.format(payment.net_pay) }}원</strong></td>
+                            <td>{{ payment.note or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="10" class="table-empty">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <p>등록된 급여 지급 정보가 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# 섹션 13: 인사이동 및 고과 #}
+<section id="personnel-movement" class="content-section">
+    {{ section_title('인사이동 및 고과') }}
+
+    {# 인사이동 및 승진 #}
+    <div class="card">
+        {{ card_header('인사이동 및 승진', 'fas fa-arrow-up') }}
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>발령일</th>
+                            <th>발령구분</th>
+                            <th>발령전</th>
+                            <th>발령후</th>
+                            <th>발령전 직급</th>
+                            <th>발령후 직급</th>
+                            <th>직무</th>
+                            <th>발령사유</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if promotion_list %}
+                        {% for promo in promotion_list|sort(attribute='effective_date', reverse=True) %}
+                        <tr>
+                            <td>{{ promo.effective_date }}</td>
+                            <td><span class="badge badge-{% if promo.promotion_type == '신규채용' %}info{% elif promo.promotion_type == '승진' %}success{% else %}secondary{% endif %}">{{ promo.promotion_type }}</span></td>
+                            <td>{{ promo.from_department or '-' }}</td>
+                            <td>{{ promo.to_department }}</td>
+                            <td>{{ promo.from_position or '-' }}</td>
+                            <td>{{ promo.to_position }}</td>
+                            <td>{{ promo.job_role or '-' }}</td>
+                            <td>{{ promo.reason or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="table-empty">
+                                <i class="fas fa-arrow-up"></i>
+                                <p>등록된 인사이동 정보가 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {# 인사고과 - 정기평가 #}
+    <div class="card" style="margin-top: var(--space-4);">
+        {{ card_header('인사고과 - 정기평가', 'fas fa-chart-line') }}
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>연차</th>
+                            <th>1분기</th>
+                            <th>2분기</th>
+                            <th>3분기</th>
+                            <th>4분기</th>
+                            <th>종합평가</th>
+                            <th>연봉협상</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if evaluation_list %}
+                        {% for eval in evaluation_list|sort(attribute='year', reverse=True) %}
+                        <tr>
+                            <td>{{ eval.year }}년</td>
+                            <td>{% if eval.q1_grade %}<span class="badge badge-{% if eval.q1_grade in ['S', 'A'] %}success{% elif eval.q1_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q1_grade }}</span>{% else %}-{% endif %}</td>
+                            <td>{% if eval.q2_grade %}<span class="badge badge-{% if eval.q2_grade in ['S', 'A'] %}success{% elif eval.q2_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q2_grade }}</span>{% else %}-{% endif %}</td>
+                            <td>{% if eval.q3_grade %}<span class="badge badge-{% if eval.q3_grade in ['S', 'A'] %}success{% elif eval.q3_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q3_grade }}</span>{% else %}-{% endif %}</td>
+                            <td>{% if eval.q4_grade %}<span class="badge badge-{% if eval.q4_grade in ['S', 'A'] %}success{% elif eval.q4_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q4_grade }}</span>{% else %}-{% endif %}</td>
+                            <td>{% if eval.overall_grade %}<strong><span class="badge badge-{% if eval.overall_grade in ['S', 'A'] %}success{% elif eval.overall_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.overall_grade }}</span></strong>{% else %}-{% endif %}</td>
+                            <td>{{ eval.salary_negotiation or '-' }}</td>
+                            <td>{{ eval.note or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="table-empty">
+                                <i class="fas fa-chart-line"></i>
+                                <p>등록된 인사고과 정보가 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {# 교육훈련 #}
+    <div class="card" style="margin-top: var(--space-4);">
+        {{ card_header('교육훈련', 'fas fa-book') }}
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>교육일</th>
+                            <th>교육명</th>
+                            <th>교육기관</th>
+                            <th>교육시간</th>
+                            <th>이수여부</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if training_list %}
+                        {% for train in training_list|sort(attribute='training_date', reverse=True) %}
+                        <tr>
+                            <td>{{ train.training_date }}</td>
+                            <td>{{ train.training_name }}</td>
+                            <td>{{ train.institution }}</td>
+                            <td>{{ train.hours }}시간</td>
+                            <td><span class="badge badge-{% if train.completion_status == '이수' %}success{% else %}danger{% endif %}">{{ train.completion_status }}</span></td>
+                            <td>{{ train.note or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="table-empty">
+                                <i class="fas fa-book"></i>
+                                <p>등록된 교육훈련 정보가 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# 섹션 14: 근태 및 비품 #}
+<section id="attendance-assets" class="content-section">
+    {{ section_title('근태 및 비품') }}
+
+    {# 근태현황 #}
+    <div class="card">
+        {{ card_header('근태현황', 'fas fa-calendar-check') }}
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">출근일수</div>
+                    <div class="info-value{% if not attendance_summary or attendance_summary.total_work_days == 0 %} empty{% endif %}">
+                        {{ attendance_summary.total_work_days if attendance_summary and attendance_summary.total_work_days > 0 else '정보 없음' }}{% if attendance_summary and attendance_summary.total_work_days > 0 %}일{% endif %}
+                    </div>
+                </div>
+                {{ info_item('결근일수', ((attendance_summary.total_absent_days if attendance_summary else 0)|string ~ '일')) }}
+                {{ info_item('지각횟수', ((attendance_summary.total_late_count if attendance_summary else 0)|string ~ '회')) }}
+                {{ info_item('조퇴횟수', ((attendance_summary.total_early_leave if attendance_summary else 0)|string ~ '회')) }}
+                {{ info_item('연차사용', ((attendance_summary.total_annual_used if attendance_summary else 0)|string ~ '일')) }}
+                {{ info_item('연차잔여', ((benefit.annual_leave_remaining if benefit else 15)|string ~ '일'), highlight=true) }}
+            </div>
+        </div>
+    </div>
+
+    {# 비품지급 #}
+    <div class="card" style="margin-top: var(--space-4);">
+        {{ card_header('비품지급', 'fas fa-laptop') }}
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>지급일</th>
+                            <th>품목</th>
+                            <th>모델/사양</th>
+                            <th>시리얼번호</th>
+                            <th>상태</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if asset_list %}
+                        {% for asset in asset_list|sort(attribute='issue_date', reverse=True) %}
+                        <tr>
+                            <td>{{ asset.issue_date }}</td>
+                            <td>{{ asset.item_name }}</td>
+                            <td>{{ asset.model }}</td>
+                            <td>{{ asset.serial_number }}</td>
+                            <td><span class="badge badge-{% if asset.status == '사용중' %}success{% elif asset.status == '반납' %}secondary{% else %}danger{% endif %}">{{ asset.status }}</span></td>
+                            <td>{{ asset.note or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="table-empty">
+                                <i class="fas fa-laptop"></i>
+                                <p>등록된 비품 정보가 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,145 +1,32 @@
 /**
  * Employee Detail Page JavaScript
- * - 섹션 네비게이션 스크롤 스파이
- * - 스무스 스크롤 네비게이션
- * - 모바일 메뉴 토글
+ * - 섹션 네비게이션 (SectionNav 컴포넌트 사용)
  * - 파일 업로드 UI
  */
 
+import { SectionNav } from '../components/section-nav.js';
+
 document.addEventListener('DOMContentLoaded', () => {
-    initScrollSpy();
-    initSmoothScroll();
-    initMobileNav();
+    initSectionNavigation();
     initFileUpload();
 });
 
 /**
- * 스크롤 스파이 - IntersectionObserver를 사용한 현재 섹션 감지
+ * 섹션 네비게이션 초기화
  */
-function initScrollSpy() {
-    const sections = document.querySelectorAll('.content-section');
-    const navItems = document.querySelectorAll('.section-nav-item');
-
-    if (sections.length === 0 || navItems.length === 0) return;
-
-    const observerOptions = {
-        root: document.querySelector('.detail-main-content'),
-        rootMargin: '-100px 0px -50% 0px',
-        threshold: 0
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const sectionId = entry.target.id;
-
-                // 모든 네비게이션 아이템에서 active 제거
-                navItems.forEach(item => {
-                    item.classList.remove('active');
-                });
-
-                // 현재 섹션에 해당하는 네비게이션 아이템에 active 추가
-                const activeNavItem = document.querySelector(`.section-nav-item[href="#${sectionId}"]`);
-                if (activeNavItem) {
-                    activeNavItem.classList.add('active');
-                }
-            }
-        });
-    }, observerOptions);
-
-    sections.forEach(section => {
-        observer.observe(section);
-    });
-}
-
-/**
- * 스무스 스크롤 - 네비게이션 클릭 시 부드러운 스크롤
- */
-function initSmoothScroll() {
-    const navItems = document.querySelectorAll('.section-nav-item');
-
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            const targetId = item.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
-
-            if (targetSection) {
-                // 메인 콘텐츠 영역 내에서 스크롤
-                const mainContent = document.querySelector('.detail-main-content');
-
-                if (mainContent) {
-                    const offsetTop = targetSection.offsetTop - 80;
-                    mainContent.scrollTo({
-                        top: offsetTop,
-                        behavior: 'smooth'
-                    });
-                } else {
-                    targetSection.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-
-                // 모바일에서 네비게이션 닫기
-                closeMobileNav();
-            }
-        });
-    });
-}
-
-/**
- * 모바일 네비게이션 토글
- */
-function initMobileNav() {
-    const toggleBtn = document.getElementById('mobileNavToggle');
-    const sectionNav = document.getElementById('sectionNav');
-    const overlay = document.getElementById('sectionNavOverlay');
-
-    if (!toggleBtn || !sectionNav) return;
-
-    toggleBtn.addEventListener('click', () => {
-        sectionNav.classList.toggle('mobile-active');
-        if (overlay) {
-            overlay.classList.toggle('active');
-        }
-
-        // 버튼 아이콘 변경
-        const icon = toggleBtn.querySelector('i');
-        if (icon) {
-            icon.classList.toggle('fa-bars');
-            icon.classList.toggle('fa-times');
-        }
+function initSectionNavigation() {
+    const sectionNav = new SectionNav({
+        sectionSelector: '.content-section',
+        navItemSelector: '.section-nav-item',
+        scrollContainerSelector: '.detail-main-content',
+        navId: 'sectionNav',
+        overlayId: 'sectionNavOverlay',
+        toggleBtnId: 'mobileNavToggle',
+        scrollOffset: 80,
+        rootMargin: '-100px 0px -50% 0px'
     });
 
-    // 오버레이 클릭 시 닫기
-    if (overlay) {
-        overlay.addEventListener('click', closeMobileNav);
-    }
-}
-
-/**
- * 모바일 네비게이션 닫기
- */
-function closeMobileNav() {
-    const sectionNav = document.getElementById('sectionNav');
-    const overlay = document.getElementById('sectionNavOverlay');
-    const toggleBtn = document.getElementById('mobileNavToggle');
-
-    if (sectionNav) {
-        sectionNav.classList.remove('mobile-active');
-    }
-    if (overlay) {
-        overlay.classList.remove('active');
-    }
-    if (toggleBtn) {
-        const icon = toggleBtn.querySelector('i');
-        if (icon) {
-            icon.classList.remove('fa-times');
-            icon.classList.add('fa-bars');
-        }
-    }
+    sectionNav.init();
 }
 
 /**
@@ -150,7 +37,6 @@ function initFileUpload() {
 
     if (!uploadArea) return;
 
-    // 드래그 앤 드롭 이벤트
     uploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         uploadArea.classList.add('dragover');
@@ -170,7 +56,6 @@ function initFileUpload() {
         }
     });
 
-    // 클릭 업로드
     uploadArea.addEventListener('click', () => {
         const input = document.createElement('input');
         input.type = 'file';
@@ -188,18 +73,18 @@ function initFileUpload() {
 }
 
 /**
- * 파일 업로드 처리 (향후 구현 예정)
+ * 파일 업로드 처리
+ * @param {FileList} files - 업로드할 파일 목록
  */
 function handleFileUpload(files) {
     console.log('Files to upload:', files);
-
-    // 향후 구현: API 호출로 파일 업로드
-    // 현재는 알림만 표시
     alert(`${files.length}개의 파일이 선택되었습니다.\n파일 업로드 기능은 향후 구현 예정입니다.`);
 }
 
 /**
- * 파일 카드 렌더링 (향후 구현 예정)
+ * 파일 카드 렌더링
+ * @param {File} file - 렌더링할 파일 객체
+ * @returns {string} HTML 문자열
  */
 function renderFileCard(file) {
     const extension = file.name.split('.').pop().toLowerCase();
@@ -252,6 +137,8 @@ function renderFileCard(file) {
 
 /**
  * 파일 크기 포맷
+ * @param {number} bytes - 바이트 수
+ * @returns {string} 포맷된 파일 크기 문자열
  */
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
