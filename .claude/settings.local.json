@@ -5,7 +5,11 @@
       "mcp__sequential-thinking__sequentialthinking",
       "Bash(git checkout:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(curl:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []
