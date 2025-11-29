@@ -1,0 +1,90 @@
+{#
+    직원 폼 - 학력정보 섹션 (동적 폼)
+    employee: 직원 객체 (수정 모드일 때)
+#}
+<section class="form-section" id="education-info">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-graduation-cap"></i>
+                학력정보
+            </h2>
+            <button type="button" class="btn btn-sm btn-secondary" id="addEducation">
+                <i class="fas fa-plus"></i> 추가
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="dynamic-list" id="educationList">
+                {% if employee and employee.education %}
+                    {% for edu in employee.education %}
+                    <div class="dynamic-item" data-index="{{ loop.index0 }}">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">학교명</label>
+                                <input type="text" name="education_school[]" class="form-input"
+                                       value="{{ edu.school }}" placeholder="대학교명">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">학위</label>
+                                <select name="education_degree[]" class="form-input">
+                                    <option value="">선택하세요</option>
+                                    <option value="highschool" {% if edu.degree == 'highschool' %}selected{% endif %}>고등학교 졸업</option>
+                                    <option value="associate" {% if edu.degree == 'associate' %}selected{% endif %}>전문학사</option>
+                                    <option value="bachelor" {% if edu.degree == 'bachelor' %}selected{% endif %}>학사</option>
+                                    <option value="master" {% if edu.degree == 'master' %}selected{% endif %}>석사</option>
+                                    <option value="doctor" {% if edu.degree == 'doctor' %}selected{% endif %}>박사</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">전공</label>
+                                <input type="text" name="education_major[]" class="form-input"
+                                       value="{{ edu.major }}" placeholder="전공명">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">졸업년도</label>
+                                <input type="text" name="education_year[]" class="form-input"
+                                       value="{{ edu.year }}" placeholder="2020">
+                            </div>
+                        </div>
+                        <button type="button" class="btn-remove" title="삭제">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="dynamic-item" data-index="0">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">학교명</label>
+                            <input type="text" name="education_school[]" class="form-input" placeholder="대학교명">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">학위</label>
+                            <select name="education_degree[]" class="form-input">
+                                <option value="">선택하세요</option>
+                                <option value="highschool">고등학교 졸업</option>
+                                <option value="associate">전문학사</option>
+                                <option value="bachelor">학사</option>
+                                <option value="master">석사</option>
+                                <option value="doctor">박사</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">전공</label>
+                            <input type="text" name="education_major[]" class="form-input" placeholder="전공명">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">졸업년도</label>
+                            <input type="text" name="education_year[]" class="form-input" placeholder="2020">
+                        </div>
+                    </div>
+                    <button type="button" class="btn-remove" title="삭제">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+            <p class="form-help">최종학력부터 역순으로 입력해 주세요.</p>
+        </div>
+    </div>
+</section>

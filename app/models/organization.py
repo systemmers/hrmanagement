@@ -35,7 +35,11 @@ class Organization(db.Model):
     )
 
     # Relationship to manager (Employee)
-    manager = db.relationship('Employee', backref=db.backref('managed_organizations', lazy='dynamic'))
+    manager = db.relationship(
+        'Employee',
+        foreign_keys=[manager_id],
+        backref=db.backref('managed_organizations', lazy='dynamic')
+    )
 
     # Organization type constants
     TYPE_COMPANY = 'company'

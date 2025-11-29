@@ -1,0 +1,91 @@
+{#
+    직원 폼 - 4대보험 섹션
+    employee: 직원 객체 (수정 모드일 때)
+    insurance: 보험 정보 객체
+#}
+<section class="form-section" id="insurance-info">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-shield-alt"></i>
+                4대보험
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="national_pension_number" class="form-label">국민연금 가입번호</label>
+                    <input type="text" id="national_pension_number" name="national_pension_number" class="form-input"
+                           value="{{ insurance.national_pension_number if insurance and insurance.national_pension_number else '' }}"
+                           placeholder="국민연금 가입번호">
+                </div>
+
+                <div class="form-group">
+                    <label for="national_pension_date" class="form-label">국민연금 취득일</label>
+                    <input type="date" id="national_pension_date" name="national_pension_date" class="form-input"
+                           value="{{ insurance.national_pension_date if insurance and insurance.national_pension_date else '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="health_insurance_number" class="form-label">건강보험 가입번호</label>
+                    <input type="text" id="health_insurance_number" name="health_insurance_number" class="form-input"
+                           value="{{ insurance.health_insurance_number if insurance and insurance.health_insurance_number else '' }}"
+                           placeholder="건강보험 가입번호">
+                </div>
+
+                <div class="form-group">
+                    <label for="health_insurance_date" class="form-label">건강보험 취득일</label>
+                    <input type="date" id="health_insurance_date" name="health_insurance_date" class="form-input"
+                           value="{{ insurance.health_insurance_date if insurance and insurance.health_insurance_date else '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="employment_insurance_number" class="form-label">고용보험 가입번호</label>
+                    <input type="text" id="employment_insurance_number" name="employment_insurance_number" class="form-input"
+                           value="{{ insurance.employment_insurance_number if insurance and insurance.employment_insurance_number else '' }}"
+                           placeholder="고용보험 가입번호">
+                </div>
+
+                <div class="form-group">
+                    <label for="employment_insurance_date" class="form-label">고용보험 취득일</label>
+                    <input type="date" id="employment_insurance_date" name="employment_insurance_date" class="form-input"
+                           value="{{ insurance.employment_insurance_date if insurance and insurance.employment_insurance_date else '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="industrial_insurance_number" class="form-label">산재보험 가입번호</label>
+                    <input type="text" id="industrial_insurance_number" name="industrial_insurance_number" class="form-input"
+                           value="{{ insurance.industrial_insurance_number if insurance and insurance.industrial_insurance_number else '' }}"
+                           placeholder="산재보험 가입번호">
+                </div>
+
+                <div class="form-group">
+                    <label for="industrial_insurance_date" class="form-label">산재보험 취득일</label>
+                    <input type="date" id="industrial_insurance_date" name="industrial_insurance_date" class="form-input"
+                           value="{{ insurance.industrial_insurance_date if insurance and insurance.industrial_insurance_date else '' }}">
+                </div>
+            </div>
+
+            <div class="form-group form-group-full" style="margin-top: 1rem;">
+                <label class="form-label">보험 적용 제외</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="pension_exempt" value="1"
+                               {% if insurance and insurance.pension_exempt %}checked{% endif %}>
+                        국민연금 제외
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="health_exempt" value="1"
+                               {% if insurance and insurance.health_exempt %}checked{% endif %}>
+                        건강보험 제외
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="employment_exempt" value="1"
+                               {% if insurance and insurance.employment_exempt %}checked{% endif %}>
+                        고용보험 제외
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

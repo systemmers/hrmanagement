@@ -1,0 +1,54 @@
+{#
+    직원 폼 - 병역정보 섹션
+    employee: 직원 객체 (수정 모드일 때)
+#}
+<section class="form-section" id="military-info">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-shield-alt"></i>
+                병역정보
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="military_status" class="form-label">병역사항</label>
+                    <select id="military_status" name="military_status" class="form-input">
+                        <option value="">선택하세요</option>
+                        <option value="completed" {% if employee and employee.military_status == 'completed' %}selected{% endif %}>군필</option>
+                        <option value="exempted" {% if employee and employee.military_status == 'exempted' %}selected{% endif %}>면제</option>
+                        <option value="serving" {% if employee and employee.military_status == 'serving' %}selected{% endif %}>복무중</option>
+                        <option value="not_applicable" {% if employee and employee.military_status == 'not_applicable' %}selected{% endif %}>해당없음</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="military_branch" class="form-label">군별</label>
+                    <select id="military_branch" name="military_branch" class="form-input">
+                        <option value="">선택하세요</option>
+                        <option value="army" {% if employee and employee.military_branch == 'army' %}selected{% endif %}>육군</option>
+                        <option value="navy" {% if employee and employee.military_branch == 'navy' %}selected{% endif %}>해군</option>
+                        <option value="airforce" {% if employee and employee.military_branch == 'airforce' %}selected{% endif %}>공군</option>
+                        <option value="marine" {% if employee and employee.military_branch == 'marine' %}selected{% endif %}>해병대</option>
+                        <option value="auxiliary" {% if employee and employee.military_branch == 'auxiliary' %}selected{% endif %}>보충역</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="military_rank" class="form-label">계급</label>
+                    <input type="text" id="military_rank" name="military_rank" class="form-input"
+                           value="{{ employee.military_rank if employee and employee.military_rank else '' }}"
+                           placeholder="병장, 상병 등">
+                </div>
+
+                <div class="form-group">
+                    <label for="military_period" class="form-label">복무기간</label>
+                    <input type="text" id="military_period" name="military_period" class="form-input"
+                           value="{{ employee.military_period if employee and employee.military_period else '' }}"
+                           placeholder="2018.01 ~ 2019.10">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

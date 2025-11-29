@@ -1,0 +1,247 @@
+/**
+ * Tree Selector Component Styles
+ */
+
+/* 모달 오버레이 */
+.tree-selector-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1100;
+    align-items: center;
+    justify-content: center;
+}
+
+.tree-selector-modal.show {
+    display: flex;
+}
+
+/* 모달 컨텐츠 */
+.tree-selector-content {
+    background: var(--white);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+/* 헤더 */
+.tree-selector-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.tree-selector-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.tree-selector-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    color: var(--gray-400);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.tree-selector-close:hover {
+    background: var(--gray-100);
+    color: var(--gray-600);
+}
+
+/* 검색 */
+.tree-selector-search {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--gray-100);
+    flex-shrink: 0;
+}
+
+.tree-selector-search-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--gray-900);
+    transition: all 0.2s;
+}
+
+.tree-selector-search-input:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+/* 트리 영역 */
+.tree-selector-body {
+    padding: 8px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 200px;
+    max-height: 400px;
+}
+
+.tree-selector-tree {
+    font-size: 14px;
+}
+
+/* 트리 리스트 */
+.tree-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tree-list.collapsed {
+    display: none;
+}
+
+/* 트리 아이템 */
+.tree-item {
+    user-select: none;
+}
+
+.tree-item-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.tree-item-content:hover {
+    background: var(--gray-50);
+}
+
+.tree-item-content.selected {
+    background: var(--primary-50);
+    color: var(--primary-700);
+}
+
+/* 토글 버튼 */
+.tree-toggle {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-400);
+    transition: transform 0.2s;
+}
+
+.tree-toggle i {
+    font-size: 10px;
+    transition: transform 0.2s;
+}
+
+.tree-toggle.expanded i {
+    transform: rotate(90deg);
+}
+
+.tree-toggle-placeholder {
+    width: 20px;
+}
+
+/* 아이콘 */
+.tree-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-500);
+}
+
+.tree-item[data-type="company"] > .tree-item-content .tree-icon {
+    color: var(--primary-600);
+}
+
+.tree-item[data-type="division"] > .tree-item-content .tree-icon {
+    color: var(--blue-600);
+}
+
+.tree-item[data-type="department"] > .tree-item-content .tree-icon {
+    color: var(--green-600);
+}
+
+.tree-item[data-type="team"] > .tree-item-content .tree-icon {
+    color: var(--orange-600);
+}
+
+/* 라벨 */
+.tree-label {
+    flex: 1;
+    font-weight: 500;
+    color: var(--gray-800);
+}
+
+.tree-code {
+    font-size: 11px;
+    padding: 2px 6px;
+    background: var(--gray-100);
+    border-radius: 4px;
+    color: var(--gray-500);
+}
+
+/* 빈 상태 */
+.tree-empty {
+    text-align: center;
+    padding: 32px;
+    color: var(--gray-400);
+}
+
+/* 푸터 */
+.tree-selector-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--gray-100);
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* 입력 필드 스타일 (조직 선택용) */
+.org-selector-input {
+    cursor: pointer !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 36px !important;
+}
+
+.org-selector-input:hover {
+    border-color: var(--primary-400);
+}
+
+/* 반응형 */
+@media (max-width: 576px) {
+    .tree-selector-content {
+        max-width: 100%;
+        margin: 16px;
+        max-height: calc(100vh - 32px);
+    }
+}

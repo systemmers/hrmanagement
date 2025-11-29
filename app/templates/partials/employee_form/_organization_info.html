@@ -1,0 +1,92 @@
+{#
+    직원 폼 - 소속정보 섹션
+    employee: 직원 객체 (수정 모드일 때)
+#}
+<section class="form-section" id="organization-info">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-building"></i>
+                소속정보
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="employee_number" class="form-label">사번</label>
+                    {% if employee and employee.employee_number %}
+                    <input type="text" id="employee_number" name="employee_number" class="form-input"
+                           value="{{ employee.employee_number }}" readonly>
+                    {% else %}
+                    <input type="text" id="employee_number" name="employee_number" class="form-input"
+                           value="" placeholder="자동생성" readonly>
+                    <small class="form-help">등록 시 자동으로 생성됩니다. (형식: EMP-YYYY-NNNN)</small>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="organization_display" class="form-label">소속 조직 <span class="required">*</span></label>
+                    <input type="text" id="organization_display" class="form-input org-selector-input"
+                           value="{{ employee.organization.name if employee and employee.organization else '' }}"
+                           placeholder="조직을 선택하세요" readonly>
+                    <input type="hidden" id="organization_id" name="organization_id"
+                           value="{{ employee.organization_id if employee and employee.organization_id else '' }}">
+                    <small class="form-help">클릭하여 조직 트리에서 선택하세요</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="department" class="form-label">부서명</label>
+                    <input type="text" id="department" name="department" class="form-input"
+                           value="{{ employee.department if employee else '' }}"
+                           placeholder="개발팀">
+                    <small class="form-help">조직 선택과 별도로 입력할 수 있습니다</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="team" class="form-label">팀</label>
+                    <input type="text" id="team" name="team" class="form-input"
+                           value="{{ employee.team if employee and employee.team else '' }}"
+                           placeholder="프론트엔드팀">
+                </div>
+
+                <div class="form-group">
+                    <label for="position" class="form-label">직급 <span class="required">*</span></label>
+                    <select id="position" name="position" class="form-input" required>
+                        <option value="">선택하세요</option>
+                        {% for pos in ['인턴', '사원', '주임', '대리', '과장', '차장', '부장', '이사', '상무', '전무', '대표'] %}
+                        <option value="{{ pos }}" {% if employee and employee.position == pos %}selected{% endif %}>{{ pos }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="job_title" class="form-label">직책</label>
+                    <input type="text" id="job_title" name="job_title" class="form-input"
+                           value="{{ employee.job_title if employee and employee.job_title else '' }}"
+                           placeholder="팀장, 파트장 등">
+                </div>
+
+                <div class="form-group">
+                    <label for="work_location" class="form-label">근무지</label>
+                    <input type="text" id="work_location" name="work_location" class="form-input"
+                           value="{{ employee.work_location if employee and employee.work_location else '' }}"
+                           placeholder="본사, 지사 등">
+                </div>
+
+                <div class="form-group">
+                    <label for="internal_phone" class="form-label">내선번호</label>
+                    <input type="text" id="internal_phone" name="internal_phone" class="form-input"
+                           value="{{ employee.internal_phone if employee and employee.internal_phone else '' }}"
+                           placeholder="1234">
+                </div>
+
+                <div class="form-group">
+                    <label for="company_email" class="form-label">회사 이메일</label>
+                    <input type="email" id="company_email" name="company_email" class="form-input"
+                           value="{{ employee.company_email if employee and employee.company_email else '' }}"
+                           placeholder="hong@company.co.kr">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

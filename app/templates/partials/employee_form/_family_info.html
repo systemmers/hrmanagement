@@ -1,0 +1,87 @@
+{#
+    직원 폼 - 가족사항 섹션 (동적 폼)
+    employee: 직원 객체 (수정 모드일 때)
+#}
+<section class="form-section" id="family-info">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-users"></i>
+                가족사항
+            </h2>
+            <button type="button" class="btn btn-sm btn-secondary" id="addFamily">
+                <i class="fas fa-plus"></i> 추가
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="dynamic-list" id="familyList">
+                {% if employee and employee.family %}
+                    {% for member in employee.family %}
+                    <div class="dynamic-item" data-index="{{ loop.index0 }}">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">관계</label>
+                                <select name="family_relation[]" class="form-input">
+                                    <option value="">선택하세요</option>
+                                    <option value="spouse" {% if member.relation == 'spouse' %}selected{% endif %}>배우자</option>
+                                    <option value="child" {% if member.relation == 'child' %}selected{% endif %}>자녀</option>
+                                    <option value="parent" {% if member.relation == 'parent' %}selected{% endif %}>부모</option>
+                                    <option value="sibling" {% if member.relation == 'sibling' %}selected{% endif %}>형제/자매</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">성명</label>
+                                <input type="text" name="family_name[]" class="form-input"
+                                       value="{{ member.name }}" placeholder="이름">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">생년월일</label>
+                                <input type="date" name="family_birth[]" class="form-input"
+                                       value="{{ member.birth }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">직업</label>
+                                <input type="text" name="family_job[]" class="form-input"
+                                       value="{{ member.job }}" placeholder="직업">
+                            </div>
+                        </div>
+                        <button type="button" class="btn-remove" title="삭제">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="dynamic-item" data-index="0">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">관계</label>
+                            <select name="family_relation[]" class="form-input">
+                                <option value="">선택하세요</option>
+                                <option value="spouse">배우자</option>
+                                <option value="child">자녀</option>
+                                <option value="parent">부모</option>
+                                <option value="sibling">형제/자매</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">성명</label>
+                            <input type="text" name="family_name[]" class="form-input" placeholder="이름">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">생년월일</label>
+                            <input type="date" name="family_birth[]" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">직업</label>
+                            <input type="text" name="family_job[]" class="form-input" placeholder="직업">
+                        </div>
+                    </div>
+                    <button type="button" class="btn-remove" title="삭제">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>

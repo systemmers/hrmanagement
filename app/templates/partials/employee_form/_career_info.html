@@ -1,0 +1,77 @@
+{#
+    직원 폼 - 경력정보 섹션 (동적 폼)
+    employee: 직원 객체 (수정 모드일 때)
+#}
+<section class="form-section" id="career-info">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-briefcase"></i>
+                경력정보
+            </h2>
+            <button type="button" class="btn btn-sm btn-secondary" id="addCareer">
+                <i class="fas fa-plus"></i> 추가
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="dynamic-list" id="careerList">
+                {% if employee and employee.career %}
+                    {% for career in employee.career %}
+                    <div class="dynamic-item" data-index="{{ loop.index0 }}">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">회사명</label>
+                                <input type="text" name="career_company[]" class="form-input"
+                                       value="{{ career.company }}" placeholder="회사명">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">직급/직책</label>
+                                <input type="text" name="career_position[]" class="form-input"
+                                       value="{{ career.position }}" placeholder="대리">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">담당업무</label>
+                                <input type="text" name="career_duty[]" class="form-input"
+                                       value="{{ career.duty }}" placeholder="웹 개발">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">재직기간</label>
+                                <input type="text" name="career_period[]" class="form-input"
+                                       value="{{ career.period }}" placeholder="2020.01 ~ 2023.12">
+                            </div>
+                        </div>
+                        <button type="button" class="btn-remove" title="삭제">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="dynamic-item" data-index="0">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">회사명</label>
+                            <input type="text" name="career_company[]" class="form-input" placeholder="회사명">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">직급/직책</label>
+                            <input type="text" name="career_position[]" class="form-input" placeholder="대리">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">담당업무</label>
+                            <input type="text" name="career_duty[]" class="form-input" placeholder="웹 개발">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">재직기간</label>
+                            <input type="text" name="career_period[]" class="form-input" placeholder="2020.01 ~ 2023.12">
+                        </div>
+                    </div>
+                    <button type="button" class="btn-remove" title="삭제">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+            <p class="form-help">최근 경력부터 역순으로 입력해 주세요.</p>
+        </div>
+    </div>
+</section>

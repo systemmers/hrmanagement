@@ -1,0 +1,76 @@
+{#
+    직원 등록/수정 폼 - 섹션 네비게이션
+    employee: 직원 객체 (수정 모드일 때)
+#}
+<aside class="section-nav" id="sectionNav">
+    <div class="section-nav-header">
+        <div class="section-nav-title">{% if employee %}직원 수정{% else %}신규 등록{% endif %}</div>
+        <div class="section-nav-subtitle">인사정보 입력</div>
+    </div>
+
+    <nav class="section-nav-menu">
+        <div class="nav-group">
+            <div class="nav-group-title">기본정보</div>
+            <a href="#personal-info" class="section-nav-item active">
+                <i class="fas fa-user"></i>
+                <span>개인 기본정보</span>
+            </a>
+            <a href="#organization-info" class="section-nav-item">
+                <i class="fas fa-building"></i>
+                <span>소속정보</span>
+            </a>
+            <a href="#contract-info" class="section-nav-item">
+                <i class="fas fa-file-contract"></i>
+                <span>계약정보</span>
+            </a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">이력 및 경력</div>
+            <a href="#education-info" class="section-nav-item">
+                <i class="fas fa-graduation-cap"></i>
+                <span>학력정보</span>
+            </a>
+            <a href="#career-info" class="section-nav-item">
+                <i class="fas fa-briefcase"></i>
+                <span>경력정보</span>
+            </a>
+            <a href="#certificate-info" class="section-nav-item">
+                <i class="fas fa-certificate"></i>
+                <span>자격증</span>
+            </a>
+            <a href="#language-info" class="section-nav-item">
+                <i class="fas fa-language"></i>
+                <span>언어능력</span>
+            </a>
+            <a href="#project-info" class="section-nav-item">
+                <i class="fas fa-project-diagram"></i>
+                <span>프로젝트</span>
+            </a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">부가정보</div>
+            <a href="#military-info" class="section-nav-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>병역정보</span>
+            </a>
+            <a href="#family-info" class="section-nav-item">
+                <i class="fas fa-users"></i>
+                <span>가족사항</span>
+            </a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">급여 및 보험</div>
+            <a href="#salary-info" class="section-nav-item">
+                <i class="fas fa-won-sign"></i>
+                <span>급여정보</span>
+            </a>
+            <a href="#insurance-info" class="section-nav-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>4대보험</span>
+            </a>
+        </div>
+    </nav>
+</aside>

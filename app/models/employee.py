@@ -10,8 +10,9 @@ class Employee(db.Model):
     """직원 모델"""
     __tablename__ = 'employees'
 
-    # 기본 정보 (9개 필드)
+    # 기본 정보 (10개 필드)
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    employee_number = db.Column(db.String(20), unique=True, nullable=True)  # 사번 (EMP-YYYY-NNNN)
     name = db.Column(db.String(100), nullable=False)
     photo = db.Column(db.String(500), nullable=True)
     department = db.Column(db.String(100), nullable=True)
@@ -20,6 +21,21 @@ class Employee(db.Model):
     hire_date = db.Column(db.String(20), nullable=True)
     phone = db.Column(db.String(50), nullable=True)
     email = db.Column(db.String(200), nullable=True)
+
+    # 조직 연결
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=True)
+    organization = db.relationship(
+        'Organization',
+        foreign_keys=[organization_id],
+        backref=db.backref('employees', lazy='dynamic')
+    )
+
+    # 소속 정보 추가 필드
+    team = db.Column(db.String(100), nullable=True)
+    job_title = db.Column(db.String(100), nullable=True)
+    work_location = db.Column(db.String(200), nullable=True)
+    internal_phone = db.Column(db.String(50), nullable=True)
+    company_email = db.Column(db.String(200), nullable=True)
 
     # 확장 정보 (17개 필드)
     english_name = db.Column(db.String(100), nullable=True)
@@ -77,6 +93,8 @@ class Employee(db.Model):
             'hireDate': self.hire_date,  # 템플릿 호환용
             'phone': self.phone,
             'email': self.email,
+            'organization_id': self.organization_id,
+            'organization': self.organization.to_dict() if self.organization else None,
             'name_en': self.english_name,  # 템플릿: employee.name_en
             'english_name': self.english_name,
             'chinese_name': self.chinese_name,
@@ -96,19 +114,13 @@ class Employee(db.Model):
             'hobby': self.hobby,
             'specialty': self.specialty,
             'disability_info': self.disability_info,
-            # 템플릿에서 사용하는 추가 필드들 (None 기본값)
-            'internal_phone': None,
-            'company_email': None,
-            'emergency_contact': None,
-            'emergency_relation': None,
-            'team': self.department,
-            'job_title': self.position,
-            'employee_number': None,
-            'employment_type': None,
-            'work_location': None,
-            'contract_period': None,
-            'probation_end': None,
-            'resignation_date': None,
+            # 소속 정보 추가 필드
+            'team': self.team,
+            'job_title': self.job_title,
+            'work_location': self.work_location,
+            'internal_phone': self.internal_phone,
+            'company_email': self.company_email,
+            'employee_number': self.employee_number,
         }
 
     @classmethod

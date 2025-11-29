@@ -1,0 +1,76 @@
+{#
+    직원 폼 - 자격증 섹션 (동적 폼)
+    employee: 직원 객체 (수정 모드일 때)
+#}
+<section class="form-section" id="certificate-info">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-certificate"></i>
+                자격증 및 면허
+            </h2>
+            <button type="button" class="btn btn-sm btn-secondary" id="addCertificate">
+                <i class="fas fa-plus"></i> 추가
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="dynamic-list" id="certificateList">
+                {% if employee and employee.certificates %}
+                    {% for cert in employee.certificates %}
+                    <div class="dynamic-item" data-index="{{ loop.index0 }}">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">자격증명</label>
+                                <input type="text" name="cert_name[]" class="form-input"
+                                       value="{{ cert.name }}" placeholder="정보처리기사">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">발급기관</label>
+                                <input type="text" name="cert_issuer[]" class="form-input"
+                                       value="{{ cert.issuer }}" placeholder="한국산업인력공단">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">취득일</label>
+                                <input type="date" name="cert_date[]" class="form-input"
+                                       value="{{ cert.date }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">자격번호</label>
+                                <input type="text" name="cert_number[]" class="form-input"
+                                       value="{{ cert.number }}" placeholder="자격번호">
+                            </div>
+                        </div>
+                        <button type="button" class="btn-remove" title="삭제">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="dynamic-item" data-index="0">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">자격증명</label>
+                            <input type="text" name="cert_name[]" class="form-input" placeholder="정보처리기사">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">발급기관</label>
+                            <input type="text" name="cert_issuer[]" class="form-input" placeholder="한국산업인력공단">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">취득일</label>
+                            <input type="date" name="cert_date[]" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">자격번호</label>
+                            <input type="text" name="cert_number[]" class="form-input" placeholder="자격번호">
+                        </div>
+                    </div>
+                    <button type="button" class="btn-remove" title="삭제">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>

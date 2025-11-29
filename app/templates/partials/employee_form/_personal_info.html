@@ -1,0 +1,122 @@
+{#
+    직원 폼 - 개인 기본정보 섹션
+    employee: 직원 객체 (수정 모드일 때)
+#}
+<section class="form-section" id="personal-info">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-user"></i>
+                개인 기본정보
+            </h2>
+        </div>
+        <div class="card-body">
+            {# 프로필 사진 영역 #}
+            <div class="photo-upload-section">
+                <div class="photo-preview" id="photoPreview">
+                    {% if employee and employee.photo %}
+                    <img src="{{ employee.photo }}" alt="프로필 사진" id="previewImage">
+                    {% else %}
+                    <div class="photo-placeholder">
+                        <i class="fas fa-user"></i>
+                        <span>사진 미등록</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="photo-upload-controls">
+                    <label for="photo" class="form-label">프로필 사진 URL</label>
+                    <input type="url" id="photo" name="photo" class="form-input"
+                           value="{{ employee.photo if employee else 'https://i.pravatar.cc/150' }}"
+                           placeholder="https://example.com/photo.jpg">
+                    <small class="form-help">URL을 입력하거나 기본 이미지를 사용합니다.</small>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="name" class="form-label">이름 <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" class="form-input"
+                           value="{{ employee.name if employee else '' }}"
+                           placeholder="홍길동" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="name_en" class="form-label">영문 이름</label>
+                    <input type="text" id="name_en" name="name_en" class="form-input"
+                           value="{{ employee.name_en if employee and employee.name_en else '' }}"
+                           placeholder="Hong Gil-dong">
+                </div>
+
+                <div class="form-group">
+                    <label for="birth_date" class="form-label">생년월일</label>
+                    <input type="date" id="birth_date" name="birth_date" class="form-input"
+                           value="{{ employee.birth_date if employee and employee.birth_date else '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="gender" class="form-label">성별</label>
+                    <select id="gender" name="gender" class="form-input">
+                        <option value="">선택하세요</option>
+                        <option value="male" {% if employee and employee.gender == 'male' %}selected{% endif %}>남성</option>
+                        <option value="female" {% if employee and employee.gender == 'female' %}selected{% endif %}>여성</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone" class="form-label">휴대전화 <span class="required">*</span></label>
+                    <input type="tel" id="phone" name="phone" class="form-input"
+                           value="{{ employee.phone if employee else '' }}"
+                           placeholder="010-1234-5678" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">이메일 <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" class="form-input"
+                           value="{{ employee.email if employee else '' }}"
+                           placeholder="example@company.com" required>
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="address" class="form-label">주소</label>
+                    <div class="input-with-button">
+                        <input type="text" id="address" name="address" class="form-input"
+                               value="{{ employee.address if employee and employee.address else '' }}"
+                               placeholder="주소 검색 버튼을 클릭하세요" readonly>
+                        <button type="button" class="btn btn-secondary" id="searchAddressBtn">
+                            <i class="fas fa-search"></i> 주소 검색
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="detailed_address" class="form-label">상세주소</label>
+                    <input type="text" id="detailed_address" name="detailed_address" class="form-input"
+                           value="{{ employee.detailed_address if employee and employee.detailed_address else '' }}"
+                           placeholder="동/호수, 건물명 등">
+                </div>
+
+                <div class="form-group">
+                    <label for="emergency_contact" class="form-label">비상연락처</label>
+                    <input type="tel" id="emergency_contact" name="emergency_contact" class="form-input"
+                           value="{{ employee.emergency_contact if employee and employee.emergency_contact else '' }}"
+                           placeholder="010-9876-5432">
+                </div>
+
+                <div class="form-group">
+                    <label for="emergency_relation" class="form-label">비상연락처 관계</label>
+                    <input type="text" id="emergency_relation" name="emergency_relation" class="form-input"
+                           value="{{ employee.emergency_relation if employee and employee.emergency_relation else '' }}"
+                           placeholder="배우자, 부모 등">
+                </div>
+
+                <div class="form-group">
+                    <label for="rrn" class="form-label">주민등록번호</label>
+                    <input type="text" id="rrn" name="rrn" class="form-input"
+                           value="{{ employee.rrn if employee and employee.rrn else '' }}"
+                           placeholder="850520-1******" maxlength="14">
+                    <small class="form-help">마스킹 처리된 형식으로 입력 (예: 850520-1******)</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

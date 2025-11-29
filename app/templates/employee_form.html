@@ -7,67 +7,17 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/cards.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/employee-form.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/right-sidebar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/tree-selector.css') }}">
 {% endblock %}
 
 {% block content %}
 <div class="form-page-layout-with-sidebar">
-    <!-- 좌측: 섹션 네비게이션 -->
-    <aside class="section-nav" id="sectionNav">
-        <div class="section-nav-header">
-            <div class="section-nav-title">{% if employee %}직원 수정{% else %}신규 등록{% endif %}</div>
-            <div class="section-nav-subtitle">인사정보 입력</div>
-        </div>
+    {# 좌측: 섹션 네비게이션 #}
+    {% include 'partials/employee_form/_section_nav.html' %}
 
-        <nav class="section-nav-menu">
-            <div class="nav-group">
-                <div class="nav-group-title">기본정보</div>
-                <a href="#personal-info" class="section-nav-item active">
-                    <i class="fas fa-user"></i>
-                    <span>개인 기본정보</span>
-                </a>
-                <a href="#organization-info" class="section-nav-item">
-                    <i class="fas fa-building"></i>
-                    <span>소속정보</span>
-                </a>
-                <a href="#contract-info" class="section-nav-item">
-                    <i class="fas fa-file-contract"></i>
-                    <span>계약정보</span>
-                </a>
-            </div>
-
-            <div class="nav-group">
-                <div class="nav-group-title">이력 및 경력</div>
-                <a href="#education-info" class="section-nav-item">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>학력정보</span>
-                </a>
-                <a href="#career-info" class="section-nav-item">
-                    <i class="fas fa-briefcase"></i>
-                    <span>경력정보</span>
-                </a>
-                <a href="#certificate-info" class="section-nav-item">
-                    <i class="fas fa-certificate"></i>
-                    <span>자격증</span>
-                </a>
-            </div>
-
-            <div class="nav-group">
-                <div class="nav-group-title">부가정보</div>
-                <a href="#military-info" class="section-nav-item">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>병역정보</span>
-                </a>
-                <a href="#family-info" class="section-nav-item">
-                    <i class="fas fa-users"></i>
-                    <span>가족사항</span>
-                </a>
-            </div>
-        </nav>
-    </aside>
-
-    <!-- 메인 콘텐츠: 폼 -->
+    {# 메인 콘텐츠: 폼 #}
     <main class="form-main-content">
-        <!-- 페이지 헤더 -->
+        {# 페이지 헤더 #}
         <div class="form-page-header">
             <h1 class="form-page-title">{% if employee %}직원 정보 수정{% else %}신규 직원 등록{% endif %}</h1>
             <div class="form-page-actions">
@@ -80,511 +30,70 @@
 
         <form method="POST" action="{% if employee %}{{ url_for('employees.employee_update', employee_id=employee.id) }}{% else %}{{ url_for('employees.employee_create') }}{% endif %}" class="employee-form" id="employeeForm">
 
-            <!-- 섹션 1: 개인 기본정보 -->
-            <section class="form-section" id="personal-info">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-user"></i>
-                            개인 기본정보
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <!-- 프로필 사진 영역 -->
-                        <div class="photo-upload-section">
-                            <div class="photo-preview" id="photoPreview">
-                                {% if employee and employee.photo %}
-                                <img src="{{ employee.photo }}" alt="프로필 사진" id="previewImage">
-                                {% else %}
-                                <div class="photo-placeholder">
-                                    <i class="fas fa-user"></i>
-                                    <span>사진 미등록</span>
-                                </div>
-                                {% endif %}
-                            </div>
-                            <div class="photo-upload-controls">
-                                <label for="photo" class="form-label">프로필 사진 URL</label>
-                                <input type="url" id="photo" name="photo" class="form-input"
-                                       value="{{ employee.photo if employee else 'https://i.pravatar.cc/150' }}"
-                                       placeholder="https://example.com/photo.jpg">
-                                <small class="form-help">URL을 입력하거나 기본 이미지를 사용합니다.</small>
-                            </div>
-                        </div>
+            {# 섹션 1: 개인 기본정보 #}
+            {% include 'partials/employee_form/_personal_info.html' %}
 
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="name" class="form-label">이름 <span class="required">*</span></label>
-                                <input type="text" id="name" name="name" class="form-input"
-                                       value="{{ employee.name if employee else '' }}"
-                                       placeholder="홍길동" required>
-                            </div>
+            {# 섹션 2: 소속정보 #}
+            {% include 'partials/employee_form/_organization_info.html' %}
 
-                            <div class="form-group">
-                                <label for="name_en" class="form-label">영문 이름</label>
-                                <input type="text" id="name_en" name="name_en" class="form-input"
-                                       value="{{ employee.name_en if employee and employee.name_en else '' }}"
-                                       placeholder="Hong Gil-dong">
-                            </div>
+            {# 섹션 3: 계약정보 #}
+            {% include 'partials/employee_form/_contract_info.html' %}
 
-                            <div class="form-group">
-                                <label for="birth_date" class="form-label">생년월일</label>
-                                <input type="date" id="birth_date" name="birth_date" class="form-input"
-                                       value="{{ employee.birth_date if employee and employee.birth_date else '' }}">
-                            </div>
+            {# 섹션 4: 학력정보 (동적 폼) #}
+            {% include 'partials/employee_form/_education_info.html' %}
 
-                            <div class="form-group">
-                                <label for="gender" class="form-label">성별</label>
-                                <select id="gender" name="gender" class="form-input">
-                                    <option value="">선택하세요</option>
-                                    <option value="male" {% if employee and employee.gender == 'male' %}selected{% endif %}>남성</option>
-                                    <option value="female" {% if employee and employee.gender == 'female' %}selected{% endif %}>여성</option>
-                                </select>
-                            </div>
+            {# 섹션 5: 경력정보 (동적 폼) #}
+            {% include 'partials/employee_form/_career_info.html' %}
 
-                            <div class="form-group">
-                                <label for="phone" class="form-label">휴대전화 <span class="required">*</span></label>
-                                <input type="tel" id="phone" name="phone" class="form-input"
-                                       value="{{ employee.phone if employee else '' }}"
-                                       placeholder="010-1234-5678" required>
-                            </div>
+            {# 섹션 6: 자격증 (동적 폼) #}
+            {% include 'partials/employee_form/_certificate_info.html' %}
 
-                            <div class="form-group">
-                                <label for="email" class="form-label">이메일 <span class="required">*</span></label>
-                                <input type="email" id="email" name="email" class="form-input"
-                                       value="{{ employee.email if employee else '' }}"
-                                       placeholder="example@company.com" required>
-                            </div>
+            {# 섹션 7: 언어능력 (동적 폼) #}
+            {% include 'partials/employee_form/_language_info.html' %}
 
-                            <div class="form-group form-group-full">
-                                <label for="address" class="form-label">주소</label>
-                                <input type="text" id="address" name="address" class="form-input"
-                                       value="{{ employee.address if employee and employee.address else '' }}"
-                                       placeholder="서울특별시 강남구 테헤란로 123">
-                            </div>
+            {# 섹션 8: 프로젝트 (동적 폼) #}
+            {% include 'partials/employee_form/_project_info.html' %}
 
-                            <div class="form-group">
-                                <label for="emergency_contact" class="form-label">비상연락처</label>
-                                <input type="tel" id="emergency_contact" name="emergency_contact" class="form-input"
-                                       value="{{ employee.emergency_contact if employee and employee.emergency_contact else '' }}"
-                                       placeholder="010-9876-5432">
-                            </div>
+            {# 섹션 9: 병역정보 #}
+            {% include 'partials/employee_form/_military_info.html' %}
 
-                            <div class="form-group">
-                                <label for="emergency_relation" class="form-label">비상연락처 관계</label>
-                                <input type="text" id="emergency_relation" name="emergency_relation" class="form-input"
-                                       value="{{ employee.emergency_relation if employee and employee.emergency_relation else '' }}"
-                                       placeholder="배우자, 부모 등">
-                            </div>
+            {# 섹션 10: 가족사항 (동적 폼) #}
+            {% include 'partials/employee_form/_family_info.html' %}
 
-                            <div class="form-group">
-                                <label for="rrn" class="form-label">주민등록번호</label>
-                                <input type="text" id="rrn" name="rrn" class="form-input"
-                                       value="{{ employee.rrn if employee and employee.rrn else '' }}"
-                                       placeholder="850520-1******" maxlength="14">
-                                <small class="form-help">마스킹 처리된 형식으로 입력 (예: 850520-1******)</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            {# 섹션 11: 급여정보 #}
+            {% include 'partials/employee_form/_salary_info.html' %}
 
-            <!-- 섹션 2: 소속정보 -->
-            <section class="form-section" id="organization-info">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-building"></i>
-                            소속정보
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="employee_number" class="form-label">사번</label>
-                                <input type="text" id="employee_number" name="employee_number" class="form-input"
-                                       value="{{ employee.employee_number if employee and employee.employee_number else '' }}"
-                                       placeholder="EMP-2024-001">
-                            </div>
+            {# 섹션 12: 4대보험 #}
+            {% include 'partials/employee_form/_insurance_info.html' %}
 
-                            <div class="form-group">
-                                <label for="department" class="form-label">부서 <span class="required">*</span></label>
-                                <input type="text" id="department" name="department" class="form-input"
-                                       value="{{ employee.department if employee else '' }}"
-                                       placeholder="개발팀" required>
-                            </div>
+            {# 폼 제출 버튼 #}
+            {% include 'partials/employee_form/_submit_section.html' %}
 
-                            <div class="form-group">
-                                <label for="team" class="form-label">팀</label>
-                                <input type="text" id="team" name="team" class="form-input"
-                                       value="{{ employee.team if employee and employee.team else '' }}"
-                                       placeholder="프론트엔드팀">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="position" class="form-label">직급 <span class="required">*</span></label>
-                                <select id="position" name="position" class="form-input" required>
-                                    <option value="">선택하세요</option>
-                                    {% for pos in ['인턴', '사원', '주임', '대리', '과장', '차장', '부장', '이사', '상무', '전무', '대표'] %}
-                                    <option value="{{ pos }}" {% if employee and employee.position == pos %}selected{% endif %}>{{ pos }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="job_title" class="form-label">직책</label>
-                                <input type="text" id="job_title" name="job_title" class="form-input"
-                                       value="{{ employee.job_title if employee and employee.job_title else '' }}"
-                                       placeholder="팀장, 파트장 등">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="work_location" class="form-label">근무지</label>
-                                <input type="text" id="work_location" name="work_location" class="form-input"
-                                       value="{{ employee.work_location if employee and employee.work_location else '' }}"
-                                       placeholder="본사, 지사 등">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="internal_phone" class="form-label">내선번호</label>
-                                <input type="text" id="internal_phone" name="internal_phone" class="form-input"
-                                       value="{{ employee.internal_phone if employee and employee.internal_phone else '' }}"
-                                       placeholder="1234">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="company_email" class="form-label">회사 이메일</label>
-                                <input type="email" id="company_email" name="company_email" class="form-input"
-                                       value="{{ employee.company_email if employee and employee.company_email else '' }}"
-                                       placeholder="hong@company.co.kr">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 섹션 3: 계약정보 -->
-            <section class="form-section" id="contract-info">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-file-contract"></i>
-                            계약정보
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="hireDate" class="form-label">입사일 <span class="required">*</span></label>
-                                <input type="date" id="hireDate" name="hireDate" class="form-input"
-                                       value="{{ employee.hireDate if employee else '' }}" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="status" class="form-label">재직 상태 <span class="required">*</span></label>
-                                <select id="status" name="status" class="form-input" required>
-                                    <option value="active" {% if employee and employee.status == 'active' %}selected{% endif %}>정상</option>
-                                    <option value="warning" {% if employee and employee.status == 'warning' %}selected{% endif %}>대기</option>
-                                    <option value="expired" {% if employee and employee.status == 'expired' %}selected{% endif %}>만료</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="employment_type" class="form-label">고용형태</label>
-                                <select id="employment_type" name="employment_type" class="form-input">
-                                    <option value="">선택하세요</option>
-                                    <option value="regular" {% if employee and employee.employment_type == 'regular' %}selected{% endif %}>정규직</option>
-                                    <option value="contract" {% if employee and employee.employment_type == 'contract' %}selected{% endif %}>계약직</option>
-                                    <option value="parttime" {% if employee and employee.employment_type == 'parttime' %}selected{% endif %}>파트타임</option>
-                                    <option value="intern" {% if employee and employee.employment_type == 'intern' %}selected{% endif %}>인턴</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="contract_period" class="form-label">계약기간</label>
-                                <input type="text" id="contract_period" name="contract_period" class="form-input"
-                                       value="{{ employee.contract_period if employee and employee.contract_period else '' }}"
-                                       placeholder="2024.01.01 ~ 2024.12.31">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="probation_end" class="form-label">수습종료일</label>
-                                <input type="date" id="probation_end" name="probation_end" class="form-input"
-                                       value="{{ employee.probation_end if employee and employee.probation_end else '' }}">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="resignation_date" class="form-label">퇴사일</label>
-                                <input type="date" id="resignation_date" name="resignation_date" class="form-input"
-                                       value="{{ employee.resignation_date if employee and employee.resignation_date else '' }}">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 섹션 4: 학력정보 -->
-            <section class="form-section" id="education-info">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-graduation-cap"></i>
-                            학력정보
-                        </h2>
-                        <button type="button" class="btn btn-sm btn-secondary" id="addEducation">
-                            <i class="fas fa-plus"></i> 추가
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="dynamic-list" id="educationList">
-                            <!-- 동적 추가 영역 -->
-                            <div class="dynamic-item" data-index="0">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label class="form-label">학교명</label>
-                                        <input type="text" name="education_school[]" class="form-input" placeholder="대학교명">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">학위</label>
-                                        <select name="education_degree[]" class="form-input">
-                                            <option value="">선택하세요</option>
-                                            <option value="highschool">고등학교 졸업</option>
-                                            <option value="associate">전문학사</option>
-                                            <option value="bachelor">학사</option>
-                                            <option value="master">석사</option>
-                                            <option value="doctor">박사</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">전공</label>
-                                        <input type="text" name="education_major[]" class="form-input" placeholder="전공명">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">졸업년도</label>
-                                        <input type="text" name="education_year[]" class="form-input" placeholder="2020">
-                                    </div>
-                                </div>
-                                <button type="button" class="btn-remove" title="삭제">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <p class="form-help">최종학력부터 역순으로 입력해 주세요.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 섹션 5: 경력정보 -->
-            <section class="form-section" id="career-info">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-briefcase"></i>
-                            경력정보
-                        </h2>
-                        <button type="button" class="btn btn-sm btn-secondary" id="addCareer">
-                            <i class="fas fa-plus"></i> 추가
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="dynamic-list" id="careerList">
-                            <div class="dynamic-item" data-index="0">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label class="form-label">회사명</label>
-                                        <input type="text" name="career_company[]" class="form-input" placeholder="회사명">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">직급/직책</label>
-                                        <input type="text" name="career_position[]" class="form-input" placeholder="대리">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">담당업무</label>
-                                        <input type="text" name="career_duty[]" class="form-input" placeholder="웹 개발">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">재직기간</label>
-                                        <input type="text" name="career_period[]" class="form-input" placeholder="2020.01 ~ 2023.12">
-                                    </div>
-                                </div>
-                                <button type="button" class="btn-remove" title="삭제">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <p class="form-help">최근 경력부터 역순으로 입력해 주세요.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 섹션 6: 자격증 -->
-            <section class="form-section" id="certificate-info">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-certificate"></i>
-                            자격증 및 면허
-                        </h2>
-                        <button type="button" class="btn btn-sm btn-secondary" id="addCertificate">
-                            <i class="fas fa-plus"></i> 추가
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="dynamic-list" id="certificateList">
-                            <div class="dynamic-item" data-index="0">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label class="form-label">자격증명</label>
-                                        <input type="text" name="cert_name[]" class="form-input" placeholder="정보처리기사">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">발급기관</label>
-                                        <input type="text" name="cert_issuer[]" class="form-input" placeholder="한국산업인력공단">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">취득일</label>
-                                        <input type="date" name="cert_date[]" class="form-input">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">자격번호</label>
-                                        <input type="text" name="cert_number[]" class="form-input" placeholder="자격번호">
-                                    </div>
-                                </div>
-                                <button type="button" class="btn-remove" title="삭제">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 섹션 7: 병역정보 -->
-            <section class="form-section" id="military-info">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-shield-alt"></i>
-                            병역정보
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="military_status" class="form-label">병역사항</label>
-                                <select id="military_status" name="military_status" class="form-input">
-                                    <option value="">선택하세요</option>
-                                    <option value="completed">군필</option>
-                                    <option value="exempted">면제</option>
-                                    <option value="serving">복무중</option>
-                                    <option value="not_applicable">해당없음</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="military_branch" class="form-label">군별</label>
-                                <select id="military_branch" name="military_branch" class="form-input">
-                                    <option value="">선택하세요</option>
-                                    <option value="army">육군</option>
-                                    <option value="navy">해군</option>
-                                    <option value="airforce">공군</option>
-                                    <option value="marine">해병대</option>
-                                    <option value="auxiliary">보충역</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="military_rank" class="form-label">계급</label>
-                                <input type="text" id="military_rank" name="military_rank" class="form-input"
-                                       placeholder="병장, 상병 등">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="military_period" class="form-label">복무기간</label>
-                                <input type="text" id="military_period" name="military_period" class="form-input"
-                                       placeholder="2018.01 ~ 2019.10">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 섹션 8: 가족사항 -->
-            <section class="form-section" id="family-info">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-users"></i>
-                            가족사항
-                        </h2>
-                        <button type="button" class="btn btn-sm btn-secondary" id="addFamily">
-                            <i class="fas fa-plus"></i> 추가
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="dynamic-list" id="familyList">
-                            <div class="dynamic-item" data-index="0">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label class="form-label">관계</label>
-                                        <select name="family_relation[]" class="form-input">
-                                            <option value="">선택하세요</option>
-                                            <option value="spouse">배우자</option>
-                                            <option value="child">자녀</option>
-                                            <option value="parent">부모</option>
-                                            <option value="sibling">형제/자매</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">성명</label>
-                                        <input type="text" name="family_name[]" class="form-input" placeholder="이름">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">생년월일</label>
-                                        <input type="date" name="family_birth[]" class="form-input">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">직업</label>
-                                        <input type="text" name="family_job[]" class="form-input" placeholder="직업">
-                                    </div>
-                                </div>
-                                <button type="button" class="btn-remove" title="삭제">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 폼 제출 버튼 -->
-            <div class="form-submit-section">
-                <div class="form-submit-info">
-                    <span class="required">*</span> 표시는 필수 입력 항목입니다.
-                </div>
-                <div class="form-submit-actions">
-                    <a href="{% if employee %}{{ url_for('employees.employee_detail', employee_id=employee.id) }}{% else %}{{ url_for('main.index') }}{% endif %}" class="btn btn-secondary btn-lg">
-                        <i class="fas fa-times"></i>
-                        <span>취소</span>
-                    </a>
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        <i class="fas fa-save"></i>
-                        <span>{% if employee %}수정 완료{% else %}등록 완료{% endif %}</span>
-                    </button>
-                </div>
-            </div>
         </form>
     </main>
 
     {% include 'partials/_attachment_sidebar.html' %}
 </div>
-
-<!-- 모바일 메뉴 토글 -->
-<button class="mobile-section-nav-toggle" id="mobileNavToggle">
-    <i class="fas fa-bars"></i>
-</button>
-<div class="section-nav-overlay" id="sectionNavOverlay"></div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/pages/employee-form.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/tree-selector.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/pages/employee-form.js') }}"></script>
+<script>
+    // 조직 트리 선택기 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+        new TreeSelector({
+            inputId: 'organization_display',
+            hiddenInputId: 'organization_id',
+            modalId: 'orgTreeSelectorModal',
+            apiUrl: '/admin/api/organizations?format=tree',
+            allowEmpty: true,
+            onSelect: function(selected) {
+                if (selected) {
+                    console.log('Selected organization:', selected);
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

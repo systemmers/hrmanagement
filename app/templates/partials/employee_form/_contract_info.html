@@ -1,0 +1,62 @@
+{#
+    직원 폼 - 계약정보 섹션
+    employee: 직원 객체 (수정 모드일 때)
+#}
+<section class="form-section" id="contract-info">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-file-contract"></i>
+                계약정보
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="hireDate" class="form-label">입사일 <span class="required">*</span></label>
+                    <input type="date" id="hireDate" name="hireDate" class="form-input"
+                           value="{{ employee.hireDate if employee else '' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="status" class="form-label">재직 상태 <span class="required">*</span></label>
+                    <select id="status" name="status" class="form-input" required>
+                        <option value="active" {% if employee and employee.status == 'active' %}selected{% endif %}>정상</option>
+                        <option value="warning" {% if employee and employee.status == 'warning' %}selected{% endif %}>대기</option>
+                        <option value="expired" {% if employee and employee.status == 'expired' %}selected{% endif %}>만료</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="employment_type" class="form-label">고용형태</label>
+                    <select id="employment_type" name="employment_type" class="form-input">
+                        <option value="">선택하세요</option>
+                        <option value="regular" {% if employee and employee.employment_type == 'regular' %}selected{% endif %}>정규직</option>
+                        <option value="contract" {% if employee and employee.employment_type == 'contract' %}selected{% endif %}>계약직</option>
+                        <option value="parttime" {% if employee and employee.employment_type == 'parttime' %}selected{% endif %}>파트타임</option>
+                        <option value="intern" {% if employee and employee.employment_type == 'intern' %}selected{% endif %}>인턴</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="contract_period" class="form-label">계약기간</label>
+                    <input type="text" id="contract_period" name="contract_period" class="form-input"
+                           value="{{ employee.contract_period if employee and employee.contract_period else '' }}"
+                           placeholder="2024.01.01 ~ 2024.12.31">
+                </div>
+
+                <div class="form-group">
+                    <label for="probation_end" class="form-label">수습종료일</label>
+                    <input type="date" id="probation_end" name="probation_end" class="form-input"
+                           value="{{ employee.probation_end if employee and employee.probation_end else '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="resignation_date" class="form-label">퇴사일</label>
+                    <input type="date" id="resignation_date" name="resignation_date" class="form-input"
+                           value="{{ employee.resignation_date if employee and employee.resignation_date else '' }}">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
