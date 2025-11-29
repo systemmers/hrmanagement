@@ -16,6 +16,30 @@ window.removeFilter = removeFilter;
 window.toggleFilterBar = toggleFilterBar;
 window.searchEmployees = searchEmployees;
 
+// 정렬 함수
+window.applySorting = function() {
+    const sortSelect = document.getElementById('sortSelect');
+    if (!sortSelect) return;
+
+    const value = sortSelect.value;
+    const url = new URL(window.location.href);
+
+    if (value) {
+        // value 형식: "name" 또는 "name-desc"
+        const parts = value.split('-');
+        const sortField = parts[0];
+        const sortOrder = parts[1] === 'desc' ? 'desc' : 'asc';
+
+        url.searchParams.set('sort', sortField);
+        url.searchParams.set('order', sortOrder);
+    } else {
+        url.searchParams.delete('sort');
+        url.searchParams.delete('order');
+    }
+
+    window.location.href = url.toString();
+};
+
 // 로그아웃 함수
 window.handleLogout = function() {
     if (confirm('로그아웃 하시겠습니까?')) {

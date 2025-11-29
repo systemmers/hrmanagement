@@ -3,16 +3,32 @@
 
 대시보드 및 검색 기능을 제공합니다.
 """
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
 
 from ..extensions import employee_repo, classification_repo
+from ..utils.decorators import login_required
 
 main_bp = Blueprint('main', __name__)
 
 
 @main_bp.route('/')
+@login_required
 def index():
-    """대시보드 - 통계 및 정보"""
+    """대시보드 - 통계 및 정보
+
+    일반 직원(employee role)은 본인 인사카드로 리다이렉트
+    """
+    # Employee role은 본인 인사카드로 리다이렉트
+    if session.get('user_role') == 'employee':
+        employee_id = session.get('employee_id')
+        if employee_id:
+            return redirect(url_for('employees.employee_detail', employee_id=employee_id))
+        else:
+            # employee_id가 없는 경우 (계정이 직원과 연결되지 않음)
+            from flask import flash
+            flash('계정에 연결된 직원 정보가 없습니다. 관리자에게 문의하세요.', 'warning')
+            return redirect(url_for('auth.logout'))
+
     stats = employee_repo.get_statistics()
     dept_stats = employee_repo.get_department_statistics()
     recent_employees = employee_repo.get_recent_employees(limit=5)

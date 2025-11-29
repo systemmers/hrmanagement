@@ -73,11 +73,57 @@
             <!-- 좌측 사이드바 -->
             <aside class="sidebar">
                 <div class="sidebar-header">
+                    {% if current_user and current_user.role == 'employee' %}
+                    <h1 class="sidebar-title">내 인사카드</h1>
+                    <p class="sidebar-subtitle">개인 정보 관리</p>
+                    {% else %}
                     <h1 class="sidebar-title">인사카드 관리</h1>
                     <p class="sidebar-subtitle">직원 정보 통합 관리 시스템</p>
+                    {% endif %}
                 </div>
 
                 <nav class="sidebar-nav">
+                    {% if current_user and current_user.role == 'employee' %}
+                    {# ========== Employee 전용 사이드바 ========== #}
+
+                    <!-- 내 정보 섹션 -->
+                    <div class="nav-section">
+                        <h2 class="nav-section-title">내 정보</h2>
+                        <a href="{{ url_for('employees.employee_detail', employee_id=current_user.employee_id) }}"
+                           class="nav-item {% if request.endpoint == 'employees.employee_detail' %}active{% endif %}">
+                            <i class="fas fa-id-card"></i>
+                            <span>기본정보</span>
+                        </a>
+                        <a href="{{ url_for('employees.employee_detail', employee_id=current_user.employee_id) }}#history"
+                           class="nav-item">
+                            <i class="fas fa-history"></i>
+                            <span>이력정보</span>
+                        </a>
+                    </div>
+
+                    <!-- 회사정보 섹션 -->
+                    <div class="nav-section">
+                        <h2 class="nav-section-title">회사정보</h2>
+                        <a href="{{ url_for('mypage.company_info') }}"
+                           class="nav-item {% if request.endpoint == 'mypage.company_info' %}active{% endif %}">
+                            <i class="fas fa-building"></i>
+                            <span>회사 인사카드</span>
+                        </a>
+                    </div>
+
+                    <!-- 계정관리 섹션 -->
+                    <div class="nav-section">
+                        <h2 class="nav-section-title">계정관리</h2>
+                        <a href="{{ url_for('auth.change_password') }}"
+                           class="nav-item {% if request.endpoint == 'auth.change_password' %}active{% endif %}">
+                            <i class="fas fa-key"></i>
+                            <span>계정정보</span>
+                        </a>
+                    </div>
+
+                    {% else %}
+                    {# ========== Admin/Manager 사이드바 ========== #}
+
                     <!-- 조회 섹션 -->
                     <div class="nav-section">
                         <h2 class="nav-section-title">조회</h2>
@@ -138,6 +184,7 @@
                             <span>AI 설정</span>
                         </a>
                     </div>
+                    {% endif %}
                 </nav>
 
                 <div class="sidebar-footer">

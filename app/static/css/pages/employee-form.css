@@ -119,6 +119,22 @@ select.form-input {
     margin-top: var(--space-1);
 }
 
+/* 입력 필드 + 버튼 조합 */
+.input-with-button {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.input-with-button .form-input {
+    flex: 1;
+    cursor: pointer;
+}
+
+.input-with-button .btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
 /* 사진 업로드 섹션 */
 .photo-upload-section {
     display: flex;

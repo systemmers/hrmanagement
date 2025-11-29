@@ -497,6 +497,37 @@
             align-self: flex-end;
         }
 
+        /* 정렬 바 */
+        .sort-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+
+        .sort-label {
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--color-gray-700);
+        }
+
+        .sort-select {
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            background-color: var(--color-pure-white);
+            color: var(--color-gray-900);
+            cursor: pointer;
+            min-width: 180px;
+        }
+
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--color-gray-500);
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+
         /* 활성 필터 표시 */
         .active-filters {
             display: flex;

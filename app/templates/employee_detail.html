@@ -20,20 +20,28 @@
     <div class="detail-main-content">
         {# 페이지 헤더 #}
         <div class="detail-page-header">
+            {% if current_user and current_user.role == 'employee' %}
+            <h1 class="detail-page-title">내 인사카드</h1>
+            {% else %}
             <h1 class="detail-page-title">직원 상세 정보</h1>
+            {% endif %}
             <div class="detail-page-actions">
+                {% if not current_user or current_user.role != 'employee' %}
                 <a href="{{ url_for('employees.employee_list') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                     <span>목록으로</span>
                 </a>
+                {% endif %}
                 <a href="{{ url_for('employees.employee_edit', employee_id=employee.id) }}" class="btn btn-primary">
                     <i class="fas fa-edit"></i>
                     <span>수정</span>
                 </a>
+                {% if current_user and current_user.is_admin %}
                 <button class="btn btn-danger" onclick="deleteEmployee({{ employee.id }}, '{{ employee.name }}')">
                     <i class="fas fa-trash"></i>
                     <span>삭제</span>
                 </button>
+                {% endif %}
             </div>
         </div>
 

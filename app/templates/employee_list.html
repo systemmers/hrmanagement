@@ -96,19 +96,35 @@
     {% endif %}
 </div>
 
+<!-- 정렬 옵션 -->
+<div class="sort-bar">
+    <label class="sort-label">정렬:</label>
+    <select class="sort-select" id="sortSelect" onchange="applySorting()">
+        <option value="" {% if not request.args.get('sort') %}selected{% endif %}>기본순</option>
+        <option value="name" {% if request.args.get('sort') == 'name' and request.args.get('order') != 'desc' %}selected{% endif %}>이름 (오름차순)</option>
+        <option value="name-desc" {% if request.args.get('sort') == 'name' and request.args.get('order') == 'desc' %}selected{% endif %}>이름 (내림차순)</option>
+        <option value="department" {% if request.args.get('sort') == 'department' and request.args.get('order') != 'desc' %}selected{% endif %}>부서 (오름차순)</option>
+        <option value="department-desc" {% if request.args.get('sort') == 'department' and request.args.get('order') == 'desc' %}selected{% endif %}>부서 (내림차순)</option>
+        <option value="position" {% if request.args.get('sort') == 'position' and request.args.get('order') != 'desc' %}selected{% endif %}>직급 (오름차순)</option>
+        <option value="position-desc" {% if request.args.get('sort') == 'position' and request.args.get('order') == 'desc' %}selected{% endif %}>직급 (내림차순)</option>
+        <option value="hireDate" {% if request.args.get('sort') == 'hireDate' and request.args.get('order') != 'desc' %}selected{% endif %}>입사일 (오래된순)</option>
+        <option value="hireDate-desc" {% if request.args.get('sort') == 'hireDate' and request.args.get('order') == 'desc' %}selected{% endif %}>입사일 (최신순)</option>
+    </select>
+</div>
+
 <!-- 목록형 뷰 -->
 <div class="table-container" id="list-view">
-    <table class="data-table">
+    <table class="data-table sortable-table">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>이름</th>
-                <th>부서</th>
-                <th>직급</th>
-                <th>입사일</th>
+                <th data-sort="id">ID</th>
+                <th data-sort="name">이름</th>
+                <th data-sort="department">부서</th>
+                <th data-sort="position">직급</th>
+                <th data-sort="hireDate">입사일</th>
                 <th>전화번호</th>
                 <th>이메일</th>
-                <th>상태</th>
+                <th data-sort="status">상태</th>
                 <th>작업</th>
             </tr>
         </thead>

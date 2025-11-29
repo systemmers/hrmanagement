@@ -2,10 +2,17 @@
     직원 등록/수정 폼 - 섹션 네비게이션
     employee: 직원 객체 (수정 모드일 때)
 #}
+{% set is_employee_role = current_user and current_user.role == 'employee' %}
+
 <aside class="section-nav" id="sectionNav">
     <div class="section-nav-header">
+        {% if is_employee_role %}
+        <div class="section-nav-title">내 정보 수정</div>
+        <div class="section-nav-subtitle">개인정보 수정</div>
+        {% else %}
         <div class="section-nav-title">{% if employee %}직원 수정{% else %}신규 등록{% endif %}</div>
         <div class="section-nav-subtitle">인사정보 입력</div>
+        {% endif %}
     </div>
 
     <nav class="section-nav-menu">
@@ -17,12 +24,14 @@
             </a>
             <a href="#organization-info" class="section-nav-item">
                 <i class="fas fa-building"></i>
-                <span>소속정보</span>
+                <span>소속정보{% if is_employee_role %} (읽기전용){% endif %}</span>
             </a>
+            {% if not is_employee_role %}
             <a href="#contract-info" class="section-nav-item">
                 <i class="fas fa-file-contract"></i>
                 <span>계약정보</span>
             </a>
+            {% endif %}
         </div>
 
         <div class="nav-group">
@@ -43,10 +52,12 @@
                 <i class="fas fa-language"></i>
                 <span>언어능력</span>
             </a>
+            {% if not is_employee_role %}
             <a href="#project-info" class="section-nav-item">
                 <i class="fas fa-project-diagram"></i>
                 <span>프로젝트</span>
             </a>
+            {% endif %}
         </div>
 
         <div class="nav-group">
@@ -61,6 +72,7 @@
             </a>
         </div>
 
+        {% if not is_employee_role %}
         <div class="nav-group">
             <div class="nav-group-title">급여 및 보험</div>
             <a href="#salary-info" class="section-nav-item">
@@ -72,5 +84,6 @@
                 <span>4대보험</span>
             </a>
         </div>
+        {% endif %}
     </nav>
 </aside>

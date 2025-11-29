@@ -1,17 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cat:*)",
-      "mcp__sequential-thinking__sequentialthinking",
-      "Bash(git checkout:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(curl:*)",
-      "mcp__context7__resolve-library-id",
-      "mcp__context7__get-library-docs",
-      "Bash(python:*)",
-      "Bash(del \"D:\\projects\\hrmanagement\\app\\static\\js\\main.js\")",
-      "Bash(ls -la \"D:\\projects\\hrmanagement\\app\\templates\\partials\"\" 2>/dev/null || echo \"Directory check \")"
+      "Bash(git push:*)",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_close",
+      "mcp__playwright__browser_navigate",
+      "Bash(taskkill:*)",
+      "Bash(sqlite3:*)"
     ],
     "deny": [],
     "ask": []

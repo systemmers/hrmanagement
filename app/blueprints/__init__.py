@@ -14,12 +14,16 @@ def register_blueprints(app):
     from .ai_test import ai_test_bp
     from .auth import auth_bp
     from .admin import admin_bp
+    from .mypage import mypage_bp
 
     # 인증 관련 (/auth/*)
     app.register_blueprint(auth_bp)
 
     # 관리자 기능 (/admin/*)
     app.register_blueprint(admin_bp)
+
+    # 마이페이지 - 일반 직원용 (/my/*)
+    app.register_blueprint(mypage_bp)
 
     # 메인 페이지 (/, /search)
     app.register_blueprint(main_bp)

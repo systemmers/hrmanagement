@@ -1,0 +1,65 @@
+{#
+    폼 컨트롤 매크로
+    재사용 가능한 폼 입력 요소 매크로 정의
+#}
+
+{# 텍스트/이메일/전화 등 기본 입력 필드 #}
+{% macro form_input(name, label, type='text', value='', required=false, placeholder='', help_text='', css_class='', maxlength='') %}
+<div class="form-group {{ css_class }}">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}{% if required %} <span class="required">*</span>{% endif %}
+    </label>
+    <input type="{{ type }}"
+           id="{{ name }}"
+           name="{{ name }}"
+           class="form-input"
+           value="{{ value }}"
+           placeholder="{{ placeholder }}"
+           {% if required %}required{% endif %}
+           {% if maxlength %}maxlength="{{ maxlength }}"{% endif %}>
+    {% if help_text %}
+    <small class="form-help">{{ help_text }}</small>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 셀렉트 박스 #}
+{% macro form_select(name, label, options, selected='', required=false, css_class='') %}
+<div class="form-group {{ css_class }}">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}{% if required %} <span class="required">*</span>{% endif %}
+    </label>
+    <select id="{{ name }}" name="{{ name }}" class="form-input" {% if required %}required{% endif %}>
+        <option value="">선택하세요</option>
+        {% for opt in options %}
+            {% if opt is mapping %}
+            <option value="{{ opt.value }}" {% if opt.value == selected %}selected{% endif %}>{{ opt.label }}</option>
+            {% else %}
+            <option value="{{ opt }}" {% if opt == selected %}selected{% endif %}>{{ opt }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+</div>
+{% endmacro %}
+
+{# 카드 헤더 (추가 버튼 포함 옵션) #}
+{% macro form_card_header(title, icon, add_button_id='') %}
+<div class="card-header">
+    <h2 class="card-title">
+        <i class="{{ icon }}"></i>
+        {{ title }}
+    </h2>
+    {% if add_button_id %}
+    <button type="button" class="btn btn-sm btn-secondary" id="{{ add_button_id }}">
+        <i class="fas fa-plus"></i> 추가
+    </button>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 동적 리스트 아이템 삭제 버튼 #}
+{% macro remove_button() %}
+<button type="button" class="btn-remove" title="삭제">
+    <i class="fas fa-times"></i>
+</button>
+{% endmacro %}

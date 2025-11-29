@@ -69,9 +69,9 @@ def extract_employee_from_form(form_data, employee_id=0):
 
 
 @employees_bp.route('/employees')
-@login_required
+@manager_or_admin_required
 def employee_list():
-    """직원 목록"""
+    """직원 목록 - 매니저/관리자만 접근 가능"""
     # 필터 파라미터 추출
     departments = request.args.getlist('department')
     positions = request.args.getlist('position')
@@ -130,7 +130,19 @@ def employee_list():
 @employees_bp.route('/employees/<int:employee_id>')
 @login_required
 def employee_detail(employee_id):
-    """직원 상세 정보"""
+    """직원 상세 정보
+
+    일반 직원(employee role)은 본인 정보만 열람 가능
+    """
+    from flask import session
+
+    # Employee role은 본인 정보만 접근 가능
+    if session.get('user_role') == 'employee':
+        my_employee_id = session.get('employee_id')
+        if my_employee_id != employee_id:
+            flash('본인 정보만 열람할 수 있습니다.', 'warning')
+            return redirect(url_for('employees.employee_detail', employee_id=my_employee_id))
+
     employee = employee_repo.get_by_id(employee_id)
     if not employee:
         flash('직원을 찾을 수 없습니다.', 'error')
@@ -224,9 +236,24 @@ def employee_create():
 
 
 @employees_bp.route('/employees/<int:employee_id>/edit', methods=['GET'])
-@manager_or_admin_required
+@login_required
 def employee_edit(employee_id):
-    """직원 수정 폼"""
+    """직원 수정 폼
+
+    - 관리자/매니저: 모든 직원 수정 가능
+    - 일반 직원: 본인 정보만 수정 가능 (일부 필드 제한)
+    """
+    from flask import session
+
+    user_role = session.get('user_role')
+
+    # Employee role은 본인 정보만 수정 가능
+    if user_role == 'employee':
+        my_employee_id = session.get('employee_id')
+        if my_employee_id != employee_id:
+            flash('본인 정보만 수정할 수 있습니다.', 'warning')
+            return redirect(url_for('employees.employee_edit', employee_id=my_employee_id))
+
     employee = employee_repo.get_by_id(employee_id)
     if not employee:
         flash('직원을 찾을 수 없습니다.', 'error')
@@ -246,9 +273,24 @@ def employee_edit(employee_id):
 
 
 @employees_bp.route('/employees/<int:employee_id>/update', methods=['POST'])
-@manager_or_admin_required
+@login_required
 def employee_update(employee_id):
-    """직원 수정 처리"""
+    """직원 수정 처리
+
+    - 관리자/매니저: 모든 직원 수정 가능
+    - 일반 직원: 본인 정보만 수정 가능
+    """
+    from flask import session
+
+    user_role = session.get('user_role')
+
+    # Employee role은 본인 정보만 수정 가능
+    if user_role == 'employee':
+        my_employee_id = session.get('employee_id')
+        if my_employee_id != employee_id:
+            flash('본인 정보만 수정할 수 있습니다.', 'warning')
+            return redirect(url_for('employees.employee_edit', employee_id=my_employee_id))
+
     try:
         employee = extract_employee_from_form(request.form, employee_id=employee_id)
 

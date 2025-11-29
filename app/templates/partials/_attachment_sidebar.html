@@ -25,7 +25,7 @@
         <div id="fileList">
             {% if attachment_list %}
                 {% for attachment in attachment_list|sort(attribute='category') %}
-                <div class="file-card">
+                <div class="file-card" data-attachment-id="{{ attachment.id }}">
                     <div class="file-icon">
                         {% if attachment.file_type in ['jpg', 'jpeg', 'png', 'gif'] %}
                             <i class="fas fa-file-image"></i>
@@ -53,6 +53,9 @@
                         <a href="{{ attachment.file_path }}" download class="btn-icon" title="다운로드">
                             <i class="fas fa-download"></i>
                         </a>
+                        <button type="button" class="btn-icon btn-delete-attachment" data-id="{{ attachment.id }}" title="삭제">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                 </div>
                 {% endfor %}

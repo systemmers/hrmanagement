@@ -140,10 +140,13 @@ class EmployeeRepository(BaseRepository):
         ).order_by(Employee.hire_date.desc()).limit(limit).all()
         return [emp.to_dict() for emp in employees]
 
-    def filter_employees(self, department: str = None, position: str = None, status: str = None) -> List[Dict]:
-        """다중 필터링"""
+    def filter_employees(self, department: str = None, position: str = None, status: str = None,
+                         departments: List[str] = None, positions: List[str] = None, statuses: List[str] = None,
+                         sort_by: str = None, sort_order: str = 'asc') -> List[Dict]:
+        """다중 필터링 및 정렬"""
         query = Employee.query
 
+        # 단일 필터 (하위 호환성)
         if department:
             query = query.filter(Employee.department == department)
         if position:
@@ -151,7 +154,28 @@ class EmployeeRepository(BaseRepository):
         if status:
             query = query.filter(Employee.status == status)
 
-        employees = query.order_by(Employee.id).all()
+        # 다중 필터
+        if departments:
+            query = query.filter(Employee.department.in_(departments))
+        if positions:
+            query = query.filter(Employee.position.in_(positions))
+        if statuses:
+            query = query.filter(Employee.status.in_(statuses))
+
+        # 정렬
+        if sort_by:
+            sort_column = getattr(Employee, sort_by, None)
+            if sort_column is not None:
+                if sort_order == 'desc':
+                    query = query.order_by(sort_column.desc())
+                else:
+                    query = query.order_by(sort_column.asc())
+            else:
+                query = query.order_by(Employee.id)
+        else:
+            query = query.order_by(Employee.id)
+
+        employees = query.all()
         return [emp.to_dict() for emp in employees]
 
     def _generate_new_id(self) -> int:

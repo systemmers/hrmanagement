@@ -151,6 +151,17 @@
     color: #2563eb;
 }
 
+.btn-icon.btn-delete-attachment {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.btn-icon.btn-delete-attachment:hover {
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+}
+
 /* 파일 업로드 영역 */
 .file-upload-area {
     border: 2px dashed var(--color-gray-300);
@@ -167,9 +178,24 @@
     background: rgba(37, 99, 235, 0.02);
 }
 
-.file-upload-area.dragover {
+.file-upload-area.dragover,
+.file-upload-area.drag-over {
     border-color: #2563eb;
     background: rgba(37, 99, 235, 0.05);
+}
+
+/* 업로드 중 카드 */
+.file-card.uploading {
+    opacity: 0.7;
+}
+
+.file-card.uploading .file-icon {
+    color: #2563eb;
+}
+
+.file-status {
+    color: #2563eb;
+    font-weight: 500;
 }
 
 .file-upload-icon {
