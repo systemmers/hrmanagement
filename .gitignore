@@ -92,3 +92,7 @@ yarn-error.log
 
 # Scripts folder
 scripts/__pycache__/
+scripts/*.pyc
+
+# Database files directory
+data/db_files/
