@@ -23,6 +23,11 @@
 
     <!-- Components -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/buttons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/badges.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/alerts.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/forms.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/tables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/details.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/modals.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/misc.css') }}">
 
@@ -89,13 +94,13 @@
                     <!-- 내 정보 섹션 -->
                     <div class="nav-section">
                         <h2 class="nav-section-title">내 정보</h2>
-                        <a href="{{ url_for('employees.employee_detail', employee_id=current_user.employee_id) }}"
-                           class="nav-item {% if request.endpoint == 'employees.employee_detail' %}active{% endif %}">
+                        <a href="{{ url_for('employees.employee_detail', employee_id=current_user.employee_id, view='basic') }}"
+                           class="nav-item {% if request.endpoint == 'employees.employee_detail' and request.args.get('view') == 'basic' %}active{% endif %}">
                             <i class="fas fa-id-card"></i>
                             <span>기본정보</span>
                         </a>
-                        <a href="{{ url_for('employees.employee_detail', employee_id=current_user.employee_id) }}#history"
-                           class="nav-item">
+                        <a href="{{ url_for('employees.employee_detail', employee_id=current_user.employee_id, view='history') }}"
+                           class="nav-item {% if request.endpoint == 'employees.employee_detail' and request.args.get('view') == 'history' %}active{% endif %}">
                             <i class="fas fa-history"></i>
                             <span>이력정보</span>
                         </a>

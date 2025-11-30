@@ -1,0 +1,36 @@
+{#
+    직원 상세 - 이력정보 전용 섹션 네비게이션
+    employee: 직원 객체
+#}
+<aside class="section-nav" id="sectionNav">
+    <div class="section-nav-header">
+        <div class="section-nav-title">이력정보</div>
+        <div class="section-nav-subtitle">{{ employee.name }}</div>
+    </div>
+    <nav class="section-nav-menu">
+        {# 이력 및 경력 그룹 #}
+        <div class="section-nav-group">
+            <div class="section-nav-group-title">이력 및 경력</div>
+            <a href="#education-info" class="section-nav-item active">
+                <i class="fas fa-graduation-cap"></i>
+                <span>학력정보</span>
+            </a>
+            <a href="#career-info" class="section-nav-item">
+                <i class="fas fa-briefcase"></i>
+                <span>경력정보</span>
+            </a>
+            <a href="#certificate-info" class="section-nav-item">
+                <i class="fas fa-certificate"></i>
+                <span>자격증 및 면허</span>
+            </a>
+            <a href="#language-info" class="section-nav-item">
+                <i class="fas fa-language"></i>
+                <span>언어능력</span>
+            </a>
+            <a href="#military-info" class="section-nav-item">
+                <i class="fas fa-medal"></i>
+                <span>병역/프로젝트/수상</span>
+            </a>
+        </div>
+    </nav>
+</aside>

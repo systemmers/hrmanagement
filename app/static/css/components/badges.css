@@ -38,6 +38,16 @@
     color: #1e40af;
 }
 
+.badge-secondary {
+    background-color: var(--color-gray-200);
+    color: var(--color-gray-700);
+}
+
+.badge-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
 /* 상태 배지 */
 .status-badge {
     display: inline-flex;

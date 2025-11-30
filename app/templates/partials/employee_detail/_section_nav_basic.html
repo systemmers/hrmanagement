@@ -1,0 +1,24 @@
+{#
+    직원 상세 - 기본정보 전용 섹션 네비게이션
+    employee: 직원 객체
+#}
+<aside class="section-nav" id="sectionNav">
+    <div class="section-nav-header">
+        <div class="section-nav-title">기본정보</div>
+        <div class="section-nav-subtitle">{{ employee.name }}</div>
+    </div>
+    <nav class="section-nav-menu">
+        {# 기본정보 그룹 #}
+        <div class="section-nav-group">
+            <div class="section-nav-group-title">개인정보</div>
+            <a href="#personal-info" class="section-nav-item active">
+                <i class="fas fa-user"></i>
+                <span>개인 기본정보</span>
+            </a>
+            <a href="#family-info" class="section-nav-item">
+                <i class="fas fa-users"></i>
+                <span>가족정보</span>
+            </a>
+        </div>
+    </nav>
+</aside>

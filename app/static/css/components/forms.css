@@ -1,0 +1,92 @@
+/**
+ * Form Component Styles
+ * 폼 레이아웃 및 입력 필드 스타일
+ */
+
+/* 폼 컨테이너 */
+.form-container {
+    max-width: 800px;
+}
+
+.employee-form {
+    background-color: var(--color-pure-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+}
+
+/* 폼 섹션 */
+.form-section {
+    margin-bottom: var(--space-8);
+}
+
+.form-section:last-of-type {
+    margin-bottom: 0;
+}
+
+.form-section-title {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-gray-900);
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-3);
+    border-bottom: 2px solid var(--color-gray-200);
+}
+
+/* 폼 레이아웃 */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+/* 폼 레이블 */
+.form-label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-gray-700);
+}
+
+.required {
+    color: #ef4444;
+}
+
+/* 폼 입력 */
+.form-input {
+    padding: var(--space-3);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    transition: all var(--transition-fast);
+    font-family: var(--font-family);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-gray-900);
+    box-shadow: var(--shadow-sm);
+}
+
+/* 폼 액션 버튼 영역 */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-gray-200);
+}
+
+/* 반응형 */
+@media (max-width: 767px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}

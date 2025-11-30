@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}{{ employee.name }} - 이력정보{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/right-sidebar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/employee-header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/cards.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/tables.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/employee-detail.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="detail-page-layout">
+    {# 좌측 섹션 네비게이션 #}
+    {% include 'partials/employee_detail/_section_nav_history.html' %}
+
+    {# 메인 콘텐츠 #}
+    <div class="detail-main-content">
+        {# 페이지 헤더 #}
+        <div class="detail-page-header">
+            <h1 class="detail-page-title">내 이력정보</h1>
+            <div class="detail-page-actions">
+                <a href="{{ url_for('employees.employee_edit_history', employee_id=employee.id) }}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i>
+                    <span>수정</span>
+                </a>
+            </div>
+        </div>
+
+        {# 개인 계정용 헤더 카드 (명함 영역 없음) #}
+        {% include 'partials/employee_detail/_employee_header_personal.html' %}
+
+        {# 이력정보 섹션들 포함 (학력, 경력, 자격증, 언어, 병역/프로젝트/수상) #}
+        {% include 'partials/employee_detail/_history_info.html' %}
+    </div>
+</div>
+
+{# 모바일 섹션 네비게이션 토글 버튼 #}
+<button class="mobile-section-nav-toggle" id="mobileNavToggle">
+    <i class="fas fa-bars"></i>
+</button>
+
+{# 모바일 오버레이 #}
+<div class="section-nav-overlay" id="sectionNavOverlay"></div>
+{% endblock %}
+
+{% block sidebar_right %}
+{% include 'partials/_attachment_sidebar.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{{ url_for('static', filename='js/pages/employee-detail.js') }}"></script>
+{% endblock %}

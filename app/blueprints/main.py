@@ -40,6 +40,13 @@ def index():
                            classification_options=classification_options)
 
 
+@main_bp.route('/examples/data-table')
+@login_required
+def data_table_demo():
+    """고급 데이터 테이블 데모 페이지"""
+    return render_template('examples/data_table_demo.html')
+
+
 @main_bp.route('/search')
 def search():
     """직원 검색"""

@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/right-sidebar.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/employee-header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/business-card.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/cards.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/tables.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/employee-detail.css') }}">
@@ -32,6 +33,7 @@
                     <span>목록으로</span>
                 </a>
                 {% endif %}
+                {% if not is_readonly %}
                 <a href="{{ url_for('employees.employee_edit', employee_id=employee.id) }}" class="btn btn-primary">
                     <i class="fas fa-edit"></i>
                     <span>수정</span>
@@ -41,6 +43,7 @@
                     <i class="fas fa-trash"></i>
                     <span>삭제</span>
                 </button>
+                {% endif %}
                 {% endif %}
             </div>
         </div>
@@ -66,6 +69,11 @@
 
 {# 모바일 오버레이 #}
 <div class="section-nav-overlay" id="sectionNavOverlay"></div>
+
+{# 명함 업로드 모달 #}
+{% if can_edit_business_card %}
+{% include 'partials/_business_card_modal.html' %}
+{% endif %}
 {% endblock %}
 
 {% block sidebar_right %}
@@ -74,6 +82,7 @@
 
 {% block extra_js %}
 <script type="module" src="{{ url_for('static', filename='js/pages/employee-detail.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/business-card.js') }}"></script>
 <script>
 function deleteEmployee(id, name) {
     if (confirm(`"${name}" 직원을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {

@@ -1,12 +1,14 @@
-/* ========================================
-   테이블 컴포넌트 스타일
-   - 인사카드 이력 테이블
-   ======================================== */
+/**
+ * Table Component Styles
+ * 테이블 컴포넌트 스타일 (인사카드 이력 테이블, 데이터 테이블 등)
+ */
 
+/* 테이블 컨테이너 */
 .table-container {
     overflow-x: auto;
     border-radius: var(--radius-md);
     border: 1px solid var(--color-gray-200);
+    background-color: var(--color-pure-white);
 }
 
 table {
@@ -83,6 +85,44 @@ table .badge {
     font-size: var(--text-sm);
 }
 
+/* 데이터 테이블 (직원 목록 등) */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead {
+    background-color: var(--color-gray-50);
+}
+
+.data-table th {
+    padding: var(--space-4);
+    text-align: left;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.data-table td {
+    padding: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-gray-900);
+    border-bottom: 1px solid var(--color-gray-100);
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--color-gray-25);
+}
+
+/* 테이블 액션 버튼 */
+.table-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
 /* 반응형 테이블 */
 @media (max-width: 768px) {
     .table-container {
@@ -95,5 +135,9 @@ table .badge {
     th, td {
         padding: var(--space-2) var(--space-3);
         font-size: var(--text-xs);
+    }
+
+    .data-table {
+        min-width: 800px;
     }
 }

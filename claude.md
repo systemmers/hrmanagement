@@ -4,7 +4,9 @@
 - kim sang jin
 - sangjin@gmail.com
 
-
+# account
+- 일반 직원: testuser@example.com / test1234
+- 관리자: company@example.com / admin1234
 
 
 

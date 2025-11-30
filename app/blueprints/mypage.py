@@ -2,12 +2,17 @@
 마이페이지 Blueprint
 
 일반 직원(employee role)의 개인 페이지 기능을 제공합니다.
-- 회사 인사카드 (회사 정보 읽기 전용)
+- 회사 인사카드 (소속정보, 계약정보, 급여정보, 복리후생, 4대보험, 인사기록 전체)
 """
 from flask import Blueprint, render_template, session, redirect, url_for, flash
 
 from ..utils.decorators import login_required
-from ..extensions import employee_repo, system_setting_repo
+from ..extensions import (
+    employee_repo, system_setting_repo,
+    salary_repo, benefit_repo, contract_repo, salary_history_repo,
+    promotion_repo, evaluation_repo, training_repo, attendance_repo,
+    insurance_repo, asset_repo, salary_payment_repo
+)
 
 mypage_bp = Blueprint('mypage', __name__, url_prefix='/my')
 
@@ -15,9 +20,11 @@ mypage_bp = Blueprint('mypage', __name__, url_prefix='/my')
 @mypage_bp.route('/company')
 @login_required
 def company_info():
-    """회사 인사카드 (소속 조직 정보)
+    """회사 인사카드
 
-    직원이 등록된 회사의 정보를 읽기 전용으로 표시합니다.
+    직원의 회사 관련 전체 인사정보를 표시합니다:
+    - 소속정보, 계약정보, 급여정보, 복리후생, 4대보험
+    - 인사기록: 근로계약/연봉, 인사이동/고과, 근태/비품
     """
     employee_id = session.get('employee_id')
 
@@ -33,7 +40,7 @@ def company_info():
         return redirect(url_for('main.index'))
 
     # 회사 정보 조회 (SystemSetting에서)
-    company_info = {}
+    company_data = {}
     company_keys = [
         'company.name', 'company.name_en', 'company.ceo_name',
         'company.business_number', 'company.corporate_number',
@@ -44,10 +51,36 @@ def company_info():
     for key in company_keys:
         setting = system_setting_repo.get_by_key(key)
         if setting:
-            # key에서 'company.' 접두어 제거
             field_name = key.replace('company.', '')
-            company_info[field_name] = setting.get('value', '') if isinstance(setting, dict) else setting.value
+            company_data[field_name] = setting.get('value', '') if isinstance(setting, dict) else setting.value
 
-    return render_template('mypage/company_info.html',
+    # 급여 및 복리후생 데이터 조회
+    salary = salary_repo.get_by_employee_id(employee_id)
+    benefit = benefit_repo.get_by_employee_id(employee_id)
+    contract = contract_repo.get_by_employee_id(employee_id)
+    insurance = insurance_repo.get_by_employee_id(employee_id)
+
+    # 인사기록 데이터 조회
+    salary_history_list = salary_history_repo.get_by_employee_id(employee_id)
+    salary_payment_list = salary_payment_repo.get_by_employee_id(employee_id)
+    promotion_list = promotion_repo.get_by_employee_id(employee_id)
+    evaluation_list = evaluation_repo.get_by_employee_id(employee_id)
+    training_list = training_repo.get_by_employee_id(employee_id)
+    attendance_summary = attendance_repo.get_summary_by_employee(employee_id, 2025)
+    asset_list = asset_repo.get_by_employee_id(employee_id)
+
+    return render_template('employee_detail.html',
                            employee=employee,
-                           company_info=company_info)
+                           company_info=company_data,
+                           salary=salary,
+                           benefit=benefit,
+                           contract=contract,
+                           insurance=insurance,
+                           salary_history_list=salary_history_list,
+                           salary_payment_list=salary_payment_list,
+                           promotion_list=promotion_list,
+                           evaluation_list=evaluation_list,
+                           training_list=training_list,
+                           attendance_summary=attendance_summary,
+                           asset_list=asset_list,
+                           is_readonly=True)

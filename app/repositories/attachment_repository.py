@@ -29,3 +29,23 @@ class AttachmentRepository(BaseRelationRepository):
             file_type=file_type
         ).all()
         return [record.to_dict() for record in records]
+
+    def get_one_by_category(self, employee_id: int, category: str) -> Dict:
+        """특정 직원의 카테고리별 단일 첨부파일 조회 (최신 1개)"""
+        record = Attachment.query.filter_by(
+            employee_id=employee_id,
+            category=category
+        ).order_by(Attachment.upload_date.desc()).first()
+        return record.to_dict() if record else None
+
+    def delete_by_category(self, employee_id: int, category: str) -> bool:
+        """특정 직원의 카테고리별 첨부파일 삭제"""
+        from app.database import db
+        records = Attachment.query.filter_by(
+            employee_id=employee_id,
+            category=category
+        ).all()
+        for record in records:
+            db.session.delete(record)
+        db.session.commit()
+        return len(records) > 0

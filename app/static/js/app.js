@@ -1,6 +1,12 @@
 /**
  * 인사카드 관리 시스템 - 메인 애플리케이션
  * ES6 모듈 기반 진입점
+ *
+ * HRApp 네임스페이스 구조:
+ * - HRApp.toast: 토스트 알림 기능
+ * - HRApp.filter: 필터링 기능
+ * - HRApp.employee: 직원 관련 기능
+ * - HRApp.ui: UI 유틸리티 기능
  */
 
 import { Toast, showToast } from './components/toast.js';
@@ -8,16 +14,10 @@ import { FormValidator } from './components/form-validator.js';
 import { Filter, applyFilters, resetFilters, removeFilter, toggleFilterBar } from './components/filter.js';
 import { searchEmployees } from './services/employee-service.js';
 
-// 전역 함수로 노출 (기존 코드 호환성)
-window.showToast = showToast;
-window.applyFilters = applyFilters;
-window.resetFilters = resetFilters;
-window.removeFilter = removeFilter;
-window.toggleFilterBar = toggleFilterBar;
-window.searchEmployees = searchEmployees;
-
-// 정렬 함수
-window.applySorting = function() {
+/**
+ * 정렬 적용 함수
+ */
+function applySorting() {
     const sortSelect = document.getElementById('sortSelect');
     if (!sortSelect) return;
 
@@ -25,7 +25,6 @@ window.applySorting = function() {
     const url = new URL(window.location.href);
 
     if (value) {
-        // value 형식: "name" 또는 "name-desc"
         const parts = value.split('-');
         const sortField = parts[0];
         const sortOrder = parts[1] === 'desc' ? 'desc' : 'asc';
@@ -38,20 +37,25 @@ window.applySorting = function() {
     }
 
     window.location.href = url.toString();
-};
+}
 
-// 로그아웃 함수
-window.handleLogout = function() {
+/**
+ * 로그아웃 처리 함수
+ */
+function handleLogout() {
     if (confirm('로그아웃 하시겠습니까?')) {
         showToast('로그아웃되었습니다.');
         setTimeout(() => {
             window.location.reload();
         }, 1500);
     }
-};
+}
 
-// 직원 목록 뷰 전환 함수
-window.toggleEmployeeView = function(viewType) {
+/**
+ * 직원 목록 뷰 전환 함수
+ * @param {string} viewType - 'list' 또는 'card'
+ */
+function toggleEmployeeView(viewType) {
     const listView = document.getElementById('list-view');
     const cardView = document.getElementById('card-view');
     const listBtn = document.querySelector('.view-toggle-btn[data-view="list"]');
@@ -72,7 +76,49 @@ window.toggleEmployeeView = function(viewType) {
         listBtn.classList.remove('active');
         cardBtn.classList.add('active');
     }
+}
+
+/**
+ * HRApp 네임스페이스 - 전역 API
+ */
+window.HRApp = {
+    version: '1.0.0',
+
+    toast: {
+        show: showToast
+    },
+
+    filter: {
+        apply: applyFilters,
+        reset: resetFilters,
+        remove: removeFilter,
+        toggle: toggleFilterBar
+    },
+
+    employee: {
+        search: searchEmployees
+    },
+
+    ui: {
+        applySorting: applySorting,
+        handleLogout: handleLogout,
+        toggleView: toggleEmployeeView
+    }
 };
+
+/**
+ * 기존 코드 호환성을 위한 전역 함수 (deprecated)
+ * 향후 HRApp 네임스페이스 사용 권장
+ */
+window.showToast = showToast;
+window.applyFilters = applyFilters;
+window.resetFilters = resetFilters;
+window.removeFilter = removeFilter;
+window.toggleFilterBar = toggleFilterBar;
+window.searchEmployees = searchEmployees;
+window.applySorting = applySorting;
+window.handleLogout = handleLogout;
+window.toggleEmployeeView = toggleEmployeeView;
 
 // 페이지 초기화
 document.addEventListener('DOMContentLoaded', () => {

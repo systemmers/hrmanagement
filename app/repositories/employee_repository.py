@@ -51,6 +51,20 @@ class EmployeeRepository(BaseRepository):
         db.session.commit()
         return employee.to_dict()
 
+    def update_partial(self, employee_id: str, data: Dict) -> Optional[Dict]:
+        """직원 정보 부분 수정 (지정된 필드만 업데이트)"""
+        employee = Employee.query.get(employee_id)
+        if not employee:
+            return None
+
+        # 지정된 필드만 업데이트
+        for key, value in data.items():
+            if hasattr(employee, key) and key != 'id':
+                setattr(employee, key, value)
+
+        db.session.commit()
+        return employee.to_dict()
+
     def delete(self, employee_id: str) -> bool:
         """직원 삭제 (관련 데이터 cascade 삭제)"""
         employee = Employee.query.get(employee_id)
