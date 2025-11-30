@@ -13,6 +13,7 @@ import { Toast, showToast } from './components/toast.js';
 import { FormValidator } from './components/form-validator.js';
 import { Filter, applyFilters, resetFilters, removeFilter, toggleFilterBar } from './components/filter.js';
 import { searchEmployees } from './services/employee-service.js';
+import { SalaryCalculator, SalaryCalculatorModal } from './components/salary-calculator.js';
 
 /**
  * 정렬 적용 함수
@@ -157,4 +158,142 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // 급여 계산기 초기화
+    initializeSalaryCalculator();
 });
+
+/**
+ * 급여 계산기 초기화
+ */
+function initializeSalaryCalculator() {
+    const openBtn = document.getElementById('openSalaryCalculatorBtn');
+    const modal = document.getElementById('salaryCalculatorModal');
+
+    if (!openBtn || !modal) return;
+
+    // 모달 인스턴스 생성
+    const salaryCalcModal = new SalaryCalculatorModal({
+        modalId: 'salaryCalculatorModal',
+        onApply: (result) => {
+            // 폼에 계산 결과 적용
+            applySalaryCalculationToForm(result);
+        }
+    });
+
+    // 계산기 열기 버튼 이벤트
+    openBtn.addEventListener('click', () => {
+        // 현재 폼 값으로 초기값 설정
+        const initialValues = {
+            annualSalary: parseInt(document.getElementById('annual_salary')?.value) || 52000000,
+            mealAllowance: parseInt(document.getElementById('meal_allowance')?.value) || 200000,
+            overtimeHours: parseInt(document.getElementById('overtime_hours')?.value) || 24,
+            nightHours: parseInt(document.getElementById('night_hours')?.value) || 8,
+            holidayDays: parseInt(document.getElementById('holiday_days')?.value) || 1
+        };
+
+        salaryCalcModal.open(initialValues);
+    });
+
+    // 취소 버튼 이벤트
+    const cancelBtn = document.getElementById('calcCancelBtn');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            salaryCalcModal.close();
+        });
+    }
+
+    // HRApp에 급여 계산기 추가
+    window.HRApp.salary = {
+        calculator: new SalaryCalculator(),
+        modal: salaryCalcModal
+    };
+}
+
+/**
+ * 급여 계산 결과를 폼에 적용
+ * @param {Object} result - 계산 결과
+ */
+function applySalaryCalculationToForm(result) {
+    const formatter = (num) => Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+    // 기본급 적용
+    const baseSalaryField = document.getElementById('base_salary');
+    if (baseSalaryField) {
+        baseSalaryField.value = result.baseSalary;
+    }
+
+    // 식대 적용
+    const mealField = document.getElementById('meal_allowance');
+    if (mealField) {
+        mealField.value = result.allowances.meal;
+    }
+
+    // 포괄임금제 필드 적용
+    const annualSalaryField = document.getElementById('annual_salary');
+    if (annualSalaryField) {
+        annualSalaryField.value = result.input.annualSalary;
+    }
+
+    const hourlyWageField = document.getElementById('hourly_wage');
+    if (hourlyWageField) {
+        hourlyWageField.value = result.hourlyWage;
+    }
+
+    const overtimeHoursField = document.getElementById('overtime_hours');
+    if (overtimeHoursField) {
+        overtimeHoursField.value = result.input.overtimeHours;
+    }
+
+    const overtimeAllowanceField = document.getElementById('overtime_allowance');
+    if (overtimeAllowanceField) {
+        overtimeAllowanceField.value = result.allowances.overtime;
+    }
+
+    const nightHoursField = document.getElementById('night_hours');
+    if (nightHoursField) {
+        nightHoursField.value = result.input.nightHours;
+    }
+
+    const nightAllowanceField = document.getElementById('night_allowance');
+    if (nightAllowanceField) {
+        nightAllowanceField.value = result.allowances.night;
+    }
+
+    const holidayDaysField = document.getElementById('holiday_days');
+    if (holidayDaysField) {
+        holidayDaysField.value = result.input.holidayDays;
+    }
+
+    const holidayAllowanceField = document.getElementById('holiday_allowance');
+    if (holidayAllowanceField) {
+        holidayAllowanceField.value = result.allowances.holiday;
+    }
+
+    // 요약 섹션 표시 및 업데이트
+    const summarySection = document.getElementById('comprehensiveSalarySummary');
+    if (summarySection) {
+        summarySection.style.display = 'block';
+
+        const summaryAnnual = document.getElementById('summaryAnnualSalary');
+        if (summaryAnnual) {
+            summaryAnnual.textContent = formatter(result.input.annualSalary) + '원';
+        }
+
+        const summaryHourly = document.getElementById('summaryHourlyWage');
+        if (summaryHourly) {
+            summaryHourly.textContent = formatter(result.hourlyWage) + '원/시간';
+        }
+
+        const summaryOvertime = document.getElementById('summaryOvertimeHours');
+        if (summaryOvertime) {
+            summaryOvertime.textContent = result.input.overtimeHours + '시간/월';
+        }
+    }
+
+    // 상세 필드 섹션 표시
+    const detailsSection = document.getElementById('comprehensiveSalaryDetails');
+    if (detailsSection) {
+        detailsSection.style.display = 'block';
+    }
+}

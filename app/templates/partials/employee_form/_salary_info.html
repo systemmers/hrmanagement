@@ -10,8 +10,34 @@
                 <i class="fas fa-won-sign"></i>
                 급여정보
             </h2>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="openSalaryCalculatorBtn">
+                <i class="fas fa-calculator"></i>
+                포괄임금 계산기
+            </button>
         </div>
         <div class="card-body">
+            <!-- 포괄임금제 요약 (계산기 사용 시 표시) -->
+            <div class="comprehensive-salary-summary" id="comprehensiveSalarySummary" style="display: none;">
+                <div class="summary-header">
+                    <i class="fas fa-info-circle"></i>
+                    <span>포괄임금제 적용</span>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-item">
+                        <span class="label">연봉</span>
+                        <span class="value" id="summaryAnnualSalary">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">통상임금(시급)</span>
+                        <span class="value" id="summaryHourlyWage">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">연장근로</span>
+                        <span class="value" id="summaryOvertimeHours">-</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-grid">
                 <div class="form-group">
                     <label for="base_salary" class="form-label">기본급</label>
@@ -77,6 +103,67 @@
                            placeholder="123-456-789012">
                 </div>
             </div>
+
+            <!-- 포괄임금제 상세 필드 (확장 영역) -->
+            <div class="comprehensive-salary-details" id="comprehensiveSalaryDetails" style="display: none;">
+                <h3 class="section-subtitle">
+                    <i class="fas fa-calculator"></i>
+                    포괄임금제 수당 내역
+                </h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="annual_salary" class="form-label">연봉</label>
+                        <input type="number" id="annual_salary" name="annual_salary" class="form-input"
+                               value="{{ salary.annual_salary if salary and salary.annual_salary else '' }}"
+                               placeholder="52000000" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="hourly_wage" class="form-label">통상임금(시급)</label>
+                        <input type="number" id="hourly_wage" name="hourly_wage" class="form-input"
+                               value="{{ salary.hourly_wage if salary and salary.hourly_wage else '' }}"
+                               placeholder="20733" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="overtime_hours" class="form-label">연장근로시간(월)</label>
+                        <input type="number" id="overtime_hours" name="overtime_hours" class="form-input"
+                               value="{{ salary.overtime_hours if salary and salary.overtime_hours else '' }}"
+                               placeholder="24" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="overtime_allowance" class="form-label">연장근로수당</label>
+                        <input type="number" id="overtime_allowance" name="overtime_allowance" class="form-input"
+                               value="{{ salary.overtime_allowance if salary and salary.overtime_allowance else '' }}"
+                               placeholder="746388" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="night_hours" class="form-label">야간근로시간(월)</label>
+                        <input type="number" id="night_hours" name="night_hours" class="form-input"
+                               value="{{ salary.night_hours if salary and salary.night_hours else '' }}"
+                               placeholder="8" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="night_allowance" class="form-label">야간근로수당</label>
+                        <input type="number" id="night_allowance" name="night_allowance" class="form-input"
+                               value="{{ salary.night_allowance if salary and salary.night_allowance else '' }}"
+                               placeholder="82932" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="holiday_days" class="form-label">휴일근로일수(월)</label>
+                        <input type="number" id="holiday_days" name="holiday_days" class="form-input"
+                               value="{{ salary.holiday_days if salary and salary.holiday_days else '' }}"
+                               placeholder="1" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="holiday_allowance" class="form-label">휴일근로수당</label>
+                        <input type="number" id="holiday_allowance" name="holiday_allowance" class="form-input"
+                               value="{{ salary.holiday_allowance if salary and salary.holiday_allowance else '' }}"
+                               placeholder="248796" readonly>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
+
+<!-- 급여 계산기 모달 Include -->
+{% include 'partials/_salary_calculator_modal.html' %}

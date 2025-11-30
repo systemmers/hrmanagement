@@ -1,0 +1,180 @@
+{#
+    포괄임금제 급여 계산기 모달
+    - 연봉 기반 기본급 역산
+    - 연장/야간/휴일 근로수당 자동 계산
+    - 최저임금 및 연장근로 한도 검증
+    2025년 기준
+#}
+<div class="salary-calculator-modal" id="salaryCalculatorModal">
+    <div class="salary-calc-container">
+        <div class="salary-calc-header">
+            <h2 class="salary-calc-title">
+                <i class="fas fa-calculator"></i>
+                포괄임금제 급여 계산기
+            </h2>
+            <button type="button" class="salary-calc-close" id="calcCloseBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="salary-calc-body">
+            <div class="salary-calc-layout">
+                <!-- 왼쪽: 입력 섹션 -->
+                <div class="salary-calc-input-section">
+                    <!-- 기본 정보 -->
+                    <div class="salary-calc-section-card">
+                        <h3 class="salary-calc-section-title">
+                            <i class="fas fa-cog"></i>
+                            기본 정보
+                        </h3>
+                        <div class="salary-calc-form-grid">
+                            <div class="salary-calc-form-group">
+                                <label class="salary-calc-label">급여 형태</label>
+                                <select class="salary-calc-select" id="calcSalaryType">
+                                    <option value="comprehensive" selected>포괄임금제</option>
+                                    <option value="monthly">월급제</option>
+                                    <option value="hourly">시급제</option>
+                                </select>
+                            </div>
+                            <div class="salary-calc-form-group">
+                                <label class="salary-calc-label">연봉 <span class="unit">(원)</span></label>
+                                <input type="text" class="salary-calc-input" id="calcAnnualSalary" value="52,000,000" placeholder="52,000,000">
+                            </div>
+                            <div class="salary-calc-form-group">
+                                <label class="salary-calc-label">식대 <span class="unit">(월/원)</span></label>
+                                <input type="text" class="salary-calc-input" id="calcMealAllowance" value="200,000" placeholder="200,000">
+                                <small class="salary-calc-help">비과세 한도: 월 20만원</small>
+                            </div>
+                            <div class="salary-calc-form-group">
+                                <label class="salary-calc-label">2025년 최저임금</label>
+                                <input type="text" class="salary-calc-input readonly" value="10,030원/시간" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 포괄임금 포함 근무시간 -->
+                    <div class="salary-calc-section-card">
+                        <h3 class="salary-calc-section-title">
+                            <i class="fas fa-clock"></i>
+                            포괄임금 포함 근무시간
+                        </h3>
+                        <div class="salary-calc-form-grid">
+                            <div class="salary-calc-form-group">
+                                <label class="salary-calc-label">연장근로 <span class="unit">(월/시간)</span></label>
+                                <input type="number" class="salary-calc-input" id="calcOvertimeHours" value="24" min="0" max="52">
+                                <small class="salary-calc-help">법정 한도: 주 12시간 (월 약 52시간)</small>
+                            </div>
+                            <div class="salary-calc-form-group">
+                                <label class="salary-calc-label">야간근로 <span class="unit">(월/시간)</span></label>
+                                <input type="number" class="salary-calc-input" id="calcNightHours" value="8" min="0">
+                                <small class="salary-calc-help">22:00 ~ 06:00 근무시간</small>
+                            </div>
+                            <div class="salary-calc-form-group">
+                                <label class="salary-calc-label">휴일근로 <span class="unit">(월/일)</span></label>
+                                <input type="number" class="salary-calc-input" id="calcHolidayDays" value="1" min="0">
+                                <small class="salary-calc-help">1일 = 8시간 기준</small>
+                            </div>
+                            <div class="salary-calc-form-group">
+                                <label class="salary-calc-label">월 소정근로시간</label>
+                                <input type="text" class="salary-calc-input readonly" value="209시간" readonly>
+                                <small class="salary-calc-help">주 40시간 기준 (자동 계산)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 오른쪽: 결과 섹션 -->
+                <div class="salary-calc-result-section">
+                    <!-- 통상임금 -->
+                    <div class="salary-calc-hourly-wage-box">
+                        <div class="salary-calc-hourly-wage-label">통상임금 (시간당)</div>
+                        <div class="salary-calc-hourly-wage-value" id="calcHourlyWage">0원</div>
+                        <div class="salary-calc-hourly-wage-unit">기본급 / 209시간</div>
+                        <div class="salary-calc-hourly-wage-compare" id="calcMinimumWageCompare">
+                            최저임금(10,030원) 대비 <strong>0%</strong>
+                        </div>
+                    </div>
+
+                    <!-- 검증 상태 -->
+                    <div class="salary-calc-validation-status success" id="calcValidationStatus">
+                        <i class="fas fa-check-circle salary-calc-validation-icon"></i>
+                        <div class="salary-calc-validation-text">
+                            <strong>검증 통과</strong>
+                            <span>통상임금이 최저임금 기준을 충족합니다.</span>
+                        </div>
+                    </div>
+
+                    <!-- 급여 구성 결과 -->
+                    <div class="salary-calc-result-card">
+                        <div class="salary-calc-result-header">
+                            <h3>
+                                <i class="fas fa-list"></i>
+                                급여 구성 상세
+                            </h3>
+                        </div>
+                        <div class="salary-calc-result-body">
+                            <div class="salary-calc-result-item">
+                                <div class="salary-calc-result-label">
+                                    월 기본급 (역산)
+                                    <span class="formula">연봉 / 12 - 수당합계</span>
+                                </div>
+                                <div class="salary-calc-result-value" id="calcBaseSalary">0원</div>
+                            </div>
+                            <div class="salary-calc-result-item">
+                                <div class="salary-calc-result-label">
+                                    식대
+                                    <span class="formula">비과세 항목</span>
+                                </div>
+                                <div class="salary-calc-result-value" id="calcMealResult">0원</div>
+                            </div>
+                            <div class="salary-calc-result-item">
+                                <div class="salary-calc-result-label">
+                                    연장근로수당
+                                    <span class="formula" id="calcOvertimeFormula">통상임금 x 1.5 x 0시간</span>
+                                </div>
+                                <div class="salary-calc-result-value" id="calcOvertimeAllowance">0원</div>
+                            </div>
+                            <div class="salary-calc-result-item">
+                                <div class="salary-calc-result-label">
+                                    야간근로수당
+                                    <span class="formula" id="calcNightFormula">통상임금 x 0.5 x 0시간</span>
+                                </div>
+                                <div class="salary-calc-result-value" id="calcNightAllowance">0원</div>
+                            </div>
+                            <div class="salary-calc-result-item">
+                                <div class="salary-calc-result-label">
+                                    휴일근로수당
+                                    <span class="formula" id="calcHolidayFormula">통상임금 x 1.5 x 0시간</span>
+                                </div>
+                                <div class="salary-calc-result-value" id="calcHolidayAllowance">0원</div>
+                            </div>
+                            <div class="salary-calc-result-item total">
+                                <div class="salary-calc-result-label">
+                                    <strong>월 급여 합계</strong>
+                                </div>
+                                <div class="salary-calc-result-value total" id="calcTotalSalary">0원</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="salary-calc-footer">
+            <div class="salary-calc-footer-info">
+                <i class="fas fa-info-circle"></i>
+                계산 결과는 참고용이며, 실제 급여는 세부 조건에 따라 달라질 수 있습니다.
+            </div>
+            <div class="salary-calc-footer-buttons">
+                <button type="button" class="btn btn-secondary" id="calcCancelBtn">
+                    <i class="fas fa-times"></i>
+                    취소
+                </button>
+                <button type="button" class="btn btn-primary" id="calcApplyBtn">
+                    <i class="fas fa-check"></i>
+                    적용
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
