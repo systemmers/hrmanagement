@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}법인 설정 - {{ company.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-row">
+        <h1 class="page-title">법인 설정</h1>
+        <div class="page-actions">
+            <a href="{{ url_for('corporate.dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                <span>대시보드로</span>
+            </a>
+        </div>
+    </div>
+    <p class="page-description">{{ company.name }} 정보 관리</p>
+</div>
+
+<div class="form-container">
+    <form method="POST" class="employee-form">
+        <!-- 기본 정보 섹션 -->
+        <div class="form-section">
+            <h2 class="form-section-title">
+                <i class="fas fa-building"></i>
+                기본 정보
+            </h2>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        법인명 <span class="required">*</span>
+                    </label>
+                    <input type="text" name="company_name" class="form-input"
+                           value="{{ company.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">사업자등록번호</label>
+                    <input type="text" class="form-input"
+                           value="{{ company.business_number_formatted }}" disabled>
+                    <small style="color: var(--color-gray-500); font-size: var(--text-xs);">
+                        사업자등록번호는 변경할 수 없습니다.
+                    </small>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        대표자명 <span class="required">*</span>
+                    </label>
+                    <input type="text" name="representative" class="form-input"
+                           value="{{ company.representative }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">웹사이트</label>
+                    <input type="url" name="website" class="form-input"
+                           placeholder="https://example.com"
+                           value="{{ company.website or '' }}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">업태</label>
+                    <input type="text" name="business_type" class="form-input"
+                           placeholder="서비스업"
+                           value="{{ company.business_type or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">업종</label>
+                    <input type="text" name="business_category" class="form-input"
+                           placeholder="소프트웨어 개발"
+                           value="{{ company.business_category or '' }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- 연락처 정보 섹션 -->
+        <div class="form-section">
+            <h2 class="form-section-title">
+                <i class="fas fa-phone"></i>
+                연락처 정보
+            </h2>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">대표 전화번호</label>
+                    <input type="tel" name="phone" class="form-input"
+                           placeholder="02-0000-0000"
+                           value="{{ company.phone or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">대표 이메일</label>
+                    <input type="email" name="company_email" class="form-input"
+                           placeholder="info@company.com"
+                           value="{{ company.email or '' }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- 주소 정보 섹션 -->
+        <div class="form-section">
+            <h2 class="form-section-title">
+                <i class="fas fa-map-marker-alt"></i>
+                주소 정보
+            </h2>
+
+            <div class="form-row">
+                <div class="form-group" style="flex: 0 0 150px;">
+                    <label class="form-label">우편번호</label>
+                    <input type="text" name="postal_code" class="form-input"
+                           placeholder="00000"
+                           value="{{ company.postal_code or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">주소</label>
+                    <input type="text" name="address" class="form-input"
+                           placeholder="서울시 강남구"
+                           value="{{ company.address or '' }}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">상세주소</label>
+                    <input type="text" name="address_detail" class="form-input"
+                           placeholder="OO빌딩 O층"
+                           value="{{ company.address_detail or '' }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- 플랜 정보 섹션 (읽기 전용) -->
+        <div class="form-section">
+            <h2 class="form-section-title">
+                <i class="fas fa-crown"></i>
+                플랜 정보
+            </h2>
+
+            <div class="plan-info-card">
+                <div class="plan-badge">현재 플랜</div>
+                <div class="plan-name">{{ company.plan_label }}</div>
+                <div class="plan-details">
+                    <div class="plan-detail">
+                        <span class="detail-label">최대 인원</span>
+                        <span class="detail-value">{{ company.max_employees }}명</span>
+                    </div>
+                    <div class="plan-detail">
+                        <span class="detail-label">현재 인원</span>
+                        <span class="detail-value">{{ company.employee_count if company.employee_count is defined else 0 }}명</span>
+                    </div>
+                </div>
+            </div>
+            <small style="color: var(--color-gray-500); font-size: var(--text-xs); margin-top: var(--space-2); display: block;">
+                플랜 변경은 관리자에게 문의해주세요.
+            </small>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('corporate.dashboard') }}" class="btn btn-secondary">취소</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                <span>저장하기</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+.form-section-title i {
+    margin-right: var(--space-2);
+    color: var(--color-primary);
+}
+
+.plan-info-card {
+    padding: var(--space-5);
+    border-radius: var(--radius-md);
+    background: var(--color-gray-50);
+    border: 2px solid var(--color-primary);
+}
+
+.plan-badge {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+}
+
+.plan-name {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-gray-900);
+    margin-bottom: var(--space-4);
+}
+
+.plan-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.plan-detail {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-sm);
+}
+
+.detail-label {
+    color: var(--color-gray-600);
+}
+
+.detail-value {
+    color: var(--color-gray-900);
+    font-weight: 500;
+}
+</style>
+{% endblock %}

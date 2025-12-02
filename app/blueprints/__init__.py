@@ -15,12 +15,16 @@ def register_blueprints(app):
     from .auth import auth_bp
     from .admin import admin_bp
     from .mypage import mypage_bp
+    from .corporate import corporate_bp  # Phase 1: 법인 계정
 
     # 인증 관련 (/auth/*)
     app.register_blueprint(auth_bp)
 
     # 관리자 기능 (/admin/*)
     app.register_blueprint(admin_bp)
+
+    # 법인 계정 (/corporate/*) - Phase 1
+    app.register_blueprint(corporate_bp)
 
     # 마이페이지 - 일반 직원용 (/my/*)
     app.register_blueprint(mypage_bp)

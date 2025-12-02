@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}법인 대시보드 - {{ company.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-row">
+        <h1 class="page-title">법인 대시보드</h1>
+        {% if session.get('user_role') in ['admin', 'manager'] %}
+        <div class="page-actions">
+            <a href="{{ url_for('corporate.settings') }}" class="btn btn-secondary">
+                <i class="fas fa-cog"></i>
+                <span>설정</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    <p class="page-description">{{ company.name }} 관리 현황</p>
+</div>
+
+<div class="dashboard-grid">
+    <!-- 법인 정보 카드 -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-info-circle"></i>
+                법인 정보
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">법인명</span>
+                    <span class="info-value">{{ company.name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">사업자등록번호</span>
+                    <span class="info-value">{{ company.business_number_formatted }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">대표자</span>
+                    <span class="info-value">{{ company.representative }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">업태/업종</span>
+                    <span class="info-value">{{ company.business_type or '-' }} / {{ company.business_category or '-' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">연락처</span>
+                    <span class="info-value">{{ company.phone or '-' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">이메일</span>
+                    <span class="info-value">{{ company.email or '-' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 현황 카드 -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-chart-bar"></i>
+                현황
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-icon employees">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-value">{{ company.employee_count }}</span>
+                        <span class="stat-label">등록 직원</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon limit">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-value">{{ company.max_employees }}</span>
+                        <span class="stat-label">최대 인원</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon plan">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-value">{{ company.plan_label }}</span>
+                        <span class="stat-label">현재 플랜</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon status {% if company.is_verified %}verified{% else %}pending{% endif %}">
+                        <i class="fas fa-{% if company.is_verified %}check-circle{% else %}clock{% endif %}"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-value">{% if company.is_verified %}인증됨{% else %}대기중{% endif %}</span>
+                        <span class="stat-label">인증 상태</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 빠른 링크 카드 -->
+    <div class="dashboard-card quick-links-card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-bolt"></i>
+                빠른 메뉴
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="quick-links">
+                <a href="{{ url_for('employees.employee_list') }}" class="quick-link">
+                    <i class="fas fa-users"></i>
+                    <span>직원 목록</span>
+                </a>
+                <a href="{{ url_for('employees.employee_new') }}" class="quick-link">
+                    <i class="fas fa-user-plus"></i>
+                    <span>직원 등록</span>
+                </a>
+                {% if session.get('user_role') in ['admin', 'manager'] %}
+                <a href="{{ url_for('corporate.users') }}" class="quick-link">
+                    <i class="fas fa-user-cog"></i>
+                    <span>사용자 관리</span>
+                </a>
+                <a href="{{ url_for('corporate.settings') }}" class="quick-link">
+                    <i class="fas fa-building"></i>
+                    <span>법인 설정</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+}
+
+.dashboard-card {
+    background: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-gray-200);
+    overflow: hidden;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+}
+
+.card-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-gray-700);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.card-title i {
+    color: var(--color-primary);
+}
+
+.card-body {
+    padding: var(--space-5);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.info-label {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+    font-weight: 500;
+}
+
+.info-value {
+    font-size: var(--text-sm);
+    color: var(--color-gray-900);
+    font-weight: 500;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-5);
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xl);
+}
+
+.stat-icon.employees {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.stat-icon.limit {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.stat-icon.plan {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.stat-icon.status.verified {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.stat-icon.status.pending {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-gray-900);
+}
+
+.stat-label {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+}
+
+.quick-links {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+
+.quick-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--color-gray-700);
+    transition: all var(--transition-fast);
+}
+
+.quick-link:hover {
+    background: var(--color-primary);
+    color: var(--color-pure-white);
+    transform: translateY(-2px);
+}
+
+.quick-link i {
+    font-size: var(--text-2xl);
+}
+
+.quick-link span {
+    font-size: var(--text-sm);
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-grid,
+    .stats-grid,
+    .quick-links {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

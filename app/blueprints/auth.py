@@ -34,6 +34,9 @@ def login():
             session['username'] = user.username
             session['user_role'] = user.role
             session['employee_id'] = user.employee_id
+            # Phase 1: 계정 유형 및 법인 정보 추가
+            session['account_type'] = user.account_type
+            session['company_id'] = user.company_id
 
             flash(f'{user.username}님, 환영합니다!', 'success')
 

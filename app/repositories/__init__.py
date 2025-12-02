@@ -26,6 +26,7 @@ from .award_repository import AwardRepository
 from .asset_repository import AssetRepository
 from .salary_payment_repository import SalaryPaymentRepository
 from .attachment_repository import AttachmentRepository
+from .company_repository import CompanyRepository
 
 __all__ = [
     'EmployeeRepository',
@@ -50,4 +51,5 @@ __all__ = [
     'AssetRepository',
     'SalaryPaymentRepository',
     'AttachmentRepository',
+    'CompanyRepository',
 ]

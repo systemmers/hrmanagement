@@ -2,6 +2,7 @@
 User SQLAlchemy 모델
 
 사용자 인증 및 권한 관리를 위한 모델입니다.
+플랫폼 멀티테넌시를 위해 계정 유형(account_type)과 법인 연결(company_id)을 지원합니다.
 """
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -22,15 +23,60 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime, nullable=True)
 
+    # 플랫폼 계정 유형 (Phase 1: Company 모델)
+    account_type = db.Column(
+        db.String(20),
+        default='corporate',
+        nullable=False,
+        index=True
+    )
+    # 법인 계정 연결 (corporate, employee_sub 계정일 때)
+    company_id = db.Column(
+        db.Integer,
+        db.ForeignKey('companies.id'),
+        nullable=True,
+        index=True
+    )
+    # 하위 직원 계정의 부모 사용자 (employee_sub일 때)
+    parent_user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id'),
+        nullable=True
+    )
+
     # Relationships
     employee = db.relationship('Employee', backref=db.backref('user', uselist=False))
+    company = db.relationship(
+        'Company',
+        foreign_keys=[company_id],
+        backref=db.backref('users', lazy='dynamic')
+    )
+    parent_user = db.relationship(
+        'User',
+        remote_side=[id],
+        foreign_keys=[parent_user_id],
+        backref=db.backref('sub_users', lazy='dynamic')
+    )
 
-    # Role constants
+    # Role constants (기존 호환성 유지)
     ROLE_ADMIN = 'admin'
     ROLE_MANAGER = 'manager'
     ROLE_EMPLOYEE = 'employee'
 
     VALID_ROLES = [ROLE_ADMIN, ROLE_MANAGER, ROLE_EMPLOYEE]
+
+    # Account type constants (Phase 1)
+    ACCOUNT_PERSONAL = 'personal'
+    ACCOUNT_CORPORATE = 'corporate'
+    ACCOUNT_EMPLOYEE_SUB = 'employee_sub'
+
+    VALID_ACCOUNT_TYPES = [ACCOUNT_PERSONAL, ACCOUNT_CORPORATE, ACCOUNT_EMPLOYEE_SUB]
+
+    ACCOUNT_TYPE_LABELS = {
+        ACCOUNT_PERSONAL: '개인',
+        ACCOUNT_CORPORATE: '법인',
+        ACCOUNT_EMPLOYEE_SUB: '법인직원',
+    }
 
     def set_password(self, password):
         """비밀번호 해싱 및 저장"""
@@ -68,6 +114,37 @@ class User(db.Model):
             return True
         return False
 
+    # Account type methods (Phase 1)
+    def is_personal_account(self):
+        """개인 계정 여부"""
+        return self.account_type == self.ACCOUNT_PERSONAL
+
+    def is_corporate_account(self):
+        """법인 계정 여부"""
+        return self.account_type == self.ACCOUNT_CORPORATE
+
+    def is_employee_sub_account(self):
+        """법인 하위 직원 계정 여부"""
+        return self.account_type == self.ACCOUNT_EMPLOYEE_SUB
+
+    def get_account_type_label(self):
+        """계정 유형 한글 라벨"""
+        return self.ACCOUNT_TYPE_LABELS.get(self.account_type, self.account_type)
+
+    def get_company(self):
+        """연결된 법인 정보 반환"""
+        if self.company_id:
+            return self.company
+        if self.parent_user_id and self.parent_user:
+            return self.parent_user.company
+        return None
+
+    def can_manage_company(self):
+        """법인 관리 권한 확인 (corporate 계정의 admin/manager)"""
+        if self.account_type != self.ACCOUNT_CORPORATE:
+            return False
+        return self.role in [self.ROLE_ADMIN, self.ROLE_MANAGER]
+
     def to_dict(self):
         """딕셔너리 변환 (비밀번호 제외)"""
         return {
@@ -77,6 +154,10 @@ class User(db.Model):
             'role': self.role,
             'employee_id': self.employee_id,
             'is_active': self.is_active,
+            'account_type': self.account_type,
+            'account_type_label': self.get_account_type_label(),
+            'company_id': self.company_id,
+            'parent_user_id': self.parent_user_id,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'last_login': self.last_login.isoformat() if self.last_login else None,
         }
@@ -90,10 +171,13 @@ class User(db.Model):
             role=data.get('role', cls.ROLE_EMPLOYEE),
             employee_id=data.get('employee_id'),
             is_active=data.get('is_active', True),
+            account_type=data.get('account_type', cls.ACCOUNT_CORPORATE),
+            company_id=data.get('company_id'),
+            parent_user_id=data.get('parent_user_id'),
         )
         if data.get('password'):
             user.set_password(data['password'])
         return user
 
     def __repr__(self):
-        return f'<User {self.username} ({self.role})>'
+        return f'<User {self.username} ({self.role}/{self.account_type})>'

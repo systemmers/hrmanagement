@@ -31,7 +31,8 @@ from app.models import (
     Salary, Benefit, Contract, SalaryHistory,
     Promotion, Evaluation, Training, Attendance,
     Insurance, Project, Award, Asset,
-    SalaryPayment, Attachment, SystemSetting
+    SalaryPayment, Attachment, SystemSetting,
+    Company  # Phase 1: Company model
 )
 
 # Alembic Config object
