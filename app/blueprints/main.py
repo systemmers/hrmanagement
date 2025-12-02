@@ -16,8 +16,15 @@ main_bp = Blueprint('main', __name__)
 def index():
     """대시보드 - 통계 및 정보
 
-    일반 직원(employee role)은 본인 인사카드로 리다이렉트
+    계정 유형에 따라 적절한 대시보드로 리다이렉트
     """
+    account_type = session.get('account_type')
+
+    # 개인 계정은 개인 대시보드로
+    if account_type == 'personal':
+        return redirect(url_for('personal.dashboard'))
+
+    # 법인 계정(corporate) 또는 직원 하위계정(employee_sub)인 경우
     # Employee role은 본인 인사카드로 리다이렉트
     if session.get('user_role') == 'employee':
         employee_id = session.get('employee_id')

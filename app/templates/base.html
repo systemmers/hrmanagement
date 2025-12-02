@@ -89,8 +89,31 @@
                 </div>
 
                 <nav class="sidebar-nav">
-                    {% if current_user and current_user.role == 'employee' %}
-                    {# ========== Employee 전용 사이드바 ========== #}
+                    {% if current_user and current_user.account_type == 'personal' %}
+                    {# ========== 개인 계정 전용 사이드바 ========== #}
+
+                    <!-- 내 정보 섹션 -->
+                    <div class="nav-section">
+                        <h2 class="nav-section-title">내 정보</h2>
+                        <a href="{{ url_for('personal.dashboard') }}"
+                           class="nav-item {% if request.endpoint == 'personal.dashboard' %}active{% endif %}">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>대시보드</span>
+                        </a>
+                        <a href="{{ url_for('personal.profile') }}"
+                           class="nav-item {% if request.endpoint == 'personal.profile' %}active{% endif %}">
+                            <i class="fas fa-user"></i>
+                            <span>프로필</span>
+                        </a>
+                        <a href="{{ url_for('personal.profile_edit') }}"
+                           class="nav-item {% if request.endpoint == 'personal.profile_edit' %}active{% endif %}">
+                            <i class="fas fa-user-edit"></i>
+                            <span>프로필 수정</span>
+                        </a>
+                    </div>
+
+                    {% elif current_user and current_user.role == 'employee' and current_user.employee_id %}
+                    {# ========== 법인 직원(Employee) 전용 사이드바 ========== #}
 
                     <!-- 내 정보 섹션 -->
                     <div class="nav-section">

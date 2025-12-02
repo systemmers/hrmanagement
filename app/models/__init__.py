@@ -29,6 +29,14 @@ from .user import User
 from .organization import Organization
 from .system_setting import SystemSetting
 from .company import Company
+from .personal_profile import (
+    PersonalProfile,
+    PersonalEducation,
+    PersonalCareer,
+    PersonalCertificate,
+    PersonalLanguage,
+    PersonalMilitaryService
+)
 
 __all__ = [
     'Employee',
@@ -57,4 +65,10 @@ __all__ = [
     'Organization',
     'SystemSetting',
     'Company',
+    'PersonalProfile',
+    'PersonalEducation',
+    'PersonalCareer',
+    'PersonalCertificate',
+    'PersonalLanguage',
+    'PersonalMilitaryService',
 ]

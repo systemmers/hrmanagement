@@ -27,6 +27,7 @@ def register_context_processors(app):
                 'employee_id': session.get('employee_id'),
                 'is_admin': session.get('user_role') == 'admin',
                 'is_manager': session.get('user_role') == 'manager',
+                'account_type': session.get('account_type'),  # Phase 2: 계정 유형
             }
             is_authenticated = True
 
