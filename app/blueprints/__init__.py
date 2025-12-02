@@ -18,6 +18,8 @@ def register_blueprints(app):
     from .corporate import corporate_bp  # Phase 1: 법인 계정
     from .personal import personal_bp  # Phase 2: 개인 계정
     from .contracts import contracts_bp  # Phase 3: 계약 관리
+    from .sync import sync_bp  # Phase 4: 데이터 동기화
+    from .audit import audit_bp  # Phase 4: 감사 로그
 
     # 인증 관련 (/auth/*)
     app.register_blueprint(auth_bp)
@@ -33,6 +35,12 @@ def register_blueprints(app):
 
     # 계약 관리 (/contracts/*) - Phase 3
     app.register_blueprint(contracts_bp)
+
+    # 데이터 동기화 (/api/sync/*) - Phase 4
+    app.register_blueprint(sync_bp)
+
+    # 감사 로그 (/api/audit/*) - Phase 4
+    app.register_blueprint(audit_bp)
 
     # 마이페이지 - 일반 직원용 (/my/*)
     app.register_blueprint(mypage_bp)

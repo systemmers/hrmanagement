@@ -5,5 +5,28 @@
 """
 
 from .ai_service import AIService
+from .sync_service import SyncService, sync_service
+from .termination_service import TerminationService, termination_service
+from .audit_service import AuditService, AuditLog, audit_service, audit_log
+from .event_listeners import (
+    SyncEventManager,
+    ContractEventManager,
+    init_event_listeners,
+    cleanup_event_listeners
+)
 
-__all__ = ['AIService']
+__all__ = [
+    'AIService',
+    'SyncService',
+    'sync_service',
+    'TerminationService',
+    'termination_service',
+    'AuditService',
+    'AuditLog',
+    'audit_service',
+    'audit_log',
+    'SyncEventManager',
+    'ContractEventManager',
+    'init_event_listeners',
+    'cleanup_event_listeners',
+]

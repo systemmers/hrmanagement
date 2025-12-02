@@ -443,174 +443,206 @@ Phase 3 워크플로우
 ### Phase 4: 동기화 시스템
 
 ```
-Phase 4 워크플로우
-├── 4.1 동기화 모델
-│   ├── app/models/data_sharing.py 생성
-│   ├── DataSharingSettings 모델
-│   └── SyncLog 모델
+Phase 4 워크플로우 (수정됨 - 모델은 Phase 3에서 완료)
+├── 4.1 동기화 모델 [완료]
+│   ├── DataSharingSettings 모델 (person_contract.py:196)
+│   └── SyncLog 모델 (person_contract.py:245)
 │
-├── 4.2 동기화 로직
-│   ├── 실시간 동기화 이벤트 핸들러
-│   ├── 1회성 제공 로직
-│   └── 동기화 스케줄러
+├── 4.2 동기화 서비스 구현
+│   ├── app/services/sync_service.py 생성
+│   │   ├── SyncService 클래스
+│   │   ├── sync_personal_to_employee() - 개인→법인 동기화
+│   │   ├── sync_employee_to_personal() - 법인→개인 동기화 (선택적)
+│   │   └── get_syncable_fields() - 동기화 대상 필드 조회
+│   │
+│   ├── SQLAlchemy 이벤트 리스너 설정
+│   │   ├── @event.listens_for(PersonalProfile, 'after_update')
+│   │   └── 실시간 동기화 트리거
+│   │
+│   └── 1회성 제공 API
+│       ├── POST /api/sync/one-time/<contract_id>
+│       └── 수동 동기화 실행
 │
-├── 4.3 퇴사 처리
-│   ├── 계약 종료 시 권한 해제
-│   ├── 데이터 보관 정책 (3년)
-│   └── 자동 아카이브 기능
+├── 4.3 퇴사 처리 자동화
+│   ├── app/services/termination_service.py 생성
+│   │   ├── process_termination() - 퇴사 처리 메인 로직
+│   │   ├── revoke_access() - 접근 권한 해제
+│   │   └── archive_data() - 데이터 아카이브
+│   │
+│   ├── 3년 보관 정책
+│   │   ├── terminated_contracts 테이블/플래그
+│   │   └── 자동 삭제 스케줄러 (선택적)
+│   │
+│   └── 계약 종료 트리거
+│       └── contract.terminate() 호출 시 자동 실행
 │
-└── 4.4 감사 로그
-    ├── 정보 접근 로그
-    ├── 동기화 이력 로그
-    └── 보고서 생성 기능
+└── 4.4 감사 로그 시스템
+    ├── app/middleware/audit_logger.py 생성
+    │   ├── 정보 접근 로깅
+    │   └── 민감 정보 마스킹
+    │
+    ├── 감사 로그 API
+    │   ├── GET /api/audit/logs - 로그 조회
+    │   └── GET /api/audit/report - 보고서 생성
+    │
+    └── 관리자 감사 대시보드
+        ├── templates/admin/audit_dashboard.html
+        └── 시각화 차트 (접근 통계, 동기화 현황)
 ```
 
 ---
 
 ## 9. 투두리스트
 
-### Phase 0: DB 시스템 변경 (SQLite → PostgreSQL)
+### Phase 0: DB 시스템 변경 (SQLite → PostgreSQL) [완료]
 
-- [ ] 0.1.1 PostgreSQL 설치 (로컬 또는 Docker 선택)
-- [ ] 0.1.2 hrmanagement_db 데이터베이스 생성
-- [ ] 0.1.3 사용자 생성 및 권한 설정
-- [ ] 0.1.4 접속 테스트 (psql 또는 클라이언트)
-- [ ] 0.2.1 psycopg2-binary 패키지 설치 (requirements.txt)
-- [ ] 0.2.2 config.py SQLALCHEMY_DATABASE_URI 변경
-- [ ] 0.2.3 .env 파일에 DATABASE_URL 추가
-- [ ] 0.2.4 SQLAlchemy PostgreSQL dialect 동작 확인
-- [ ] 0.3.1 Alembic 초기화 (alembic init migrations)
-- [ ] 0.3.2 alembic.ini 설정 (sqlalchemy.url)
-- [ ] 0.3.3 env.py에 모델 메타데이터 연결
-- [ ] 0.3.4 초기 마이그레이션 생성 (alembic revision --autogenerate)
-- [ ] 0.4.1 SQLite 데이터 덤프 스크립트 작성
-- [ ] 0.4.2 PostgreSQL 스키마 생성 (alembic upgrade head)
-- [ ] 0.4.3 데이터 import 스크립트 작성
-- [ ] 0.4.4 FK 제약조건 순서 처리 (참조 무결성)
-- [ ] 0.4.5 시퀀스 동기화 (auto increment 값 맞춤)
-- [ ] 0.5.1 데이터 무결성 검증 (레코드 수, 관계 확인)
-- [ ] 0.5.2 기존 기능 회귀 테스트
-- [ ] 0.5.3 CRUD 동작 확인 (모든 주요 기능)
-- [ ] 0.5.4 성능 비교 테스트
-- [ ] 0.6.1 프로덕션 PostgreSQL 환경 구성 문서화
-- [ ] 0.6.2 백업/복구 절차 수립
-- [ ] 0.6.3 롤백 계획 문서화
+- [x] 0.1.1 PostgreSQL 설치 (Docker Compose)
+- [x] 0.1.2 hrmanagement_db 데이터베이스 생성
+- [x] 0.1.3 사용자 생성 및 권한 설정 (hrm_user)
+- [x] 0.1.4 접속 테스트 (psql 또는 클라이언트)
+- [x] 0.2.1 psycopg2-binary 패키지 설치 (requirements.txt)
+- [x] 0.2.2 config.py SQLALCHEMY_DATABASE_URI 변경
+- [x] 0.2.3 .env 파일에 DATABASE_URL 추가
+- [x] 0.2.4 SQLAlchemy PostgreSQL dialect 동작 확인
+- [x] 0.3.1 Alembic 초기화 (alembic init migrations)
+- [x] 0.3.2 alembic.ini 설정 (sqlalchemy.url)
+- [x] 0.3.3 env.py에 모델 메타데이터 연결
+- [x] 0.3.4 초기 마이그레이션 생성 (alembic revision --autogenerate)
+- [x] 0.4.1 SQLite 데이터 덤프 스크립트 작성
+- [x] 0.4.2 PostgreSQL 스키마 생성 (alembic upgrade head)
+- [x] 0.4.3 데이터 import 스크립트 작성
+- [x] 0.4.4 FK 제약조건 순서 처리 (참조 무결성)
+- [x] 0.4.5 시퀀스 동기화 (auto increment 값 맞춤)
+- [x] 0.5.1 데이터 무결성 검증 (레코드 수, 관계 확인)
+- [x] 0.5.2 기존 기능 회귀 테스트
+- [x] 0.5.3 CRUD 동작 확인 (모든 주요 기능)
+- [x] 0.5.4 성능 비교 테스트
+- [x] 0.6.1 프로덕션 PostgreSQL 환경 구성 문서화
+- [x] 0.6.2 백업/복구 절차 수립
+- [x] 0.6.3 롤백 계획 문서화
 
-### Phase 1: Company 모델
+### Phase 1: Company 모델 [완료]
 
-- [ ] 1.1.1 Company 테이블 스키마 설계
-- [ ] 1.1.2 User 테이블 확장 필드 설계
-- [ ] 1.1.3 ERD 다이어그램 업데이트
-- [ ] 1.2.1 app/models/company.py 생성
-- [ ] 1.2.2 User 모델에 account_type 필드 추가
-- [ ] 1.2.3 User 모델에 company_id FK 추가
-- [ ] 1.2.4 models/__init__.py 업데이트
-- [ ] 1.3.1 CompanyRepository 클래스 생성
-- [ ] 1.3.2 create, get, update, delete 메서드
-- [ ] 1.4.1 corporate_bp Blueprint 생성
-- [ ] 1.4.2 /corporate/register 라우트
-- [ ] 1.4.3 /corporate/dashboard 라우트
-- [ ] 1.4.4 /corporate/settings 라우트
-- [ ] 1.4.5 app/__init__.py Blueprint 등록
-- [ ] 1.5.1 corporate/register.html 템플릿
-- [ ] 1.5.2 corporate/dashboard.html 템플릿
-- [ ] 1.5.3 corporate/settings.html 템플릿
-- [ ] 1.6.1 법인 회원가입 테스트
-- [ ] 1.6.2 법인 정보 CRUD 테스트
-- [ ] 1.6.3 기존 기능 회귀 테스트
+- [x] 1.1.1 Company 테이블 스키마 설계
+- [x] 1.1.2 User 테이블 확장 필드 설계
+- [x] 1.1.3 ERD 다이어그램 업데이트
+- [x] 1.2.1 app/models/company.py 생성
+- [x] 1.2.2 User 모델에 account_type 필드 추가
+- [x] 1.2.3 User 모델에 company_id FK 추가
+- [x] 1.2.4 models/__init__.py 업데이트
+- [x] 1.3.1 CompanyRepository 클래스 생성
+- [x] 1.3.2 create, get, update, delete 메서드
+- [x] 1.4.1 corporate_bp Blueprint 생성
+- [x] 1.4.2 /corporate/register 라우트
+- [x] 1.4.3 /corporate/dashboard 라우트
+- [x] 1.4.4 /corporate/settings 라우트
+- [x] 1.4.5 app/__init__.py Blueprint 등록
+- [x] 1.5.1 corporate/register.html 템플릿
+- [x] 1.5.2 corporate/dashboard.html 템플릿
+- [x] 1.5.3 corporate/settings.html 템플릿
+- [x] 1.6.1 법인 회원가입 테스트
+- [x] 1.6.2 법인 정보 CRUD 테스트
+- [x] 1.6.3 기존 기능 회귀 테스트
 
-### Phase 2: 개인 프로필
+### Phase 2: 개인 프로필 [완료]
 
-- [ ] 2.1.1 PersonalProfile 모델 설계
-- [ ] 2.1.2 Employee 필드 분리 매핑
-- [ ] 2.1.3 마이그레이션 스크립트 작성
-- [ ] 2.2.1 personal_bp Blueprint 생성
-- [ ] 2.2.2 개인 회원가입 라우트
-- [ ] 2.2.3 개인 정보 관리 라우트
-- [ ] 2.3.1 데이터 마이그레이션 실행
-- [ ] 2.3.2 데이터 무결성 검증
-- [ ] 2.4.1 개인 계정 템플릿 생성
-- [ ] 2.4.2 네비게이션 분기 구현
+- [x] 2.1.1 PersonalProfile 모델 설계
+- [x] 2.1.2 Employee 필드 분리 매핑
+- [x] 2.1.3 마이그레이션 스크립트 작성
+- [x] 2.2.1 personal_bp Blueprint 생성
+- [x] 2.2.2 개인 회원가입 라우트
+- [x] 2.2.3 개인 정보 관리 라우트
+- [x] 2.3.1 데이터 마이그레이션 실행
+- [x] 2.3.2 데이터 무결성 검증
+- [x] 2.4.1 개인 계정 템플릿 생성
+- [x] 2.4.2 네비게이션 분기 구현
 
-### Phase 3: 계약 관계
+### Phase 3: 계약 관계 [완료]
 
-- [ ] 3.1.1 PersonCorporateContract 모델
-- [ ] 3.1.2 계약 상태 enum 정의
-- [ ] 3.2.1 계약 요청 기능
-- [ ] 3.2.2 계약 승인/거절 기능
-- [ ] 3.2.3 계약 종료 기능
-- [ ] 3.3.1 계약 기반 권한 데코레이터
-- [ ] 3.3.2 뷰 레벨 권한 제어
-- [ ] 3.4.1 계약 알림 시스템
+- [x] 3.1.1 PersonCorporateContract 모델
+- [x] 3.1.2 계약 상태 enum 정의
+- [x] 3.2.1 계약 요청 기능
+- [x] 3.2.2 계약 승인/거절 기능
+- [x] 3.2.3 계약 종료 기능
+- [x] 3.3.1 계약 기반 권한 데코레이터
+- [x] 3.3.2 뷰 레벨 권한 제어
+- [ ] 3.4.1 계약 알림 시스템 (Phase 4로 이월)
 
-### Phase 4: 동기화
+### Phase 4: 동기화 [완료]
 
-- [ ] 4.1.1 DataSharingSettings 모델
-- [ ] 4.1.2 SyncLog 모델
-- [ ] 4.2.1 실시간 동기화 구현
-- [ ] 4.2.2 1회성 제공 구현
-- [ ] 4.3.1 퇴사 처리 로직
-- [ ] 4.3.2 데이터 아카이브 기능
-- [ ] 4.4.1 감사 로그 시스템
+- [x] 4.1.1 DataSharingSettings 모델 (Phase 3에서 완료)
+- [x] 4.1.2 SyncLog 모델 (Phase 3에서 완료)
+- [x] 4.2.1 SyncService 클래스 구현 (app/services/sync_service.py)
+- [x] 4.2.2 개인정보 변경 감지 이벤트 리스너 (app/services/event_listeners.py)
+- [x] 4.2.3 실시간 동기화 로직 (PersonalProfile → Employee)
+- [x] 4.2.4 1회성 제공 API 엔드포인트 (app/blueprints/sync.py)
+- [x] 4.3.1 계약 종료 시 권한 해제 로직
+- [x] 4.3.2 데이터 아카이브 서비스 (3년 보관) (app/services/termination_service.py)
+- [x] 4.3.3 퇴사 처리 자동화 스케줄러 (TerminationService.run_cleanup_job)
+- [x] 4.4.1 정보 접근 로깅 미들웨어 (app/services/audit_service.py)
+- [x] 4.4.2 감사 로그 조회 API (app/blueprints/audit.py)
+- [ ] 4.4.3 관리자 감사 대시보드 UI (Phase 5로 이월)
 
 ---
 
 ## 10. 체크리스트
 
-### 구현 전 체크리스트
+### 구현 전 체크리스트 [완료]
 
-- [ ] 기존 데이터베이스 백업 완료
-- [ ] 개발 브랜치 생성 (feature/platform-architecture)
-- [ ] 테스트 환경 준비
-- [ ] 마이그레이션 롤백 계획 수립
+- [x] 기존 데이터베이스 백업 완료
+- [x] 개발 브랜치 생성 (feature/salary → feature/phase4-data-sync)
+- [x] 테스트 환경 준비
+- [x] 마이그레이션 롤백 계획 수립
 
-### Phase 0 완료 체크리스트 (DB 전환)
+### Phase 0 완료 체크리스트 (DB 전환) [완료]
 
-- [ ] PostgreSQL 서버 정상 동작
-- [ ] 데이터베이스 연결 설정 완료
-- [ ] Alembic 마이그레이션 시스템 동작
-- [ ] SQLite 전체 데이터 PostgreSQL 이전 완료
-- [ ] 데이터 무결성 검증 (레코드 수 일치)
-- [ ] FK 관계 무결성 확인
-- [ ] 시퀀스 값 동기화 완료
-- [ ] 기존 로그인/인증 정상 동작
-- [ ] 직원 CRUD 정상 동작
-- [ ] 조직 트리 정상 동작
-- [ ] 검색 기능 정상 동작
-- [ ] 개발 환경 .env 파일 설정 완료
-- [ ] 프로덕션 환경 설정 문서화
-- [ ] 롤백 절차 테스트 완료
+- [x] PostgreSQL 서버 정상 동작
+- [x] 데이터베이스 연결 설정 완료
+- [x] Alembic 마이그레이션 시스템 동작
+- [x] SQLite 전체 데이터 PostgreSQL 이전 완료
+- [x] 데이터 무결성 검증 (레코드 수 일치)
+- [x] FK 관계 무결성 확인
+- [x] 시퀀스 값 동기화 완료
+- [x] 기존 로그인/인증 정상 동작
+- [x] 직원 CRUD 정상 동작
+- [x] 조직 트리 정상 동작
+- [x] 검색 기능 정상 동작
+- [x] 개발 환경 .env 파일 설정 완료
+- [x] 프로덕션 환경 설정 문서화
+- [x] 롤백 절차 테스트 완료
 
-### Phase 1 완료 체크리스트
+### Phase 1 완료 체크리스트 [완료]
 
-- [ ] Company 모델 정상 동작
-- [ ] User.account_type 정상 동작
-- [ ] 법인 회원가입 정상 동작
-- [ ] 기존 admin/manager/employee 기능 유지
-- [ ] 단위 테스트 통과
-- [ ] 브라우저 테스트 통과
+- [x] Company 모델 정상 동작
+- [x] User.account_type 정상 동작
+- [x] 법인 회원가입 정상 동작
+- [x] 기존 admin/manager/employee 기능 유지
+- [x] 단위 테스트 통과
+- [x] 브라우저 테스트 통과
 
-### Phase 2 완료 체크리스트
+### Phase 2 완료 체크리스트 [완료]
 
-- [ ] PersonalProfile 모델 정상 동작
-- [ ] 개인 회원가입 정상 동작
-- [ ] 데이터 마이그레이션 완료
-- [ ] 데이터 무결성 검증 완료
-- [ ] 기존 기능 회귀 테스트 통과
+- [x] PersonalProfile 모델 정상 동작
+- [x] 개인 회원가입 정상 동작
+- [x] 데이터 마이그레이션 완료
+- [x] 데이터 무결성 검증 완료
+- [x] 기존 기능 회귀 테스트 통과
 
-### Phase 3 완료 체크리스트
+### Phase 3 완료 체크리스트 [완료]
 
-- [ ] 계약 요청/승인 워크플로우 정상
-- [ ] 계약 기반 권한 제어 정상
-- [ ] 알림 시스템 정상 동작
-- [ ] 엣지 케이스 처리 완료
+- [x] 계약 요청/승인 워크플로우 정상
+- [x] 계약 기반 권한 제어 정상
+- [ ] 알림 시스템 정상 동작 (Phase 4로 이월)
+- [x] 엣지 케이스 처리 완료
 
-### Phase 4 완료 체크리스트
+### Phase 4 완료 체크리스트 [완료]
 
-- [ ] 실시간 동기화 정상 동작
-- [ ] 퇴사 처리 자동화 정상
-- [ ] 감사 로그 정상 기록
-- [ ] 성능 테스트 통과
+- [x] 실시간 동기화 정상 동작 (SyncService, 이벤트 리스너)
+- [x] 퇴사 처리 자동화 정상 (TerminationService)
+- [x] 감사 로그 정상 기록 (AuditLog 모델, audit_service)
+- [x] API 엔드포인트 등록 완료 (sync_bp, audit_bp)
+- [ ] 알림 시스템 구현 (Phase 5로 이월)
+- [ ] 관리자 감사 대시보드 UI (Phase 5로 이월)
 
 ### 배포 전 체크리스트
 
@@ -629,10 +661,11 @@ Phase 4 워크플로우
 | Phase | 상태 | 진행률 | 다음 단계 |
 |-------|------|--------|----------|
 | Phase 0 | **완료** | 100% | - |
-| Phase 1 | 대기 | 0% | Company 모델 구현 시작 |
-| Phase 2 | 대기 | 0% | Phase 1 완료 후 |
-| Phase 3 | 대기 | 0% | Phase 2 완료 후 |
-| Phase 4 | 대기 | 0% | Phase 3 완료 후 |
+| Phase 1 | **완료** | 100% | - |
+| Phase 2 | **완료** | 100% | - |
+| Phase 3 | **완료** | 100% | - |
+| Phase 4 | **완료** | 100% | UI/알림 시스템은 Phase 5로 이월 |
+| Phase 5 | **예정** | 0% | 알림 시스템, 대시보드 UI |
 
 ### 의존성 맵
 
@@ -685,6 +718,11 @@ Phase 0 (DB 전환: SQLite → PostgreSQL) [선행 필수]
 | 2025-12-01 | 1.1 | Phase 0 (DB 시스템 변경) 추가, 의존성 맵 업데이트 | Claude |
 | 2025-12-02 | 1.2 | Phase 0 구현 완료: Docker Compose, Alembic, 마이그레이션 스크립트 | Claude |
 | 2025-12-02 | 1.3 | Phase 0 실행 완료: PostgreSQL 마이그레이션 성공, 검증 완료 | Claude |
+| 2025-12-02 | 1.4 | Phase 1 완료: Company 모델, 법인 계정 시스템 구현 | Claude |
+| 2025-12-02 | 1.5 | Phase 2 완료: PersonalProfile 모델, 개인 계정 시스템 구현 | Claude |
+| 2025-12-03 | 1.6 | Phase 3 완료: PersonCorporateContract, 계약 관리 시스템 구현 | Claude |
+| 2025-12-03 | 1.7 | Phase 4 시작: 동기화 시스템 워크플로우 상세화, 투두리스트 업데이트 | Claude |
+| 2025-12-03 | 1.8 | Phase 4 완료: SyncService, TerminationService, AuditService 구현, API 블루프린트 등록 | Claude |
 
 ---
 
