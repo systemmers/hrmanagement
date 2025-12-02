@@ -1,3 +1,7 @@
+- note
+- setting
+- rules
+
 
 # Github
 - git : https://github.com/systemmers/hrmanagement.git
