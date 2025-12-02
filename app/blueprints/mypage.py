@@ -69,7 +69,7 @@ def company_info():
     attendance_summary = attendance_repo.get_summary_by_employee(employee_id, 2025)
     asset_list = asset_repo.get_by_employee_id(employee_id)
 
-    return render_template('employee_detail.html',
+    return render_template('mypage/company_info.html',
                            employee=employee,
                            company_info=company_data,
                            salary=salary,

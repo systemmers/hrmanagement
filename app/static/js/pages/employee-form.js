@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initSectionNavigation();
     initDynamicFields();
     initPhotoPreview();
+    initProfilePhotoUpload();
+    initBusinessCardUpload();
     initFormValidation();
     initAddressSearch();
     initFileUpload();
@@ -356,13 +358,16 @@ function getProjectTemplate() {
 }
 
 /**
- * 사진 미리보기
+ * 사진 미리보기 (URL 입력용 - 신규 등록 모드)
  */
 function initPhotoPreview() {
     const photoInput = document.getElementById('photo');
     const photoPreview = document.getElementById('photoPreview');
 
     if (!photoInput || !photoPreview) return;
+
+    // URL 타입 input인 경우만 처리 (신규 등록 모드)
+    if (photoInput.type !== 'url') return;
 
     photoInput.addEventListener('input', (e) => {
         const url = e.target.value.trim();
@@ -390,6 +395,407 @@ function initPhotoPreview() {
             `;
         }
     });
+}
+
+/**
+ * 프로필 사진 파일 업로드 초기화 (수정 모드)
+ */
+function initProfilePhotoUpload() {
+    const selectPhotoBtn = document.getElementById('selectPhotoBtn');
+    const deletePhotoBtn = document.getElementById('deletePhotoBtn');
+    const photoFileInput = document.getElementById('photoFile');
+    const photoHiddenInput = document.getElementById('photo');
+    const photoPreview = document.getElementById('photoPreview');
+
+    if (!selectPhotoBtn || !photoFileInput) return;
+
+    // 직원 ID 추출
+    const employeeId = getEmployeeIdFromForm();
+    if (!employeeId) return;
+
+    // 사진 선택 버튼 클릭
+    selectPhotoBtn.addEventListener('click', () => {
+        photoFileInput.click();
+    });
+
+    // 파일 선택 시 업로드
+    photoFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // 파일 유효성 검사
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            showToast('이미지 파일만 업로드 가능합니다. (JPG, PNG, GIF, WebP)', 'error');
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            showToast('파일 크기가 5MB를 초과합니다.', 'error');
+            return;
+        }
+
+        // 업로드 진행
+        try {
+            selectPhotoBtn.disabled = true;
+            selectPhotoBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 업로드 중...';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch(`/api/employees/${employeeId}/profile-photo`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // 미리보기 업데이트
+                photoPreview.innerHTML = `<img src="${result.file_path}" alt="프로필 사진" id="previewImage">`;
+                if (photoHiddenInput) {
+                    photoHiddenInput.value = result.file_path;
+                }
+
+                // 삭제 버튼 추가
+                addDeletePhotoButton();
+
+                showToast('프로필 사진이 업로드되었습니다.', 'success');
+            } else {
+                showToast(result.error || '업로드 실패', 'error');
+            }
+        } catch (error) {
+            console.error('Profile photo upload error:', error);
+            showToast('업로드 중 오류가 발생했습니다.', 'error');
+        } finally {
+            selectPhotoBtn.disabled = false;
+            selectPhotoBtn.innerHTML = '<i class="fas fa-camera"></i> 사진 선택';
+            photoFileInput.value = '';
+        }
+    });
+
+    // 삭제 버튼 이벤트
+    if (deletePhotoBtn) {
+        deletePhotoBtn.addEventListener('click', async () => {
+            if (!confirm('프로필 사진을 삭제하시겠습니까?')) return;
+
+            try {
+                deletePhotoBtn.disabled = true;
+
+                const response = await fetch(`/api/employees/${employeeId}/profile-photo`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // 미리보기 초기화
+                    photoPreview.innerHTML = `
+                        <div class="photo-placeholder" id="photoPlaceholder">
+                            <i class="fas fa-user"></i>
+                            <span>사진 미등록</span>
+                        </div>
+                    `;
+                    if (photoHiddenInput) {
+                        photoHiddenInput.value = '';
+                    }
+                    deletePhotoBtn.remove();
+                    showToast('프로필 사진이 삭제되었습니다.', 'success');
+                } else {
+                    showToast(result.error || '삭제 실패', 'error');
+                }
+            } catch (error) {
+                console.error('Profile photo delete error:', error);
+                showToast('삭제 중 오류가 발생했습니다.', 'error');
+            } finally {
+                deletePhotoBtn.disabled = false;
+            }
+        });
+    }
+}
+
+/**
+ * 삭제 버튼 동적 추가
+ */
+function addDeletePhotoButton() {
+    const buttonsContainer = document.querySelector('.photo-upload-buttons');
+    if (!buttonsContainer) return;
+
+    // 이미 삭제 버튼이 있으면 무시
+    if (document.getElementById('deletePhotoBtn')) return;
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.type = 'button';
+    deleteBtn.id = 'deletePhotoBtn';
+    deleteBtn.className = 'btn btn-outline-danger btn-sm';
+    deleteBtn.innerHTML = '<i class="fas fa-trash"></i> 삭제';
+
+    const employeeId = getEmployeeIdFromForm();
+
+    deleteBtn.addEventListener('click', async () => {
+        if (!confirm('프로필 사진을 삭제하시겠습니까?')) return;
+
+        try {
+            deleteBtn.disabled = true;
+
+            const response = await fetch(`/api/employees/${employeeId}/profile-photo`, {
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                const photoPreview = document.getElementById('photoPreview');
+                const photoHiddenInput = document.getElementById('photo');
+
+                photoPreview.innerHTML = `
+                    <div class="photo-placeholder" id="photoPlaceholder">
+                        <i class="fas fa-user"></i>
+                        <span>사진 미등록</span>
+                    </div>
+                `;
+                if (photoHiddenInput) {
+                    photoHiddenInput.value = '';
+                }
+                deleteBtn.remove();
+                showToast('프로필 사진이 삭제되었습니다.', 'success');
+            } else {
+                showToast(result.error || '삭제 실패', 'error');
+            }
+        } catch (error) {
+            console.error('Profile photo delete error:', error);
+            showToast('삭제 중 오류가 발생했습니다.', 'error');
+        } finally {
+            deleteBtn.disabled = false;
+        }
+    });
+
+    buttonsContainer.appendChild(deleteBtn);
+}
+
+/**
+ * 명함 업로드 초기화
+ */
+function initBusinessCardUpload() {
+    const frontFileInput = document.getElementById('businessCardFrontFile');
+    const backFileInput = document.getElementById('businessCardBackFile');
+
+    if (!frontFileInput && !backFileInput) return;
+
+    const employeeId = getEmployeeIdFromForm();
+    if (!employeeId) return;
+
+    // 앞면 업로드
+    if (frontFileInput) {
+        frontFileInput.addEventListener('change', (e) => handleBusinessCardUpload(e, 'front', employeeId));
+    }
+
+    // 뒷면 업로드
+    if (backFileInput) {
+        backFileInput.addEventListener('change', (e) => handleBusinessCardUpload(e, 'back', employeeId));
+    }
+
+    // 삭제 버튼 이벤트
+    document.querySelectorAll('.delete-card-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const side = btn.dataset.side;
+            if (!confirm(`명함 ${side === 'front' ? '앞면' : '뒷면'}을 삭제하시겠습니까?`)) return;
+
+            try {
+                btn.disabled = true;
+
+                const response = await fetch(`/api/employees/${employeeId}/business-card/${side}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const previewId = side === 'front' ? 'businessCardFrontPreview' : 'businessCardBackPreview';
+                    const preview = document.getElementById(previewId);
+                    if (preview) {
+                        preview.innerHTML = `
+                            <div class="card-placeholder">
+                                <i class="fas fa-id-card"></i>
+                                <span>${side === 'front' ? '앞면' : '뒷면'} 미등록</span>
+                            </div>
+                        `;
+                    }
+                    btn.remove();
+                    showToast(`명함 ${side === 'front' ? '앞면' : '뒷면'}이 삭제되었습니다.`, 'success');
+                } else {
+                    showToast(result.error || '삭제 실패', 'error');
+                }
+            } catch (error) {
+                console.error('Business card delete error:', error);
+                showToast('삭제 중 오류가 발생했습니다.', 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    });
+}
+
+/**
+ * 명함 업로드 처리
+ */
+async function handleBusinessCardUpload(e, side, employeeId) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // 파일 유효성 검사
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+        showToast('이미지 파일만 업로드 가능합니다. (JPG, PNG, GIF, WebP)', 'error');
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        showToast('파일 크기가 5MB를 초과합니다.', 'error');
+        return;
+    }
+
+    const previewId = side === 'front' ? 'businessCardFrontPreview' : 'businessCardBackPreview';
+    const preview = document.getElementById(previewId);
+
+    try {
+        if (preview) {
+            preview.innerHTML = '<div class="card-loading"><i class="fas fa-spinner fa-spin"></i></div>';
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('side', side);
+
+        const response = await fetch(`/api/employees/${employeeId}/business-card`, {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            if (preview) {
+                preview.innerHTML = `<img src="${result.file_path}" alt="명함 ${side === 'front' ? '앞면' : '뒷면'}">`;
+            }
+
+            // 삭제 버튼 추가
+            addBusinessCardDeleteButton(side, employeeId);
+
+            showToast(`명함 ${side === 'front' ? '앞면' : '뒷면'}이 업로드되었습니다.`, 'success');
+        } else {
+            if (preview) {
+                preview.innerHTML = `
+                    <div class="card-placeholder">
+                        <i class="fas fa-id-card"></i>
+                        <span>${side === 'front' ? '앞면' : '뒷면'} 미등록</span>
+                    </div>
+                `;
+            }
+            showToast(result.error || '업로드 실패', 'error');
+        }
+    } catch (error) {
+        console.error('Business card upload error:', error);
+        if (preview) {
+            preview.innerHTML = `
+                <div class="card-placeholder">
+                    <i class="fas fa-id-card"></i>
+                    <span>${side === 'front' ? '앞면' : '뒷면'} 미등록</span>
+                </div>
+            `;
+        }
+        showToast('업로드 중 오류가 발생했습니다.', 'error');
+    } finally {
+        e.target.value = '';
+    }
+}
+
+/**
+ * 명함 삭제 버튼 동적 추가
+ */
+function addBusinessCardDeleteButton(side, employeeId) {
+    const item = document.querySelector(`.business-card-item[data-side="${side}"]`);
+    if (!item) return;
+
+    const actionsContainer = item.querySelector('.card-actions');
+    if (!actionsContainer) return;
+
+    // 이미 삭제 버튼이 있으면 무시
+    if (actionsContainer.querySelector('.delete-card-btn')) return;
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.type = 'button';
+    deleteBtn.className = 'btn btn-outline-danger btn-sm delete-card-btn';
+    deleteBtn.dataset.side = side;
+    deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+
+    deleteBtn.addEventListener('click', async () => {
+        if (!confirm(`명함 ${side === 'front' ? '앞면' : '뒷면'}을 삭제하시겠습니까?`)) return;
+
+        try {
+            deleteBtn.disabled = true;
+
+            const response = await fetch(`/api/employees/${employeeId}/business-card/${side}`, {
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                const previewId = side === 'front' ? 'businessCardFrontPreview' : 'businessCardBackPreview';
+                const preview = document.getElementById(previewId);
+                if (preview) {
+                    preview.innerHTML = `
+                        <div class="card-placeholder">
+                            <i class="fas fa-id-card"></i>
+                            <span>${side === 'front' ? '앞면' : '뒷면'} 미등록</span>
+                        </div>
+                    `;
+                }
+                deleteBtn.remove();
+                showToast(`명함 ${side === 'front' ? '앞면' : '뒷면'}이 삭제되었습니다.`, 'success');
+            } else {
+                showToast(result.error || '삭제 실패', 'error');
+            }
+        } catch (error) {
+            console.error('Business card delete error:', error);
+            showToast('삭제 중 오류가 발생했습니다.', 'error');
+        } finally {
+            deleteBtn.disabled = false;
+        }
+    });
+
+    actionsContainer.appendChild(deleteBtn);
+}
+
+/**
+ * 폼에서 직원 ID 추출
+ */
+function getEmployeeIdFromForm() {
+    const form = document.getElementById('employeeForm');
+    if (!form) return null;
+
+    const actionUrl = form.getAttribute('action');
+    const match = actionUrl.match(/\/employees\/(\d+)\/update/);
+    return match ? parseInt(match[1], 10) : null;
+}
+
+/**
+ * Toast 메시지 표시
+ */
+function showToast(message, type = 'info') {
+    // Toast 컴포넌트가 있으면 사용
+    if (typeof Toast !== 'undefined' && Toast.show) {
+        Toast.show(message, type);
+        return;
+    }
+
+    // 기본 alert 대체
+    if (type === 'error') {
+        alert('오류: ' + message);
+    } else {
+        alert(message);
+    }
 }
 
 /**

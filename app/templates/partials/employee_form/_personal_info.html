@@ -1,6 +1,7 @@
 {#
     직원 폼 - 개인 기본정보 섹션
     employee: 직원 객체 (수정 모드일 때)
+    action: 'create' 또는 'update'
 #}
 <section class="form-section" id="personal-info">
     <div class="card">
@@ -17,20 +18,124 @@
                     {% if employee and employee.photo %}
                     <img src="{{ employee.photo }}" alt="프로필 사진" id="previewImage">
                     {% else %}
-                    <div class="photo-placeholder">
+                    <div class="photo-placeholder" id="photoPlaceholder">
                         <i class="fas fa-user"></i>
                         <span>사진 미등록</span>
                     </div>
                     {% endif %}
                 </div>
                 <div class="photo-upload-controls">
-                    <label for="photo" class="form-label">프로필 사진 URL</label>
-                    <input type="url" id="photo" name="photo" class="form-input"
-                           value="{{ employee.photo if employee else 'https://i.pravatar.cc/150' }}"
-                           placeholder="https://example.com/photo.jpg">
-                    <small class="form-help">URL을 입력하거나 기본 이미지를 사용합니다.</small>
+                    {% if action == 'update' and employee %}
+                    {# 수정 모드: 파일 업로드 #}
+                    <label class="form-label">프로필 사진</label>
+                    <div class="photo-file-upload" id="photoFileUpload">
+                        <input type="file" id="photoFile" name="photoFile"
+                               accept="image/jpeg,image/png,image/gif,image/webp"
+                               class="form-input-file" style="display: none;">
+                        <input type="hidden" id="photo" name="photo" value="{{ employee.photo if employee else '' }}">
+                        <div class="photo-upload-buttons">
+                            <button type="button" class="btn btn-secondary btn-sm" id="selectPhotoBtn">
+                                <i class="fas fa-camera"></i> 사진 선택
+                            </button>
+                            {% if employee and employee.photo and not employee.photo.startswith('http') %}
+                            <button type="button" class="btn btn-outline-danger btn-sm" id="deletePhotoBtn">
+                                <i class="fas fa-trash"></i> 삭제
+                            </button>
+                            {% endif %}
+                        </div>
+                        <small class="form-help">JPG, PNG, GIF, WebP (최대 5MB)</small>
+                    </div>
+                    {% else %}
+                    {# 신규 등록 모드: 비활성화 안내 #}
+                    <label class="form-label">프로필 사진</label>
+                    <div class="photo-upload-disabled">
+                        <div class="disabled-message">
+                            <i class="fas fa-info-circle"></i>
+                            <span>직원 등록 완료 후 사진을 업로드할 수 있습니다.</span>
+                        </div>
+                        <input type="hidden" id="photo" name="photo" value="https://i.pravatar.cc/150">
+                    </div>
+                    {% endif %}
                 </div>
             </div>
+
+            {# 명함 영역 (수정 모드에서만 표시) #}
+            {% if action == 'update' and employee %}
+            <div class="business-card-section" id="businessCardSection">
+                <label class="form-label">명함</label>
+                <div class="business-card-upload-area">
+                    <div class="business-card-grid">
+                        {# 앞면 #}
+                        <div class="business-card-item" data-side="front">
+                            <div class="card-label">앞면</div>
+                            <div class="card-preview" id="businessCardFrontPreview">
+                                {% if business_card_front %}
+                                <img src="{{ business_card_front.file_path }}" alt="명함 앞면">
+                                {% else %}
+                                <div class="card-placeholder">
+                                    <i class="fas fa-id-card"></i>
+                                    <span>앞면 미등록</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-actions">
+                                <input type="file" id="businessCardFrontFile"
+                                       accept="image/jpeg,image/png,image/gif,image/webp"
+                                       style="display: none;">
+                                <button type="button" class="btn btn-secondary btn-sm"
+                                        onclick="document.getElementById('businessCardFrontFile').click()">
+                                    <i class="fas fa-upload"></i> 업로드
+                                </button>
+                                {% if business_card_front %}
+                                <button type="button" class="btn btn-outline-danger btn-sm delete-card-btn"
+                                        data-side="front">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {# 뒷면 #}
+                        <div class="business-card-item" data-side="back">
+                            <div class="card-label">뒷면</div>
+                            <div class="card-preview" id="businessCardBackPreview">
+                                {% if business_card_back %}
+                                <img src="{{ business_card_back.file_path }}" alt="명함 뒷면">
+                                {% else %}
+                                <div class="card-placeholder">
+                                    <i class="fas fa-id-card"></i>
+                                    <span>뒷면 미등록</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-actions">
+                                <input type="file" id="businessCardBackFile"
+                                       accept="image/jpeg,image/png,image/gif,image/webp"
+                                       style="display: none;">
+                                <button type="button" class="btn btn-secondary btn-sm"
+                                        onclick="document.getElementById('businessCardBackFile').click()">
+                                    <i class="fas fa-upload"></i> 업로드
+                                </button>
+                                {% if business_card_back %}
+                                <button type="button" class="btn btn-outline-danger btn-sm delete-card-btn"
+                                        data-side="back">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <small class="form-help">JPG, PNG, GIF, WebP (최대 5MB)</small>
+                </div>
+            </div>
+            {% elif action == 'create' %}
+            <div class="business-card-section disabled">
+                <label class="form-label">명함</label>
+                <div class="disabled-message">
+                    <i class="fas fa-info-circle"></i>
+                    <span>직원 등록 완료 후 명함을 업로드할 수 있습니다.</span>
+                </div>
+            </div>
+            {% endif %}
 
             <div class="form-grid">
                 <div class="form-group">

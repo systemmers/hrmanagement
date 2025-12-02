@@ -47,6 +47,16 @@ def data_table_demo():
     return render_template('examples/data_table_demo.html')
 
 
+@main_bp.route('/examples/styleguide')
+@login_required
+def styleguide():
+    """스타일 가이드 페이지
+
+    프로젝트의 모든 UI 컴포넌트와 디자인 시스템을 문서화합니다.
+    """
+    return render_template('examples/styleguide.html')
+
+
 @main_bp.route('/search')
 def search():
     """직원 검색"""

@@ -84,9 +84,193 @@
     border-top: 1px solid var(--color-gray-200);
 }
 
+/* ========================================
+   프로필 사진 업로드 섹션
+   ======================================== */
+
+.photo-upload-section {
+    display: flex;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.photo-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background-color: var(--color-gray-100);
+    border: 2px solid var(--color-gray-200);
+    flex-shrink: 0;
+}
+
+.photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-gray-400);
+    gap: var(--space-2);
+}
+
+.photo-placeholder i {
+    font-size: var(--text-3xl);
+}
+
+.photo-placeholder span {
+    font-size: var(--text-xs);
+}
+
+.photo-upload-controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.photo-file-upload {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.photo-upload-buttons {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.photo-upload-disabled {
+    padding: var(--space-4);
+    background-color: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    border: 1px dashed var(--color-gray-300);
+}
+
+.disabled-message {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-gray-500);
+    font-size: var(--text-sm);
+}
+
+.disabled-message i {
+    color: var(--color-blue-500);
+}
+
+/* ========================================
+   명함 업로드 섹션
+   ======================================== */
+
+.business-card-section {
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.business-card-section.disabled {
+    opacity: 0.6;
+}
+
+.business-card-upload-area {
+    margin-top: var(--space-3);
+}
+
+.business-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-2);
+}
+
+.business-card-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.card-label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-gray-600);
+}
+
+.card-preview {
+    width: 100%;
+    aspect-ratio: 1.8 / 1;
+    background-color: var(--color-gray-100);
+    border: 2px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    color: var(--color-gray-400);
+}
+
+.card-placeholder i {
+    font-size: var(--text-2xl);
+}
+
+.card-placeholder span {
+    font-size: var(--text-xs);
+}
+
+.card-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.card-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-gray-400);
+    font-size: var(--text-xl);
+}
+
 /* 반응형 */
 @media (max-width: 767px) {
     .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .photo-upload-section {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .photo-upload-controls {
+        align-items: center;
+    }
+
+    .business-card-grid {
         grid-template-columns: 1fr;
     }
 }

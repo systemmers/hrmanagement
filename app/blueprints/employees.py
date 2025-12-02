@@ -286,8 +286,9 @@ def employee_create():
             employee.employee_number = generate_employee_number()
 
         created_employee = employee_repo.create(employee)
-        flash(f'{created_employee.name} 직원이 등록되었습니다. (사번: {created_employee.employee_number})', 'success')
-        return redirect(url_for('employees.employee_detail', employee_id=created_employee.id))
+        flash(f'{created_employee.name} 직원이 등록되었습니다. 사진과 명함을 추가해주세요.', 'success')
+        # 신규 등록 완료 후 수정 페이지로 리다이렉트 (사진/명함 업로드 가능)
+        return redirect(url_for('employees.employee_edit', employee_id=created_employee.id))
 
     except Exception as e:
         flash(f'직원 등록 중 오류가 발생했습니다: {str(e)}', 'error')
@@ -321,6 +322,10 @@ def employee_edit(employee_id):
     # Phase 6: 첨부파일 조회
     attachment_list = attachment_repo.get_by_employee_id(employee_id)
 
+    # 명함 이미지 조회
+    business_card_front = attachment_repo.get_one_by_category(employee_id, 'business_card_front')
+    business_card_back = attachment_repo.get_one_by_category(employee_id, 'business_card_back')
+
     # 분류 옵션 조회
     classification_options = classification_repo.get_all_options()
 
@@ -328,6 +333,8 @@ def employee_edit(employee_id):
                            employee=employee,
                            action='update',
                            attachment_list=attachment_list,
+                           business_card_front=business_card_front,
+                           business_card_back=business_card_back,
                            classification_options=classification_options)
 
 
@@ -883,6 +890,152 @@ def delete_attachment(attachment_id):
         attachment_repo.delete(attachment_id)
 
         return jsonify({'success': True})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ========================================
+# 프로필 사진 API
+# ========================================
+
+def get_profile_photo_folder():
+    """프로필 사진 업로드 폴더 경로 반환 및 생성"""
+    upload_folder = os.path.join(current_app.root_path, 'static', 'uploads', 'profile_photos')
+    os.makedirs(upload_folder, exist_ok=True)
+    return upload_folder
+
+
+@employees_bp.route('/api/employees/<int:employee_id>/profile-photo', methods=['POST'])
+@login_required
+def upload_profile_photo(employee_id):
+    """프로필 사진 업로드 API"""
+    try:
+        # 권한 체크: 본인 또는 관리자/매니저
+        user_role = session.get('user_role')
+        is_admin_or_manager = user_role in ['admin', 'manager']
+        is_self = session.get('employee_id') == employee_id
+        if not is_admin_or_manager and not is_self:
+            return jsonify({'success': False, 'error': '권한이 없습니다.'}), 403
+
+        # 직원 존재 확인
+        employee = employee_repo.get_by_id(employee_id)
+        if not employee:
+            return jsonify({'success': False, 'error': '직원을 찾을 수 없습니다.'}), 404
+
+        # 파일 검증
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': '파일이 없습니다.'}), 400
+
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': '파일이 선택되지 않았습니다.'}), 400
+
+        # 이미지 파일만 허용
+        allowed_image_ext = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
+        ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+        if ext not in allowed_image_ext:
+            return jsonify({'success': False, 'error': '이미지 파일만 업로드 가능합니다. (jpg, png, gif, webp)'}), 400
+
+        # 파일 크기 확인 (5MB)
+        file.seek(0, os.SEEK_END)
+        file_size = file.tell()
+        file.seek(0)
+
+        if file_size > 5 * 1024 * 1024:
+            return jsonify({'success': False, 'error': '파일 크기가 5MB를 초과합니다.'}), 400
+
+        category = 'profile_photo'
+
+        # 기존 프로필 사진 삭제
+        old_photo = attachment_repo.get_one_by_category(employee_id, category)
+        if old_photo:
+            old_path = old_photo.get('file_path') if isinstance(old_photo, dict) else old_photo.file_path
+            if old_path:
+                full_path = os.path.join(current_app.root_path, old_path.lstrip('/'))
+                if os.path.exists(full_path):
+                    os.remove(full_path)
+            attachment_repo.delete_by_category(employee_id, category)
+
+        # 파일 저장
+        filename = secure_filename(file.filename)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        unique_filename = f"{employee_id}_profile_{timestamp}.{ext}"
+
+        upload_folder = get_profile_photo_folder()
+        file_path = os.path.join(upload_folder, unique_filename)
+        file.save(file_path)
+
+        # 웹 접근 경로
+        web_path = f"/static/uploads/profile_photos/{unique_filename}"
+
+        # DB 저장 (Attachment 테이블)
+        attachment_data = {
+            'employeeId': employee_id,
+            'fileName': filename,
+            'filePath': web_path,
+            'fileType': ext,
+            'fileSize': file_size,
+            'category': category,
+            'uploadDate': datetime.now().strftime('%Y-%m-%d')
+        }
+        created = attachment_repo.create(attachment_data)
+
+        return jsonify({
+            'success': True,
+            'file_path': web_path,
+            'attachment': created.to_dict() if hasattr(created, 'to_dict') else created
+        })
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@employees_bp.route('/api/employees/<int:employee_id>/profile-photo', methods=['GET'])
+@login_required
+def get_profile_photo(employee_id):
+    """프로필 사진 조회 API"""
+    try:
+        photo = attachment_repo.get_one_by_category(employee_id, 'profile_photo')
+        if photo:
+            return jsonify({
+                'success': True,
+                'file_path': photo.get('file_path') if isinstance(photo, dict) else photo.file_path,
+                'attachment': photo
+            })
+        else:
+            return jsonify({'success': True, 'file_path': None, 'attachment': None})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@employees_bp.route('/api/employees/<int:employee_id>/profile-photo', methods=['DELETE'])
+@login_required
+def delete_profile_photo(employee_id):
+    """프로필 사진 삭제 API"""
+    try:
+        # 권한 체크: 본인 또는 관리자/매니저
+        user_role = session.get('user_role')
+        is_admin_or_manager = user_role in ['admin', 'manager']
+        is_self = session.get('employee_id') == employee_id
+        if not is_admin_or_manager and not is_self:
+            return jsonify({'success': False, 'error': '권한이 없습니다.'}), 403
+
+        category = 'profile_photo'
+
+        # 기존 프로필 사진 삭제
+        old_photo = attachment_repo.get_one_by_category(employee_id, category)
+        if old_photo:
+            old_path = old_photo.get('file_path') if isinstance(old_photo, dict) else old_photo.file_path
+            if old_path:
+                full_path = os.path.join(current_app.root_path, old_path.lstrip('/'))
+                if os.path.exists(full_path):
+                    os.remove(full_path)
+            attachment_repo.delete_by_category(employee_id, category)
+            return jsonify({'success': True, 'message': '프로필 사진이 삭제되었습니다.'})
+        else:
+            return jsonify({'success': False, 'error': '삭제할 프로필 사진이 없습니다.'}), 404
 
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
