@@ -37,6 +37,11 @@ from .personal_profile import (
     PersonalLanguage,
     PersonalMilitaryService
 )
+from .person_contract import (
+    PersonCorporateContract,
+    DataSharingSettings,
+    SyncLog
+)
 
 __all__ = [
     'Employee',
@@ -71,4 +76,7 @@ __all__ = [
     'PersonalCertificate',
     'PersonalLanguage',
     'PersonalMilitaryService',
+    'PersonCorporateContract',
+    'DataSharingSettings',
+    'SyncLog',
 ]

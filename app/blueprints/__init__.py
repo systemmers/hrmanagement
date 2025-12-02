@@ -17,6 +17,7 @@ def register_blueprints(app):
     from .mypage import mypage_bp
     from .corporate import corporate_bp  # Phase 1: 법인 계정
     from .personal import personal_bp  # Phase 2: 개인 계정
+    from .contracts import contracts_bp  # Phase 3: 계약 관리
 
     # 인증 관련 (/auth/*)
     app.register_blueprint(auth_bp)
@@ -29,6 +30,9 @@ def register_blueprints(app):
 
     # 개인 계정 (/personal/*) - Phase 2
     app.register_blueprint(personal_bp)
+
+    # 계약 관리 (/contracts/*) - Phase 3
+    app.register_blueprint(contracts_bp)
 
     # 마이페이지 - 일반 직원용 (/my/*)
     app.register_blueprint(mypage_bp)

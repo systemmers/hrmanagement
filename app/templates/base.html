@@ -112,6 +112,21 @@
                         </a>
                     </div>
 
+                    <!-- 계약 관리 섹션 (개인 계정) -->
+                    <div class="nav-section">
+                        <h2 class="nav-section-title">계약 관리</h2>
+                        <a href="{{ url_for('contracts.my_contracts') }}"
+                           class="nav-item {% if request.endpoint == 'contracts.my_contracts' %}active{% endif %}">
+                            <i class="fas fa-file-contract"></i>
+                            <span>내 계약</span>
+                        </a>
+                        <a href="{{ url_for('contracts.pending_contracts') }}"
+                           class="nav-item {% if request.endpoint == 'contracts.pending_contracts' %}active{% endif %}">
+                            <i class="fas fa-clock"></i>
+                            <span>대기 중인 요청</span>
+                        </a>
+                    </div>
+
                     {% elif current_user and current_user.role == 'employee' and current_user.employee_id %}
                     {# ========== 법인 직원(Employee) 전용 사이드바 ========== #}
 
@@ -174,6 +189,28 @@
                             <span>직원 등록</span>
                         </a>
                     </div>
+
+                    <!-- 계약 관리 섹션 (법인 계정) -->
+                    {% if current_user and current_user.account_type == 'corporate' %}
+                    <div class="nav-section">
+                        <h2 class="nav-section-title">계약 관리</h2>
+                        <a href="{{ url_for('contracts.company_contracts') }}"
+                           class="nav-item {% if request.endpoint == 'contracts.company_contracts' %}active{% endif %}">
+                            <i class="fas fa-file-contract"></i>
+                            <span>계약 목록</span>
+                        </a>
+                        <a href="{{ url_for('contracts.request_contract') }}"
+                           class="nav-item {% if request.endpoint == 'contracts.request_contract' %}active{% endif %}">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>계약 요청</span>
+                        </a>
+                        <a href="{{ url_for('contracts.company_pending') }}"
+                           class="nav-item {% if request.endpoint == 'contracts.company_pending' %}active{% endif %}">
+                            <i class="fas fa-clock"></i>
+                            <span>대기 중</span>
+                        </a>
+                    </div>
+                    {% endif %}
 
                     <!-- 관리 섹션 -->
                     {% if current_user and current_user.is_admin %}

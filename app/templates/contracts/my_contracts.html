@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+
+{% block title %}내 계약 목록 - 인사카드 관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-row">
+        <h1 class="page-title">내 계약 목록</h1>
+        <div class="page-actions">
+            <a href="{{ url_for('contracts.pending_contracts') }}" class="btn btn-secondary">
+                <i class="fas fa-clock"></i>
+                <span>대기 중인 요청 ({{ stats.pending or 0 }})</span>
+            </a>
+        </div>
+    </div>
+    <p class="page-description">기업과의 계약 관계를 관리합니다.</p>
+</div>
+
+<!-- 통계 카드 -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon total">
+            <i class="fas fa-file-contract"></i>
+        </div>
+        <div class="stat-content">
+            <span class="stat-value">{{ stats.total or 0 }}</span>
+            <span class="stat-label">전체 계약</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon active">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <span class="stat-value">{{ stats.active or 0 }}</span>
+            <span class="stat-label">활성 계약</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon pending">
+            <i class="fas fa-hourglass-half"></i>
+        </div>
+        <div class="stat-content">
+            <span class="stat-value">{{ stats.pending or 0 }}</span>
+            <span class="stat-label">대기 중</span>
+        </div>
+    </div>
+</div>
+
+<!-- 계약 목록 -->
+<div class="contracts-list">
+    {% if contracts %}
+    {% for contract in contracts %}
+    <div class="contract-card">
+        <div class="contract-header">
+            <div class="company-info">
+                <div class="company-avatar">{{ contract.company_name[:1] if contract.company_name else 'C' }}</div>
+                <div class="company-details">
+                    <h3 class="company-name">{{ contract.company_name or '기업명 없음' }}</h3>
+                    <span class="contract-type">{{ contract.contract_type_label or contract.contract_type }}</span>
+                </div>
+            </div>
+            <div class="contract-status">
+                {% if contract.status == 'approved' %}
+                <span class="badge badge-success">활성</span>
+                {% elif contract.status == 'requested' %}
+                <span class="badge badge-warning">대기 중</span>
+                {% elif contract.status == 'rejected' %}
+                <span class="badge badge-danger">거절됨</span>
+                {% elif contract.status == 'terminated' %}
+                <span class="badge badge-secondary">종료됨</span>
+                {% elif contract.status == 'expired' %}
+                <span class="badge badge-secondary">만료됨</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="contract-body">
+            <div class="contract-info-grid">
+                {% if contract.position %}
+                <div class="info-item">
+                    <span class="info-label">직위</span>
+                    <span class="info-value">{{ contract.position }}</span>
+                </div>
+                {% endif %}
+                {% if contract.department %}
+                <div class="info-item">
+                    <span class="info-label">부서</span>
+                    <span class="info-value">{{ contract.department }}</span>
+                </div>
+                {% endif %}
+                {% if contract.employee_number %}
+                <div class="info-item">
+                    <span class="info-label">사번</span>
+                    <span class="info-value">{{ contract.employee_number }}</span>
+                </div>
+                {% endif %}
+                <div class="info-item">
+                    <span class="info-label">요청일</span>
+                    <span class="info-value">{{ contract.requested_at[:10] if contract.requested_at else '-' }}</span>
+                </div>
+                {% if contract.approved_at %}
+                <div class="info-item">
+                    <span class="info-label">승인일</span>
+                    <span class="info-value">{{ contract.approved_at[:10] }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="contract-footer">
+            <a href="{{ url_for('contracts.contract_detail', contract_id=contract.id) }}" class="btn btn-sm btn-secondary">
+                <i class="fas fa-eye"></i>
+                <span>상세보기</span>
+            </a>
+            {% if contract.status == 'requested' and contract.requested_by == 'company' %}
+            <button type="button" class="btn btn-sm btn-success" onclick="approveContract({{ contract.id }})">
+                <i class="fas fa-check"></i>
+                <span>승인</span>
+            </button>
+            <button type="button" class="btn btn-sm btn-danger" onclick="rejectContract({{ contract.id }})">
+                <i class="fas fa-times"></i>
+                <span>거절</span>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-file-contract"></i>
+        <h3>계약 내역이 없습니다</h3>
+        <p>기업으로부터 계약 요청이 오면 여기에 표시됩니다.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.stats-row {
+    display: flex;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.stat-card {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    background: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-gray-200);
+}
+
+.stat-card .stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xl);
+}
+
+.stat-icon.total { background: #dbeafe; color: #2563eb; }
+.stat-icon.active { background: #dcfce7; color: #16a34a; }
+.stat-icon.pending { background: #fef3c7; color: #d97706; }
+
+.stat-card .stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-card .stat-value {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-gray-900);
+}
+
+.stat-card .stat-label {
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+}
+
+.contracts-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.contract-card {
+    background: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-gray-200);
+    overflow: hidden;
+}
+
+.contract-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+}
+
+.company-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.company-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-lg);
+    font-weight: 700;
+}
+
+.company-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.company-name {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-gray-900);
+    margin: 0;
+}
+
+.contract-type {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+}
+
+.contract-body {
+    padding: var(--space-5);
+}
+
+.contract-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-4);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.info-label {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+}
+
+.info-value {
+    font-size: var(--text-sm);
+    color: var(--color-gray-900);
+    font-weight: 500;
+}
+
+.contract-footer {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--space-12);
+    background: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-gray-200);
+}
+
+.empty-state i {
+    font-size: 48px;
+    color: var(--color-gray-300);
+    margin-bottom: var(--space-4);
+}
+
+.empty-state h3 {
+    font-size: var(--text-lg);
+    color: var(--color-gray-700);
+    margin: 0 0 var(--space-2);
+}
+
+.empty-state p {
+    color: var(--color-gray-500);
+    margin: 0;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: 600;
+}
+
+.badge-success { background: #dcfce7; color: #16a34a; }
+.badge-warning { background: #fef3c7; color: #d97706; }
+.badge-danger { background: #fee2e2; color: #dc2626; }
+.badge-secondary { background: #f3f4f6; color: #6b7280; }
+
+@media (max-width: 768px) {
+    .stats-row {
+        flex-direction: column;
+    }
+
+    .contract-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+}
+</style>
+
+<script>
+async function approveContract(contractId) {
+    if (!confirm('이 계약 요청을 승인하시겠습니까?')) return;
+
+    try {
+        const response = await fetch(`/contracts/api/${contractId}/approve`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert('계약이 승인되었습니다.');
+            location.reload();
+        } else {
+            alert(result.message || '오류가 발생했습니다.');
+        }
+    } catch (error) {
+        alert('요청 처리 중 오류가 발생했습니다.');
+    }
+}
+
+async function rejectContract(contractId) {
+    const reason = prompt('거절 사유를 입력해주세요 (선택사항):');
+    if (reason === null) return;
+
+    try {
+        const response = await fetch(`/contracts/api/${contractId}/reject`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert('계약 요청이 거절되었습니다.');
+            location.reload();
+        } else {
+            alert(result.message || '오류가 발생했습니다.');
+        }
+    } catch (error) {
+        alert('요청 처리 중 오류가 발생했습니다.');
+    }
+}
+</script>
+{% endblock %}
