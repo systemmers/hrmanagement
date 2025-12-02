@@ -9,3 +9,4 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 # Import and register sub-modules
 from . import organization
+from . import audit  # Phase 5: 감사 대시보드

@@ -14,6 +14,7 @@ from .event_listeners import (
     init_event_listeners,
     cleanup_event_listeners
 )
+from .notification_service import NotificationService, notification_service
 
 __all__ = [
     'AIService',
@@ -29,4 +30,6 @@ __all__ = [
     'ContractEventManager',
     'init_event_listeners',
     'cleanup_event_listeners',
+    'NotificationService',
+    'notification_service',
 ]

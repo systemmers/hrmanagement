@@ -42,6 +42,7 @@ from .person_contract import (
     DataSharingSettings,
     SyncLog
 )
+from .notification import Notification, NotificationPreference
 
 __all__ = [
     'Employee',
@@ -79,4 +80,6 @@ __all__ = [
     'PersonCorporateContract',
     'DataSharingSettings',
     'SyncLog',
+    'Notification',
+    'NotificationPreference',
 ]
