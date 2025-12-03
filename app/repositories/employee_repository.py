@@ -10,14 +10,71 @@ from .base_repository import BaseRepository
 
 
 class EmployeeRepository(BaseRepository):
-    """직원 저장소"""
+    """직원 저장소 - 멀티테넌시 지원"""
 
     def __init__(self):
         super().__init__(Employee)
 
-    def get_all(self) -> List[Dict]:
-        """모든 직원 조회"""
-        employees = Employee.query.order_by(Employee.id).all()
+    # ========================================
+    # 멀티테넌시 헬퍼 메서드
+    # ========================================
+
+    def _build_query(self, organization_id: int = None):
+        """organization_id 필터가 적용된 기본 쿼리 생성
+
+        Args:
+            organization_id: 조직 ID (None이면 필터 미적용)
+
+        Returns:
+            SQLAlchemy Query 객체
+        """
+        query = Employee.query
+        if organization_id:
+            query = query.filter_by(organization_id=organization_id)
+        return query
+
+    def get_by_company(self, company_id: int) -> List[Dict]:
+        """회사 ID로 직원 조회 (편의 메서드)
+
+        Args:
+            company_id: 회사 ID
+
+        Returns:
+            해당 회사의 직원 목록
+        """
+        from app.models.company import Company
+        company = Company.query.get(company_id)
+        if not company or not company.root_organization_id:
+            return []
+        return self.get_all(organization_id=company.root_organization_id)
+
+    def verify_ownership(self, employee_id: int, organization_id: int) -> bool:
+        """직원이 해당 조직에 속하는지 확인
+
+        Args:
+            employee_id: 직원 ID
+            organization_id: 조직 ID
+
+        Returns:
+            소속 여부 (True/False)
+        """
+        employee = Employee.query.get(employee_id)
+        if not employee:
+            return False
+        return employee.organization_id == organization_id
+
+    # ========================================
+    # CRUD 메서드
+    # ========================================
+
+    def get_all(self, organization_id: int = None) -> List[Dict]:
+        """모든 직원 조회
+
+        Args:
+            organization_id: 조직 ID (None이면 전체 조회)
+        """
+        query = self._build_query(organization_id)
+        employees = query.order_by(Employee.id).all()
         return [emp.to_dict() for emp in employees]
 
     def get_by_id(self, employee_id: str) -> Optional[Dict]:
@@ -75,13 +132,19 @@ class EmployeeRepository(BaseRepository):
         db.session.commit()
         return True
 
-    def search(self, query: str) -> List[Dict]:
-        """직원 검색 (이름, 부서, 직급)"""
+    def search(self, query: str, organization_id: int = None) -> List[Dict]:
+        """직원 검색 (이름, 부서, 직급)
+
+        Args:
+            query: 검색어
+            organization_id: 조직 ID (None이면 전체 검색)
+        """
         if not query:
-            return self.get_all()
+            return self.get_all(organization_id=organization_id)
 
         search_term = f'%{query}%'
-        employees = Employee.query.filter(
+        base_query = self._build_query(organization_id)
+        employees = base_query.filter(
             db.or_(
                 Employee.name.ilike(search_term),
                 Employee.department.ilike(search_term),
@@ -92,44 +155,80 @@ class EmployeeRepository(BaseRepository):
 
         return [emp.to_dict() for emp in employees]
 
-    def filter_by_department(self, department: str) -> List[Dict]:
-        """부서별 직원 조회"""
-        employees = Employee.query.filter_by(department=department).order_by(Employee.id).all()
+    def filter_by_department(self, department: str, organization_id: int = None) -> List[Dict]:
+        """부서별 직원 조회
+
+        Args:
+            department: 부서명
+            organization_id: 조직 ID (None이면 전체 조회)
+        """
+        query = self._build_query(organization_id)
+        employees = query.filter_by(department=department).order_by(Employee.id).all()
         return [emp.to_dict() for emp in employees]
 
-    def filter_by_status(self, status: str) -> List[Dict]:
-        """재직상태별 직원 조회"""
-        employees = Employee.query.filter_by(status=status).order_by(Employee.id).all()
+    def filter_by_status(self, status: str, organization_id: int = None) -> List[Dict]:
+        """재직상태별 직원 조회
+
+        Args:
+            status: 재직상태
+            organization_id: 조직 ID (None이면 전체 조회)
+        """
+        query = self._build_query(organization_id)
+        employees = query.filter_by(status=status).order_by(Employee.id).all()
         return [emp.to_dict() for emp in employees]
 
-    def get_count(self) -> int:
-        """전체 직원 수"""
-        return Employee.query.count()
+    def get_count(self, organization_id: int = None) -> int:
+        """전체 직원 수
 
-    def get_count_by_department(self) -> Dict[str, int]:
-        """부서별 직원 수"""
-        result = db.session.query(
+        Args:
+            organization_id: 조직 ID (None이면 전체 조회)
+        """
+        query = self._build_query(organization_id)
+        return query.count()
+
+    def get_count_by_department(self, organization_id: int = None) -> Dict[str, int]:
+        """부서별 직원 수
+
+        Args:
+            organization_id: 조직 ID (None이면 전체 조회)
+        """
+        query = db.session.query(
             Employee.department,
             db.func.count(Employee.id)
-        ).group_by(Employee.department).all()
+        )
+        if organization_id:
+            query = query.filter(Employee.organization_id == organization_id)
+        result = query.group_by(Employee.department).all()
 
         return {dept or '미지정': count for dept, count in result}
 
-    def get_count_by_status(self) -> Dict[str, int]:
-        """재직상태별 직원 수"""
-        result = db.session.query(
+    def get_count_by_status(self, organization_id: int = None) -> Dict[str, int]:
+        """재직상태별 직원 수
+
+        Args:
+            organization_id: 조직 ID (None이면 전체 조회)
+        """
+        query = db.session.query(
             Employee.status,
             db.func.count(Employee.id)
-        ).group_by(Employee.status).all()
+        )
+        if organization_id:
+            query = query.filter(Employee.organization_id == organization_id)
+        result = query.group_by(Employee.status).all()
 
         return {status or '미지정': count for status, count in result}
 
-    def get_statistics(self) -> Dict:
-        """직원 통계 정보"""
-        total = Employee.query.count()
-        active = Employee.query.filter_by(status='재직').count()
-        on_leave = Employee.query.filter_by(status='휴직').count()
-        resigned = Employee.query.filter_by(status='퇴사').count()
+    def get_statistics(self, organization_id: int = None) -> Dict:
+        """직원 통계 정보
+
+        Args:
+            organization_id: 조직 ID (None이면 전체 조회)
+        """
+        query = self._build_query(organization_id)
+        total = query.count()
+        active = self._build_query(organization_id).filter_by(status='재직').count()
+        on_leave = self._build_query(organization_id).filter_by(status='휴직').count()
+        resigned = self._build_query(organization_id).filter_by(status='퇴사').count()
 
         return {
             'total': total,
@@ -138,27 +237,52 @@ class EmployeeRepository(BaseRepository):
             'resigned': resigned
         }
 
-    def get_department_statistics(self) -> Dict[str, int]:
-        """부서별 통계 정보"""
-        result = db.session.query(
+    def get_department_statistics(self, organization_id: int = None) -> Dict[str, int]:
+        """부서별 통계 정보
+
+        Args:
+            organization_id: 조직 ID (None이면 전체 조회)
+        """
+        query = db.session.query(
             Employee.department,
             db.func.count(Employee.id)
-        ).group_by(Employee.department).all()
+        )
+        if organization_id:
+            query = query.filter(Employee.organization_id == organization_id)
+        result = query.group_by(Employee.department).all()
 
         return {dept or '미지정': count for dept, count in result}
 
-    def get_recent_employees(self, limit: int = 5) -> List[Dict]:
-        """최근 입사 직원"""
-        employees = Employee.query.filter(
+    def get_recent_employees(self, limit: int = 5, organization_id: int = None) -> List[Dict]:
+        """최근 입사 직원
+
+        Args:
+            limit: 조회할 직원 수
+            organization_id: 조직 ID (None이면 전체 조회)
+        """
+        query = self._build_query(organization_id)
+        employees = query.filter(
             Employee.hire_date.isnot(None)
         ).order_by(Employee.hire_date.desc()).limit(limit).all()
         return [emp.to_dict() for emp in employees]
 
     def filter_employees(self, department: str = None, position: str = None, status: str = None,
                          departments: List[str] = None, positions: List[str] = None, statuses: List[str] = None,
-                         sort_by: str = None, sort_order: str = 'asc') -> List[Dict]:
-        """다중 필터링 및 정렬"""
-        query = Employee.query
+                         sort_by: str = None, sort_order: str = 'asc', organization_id: int = None) -> List[Dict]:
+        """다중 필터링 및 정렬
+
+        Args:
+            department: 단일 부서 필터
+            position: 단일 직급 필터
+            status: 단일 상태 필터
+            departments: 복수 부서 필터
+            positions: 복수 직급 필터
+            statuses: 복수 상태 필터
+            sort_by: 정렬 기준 컬럼
+            sort_order: 정렬 순서 (asc/desc)
+            organization_id: 조직 ID (None이면 전체 조회)
+        """
+        query = self._build_query(organization_id)
 
         # 단일 필터 (하위 호환성)
         if department:

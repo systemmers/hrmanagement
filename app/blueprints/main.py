@@ -7,6 +7,20 @@ from flask import Blueprint, render_template, request, jsonify, session, redirec
 
 from ..extensions import employee_repo, classification_repo
 from ..utils.decorators import login_required
+from ..models.company import Company
+
+
+def get_current_organization_id():
+    """현재 로그인한 회사의 root_organization_id 반환
+
+    Returns:
+        int or None: 조직 ID (회사가 없거나 설정되지 않은 경우 None)
+    """
+    company_id = session.get('company_id')
+    if not company_id:
+        return None
+    company = Company.query.get(company_id)
+    return company.root_organization_id if company else None
 
 main_bp = Blueprint('main', __name__)
 
@@ -36,9 +50,12 @@ def index():
             flash('계정에 연결된 직원 정보가 없습니다. 관리자에게 문의하세요.', 'warning')
             return redirect(url_for('auth.logout'))
 
-    stats = employee_repo.get_statistics()
-    dept_stats = employee_repo.get_department_statistics()
-    recent_employees = employee_repo.get_recent_employees(limit=5)
+    # 멀티테넌시: 현재 회사의 organization_id로 필터링
+    org_id = get_current_organization_id()
+
+    stats = employee_repo.get_statistics(organization_id=org_id)
+    dept_stats = employee_repo.get_department_statistics(organization_id=org_id)
+    recent_employees = employee_repo.get_recent_employees(limit=5, organization_id=org_id)
     classification_options = classification_repo.get_all_options()
     return render_template('index.html',
                            stats=stats,
@@ -65,6 +82,7 @@ def styleguide():
 
 
 @main_bp.route('/search')
+@login_required
 def search():
     """직원 검색"""
     query = request.args.get('q', '')
@@ -72,19 +90,23 @@ def search():
     department_filter = request.args.get('department', '')
     position_filter = request.args.get('position', '')
 
-    # 필터 적용
+    # 멀티테넌시: 현재 회사의 organization_id로 필터링
+    org_id = get_current_organization_id()
+
+    # 필터 적용 (organization_id 포함)
     if status_filter or department_filter or position_filter:
         employees = employee_repo.filter_employees(
+            organization_id=org_id,
             department=department_filter if department_filter else None,
             position=position_filter if position_filter else None,
             status=status_filter if status_filter else None
         )
     elif query:
-        employees = employee_repo.search(query)
+        employees = employee_repo.search(query, organization_id=org_id)
     else:
-        employees = employee_repo.get_all()
+        employees = employee_repo.get_all(organization_id=org_id)
 
-    stats = employee_repo.get_statistics()
+    stats = employee_repo.get_statistics(organization_id=org_id)
 
     # AJAX 요청인 경우 JSON 반환
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -93,8 +115,8 @@ def search():
             'stats': stats
         })
 
-    dept_stats = employee_repo.get_department_statistics()
-    recent_employees = employee_repo.get_recent_employees(limit=5)
+    dept_stats = employee_repo.get_department_statistics(organization_id=org_id)
+    recent_employees = employee_repo.get_recent_employees(limit=5, organization_id=org_id)
     classification_options = classification_repo.get_all_options()
     return render_template('index.html',
                            employees=employees,

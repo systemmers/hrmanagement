@@ -20,8 +20,41 @@ from ..extensions import (
     salary_payment_repo, attachment_repo
 )
 from ..models import Employee
+from ..models.company import Company
 
 employees_bp = Blueprint('employees', __name__)
+
+
+# ========================================
+# 멀티테넌시 헬퍼 함수
+# ========================================
+
+def get_current_organization_id():
+    """현재 로그인한 회사의 root_organization_id 반환
+
+    Returns:
+        organization_id 또는 None
+    """
+    company_id = session.get('company_id')
+    if not company_id:
+        return None
+    company = Company.query.get(company_id)
+    return company.root_organization_id if company else None
+
+
+def verify_employee_access(employee_id: int) -> bool:
+    """현재 회사가 해당 직원에 접근 가능한지 확인
+
+    Args:
+        employee_id: 직원 ID
+
+    Returns:
+        접근 가능 여부
+    """
+    org_id = get_current_organization_id()
+    if not org_id:
+        return False
+    return employee_repo.verify_ownership(employee_id, org_id)
 
 
 def extract_employee_from_form(form_data, employee_id=0):
@@ -71,7 +104,10 @@ def extract_employee_from_form(form_data, employee_id=0):
 @employees_bp.route('/employees')
 @manager_or_admin_required
 def employee_list():
-    """직원 목록 - 매니저/관리자만 접근 가능"""
+    """직원 목록 - 매니저/관리자만 접근 가능 (멀티테넌시 적용)"""
+    # 현재 회사의 organization_id 가져오기
+    org_id = get_current_organization_id()
+
     # 필터 파라미터 추출
     departments = request.args.getlist('department')
     positions = request.args.getlist('position')
@@ -97,14 +133,15 @@ def employee_list():
     position = request.args.get('position', None) if not positions else None
     status = request.args.get('status', None) if not statuses else None
 
-    # 다중 필터 적용
+    # 다중 필터 적용 (organization_id 필터 추가)
     if departments or positions or statuses or sort_column:
         employees = employee_repo.filter_employees(
             departments=departments if departments else None,
             positions=positions if positions else None,
             statuses=statuses if statuses else None,
             sort_by=sort_column,
-            sort_order=sort_order
+            sort_order=sort_order,
+            organization_id=org_id
         )
     elif department or position or status:
         employees = employee_repo.filter_employees(
@@ -112,12 +149,14 @@ def employee_list():
             position=position,
             status=status,
             sort_by=sort_column,
-            sort_order=sort_order
+            sort_order=sort_order,
+            organization_id=org_id
         )
     else:
         employees = employee_repo.filter_employees(
             sort_by=sort_column,
-            sort_order=sort_order
+            sort_order=sort_order,
+            organization_id=org_id
         )
 
     # 분류 옵션 전달
@@ -130,9 +169,10 @@ def employee_list():
 @employees_bp.route('/employees/<int:employee_id>')
 @login_required
 def employee_detail(employee_id):
-    """직원 상세 정보
+    """직원 상세 정보 (멀티테넌시 적용)
 
     일반 직원(employee role)은 본인 정보만 열람 가능
+    관리자/매니저는 자사 소속 직원만 열람 가능
     view 파라미터에 따라 다른 페이지 렌더링:
     - basic: 개인 기본정보만 (Employee role 전용)
     - history: 이력정보만 (Employee role 전용)
@@ -150,6 +190,12 @@ def employee_detail(employee_id):
             flash('본인 정보만 열람할 수 있습니다.', 'warning')
             return redirect(url_for('employees.employee_detail',
                                    employee_id=my_employee_id, view=view_type))
+
+    # 관리자/매니저는 자사 소속 직원만 접근 가능 (멀티테넌시 검증)
+    if user_role in ['admin', 'manager']:
+        if not verify_employee_access(employee_id):
+            flash('접근 권한이 없습니다.', 'error')
+            return redirect(url_for('main.index'))
 
     employee = employee_repo.get_by_id(employee_id)
     if not employee:
@@ -277,13 +323,18 @@ def employee_new():
 @employees_bp.route('/employees', methods=['POST'])
 @manager_or_admin_required
 def employee_create():
-    """직원 등록 처리"""
+    """직원 등록 처리 (멀티테넌시 적용)"""
     try:
         employee = extract_employee_from_form(request.form, employee_id=0)
 
         # 사번 자동 생성 (폼에서 입력하지 않은 경우)
         if not employee.employee_number:
             employee.employee_number = generate_employee_number()
+
+        # organization_id 자동 설정 (멀티테넌시)
+        org_id = get_current_organization_id()
+        if org_id and not employee.organization_id:
+            employee.organization_id = org_id
 
         created_employee = employee_repo.create(employee)
         flash(f'{created_employee.name} 직원이 등록되었습니다. 사진과 명함을 추가해주세요.', 'success')
@@ -298,9 +349,9 @@ def employee_create():
 @employees_bp.route('/employees/<int:employee_id>/edit', methods=['GET'])
 @login_required
 def employee_edit(employee_id):
-    """직원 수정 폼
+    """직원 수정 폼 (멀티테넌시 적용)
 
-    - 관리자/매니저: 모든 직원 수정 가능
+    - 관리자/매니저: 자사 소속 직원 수정 가능
     - 일반 직원: 본인 정보만 수정 가능 (일부 필드 제한)
     """
     from flask import session
@@ -313,6 +364,12 @@ def employee_edit(employee_id):
         if my_employee_id != employee_id:
             flash('본인 정보만 수정할 수 있습니다.', 'warning')
             return redirect(url_for('employees.employee_edit', employee_id=my_employee_id))
+
+    # 관리자/매니저는 자사 소속 직원만 수정 가능 (멀티테넌시 검증)
+    if user_role in ['admin', 'manager']:
+        if not verify_employee_access(employee_id):
+            flash('접근 권한이 없습니다.', 'error')
+            return redirect(url_for('main.index'))
 
     employee = employee_repo.get_by_id(employee_id)
     if not employee:
@@ -345,7 +402,7 @@ def employee_edit(employee_id):
 @employees_bp.route('/employees/<int:employee_id>/edit/basic', methods=['GET'])
 @login_required
 def employee_edit_basic(employee_id):
-    """기본정보 전용 수정 폼 (Employee role 전용)
+    """기본정보 전용 수정 폼 (Employee role 전용, 멀티테넌시 적용)
 
     개인 기본정보와 가족정보만 수정 가능
     """
@@ -359,6 +416,12 @@ def employee_edit_basic(employee_id):
         if my_employee_id != employee_id:
             flash('본인 정보만 수정할 수 있습니다.', 'warning')
             return redirect(url_for('employees.employee_edit_basic', employee_id=my_employee_id))
+
+    # 관리자/매니저는 자사 소속 직원만 수정 가능 (멀티테넌시 검증)
+    if user_role in ['admin', 'manager']:
+        if not verify_employee_access(employee_id):
+            flash('접근 권한이 없습니다.', 'error')
+            return redirect(url_for('main.index'))
 
     employee = employee_repo.get_by_id(employee_id)
     if not employee:
@@ -377,7 +440,7 @@ def employee_edit_basic(employee_id):
 @employees_bp.route('/employees/<int:employee_id>/update/basic', methods=['POST'])
 @login_required
 def employee_update_basic(employee_id):
-    """기본정보 전용 수정 처리 (Employee role 전용)
+    """기본정보 전용 수정 처리 (Employee role 전용, 멀티테넌시 적용)
 
     개인 기본정보와 가족정보만 업데이트
     """
@@ -391,6 +454,12 @@ def employee_update_basic(employee_id):
         if my_employee_id != employee_id:
             flash('본인 정보만 수정할 수 있습니다.', 'warning')
             return redirect(url_for('employees.employee_edit_basic', employee_id=my_employee_id))
+
+    # 관리자/매니저는 자사 소속 직원만 수정 가능 (멀티테넌시 검증)
+    if user_role in ['admin', 'manager']:
+        if not verify_employee_access(employee_id):
+            flash('접근 권한이 없습니다.', 'error')
+            return redirect(url_for('main.index'))
 
     try:
         # 기본정보 필드만 추출하여 업데이트
@@ -436,7 +505,7 @@ def employee_update_basic(employee_id):
 @employees_bp.route('/employees/<int:employee_id>/edit/history', methods=['GET'])
 @login_required
 def employee_edit_history(employee_id):
-    """이력정보 전용 수정 폼 (Employee role 전용)
+    """이력정보 전용 수정 폼 (Employee role 전용, 멀티테넌시 적용)
 
     학력, 경력, 자격증, 언어능력, 병역/프로젝트/수상 수정 가능
     """
@@ -450,6 +519,12 @@ def employee_edit_history(employee_id):
         if my_employee_id != employee_id:
             flash('본인 정보만 수정할 수 있습니다.', 'warning')
             return redirect(url_for('employees.employee_edit_history', employee_id=my_employee_id))
+
+    # 관리자/매니저는 자사 소속 직원만 수정 가능 (멀티테넌시 검증)
+    if user_role in ['admin', 'manager']:
+        if not verify_employee_access(employee_id):
+            flash('접근 권한이 없습니다.', 'error')
+            return redirect(url_for('main.index'))
 
     employee = employee_repo.get_by_id(employee_id)
     if not employee:
@@ -480,7 +555,7 @@ def employee_edit_history(employee_id):
 @employees_bp.route('/employees/<int:employee_id>/update/history', methods=['POST'])
 @login_required
 def employee_update_history(employee_id):
-    """이력정보 전용 수정 처리 (Employee role 전용)
+    """이력정보 전용 수정 처리 (Employee role 전용, 멀티테넌시 적용)
 
     학력, 경력, 자격증, 언어능력, 병역/프로젝트/수상만 업데이트
     """
@@ -494,6 +569,12 @@ def employee_update_history(employee_id):
         if my_employee_id != employee_id:
             flash('본인 정보만 수정할 수 있습니다.', 'warning')
             return redirect(url_for('employees.employee_edit_history', employee_id=my_employee_id))
+
+    # 관리자/매니저는 자사 소속 직원만 수정 가능 (멀티테넌시 검증)
+    if user_role in ['admin', 'manager']:
+        if not verify_employee_access(employee_id):
+            flash('접근 권한이 없습니다.', 'error')
+            return redirect(url_for('main.index'))
 
     try:
         # 이력정보 업데이트 처리 (각 관계형 데이터)
@@ -718,9 +799,9 @@ def _update_award_data(employee_id, form_data):
 @employees_bp.route('/employees/<int:employee_id>/update', methods=['POST'])
 @login_required
 def employee_update(employee_id):
-    """직원 수정 처리
+    """직원 수정 처리 (멀티테넌시 적용)
 
-    - 관리자/매니저: 모든 직원 수정 가능
+    - 관리자/매니저: 자사 소속 직원 수정 가능
     - 일반 직원: 본인 정보만 수정 가능
     """
     from flask import session
@@ -733,6 +814,12 @@ def employee_update(employee_id):
         if my_employee_id != employee_id:
             flash('본인 정보만 수정할 수 있습니다.', 'warning')
             return redirect(url_for('employees.employee_edit', employee_id=my_employee_id))
+
+    # 관리자/매니저는 자사 소속 직원만 수정 가능 (멀티테넌시 검증)
+    if user_role in ['admin', 'manager']:
+        if not verify_employee_access(employee_id):
+            flash('접근 권한이 없습니다.', 'error')
+            return redirect(url_for('main.index'))
 
     try:
         employee = extract_employee_from_form(request.form, employee_id=employee_id)
@@ -753,7 +840,12 @@ def employee_update(employee_id):
 @employees_bp.route('/employees/<int:employee_id>/delete', methods=['POST'])
 @admin_required
 def employee_delete(employee_id):
-    """직원 삭제 처리"""
+    """직원 삭제 처리 (멀티테넌시 적용)"""
+    # 관리자는 자사 소속 직원만 삭제 가능 (멀티테넌시 검증)
+    if not verify_employee_access(employee_id):
+        flash('접근 권한이 없습니다.', 'error')
+        return redirect(url_for('main.index'))
+
     try:
         employee = employee_repo.get_by_id(employee_id)
         if employee:

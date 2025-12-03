@@ -24,7 +24,7 @@ def admin_required(f):
     """관리자 권한 필수 데코레이터"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get('role') not in ['admin', 'manager']:
+        if session.get('user_role') not in ['admin', 'manager']:
             from flask import redirect, url_for, flash
             flash('관리자 권한이 필요합니다.', 'error')
             return redirect(url_for('main.index'))

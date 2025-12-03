@@ -7,10 +7,13 @@ AI 테스트 Blueprint
 from flask import Blueprint, render_template, request, jsonify, current_app
 import os
 
+from ..utils.decorators import login_required, admin_required
+
 ai_test_bp = Blueprint('ai_test', __name__, url_prefix='/ai-test')
 
 
 @ai_test_bp.route('/')
+@login_required
 def index():
     """AI 문서 분석 테스트 메인 페이지"""
     sample_files = get_sample_files()
@@ -21,6 +24,7 @@ def index():
 
 
 @ai_test_bp.route('/analyze', methods=['POST'])
+@login_required
 def analyze():
     """문서 분석 실행"""
     file = request.files.get('file')
@@ -58,6 +62,7 @@ def analyze():
 
 
 @ai_test_bp.route('/compare')
+@login_required
 def compare():
     """Provider 비교 테스트 페이지"""
     sample_files = get_sample_files()
@@ -68,6 +73,7 @@ def compare():
 
 
 @ai_test_bp.route('/compare/run', methods=['POST'])
+@login_required
 def run_compare():
     """여러 Provider로 동시 분석 비교"""
     file = request.files.get('file')
@@ -109,6 +115,7 @@ def run_compare():
 
 
 @ai_test_bp.route('/settings')
+@admin_required
 def settings():
     """AI 설정 페이지"""
     config = {

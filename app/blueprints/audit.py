@@ -29,7 +29,7 @@ def admin_required(f):
     """관리자 권한 필수 데코레이터"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get('role') not in ['admin', 'manager']:
+        if session.get('user_role') not in ['admin', 'manager']:
             return jsonify({'success': False, 'error': '관리자 권한이 필요합니다.'}), 403
         return f(*args, **kwargs)
     return decorated_function

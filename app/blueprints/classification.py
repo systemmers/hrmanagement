@@ -6,11 +6,13 @@
 from flask import Blueprint, render_template
 
 from ..extensions import classification_repo
+from ..utils.decorators import login_required
 
 classification_bp = Blueprint('classification', __name__)
 
 
 @classification_bp.route('/classification-options')
+@login_required
 def classification_options_page():
     """분류 옵션 관리 페이지"""
     options = classification_repo.get_all()
