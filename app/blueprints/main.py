@@ -26,12 +26,16 @@ main_bp = Blueprint('main', __name__)
 
 
 @main_bp.route('/')
-@login_required
 def index():
-    """대시보드 - 통계 및 정보
+    """메인 페이지
 
-    계정 유형에 따라 적절한 대시보드로 리다이렉트
+    비로그인: 랜딩페이지
+    로그인: 계정 유형에 따라 적절한 대시보드로 리다이렉트
     """
+    # 비로그인 사용자는 랜딩페이지로
+    if not session.get('user_id'):
+        return render_template('landing.html')
+
     account_type = session.get('account_type')
 
     # 개인 계정은 개인 대시보드로

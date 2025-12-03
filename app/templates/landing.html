@@ -1,0 +1,258 @@
+{% extends 'base_public.html' %}
+
+{% block title %}HR Management - 스마트한 인사관리 솔루션{% endblock %}
+{% block meta_description %}HR Management로 직원 인사카드, 조직 구조, 계약 관리를 효율적으로 처리하세요. 개인과 법인 모두를 위한 통합 인사관리 플랫폼입니다.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/landing.css') }}">
+{% endblock %}
+
+{% block body_class %} landing-page{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="landing-hero">
+    <div class="landing-hero__container">
+        <div class="landing-hero__badge">
+            <i class="fas fa-rocket"></i>
+            <span>지금 무료로 시작하세요</span>
+        </div>
+        <h1 class="landing-hero__title">
+            스마트한 <span>인사관리</span>의<br>새로운 기준
+        </h1>
+        <p class="landing-hero__subtitle">
+            직원 인사카드부터 조직 구조, 계약 관리까지.<br>
+            모든 인사 업무를 하나의 플랫폼에서 효율적으로 관리하세요.
+        </p>
+        <div class="landing-hero__cta">
+            <a href="{{ url_for('auth.register') }}" class="landing-hero__btn landing-hero__btn--primary">
+                <i class="fas fa-arrow-right"></i>
+                무료로 시작하기
+            </a>
+            <a href="#features" class="landing-hero__btn landing-hero__btn--secondary">
+                <i class="fas fa-play-circle"></i>
+                기능 둘러보기
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="landing-features" id="features">
+    <div class="landing-features__container">
+        <div class="landing-section-header">
+            <span class="landing-section-label">Features</span>
+            <h2 class="landing-section-title">필요한 모든 기능을 한 곳에서</h2>
+            <p class="landing-section-subtitle">
+                복잡한 인사 업무를 간편하게 처리할 수 있는 다양한 기능을 제공합니다.
+            </p>
+        </div>
+
+        <div class="landing-features__grid">
+            <!-- Feature 1 -->
+            <div class="landing-feature-card">
+                <div class="landing-feature-card__icon">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <h3 class="landing-feature-card__title">인사카드 관리</h3>
+                <p class="landing-feature-card__description">
+                    직원의 기본 정보, 경력, 학력, 자격증 등 모든 인사 정보를 체계적으로 관리합니다.
+                    언제든 필요한 정보를 빠르게 조회하세요.
+                </p>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="landing-feature-card">
+                <div class="landing-feature-card__icon">
+                    <i class="fas fa-sitemap"></i>
+                </div>
+                <h3 class="landing-feature-card__title">조직 구조 설정</h3>
+                <p class="landing-feature-card__description">
+                    부서, 팀, 직급 등 조직 구조를 자유롭게 구성하고 관리합니다.
+                    조직도를 한눈에 파악하고 효율적으로 운영하세요.
+                </p>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="landing-feature-card">
+                <div class="landing-feature-card__icon">
+                    <i class="fas fa-file-contract"></i>
+                </div>
+                <h3 class="landing-feature-card__title">계약 관리</h3>
+                <p class="landing-feature-card__description">
+                    근로계약서, 프리랜서 계약 등 다양한 계약 유형을 지원합니다.
+                    계약 만료일 알림으로 중요한 일정을 놓치지 마세요.
+                </p>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="landing-feature-card">
+                <div class="landing-feature-card__icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="landing-feature-card__title">직원 계정 관리</h3>
+                <p class="landing-feature-card__description">
+                    직원별 계정을 생성하고 권한을 세밀하게 설정합니다.
+                    각자의 역할에 맞는 정보만 접근할 수 있도록 관리하세요.
+                </p>
+            </div>
+
+            <!-- Feature 5 -->
+            <div class="landing-feature-card">
+                <div class="landing-feature-card__icon">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <h3 class="landing-feature-card__title">데이터 동기화</h3>
+                <p class="landing-feature-card__description">
+                    개인 사용자와 법인 간의 정보를 안전하게 동기화합니다.
+                    양측 승인 기반의 신뢰할 수 있는 데이터 교환을 지원합니다.
+                </p>
+            </div>
+
+            <!-- Feature 6 -->
+            <div class="landing-feature-card">
+                <div class="landing-feature-card__icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3 class="landing-feature-card__title">알림 시스템</h3>
+                <p class="landing-feature-card__description">
+                    계약 만료, 승인 요청, 중요 일정 등을 실시간으로 알려드립니다.
+                    중요한 업무를 놓치지 않고 처리하세요.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Plans Section -->
+<section class="landing-plans" id="plans">
+    <div class="landing-plans__container">
+        <div class="landing-section-header">
+            <span class="landing-section-label">Pricing</span>
+            <h2 class="landing-section-title">합리적인 요금제</h2>
+            <p class="landing-section-subtitle">
+                비즈니스 규모에 맞는 요금제를 선택하세요. 모든 플랜은 무료 체험이 가능합니다.
+            </p>
+        </div>
+
+        <div class="landing-plans__grid">
+            <!-- Free Plan -->
+            <div class="landing-plan-card">
+                <div class="landing-plan-card__header">
+                    <h3 class="landing-plan-card__name">Free</h3>
+                    <div class="landing-plan-card__price">
+                        무료
+                    </div>
+                </div>
+                <ul class="landing-plan-card__features">
+                    <li class="landing-plan-card__feature">
+                        <i class="fas fa-check"></i>
+                        <span>개인 프로필 관리</span>
+                    </li>
+                    <li class="landing-plan-card__feature">
+                        <i class="fas fa-check"></i>
+                        <span>기본 인사카드 기능</span>
+                    </li>
+                    <li class="landing-plan-card__feature">
+                        <i class="fas fa-check"></i>
+                        <span>계약 이력 조회</span>
+                    </li>
+                    <li class="landing-plan-card__feature">
+                        <i class="fas fa-check"></i>
+                        <span>이메일 지원</span>
+                    </li>
+                </ul>
+                <a href="{{ url_for('personal.register') }}" class="landing-plan-card__btn landing-plan-card__btn--outline">
+                    무료로 시작하기
+                </a>
+            </div>
+
+            <!-- Basic Plan -->
+            <div class="landing-plan-card landing-plan-card--featured">
+                <span class="landing-plan-card__badge">인기</span>
+                <div class="landing-plan-card__header">
+                    <h3 class="landing-plan-card__name">Basic</h3>
+                    <div class="landing-plan-card__price">
+                        50,000<span>원/월</span>
+                    </div>
+                </div>
+                <ul class="landing-plan-card__features">
+                    <li class="landing-plan-card__feature">
+                        <i class="fas fa-check"></i>
+                        <span>직원 50명까지</span>
+                    </li>
+                    <li class="landing-plan-card__feature">
+                        <i class="fas fa-check"></i>
+                        <span>전체 인사카드 기능</span>
+                    </li>
+                    <li class="landing-plan-card__feature">
+                        <i class="fas fa-check"></i>
+                        <span>조직 구조 관리</span>
+                    </li>
+                    <li class="landing-plan-card__feature">
+                        <i class="fas fa-check"></i>
+                        <span>계약 관리 및 알림</span>
+                    </li>
+                    <li class="landing-plan-card__feature">
+                        <i class="fas fa-check"></i>
+                        <span>우선 이메일 지원</span>
+                    </li>
+                </ul>
+                <a href="{{ url_for('corporate.register') }}" class="landing-plan-card__btn landing-plan-card__btn--primary">
+                    14일 무료 체험
+                </a>
+            </div>
+
+            <!-- Premium Plan -->
+            <div class="landing-plan-card">
+                <div class="landing-plan-card__header">
+                    <h3 class="landing-plan-card__name">Premium</h3>
+                    <div class="landing-plan-card__price">
+                        150,000<span>원/월</span>
+                    </div>
+                </div>
+                <ul class="landing-plan-card__features">
+                    <li class="landing-plan-card__feature">
+                        <i class="fas fa-check"></i>
+                        <span>무제한 직원</span>
+                    </li>
+                    <li class="landing-plan-card__feature">
+                        <i class="fas fa-check"></i>
+                        <span>Basic 플랜 전체 기능</span>
+                    </li>
+                    <li class="landing-plan-card__feature">
+                        <i class="fas fa-check"></i>
+                        <span>고급 보고서 및 분석</span>
+                    </li>
+                    <li class="landing-plan-card__feature">
+                        <i class="fas fa-check"></i>
+                        <span>API 연동 지원</span>
+                    </li>
+                    <li class="landing-plan-card__feature">
+                        <i class="fas fa-check"></i>
+                        <span>전담 매니저 지원</span>
+                    </li>
+                </ul>
+                <a href="{{ url_for('corporate.register') }}" class="landing-plan-card__btn landing-plan-card__btn--outline">
+                    14일 무료 체험
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="landing-cta">
+    <div class="landing-cta__container">
+        <h2 class="landing-cta__title">지금 바로 시작하세요</h2>
+        <p class="landing-cta__subtitle">
+            복잡한 인사 업무, HR Management와 함께라면 간단해집니다.<br>
+            무료로 시작하고 비즈니스에 맞게 확장하세요.
+        </p>
+        <a href="{{ url_for('auth.register') }}" class="landing-cta__btn">
+            <i class="fas fa-rocket"></i>
+            무료로 시작하기
+        </a>
+    </div>
+</section>
+{% endblock %}

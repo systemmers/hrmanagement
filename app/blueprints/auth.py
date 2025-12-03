@@ -52,6 +52,16 @@ def login():
     return render_template('auth/login.html')
 
 
+@auth_bp.route('/register')
+def register():
+    """회원가입 유형 선택 페이지"""
+    # 이미 로그인된 경우 대시보드로
+    if session.get('user_id'):
+        return redirect(url_for('main.index'))
+
+    return render_template('auth/register_select.html')
+
+
 @auth_bp.route('/logout')
 def logout():
     """로그아웃 처리"""

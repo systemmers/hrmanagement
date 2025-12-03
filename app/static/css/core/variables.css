@@ -65,4 +65,27 @@
     --transition-fast: 120ms cubic-bezier(0.4, 0.0, 0.2, 1);
     --transition-normal: 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
     --transition-slow: 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+
+    /* Primary Colors - 브랜드 색상 */
+    --color-primary-50: #EEF2FF;
+    --color-primary-100: #E0E7FF;
+    --color-primary-200: #C7D2FE;
+    --color-primary-300: #A5B4FC;
+    --color-primary-400: #818CF8;
+    --color-primary-500: #6366F1;
+    --color-primary-600: #4F46E5;
+    --color-primary-700: #4338CA;
+    --color-primary-800: #3730A3;
+    --color-primary-900: #312E81;
+
+    /* Success/Error/Warning Colors */
+    --color-success-50: #F0FDF4;
+    --color-success-500: #22C55E;
+    --color-success-600: #16A34A;
+    --color-error-50: #FEF2F2;
+    --color-error-500: #EF4444;
+    --color-error-600: #DC2626;
+    --color-warning-50: #FFFBEB;
+    --color-warning-500: #F59E0B;
+    --color-warning-600: #D97706;
 }
