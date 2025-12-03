@@ -20,6 +20,10 @@ def create_app(config_name=None):
     from .config import config
     app.config.from_object(config[config_name])
 
+    # DATABASE_URL 필수 검증
+    if not app.config.get('SQLALCHEMY_DATABASE_URI'):
+        raise ValueError("DATABASE_URL environment variable is required")
+
     # 데이터베이스 초기화
     from .database import db
     db.init_app(app)

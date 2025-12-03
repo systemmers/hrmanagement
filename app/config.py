@@ -21,9 +21,9 @@ class Config:
     GOOGLE_LOCATION = os.environ.get('GOOGLE_LOCATION', 'asia-northeast3')
     DOCUMENTAI_PROCESSOR_ID = os.environ.get('DOCUMENTAI_PROCESSOR_ID')
 
-    # SQLAlchemy 설정
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        f'sqlite:///{os.path.join(BASE_DIR, "instance", "hrmanagement.db")}'
+    # SQLAlchemy 설정 (PostgreSQL 필수)
+    # DATABASE_URL 환경변수 필수 - dotenv 로드 후 사용
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', '')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     EMPLOYEES_JSON = os.path.join(DATA_DIR, 'employees.json')
     CLASSIFICATION_OPTIONS_JSON = os.path.join(DATA_DIR, 'classification_options.json')
