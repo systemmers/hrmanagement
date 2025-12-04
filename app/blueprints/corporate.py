@@ -3,15 +3,20 @@
 
 법인 회원가입, 법인 정보 관리, 법인 대시보드를 처리합니다.
 Phase 1: Company 모델 구현의 일부입니다.
+Phase 6: 백엔드 리팩토링 - register() 헬퍼 분할
 """
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 
 from app.database import db
 from app.models.company import Company
 from app.models.user import User
-from app.models.organization import Organization
 from app.repositories.company_repository import company_repository
 from app.utils.decorators import corporate_login_required, corporate_admin_required
+from app.utils.corporate_helpers import (
+    extract_registration_data,
+    validate_registration,
+    create_company_entities
+)
 
 corporate_bp = Blueprint('corporate', __name__, url_prefix='/corporate')
 
@@ -19,139 +24,28 @@ corporate_bp = Blueprint('corporate', __name__, url_prefix='/corporate')
 @corporate_bp.route('/register', methods=['GET', 'POST'])
 def register():
     """법인 회원가입"""
-    # 이미 로그인된 경우
     if session.get('user_id'):
         return redirect(url_for('main.index'))
 
     if request.method == 'POST':
-        # 법인 정보
-        company_name = request.form.get('company_name', '').strip()
-        business_number = request.form.get('business_number', '').strip()
-        representative = request.form.get('representative', '').strip()
-        business_type = request.form.get('business_type', '').strip()
-        business_category = request.form.get('business_category', '').strip()
-        phone = request.form.get('phone', '').strip()
-        email = request.form.get('company_email', '').strip()
-        address = request.form.get('address', '').strip()
-        address_detail = request.form.get('address_detail', '').strip()
-        postal_code = request.form.get('postal_code', '').strip()
+        # 데이터 추출
+        data = extract_registration_data(request.form)
 
-        # 관리자 계정 정보
-        admin_username = request.form.get('admin_username', '').strip()
-        admin_email = request.form.get('admin_email', '').strip()
-        admin_password = request.form.get('admin_password', '')
-        admin_password_confirm = request.form.get('admin_password_confirm', '')
-
-        # 필수 입력 검증
-        errors = []
-        if not company_name:
-            errors.append('법인명을 입력해주세요.')
-        if not business_number:
-            errors.append('사업자등록번호를 입력해주세요.')
-        if not representative:
-            errors.append('대표자명을 입력해주세요.')
-        if not admin_username:
-            errors.append('관리자 아이디를 입력해주세요.')
-        if not admin_email:
-            errors.append('관리자 이메일을 입력해주세요.')
-        if not admin_password:
-            errors.append('비밀번호를 입력해주세요.')
-        if admin_password != admin_password_confirm:
-            errors.append('비밀번호가 일치하지 않습니다.')
-        if len(admin_password) < 8:
-            errors.append('비밀번호는 최소 8자 이상이어야 합니다.')
-
-        # 사업자등록번호 중복 확인
-        if company_repository.exists_by_business_number(business_number):
-            errors.append('이미 등록된 사업자등록번호입니다.')
-
-        # 아이디/이메일 중복 확인
-        if User.query.filter_by(username=admin_username).first():
-            errors.append('이미 사용 중인 아이디입니다.')
-        if User.query.filter_by(email=admin_email).first():
-            errors.append('이미 사용 중인 이메일입니다.')
-
+        # 유효성 검증
+        errors = validate_registration(data)
         if errors:
             for error in errors:
                 flash(error, 'error')
-            return render_template('corporate/register.html',
-                                   company_name=company_name,
-                                   business_number=business_number,
-                                   representative=representative,
-                                   business_type=business_type,
-                                   business_category=business_category,
-                                   phone=phone,
-                                   company_email=email,
-                                   address=address,
-                                   address_detail=address_detail,
-                                   postal_code=postal_code,
-                                   admin_username=admin_username,
-                                   admin_email=admin_email)
+            return render_template('corporate/register.html', **data.to_template_context())
 
-        try:
-            # 루트 조직 생성
-            root_org = Organization(
-                name=company_name,
-                org_type=Organization.TYPE_COMPANY,
-                is_active=True,
-                description=f'{company_name} 루트 조직'
-            )
-            db.session.add(root_org)
-            db.session.flush()
+        # 엔티티 생성
+        error_msg = create_company_entities(data)
+        if error_msg:
+            flash(error_msg, 'error')
+            return render_template('corporate/register.html', **data.to_template_context())
 
-            # 법인 생성
-            company = Company(
-                name=company_name,
-                business_number=business_number.replace('-', ''),
-                representative=representative,
-                business_type=business_type,
-                business_category=business_category,
-                phone=phone,
-                email=email,
-                address=address,
-                address_detail=address_detail,
-                postal_code=postal_code,
-                root_organization_id=root_org.id,
-                is_active=True,
-                plan_type=Company.PLAN_FREE,
-                max_employees=Company.PLAN_MAX_EMPLOYEES[Company.PLAN_FREE]
-            )
-            db.session.add(company)
-            db.session.flush()
-
-            # 관리자 계정 생성
-            admin_user = User(
-                username=admin_username,
-                email=admin_email,
-                role=User.ROLE_ADMIN,
-                account_type=User.ACCOUNT_CORPORATE,
-                company_id=company.id,
-                is_active=True
-            )
-            admin_user.set_password(admin_password)
-            db.session.add(admin_user)
-
-            db.session.commit()
-
-            flash('법인 회원가입이 완료되었습니다. 로그인해주세요.', 'success')
-            return redirect(url_for('auth.login'))
-
-        except Exception as e:
-            db.session.rollback()
-            flash(f'회원가입 중 오류가 발생했습니다: {str(e)}', 'error')
-            return render_template('corporate/register.html',
-                                   company_name=company_name,
-                                   business_number=business_number,
-                                   representative=representative,
-                                   business_type=business_type,
-                                   business_category=business_category,
-                                   phone=phone,
-                                   company_email=email,
-                                   address=address,
-                                   address_detail=address_detail,
-                                   postal_code=postal_code,
-                                   admin_username=admin_username,
-                                   admin_email=admin_email)
+        flash('법인 회원가입이 완료되었습니다. 로그인해주세요.', 'success')
+        return redirect(url_for('auth.login'))
 
     return render_template('corporate/register.html')
 
