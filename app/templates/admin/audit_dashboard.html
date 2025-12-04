@@ -431,7 +431,7 @@
             </thead>
             <tbody id="logTableBody">
                 <tr>
-                    <td colspan="7" style="text-align: center; padding: 40px;">
+                    <td colspan="7" class="table-empty-cell">
                         <i class="fas fa-spinner fa-spin"></i> 로딩 중...
                     </td>
                 </tr>
@@ -519,7 +519,7 @@
             console.error('로그 로드 실패:', error);
             document.getElementById('logTableBody').innerHTML = `
                 <tr>
-                    <td colspan="7" style="text-align: center; padding: 40px; color: #ef4444;">
+                    <td colspan="7" class="table-empty-cell error">
                         <i class="fas fa-exclamation-circle"></i> 로드 실패
                     </td>
                 </tr>
@@ -534,7 +534,7 @@
         if (!logs || logs.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" style="text-align: center; padding: 40px;">
+                    <td colspan="7" class="table-empty-cell">
                         <i class="fas fa-inbox"></i> 로그가 없습니다
                     </td>
                 </tr>

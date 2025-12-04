@@ -193,15 +193,15 @@
         }
 
         .employee-status.active {
-            background-color: #10b981;
+            background-color: var(--color-success-500);
         }
 
         .employee-status.warning {
-            background-color: #f59e0b;
+            background-color: var(--color-warning-500);
         }
 
         .employee-status.expired {
-            background-color: #ef4444;
+            background-color: var(--color-error-500);
         }
 
         .employee-photo {

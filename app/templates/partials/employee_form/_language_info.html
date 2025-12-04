@@ -3,97 +3,83 @@
     employee: 직원 객체 (수정 모드일 때)
     language_list: 언어 능력 목록
 #}
-<section class="form-section" id="language-info">
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">
-                <i class="fas fa-language"></i>
-                언어능력
-            </h2>
-            <button type="button" class="btn btn-sm btn-secondary" id="addLanguage">
-                <i class="fas fa-plus"></i> 추가
-            </button>
-        </div>
-        <div class="card-body">
-            <div class="dynamic-list" id="languageList">
-                {% if language_list and language_list|length > 0 %}
-                    {% for lang in language_list %}
-                    <div class="dynamic-item" data-index="{{ loop.index0 }}">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">언어</label>
-                                <select name="language_name[]" class="form-input">
-                                    <option value="">선택하세요</option>
-                                    {% for l in ['영어', '일본어', '중국어', '스페인어', '프랑스어', '독일어', '러시아어', '베트남어', '태국어', '기타'] %}
-                                    <option value="{{ l }}" {% if lang.language_name == l %}selected{% endif %}>{{ l }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">수준</label>
-                                <select name="language_level[]" class="form-input">
-                                    <option value="">선택하세요</option>
-                                    <option value="native" {% if lang.level == 'native' %}selected{% endif %}>원어민</option>
-                                    <option value="advanced" {% if lang.level == 'advanced' %}selected{% endif %}>상</option>
-                                    <option value="intermediate" {% if lang.level == 'intermediate' %}selected{% endif %}>중</option>
-                                    <option value="basic" {% if lang.level == 'basic' %}selected{% endif %}>하</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">자격증/점수</label>
-                                <input type="text" name="language_cert[]" class="form-input"
-                                       value="{{ lang.certification }}"
-                                       placeholder="TOEIC 900, JLPT N1 등">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">취득일</label>
-                                <input type="date" name="language_cert_date[]" class="form-input"
-                                       value="{{ lang.cert_date }}">
-                            </div>
-                        </div>
-                        <button type="button" class="btn-remove" title="삭제">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                <div class="dynamic-item" data-index="0">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">언어</label>
-                            <select name="language_name[]" class="form-input">
-                                <option value="">선택하세요</option>
-                                {% for l in ['영어', '일본어', '중국어', '스페인어', '프랑스어', '독일어', '러시아어', '베트남어', '태국어', '기타'] %}
-                                <option value="{{ l }}">{{ l }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">수준</label>
-                            <select name="language_level[]" class="form-input">
-                                <option value="">선택하세요</option>
-                                <option value="native">원어민</option>
-                                <option value="advanced">상</option>
-                                <option value="intermediate">중</option>
-                                <option value="basic">하</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">자격증/점수</label>
-                            <input type="text" name="language_cert[]" class="form-input"
-                                   placeholder="TOEIC 900, JLPT N1 등">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">취득일</label>
-                            <input type="date" name="language_cert_date[]" class="form-input">
-                        </div>
-                    </div>
-                    <button type="button" class="btn-remove" title="삭제">
-                        <i class="fas fa-times"></i>
-                    </button>
+{% from 'macros/_cards.html' import form_section_card_dynamic %}
+{% from 'macros/_form_controls.html' import remove_button %}
+
+{% call form_section_card_dynamic('언어능력', 'fas fa-language', 'language-info', 'addLanguage', '추가') %}
+<div class="dynamic-list" id="languageList">
+    {% if language_list and language_list|length > 0 %}
+        {% for lang in language_list %}
+        <div class="dynamic-item" data-index="{{ loop.index0 }}">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">언어</label>
+                    <select name="language_name[]" class="form-input">
+                        <option value="">선택하세요</option>
+                        {% for l in ['영어', '일본어', '중국어', '스페인어', '프랑스어', '독일어', '러시아어', '베트남어', '태국어', '기타'] %}
+                        <option value="{{ l }}" {% if lang.language_name == l %}selected{% endif %}>{{ l }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                {% endif %}
+                <div class="form-group">
+                    <label class="form-label">수준</label>
+                    <select name="language_level[]" class="form-input">
+                        <option value="">선택하세요</option>
+                        <option value="native" {% if lang.level == 'native' %}selected{% endif %}>원어민</option>
+                        <option value="advanced" {% if lang.level == 'advanced' %}selected{% endif %}>상</option>
+                        <option value="intermediate" {% if lang.level == 'intermediate' %}selected{% endif %}>중</option>
+                        <option value="basic" {% if lang.level == 'basic' %}selected{% endif %}>하</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">자격증/점수</label>
+                    <input type="text" name="language_cert[]" class="form-input"
+                           value="{{ lang.certification }}"
+                           placeholder="TOEIC 900, JLPT N1 등">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">취득일</label>
+                    <input type="date" name="language_cert_date[]" class="form-input"
+                           value="{{ lang.cert_date }}">
+                </div>
+            </div>
+            {{ remove_button() }}
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="dynamic-item" data-index="0">
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label">언어</label>
+                <select name="language_name[]" class="form-input">
+                    <option value="">선택하세요</option>
+                    {% for l in ['영어', '일본어', '중국어', '스페인어', '프랑스어', '독일어', '러시아어', '베트남어', '태국어', '기타'] %}
+                    <option value="{{ l }}">{{ l }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">수준</label>
+                <select name="language_level[]" class="form-input">
+                    <option value="">선택하세요</option>
+                    <option value="native">원어민</option>
+                    <option value="advanced">상</option>
+                    <option value="intermediate">중</option>
+                    <option value="basic">하</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">자격증/점수</label>
+                <input type="text" name="language_cert[]" class="form-input"
+                       placeholder="TOEIC 900, JLPT N1 등">
+            </div>
+            <div class="form-group">
+                <label class="form-label">취득일</label>
+                <input type="date" name="language_cert_date[]" class="form-input">
             </div>
         </div>
+        {{ remove_button() }}
     </div>
-</section>
+    {% endif %}
+</div>
+{% endcall %}

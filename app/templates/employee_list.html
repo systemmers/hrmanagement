@@ -133,9 +133,8 @@
             <tr>
                 <td>{{ employee.id }}</td>
                 <td>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <img src="{{ employee.photo }}" alt="{{ employee.name }}" 
-                             style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                    <div class="d-flex items-center gap-2">
+                        <img src="{{ employee.photo }}" alt="{{ employee.name }}" class="avatar-sm">
                         <span>{{ employee.name }}</span>
                     </div>
                 </td>
@@ -166,7 +165,7 @@
 </div>
 
 <!-- 카드형 뷰 -->
-<div class="employee-grid" id="card-view" style="display: none;">
+<div class="employee-grid d-none" id="card-view">
     {% for employee in employees %}
     <div class="employee-card" onclick="window.location.href='{{ url_for('employees.employee_detail', employee_id=employee.id) }}'">
         <div class="employee-status {{ employee.status }}"></div>
@@ -198,9 +197,9 @@
 </div>
 
 {% if employees|length == 0 %}
-<div class="empty-state">
-    <i class="fas fa-users" style="font-size: 4rem; color: var(--color-gray-400); margin-bottom: 1rem;"></i>
-    <p style="color: var(--color-gray-600);">등록된 직원이 없습니다.</p>
+<div class="empty-state empty-state-large">
+    <i class="fas fa-users"></i>
+    <p>등록된 직원이 없습니다.</p>
 </div>
 {% endif %}
 {% endblock %}

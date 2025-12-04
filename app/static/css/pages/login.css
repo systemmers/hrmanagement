@@ -8,7 +8,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--gradient-accent);
     padding: 20px;
 }
 
@@ -37,7 +37,7 @@
 .login-logo {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--gradient-accent);
     border-radius: 20px;
     display: flex;
     align-items: center;
@@ -46,7 +46,7 @@
     font-weight: 700;
     color: white;
     margin: 0 auto 16px;
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4); /* --color-accent-start shadow */
 }
 
 .login-title {
@@ -121,9 +121,9 @@
 
 .login-form .form-input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--color-accent-start);
     background: var(--white);
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1); /* --color-accent-start focus ring */
 }
 
 .login-form .form-input::placeholder {
@@ -187,8 +187,8 @@
 }
 
 .checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
-    background: #667eea;
-    border-color: #667eea;
+    background: var(--color-accent-start);
+    border-color: var(--color-accent-start);
 }
 
 .checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
@@ -207,7 +207,7 @@
 .btn-login {
     width: 100%;
     padding: 14px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--gradient-accent);
     border: none;
     border-radius: 10px;
     font-size: 16px;
@@ -219,12 +219,12 @@
     justify-content: center;
     gap: 10px;
     transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); /* --color-accent-start shadow */
 }
 
 .btn-login:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5); /* --color-accent-start hover shadow */
 }
 
 .btn-login:active {
@@ -247,7 +247,7 @@
 
 .login-help a {
     font-size: 14px;
-    color: #667eea;
+    color: var(--color-accent-start);
     text-decoration: none;
     font-weight: 500;
 }

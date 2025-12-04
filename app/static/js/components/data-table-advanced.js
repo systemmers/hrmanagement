@@ -1,8 +1,23 @@
 /**
  * Advanced Data Table Component
+ * Phase 7: 프론트엔드 리팩토링 - 모듈 분할
+ *
  * 고급 데이터 테이블 - 소팅, 검색, 행선택, 컬럼 토글, 컬럼 재정렬
  *
- * 사용법:
+ * 이 파일은 하위 호환성을 위해 유지됩니다.
+ * 개별 기능이 필요한 경우 './data-table/index.js'에서 import하세요:
+ *
+ * import {
+ *   StorageManager,
+ *   ColumnManager,
+ *   FilterManager,
+ *   PaginationManager,
+ *   SelectionManager,
+ *   CellRenderer,
+ *   ExcelExporter
+ * } from './data-table/index.js';
+ *
+ * 사용법 (기존 방식, 유지됨):
  * const table = new DataTableAdvanced('containerId', {
  *   columns: [{ key: 'name', label: '이름', sortable: true, width: '200px' }],
  *   data: [{ id: 1, name: '홍길동' }],

@@ -67,7 +67,7 @@
     right: var(--space-6);
     width: 56px;
     height: 56px;
-    background: #2563eb;
+    background: var(--color-blue-600);
     color: var(--color-pure-white);
     border: none;
     border-radius: 50%;
@@ -79,7 +79,7 @@
 }
 
 .mobile-section-nav-toggle:hover {
-    background: #1d4ed8;
+    background: var(--color-blue-700);
     transform: scale(1.05);
 }
 

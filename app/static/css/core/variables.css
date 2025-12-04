@@ -78,14 +78,58 @@
     --color-primary-800: #3730A3;
     --color-primary-900: #312E81;
 
-    /* Success/Error/Warning Colors */
+    /* Success Colors - 성공 상태 */
     --color-success-50: #F0FDF4;
+    --color-success-100: #DCFCE7;
     --color-success-500: #22C55E;
     --color-success-600: #16A34A;
+    --color-success-700: #15803D;
+
+    /* Error Colors - 오류 상태 */
     --color-error-50: #FEF2F2;
+    --color-error-100: #FEE2E2;
     --color-error-500: #EF4444;
     --color-error-600: #DC2626;
+    --color-error-700: #B91C1C;
+
+    /* Warning Colors - 경고 상태 */
     --color-warning-50: #FFFBEB;
+    --color-warning-100: #FEF3C7;
     --color-warning-500: #F59E0B;
     --color-warning-600: #D97706;
+    --color-warning-700: #B45309;
+
+    /* Info Colors - 정보 상태 */
+    --color-info-50: #EFF6FF;
+    --color-info-100: #DBEAFE;
+    --color-info-500: #3B82F6;
+    --color-info-600: #2563EB;
+    --color-info-700: #1D4ED8;
+
+    /* Blue Colors - 버튼, 링크 등 */
+    --color-blue-50: #EFF6FF;
+    --color-blue-100: #DBEAFE;
+    --color-blue-500: #3B82F6;
+    --color-blue-600: #2563EB;
+    --color-blue-700: #1D4ED8;
+    --color-blue-800: #1E40AF;
+    --color-blue-900: #1E3A8A;
+
+    /* Accent Colors - 로그인 페이지 그라데이션 */
+    --color-accent-start: #667EEA;
+    --color-accent-end: #764BA2;
+    --gradient-accent: linear-gradient(135deg, var(--color-accent-start) 0%, var(--color-accent-end) 100%);
+    --gradient-blue: linear-gradient(135deg, var(--color-blue-600) 0%, var(--color-blue-800) 100%);
+
+    /* Semantic Colors - 의미별 색상 */
+    --color-link: var(--color-blue-600);
+    --color-link-hover: var(--color-blue-700);
+    --color-focus-ring: var(--color-blue-600);
+    --color-border-input: var(--color-gray-300);
+    --color-border-input-focus: var(--color-blue-600);
+    --color-text-primary: var(--color-gray-900);
+    --color-text-secondary: var(--color-gray-600);
+    --color-text-muted: var(--color-gray-500);
+    --color-bg-page: var(--color-gray-50);
+    --color-bg-card: var(--color-pure-white);
 }

@@ -79,7 +79,7 @@
 }
 
 .form-label .required {
-    color: #dc2626;
+    color: var(--color-error-600);
     margin-left: var(--space-1);
 }
 
@@ -96,8 +96,8 @@
 
 .form-input:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: var(--color-blue-600);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); /* --color-blue-600 focus ring */
 }
 
 .form-input::placeholder {
@@ -223,8 +223,8 @@ select.form-input {
 }
 
 .btn-remove:hover {
-    background-color: #fee2e2;
-    color: #dc2626;
+    background-color: var(--color-error-100);
+    color: var(--color-error-600);
 }
 
 /* 폼 제출 섹션 */
@@ -247,7 +247,7 @@ select.form-input {
 }
 
 .form-submit-info .required {
-    color: #dc2626;
+    color: var(--color-error-600);
     font-weight: 600;
 }
 
@@ -275,7 +275,7 @@ select.form-input {
     right: var(--space-6);
     width: 56px;
     height: 56px;
-    background: #2563eb;
+    background: var(--color-blue-600);
     color: var(--color-pure-white);
     border: none;
     border-radius: 50%;
@@ -287,7 +287,7 @@ select.form-input {
 }
 
 .mobile-section-nav-toggle:hover {
-    background: #1d4ed8;
+    background: var(--color-blue-700);
     transform: scale(1.05);
 }
 
@@ -433,4 +433,9 @@ select.form-input {
     .form-page-layout-with-sidebar .section-nav {
         width: 100%;
     }
+}
+
+/* 체크박스 섹션 */
+.checkbox-section {
+    margin-top: var(--space-4);
 }
