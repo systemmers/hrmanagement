@@ -4,6 +4,8 @@
 개인-법인 계약 관계를 관리합니다.
 - 개인 측면: 계약 목록 조회, 계약 승인 거절
 - 법인 측면: 계약 요청, 계약 승인 거절, 계약 관리
+
+Phase 6: 백엔드 리팩토링 - contract_helpers 적용
 """
 from flask import Blueprint, render_template, request, jsonify, session, flash, redirect, url_for
 
@@ -13,6 +15,13 @@ from ..models.company import Company
 from ..models.user import User
 from ..models.person_contract import PersonCorporateContract
 from ..utils.decorators import login_required, personal_account_required, corporate_account_required
+from ..utils.contract_helpers import (
+    get_contract_context,
+    check_contract_party,
+    check_approve_reject_permission,
+    contract_party_required,
+    approve_reject_permission_required
+)
 
 contracts_bp = Blueprint('contracts', __name__, url_prefix='/contracts')
 
@@ -59,12 +68,8 @@ def contract_detail(contract_id):
         return redirect(url_for('contracts.my_contracts'))
 
     # 권한 확인: 계약 당사자만 접근 가능
-    user_id = session.get('user_id')
-    account_type = session.get('account_type')
-    company_id = session.get('company_id')
-
-    is_person = contract['person_user_id'] == user_id
-    is_company = account_type == 'corporate' and contract['company_id'] == company_id
+    ctx = get_contract_context()
+    is_person, is_company = ctx.get_party_status(contract)
 
     if not is_person and not is_company:
         flash('접근 권한이 없습니다.', 'error')
@@ -172,25 +177,10 @@ def request_contract():
 
 @contracts_bp.route('/api/<int:contract_id>/approve', methods=['POST'])
 @login_required
-def api_approve_contract(contract_id):
+@approve_reject_permission_required
+def api_approve_contract(contract, contract_id):
     """계약 승인 API"""
     user_id = session.get('user_id')
-    account_type = session.get('account_type')
-    company_id = session.get('company_id')
-
-    contract = person_contract_repo.get_model_by_id(contract_id)
-    if not contract:
-        return jsonify({'success': False, 'message': '계약을 찾을 수 없습니다.'}), 404
-
-    # 권한 확인
-    if contract.requested_by == 'company':
-        # 기업에서 요청한 경우 개인이 승인
-        if contract.person_user_id != user_id:
-            return jsonify({'success': False, 'message': '권한이 없습니다.'}), 403
-    else:
-        # 개인이 요청한 경우 기업이 승인
-        if account_type != 'corporate' or contract.company_id != company_id:
-            return jsonify({'success': False, 'message': '권한이 없습니다.'}), 403
 
     try:
         result = person_contract_repo.approve_contract(contract_id, user_id)
@@ -201,24 +191,10 @@ def api_approve_contract(contract_id):
 
 @contracts_bp.route('/api/<int:contract_id>/reject', methods=['POST'])
 @login_required
-def api_reject_contract(contract_id):
+@approve_reject_permission_required
+def api_reject_contract(contract, contract_id):
     """계약 거절 API"""
     user_id = session.get('user_id')
-    account_type = session.get('account_type')
-    company_id = session.get('company_id')
-
-    contract = person_contract_repo.get_model_by_id(contract_id)
-    if not contract:
-        return jsonify({'success': False, 'message': '계약을 찾을 수 없습니다.'}), 404
-
-    # 권한 확인
-    if contract.requested_by == 'company':
-        if contract.person_user_id != user_id:
-            return jsonify({'success': False, 'message': '권한이 없습니다.'}), 403
-    else:
-        if account_type != 'corporate' or contract.company_id != company_id:
-            return jsonify({'success': False, 'message': '권한이 없습니다.'}), 403
-
     data = request.get_json() or {}
     reason = data.get('reason')
 
@@ -231,23 +207,10 @@ def api_reject_contract(contract_id):
 
 @contracts_bp.route('/api/<int:contract_id>/terminate', methods=['POST'])
 @login_required
-def api_terminate_contract(contract_id):
+@contract_party_required
+def api_terminate_contract(contract, contract_id):
     """계약 종료 API"""
     user_id = session.get('user_id')
-    account_type = session.get('account_type')
-    company_id = session.get('company_id')
-
-    contract = person_contract_repo.get_model_by_id(contract_id)
-    if not contract:
-        return jsonify({'success': False, 'message': '계약을 찾을 수 없습니다.'}), 404
-
-    # 권한 확인: 양쪽 모두 종료 가능
-    is_person = contract.person_user_id == user_id
-    is_company = account_type == 'corporate' and contract.company_id == company_id
-
-    if not is_person and not is_company:
-        return jsonify({'success': False, 'message': '권한이 없습니다.'}), 403
-
     data = request.get_json() or {}
     reason = data.get('reason')
 
@@ -262,14 +225,14 @@ def api_terminate_contract(contract_id):
 @login_required
 def api_sharing_settings(contract_id):
     """데이터 공유 설정 API"""
-    user_id = session.get('user_id')
+    ctx = get_contract_context()
 
     contract = person_contract_repo.get_model_by_id(contract_id)
     if not contract:
         return jsonify({'success': False, 'message': '계약을 찾을 수 없습니다.'}), 404
 
     # 권한 확인: 개인만 공유 설정 변경 가능
-    if contract.person_user_id != user_id:
+    if contract.person_user_id != ctx.user_id:
         return jsonify({'success': False, 'message': '권한이 없습니다.'}), 403
 
     if request.method == 'GET':
@@ -288,23 +251,9 @@ def api_sharing_settings(contract_id):
 
 @contracts_bp.route('/api/<int:contract_id>/sync-logs')
 @login_required
-def api_sync_logs(contract_id):
+@contract_party_required
+def api_sync_logs(contract, contract_id):
     """동기화 로그 조회 API"""
-    user_id = session.get('user_id')
-    account_type = session.get('account_type')
-    company_id = session.get('company_id')
-
-    contract = person_contract_repo.get_model_by_id(contract_id)
-    if not contract:
-        return jsonify({'success': False, 'message': '계약을 찾을 수 없습니다.'}), 404
-
-    # 권한 확인
-    is_person = contract.person_user_id == user_id
-    is_company = account_type == 'corporate' and contract.company_id == company_id
-
-    if not is_person and not is_company:
-        return jsonify({'success': False, 'message': '권한이 없습니다.'}), 403
-
     limit = request.args.get('limit', 50, type=int)
     logs = person_contract_repo.get_sync_logs(contract_id, limit)
 
