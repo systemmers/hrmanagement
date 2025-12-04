@@ -184,7 +184,7 @@ def extract_basic_fields_from_form(form_data):
 
 def update_family_data(employee_id, form_data):
     """가족정보 업데이트"""
-    from ...models import Family
+    from ...models import FamilyMember
 
     # 기존 데이터 삭제 후 새로 입력
     family_repo.delete_by_employee_id(employee_id)
@@ -199,14 +199,14 @@ def update_family_data(employee_id, form_data):
 
     for i in range(len(relations)):
         if relations[i] and names[i]:  # 필수 필드가 있는 경우만
-            family = Family(
+            family = FamilyMember(
                 employee_id=employee_id,
                 relation=relations[i],
                 name=names[i],
                 birth_date=birth_dates[i] if i < len(birth_dates) else None,
                 occupation=occupations[i] if i < len(occupations) else None,
-                phone=phones[i] if i < len(phones) else None,
-                cohabiting=cohabitings[i] if i < len(cohabitings) else None
+                contact=phones[i] if i < len(phones) else None,
+                is_cohabitant=bool(cohabitings[i]) if i < len(cohabitings) else False
             )
             family_repo.create(family)
 
@@ -219,10 +219,9 @@ def update_education_data(employee_id, form_data):
 
     school_types = form_data.getlist('education_school_type[]')
     school_names = form_data.getlist('education_school_name[]')
-    graduation_years = form_data.getlist('education_graduation_year[]')
+    graduation_dates = form_data.getlist('education_graduation_year[]')
     majors = form_data.getlist('education_major[]')
     degrees = form_data.getlist('education_degree[]')
-    gpas = form_data.getlist('education_gpa[]')
     graduation_statuses = form_data.getlist('education_graduation_status[]')
 
     for i in range(len(school_names)):
@@ -231,10 +230,9 @@ def update_education_data(employee_id, form_data):
                 employee_id=employee_id,
                 school_type=school_types[i] if i < len(school_types) else None,
                 school_name=school_names[i],
-                graduation_year=graduation_years[i] if i < len(graduation_years) else None,
+                graduation_date=graduation_dates[i] if i < len(graduation_dates) else None,
                 major=majors[i] if i < len(majors) else None,
                 degree=degrees[i] if i < len(degrees) else None,
-                gpa=gpas[i] if i < len(gpas) else None,
                 graduation_status=graduation_statuses[i] if i < len(graduation_statuses) else None
             )
             education_repo.create(education)
@@ -262,7 +260,7 @@ def update_career_data(employee_id, form_data):
                 end_date=end_dates[i] if i < len(end_dates) else None,
                 department=departments[i] if i < len(departments) else None,
                 position=positions[i] if i < len(positions) else None,
-                duties=duties[i] if i < len(duties) else None
+                job_description=duties[i] if i < len(duties) else None
             )
             career_repo.create(career)
 
@@ -279,14 +277,16 @@ def update_certificate_data(employee_id, form_data):
     cert_issuers = form_data.getlist('certificate_issuer[]')
     cert_dates = form_data.getlist('certificate_date[]')
 
+    cert_numbers = form_data.getlist('certificate_number[]')
+
     for i in range(len(cert_names)):
         if cert_names[i]:
             certificate = Certificate(
                 employee_id=employee_id,
-                cert_type=cert_types[i] if i < len(cert_types) else None,
-                cert_name=cert_names[i],
+                certificate_name=cert_names[i],
                 grade=cert_grades[i] if i < len(cert_grades) else None,
-                issuer=cert_issuers[i] if i < len(cert_issuers) else None,
+                issuing_organization=cert_issuers[i] if i < len(cert_issuers) else None,
+                certificate_number=cert_numbers[i] if i < len(cert_numbers) else None,
                 acquisition_date=cert_dates[i] if i < len(cert_dates) else None
             )
             certificate_repo.create(certificate)
@@ -319,20 +319,19 @@ def update_language_data(employee_id, form_data):
 
 def update_military_data(employee_id, form_data):
     """병역정보 업데이트"""
-    from ...models import Military
+    from ...models import MilitaryService
 
     military_repo.delete_by_employee_id(employee_id)
 
     military_status = form_data.get('military_status')
     if military_status:
-        military = Military(
+        military = MilitaryService(
             employee_id=employee_id,
             military_status=military_status,
             branch=form_data.get('military_branch') or None,
-            start_date=form_data.get('military_start_date') or None,
-            end_date=form_data.get('military_end_date') or None,
+            enlistment_date=form_data.get('military_start_date') or None,
+            discharge_date=form_data.get('military_end_date') or None,
             rank=form_data.get('military_rank') or None,
-            specialty=form_data.get('military_specialty') or None,
             discharge_reason=form_data.get('military_discharge_reason') or None
         )
         military_repo.create(military)

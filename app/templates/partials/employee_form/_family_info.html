@@ -36,13 +36,13 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">생년월일</label>
-                                <input type="date" name="family_birth[]" class="form-input"
-                                       value="{{ member.birth }}">
+                                <input type="date" name="family_birth_date[]" class="form-input"
+                                       value="{{ member.birth_date }}">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">직업</label>
-                                <input type="text" name="family_job[]" class="form-input"
-                                       value="{{ member.job }}" placeholder="직업">
+                                <input type="text" name="family_occupation[]" class="form-input"
+                                       value="{{ member.occupation }}" placeholder="직업">
                             </div>
                         </div>
                         <button type="button" class="btn-remove" title="삭제">
@@ -69,11 +69,11 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">생년월일</label>
-                            <input type="date" name="family_birth[]" class="form-input">
+                            <input type="date" name="family_birth_date[]" class="form-input">
                         </div>
                         <div class="form-group">
                             <label class="form-label">직업</label>
-                            <input type="text" name="family_job[]" class="form-input" placeholder="직업">
+                            <input type="text" name="family_occupation[]" class="form-input" placeholder="직업">
                         </div>
                     </div>
                     <button type="button" class="btn-remove" title="삭제">

@@ -263,9 +263,11 @@ def register_routes(bp: Blueprint):
             if org_id and not employee.organization_id:
                 employee.organization_id = org_id
 
-            created_employee = employee_repo.create(employee)
-            flash(f'{created_employee.name} 직원이 등록되었습니다. 사진과 명함을 추가해주세요.', 'success')
-            return redirect(url_for('employees.employee_edit', employee_id=created_employee.id))
+            # Employee 객체를 Dict로 변환하여 repository에 전달
+            employee_data = employee.to_dict() if hasattr(employee, 'to_dict') else vars(employee)
+            created_employee = employee_repo.create(employee_data)
+            flash(f'{created_employee["name"]} 직원이 등록되었습니다. 사진과 명함을 추가해주세요.', 'success')
+            return redirect(url_for('employees.employee_edit', employee_id=created_employee['id']))
 
         except Exception as e:
             flash(f'직원 등록 중 오류가 발생했습니다: {str(e)}', 'error')

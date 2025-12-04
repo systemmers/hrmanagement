@@ -21,23 +21,23 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label class="form-label">자격증명</label>
-                                <input type="text" name="cert_name[]" class="form-input"
-                                       value="{{ cert.name }}" placeholder="정보처리기사">
+                                <input type="text" name="certificate_name[]" class="form-input"
+                                       value="{{ cert.certificate_name }}" placeholder="정보처리기사">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">발급기관</label>
-                                <input type="text" name="cert_issuer[]" class="form-input"
-                                       value="{{ cert.issuer }}" placeholder="한국산업인력공단">
+                                <input type="text" name="certificate_issuer[]" class="form-input"
+                                       value="{{ cert.issuing_organization }}" placeholder="한국산업인력공단">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">취득일</label>
-                                <input type="date" name="cert_date[]" class="form-input"
-                                       value="{{ cert.date }}">
+                                <input type="date" name="certificate_date[]" class="form-input"
+                                       value="{{ cert.acquisition_date }}">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">자격번호</label>
-                                <input type="text" name="cert_number[]" class="form-input"
-                                       value="{{ cert.number }}" placeholder="자격번호">
+                                <input type="text" name="certificate_number[]" class="form-input"
+                                       value="{{ cert.certificate_number }}" placeholder="자격번호">
                             </div>
                         </div>
                         <button type="button" class="btn-remove" title="삭제">
@@ -50,19 +50,19 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">자격증명</label>
-                            <input type="text" name="cert_name[]" class="form-input" placeholder="정보처리기사">
+                            <input type="text" name="certificate_name[]" class="form-input" placeholder="정보처리기사">
                         </div>
                         <div class="form-group">
                             <label class="form-label">발급기관</label>
-                            <input type="text" name="cert_issuer[]" class="form-input" placeholder="한국산업인력공단">
+                            <input type="text" name="certificate_issuer[]" class="form-input" placeholder="한국산업인력공단">
                         </div>
                         <div class="form-group">
                             <label class="form-label">취득일</label>
-                            <input type="date" name="cert_date[]" class="form-input">
+                            <input type="date" name="certificate_date[]" class="form-input">
                         </div>
                         <div class="form-group">
                             <label class="form-label">자격번호</label>
-                            <input type="text" name="cert_number[]" class="form-input" placeholder="자격번호">
+                            <input type="text" name="certificate_number[]" class="form-input" placeholder="자격번호">
                         </div>
                     </div>
                     <button type="button" class="btn-remove" title="삭제">

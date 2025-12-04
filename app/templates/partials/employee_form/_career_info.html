@@ -21,8 +21,8 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label class="form-label">회사명</label>
-                                <input type="text" name="career_company[]" class="form-input"
-                                       value="{{ career.company }}" placeholder="회사명">
+                                <input type="text" name="career_company_name[]" class="form-input"
+                                       value="{{ career.company_name }}" placeholder="회사명">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">직급/직책</label>
@@ -31,13 +31,18 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">담당업무</label>
-                                <input type="text" name="career_duty[]" class="form-input"
-                                       value="{{ career.duty }}" placeholder="웹 개발">
+                                <input type="text" name="career_duties[]" class="form-input"
+                                       value="{{ career.job_description }}" placeholder="웹 개발">
                             </div>
                             <div class="form-group">
-                                <label class="form-label">재직기간</label>
-                                <input type="text" name="career_period[]" class="form-input"
-                                       value="{{ career.period }}" placeholder="2020.01 ~ 2023.12">
+                                <label class="form-label">입사일</label>
+                                <input type="date" name="career_start_date[]" class="form-input"
+                                       value="{{ career.start_date }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">퇴사일</label>
+                                <input type="date" name="career_end_date[]" class="form-input"
+                                       value="{{ career.end_date }}">
                             </div>
                         </div>
                         <button type="button" class="btn-remove" title="삭제">
@@ -50,7 +55,7 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">회사명</label>
-                            <input type="text" name="career_company[]" class="form-input" placeholder="회사명">
+                            <input type="text" name="career_company_name[]" class="form-input" placeholder="회사명">
                         </div>
                         <div class="form-group">
                             <label class="form-label">직급/직책</label>
@@ -58,11 +63,15 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">담당업무</label>
-                            <input type="text" name="career_duty[]" class="form-input" placeholder="웹 개발">
+                            <input type="text" name="career_duties[]" class="form-input" placeholder="웹 개발">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">재직기간</label>
-                            <input type="text" name="career_period[]" class="form-input" placeholder="2020.01 ~ 2023.12">
+                            <label class="form-label">입사일</label>
+                            <input type="date" name="career_start_date[]" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">퇴사일</label>
+                            <input type="date" name="career_end_date[]" class="form-input">
                         </div>
                     </div>
                     <button type="button" class="btn-remove" title="삭제">
