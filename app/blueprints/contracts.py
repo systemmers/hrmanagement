@@ -22,6 +22,7 @@ from ..utils.contract_helpers import (
     contract_party_required,
     approve_reject_permission_required
 )
+from ..utils.api_helpers import api_success, api_error, api_not_found, api_forbidden
 
 contracts_bp = Blueprint('contracts', __name__, url_prefix='/contracts')
 
@@ -184,9 +185,9 @@ def api_approve_contract(contract, contract_id):
 
     try:
         result = person_contract_repo.approve_contract(contract_id, user_id)
-        return jsonify({'success': True, 'data': result})
+        return api_success(result)
     except ValueError as e:
-        return jsonify({'success': False, 'message': str(e)}), 400
+        return api_error(str(e))
 
 
 @contracts_bp.route('/api/<int:contract_id>/reject', methods=['POST'])
@@ -200,9 +201,9 @@ def api_reject_contract(contract, contract_id):
 
     try:
         result = person_contract_repo.reject_contract(contract_id, user_id, reason)
-        return jsonify({'success': True, 'data': result})
+        return api_success(result)
     except ValueError as e:
-        return jsonify({'success': False, 'message': str(e)}), 400
+        return api_error(str(e))
 
 
 @contracts_bp.route('/api/<int:contract_id>/terminate', methods=['POST'])
@@ -216,9 +217,9 @@ def api_terminate_contract(contract, contract_id):
 
     try:
         result = person_contract_repo.terminate_contract(contract_id, user_id, reason)
-        return jsonify({'success': True, 'data': result})
+        return api_success(result)
     except ValueError as e:
-        return jsonify({'success': False, 'message': str(e)}), 400
+        return api_error(str(e))
 
 
 @contracts_bp.route('/api/<int:contract_id>/sharing-settings', methods=['GET', 'PUT'])
@@ -229,24 +230,24 @@ def api_sharing_settings(contract_id):
 
     contract = person_contract_repo.get_model_by_id(contract_id)
     if not contract:
-        return jsonify({'success': False, 'message': '계약을 찾을 수 없습니다.'}), 404
+        return api_not_found('계약')
 
     # 권한 확인: 개인만 공유 설정 변경 가능
     if contract.person_user_id != ctx.user_id:
-        return jsonify({'success': False, 'message': '권한이 없습니다.'}), 403
+        return api_forbidden()
 
     if request.method == 'GET':
         settings = person_contract_repo.get_sharing_settings(contract_id)
-        return jsonify({'success': True, 'data': settings})
+        return api_success(settings)
 
     # PUT: 설정 업데이트
     data = request.get_json() or {}
 
     try:
         result = person_contract_repo.update_sharing_settings(contract_id, data)
-        return jsonify({'success': True, 'data': result})
+        return api_success(result)
     except ValueError as e:
-        return jsonify({'success': False, 'message': str(e)}), 400
+        return api_error(str(e))
 
 
 @contracts_bp.route('/api/<int:contract_id>/sync-logs')
@@ -257,7 +258,7 @@ def api_sync_logs(contract, contract_id):
     limit = request.args.get('limit', 50, type=int)
     logs = person_contract_repo.get_sync_logs(contract_id, limit)
 
-    return jsonify({'success': True, 'data': logs})
+    return api_success(logs)
 
 
 @contracts_bp.route('/api/search')
@@ -267,7 +268,7 @@ def api_search_contracts():
     """계약 검색 API (법인용)"""
     company_id = session.get('company_id')
     if not company_id:
-        return jsonify({'success': False, 'message': '법인 정보가 없습니다.'}), 400
+        return api_error('법인 정보가 없습니다.')
 
     status = request.args.get('status')
     contract_type = request.args.get('contract_type')
@@ -280,7 +281,7 @@ def api_search_contracts():
         search_term=search_term
     )
 
-    return jsonify({'success': True, 'data': contracts})
+    return api_success(contracts)
 
 
 @contracts_bp.route('/api/stats/company')
@@ -290,10 +291,10 @@ def api_company_stats():
     """법인 계약 통계 API"""
     company_id = session.get('company_id')
     if not company_id:
-        return jsonify({'success': False, 'message': '법인 정보가 없습니다.'}), 400
+        return api_error('법인 정보가 없습니다.')
 
     stats = person_contract_repo.get_statistics_by_company(company_id)
-    return jsonify({'success': True, 'data': stats})
+    return api_success(stats)
 
 
 @contracts_bp.route('/api/stats/personal')
@@ -303,4 +304,4 @@ def api_personal_stats():
     """개인 계약 통계 API"""
     user_id = session.get('user_id')
     stats = person_contract_repo.get_statistics_by_person(user_id)
-    return jsonify({'success': True, 'data': stats})
+    return api_success(stats)
