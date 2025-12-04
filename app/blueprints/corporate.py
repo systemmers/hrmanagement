@@ -4,7 +4,6 @@
 법인 회원가입, 법인 정보 관리, 법인 대시보드를 처리합니다.
 Phase 1: Company 모델 구현의 일부입니다.
 """
-from functools import wraps
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 
 from app.database import db
@@ -12,39 +11,9 @@ from app.models.company import Company
 from app.models.user import User
 from app.models.organization import Organization
 from app.repositories.company_repository import company_repository
+from app.utils.decorators import corporate_login_required, corporate_admin_required
 
 corporate_bp = Blueprint('corporate', __name__, url_prefix='/corporate')
-
-
-def corporate_login_required(f):
-    """법인 계정 로그인 필수 데코레이터"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('user_id'):
-            flash('로그인이 필요합니다.', 'error')
-            return redirect(url_for('auth.login', next=request.url))
-        if session.get('account_type') != User.ACCOUNT_CORPORATE:
-            flash('법인 계정으로 로그인해주세요.', 'error')
-            return redirect(url_for('main.index'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def corporate_admin_required(f):
-    """법인 관리자 권한 필수 데코레이터"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('user_id'):
-            flash('로그인이 필요합니다.', 'error')
-            return redirect(url_for('auth.login', next=request.url))
-        if session.get('account_type') != User.ACCOUNT_CORPORATE:
-            flash('법인 계정으로 로그인해주세요.', 'error')
-            return redirect(url_for('main.index'))
-        if session.get('user_role') not in [User.ROLE_ADMIN, User.ROLE_MANAGER]:
-            flash('관리자 권한이 필요합니다.', 'error')
-            return redirect(url_for('corporate.dashboard'))
-        return f(*args, **kwargs)
-    return decorated_function
 
 
 @corporate_bp.route('/register', methods=['GET', 'POST'])

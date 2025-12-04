@@ -5,68 +5,18 @@
 Phase 4: 데이터 동기화 및 퇴사 처리
 """
 from flask import Blueprint, request, jsonify, session
-from functools import wraps
 
 from app.services.sync_service import sync_service
 from app.services.termination_service import termination_service
 from app.models.person_contract import PersonCorporateContract, SyncLog
+from app.utils.decorators import (
+    api_login_required as login_required,
+    api_personal_account_required as personal_account_required,
+    api_corporate_account_required as corporate_account_required,
+    contract_access_required
+)
 
 sync_bp = Blueprint('sync', __name__, url_prefix='/api/sync')
-
-
-# ===== 데코레이터 =====
-
-def login_required(f):
-    """로그인 필수 데코레이터"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('user_id'):
-            return jsonify({'success': False, 'error': '로그인이 필요합니다.'}), 401
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def personal_account_required(f):
-    """개인 계정 필수 데코레이터"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get('account_type') != 'personal':
-            return jsonify({'success': False, 'error': '개인 계정으로만 접근할 수 있습니다.'}), 403
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def corporate_account_required(f):
-    """법인 계정 필수 데코레이터"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get('account_type') != 'corporate':
-            return jsonify({'success': False, 'error': '법인 계정으로만 접근할 수 있습니다.'}), 403
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def contract_access_required(f):
-    """계약 접근 권한 확인 데코레이터"""
-    @wraps(f)
-    def decorated_function(contract_id, *args, **kwargs):
-        user_id = session.get('user_id')
-        account_type = session.get('account_type')
-        company_id = session.get('company_id')
-
-        contract = PersonCorporateContract.query.get(contract_id)
-        if not contract:
-            return jsonify({'success': False, 'error': '계약을 찾을 수 없습니다.'}), 404
-
-        # 권한 확인
-        is_person = contract.person_user_id == user_id
-        is_company = account_type == 'corporate' and contract.company_id == company_id
-
-        if not is_person and not is_company:
-            return jsonify({'success': False, 'error': '접근 권한이 없습니다.'}), 403
-
-        return f(contract_id, *args, **kwargs)
-    return decorated_function
 
 
 # ===== 동기화 API =====

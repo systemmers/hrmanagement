@@ -6,50 +6,15 @@
 - 법인 측면: 계약 요청, 계약 승인 거절, 계약 관리
 """
 from flask import Blueprint, render_template, request, jsonify, session, flash, redirect, url_for
-from functools import wraps
 
 from ..extensions import person_contract_repo, user_repo
 from ..database import db
 from ..models.company import Company
 from ..models.user import User
 from ..models.person_contract import PersonCorporateContract
+from ..utils.decorators import login_required, personal_account_required, corporate_account_required
 
 contracts_bp = Blueprint('contracts', __name__, url_prefix='/contracts')
-
-
-# ===== 데코레이터 =====
-
-def login_required(f):
-    """로그인 필수 데코레이터"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('user_id'):
-            flash('로그인이 필요합니다.', 'warning')
-            return redirect(url_for('auth.login', next=request.url))
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def personal_account_required(f):
-    """개인 계정 필수 데코레이터"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get('account_type') != 'personal':
-            flash('개인 계정으로만 접근할 수 있습니다.', 'warning')
-            return redirect(url_for('main.index'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def corporate_account_required(f):
-    """법인 계정 필수 데코레이터"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get('account_type') != 'corporate':
-            flash('법인 계정으로만 접근할 수 있습니다.', 'warning')
-            return redirect(url_for('main.index'))
-        return f(*args, **kwargs)
-    return decorated_function
 
 
 # ===== 개인 계정용 라우트 =====

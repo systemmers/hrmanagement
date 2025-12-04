@@ -4,7 +4,6 @@
 개인 회원가입, 프로필 관리, 개인 대시보드를 처리합니다.
 Phase 2: 개인-법인 분리 아키텍처의 일부입니다.
 """
-from functools import wraps
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 
 from app.database import db
@@ -13,22 +12,9 @@ from app.models.personal_profile import (
     PersonalProfile, PersonalEducation, PersonalCareer,
     PersonalCertificate, PersonalLanguage, PersonalMilitaryService
 )
+from app.utils.decorators import personal_login_required
 
 personal_bp = Blueprint('personal', __name__, url_prefix='/personal')
-
-
-def personal_login_required(f):
-    """개인 계정 로그인 필수 데코레이터"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('user_id'):
-            flash('로그인이 필요합니다.', 'error')
-            return redirect(url_for('auth.login', next=request.url))
-        if session.get('account_type') != User.ACCOUNT_PERSONAL:
-            flash('개인 계정으로 로그인해주세요.', 'error')
-            return redirect(url_for('main.index'))
-        return f(*args, **kwargs)
-    return decorated_function
 
 
 @personal_bp.route('/register', methods=['GET', 'POST'])

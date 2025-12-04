@@ -7,20 +7,7 @@ from flask import Blueprint, render_template, request, jsonify, session, redirec
 
 from ..extensions import employee_repo, classification_repo
 from ..utils.decorators import login_required
-from ..models.company import Company
-
-
-def get_current_organization_id():
-    """현재 로그인한 회사의 root_organization_id 반환
-
-    Returns:
-        int or None: 조직 ID (회사가 없거나 설정되지 않은 경우 None)
-    """
-    company_id = session.get('company_id')
-    if not company_id:
-        return None
-    company = Company.query.get(company_id)
-    return company.root_organization_id if company else None
+from ..utils.tenant import get_current_organization_id
 
 main_bp = Blueprint('main', __name__)
 
