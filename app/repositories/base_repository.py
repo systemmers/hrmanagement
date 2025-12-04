@@ -2,6 +2,7 @@
 Base Repository 클래스
 
 SQLAlchemy 기반 공통 CRUD 기능을 제공합니다.
+Phase 6: 백엔드 리팩토링 - 중복 로직 통합
 """
 from typing import List, Optional, Dict, Any, Type
 from app.database import db
@@ -40,13 +41,7 @@ class BaseRepository:
         if not record:
             return None
 
-        # 데이터 업데이트
-        for key, value in data.items():
-            # camelCase를 snake_case로 변환
-            snake_key = self._camel_to_snake(key)
-            if hasattr(record, snake_key):
-                setattr(record, snake_key, value)
-
+        self._update_record_fields(record, data)
         db.session.commit()
         return record.to_dict()
 
@@ -59,6 +54,21 @@ class BaseRepository:
         db.session.delete(record)
         db.session.commit()
         return True
+
+    def _update_record_fields(self, record, data: Dict) -> None:
+        """
+        레코드 필드 업데이트 (공통 로직)
+
+        camelCase 키를 snake_case로 변환하여 레코드에 적용합니다.
+
+        Args:
+            record: SQLAlchemy 모델 인스턴스
+            data: 업데이트할 데이터 딕셔너리
+        """
+        for key, value in data.items():
+            snake_key = self._camel_to_snake(key)
+            if hasattr(record, snake_key):
+                setattr(record, snake_key, value)
 
     def _camel_to_snake(self, name: str) -> str:
         """camelCase를 snake_case로 변환"""
@@ -113,11 +123,8 @@ class BaseOneToOneRepository(BaseRepository):
         record = self.model_class.query.filter_by(employee_id=employee_id).first()
 
         if record:
-            # 기존 레코드 업데이트
-            for key, value in data.items():
-                snake_key = self._camel_to_snake(key)
-                if hasattr(record, snake_key):
-                    setattr(record, snake_key, value)
+            # 기존 레코드 업데이트 (_update_record_fields 재사용)
+            self._update_record_fields(record, data)
             db.session.commit()
             return record.to_dict()
         else:

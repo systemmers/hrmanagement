@@ -3,6 +3,7 @@
 
 개인 회원가입, 프로필 관리, 개인 대시보드를 처리합니다.
 Phase 2: 개인-법인 분리 아키텍처의 일부입니다.
+Phase 6: 백엔드 리팩토링 - 프로필 헬퍼 통합
 """
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 
@@ -13,6 +14,7 @@ from app.models.personal_profile import (
     PersonalCertificate, PersonalLanguage, PersonalMilitaryService
 )
 from app.utils.decorators import personal_login_required
+from app.utils.personal_helpers import get_current_profile, profile_required_no_inject
 
 personal_bp = Blueprint('personal', __name__, url_prefix='/personal')
 
@@ -214,26 +216,20 @@ def profile_edit():
 
 @personal_bp.route('/education', methods=['GET'])
 @personal_login_required
+@profile_required_no_inject
 def education_list():
     """학력 목록 조회"""
-    user_id = session.get('user_id')
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({'error': '프로필을 먼저 생성해주세요.'}), 404
-
+    profile = get_current_profile()
     educations = [edu.to_dict() for edu in profile.educations.all()]
     return jsonify({'educations': educations})
 
 
 @personal_bp.route('/education', methods=['POST'])
 @personal_login_required
+@profile_required_no_inject
 def education_add():
     """학력 추가"""
-    user_id = session.get('user_id')
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({'error': '프로필을 먼저 생성해주세요.'}), 404
-
+    profile = get_current_profile()
     data = request.get_json()
     education = PersonalEducation(
         profile_id=profile.id,
@@ -255,13 +251,10 @@ def education_add():
 
 @personal_bp.route('/education/<int:education_id>', methods=['DELETE'])
 @personal_login_required
+@profile_required_no_inject
 def education_delete(education_id):
     """학력 삭제"""
-    user_id = session.get('user_id')
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({'error': '프로필을 먼저 생성해주세요.'}), 404
-
+    profile = get_current_profile()
     education = PersonalEducation.query.filter_by(
         id=education_id, profile_id=profile.id
     ).first()
@@ -280,26 +273,20 @@ def education_delete(education_id):
 
 @personal_bp.route('/career', methods=['GET'])
 @personal_login_required
+@profile_required_no_inject
 def career_list():
     """경력 목록 조회"""
-    user_id = session.get('user_id')
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({'error': '프로필을 먼저 생성해주세요.'}), 404
-
+    profile = get_current_profile()
     careers = [career.to_dict() for career in profile.careers.all()]
     return jsonify({'careers': careers})
 
 
 @personal_bp.route('/career', methods=['POST'])
 @personal_login_required
+@profile_required_no_inject
 def career_add():
     """경력 추가"""
-    user_id = session.get('user_id')
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({'error': '프로필을 먼저 생성해주세요.'}), 404
-
+    profile = get_current_profile()
     data = request.get_json()
     career = PersonalCareer(
         profile_id=profile.id,
@@ -322,13 +309,10 @@ def career_add():
 
 @personal_bp.route('/career/<int:career_id>', methods=['DELETE'])
 @personal_login_required
+@profile_required_no_inject
 def career_delete(career_id):
     """경력 삭제"""
-    user_id = session.get('user_id')
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({'error': '프로필을 먼저 생성해주세요.'}), 404
-
+    profile = get_current_profile()
     career = PersonalCareer.query.filter_by(
         id=career_id, profile_id=profile.id
     ).first()
@@ -347,26 +331,20 @@ def career_delete(career_id):
 
 @personal_bp.route('/certificate', methods=['GET'])
 @personal_login_required
+@profile_required_no_inject
 def certificate_list():
     """자격증 목록 조회"""
-    user_id = session.get('user_id')
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({'error': '프로필을 먼저 생성해주세요.'}), 404
-
+    profile = get_current_profile()
     certificates = [cert.to_dict() for cert in profile.certificates.all()]
     return jsonify({'certificates': certificates})
 
 
 @personal_bp.route('/certificate', methods=['POST'])
 @personal_login_required
+@profile_required_no_inject
 def certificate_add():
     """자격증 추가"""
-    user_id = session.get('user_id')
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({'error': '프로필을 먼저 생성해주세요.'}), 404
-
+    profile = get_current_profile()
     data = request.get_json()
     certificate = PersonalCertificate(
         profile_id=profile.id,
@@ -386,13 +364,10 @@ def certificate_add():
 
 @personal_bp.route('/certificate/<int:certificate_id>', methods=['DELETE'])
 @personal_login_required
+@profile_required_no_inject
 def certificate_delete(certificate_id):
     """자격증 삭제"""
-    user_id = session.get('user_id')
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({'error': '프로필을 먼저 생성해주세요.'}), 404
-
+    profile = get_current_profile()
     certificate = PersonalCertificate.query.filter_by(
         id=certificate_id, profile_id=profile.id
     ).first()
@@ -411,26 +386,20 @@ def certificate_delete(certificate_id):
 
 @personal_bp.route('/language', methods=['GET'])
 @personal_login_required
+@profile_required_no_inject
 def language_list():
     """어학 목록 조회"""
-    user_id = session.get('user_id')
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({'error': '프로필을 먼저 생성해주세요.'}), 404
-
+    profile = get_current_profile()
     languages = [lang.to_dict() for lang in profile.languages.all()]
     return jsonify({'languages': languages})
 
 
 @personal_bp.route('/language', methods=['POST'])
 @personal_login_required
+@profile_required_no_inject
 def language_add():
     """어학 추가"""
-    user_id = session.get('user_id')
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({'error': '프로필을 먼저 생성해주세요.'}), 404
-
+    profile = get_current_profile()
     data = request.get_json()
     language = PersonalLanguage(
         profile_id=profile.id,
@@ -449,13 +418,10 @@ def language_add():
 
 @personal_bp.route('/language/<int:language_id>', methods=['DELETE'])
 @personal_login_required
+@profile_required_no_inject
 def language_delete(language_id):
     """어학 삭제"""
-    user_id = session.get('user_id')
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({'error': '프로필을 먼저 생성해주세요.'}), 404
-
+    profile = get_current_profile()
     language = PersonalLanguage.query.filter_by(
         id=language_id, profile_id=profile.id
     ).first()
@@ -474,13 +440,10 @@ def language_delete(language_id):
 
 @personal_bp.route('/military', methods=['GET'])
 @personal_login_required
+@profile_required_no_inject
 def military_get():
     """병역 정보 조회"""
-    user_id = session.get('user_id')
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({'error': '프로필을 먼저 생성해주세요.'}), 404
-
+    profile = get_current_profile()
     military = profile.military_service
     if not military:
         return jsonify({'military': None})
@@ -490,13 +453,10 @@ def military_get():
 
 @personal_bp.route('/military', methods=['POST'])
 @personal_login_required
+@profile_required_no_inject
 def military_save():
     """병역 정보 저장/수정"""
-    user_id = session.get('user_id')
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
-    if not profile:
-        return jsonify({'error': '프로필을 먼저 생성해주세요.'}), 404
-
+    profile = get_current_profile()
     data = request.get_json()
 
     # 기존 병역 정보가 있으면 수정, 없으면 생성

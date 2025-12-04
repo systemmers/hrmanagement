@@ -43,6 +43,7 @@ from .person_contract import (
     SyncLog
 )
 from .notification import Notification, NotificationPreference
+from .audit_log import AuditLog
 
 __all__ = [
     'Employee',
@@ -82,4 +83,5 @@ __all__ = [
     'SyncLog',
     'Notification',
     'NotificationPreference',
+    'AuditLog',
 ]

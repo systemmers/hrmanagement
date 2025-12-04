@@ -2,10 +2,101 @@
 인증 데코레이터 모듈
 
 @login_required, @role_required 등 인증 관련 데코레이터를 제공합니다.
+Phase 6: 백엔드 리팩토링 - 중복 로직 통합
 """
 from functools import wraps
-from flask import session, redirect, url_for, flash, request, abort
+from flask import session, redirect, url_for, flash, request, abort, jsonify
+from typing import Optional, Tuple, Callable
 
+
+# ============================================================
+# 헬퍼 함수 (중복 로직 통합)
+# ============================================================
+
+def _check_login() -> Optional[Tuple]:
+    """
+    로그인 상태 확인 (웹 페이지용)
+
+    Returns:
+        None: 로그인됨
+        Tuple: (redirect_response,) 로그인 필요시 리다이렉트
+    """
+    if not session.get('user_id'):
+        flash('로그인이 필요합니다.', 'error')
+        return (redirect(url_for('auth.login', next=request.url)),)
+    return None
+
+
+def _check_api_login() -> Optional[Tuple]:
+    """
+    로그인 상태 확인 (API용)
+
+    Returns:
+        None: 로그인됨
+        Tuple: (json_response, status_code) 로그인 필요시 JSON 응답
+    """
+    if not session.get('user_id'):
+        return (jsonify({'success': False, 'error': '로그인이 필요합니다.'}), 401)
+    return None
+
+
+def _check_account_type(required_type: str, error_redirect: str = 'main.index') -> Optional[Tuple]:
+    """
+    계정 타입 확인 (웹 페이지용)
+
+    Args:
+        required_type: 'personal' 또는 'corporate'
+        error_redirect: 권한 없을 때 리다이렉트할 URL
+
+    Returns:
+        None: 권한 있음
+        Tuple: (redirect_response,) 권한 없을시 리다이렉트
+    """
+    if session.get('account_type') != required_type:
+        type_name = '개인' if required_type == 'personal' else '법인'
+        flash(f'{type_name} 계정으로 로그인해주세요.', 'error')
+        return (redirect(url_for(error_redirect)),)
+    return None
+
+
+def _check_api_account_type(required_type: str) -> Optional[Tuple]:
+    """
+    계정 타입 확인 (API용)
+
+    Args:
+        required_type: 'personal' 또는 'corporate'
+
+    Returns:
+        None: 권한 있음
+        Tuple: (json_response, status_code) 권한 없을시 JSON 응답
+    """
+    if session.get('account_type') != required_type:
+        type_name = '개인' if required_type == 'personal' else '법인'
+        return (jsonify({'success': False, 'error': f'{type_name} 계정으로만 접근할 수 있습니다.'}), 403)
+    return None
+
+
+def _check_role(*roles) -> Optional[Tuple]:
+    """
+    역할 확인
+
+    Args:
+        roles: 허용되는 역할들
+
+    Returns:
+        None: 권한 있음
+        Tuple: (abort_response,) 권한 없을시 403
+    """
+    user_role = session.get('user_role')
+    if user_role not in roles:
+        flash('접근 권한이 없습니다.', 'error')
+        return (abort(403),)
+    return None
+
+
+# ============================================================
+# 기본 데코레이터
+# ============================================================
 
 def login_required(f):
     """
@@ -15,10 +106,9 @@ def login_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get('user_id'):
-            flash('로그인이 필요합니다.', 'error')
-            # 현재 URL을 next 파라미터로 전달
-            return redirect(url_for('auth.login', next=request.url))
+        login_check = _check_login()
+        if login_check:
+            return login_check[0]
         return f(*args, **kwargs)
     return decorated_function
 
@@ -36,16 +126,13 @@ def role_required(*roles):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            # 먼저 로그인 확인
-            if not session.get('user_id'):
-                flash('로그인이 필요합니다.', 'error')
-                return redirect(url_for('auth.login', next=request.url))
+            login_check = _check_login()
+            if login_check:
+                return login_check[0]
 
-            # 역할 확인
-            user_role = session.get('user_role')
-            if user_role not in roles:
-                flash('접근 권한이 없습니다.', 'error')
-                abort(403)
+            role_check = _check_role(*roles)
+            if role_check:
+                return role_check[0]
 
             return f(*args, **kwargs)
         return decorated_function
@@ -60,9 +147,9 @@ def admin_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get('user_id'):
-            flash('로그인이 필요합니다.', 'error')
-            return redirect(url_for('auth.login', next=request.url))
+        login_check = _check_login()
+        if login_check:
+            return login_check[0]
 
         if session.get('user_role') != 'admin':
             flash('관리자만 접근 가능합니다.', 'error')
@@ -80,9 +167,9 @@ def manager_or_admin_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get('user_id'):
-            flash('로그인이 필요합니다.', 'error')
-            return redirect(url_for('auth.login', next=request.url))
+        login_check = _check_login()
+        if login_check:
+            return login_check[0]
 
         user_role = session.get('user_role')
         if user_role not in ('admin', 'manager'):
@@ -107,9 +194,9 @@ def self_or_admin_required(employee_id_param='employee_id'):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if not session.get('user_id'):
-                flash('로그인이 필요합니다.', 'error')
-                return redirect(url_for('auth.login', next=request.url))
+            login_check = _check_login()
+            if login_check:
+                return login_check[0]
 
             # admin은 모든 접근 가능
             if session.get('user_role') == 'admin':
@@ -147,14 +234,13 @@ def account_type_required(account_type: str, error_redirect: str = 'main.index')
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if not session.get('user_id'):
-                flash('로그인이 필요합니다.', 'error')
-                return redirect(url_for('auth.login', next=request.url))
+            login_check = _check_login()
+            if login_check:
+                return login_check[0]
 
-            if session.get('account_type') != account_type:
-                type_name = '개인' if account_type == 'personal' else '법인'
-                flash(f'{type_name} 계정으로 로그인해주세요.', 'error')
-                return redirect(url_for(error_redirect))
+            type_check = _check_account_type(account_type, error_redirect)
+            if type_check:
+                return type_check[0]
 
             return f(*args, **kwargs)
         return decorated_function
@@ -169,13 +255,13 @@ def personal_login_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get('user_id'):
-            flash('로그인이 필요합니다.', 'error')
-            return redirect(url_for('auth.login', next=request.url))
+        login_check = _check_login()
+        if login_check:
+            return login_check[0]
 
-        if session.get('account_type') != 'personal':
-            flash('개인 계정으로 로그인해주세요.', 'error')
-            return redirect(url_for('main.index'))
+        type_check = _check_account_type('personal')
+        if type_check:
+            return type_check[0]
 
         return f(*args, **kwargs)
     return decorated_function
@@ -189,13 +275,13 @@ def corporate_login_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get('user_id'):
-            flash('로그인이 필요합니다.', 'error')
-            return redirect(url_for('auth.login', next=request.url))
+        login_check = _check_login()
+        if login_check:
+            return login_check[0]
 
-        if session.get('account_type') != 'corporate':
-            flash('법인 계정으로 로그인해주세요.', 'error')
-            return redirect(url_for('main.index'))
+        type_check = _check_account_type('corporate')
+        if type_check:
+            return type_check[0]
 
         return f(*args, **kwargs)
     return decorated_function
@@ -209,13 +295,13 @@ def corporate_admin_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get('user_id'):
-            flash('로그인이 필요합니다.', 'error')
-            return redirect(url_for('auth.login', next=request.url))
+        login_check = _check_login()
+        if login_check:
+            return login_check[0]
 
-        if session.get('account_type') != 'corporate':
-            flash('법인 계정으로 로그인해주세요.', 'error')
-            return redirect(url_for('main.index'))
+        type_check = _check_account_type('corporate')
+        if type_check:
+            return type_check[0]
 
         if session.get('user_role') not in ('admin', 'manager'):
             flash('관리자 권한이 필요합니다.', 'error')
@@ -303,9 +389,9 @@ def api_login_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        from flask import jsonify
-        if not session.get('user_id'):
-            return jsonify({'success': False, 'error': '로그인이 필요합니다.'}), 401
+        api_check = _check_api_login()
+        if api_check:
+            return api_check
         return f(*args, **kwargs)
     return decorated_function
 
@@ -318,9 +404,9 @@ def api_personal_account_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        from flask import jsonify
-        if session.get('account_type') != 'personal':
-            return jsonify({'success': False, 'error': '개인 계정으로만 접근할 수 있습니다.'}), 403
+        type_check = _check_api_account_type('personal')
+        if type_check:
+            return type_check
         return f(*args, **kwargs)
     return decorated_function
 
@@ -333,8 +419,8 @@ def api_corporate_account_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        from flask import jsonify
-        if session.get('account_type') != 'corporate':
-            return jsonify({'success': False, 'error': '법인 계정으로만 접근할 수 있습니다.'}), 403
+        type_check = _check_api_account_type('corporate')
+        if type_check:
+            return type_check
         return f(*args, **kwargs)
     return decorated_function
