@@ -125,7 +125,7 @@ class Employee(db.Model):
 
     @classmethod
     def from_dict(cls, data):
-        """camelCase 딕셔너리에서 모델 생성"""
+        """camelCase/snake_case 딕셔너리에서 모델 생성"""
         return cls(
             id=data.get('id'),
             name=data.get('name'),
@@ -133,26 +133,36 @@ class Employee(db.Model):
             department=data.get('department'),
             position=data.get('position'),
             status=data.get('status'),
-            hire_date=data.get('hireDate'),
+            hire_date=data.get('hire_date') or data.get('hireDate'),
             phone=data.get('phone'),
             email=data.get('email'),
-            english_name=data.get('englishName'),
-            chinese_name=data.get('chineseName'),
-            birth_date=data.get('birthDate'),
-            lunar_birth=data.get('lunarBirth', False),
+            # 조직 연결
+            organization_id=data.get('organization_id') or data.get('organizationId'),
+            # 소속정보 추가 필드
+            employee_number=data.get('employee_number') or data.get('employeeNumber'),
+            team=data.get('team'),
+            job_title=data.get('job_title') or data.get('jobTitle'),
+            work_location=data.get('work_location') or data.get('workLocation'),
+            internal_phone=data.get('internal_phone') or data.get('internalPhone'),
+            company_email=data.get('company_email') or data.get('companyEmail'),
+            # 개인정보
+            english_name=data.get('english_name') or data.get('englishName'),
+            chinese_name=data.get('chinese_name') or data.get('chineseName'),
+            birth_date=data.get('birth_date') or data.get('birthDate'),
+            lunar_birth=data.get('lunar_birth') or data.get('lunarBirth', False),
             gender=data.get('gender'),
-            mobile_phone=data.get('mobilePhone'),
-            home_phone=data.get('homePhone'),
+            mobile_phone=data.get('mobile_phone') or data.get('mobilePhone'),
+            home_phone=data.get('home_phone') or data.get('homePhone'),
             address=data.get('address'),
-            detailed_address=data.get('detailedAddress'),
-            postal_code=data.get('postalCode'),
-            resident_number=data.get('residentNumber'),
+            detailed_address=data.get('detailed_address') or data.get('detailedAddress'),
+            postal_code=data.get('postal_code') or data.get('postalCode'),
+            resident_number=data.get('resident_number') or data.get('residentNumber'),
             nationality=data.get('nationality'),
-            blood_type=data.get('bloodType'),
+            blood_type=data.get('blood_type') or data.get('bloodType'),
             religion=data.get('religion'),
             hobby=data.get('hobby'),
             specialty=data.get('specialty'),
-            disability_info=data.get('disabilityInfo'),
+            disability_info=data.get('disability_info') or data.get('disabilityInfo'),
         )
 
     def __repr__(self):
