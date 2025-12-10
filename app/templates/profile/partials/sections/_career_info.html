@@ -1,0 +1,55 @@
+{#
+    경력 정보 섹션 (공통)
+    career_list: 경력 정보 리스트
+#}
+<section class="profile-section" id="career-info">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="fas fa-briefcase"></i>
+            경력정보
+        </h2>
+    </div>
+
+    <div class="section-content">
+        {% if career_list and career_list|length > 0 %}
+        <div class="timeline">
+            {% for career in career_list %}
+            <div class="timeline-item">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                    <div class="timeline-header">
+                        <h4 class="timeline-title">{{ career.company_name or '-' }}</h4>
+                        <span class="timeline-badge">{{ career.position or '-' }}</span>
+                    </div>
+                    <div class="timeline-meta">
+                        {% if career.department %}
+                        <span class="timeline-meta-item">
+                            <i class="fas fa-building"></i>
+                            {{ career.department }}
+                        </span>
+                        {% endif %}
+                        <span class="timeline-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            {{ career.start_date or '-' }} ~ {{ career.end_date or '재직중' }}
+                        </span>
+                    </div>
+                    {% if career.job_description %}
+                    <div class="timeline-description">{{ career.job_description }}</div>
+                    {% endif %}
+                    {% if career.reason_for_leaving %}
+                    <div class="timeline-footer">
+                        <span class="text-muted">퇴사사유: {{ career.reason_for_leaving }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-briefcase"></i>
+            <p>등록된 경력 정보가 없습니다.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>

@@ -1,0 +1,76 @@
+{#
+    병역/프로젝트/수상 섹션 (공통)
+    military_info: 병역 정보 딕셔너리
+#}
+<section class="profile-section" id="military-info">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="fas fa-medal"></i>
+            병역/프로젝트/수상
+        </h2>
+    </div>
+
+    <div class="section-content">
+        {# 병역 정보 #}
+        <div class="subsection">
+            <h3 class="subsection-title">
+                <i class="fas fa-shield-alt"></i>
+                병역사항
+            </h3>
+            {% if military_info %}
+            <div class="info-grid">
+                <div class="info-group">
+                    <label class="info-label">병역구분</label>
+                    <div class="info-value">{{ military_info.military_status or military_info.service_type or '-' }}</div>
+                </div>
+
+                {% if military_info.branch or military_info.military_branch %}
+                <div class="info-group">
+                    <label class="info-label">군별</label>
+                    <div class="info-value">{{ military_info.branch or military_info.military_branch }}</div>
+                </div>
+                {% endif %}
+
+                {% if military_info.rank or military_info.discharge_rank %}
+                <div class="info-group">
+                    <label class="info-label">계급</label>
+                    <div class="info-value">{{ military_info.rank or military_info.discharge_rank }}</div>
+                </div>
+                {% endif %}
+
+                {% if military_info.start_date or military_info.enlistment_date %}
+                <div class="info-group">
+                    <label class="info-label">입대일</label>
+                    <div class="info-value">{{ military_info.start_date or military_info.enlistment_date }}</div>
+                </div>
+                {% endif %}
+
+                {% if military_info.end_date or military_info.discharge_date %}
+                <div class="info-group">
+                    <label class="info-label">전역일</label>
+                    <div class="info-value">{{ military_info.end_date or military_info.discharge_date }}</div>
+                </div>
+                {% endif %}
+
+                {% if military_info.discharge_type %}
+                <div class="info-group">
+                    <label class="info-label">전역구분</label>
+                    <div class="info-value">{{ military_info.discharge_type }}</div>
+                </div>
+                {% endif %}
+
+                {% if military_info.exemption_reason %}
+                <div class="info-group info-group--full">
+                    <label class="info-label">면제사유</label>
+                    <div class="info-value">{{ military_info.exemption_reason }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="empty-state empty-state--small">
+                <p>병역 정보가 없습니다.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>

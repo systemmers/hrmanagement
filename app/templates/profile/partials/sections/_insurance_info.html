@@ -1,0 +1,84 @@
+{#
+    4대보험 섹션 (법인 전용)
+    insurance_info: 보험 정보 딕셔너리
+#}
+<section class="profile-section" id="insurance-info">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="fas fa-shield-alt"></i>
+            4대보험
+        </h2>
+    </div>
+
+    <div class="section-content">
+        {% if insurance_info %}
+        <div class="insurance-cards">
+            {# 국민연금 #}
+            <div class="insurance-card">
+                <div class="insurance-card-header">
+                    <i class="fas fa-coins"></i>
+                    <span>국민연금</span>
+                </div>
+                <div class="insurance-card-body">
+                    <div class="insurance-status {{ 'active' if insurance_info.national_pension else 'inactive' }}">
+                        {{ '가입' if insurance_info.national_pension else '미가입' }}
+                    </div>
+                    {% if insurance_info.national_pension_number %}
+                    <div class="insurance-number">{{ insurance_info.national_pension_number }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# 건강보험 #}
+            <div class="insurance-card">
+                <div class="insurance-card-header">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>건강보험</span>
+                </div>
+                <div class="insurance-card-body">
+                    <div class="insurance-status {{ 'active' if insurance_info.health_insurance else 'inactive' }}">
+                        {{ '가입' if insurance_info.health_insurance else '미가입' }}
+                    </div>
+                    {% if insurance_info.health_insurance_number %}
+                    <div class="insurance-number">{{ insurance_info.health_insurance_number }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# 고용보험 #}
+            <div class="insurance-card">
+                <div class="insurance-card-header">
+                    <i class="fas fa-briefcase"></i>
+                    <span>고용보험</span>
+                </div>
+                <div class="insurance-card-body">
+                    <div class="insurance-status {{ 'active' if insurance_info.employment_insurance else 'inactive' }}">
+                        {{ '가입' if insurance_info.employment_insurance else '미가입' }}
+                    </div>
+                    {% if insurance_info.employment_insurance_number %}
+                    <div class="insurance-number">{{ insurance_info.employment_insurance_number }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# 산재보험 #}
+            <div class="insurance-card">
+                <div class="insurance-card-header">
+                    <i class="fas fa-hard-hat"></i>
+                    <span>산재보험</span>
+                </div>
+                <div class="insurance-card-body">
+                    <div class="insurance-status {{ 'active' if insurance_info.industrial_accident_insurance else 'inactive' }}">
+                        {{ '가입' if insurance_info.industrial_accident_insurance else '미가입' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-shield-alt"></i>
+            <p>4대보험 정보가 없습니다.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>

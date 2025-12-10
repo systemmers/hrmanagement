@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ '인사카드' if is_corporate else '프로필' }} - {{ profile_name }}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/profile.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-page" data-account-type="{{ 'corporate' if is_corporate else 'personal' }}">
+    {# 사이드 네비게이션 #}
+    {% include 'profile/partials/_section_nav_unified.html' %}
+
+    {# 메인 콘텐츠 영역 #}
+    <main class="profile-main">
+        {# 헤더 영역 #}
+        {% include 'profile/partials/_header_unified.html' %}
+
+        <div class="profile-content">
+            {# 공통 섹션: 기본 정보 #}
+            {% include 'profile/partials/sections/_basic_info.html' %}
+
+            {# 법인 전용 섹션 #}
+            {% if is_corporate %}
+                {% include 'profile/partials/sections/_organization_info.html' %}
+                {% include 'profile/partials/sections/_contract_info.html' %}
+                {% include 'profile/partials/sections/_salary_info.html' %}
+                {% include 'profile/partials/sections/_benefit_info.html' %}
+                {% include 'profile/partials/sections/_insurance_info.html' %}
+            {% endif %}
+
+            {# 공통 섹션: 이력 및 경력 #}
+            {% include 'profile/partials/sections/_education_info.html' %}
+            {% include 'profile/partials/sections/_career_info.html' %}
+            {% include 'profile/partials/sections/_certificate_info.html' %}
+            {% include 'profile/partials/sections/_language_info.html' %}
+            {% include 'profile/partials/sections/_military_info.html' %}
+
+            {# 법인 전용 섹션: 인사기록 #}
+            {% if is_corporate %}
+                {% include 'profile/partials/sections/_employment_contract.html' %}
+                {% include 'profile/partials/sections/_personnel_movement.html' %}
+                {% include 'profile/partials/sections/_attendance_assets.html' %}
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 섹션 네비게이션 스크롤 동작
+    const navItems = document.querySelectorAll('.section-nav-item');
+    const sections = document.querySelectorAll('.profile-section');
+
+    // 스크롤 시 활성 섹션 업데이트
+    function updateActiveNav() {
+        let currentSection = '';
+        const scrollPosition = window.scrollY + 100;
+
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
+
+            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                currentSection = section.getAttribute('id');
+            }
+        });
+
+        navItems.forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('href') === '#' + currentSection) {
+                item.classList.add('active');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', updateActiveNav);
+
+    // 네비게이션 클릭 시 부드러운 스크롤
+    navItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetSection = document.getElementById(targetId);
+
+            if (targetSection) {
+                targetSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

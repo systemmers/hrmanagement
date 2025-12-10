@@ -1,0 +1,147 @@
+{#
+    인사이동 및 고과 섹션 (법인 전용)
+    데이터는 API로 로드
+#}
+<section class="profile-section" id="personnel-movement">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="fas fa-arrow-up"></i>
+            인사이동 및 고과
+        </h2>
+    </div>
+
+    <div class="section-content">
+        {# 승진 이력 #}
+        <div class="subsection">
+            <h3 class="subsection-title">
+                <i class="fas fa-level-up-alt"></i>
+                승진 이력
+            </h3>
+            <div class="data-table-container" id="promotionContainer">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>데이터를 불러오는 중...</p>
+                </div>
+            </div>
+        </div>
+
+        {# 인사평가 #}
+        <div class="subsection">
+            <h3 class="subsection-title">
+                <i class="fas fa-chart-line"></i>
+                인사평가
+            </h3>
+            <div class="data-table-container" id="evaluationContainer">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>데이터를 불러오는 중...</p>
+                </div>
+            </div>
+        </div>
+
+        {# 교육 이력 #}
+        <div class="subsection">
+            <h3 class="subsection-title">
+                <i class="fas fa-chalkboard-teacher"></i>
+                교육 이력
+            </h3>
+            <div class="data-table-container" id="trainingContainer">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>데이터를 불러오는 중...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 승진 이력 로드
+    fetch('{{ url_for("profile.promotions") }}')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('promotionContainer');
+            if (data.success && data.data && data.data.length > 0) {
+                let html = '<table class="data-table"><thead><tr>';
+                html += '<th>승진일</th><th>이전 직급</th><th>승진 직급</th><th>비고</th>';
+                html += '</tr></thead><tbody>';
+
+                data.data.forEach(item => {
+                    html += '<tr>';
+                    html += '<td>' + (item.promotion_date || '-') + '</td>';
+                    html += '<td>' + (item.previous_position || '-') + '</td>';
+                    html += '<td>' + (item.new_position || '-') + '</td>';
+                    html += '<td>' + (item.notes || '-') + '</td>';
+                    html += '</tr>';
+                });
+
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div class="empty-state empty-state--small"><p>승진 이력이 없습니다.</p></div>';
+            }
+        })
+        .catch(() => {
+            document.getElementById('promotionContainer').innerHTML = '<div class="error-state"><p>데이터 로드 실패</p></div>';
+        });
+
+    // 인사평가 로드
+    fetch('{{ url_for("profile.evaluations") }}')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('evaluationContainer');
+            if (data.success && data.data && data.data.length > 0) {
+                let html = '<table class="data-table"><thead><tr>';
+                html += '<th>평가기간</th><th>평가등급</th><th>점수</th><th>비고</th>';
+                html += '</tr></thead><tbody>';
+
+                data.data.forEach(item => {
+                    html += '<tr>';
+                    html += '<td>' + (item.evaluation_period || '-') + '</td>';
+                    html += '<td>' + (item.grade || '-') + '</td>';
+                    html += '<td>' + (item.score || '-') + '</td>';
+                    html += '<td>' + (item.notes || '-') + '</td>';
+                    html += '</tr>';
+                });
+
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div class="empty-state empty-state--small"><p>평가 이력이 없습니다.</p></div>';
+            }
+        })
+        .catch(() => {
+            document.getElementById('evaluationContainer').innerHTML = '<div class="error-state"><p>데이터 로드 실패</p></div>';
+        });
+
+    // 교육 이력 로드
+    fetch('{{ url_for("profile.trainings") }}')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('trainingContainer');
+            if (data.success && data.data && data.data.length > 0) {
+                let html = '<table class="data-table"><thead><tr>';
+                html += '<th>교육명</th><th>교육기간</th><th>교육기관</th><th>수료여부</th>';
+                html += '</tr></thead><tbody>';
+
+                data.data.forEach(item => {
+                    html += '<tr>';
+                    html += '<td>' + (item.training_name || '-') + '</td>';
+                    html += '<td>' + (item.start_date || '-') + ' ~ ' + (item.end_date || '-') + '</td>';
+                    html += '<td>' + (item.institution || '-') + '</td>';
+                    html += '<td>' + (item.completion_status || '-') + '</td>';
+                    html += '</tr>';
+                });
+
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div class="empty-state empty-state--small"><p>교육 이력이 없습니다.</p></div>';
+            }
+        })
+        .catch(() => {
+            document.getElementById('trainingContainer').innerHTML = '<div class="error-state"><p>데이터 로드 실패</p></div>';
+        });
+});
+</script>

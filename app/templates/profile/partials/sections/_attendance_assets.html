@@ -1,0 +1,108 @@
+{#
+    근태 및 비품 섹션 (법인 전용)
+    데이터는 API로 로드
+#}
+<section class="profile-section" id="attendance-assets">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="fas fa-calendar-check"></i>
+            근태 및 비품
+        </h2>
+    </div>
+
+    <div class="section-content">
+        {# 근태 현황 #}
+        <div class="subsection">
+            <h3 class="subsection-title">
+                <i class="fas fa-clock"></i>
+                최근 근태 현황
+            </h3>
+            <div class="data-table-container" id="attendanceContainer">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>데이터를 불러오는 중...</p>
+                </div>
+            </div>
+        </div>
+
+        {# 비품 현황 #}
+        <div class="subsection">
+            <h3 class="subsection-title">
+                <i class="fas fa-box"></i>
+                지급 비품
+            </h3>
+            <div class="data-table-container" id="assetContainer">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>데이터를 불러오는 중...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 근태 현황 로드
+    fetch('{{ url_for("profile.attendances") }}')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('attendanceContainer');
+            if (data.success && data.data && data.data.length > 0) {
+                // 최근 10건만 표시
+                const recentData = data.data.slice(0, 10);
+
+                let html = '<table class="data-table"><thead><tr>';
+                html += '<th>날짜</th><th>출근</th><th>퇴근</th><th>근무시간</th><th>상태</th>';
+                html += '</tr></thead><tbody>';
+
+                recentData.forEach(item => {
+                    html += '<tr>';
+                    html += '<td>' + (item.date || '-') + '</td>';
+                    html += '<td>' + (item.check_in || '-') + '</td>';
+                    html += '<td>' + (item.check_out || '-') + '</td>';
+                    html += '<td>' + (item.work_hours || '-') + '</td>';
+                    html += '<td><span class="status-badge status-badge--' + (item.status || 'default') + '">' + (item.status || '-') + '</span></td>';
+                    html += '</tr>';
+                });
+
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div class="empty-state empty-state--small"><p>근태 기록이 없습니다.</p></div>';
+            }
+        })
+        .catch(() => {
+            document.getElementById('attendanceContainer').innerHTML = '<div class="error-state"><p>데이터 로드 실패</p></div>';
+        });
+
+    // 비품 현황 로드
+    fetch('{{ url_for("profile.assets") }}')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('assetContainer');
+            if (data.success && data.data && data.data.length > 0) {
+                let html = '<table class="data-table"><thead><tr>';
+                html += '<th>품목명</th><th>관리번호</th><th>지급일</th><th>상태</th>';
+                html += '</tr></thead><tbody>';
+
+                data.data.forEach(item => {
+                    html += '<tr>';
+                    html += '<td>' + (item.asset_name || item.name || '-') + '</td>';
+                    html += '<td>' + (item.asset_number || '-') + '</td>';
+                    html += '<td>' + (item.issue_date || '-') + '</td>';
+                    html += '<td><span class="status-badge status-badge--' + (item.status || 'default') + '">' + (item.status || '-') + '</span></td>';
+                    html += '</tr>';
+                });
+
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div class="empty-state empty-state--small"><p>지급된 비품이 없습니다.</p></div>';
+            }
+        })
+        .catch(() => {
+            document.getElementById('assetContainer').innerHTML = '<div class="error-state"><p>데이터 로드 실패</p></div>';
+        });
+});
+</script>

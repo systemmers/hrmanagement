@@ -1,0 +1,80 @@
+{#
+    급여 정보 섹션 (법인 전용)
+    salary_info: 급여 정보 딕셔너리
+#}
+<section class="profile-section" id="salary-info">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="fas fa-won-sign"></i>
+            급여정보
+        </h2>
+    </div>
+
+    <div class="section-content">
+        {% if salary_info %}
+        <div class="info-grid">
+            <div class="info-group">
+                <label class="info-label">급여유형</label>
+                <div class="info-value">{{ salary_info.salary_type or '-' }}</div>
+            </div>
+
+            <div class="info-group">
+                <label class="info-label">기본급</label>
+                <div class="info-value info-value--currency">
+                    {% if salary_info.base_salary %}
+                    {{ "{:,.0f}".format(salary_info.base_salary) }}원
+                    {% else %}
+                    -
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if salary_info.annual_salary %}
+            <div class="info-group">
+                <label class="info-label">연봉</label>
+                <div class="info-value info-value--currency">
+                    {{ "{:,.0f}".format(salary_info.annual_salary) }}원
+                </div>
+            </div>
+            {% endif %}
+
+            {% if salary_info.hourly_rate %}
+            <div class="info-group">
+                <label class="info-label">시급</label>
+                <div class="info-value info-value--currency">
+                    {{ "{:,.0f}".format(salary_info.hourly_rate) }}원
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="info-group">
+                <label class="info-label">지급일</label>
+                <div class="info-value">{{ salary_info.pay_day or '-' }}일</div>
+            </div>
+
+            <div class="info-group">
+                <label class="info-label">급여계좌</label>
+                <div class="info-value">
+                    {% if salary_info.bank_name and salary_info.account_number %}
+                    {{ salary_info.bank_name }} {{ salary_info.account_number }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if salary_info.account_holder %}
+            <div class="info-group">
+                <label class="info-label">예금주</label>
+                <div class="info-value">{{ salary_info.account_holder }}</div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-won-sign"></i>
+            <p>급여 정보가 없습니다.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>

@@ -1,0 +1,121 @@
+{#
+    기본 정보 섹션 (공통)
+    basic_info: 기본 정보 딕셔너리
+#}
+<section class="profile-section" id="basic-info">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="fas fa-user"></i>
+            개인 기본정보
+        </h2>
+    </div>
+
+    <div class="section-content">
+        <div class="info-grid">
+            {# 이름 정보 #}
+            <div class="info-group">
+                <label class="info-label">이름</label>
+                <div class="info-value">{{ basic_info.name or '-' }}</div>
+            </div>
+
+            {% if basic_info.english_name %}
+            <div class="info-group">
+                <label class="info-label">영문명</label>
+                <div class="info-value">{{ basic_info.english_name }}</div>
+            </div>
+            {% endif %}
+
+            {% if basic_info.chinese_name %}
+            <div class="info-group">
+                <label class="info-label">한문명</label>
+                <div class="info-value">{{ basic_info.chinese_name }}</div>
+            </div>
+            {% endif %}
+
+            {# 생년월일 #}
+            <div class="info-group">
+                <label class="info-label">생년월일</label>
+                <div class="info-value">
+                    {{ basic_info.birth_date or '-' }}
+                    {% if basic_info.lunar_birth %}
+                    <span class="info-badge">음력</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# 성별 #}
+            <div class="info-group">
+                <label class="info-label">성별</label>
+                <div class="info-value">{{ basic_info.gender or '-' }}</div>
+            </div>
+
+            {# 연락처 #}
+            <div class="info-group">
+                <label class="info-label">휴대전화</label>
+                <div class="info-value">{{ basic_info.mobile_phone or '-' }}</div>
+            </div>
+
+            {% if basic_info.home_phone %}
+            <div class="info-group">
+                <label class="info-label">자택전화</label>
+                <div class="info-value">{{ basic_info.home_phone }}</div>
+            </div>
+            {% endif %}
+
+            <div class="info-group">
+                <label class="info-label">이메일</label>
+                <div class="info-value">{{ basic_info.email or '-' }}</div>
+            </div>
+
+            {# 주소 #}
+            <div class="info-group info-group--full">
+                <label class="info-label">주소</label>
+                <div class="info-value">
+                    {% if basic_info.postal_code %}
+                    <span class="info-postal">({{ basic_info.postal_code }})</span>
+                    {% endif %}
+                    {{ basic_info.address or '-' }}
+                    {% if basic_info.detailed_address %}
+                    {{ basic_info.detailed_address }}
+                    {% endif %}
+                </div>
+            </div>
+
+            {# 기타 정보 #}
+            {% if basic_info.nationality %}
+            <div class="info-group">
+                <label class="info-label">국적</label>
+                <div class="info-value">{{ basic_info.nationality }}</div>
+            </div>
+            {% endif %}
+
+            {% if basic_info.blood_type %}
+            <div class="info-group">
+                <label class="info-label">혈액형</label>
+                <div class="info-value">{{ basic_info.blood_type }}</div>
+            </div>
+            {% endif %}
+
+            {% if basic_info.religion %}
+            <div class="info-group">
+                <label class="info-label">종교</label>
+                <div class="info-value">{{ basic_info.religion }}</div>
+            </div>
+            {% endif %}
+
+            {% if basic_info.hobby %}
+            <div class="info-group">
+                <label class="info-label">취미</label>
+                <div class="info-value">{{ basic_info.hobby }}</div>
+            </div>
+            {% endif %}
+
+            {% if basic_info.specialty %}
+            <div class="info-group">
+                <label class="info-label">특기</label>
+                <div class="info-value">{{ basic_info.specialty }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,89 @@
+{#
+    소속 정보 섹션 (법인 전용)
+    organization_info: 소속 정보 딕셔너리
+#}
+<section class="profile-section" id="organization-info">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="fas fa-building"></i>
+            소속정보
+        </h2>
+    </div>
+
+    <div class="section-content">
+        {% if organization_info %}
+        <div class="info-grid">
+            {% if organization_info.organization %}
+            <div class="info-group">
+                <label class="info-label">소속회사</label>
+                <div class="info-value">{{ organization_info.organization.name or '-' }}</div>
+            </div>
+            {% endif %}
+
+            <div class="info-group">
+                <label class="info-label">부서</label>
+                <div class="info-value">{{ organization_info.department or '-' }}</div>
+            </div>
+
+            {% if organization_info.team %}
+            <div class="info-group">
+                <label class="info-label">팀</label>
+                <div class="info-value">{{ organization_info.team }}</div>
+            </div>
+            {% endif %}
+
+            <div class="info-group">
+                <label class="info-label">직급</label>
+                <div class="info-value">{{ organization_info.position or '-' }}</div>
+            </div>
+
+            {% if organization_info.job_title %}
+            <div class="info-group">
+                <label class="info-label">직책</label>
+                <div class="info-value">{{ organization_info.job_title }}</div>
+            </div>
+            {% endif %}
+
+            <div class="info-group">
+                <label class="info-label">입사일</label>
+                <div class="info-value">{{ organization_info.hire_date or '-' }}</div>
+            </div>
+
+            <div class="info-group">
+                <label class="info-label">재직상태</label>
+                <div class="info-value">
+                    <span class="status-badge status-badge--{{ organization_info.status or 'default' }}">
+                        {{ organization_info.status or '-' }}
+                    </span>
+                </div>
+            </div>
+
+            {% if organization_info.work_location %}
+            <div class="info-group">
+                <label class="info-label">근무지</label>
+                <div class="info-value">{{ organization_info.work_location }}</div>
+            </div>
+            {% endif %}
+
+            {% if organization_info.internal_phone %}
+            <div class="info-group">
+                <label class="info-label">내선번호</label>
+                <div class="info-value">{{ organization_info.internal_phone }}</div>
+            </div>
+            {% endif %}
+
+            {% if organization_info.company_email %}
+            <div class="info-group">
+                <label class="info-label">회사 이메일</label>
+                <div class="info-value">{{ organization_info.company_email }}</div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-building"></i>
+            <p>소속 정보가 없습니다.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>

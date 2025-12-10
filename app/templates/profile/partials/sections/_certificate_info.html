@@ -1,0 +1,59 @@
+{#
+    자격증 및 면허 섹션 (공통)
+    certificate_list: 자격증 정보 리스트
+#}
+<section class="profile-section" id="certificate-info">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="fas fa-certificate"></i>
+            자격증 및 면허
+        </h2>
+    </div>
+
+    <div class="section-content">
+        {% if certificate_list and certificate_list|length > 0 %}
+        <div class="card-list">
+            {% for cert in certificate_list %}
+            <div class="info-card">
+                <div class="info-card-icon">
+                    <i class="fas fa-award"></i>
+                </div>
+                <div class="info-card-content">
+                    <h4 class="info-card-title">{{ cert.name or cert.certificate_name or '-' }}</h4>
+                    <div class="info-card-meta">
+                        {% if cert.issuing_organization or cert.issuer %}
+                        <span class="info-card-meta-item">
+                            <i class="fas fa-building"></i>
+                            {{ cert.issuing_organization or cert.issuer }}
+                        </span>
+                        {% endif %}
+                        {% if cert.acquisition_date or cert.issue_date %}
+                        <span class="info-card-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            {{ cert.acquisition_date or cert.issue_date }}
+                        </span>
+                        {% endif %}
+                        {% if cert.certificate_number %}
+                        <span class="info-card-meta-item">
+                            <i class="fas fa-hashtag"></i>
+                            {{ cert.certificate_number }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% if cert.grade or cert.level %}
+                    <div class="info-card-badge">
+                        {{ cert.grade or cert.level }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-certificate"></i>
+            <p>등록된 자격증이 없습니다.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>

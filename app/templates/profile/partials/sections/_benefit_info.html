@@ -1,0 +1,76 @@
+{#
+    연차 및 복리후생 섹션 (법인 전용)
+    benefit_info: 복리후생 정보 딕셔너리
+#}
+<section class="profile-section" id="benefit-info">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="fas fa-umbrella-beach"></i>
+            연차 및 복리후생
+        </h2>
+    </div>
+
+    <div class="section-content">
+        {% if benefit_info %}
+        <div class="info-grid">
+            {# 연차 정보 #}
+            <div class="info-group">
+                <label class="info-label">총 연차</label>
+                <div class="info-value">{{ benefit_info.total_leave or 0 }}일</div>
+            </div>
+
+            <div class="info-group">
+                <label class="info-label">사용 연차</label>
+                <div class="info-value">{{ benefit_info.used_leave or 0 }}일</div>
+            </div>
+
+            <div class="info-group">
+                <label class="info-label">잔여 연차</label>
+                <div class="info-value info-value--highlight">
+                    {{ (benefit_info.total_leave or 0) - (benefit_info.used_leave or 0) }}일
+                </div>
+            </div>
+
+            {# 기타 복리후생 #}
+            {% if benefit_info.meal_allowance %}
+            <div class="info-group">
+                <label class="info-label">식대</label>
+                <div class="info-value info-value--currency">
+                    {{ "{:,.0f}".format(benefit_info.meal_allowance) }}원/월
+                </div>
+            </div>
+            {% endif %}
+
+            {% if benefit_info.transportation_allowance %}
+            <div class="info-group">
+                <label class="info-label">교통비</label>
+                <div class="info-value info-value--currency">
+                    {{ "{:,.0f}".format(benefit_info.transportation_allowance) }}원/월
+                </div>
+            </div>
+            {% endif %}
+
+            {% if benefit_info.housing_allowance %}
+            <div class="info-group">
+                <label class="info-label">주거수당</label>
+                <div class="info-value info-value--currency">
+                    {{ "{:,.0f}".format(benefit_info.housing_allowance) }}원/월
+                </div>
+            </div>
+            {% endif %}
+
+            {% if benefit_info.notes %}
+            <div class="info-group info-group--full">
+                <label class="info-label">비고</label>
+                <div class="info-value">{{ benefit_info.notes }}</div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-umbrella-beach"></i>
+            <p>복리후생 정보가 없습니다.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>

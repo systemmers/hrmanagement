@@ -1,0 +1,55 @@
+{#
+    학력 정보 섹션 (공통)
+    education_list: 학력 정보 리스트
+#}
+<section class="profile-section" id="education-info">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="fas fa-graduation-cap"></i>
+            학력정보
+        </h2>
+    </div>
+
+    <div class="section-content">
+        {% if education_list and education_list|length > 0 %}
+        <div class="timeline">
+            {% for edu in education_list %}
+            <div class="timeline-item">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                    <div class="timeline-header">
+                        <h4 class="timeline-title">{{ edu.school_name or '-' }}</h4>
+                        <span class="timeline-badge">{{ edu.degree or edu.education_level or '-' }}</span>
+                    </div>
+                    <div class="timeline-meta">
+                        {% if edu.major %}
+                        <span class="timeline-meta-item">
+                            <i class="fas fa-book"></i>
+                            {{ edu.major }}
+                        </span>
+                        {% endif %}
+                        <span class="timeline-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            {{ edu.start_date or '-' }} ~ {{ edu.end_date or '재학중' }}
+                        </span>
+                        {% if edu.graduation_status %}
+                        <span class="timeline-meta-item">
+                            {{ edu.graduation_status }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% if edu.notes %}
+                    <div class="timeline-description">{{ edu.notes }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-graduation-cap"></i>
+            <p>등록된 학력 정보가 없습니다.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
