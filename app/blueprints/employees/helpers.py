@@ -179,142 +179,225 @@ def extract_basic_fields_from_form(form_data):
 
 
 # ========================================
-# 관계형 데이터 업데이트 헬퍼 함수
+# 관계형 데이터 업데이트 - 범용 클래스
+# ========================================
+
+class RelatedDataUpdater:
+    """관계형 데이터 업데이트를 위한 범용 헬퍼 클래스
+
+    반복적인 update_*_data() 함수들의 공통 패턴을 추상화합니다.
+    """
+
+    def __init__(self, model_class, repository, form_prefix, required_field, field_mapping, converters=None):
+        """
+        Args:
+            model_class: SQLAlchemy 모델 클래스
+            repository: 레포지토리 인스턴스
+            form_prefix: 폼 필드 접두사 (예: 'family_', 'education_')
+            required_field: 필수 필드 suffix (이 필드가 있어야 레코드 생성)
+            field_mapping: {form_field_suffix: model_attribute} 매핑
+            converters: {model_attribute: converter_func} 타입 변환 함수
+        """
+        self.model_class = model_class
+        self.repository = repository
+        self.form_prefix = form_prefix
+        self.required_field = required_field
+        self.field_mapping = field_mapping
+        self.converters = converters or {}
+
+    def update(self, employee_id, form_data):
+        """관계형 데이터 업데이트 실행"""
+        # 기존 데이터 삭제
+        self.repository.delete_by_employee_id(employee_id)
+
+        # 폼 데이터 추출
+        form_lists = {}
+        for field_suffix in self.field_mapping.keys():
+            form_key = f"{self.form_prefix}{field_suffix}[]"
+            form_lists[field_suffix] = form_data.getlist(form_key)
+
+        # 필수 필드 리스트를 기준으로 반복
+        required_values = form_lists.get(self.required_field, [])
+
+        for i in range(len(required_values)):
+            if required_values[i]:  # 필수 필드가 있는 경우만
+                model_data = {'employee_id': employee_id}
+
+                for field_suffix, model_attr in self.field_mapping.items():
+                    values = form_lists.get(field_suffix, [])
+                    value = values[i] if i < len(values) else None
+
+                    # 타입 변환 적용
+                    if model_attr in self.converters and value is not None:
+                        value = self.converters[model_attr](value)
+
+                    model_data[model_attr] = value
+
+                instance = self.model_class(**model_data)
+                self.repository.create(instance)
+
+
+# ========================================
+# 관계형 데이터 Updater 인스턴스 생성 함수
+# ========================================
+
+def _get_family_updater():
+    """가족정보 Updater 생성"""
+    from ...models import FamilyMember
+    return RelatedDataUpdater(
+        model_class=FamilyMember,
+        repository=family_repo,
+        form_prefix='family_',
+        required_field='name',
+        field_mapping={
+            'relation': 'relation',
+            'name': 'name',
+            'birth_date': 'birth_date',
+            'occupation': 'occupation',
+            'phone': 'contact',
+            'cohabiting': 'is_cohabitant',
+        },
+        converters={'is_cohabitant': bool}
+    )
+
+
+def _get_education_updater():
+    """학력정보 Updater 생성"""
+    from ...models import Education
+    return RelatedDataUpdater(
+        model_class=Education,
+        repository=education_repo,
+        form_prefix='education_',
+        required_field='school_name',
+        field_mapping={
+            'school_type': 'school_type',
+            'school_name': 'school_name',
+            'graduation_year': 'graduation_date',
+            'major': 'major',
+            'degree': 'degree',
+            'graduation_status': 'graduation_status',
+        }
+    )
+
+
+def _get_career_updater():
+    """경력정보 Updater 생성"""
+    from ...models import Career
+    return RelatedDataUpdater(
+        model_class=Career,
+        repository=career_repo,
+        form_prefix='career_',
+        required_field='company_name',
+        field_mapping={
+            'company_name': 'company_name',
+            'start_date': 'start_date',
+            'end_date': 'end_date',
+            'department': 'department',
+            'position': 'position',
+            'duties': 'job_description',
+        }
+    )
+
+
+def _get_certificate_updater():
+    """자격증정보 Updater 생성"""
+    from ...models import Certificate
+    return RelatedDataUpdater(
+        model_class=Certificate,
+        repository=certificate_repo,
+        form_prefix='certificate_',
+        required_field='name',
+        field_mapping={
+            'name': 'certificate_name',
+            'grade': 'grade',
+            'issuer': 'issuing_organization',
+            'number': 'certificate_number',
+            'date': 'acquisition_date',
+        }
+    )
+
+
+def _get_language_updater():
+    """언어능력정보 Updater 생성"""
+    from ...models import Language
+    return RelatedDataUpdater(
+        model_class=Language,
+        repository=language_repo,
+        form_prefix='language_',
+        required_field='name',
+        field_mapping={
+            'name': 'language',
+            'level': 'level',
+            'test_name': 'test_name',
+            'score': 'score',
+            'test_date': 'test_date',
+        }
+    )
+
+
+def _get_project_updater():
+    """프로젝트정보 Updater 생성"""
+    from ...models import Project
+    return RelatedDataUpdater(
+        model_class=Project,
+        repository=project_repo,
+        form_prefix='project_',
+        required_field='name',
+        field_mapping={
+            'name': 'project_name',
+            'start_date': 'start_date',
+            'end_date': 'end_date',
+            'duties': 'duties',
+            'role': 'role',
+            'client': 'client',
+        }
+    )
+
+
+def _get_award_updater():
+    """수상정보 Updater 생성"""
+    from ...models import Award
+    return RelatedDataUpdater(
+        model_class=Award,
+        repository=award_repo,
+        form_prefix='award_',
+        required_field='name',
+        field_mapping={
+            'date': 'award_date',
+            'name': 'award_name',
+            'issuer': 'issuer',
+            'note': 'note',
+        }
+    )
+
+
+# ========================================
+# 관계형 데이터 업데이트 래퍼 함수 (기존 API 호환)
 # ========================================
 
 def update_family_data(employee_id, form_data):
-    """가족정보 업데이트"""
-    from ...models import FamilyMember
-
-    # 기존 데이터 삭제 후 새로 입력
-    family_repo.delete_by_employee_id(employee_id)
-
-    # 폼에서 가족정보 추출
-    relations = form_data.getlist('family_relation[]')
-    names = form_data.getlist('family_name[]')
-    birth_dates = form_data.getlist('family_birth_date[]')
-    occupations = form_data.getlist('family_occupation[]')
-    phones = form_data.getlist('family_phone[]')
-    cohabitings = form_data.getlist('family_cohabiting[]')
-
-    for i in range(len(relations)):
-        if relations[i] and names[i]:  # 필수 필드가 있는 경우만
-            family = FamilyMember(
-                employee_id=employee_id,
-                relation=relations[i],
-                name=names[i],
-                birth_date=birth_dates[i] if i < len(birth_dates) else None,
-                occupation=occupations[i] if i < len(occupations) else None,
-                contact=phones[i] if i < len(phones) else None,
-                is_cohabitant=bool(cohabitings[i]) if i < len(cohabitings) else False
-            )
-            family_repo.create(family)
+    """가족정보 업데이트 (RelatedDataUpdater 사용)"""
+    _get_family_updater().update(employee_id, form_data)
 
 
 def update_education_data(employee_id, form_data):
-    """학력정보 업데이트"""
-    from ...models import Education
-
-    education_repo.delete_by_employee_id(employee_id)
-
-    school_types = form_data.getlist('education_school_type[]')
-    school_names = form_data.getlist('education_school_name[]')
-    graduation_dates = form_data.getlist('education_graduation_year[]')
-    majors = form_data.getlist('education_major[]')
-    degrees = form_data.getlist('education_degree[]')
-    graduation_statuses = form_data.getlist('education_graduation_status[]')
-
-    for i in range(len(school_names)):
-        if school_names[i]:
-            education = Education(
-                employee_id=employee_id,
-                school_type=school_types[i] if i < len(school_types) else None,
-                school_name=school_names[i],
-                graduation_date=graduation_dates[i] if i < len(graduation_dates) else None,
-                major=majors[i] if i < len(majors) else None,
-                degree=degrees[i] if i < len(degrees) else None,
-                graduation_status=graduation_statuses[i] if i < len(graduation_statuses) else None
-            )
-            education_repo.create(education)
+    """학력정보 업데이트 (RelatedDataUpdater 사용)"""
+    _get_education_updater().update(employee_id, form_data)
 
 
 def update_career_data(employee_id, form_data):
-    """경력정보 업데이트"""
-    from ...models import Career
-
-    career_repo.delete_by_employee_id(employee_id)
-
-    company_names = form_data.getlist('career_company_name[]')
-    start_dates = form_data.getlist('career_start_date[]')
-    end_dates = form_data.getlist('career_end_date[]')
-    departments = form_data.getlist('career_department[]')
-    positions = form_data.getlist('career_position[]')
-    duties = form_data.getlist('career_duties[]')
-
-    for i in range(len(company_names)):
-        if company_names[i]:
-            career = Career(
-                employee_id=employee_id,
-                company_name=company_names[i],
-                start_date=start_dates[i] if i < len(start_dates) else None,
-                end_date=end_dates[i] if i < len(end_dates) else None,
-                department=departments[i] if i < len(departments) else None,
-                position=positions[i] if i < len(positions) else None,
-                job_description=duties[i] if i < len(duties) else None
-            )
-            career_repo.create(career)
+    """경력정보 업데이트 (RelatedDataUpdater 사용)"""
+    _get_career_updater().update(employee_id, form_data)
 
 
 def update_certificate_data(employee_id, form_data):
-    """자격증정보 업데이트"""
-    from ...models import Certificate
-
-    certificate_repo.delete_by_employee_id(employee_id)
-
-    cert_types = form_data.getlist('certificate_type[]')
-    cert_names = form_data.getlist('certificate_name[]')
-    cert_grades = form_data.getlist('certificate_grade[]')
-    cert_issuers = form_data.getlist('certificate_issuer[]')
-    cert_dates = form_data.getlist('certificate_date[]')
-
-    cert_numbers = form_data.getlist('certificate_number[]')
-
-    for i in range(len(cert_names)):
-        if cert_names[i]:
-            certificate = Certificate(
-                employee_id=employee_id,
-                certificate_name=cert_names[i],
-                grade=cert_grades[i] if i < len(cert_grades) else None,
-                issuing_organization=cert_issuers[i] if i < len(cert_issuers) else None,
-                certificate_number=cert_numbers[i] if i < len(cert_numbers) else None,
-                acquisition_date=cert_dates[i] if i < len(cert_dates) else None
-            )
-            certificate_repo.create(certificate)
+    """자격증정보 업데이트 (RelatedDataUpdater 사용)"""
+    _get_certificate_updater().update(employee_id, form_data)
 
 
 def update_language_data(employee_id, form_data):
-    """언어능력정보 업데이트"""
-    from ...models import Language
-
-    language_repo.delete_by_employee_id(employee_id)
-
-    languages = form_data.getlist('language_name[]')
-    levels = form_data.getlist('language_level[]')
-    test_names = form_data.getlist('language_test_name[]')
-    scores = form_data.getlist('language_score[]')
-    test_dates = form_data.getlist('language_test_date[]')
-
-    for i in range(len(languages)):
-        if languages[i]:
-            language = Language(
-                employee_id=employee_id,
-                language=languages[i],
-                level=levels[i] if i < len(levels) else None,
-                test_name=test_names[i] if i < len(test_names) else None,
-                score=scores[i] if i < len(scores) else None,
-                test_date=test_dates[i] if i < len(test_dates) else None
-            )
-            language_repo.create(language)
+    """언어능력정보 업데이트 (RelatedDataUpdater 사용)"""
+    _get_language_updater().update(employee_id, form_data)
 
 
 def update_military_data(employee_id, form_data):
@@ -338,50 +421,10 @@ def update_military_data(employee_id, form_data):
 
 
 def update_project_data(employee_id, form_data):
-    """프로젝트정보 업데이트"""
-    from ...models import Project
-
-    project_repo.delete_by_employee_id(employee_id)
-
-    project_names = form_data.getlist('project_name[]')
-    start_dates = form_data.getlist('project_start_date[]')
-    end_dates = form_data.getlist('project_end_date[]')
-    duties = form_data.getlist('project_duties[]')
-    roles = form_data.getlist('project_role[]')
-    clients = form_data.getlist('project_client[]')
-
-    for i in range(len(project_names)):
-        if project_names[i]:
-            project = Project(
-                employee_id=employee_id,
-                project_name=project_names[i],
-                start_date=start_dates[i] if i < len(start_dates) else None,
-                end_date=end_dates[i] if i < len(end_dates) else None,
-                duties=duties[i] if i < len(duties) else None,
-                role=roles[i] if i < len(roles) else None,
-                client=clients[i] if i < len(clients) else None
-            )
-            project_repo.create(project)
+    """프로젝트정보 업데이트 (RelatedDataUpdater 사용)"""
+    _get_project_updater().update(employee_id, form_data)
 
 
 def update_award_data(employee_id, form_data):
-    """수상정보 업데이트"""
-    from ...models import Award
-
-    award_repo.delete_by_employee_id(employee_id)
-
-    award_dates = form_data.getlist('award_date[]')
-    award_names = form_data.getlist('award_name[]')
-    award_issuers = form_data.getlist('award_issuer[]')
-    award_notes = form_data.getlist('award_note[]')
-
-    for i in range(len(award_names)):
-        if award_names[i]:
-            award = Award(
-                employee_id=employee_id,
-                award_date=award_dates[i] if i < len(award_dates) else None,
-                award_name=award_names[i],
-                issuer=award_issuers[i] if i < len(award_issuers) else None,
-                note=award_notes[i] if i < len(award_notes) else None
-            )
-            award_repo.create(award)
+    """수상정보 업데이트 (RelatedDataUpdater 사용)"""
+    _get_award_updater().update(employee_id, form_data)

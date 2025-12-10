@@ -1,0 +1,108 @@
+/**
+ * 포괄임금제 급여 요약 섹션 스타일
+ *
+ * 구성 요소:
+ * - 폼 페이지 요약 박스
+ * - 상세 필드 영역
+ * - 카드 헤더 버튼
+ */
+
+/* ========================================
+   폼 페이지 - 포괄임금제 요약 섹션
+   ======================================== */
+
+.comprehensive-salary-summary {
+    background: linear-gradient(135deg, var(--color-blue-50, #eff6ff), var(--color-blue-100, #dbeafe));
+    border: 1px solid var(--color-blue-200, #bfdbfe);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+.comprehensive-salary-summary .summary-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 600;
+    color: var(--color-blue-700, #1d4ed8);
+    margin-bottom: var(--space-3);
+}
+
+.comprehensive-salary-summary .summary-header i {
+    font-size: var(--text-lg);
+}
+
+.comprehensive-salary-summary .summary-content {
+    display: flex;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+}
+
+.comprehensive-salary-summary .summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.comprehensive-salary-summary .summary-item .label {
+    font-size: var(--text-xs);
+    color: var(--color-gray-600);
+}
+
+.comprehensive-salary-summary .summary-item .value {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-gray-900);
+}
+
+/* 포괄임금제 상세 필드 영역 */
+.comprehensive-salary-details {
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-gray-200);
+}
+
+.comprehensive-salary-details .section-subtitle {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-gray-900);
+    margin-bottom: var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.comprehensive-salary-details .section-subtitle i {
+    color: var(--color-blue-500);
+}
+
+/* 카드 헤더 버튼 정렬 */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header .btn-outline-primary {
+    background: transparent;
+    border: 1px solid var(--color-blue-500);
+    color: var(--color-blue-500);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.card-header .btn-outline-primary:hover {
+    background: var(--color-blue-500);
+    color: white;
+}
+
+.card-header .btn-sm {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+}

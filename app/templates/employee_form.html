@@ -14,9 +14,10 @@
 {# Employee role 여부 플래그 #}
 {% set is_employee_role = current_user and current_user.role == 'employee' %}
 
+{% from 'macros/_navigation.html' import section_nav %}
 <div class="form-page-layout-with-sidebar">
     {# 좌측: 섹션 네비게이션 #}
-    {% include 'partials/employee_form/_section_nav.html' %}
+    {{ section_nav('인사정보 등록', employee.name if employee else '신규 등록', variant='form', employee=employee, is_employee_role=is_employee_role) }}
 
     {# 메인 콘텐츠: 폼 #}
     <main class="form-main-content">

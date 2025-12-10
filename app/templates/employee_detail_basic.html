@@ -12,9 +12,10 @@
 {% endblock %}
 
 {% block content %}
+{% from 'macros/_navigation.html' import section_nav %}
 <div class="detail-page-layout">
     {# 좌측 섹션 네비게이션 #}
-    {% include 'partials/employee_detail/_section_nav_basic.html' %}
+    {{ section_nav('내 기본정보', employee.name, variant='basic', employee=employee) }}
 
     {# 메인 콘텐츠 #}
     <div class="detail-main-content">
@@ -29,8 +30,9 @@
             </div>
         </div>
 
-        {# 개인 계정용 헤더 카드 (명함 영역 없음) #}
-        {% include 'partials/employee_detail/_employee_header_personal.html' %}
+        {# 통합 헤더 카드 - 개인 계정 variant #}
+        {% set variant = 'personal' %}
+        {% include 'partials/employee_detail/_employee_header.html' %}
 
         {# 개인 기본정보 섹션만 포함 #}
         {% from 'macros/_info_display.html' import info_item, card_header, section_title %}

@@ -1,13 +1,19 @@
 {#
-    직원 상세 - 직원 헤더 카드
-    employee: 직원 객체
-    get_status_text: 상태 텍스트 함수
-    calculate_tenure: 재직기간 계산 함수
-    business_card_front: 명함 앞면 첨부파일 객체
-    business_card_back: 명함 뒷면 첨부파일 객체
-    can_edit_business_card: 명함 편집 권한 여부
+    직원 상세 - 통합 직원 헤더 카드
+
+    Parameters:
+    - employee: 직원 객체 (필수)
+    - get_status_text: 상태 텍스트 함수 (선택적)
+    - calculate_tenure: 재직기간 계산 함수 (선택적)
+    - business_card_front: 명함 앞면 첨부파일 객체 (선택적)
+    - business_card_back: 명함 뒷면 첨부파일 객체 (선택적)
+    - can_edit_business_card: 명함 편집 권한 여부 (선택적)
+    - variant: 'corporate' | 'personal' (기본: 'corporate')
+        - corporate: 회사 소속정보, 명함 표시
+        - personal: 개인 연락처, 명함 없음
 #}
-<div class="employee-header">
+{% set header_variant = variant|default('corporate') %}
+<div class="employee-header{% if header_variant == 'personal' %} employee-header--personal{% endif %}">
     <div class="employee-header-content">
         <div class="employee-header-left">
             <div class="employee-photo">
@@ -17,6 +23,8 @@
                 <div class="employee-name">{{ employee.name }}</div>
                 <div class="employee-name-en">{{ employee.name|upper }}</div>
                 <div class="employee-meta">
+                    {% if header_variant == 'corporate' %}
+                    {# 법인 계정: 소속 정보 #}
                     <div class="meta-item">
                         <i class="fas fa-building"></i>
                         <span>{{ employee.department }}</span>
@@ -27,31 +35,68 @@
                     </div>
                     <div class="meta-item">
                         <i class="fas fa-calendar-check"></i>
-                        <span>{{ get_status_text(employee.status) }}</span>
+                        <span>{{ get_status_text(employee.status) if get_status_text else employee.status }}</span>
                     </div>
+                    {% else %}
+                    {# 개인 계정: 연락처 정보 #}
+                    <div class="meta-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>{{ employee.email or '-' }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-phone"></i>
+                        <span>{{ employee.phone or '-' }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ employee.address or '-' }}</span>
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="employee-stats">
+                    {% if header_variant == 'corporate' %}
+                    {# 법인 계정: 고용 정보 #}
                     <div class="stat-item">
                         <div class="stat-label">입사일</div>
-                        <div class="stat-value">{{ employee.hire_date }}</div>
+                        <div class="stat-value">{{ employee.hire_date or '-' }}</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-label">재직기간</div>
-                        <div class="stat-value">{{ calculate_tenure(employee.hire_date) }}</div>
+                        <div class="stat-value">{{ calculate_tenure(employee.hire_date) if calculate_tenure and employee.hire_date else '-' }}</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-label">연차 잔여</div>
-                        <div class="stat-value">15일</div>
+                        <div class="stat-value">{{ employee.remaining_leave|default(15) }}일</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-label">사번</div>
                         <div class="stat-value">EMP-{{ '%03d'|format(employee.id) }}</div>
                     </div>
+                    {% else %}
+                    {# 개인 계정: 개인 정보 #}
+                    <div class="stat-item">
+                        <div class="stat-label">생년월일</div>
+                        <div class="stat-value">{{ employee.birth_date or '-' }}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">계약 수</div>
+                        <div class="stat-value">{{ employee.contract_count|default(0) }}건</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">가입일</div>
+                        <div class="stat-value">{{ employee.created_at|default('-') }}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">회원번호</div>
+                        <div class="stat-value">USR-{{ '%03d'|format(employee.id) }}</div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- 명함 카드 영역 -->
+        {% if header_variant == 'corporate' %}
+        <!-- 명함 카드 영역 (법인 계정 전용) -->
         <div class="business-card-container" data-employee-id="{{ employee.id }}">
             <span class="business-card-title">명함</span>
             <div class="business-card-wrapper">
@@ -104,5 +149,6 @@
             </div>
             {% endif %}
         </div>
+        {% endif %}
     </div>
 </div>

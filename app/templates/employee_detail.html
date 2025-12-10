@@ -13,9 +13,10 @@
 {% endblock %}
 
 {% block content %}
+{% from 'macros/_navigation.html' import section_nav %}
 <div class="detail-page-layout">
     {# 좌측 섹션 네비게이션 #}
-    {% include 'partials/employee_detail/_section_nav.html' %}
+    {{ section_nav('인사카드', employee.name, variant='full', employee=employee) }}
 
     {# 메인 콘텐츠 #}
     <div class="detail-main-content">
