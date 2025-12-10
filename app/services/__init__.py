@@ -16,6 +16,13 @@ from .event_listeners import (
 )
 from .notification_service import NotificationService, notification_service
 from .personal_service import PersonalService, personal_service
+from .file_storage_service import (
+    FileStorageService, file_storage,
+    ALLOWED_EXTENSIONS, ALLOWED_IMAGE_EXTENSIONS,
+    MAX_FILE_SIZE, MAX_IMAGE_SIZE,
+    CATEGORY_ATTACHMENT, CATEGORY_PROFILE_PHOTO,
+    CATEGORY_BUSINESS_CARD_FRONT, CATEGORY_BUSINESS_CARD_BACK
+)
 
 __all__ = [
     'AIService',
@@ -35,4 +42,14 @@ __all__ = [
     'notification_service',
     'PersonalService',
     'personal_service',
+    'FileStorageService',
+    'file_storage',
+    'ALLOWED_EXTENSIONS',
+    'ALLOWED_IMAGE_EXTENSIONS',
+    'MAX_FILE_SIZE',
+    'MAX_IMAGE_SIZE',
+    'CATEGORY_ATTACHMENT',
+    'CATEGORY_PROFILE_PHOTO',
+    'CATEGORY_BUSINESS_CARD_FRONT',
+    'CATEGORY_BUSINESS_CARD_BACK',
 ]
