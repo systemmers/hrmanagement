@@ -40,17 +40,17 @@
         {% endwith %}
 
         <!-- 회원가입 폼 -->
-        <form method="POST" class="auth-form" id="registerForm">
+        <form method="POST" class="auth-form" id="registerForm" aria-label="개인 회원가입 폼">
             <!-- 계정 정보 섹션 -->
             <div class="auth-form__section" style="padding-top: 0; border-top: none;">
                 <h3 class="auth-form__section-title">
-                    <i class="fas fa-key"></i>
+                    <i class="fas fa-key" aria-hidden="true"></i>
                     계정 정보
                 </h3>
 
                 <div class="auth-form__group">
                     <label for="username" class="auth-form__label">
-                        아이디 <span style="color: var(--color-error-500);">*</span>
+                        아이디 <span style="color: var(--color-error-500);" aria-hidden="true">*</span>
                     </label>
                     <input type="text"
                            id="username"
@@ -58,12 +58,13 @@
                            class="auth-form__input"
                            placeholder="영문, 숫자 조합"
                            value="{{ username or '' }}"
-                           required>
+                           required
+                           aria-required="true">
                 </div>
 
                 <div class="auth-form__group">
                     <label for="email" class="auth-form__label">
-                        이메일 <span style="color: var(--color-error-500);">*</span>
+                        이메일 <span style="color: var(--color-error-500);" aria-hidden="true">*</span>
                     </label>
                     <input type="email"
                            id="email"
@@ -71,13 +72,14 @@
                            class="auth-form__input"
                            placeholder="user@example.com"
                            value="{{ email or '' }}"
-                           required>
+                           required
+                           aria-required="true">
                 </div>
 
                 <div class="auth-form__row">
                     <div class="auth-form__group">
                         <label for="password" class="auth-form__label">
-                            비밀번호 <span style="color: var(--color-error-500);">*</span>
+                            비밀번호 <span style="color: var(--color-error-500);" aria-hidden="true">*</span>
                         </label>
                         <input type="password"
                                id="password"
@@ -85,12 +87,14 @@
                                class="auth-form__input"
                                placeholder="8자 이상"
                                required
+                               aria-required="true"
+                               aria-describedby="password_help"
                                minlength="8">
-                        <p class="auth-form__help">최소 8자 이상 입력하세요</p>
+                        <p id="password_help" class="auth-form__help">최소 8자 이상 입력하세요</p>
                     </div>
                     <div class="auth-form__group">
                         <label for="password_confirm" class="auth-form__label">
-                            비밀번호 확인 <span style="color: var(--color-error-500);">*</span>
+                            비밀번호 확인 <span style="color: var(--color-error-500);" aria-hidden="true">*</span>
                         </label>
                         <input type="password"
                                id="password_confirm"
@@ -98,6 +102,7 @@
                                class="auth-form__input"
                                placeholder="비밀번호 재입력"
                                required
+                               aria-required="true"
                                minlength="8">
                     </div>
                 </div>
@@ -106,13 +111,13 @@
             <!-- 기본 정보 섹션 -->
             <div class="auth-form__section">
                 <h3 class="auth-form__section-title">
-                    <i class="fas fa-user"></i>
+                    <i class="fas fa-user" aria-hidden="true"></i>
                     기본 정보
                 </h3>
 
                 <div class="auth-form__group">
                     <label for="name" class="auth-form__label">
-                        이름 <span style="color: var(--color-error-500);">*</span>
+                        이름 <span style="color: var(--color-error-500);" aria-hidden="true">*</span>
                     </label>
                     <input type="text"
                            id="name"
@@ -120,7 +125,8 @@
                            class="auth-form__input"
                            placeholder="홍길동"
                            value="{{ name or '' }}"
-                           required>
+                           required
+                           aria-required="true">
                 </div>
 
                 <div class="auth-form__group">
@@ -136,8 +142,8 @@
                 </div>
             </div>
 
-            <button type="submit" class="auth-form__submit">
-                <i class="fas fa-check"></i>
+            <button type="submit" class="auth-form__submit" aria-label="회원가입">
+                <i class="fas fa-check" aria-hidden="true"></i>
                 회원가입
             </button>
         </form>
@@ -151,17 +157,12 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- JS moved to: utils/formatters.js -->
+<script src="{{ url_for('static', filename='js/utils/formatters.js') }}"></script>
 <script>
-    // 전화번호 자동 포맷팅
-    document.getElementById('mobile_phone').addEventListener('input', function(e) {
-        let value = e.target.value.replace(/[^0-9]/g, '');
-        if (value.length > 11) value = value.slice(0, 11);
-        if (value.length > 7) {
-            value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
-        } else if (value.length > 3) {
-            value = value.slice(0, 3) + '-' + value.slice(3);
-        }
-        e.target.value = value;
-    });
+    // 전화번호 입력 필드 자동 포맷팅 초기화
+    if (window.HRFormatters) {
+        window.HRFormatters.initPhoneInputs();
+    }
 </script>
 {% endblock %}

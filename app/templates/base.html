@@ -53,34 +53,35 @@
 </head>
 <body>
     <!-- 상단 헤더 -->
-    <header class="app-header">
+    <header class="app-header" role="banner">
         <div class="header-brand">
-            <div class="header-logo">HR</div>
+            <div class="header-logo" aria-hidden="true">HR</div>
             <h1 class="header-title">인사카드 관리 시스템</h1>
         </div>
 
-        <div class="header-search">
-            <i class="fas fa-search header-search-icon"></i>
-            <form action="{{ url_for('main.search') }}" method="get">
-                <input type="text" name="q" class="header-search-input" 
-                       placeholder="직원 검색 (이름, 부서, 직급)" 
-                       value="{{ search_query or '' }}">
+        <div class="header-search" role="search">
+            <i class="fas fa-search header-search-icon" aria-hidden="true"></i>
+            <form action="{{ url_for('main.search') }}" method="get" aria-label="직원 검색">
+                <input type="text" name="q" class="header-search-input"
+                       placeholder="직원 검색 (이름, 부서, 직급)"
+                       value="{{ search_query or '' }}"
+                       aria-label="검색어 입력">
             </form>
         </div>
 
         <div class="header-actions">
             {% if is_authenticated and current_user %}
             <div class="header-user">
-                <div class="header-user-avatar">{{ current_user.username[:1]|upper }}</div>
+                <div class="header-user-avatar" aria-hidden="true">{{ current_user.username[:1]|upper }}</div>
                 <span class="header-user-name">{{ current_user.username }}</span>
             </div>
-            <a href="{{ url_for('auth.logout') }}" class="btn-logout">
-                <i class="fas fa-sign-out-alt"></i>
+            <a href="{{ url_for('auth.logout') }}" class="btn-logout" aria-label="로그아웃">
+                <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
                 <span>로그아웃</span>
             </a>
             {% else %}
-            <a href="{{ url_for('auth.login') }}" class="btn-logout">
-                <i class="fas fa-sign-in-alt"></i>
+            <a href="{{ url_for('auth.login') }}" class="btn-logout" aria-label="로그인">
+                <i class="fas fa-sign-in-alt" aria-hidden="true"></i>
                 <span>로그인</span>
             </a>
             {% endif %}
@@ -91,7 +92,7 @@
     <div class="app-container">
         <div class="app-layout">
             <!-- 좌측 사이드바 -->
-            <aside class="sidebar">
+            <aside class="sidebar" role="complementary" aria-label="사이드바">
                 <div class="sidebar-header">
                     {% if current_user and current_user.role == 'employee' %}
                     <h1 class="sidebar-title">내 인사카드</h1>
@@ -102,7 +103,7 @@
                     {% endif %}
                 </div>
 
-                <nav class="sidebar-nav">
+                <nav class="sidebar-nav" role="navigation" aria-label="메인 메뉴">
                     {% if current_user and current_user.account_type == 'personal' %}
                     {# ========== 개인 계정 전용 사이드바 ========== #}
 
@@ -285,14 +286,14 @@
             </aside>
 
             <!-- 메인 컨텐츠 -->
-            <main class="main-content">
+            <main class="main-content" role="main" aria-label="메인 콘텐츠">
                 <!-- Flash 메시지 -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
-                        <div class="flash-messages">
+                        <div class="flash-messages" role="alert" aria-live="polite">
                             {% for category, message in messages %}
                                 <div class="alert alert-{{ category }}">
-                                    <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                                    <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'error' %}exclamation-circle{% else %}info-circle{% endif %}" aria-hidden="true"></i>
                                     <span>{{ message }}</span>
                                 </div>
                             {% endfor %}

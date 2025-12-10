@@ -32,10 +32,10 @@
         {% endwith %}
 
         <!-- 로그인 폼 -->
-        <form method="POST" class="auth-form">
+        <form method="POST" class="auth-form" aria-label="로그인 폼">
             <div class="auth-form__group">
                 <label for="username" class="auth-form__label">
-                    <i class="fas fa-user"></i>
+                    <i class="fas fa-user" aria-hidden="true"></i>
                     사용자명
                 </label>
                 <input type="text"
@@ -45,13 +45,14 @@
                        placeholder="사용자명을 입력하세요"
                        value="{{ username or '' }}"
                        required
+                       aria-required="true"
                        autocomplete="username"
                        autofocus>
             </div>
 
             <div class="auth-form__group">
                 <label for="password" class="auth-form__label">
-                    <i class="fas fa-lock"></i>
+                    <i class="fas fa-lock" aria-hidden="true"></i>
                     비밀번호
                 </label>
                 <div class="auth-form__password-wrapper">
@@ -61,9 +62,13 @@
                            class="auth-form__input"
                            placeholder="비밀번호를 입력하세요"
                            required
+                           aria-required="true"
                            autocomplete="current-password">
-                    <button type="button" class="auth-form__password-toggle" onclick="togglePassword()">
-                        <i class="fas fa-eye" id="toggleIcon"></i>
+                    <button type="button"
+                            class="auth-form__password-toggle"
+                            onclick="togglePassword()"
+                            aria-label="비밀번호 표시/숨김 토글">
+                        <i class="fas fa-eye" id="toggleIcon" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -73,8 +78,8 @@
                 <span>로그인 상태 유지</span>
             </label>
 
-            <button type="submit" class="auth-form__submit">
-                <i class="fas fa-sign-in-alt"></i>
+            <button type="submit" class="auth-form__submit" aria-label="로그인">
+                <i class="fas fa-sign-in-alt" aria-hidden="true"></i>
                 로그인
             </button>
         </form>
