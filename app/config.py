@@ -74,6 +74,10 @@ class Config:
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
 
+    # 통합 프로필 기능 플래그 (법인/개인 계정 인터페이스 통합)
+    ENABLE_UNIFIED_PROFILE = os.environ.get('ENABLE_UNIFIED_PROFILE', 'false').lower() == 'true'
+    UNIFIED_PROFILE_ROLLOUT_PERCENT = int(os.environ.get('UNIFIED_PROFILE_ROLLOUT_PERCENT', '0'))
+
 
 class DevelopmentConfig(Config):
     """개발 환경 설정"""
@@ -90,6 +94,8 @@ class TestingConfig(Config):
     """테스트 환경 설정"""
     TESTING = True
     WTF_CSRF_ENABLED = False
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SECRET_KEY = 'test-secret-key'
 
 
 # 설정 딕셔너리
