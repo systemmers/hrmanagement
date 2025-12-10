@@ -39,7 +39,7 @@
             <tr>
                 <td>{{ user.id }}</td>
                 <td>
-                    <div style="display: flex; align-items: center; gap: var(--space-2);">
+                    <div class="d-flex items-center gap-2">
                         <div class="user-avatar-small">{{ user.username[:1]|upper }}</div>
                         <span>{{ user.username }}</span>
                     </div>
@@ -81,10 +81,10 @@
 </div>
 
 {% if users|length == 0 %}
-<div class="empty-state">
-    <i class="fas fa-users" style="font-size: 4rem; color: var(--color-gray-400); margin-bottom: 1rem;"></i>
-    <p style="color: var(--color-gray-600);">등록된 사용자가 없습니다.</p>
-    <a href="{{ url_for('corporate.add_user') }}" class="btn btn-primary" style="margin-top: 1rem;">
+<div class="empty-state-large">
+    <i class="fas fa-users"></i>
+    <p>등록된 사용자가 없습니다.</p>
+    <a href="{{ url_for('corporate.add_user') }}" class="btn btn-primary">
         <i class="fas fa-user-plus"></i>
         <span>사용자 추가</span>
     </a>
