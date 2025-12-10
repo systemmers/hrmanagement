@@ -1,0 +1,83 @@
+{# 법인 관리자/매니저 사이드바 #}
+<!-- 조회 섹션 -->
+<div class="nav-section">
+    <h2 class="nav-section-title">조회</h2>
+    <a href="{{ url_for('main.index') }}" class="nav-item {% if request.endpoint == 'main.index' %}active{% endif %}">
+        <i class="fas fa-home"></i>
+        <span>대시보드</span>
+    </a>
+    <a href="{{ url_for('employees.employee_list') }}" class="nav-item {% if request.endpoint == 'employees.employee_list' %}active{% endif %}">
+        <i class="fas fa-users"></i>
+        <span>직원 목록</span>
+    </a>
+</div>
+
+<!-- 입력 섹션 -->
+<div class="nav-section">
+    <h2 class="nav-section-title">입력</h2>
+    <a href="{{ url_for('employees.employee_new') }}" class="nav-item {% if request.endpoint == 'employees.employee_new' %}active{% endif %}">
+        <i class="fas fa-user-plus"></i>
+        <span>직원 등록</span>
+    </a>
+</div>
+
+<!-- 계약 관리 섹션 (법인 계정) -->
+{% if current_user and current_user.account_type == 'corporate' %}
+<div class="nav-section">
+    <h2 class="nav-section-title">계약 관리</h2>
+    <a href="{{ url_for('contracts.company_contracts') }}"
+       class="nav-item {% if request.endpoint == 'contracts.company_contracts' %}active{% endif %}">
+        <i class="fas fa-file-contract"></i>
+        <span>계약 목록</span>
+    </a>
+    <a href="{{ url_for('contracts.request_contract') }}"
+       class="nav-item {% if request.endpoint == 'contracts.request_contract' %}active{% endif %}">
+        <i class="fas fa-paper-plane"></i>
+        <span>계약 요청</span>
+    </a>
+    <a href="{{ url_for('contracts.company_pending') }}"
+       class="nav-item {% if request.endpoint == 'contracts.company_pending' %}active{% endif %}">
+        <i class="fas fa-clock"></i>
+        <span>대기 중</span>
+    </a>
+</div>
+{% endif %}
+
+<!-- 관리 섹션 -->
+{% if current_user and current_user.is_admin %}
+<div class="nav-section">
+    <h2 class="nav-section-title">관리</h2>
+    <a href="{{ url_for('admin.organization_list') }}" class="nav-item {% if request.endpoint == 'admin.organization_list' %}active{% endif %}">
+        <i class="fas fa-sitemap"></i>
+        <span>조직 관리</span>
+    </a>
+</div>
+{% endif %}
+
+<!-- 설정 섹션 -->
+<div class="nav-section">
+    <h2 class="nav-section-title">설정</h2>
+    <a href="{{ url_for('classification.classification_options_page') }}" class="nav-item {% if request.endpoint == 'classification.classification_options_page' %}active{% endif %}">
+        <i class="fas fa-cog"></i>
+        <span>분류 옵션 관리</span>
+    </a>
+</div>
+
+<!-- AI 테스트 섹션 (프로토타입) -->
+<div class="nav-section">
+    <h2 class="nav-section-title">
+        <i class="fas fa-flask"></i> AI 테스트
+    </h2>
+    <a href="{{ url_for('ai_test.index') }}" class="nav-item {% if request.endpoint and request.endpoint.startswith('ai_test.') and request.endpoint != 'ai_test.compare' and request.endpoint != 'ai_test.settings' %}active{% endif %}">
+        <i class="fas fa-robot"></i>
+        <span>문서 분석 테스트</span>
+    </a>
+    <a href="{{ url_for('ai_test.compare') }}" class="nav-item {% if request.endpoint == 'ai_test.compare' %}active{% endif %}">
+        <i class="fas fa-balance-scale"></i>
+        <span>Provider 비교</span>
+    </a>
+    <a href="{{ url_for('ai_test.settings') }}" class="nav-item {% if request.endpoint == 'ai_test.settings' %}active{% endif %}">
+        <i class="fas fa-sliders-h"></i>
+        <span>AI 설정</span>
+    </a>
+</div>

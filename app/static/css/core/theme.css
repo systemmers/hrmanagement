@@ -1,0 +1,157 @@
+/* ========================================
+   계정 유형별 테마 시스템
+   ======================================== */
+
+/* 기본 테마 변수 (Corporate - 기본값) */
+:root {
+    /* 테마 Primary 색상 */
+    --theme-primary: var(--color-blue-600);
+    --theme-primary-light: var(--color-blue-100);
+    --theme-primary-dark: var(--color-blue-700);
+
+    /* 사이드바 테마 */
+    --theme-sidebar-active-bg: var(--color-gray-900);
+    --theme-sidebar-active-text: var(--color-pure-white);
+    --theme-sidebar-hover-bg: var(--color-gray-50);
+
+    /* 헤더 테마 */
+    --theme-header-accent: var(--color-blue-600);
+
+    /* 아바타 테마 */
+    --theme-avatar-bg: var(--color-gray-900);
+    --theme-avatar-text: var(--color-pure-white);
+
+    /* 버튼 테마 */
+    --theme-btn-primary-bg: var(--color-blue-600);
+    --theme-btn-primary-hover: var(--color-blue-700);
+
+    /* 그라디언트 */
+    --theme-gradient: linear-gradient(135deg, var(--color-blue-600) 0%, var(--color-blue-800) 100%);
+
+    /* 통계 카드 아이콘 */
+    --theme-stats-icon-bg: var(--color-blue-100);
+    --theme-stats-icon-color: var(--color-blue-600);
+}
+
+/* Personal 계정 테마 (녹색 계열) */
+[data-account-type="personal"] {
+    --theme-primary: #059669;
+    --theme-primary-light: #D1FAE5;
+    --theme-primary-dark: #047857;
+
+    --theme-sidebar-active-bg: #059669;
+    --theme-sidebar-active-text: var(--color-pure-white);
+    --theme-sidebar-hover-bg: #ECFDF5;
+
+    --theme-header-accent: #059669;
+
+    --theme-avatar-bg: #059669;
+    --theme-avatar-text: var(--color-pure-white);
+
+    --theme-btn-primary-bg: #059669;
+    --theme-btn-primary-hover: #047857;
+
+    --theme-gradient: linear-gradient(135deg, #059669 0%, #047857 100%);
+
+    --theme-stats-icon-bg: #D1FAE5;
+    --theme-stats-icon-color: #059669;
+}
+
+/* Employee Sub 계정 테마 (보라색 계열) */
+[data-account-type="employee_sub"] {
+    --theme-primary: #7C3AED;
+    --theme-primary-light: #EDE9FE;
+    --theme-primary-dark: #6D28D9;
+
+    --theme-sidebar-active-bg: #7C3AED;
+    --theme-sidebar-active-text: var(--color-pure-white);
+    --theme-sidebar-hover-bg: #F5F3FF;
+
+    --theme-header-accent: #7C3AED;
+
+    --theme-avatar-bg: #7C3AED;
+    --theme-avatar-text: var(--color-pure-white);
+
+    --theme-btn-primary-bg: #7C3AED;
+    --theme-btn-primary-hover: #6D28D9;
+
+    --theme-gradient: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+
+    --theme-stats-icon-bg: #EDE9FE;
+    --theme-stats-icon-color: #7C3AED;
+}
+
+/* Corporate 계정 테마 (파란색 계열 - 명시적) */
+[data-account-type="corporate"] {
+    --theme-primary: var(--color-blue-600);
+    --theme-primary-light: var(--color-blue-100);
+    --theme-primary-dark: var(--color-blue-700);
+
+    --theme-sidebar-active-bg: var(--color-gray-900);
+    --theme-sidebar-active-text: var(--color-pure-white);
+    --theme-sidebar-hover-bg: var(--color-gray-50);
+
+    --theme-header-accent: var(--color-blue-600);
+
+    --theme-avatar-bg: var(--color-gray-900);
+    --theme-avatar-text: var(--color-pure-white);
+
+    --theme-btn-primary-bg: var(--color-blue-600);
+    --theme-btn-primary-hover: var(--color-blue-700);
+
+    --theme-gradient: linear-gradient(135deg, var(--color-blue-600) 0%, var(--color-blue-800) 100%);
+
+    --theme-stats-icon-bg: var(--color-blue-100);
+    --theme-stats-icon-color: var(--color-blue-600);
+}
+
+/* 테마 적용 - 사이드바 */
+.nav-item.active {
+    background-color: var(--theme-sidebar-active-bg);
+    color: var(--theme-sidebar-active-text);
+}
+
+.nav-item:hover:not(.active) {
+    background-color: var(--theme-sidebar-hover-bg);
+}
+
+/* 테마 적용 - 아바타 */
+.user-avatar,
+.header-user-avatar {
+    background-color: var(--theme-avatar-bg);
+    color: var(--theme-avatar-text);
+}
+
+/* 테마 적용 - Primary 버튼 */
+.btn-primary,
+.btn-theme-primary {
+    background-color: var(--theme-btn-primary-bg);
+    border-color: var(--theme-btn-primary-bg);
+}
+
+.btn-primary:hover,
+.btn-theme-primary:hover {
+    background-color: var(--theme-btn-primary-hover);
+    border-color: var(--theme-btn-primary-hover);
+}
+
+/* 테마 적용 - 통계 카드 아이콘 */
+.stat-icon {
+    background-color: var(--theme-stats-icon-bg);
+    color: var(--theme-stats-icon-color);
+}
+
+/* 테마 적용 - 링크 */
+.theme-link {
+    color: var(--theme-primary);
+}
+
+.theme-link:hover {
+    color: var(--theme-primary-dark);
+}
+
+/* 테마 적용 - 배지 */
+.badge-theme {
+    background-color: var(--theme-primary-light);
+    color: var(--theme-primary-dark);
+}

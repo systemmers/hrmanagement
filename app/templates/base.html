@@ -15,6 +15,7 @@
     <!-- Core -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/core/variables.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/core/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/core/theme.css') }}">
 
     <!-- Layouts -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/header.css') }}">
@@ -51,7 +52,7 @@
     
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body data-account-type="{{ current_user.account_type if current_user else 'corporate' }}">
     <!-- 상단 헤더 -->
     <header class="app-header" role="banner">
         <div class="header-brand">
@@ -105,166 +106,11 @@
 
                 <nav class="sidebar-nav" role="navigation" aria-label="메인 메뉴">
                     {% if current_user and current_user.account_type == 'personal' %}
-                    {# ========== 개인 계정 전용 사이드바 ========== #}
-
-                    <!-- 내 정보 섹션 -->
-                    <div class="nav-section">
-                        <h2 class="nav-section-title">내 정보</h2>
-                        <a href="{{ url_for('personal.dashboard') }}"
-                           class="nav-item {% if request.endpoint == 'personal.dashboard' %}active{% endif %}">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span>대시보드</span>
-                        </a>
-                        <a href="{{ url_for('personal.profile') }}"
-                           class="nav-item {% if request.endpoint == 'personal.profile' %}active{% endif %}">
-                            <i class="fas fa-user"></i>
-                            <span>프로필</span>
-                        </a>
-                        <a href="{{ url_for('personal.profile_edit') }}"
-                           class="nav-item {% if request.endpoint == 'personal.profile_edit' %}active{% endif %}">
-                            <i class="fas fa-user-edit"></i>
-                            <span>프로필 수정</span>
-                        </a>
-                    </div>
-
-                    <!-- 계약 관리 섹션 (개인 계정) -->
-                    <div class="nav-section">
-                        <h2 class="nav-section-title">계약 관리</h2>
-                        <a href="{{ url_for('contracts.my_contracts') }}"
-                           class="nav-item {% if request.endpoint == 'contracts.my_contracts' %}active{% endif %}">
-                            <i class="fas fa-file-contract"></i>
-                            <span>내 계약</span>
-                        </a>
-                        <a href="{{ url_for('contracts.pending_contracts') }}"
-                           class="nav-item {% if request.endpoint == 'contracts.pending_contracts' %}active{% endif %}">
-                            <i class="fas fa-clock"></i>
-                            <span>대기 중인 요청</span>
-                        </a>
-                    </div>
-
+                        {% include 'components/navigation/_sidebar_personal.html' %}
                     {% elif current_user and current_user.role == 'employee' and current_user.employee_id %}
-                    {# ========== 법인 직원(Employee) 전용 사이드바 ========== #}
-
-                    <!-- 내 정보 섹션 -->
-                    <div class="nav-section">
-                        <h2 class="nav-section-title">내 정보</h2>
-                        <a href="{{ url_for('employees.employee_detail', employee_id=current_user.employee_id, view='basic') }}"
-                           class="nav-item {% if request.endpoint == 'employees.employee_detail' and request.args.get('view') == 'basic' %}active{% endif %}">
-                            <i class="fas fa-id-card"></i>
-                            <span>기본정보</span>
-                        </a>
-                        <a href="{{ url_for('employees.employee_detail', employee_id=current_user.employee_id, view='history') }}"
-                           class="nav-item {% if request.endpoint == 'employees.employee_detail' and request.args.get('view') == 'history' %}active{% endif %}">
-                            <i class="fas fa-history"></i>
-                            <span>이력정보</span>
-                        </a>
-                    </div>
-
-                    <!-- 회사정보 섹션 -->
-                    <div class="nav-section">
-                        <h2 class="nav-section-title">회사정보</h2>
-                        <a href="{{ url_for('mypage.company_info') }}"
-                           class="nav-item {% if request.endpoint == 'mypage.company_info' %}active{% endif %}">
-                            <i class="fas fa-building"></i>
-                            <span>회사 인사카드</span>
-                        </a>
-                    </div>
-
-                    <!-- 계정관리 섹션 -->
-                    <div class="nav-section">
-                        <h2 class="nav-section-title">계정관리</h2>
-                        <a href="{{ url_for('auth.change_password') }}"
-                           class="nav-item {% if request.endpoint == 'auth.change_password' %}active{% endif %}">
-                            <i class="fas fa-key"></i>
-                            <span>계정정보</span>
-                        </a>
-                    </div>
-
+                        {% include 'components/navigation/_sidebar_employee.html' %}
                     {% else %}
-                    {# ========== Admin/Manager 사이드바 ========== #}
-
-                    <!-- 조회 섹션 -->
-                    <div class="nav-section">
-                        <h2 class="nav-section-title">조회</h2>
-                        <a href="{{ url_for('main.index') }}" class="nav-item {% if request.endpoint == 'main.index' %}active{% endif %}">
-                            <i class="fas fa-home"></i>
-                            <span>대시보드</span>
-                        </a>
-                        <a href="{{ url_for('employees.employee_list') }}" class="nav-item {% if request.endpoint == 'employees.employee_list' %}active{% endif %}">
-                            <i class="fas fa-users"></i>
-                            <span>직원 목록</span>
-                        </a>
-                    </div>
-
-                    <!-- 입력 섹션 -->
-                    <div class="nav-section">
-                        <h2 class="nav-section-title">입력</h2>
-                        <a href="{{ url_for('employees.employee_new') }}" class="nav-item {% if request.endpoint == 'employees.employee_new' %}active{% endif %}">
-                            <i class="fas fa-user-plus"></i>
-                            <span>직원 등록</span>
-                        </a>
-                    </div>
-
-                    <!-- 계약 관리 섹션 (법인 계정) -->
-                    {% if current_user and current_user.account_type == 'corporate' %}
-                    <div class="nav-section">
-                        <h2 class="nav-section-title">계약 관리</h2>
-                        <a href="{{ url_for('contracts.company_contracts') }}"
-                           class="nav-item {% if request.endpoint == 'contracts.company_contracts' %}active{% endif %}">
-                            <i class="fas fa-file-contract"></i>
-                            <span>계약 목록</span>
-                        </a>
-                        <a href="{{ url_for('contracts.request_contract') }}"
-                           class="nav-item {% if request.endpoint == 'contracts.request_contract' %}active{% endif %}">
-                            <i class="fas fa-paper-plane"></i>
-                            <span>계약 요청</span>
-                        </a>
-                        <a href="{{ url_for('contracts.company_pending') }}"
-                           class="nav-item {% if request.endpoint == 'contracts.company_pending' %}active{% endif %}">
-                            <i class="fas fa-clock"></i>
-                            <span>대기 중</span>
-                        </a>
-                    </div>
-                    {% endif %}
-
-                    <!-- 관리 섹션 -->
-                    {% if current_user and current_user.is_admin %}
-                    <div class="nav-section">
-                        <h2 class="nav-section-title">관리</h2>
-                        <a href="{{ url_for('admin.organization_list') }}" class="nav-item {% if request.endpoint == 'admin.organization_list' %}active{% endif %}">
-                            <i class="fas fa-sitemap"></i>
-                            <span>조직 관리</span>
-                        </a>
-                    </div>
-                    {% endif %}
-
-                    <!-- 설정 섹션 -->
-                    <div class="nav-section">
-                        <h2 class="nav-section-title">설정</h2>
-                        <a href="{{ url_for('classification.classification_options_page') }}" class="nav-item {% if request.endpoint == 'classification.classification_options_page' %}active{% endif %}">
-                            <i class="fas fa-cog"></i>
-                            <span>분류 옵션 관리</span>
-                        </a>
-                    </div>
-
-                    <!-- AI 테스트 섹션 (프로토타입) -->
-                    <div class="nav-section">
-                        <h2 class="nav-section-title">
-                            <i class="fas fa-flask"></i> AI 테스트
-                        </h2>
-                        <a href="{{ url_for('ai_test.index') }}" class="nav-item {% if request.endpoint and request.endpoint.startswith('ai_test.') and request.endpoint != 'ai_test.compare' and request.endpoint != 'ai_test.settings' %}active{% endif %}">
-                            <i class="fas fa-robot"></i>
-                            <span>문서 분석 테스트</span>
-                        </a>
-                        <a href="{{ url_for('ai_test.compare') }}" class="nav-item {% if request.endpoint == 'ai_test.compare' %}active{% endif %}">
-                            <i class="fas fa-balance-scale"></i>
-                            <span>Provider 비교</span>
-                        </a>
-                        <a href="{{ url_for('ai_test.settings') }}" class="nav-item {% if request.endpoint == 'ai_test.settings' %}active{% endif %}">
-                            <i class="fas fa-sliders-h"></i>
-                            <span>AI 설정</span>
-                        </a>
-                    </div>
+                        {% include 'components/navigation/_sidebar_corporate.html' %}
                     {% endif %}
                 </nav>
 
