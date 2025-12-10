@@ -21,6 +21,7 @@ def register_blueprints(app):
     from .sync import sync_bp  # Phase 4: 데이터 동기화
     from .audit import audit_bp  # Phase 4: 감사 로그
     from .notifications import notifications_bp  # Phase 5: 알림 시스템
+    from .profile import profile_bp  # 통합 프로필 (법인/개인 인터페이스 통합)
 
     # 인증 관련 (/auth/*)
     app.register_blueprint(auth_bp)
@@ -45,6 +46,9 @@ def register_blueprints(app):
 
     # 알림 시스템 (/api/notifications/*) - Phase 5
     app.register_blueprint(notifications_bp)
+
+    # 통합 프로필 (/profile/*) - 법인/개인 인터페이스 통합
+    app.register_blueprint(profile_bp)
 
     # 마이페이지 - 일반 직원용 (/my/*)
     app.register_blueprint(mypage_bp)

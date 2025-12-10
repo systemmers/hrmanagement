@@ -1,0 +1,59 @@
+/**
+ * Quick Links Component
+ * 빠른 링크 공통 스타일
+ * 사용: personal/dashboard, corporate/dashboard
+ */
+
+/* Quick Links Grid */
+.quick-links {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+
+/* Quick Link Item */
+.quick-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--color-gray-700);
+    transition: all var(--transition-fast);
+}
+
+/* Corporate Theme - Blue hover */
+.quick-link:hover {
+    background: var(--color-primary);
+    color: var(--color-pure-white);
+    transform: translateY(-2px);
+}
+
+/* Personal Theme - Green hover */
+.personal-dashboard .quick-link:hover,
+.quick-link.personal-theme:hover {
+    background: #10b981;
+    color: var(--color-pure-white);
+    transform: translateY(-2px);
+}
+
+/* Quick Link Icon */
+.quick-link i {
+    font-size: var(--text-2xl);
+}
+
+/* Quick Link Text */
+.quick-link span {
+    font-size: var(--text-sm);
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .quick-links {
+        grid-template-columns: 1fr;
+    }
+}

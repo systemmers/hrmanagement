@@ -1,0 +1,109 @@
+/**
+ * Stats Cards Component
+ * 통계 카드 공통 스타일
+ * 사용: contracts/, personal/dashboard, corporate/dashboard
+ */
+
+/* Stats Row - 통계 카드 행 */
+.stats-row {
+    display: flex;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+/* Stats Grid - 2열 그리드 */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-5);
+}
+
+/* Stat Card */
+.stat-card {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    background: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-gray-200);
+}
+
+/* Stat Item (grid 내) */
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+/* Stat Icon */
+.stat-icon,
+.stat-card .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xl);
+}
+
+.stat-card .stat-icon {
+    width: 56px;
+    height: 56px;
+}
+
+/* Icon Color Variants - Contracts */
+.stat-icon.total { background: #dbeafe; color: #2563eb; }
+.stat-icon.active { background: #dcfce7; color: #16a34a; }
+.stat-icon.pending { background: #fef3c7; color: #d97706; }
+.stat-icon.terminated { background: #f3f4f6; color: #6b7280; }
+
+/* Icon Color Variants - Personal/Corporate */
+.stat-icon.education { background: #dbeafe; color: #2563eb; }
+.stat-icon.career { background: #dcfce7; color: #16a34a; }
+.stat-icon.certificate { background: #fef3c7; color: #d97706; }
+.stat-icon.language { background: #fce7f3; color: #db2777; }
+.stat-icon.employees { background: #dbeafe; color: #2563eb; }
+.stat-icon.limit { background: #dcfce7; color: #16a34a; }
+.stat-icon.plan { background: #fef3c7; color: #d97706; }
+.stat-icon.status.verified { background: #dcfce7; color: #16a34a; }
+.stat-icon.status.pending { background: #fef3c7; color: #d97706; }
+
+/* Stat Content */
+.stat-content,
+.stat-card .stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Stat Value */
+.stat-value,
+.stat-card .stat-value {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-gray-900);
+}
+
+/* Stat Label */
+.stat-label,
+.stat-card .stat-label {
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+}
+
+.stats-grid .stat-label {
+    font-size: var(--text-xs);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-row {
+        flex-direction: column;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

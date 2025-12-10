@@ -1,0 +1,380 @@
+{#
+    _contracts.html - 계약 관련 재사용 가능한 Jinja2 매크로
+
+    포함 매크로:
+    - contract_stats_row: 통계 카드 행
+    - contract_status_badge: 상태 배지
+    - contract_card_personal: 개인용 계약 카드
+    - contract_card_company: 기업용 계약 행
+    - pending_card: 대기 중인 계약 카드
+    - contract_empty_state: 빈 상태 표시
+    - contract_filter_bar: 필터 바
+#}
+
+{# 계약 상태 배지 #}
+{% macro contract_status_badge(status) %}
+{% if status == 'approved' %}
+<span class="badge badge-success">활성</span>
+{% elif status == 'requested' %}
+<span class="badge badge-warning">대기 중</span>
+{% elif status == 'rejected' %}
+<span class="badge badge-danger">거절됨</span>
+{% elif status == 'terminated' %}
+<span class="badge badge-secondary">종료됨</span>
+{% elif status == 'expired' %}
+<span class="badge badge-secondary">만료됨</span>
+{% else %}
+<span class="badge badge-secondary">{{ status }}</span>
+{% endif %}
+{% endmacro %}
+
+{# 상태 배지 (테이블용) #}
+{% macro status_badge(status) %}
+<span class="status-badge status-{{ status }}">
+{% if status == 'approved' %}활성
+{% elif status == 'requested' %}대기 중
+{% elif status == 'rejected' %}거절됨
+{% elif status == 'terminated' %}종료됨
+{% elif status == 'expired' %}만료됨
+{% else %}{{ status }}
+{% endif %}
+</span>
+{% endmacro %}
+
+{# 통계 카드 (개인용) #}
+{% macro contract_stats_row(stats) %}
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon total">
+            <i class="fas fa-file-contract"></i>
+        </div>
+        <div class="stat-content">
+            <span class="stat-value">{{ stats.total or 0 }}</span>
+            <span class="stat-label">전체 계약</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon active">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <span class="stat-value">{{ stats.active or 0 }}</span>
+            <span class="stat-label">활성 계약</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon pending">
+            <i class="fas fa-hourglass-half"></i>
+        </div>
+        <div class="stat-content">
+            <span class="stat-value">{{ stats.pending or 0 }}</span>
+            <span class="stat-label">대기 중</span>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{# 통계 카드 (기업용 - 종료됨 포함) #}
+{% macro contract_stats_row_company(stats) %}
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon total">
+            <i class="fas fa-file-contract"></i>
+        </div>
+        <div class="stat-content">
+            <span class="stat-value">{{ stats.total or 0 }}</span>
+            <span class="stat-label">전체 계약</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon active">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <span class="stat-value">{{ stats.active or 0 }}</span>
+            <span class="stat-label">활성 계약</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon pending">
+            <i class="fas fa-hourglass-half"></i>
+        </div>
+        <div class="stat-content">
+            <span class="stat-value">{{ stats.pending or 0 }}</span>
+            <span class="stat-label">대기 중</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon terminated">
+            <i class="fas fa-ban"></i>
+        </div>
+        <div class="stat-content">
+            <span class="stat-value">{{ stats.terminated or 0 }}</span>
+            <span class="stat-label">종료됨</span>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{# 개인용 계약 카드 #}
+{% macro contract_card_personal(contract, show_actions=true) %}
+<div class="contract-card">
+    <div class="contract-header">
+        <div class="company-info">
+            <div class="company-avatar">{{ contract.company_name[:1] if contract.company_name else 'C' }}</div>
+            <div class="company-details">
+                <h3 class="company-name">{{ contract.company_name or '기업명 없음' }}</h3>
+                <span class="contract-type">{{ contract.contract_type_label or contract.contract_type }}</span>
+            </div>
+        </div>
+        <div class="contract-status">
+            {{ contract_status_badge(contract.status) }}
+        </div>
+    </div>
+    <div class="contract-body">
+        <div class="contract-info-grid">
+            {% if contract.position %}
+            <div class="info-item">
+                <span class="info-label">직위</span>
+                <span class="info-value">{{ contract.position }}</span>
+            </div>
+            {% endif %}
+            {% if contract.department %}
+            <div class="info-item">
+                <span class="info-label">부서</span>
+                <span class="info-value">{{ contract.department }}</span>
+            </div>
+            {% endif %}
+            {% if contract.employee_number %}
+            <div class="info-item">
+                <span class="info-label">사번</span>
+                <span class="info-value">{{ contract.employee_number }}</span>
+            </div>
+            {% endif %}
+            <div class="info-item">
+                <span class="info-label">요청일</span>
+                <span class="info-value">{{ contract.requested_at[:10] if contract.requested_at else '-' }}</span>
+            </div>
+            {% if contract.approved_at %}
+            <div class="info-item">
+                <span class="info-label">승인일</span>
+                <span class="info-value">{{ contract.approved_at[:10] }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="contract-footer">
+        <a href="{{ url_for('contracts.contract_detail', contract_id=contract.id) }}" class="btn btn-sm btn-secondary">
+            <i class="fas fa-eye"></i>
+            <span>상세보기</span>
+        </a>
+        {% if show_actions and contract.status == 'requested' and contract.requested_by == 'company' %}
+        <button type="button" class="btn btn-sm btn-success" onclick="approveContract({{ contract.id }})">
+            <i class="fas fa-check"></i>
+            <span>승인</span>
+        </button>
+        <button type="button" class="btn btn-sm btn-danger" onclick="rejectContract({{ contract.id }})">
+            <i class="fas fa-times"></i>
+            <span>거절</span>
+        </button>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{# 대기 중인 계약 카드 (개인용) #}
+{% macro pending_card_personal(contract) %}
+<div class="pending-card">
+    <div class="pending-header">
+        <div class="company-info">
+            <div class="company-avatar">{{ contract.company_name[:1] if contract.company_name else 'C' }}</div>
+            <div class="company-details">
+                <h3 class="company-name">{{ contract.company_name or '기업명 없음' }}</h3>
+                <span class="request-date">요청일: {{ contract.requested_at[:10] if contract.requested_at else '-' }}</span>
+            </div>
+        </div>
+        <span class="badge badge-warning">승인 대기</span>
+    </div>
+
+    <div class="pending-body">
+        <div class="contract-summary">
+            <div class="summary-item">
+                <span class="label">계약 유형</span>
+                <span class="value">{{ contract.contract_type_label or contract.contract_type }}</span>
+            </div>
+            {% if contract.position %}
+            <div class="summary-item">
+                <span class="label">직위</span>
+                <span class="value">{{ contract.position }}</span>
+            </div>
+            {% endif %}
+            {% if contract.department %}
+            <div class="summary-item">
+                <span class="label">부서</span>
+                <span class="value">{{ contract.department }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if contract.notes %}
+        <div class="contract-notes">
+            <span class="notes-label">메모</span>
+            <p class="notes-content">{{ contract.notes }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="pending-footer">
+        <div class="action-info">
+            <i class="fas fa-info-circle"></i>
+            <span>승인 시 기업이 귀하의 정보에 접근할 수 있습니다.</span>
+        </div>
+        <div class="action-buttons">
+            <button type="button" class="btn btn-success" onclick="approveContract({{ contract.id }})">
+                <i class="fas fa-check"></i>
+                <span>승인</span>
+            </button>
+            <button type="button" class="btn btn-danger" onclick="rejectContract({{ contract.id }})">
+                <i class="fas fa-times"></i>
+                <span>거절</span>
+            </button>
+            <a href="{{ url_for('contracts.contract_detail', contract_id=contract.id) }}" class="btn btn-secondary">
+                <i class="fas fa-eye"></i>
+                <span>상세</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{# 대기 중인 계약 카드 (기업용) #}
+{% macro pending_card_company(contract) %}
+<div class="pending-card">
+    <div class="pending-header">
+        <div class="person-info">
+            <div class="person-avatar">{{ contract.person_name[:1] if contract.person_name else 'U' }}</div>
+            <div class="person-details">
+                <h3 class="person-name">{{ contract.person_name or '이름 없음' }}</h3>
+                <span class="person-email">{{ contract.person_email or '' }}</span>
+            </div>
+        </div>
+        <div class="pending-meta">
+            <span class="request-date">{{ contract.requested_at[:10] if contract.requested_at else '-' }}</span>
+            <span class="badge badge-warning">승인 대기</span>
+        </div>
+    </div>
+
+    <div class="pending-body">
+        <div class="contract-info-grid">
+            <div class="info-item">
+                <span class="info-label">계약 유형</span>
+                <span class="info-value">{{ contract.contract_type_label or contract.contract_type }}</span>
+            </div>
+            {% if contract.position %}
+            <div class="info-item">
+                <span class="info-label">직위</span>
+                <span class="info-value">{{ contract.position }}</span>
+            </div>
+            {% endif %}
+            {% if contract.department %}
+            <div class="info-item">
+                <span class="info-label">부서</span>
+                <span class="info-value">{{ contract.department }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if contract.notes %}
+        <div class="notes-section">
+            <span class="notes-label">메모</span>
+            <p class="notes-content">{{ contract.notes }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="pending-footer">
+        <div class="wait-info">
+            <i class="fas fa-hourglass-half"></i>
+            <span>개인 회원의 승인을 기다리는 중입니다.</span>
+        </div>
+        <a href="{{ url_for('contracts.contract_detail', contract_id=contract.id) }}" class="btn btn-sm btn-secondary">
+            <i class="fas fa-eye"></i>
+            <span>상세보기</span>
+        </a>
+    </div>
+</div>
+{% endmacro %}
+
+{# 빈 상태 표시 #}
+{% macro contract_empty_state(icon='fa-file-contract', title='계약 내역이 없습니다', message='', action_url='', action_text='') %}
+<div class="empty-state">
+    <i class="fas {{ icon }}"></i>
+    <h3>{{ title }}</h3>
+    {% if message %}
+    <p>{{ message }}</p>
+    {% endif %}
+    {% if action_url and action_text %}
+    <a href="{{ action_url }}" class="btn btn-primary" style="margin-top: 16px;">
+        <i class="fas fa-plus"></i>
+        <span>{{ action_text }}</span>
+    </a>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 필터 바 (기업용) #}
+{% macro contract_filter_bar(show_type_filter=true) %}
+<div class="filter-bar">
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="이름, 부서, 직위, 사번으로 검색">
+    </div>
+    <div class="filter-group">
+        <select id="statusFilter" class="filter-select">
+            <option value="">전체 상태</option>
+            <option value="approved">활성</option>
+            <option value="requested">대기 중</option>
+            <option value="rejected">거절됨</option>
+            <option value="terminated">종료됨</option>
+        </select>
+        {% if show_type_filter %}
+        <select id="typeFilter" class="filter-select">
+            <option value="">전체 유형</option>
+            <option value="employment">정규직</option>
+            <option value="contract">계약직</option>
+            <option value="freelance">프리랜서</option>
+            <option value="intern">인턴</option>
+        </select>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{# 기업 계약 테이블 행 #}
+{% macro contract_table_row(contract) %}
+<tr data-status="{{ contract.status }}" data-type="{{ contract.contract_type }}">
+    <td>
+        <div class="person-info">
+            <div class="person-avatar">{{ contract.person_name[:1] if contract.person_name else 'U' }}</div>
+            <span class="person-name">{{ contract.person_name or '이름 없음' }}</span>
+        </div>
+    </td>
+    <td>{{ contract.department or '-' }}</td>
+    <td>{{ contract.position or '-' }}</td>
+    <td>{{ contract.contract_type_label or contract.contract_type }}</td>
+    <td>{{ status_badge(contract.status) }}</td>
+    <td>{{ contract.approved_at[:10] if contract.approved_at else '-' }}</td>
+    <td>
+        <div class="action-buttons">
+            <a href="{{ url_for('contracts.contract_detail', contract_id=contract.id) }}" class="btn btn-sm btn-secondary" title="상세보기">
+                <i class="fas fa-eye"></i>
+            </a>
+            {% if contract.status == 'approved' %}
+            <button type="button" class="btn btn-sm btn-danger" onclick="terminateContract({{ contract.id }})" title="계약 종료">
+                <i class="fas fa-ban"></i>
+            </button>
+            {% endif %}
+        </div>
+    </td>
+</tr>
+{% endmacro %}

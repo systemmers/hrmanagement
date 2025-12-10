@@ -1,0 +1,47 @@
+/**
+ * Info Grid Component
+ * 정보 표시 그리드 공통 스타일
+ * 사용: contracts/, corporate/dashboard, personal/profile
+ */
+
+/* Info Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+}
+
+/* Contract Info Grid - auto-fit variant */
+.contract-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-4);
+}
+
+/* Info Item */
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+/* Info Label */
+.info-label {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+    font-weight: 500;
+}
+
+/* Info Value */
+.info-value {
+    font-size: var(--text-sm);
+    color: var(--color-gray-900);
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}

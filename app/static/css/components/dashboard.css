@@ -1,0 +1,168 @@
+/**
+ * Dashboard Component
+ * 대시보드 그리드 및 카드 공통 스타일
+ * 사용: personal/dashboard, corporate/dashboard
+ */
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+}
+
+/* Dashboard Card */
+.dashboard-card {
+    background: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-gray-200);
+    overflow: hidden;
+}
+
+/* Card Header */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+}
+
+/* Card Title */
+.card-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-gray-700);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+/* Card Title Icon - Corporate (Primary Blue) */
+.dashboard-card .card-title i {
+    color: var(--color-primary);
+}
+
+/* Card Title Icon - Personal (Green) */
+.dashboard-card.personal-theme .card-title i,
+.personal-dashboard .card-title i {
+    color: #10b981;
+}
+
+/* Card Body */
+.card-body {
+    padding: var(--space-5);
+}
+
+/* Profile Summary (Personal Dashboard) */
+.profile-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+}
+
+.profile-avatar {
+    flex-shrink: 0;
+}
+
+.profile-avatar img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-2xl);
+    font-weight: 700;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-name {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-gray-900);
+    margin: 0 0 var(--space-1);
+}
+
+.profile-english-name {
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+    margin: 0 0 var(--space-3);
+}
+
+.profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.detail-item {
+    font-size: var(--text-sm);
+    color: var(--color-gray-600);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.detail-item i {
+    width: 16px;
+    color: var(--color-gray-400);
+}
+
+/* Visibility Status (Personal Dashboard) */
+.visibility-status {
+    text-align: center;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: var(--text-sm);
+}
+
+.status-badge.public {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.status-badge.private {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.status-description {
+    color: var(--color-gray-600);
+    font-size: var(--text-sm);
+    margin: var(--space-3) 0 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-summary {
+        flex-direction: column;
+        text-align: center;
+    }
+}

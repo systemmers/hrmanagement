@@ -206,62 +206,14 @@
     </form>
 </div>
 
-<style>
-.form-section-title i {
-    margin-right: var(--space-2);
-    color: #10b981;
-}
+<!-- CSS moved to: components/forms.css -->
 
-.visibility-option {
-    padding: var(--space-4);
-    background: var(--color-gray-50);
-    border-radius: var(--radius-md);
-}
-
-.visibility-toggle {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-3);
-}
-
-.visibility-toggle input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    margin-top: 2px;
-    accent-color: #10b981;
-}
-
-.toggle-label {
-    cursor: pointer;
-}
-
-.toggle-text {
-    display: block;
-    font-weight: 600;
-    color: var(--color-gray-900);
-    margin-bottom: var(--space-1);
-}
-
-.toggle-description {
-    display: block;
-    font-size: var(--text-sm);
-    color: var(--color-gray-600);
-}
-</style>
-
+<!-- JS moved to: utils/formatters.js -->
+<script src="{{ url_for('static', filename='js/utils/formatters.js') }}"></script>
 <script>
-// 전화번호 자동 포맷팅
-document.querySelectorAll('input[type="tel"]').forEach(function(input) {
-    input.addEventListener('input', function(e) {
-        let value = e.target.value.replace(/[^0-9]/g, '');
-        if (value.length > 11) value = value.slice(0, 11);
-        if (value.length > 7) {
-            value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
-        } else if (value.length > 3) {
-            value = value.slice(0, 3) + '-' + value.slice(3);
-        }
-        e.target.value = value;
-    });
-});
+    // 전화번호 입력 필드 자동 포맷팅 초기화
+    if (window.HRFormatters) {
+        window.HRFormatters.initPhoneInputs();
+    }
 </script>
 {% endblock %}
