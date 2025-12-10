@@ -15,6 +15,7 @@ from .event_listeners import (
     cleanup_event_listeners
 )
 from .notification_service import NotificationService, notification_service
+from .personal_service import PersonalService, personal_service
 
 __all__ = [
     'AIService',
@@ -32,4 +33,6 @@ __all__ = [
     'cleanup_event_listeners',
     'NotificationService',
     'notification_service',
+    'PersonalService',
+    'personal_service',
 ]
