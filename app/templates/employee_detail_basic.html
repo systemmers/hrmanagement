@@ -42,8 +42,8 @@
                 <div class="card-body">
                     <div class="info-grid">
                         {{ info_item('성명 (한글)', employee.name) }}
-                        {{ info_item('여권명 (영문)', employee.name_en) }}
-                        {{ info_item('주민등록번호', employee.rrn) }}
+                        {{ info_item('여권명 (영문)', employee.english_name) }}
+                        {{ info_item('주민등록번호', employee.resident_number) }}
                         {{ info_item('생년월일', employee.birth_date) }}
                         {{ info_item('성별', get_gender_label(employee.gender)) }}
                         <div class="info-item">

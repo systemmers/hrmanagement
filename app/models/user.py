@@ -108,8 +108,14 @@ class User(db.Model):
         if self.is_admin():
             return True
         if self.is_manager():
-            # TODO: 매니저의 소속 부서 직원인지 확인
-            return True
+            # 매니저의 소속 부서 직원인지 확인
+            if self.employee_id:
+                from app.models.employee import Employee
+                manager_employee = Employee.query.get(self.employee_id)
+                target_employee = Employee.query.get(employee_id)
+                if manager_employee and target_employee:
+                    return manager_employee.department == target_employee.department
+            return False
         if self.employee_id == employee_id:
             return True
         return False

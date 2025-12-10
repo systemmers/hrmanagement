@@ -49,8 +49,8 @@
                                 </span>
                             </div>
                         </div>
-                        {{ info_item('입사일', employee.hireDate) }}
-                        {{ info_item('재직기간', calculate_tenure(employee.hireDate), highlight=true) }}
+                        {{ info_item('입사일', employee.hire_date) }}
+                        {{ info_item('재직기간', calculate_tenure(employee.hire_date), highlight=true) }}
                     </div>
                 </div>
             </div>
@@ -65,7 +65,7 @@
                     <div class="info-grid">
                         {{ info_item('계약형태', contract.contract_type if contract else (get_employment_type_label(employee.employment_type) if employee.employment_type else none)) }}
                         {{ info_item('계약기간', contract.contract_period if contract else (employee.contract_period or '무기한')) }}
-                        {{ info_item('계약시작일', contract.contract_date if contract else employee.hireDate) }}
+                        {{ info_item('계약시작일', contract.contract_date if contract else employee.hire_date) }}
                         {{ info_item('직원유형', contract.employee_type if contract else none) }}
                         {{ info_item('근무형태', contract.work_type if contract else none) }}
                         {{ info_item('시용기간 종료', employee.probation_end) }}
@@ -184,11 +184,11 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>{{ employee.hireDate }}</td>
+                                    <td>{{ employee.hire_date }}</td>
                                     <td><span class="badge badge-success">정규직</span></td>
-                                    <td>{{ employee.hireDate }}</td>
+                                    <td>{{ employee.hire_date }}</td>
                                     <td>-</td>
-                                    <td>{{ calculate_tenure(employee.hireDate) }}</td>
+                                    <td>{{ calculate_tenure(employee.hire_date) }}</td>
                                     <td>정규직</td>
                                     <td>전일제</td>
                                     <td>신규입사</td>

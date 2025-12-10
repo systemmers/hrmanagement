@@ -424,3 +424,18 @@ def api_corporate_account_required(f):
             return type_check
         return f(*args, **kwargs)
     return decorated_function
+
+
+def api_admin_or_manager_required(f):
+    """
+    API용 관리자/매니저 권한 필수 데코레이터
+
+    admin 또는 manager 역할을 가진 사용자만 접근 가능합니다.
+    JSON 응답을 반환하는 API 엔드포인트용입니다.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('user_role') not in ['admin', 'manager']:
+            return jsonify({'success': False, 'error': '관리자 권한이 필요합니다.'}), 403
+        return f(*args, **kwargs)
+    return decorated_function

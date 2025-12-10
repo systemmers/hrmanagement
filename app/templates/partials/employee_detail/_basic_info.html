@@ -12,8 +12,8 @@
         <div class="card-body">
             <div class="info-grid">
                 {{ info_item('성명 (한글)', employee.name) }}
-                {{ info_item('여권명 (영문)', employee.name_en) }}
-                {{ info_item('주민등록번호', employee.rrn) }}
+                {{ info_item('여권명 (영문)', employee.english_name) }}
+                {{ info_item('주민등록번호', employee.resident_number) }}
                 {{ info_item('생년월일', employee.birth_date) }}
                 {{ info_item('성별', get_gender_label(employee.gender)) }}
                 <div class="info-item">
@@ -62,8 +62,8 @@
                         </span>
                     </div>
                 </div>
-                {{ info_item('입사일', employee.hireDate) }}
-                {{ info_item('재직기간', calculate_tenure(employee.hireDate), highlight=true) }}
+                {{ info_item('입사일', employee.hire_date) }}
+                {{ info_item('재직기간', calculate_tenure(employee.hire_date), highlight=true) }}
             </div>
         </div>
     </div>
@@ -78,7 +78,7 @@
             <div class="info-grid">
                 {{ info_item('계약형태', contract.contract_type if contract else (get_employment_type_label(employee.employment_type) if employee.employment_type else none)) }}
                 {{ info_item('계약기간', contract.contract_period if contract else (employee.contract_period or '무기한')) }}
-                {{ info_item('계약시작일', contract.contract_date if contract else employee.hireDate) }}
+                {{ info_item('계약시작일', contract.contract_date if contract else employee.hire_date) }}
                 {{ info_item('직원유형', contract.employee_type if contract else none) }}
                 {{ info_item('근무형태', contract.work_type if contract else none) }}
                 {{ info_item('시용기간 종료', employee.probation_end) }}

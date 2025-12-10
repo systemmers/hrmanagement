@@ -15,8 +15,8 @@
             </div>
             <div class="employee-info">
                 <div class="employee-name">{{ employee.name }}</div>
-                {% if employee.name_en %}
-                <div class="employee-name-en">{{ employee.name_en|upper }}</div>
+                {% if employee.english_name %}
+                <div class="employee-name-en">{{ employee.english_name|upper }}</div>
                 {% endif %}
                 <div class="employee-meta">
                     {% if employee.email %}

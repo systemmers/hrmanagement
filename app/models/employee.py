@@ -81,7 +81,7 @@ class Employee(db.Model):
     insurance = db.relationship('Insurance', backref='employee', uselist=False, cascade='all, delete-orphan')
 
     def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case + hireDate 호환)"""
+        """딕셔너리 반환 (snake_case 통일)"""
         return {
             'id': self.id,
             'name': self.name,
@@ -90,12 +90,10 @@ class Employee(db.Model):
             'position': self.position,
             'status': self.status,
             'hire_date': self.hire_date,
-            'hireDate': self.hire_date,  # 템플릿 호환용
             'phone': self.phone,
             'email': self.email,
             'organization_id': self.organization_id,
             'organization': self.organization.to_dict() if self.organization else None,
-            'name_en': self.english_name,  # 템플릿: employee.name_en
             'english_name': self.english_name,
             'chinese_name': self.chinese_name,
             'birth_date': self.birth_date,
@@ -107,7 +105,6 @@ class Employee(db.Model):
             'detailed_address': self.detailed_address,
             'postal_code': self.postal_code,
             'resident_number': self.resident_number,
-            'rrn': self.resident_number,  # 템플릿: employee.rrn
             'nationality': self.nationality,
             'blood_type': self.blood_type,
             'religion': self.religion,

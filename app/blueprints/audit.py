@@ -3,46 +3,19 @@
 
 감사 로그 조회 및 통계 API를 제공합니다.
 Phase 4: 데이터 동기화 및 퇴사 처리
+Phase 7: 데코레이터 통합 리팩토링
 """
 from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify, session
-from functools import wraps
 
 from app.services.audit_service import audit_service, AuditLog
+from app.utils.decorators import (
+    api_login_required as login_required,
+    api_admin_or_manager_required as admin_required,
+    api_corporate_account_required as corporate_account_required
+)
 
 audit_bp = Blueprint('audit', __name__, url_prefix='/api/audit')
-
-
-# ===== 데코레이터 =====
-
-def login_required(f):
-    """로그인 필수 데코레이터"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('user_id'):
-            return jsonify({'success': False, 'error': '로그인이 필요합니다.'}), 401
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def admin_required(f):
-    """관리자 권한 필수 데코레이터"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get('user_role') not in ['admin', 'manager']:
-            return jsonify({'success': False, 'error': '관리자 권한이 필요합니다.'}), 403
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def corporate_account_required(f):
-    """법인 계정 필수 데코레이터"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get('account_type') != 'corporate':
-            return jsonify({'success': False, 'error': '법인 계정으로만 접근할 수 있습니다.'}), 403
-        return f(*args, **kwargs)
-    return decorated_function
 
 
 # ===== 감사 로그 조회 API =====
