@@ -15,8 +15,8 @@
     --profile-accent: var(--color-primary-500);
     --profile-gradient: var(--gradient-blue);
 
-    /* 프로필 레이아웃 */
-    --profile-nav-width: 260px;
+    /* 프로필 레이아웃 - 법인과 동일한 250px 사용 */
+    --profile-nav-width: 250px;
     --profile-header-height: 200px;
     --profile-section-gap: var(--space-8);
 }
@@ -673,7 +673,7 @@
    반응형 레이아웃
    ---------------------------------------- */
 
-/* 1200px 이하 */
+/* 1200px 이하 - 법인과 동일한 220px 사용 */
 @media (max-width: 1200px) {
     :root {
         --profile-nav-width: 220px;

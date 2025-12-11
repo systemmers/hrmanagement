@@ -1,6 +1,7 @@
 {#
     기본 정보 섹션 (공통)
     basic_info: 기본 정보 딕셔너리
+    법인 직원 상세 페이지와 필드 구조 통일
 #}
 <section class="profile-section" id="basic-info">
     <div class="section-header">
@@ -12,18 +13,16 @@
 
     <div class="section-content">
         <div class="info-grid">
-            {# 이름 정보 #}
+            {# 이름 정보 - 법인과 동일 #}
             <div class="info-group">
-                <label class="info-label">이름</label>
+                <label class="info-label">성명 (한글)</label>
                 <div class="info-value">{{ basic_info.name or '-' }}</div>
             </div>
 
-            {% if basic_info.english_name %}
             <div class="info-group">
-                <label class="info-label">영문명</label>
-                <div class="info-value">{{ basic_info.english_name }}</div>
+                <label class="info-label">여권명 (영문)</label>
+                <div class="info-value">{{ basic_info.english_name or '-' }}</div>
             </div>
-            {% endif %}
 
             {% if basic_info.chinese_name %}
             <div class="info-group">
@@ -31,6 +30,12 @@
                 <div class="info-value">{{ basic_info.chinese_name }}</div>
             </div>
             {% endif %}
+
+            {# 주민등록번호 - 법인과 동일하게 추가 #}
+            <div class="info-group">
+                <label class="info-label">주민등록번호</label>
+                <div class="info-value">{{ basic_info.resident_number or '-' }}</div>
+            </div>
 
             {# 생년월일 #}
             <div class="info-group">
@@ -49,7 +54,7 @@
                 <div class="info-value">{{ basic_info.gender or '-' }}</div>
             </div>
 
-            {# 연락처 #}
+            {# 연락처 - 법인과 동일 #}
             <div class="info-group">
                 <label class="info-label">휴대전화</label>
                 <div class="info-value">{{ basic_info.mobile_phone or '-' }}</div>
@@ -67,7 +72,7 @@
                 <div class="info-value">{{ basic_info.email or '-' }}</div>
             </div>
 
-            {# 주소 #}
+            {# 주소 - 법인과 동일 #}
             <div class="info-group info-group--full">
                 <label class="info-label">주소</label>
                 <div class="info-value">

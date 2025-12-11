@@ -22,7 +22,8 @@ export {
     getCertificateTemplate,
     getFamilyTemplate,
     getLanguageTemplate,
-    getProjectTemplate
+    getProjectTemplate,
+    getAwardTemplate
 } from './templates.js';
 
 // 함수 re-export
@@ -40,8 +41,33 @@ export {
     initFileUpload,
     getEmployeeIdFromForm,
     showToast,
-    validateImageFile
+    validateImageFile,
+    initTreeSelector
 };
+
+/**
+ * 조직 트리 선택기 초기화
+ * TreeSelector 컴포넌트를 사용하여 조직 선택 UI 구성
+ */
+export function initTreeSelector() {
+    const organizationDisplay = document.getElementById('organization_display');
+    if (!organizationDisplay || typeof window.TreeSelector === 'undefined') {
+        return;
+    }
+
+    new window.TreeSelector({
+        inputId: 'organization_display',
+        hiddenInputId: 'organization_id',
+        modalId: 'orgTreeSelectorModal',
+        apiUrl: '/admin/api/organizations?format=tree',
+        allowEmpty: true,
+        onSelect: function(selected) {
+            if (selected) {
+                console.log('Selected organization:', selected);
+            }
+        }
+    });
+}
 
 /**
  * 직원 폼 전체 초기화
@@ -56,6 +82,7 @@ export function initEmployeeForm() {
     initFormValidation();
     initAddressSearch();
     initFileUpload();
+    initTreeSelector();
 }
 
 // DOMContentLoaded에서 자동 초기화

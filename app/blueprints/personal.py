@@ -149,11 +149,12 @@ def profile_edit():
         profile_obj = personal_service.ensure_profile_exists(user_id, user.username)
 
     if request.method == 'POST':
-        # 폼 데이터 수집
+        # 폼 데이터 수집 - 법인과 동일한 필드 구조
         data = {
             'name': request.form.get('name', profile_obj.name).strip(),
             'english_name': request.form.get('english_name', '').strip() or None,
             'chinese_name': request.form.get('chinese_name', '').strip() or None,
+            'resident_number': request.form.get('resident_number', '').strip() or None,
             'birth_date': request.form.get('birth_date', '').strip() or None,
             'lunar_birth': request.form.get('lunar_birth') == 'true',
             'gender': request.form.get('gender', '').strip() or None,

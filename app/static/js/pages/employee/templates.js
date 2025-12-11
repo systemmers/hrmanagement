@@ -232,11 +232,44 @@ export function getProjectTemplate() {
     `;
 }
 
+/**
+ * 수상내역 템플릿
+ * @returns {string} HTML 템플릿
+ */
+export function getAwardTemplate() {
+    return `
+        <div class="dynamic-item" data-index="0">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">수상일</label>
+                    <input type="date" name="award_date[]" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">수상명</label>
+                    <input type="text" name="award_name[]" class="form-input" placeholder="수상명">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">수여기관</label>
+                    <input type="text" name="award_issuer[]" class="form-input" placeholder="수여기관">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">비고</label>
+                    <input type="text" name="award_note[]" class="form-input" placeholder="비고">
+                </div>
+            </div>
+            <button type="button" class="btn-remove" title="삭제">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+}
+
 export default {
     getEducationTemplate,
     getCareerTemplate,
     getCertificateTemplate,
     getFamilyTemplate,
     getLanguageTemplate,
-    getProjectTemplate
+    getProjectTemplate,
+    getAwardTemplate
 };

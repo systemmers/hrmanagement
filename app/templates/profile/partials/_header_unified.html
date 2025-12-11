@@ -72,17 +72,16 @@
 
         {# 액션 버튼 영역 #}
         <div class="profile-actions">
-            {# TODO: 프로필 수정 기능 구현 후 활성화
-            <a href="{{ url_for('profile.edit') }}" class="btn btn-outline">
-                <i class="fas fa-edit"></i>
-                수정
-            </a>
-            #}
             {% if is_corporate %}
             <button type="button" class="btn btn-outline" onclick="window.print()">
                 <i class="fas fa-print"></i>
                 인쇄
             </button>
+            {% else %}
+            <a href="{{ url_for('personal.profile_edit') }}" class="btn btn-primary">
+                <i class="fas fa-edit"></i>
+                수정
+            </a>
             {% endif %}
         </div>
     </div>

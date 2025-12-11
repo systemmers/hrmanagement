@@ -146,21 +146,4 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/components/tree-selector.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/pages/employee-form.js') }}"></script>
-<script>
-    // 조직 트리 선택기 초기화
-    document.addEventListener('DOMContentLoaded', function() {
-        new TreeSelector({
-            inputId: 'organization_display',
-            hiddenInputId: 'organization_id',
-            modalId: 'orgTreeSelectorModal',
-            apiUrl: '/admin/api/organizations?format=tree',
-            allowEmpty: true,
-            onSelect: function(selected) {
-                if (selected) {
-                    console.log('Selected organization:', selected);
-                }
-            }
-        });
-    });
-</script>
 {% endblock %}

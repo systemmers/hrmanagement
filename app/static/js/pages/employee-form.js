@@ -40,6 +40,7 @@ export {
     validateForm,
     initAddressSearch,
     initFileUpload,
+    initTreeSelector,
     getEmployeeIdFromForm,
     showToast,
     validateImageFile,
@@ -48,7 +49,8 @@ export {
     getCertificateTemplate,
     getFamilyTemplate,
     getLanguageTemplate,
-    getProjectTemplate
+    getProjectTemplate,
+    getAwardTemplate
 } from './employee/index.js';
 
 // 기본 export

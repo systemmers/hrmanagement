@@ -17,6 +17,7 @@ from .event_listeners import (
 from .notification_service import NotificationService, notification_service
 from .personal_service import PersonalService, personal_service
 from .corporate_admin_profile_service import CorporateAdminProfileService, corporate_admin_profile_service
+from .employee_service import EmployeeService, employee_service
 from .file_storage_service import (
     FileStorageService, file_storage,
     ALLOWED_EXTENSIONS, ALLOWED_IMAGE_EXTENSIONS,

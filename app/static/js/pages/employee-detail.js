@@ -146,3 +146,18 @@ function formatFileSize(bytes) {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
+
+/**
+ * 직원 삭제 확인 및 처리
+ * @param {number} id - 직원 ID
+ * @param {string} name - 직원 이름
+ */
+window.deleteEmployee = function(id, name) {
+    if (confirm(`"${name}" 직원을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/employees/${id}/delete`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+};

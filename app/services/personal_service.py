@@ -113,15 +113,19 @@ class PersonalService:
         return user_obj, profile
 
     def get_dashboard_data(self, user_id: int) -> Optional[Dict]:
-        """대시보드용 데이터 조회"""
+        """대시보드용 데이터 조회
+
+        프로필이 없어도 user 정보는 반환합니다.
+        호출측에서 profile이 None인지 확인하여 프로필 생성 페이지로 안내해야 합니다.
+        """
         user, profile = self.get_user_with_profile(user_id)
-        if not user or not profile:
+        if not user:
             return None
 
         return {
             'user': user,
-            'profile': profile,
-            'stats': self.profile_repo.get_profile_stats(profile)
+            'profile': profile,  # None일 수 있음
+            'stats': self.profile_repo.get_profile_stats(profile) if profile else {}
         }
 
     def ensure_profile_exists(self, user_id: int, default_name: str) -> object:

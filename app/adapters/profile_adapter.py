@@ -275,12 +275,13 @@ class PersonalProfileAdapter(ProfileAdapter):
         self.profile = profile
 
     def get_basic_info(self) -> Dict[str, Any]:
-        """기본 개인정보 반환"""
+        """기본 개인정보 반환 - 법인과 동일한 필드 구조"""
         return {
             'id': self.profile.id,
             'name': self.profile.name,
             'english_name': self.profile.english_name,
             'chinese_name': self.profile.chinese_name,
+            'resident_number': self.profile.resident_number,
             'birth_date': self.profile.birth_date,
             'lunar_birth': self.profile.lunar_birth,
             'gender': self.profile.gender,
