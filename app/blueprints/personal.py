@@ -6,9 +6,41 @@ Phase 2: 개인-법인 분리 아키텍처의 일부입니다.
 Phase 6: 백엔드 리팩토링 - 프로필 헬퍼 통합
 Sprint 1: Repository 계층 적용 - ORM 직접 사용 제거
 """
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+import os
+import uuid
+from datetime import datetime
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, current_app
+from werkzeug.utils import secure_filename
 
 from app.services.personal_service import personal_service
+
+# 사진 업로드 설정
+ALLOWED_IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
+MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
+
+
+def allowed_image_file(filename):
+    """이미지 파일 확장자 검사"""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_IMAGE_EXTENSIONS
+
+
+def get_personal_photo_folder():
+    """개인 프로필 사진 저장 폴더 반환"""
+    folder = os.path.join(current_app.static_folder, 'uploads', 'personal_photos')
+    os.makedirs(folder, exist_ok=True)
+    return folder
+
+
+def save_personal_photo(file, user_id):
+    """개인 프로필 사진 저장"""
+    ext = file.filename.rsplit('.', 1)[1].lower()
+    unique_filename = f"personal_{user_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:8]}.{ext}"
+
+    folder = get_personal_photo_folder()
+    file_path = os.path.join(folder, unique_filename)
+    file.save(file_path)
+
+    return f"/static/uploads/personal_photos/{unique_filename}"
 from app.utils.decorators import personal_login_required
 from app.utils.personal_helpers import get_current_profile, profile_required_no_inject
 from app.adapters.profile_adapter import PersonalProfileAdapter
@@ -149,6 +181,24 @@ def profile_edit():
         profile_obj = personal_service.ensure_profile_exists(user_id, user.username)
 
     if request.method == 'POST':
+        # 사진 업로드 처리
+        photo_path = profile_obj.photo  # 기존 사진 경로 유지
+        if 'photoFile' in request.files:
+            photo_file = request.files['photoFile']
+            if photo_file and photo_file.filename:
+                if allowed_image_file(photo_file.filename):
+                    # 파일 크기 검사
+                    photo_file.seek(0, os.SEEK_END)
+                    file_size = photo_file.tell()
+                    photo_file.seek(0)
+
+                    if file_size <= MAX_IMAGE_SIZE:
+                        photo_path = save_personal_photo(photo_file, user_id)
+                    else:
+                        flash('사진 파일 크기는 5MB 이하여야 합니다.', 'warning')
+                else:
+                    flash('이미지 파일만 업로드 가능합니다. (jpg, png, gif, webp)', 'warning')
+
         # 폼 데이터 수집 - 법인과 동일한 필드 구조
         data = {
             'name': request.form.get('name', profile_obj.name).strip(),
@@ -170,6 +220,7 @@ def profile_edit():
             'hobby': request.form.get('hobby', '').strip() or None,
             'specialty': request.form.get('specialty', '').strip() or None,
             'is_public': request.form.get('is_public') == 'true',
+            'photo': photo_path,
         }
 
         success, error_msg = personal_service.update_profile(user_id, data)

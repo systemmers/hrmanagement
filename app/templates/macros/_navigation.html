@@ -136,6 +136,20 @@ Parameters:
             {{ section_nav_item('#insurance-info', 'fa-shield-alt', '4대보험') }}
         </div>
         {% endif %}
+
+        {% elif variant == 'profile' %}
+        {# 개인 프로필 수정 네비게이션 #}
+        <div class="section-nav-group">
+            <div class="section-nav-group-title">기본정보</div>
+            {{ section_nav_item('#personal-info', 'fa-user', '개인 기본정보', true) }}
+            {{ section_nav_item('#contact-info', 'fa-phone', '연락처 정보') }}
+            {{ section_nav_item('#address-info', 'fa-map-marker-alt', '주소 정보') }}
+        </div>
+        <div class="section-nav-group">
+            <div class="section-nav-group-title">부가정보</div>
+            {{ section_nav_item('#other-info', 'fa-info-circle', '기타 정보') }}
+            {{ section_nav_item('#visibility-settings', 'fa-eye', '공개 설정') }}
+        </div>
         {% endif %}
     </nav>
 </aside>

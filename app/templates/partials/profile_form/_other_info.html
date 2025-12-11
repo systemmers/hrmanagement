@@ -1,0 +1,58 @@
+{#
+    개인 프로필 폼 - 기타 정보 섹션
+    profile: PersonalProfile 객체
+
+    개인 계정 전용 필드: 국적, 혈액형, 종교, 취미, 특기
+#}
+<section class="form-section" id="other-info" aria-labelledby="other-info-title">
+    <div class="card">
+        <div class="card-header">
+            <h2 id="other-info-title" class="card-title">
+                <i class="fas fa-info-circle" aria-hidden="true"></i>
+                기타 정보
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="nationality" class="form-label">국적</label>
+                    <input type="text" id="nationality" name="nationality" class="form-input"
+                           value="{{ profile.nationality if profile and profile.nationality else '' }}"
+                           placeholder="대한민국">
+                </div>
+
+                <div class="form-group">
+                    <label for="blood_type" class="form-label">혈액형</label>
+                    <select id="blood_type" name="blood_type" class="form-input">
+                        <option value="">선택</option>
+                        <option value="A형" {% if profile and profile.blood_type == 'A형' %}selected{% endif %}>A형</option>
+                        <option value="B형" {% if profile and profile.blood_type == 'B형' %}selected{% endif %}>B형</option>
+                        <option value="O형" {% if profile and profile.blood_type == 'O형' %}selected{% endif %}>O형</option>
+                        <option value="AB형" {% if profile and profile.blood_type == 'AB형' %}selected{% endif %}>AB형</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="religion" class="form-label">종교</label>
+                    <input type="text" id="religion" name="religion" class="form-input"
+                           value="{{ profile.religion if profile and profile.religion else '' }}"
+                           placeholder="무교, 기독교, 불교 등">
+                </div>
+
+                <div class="form-group">
+                    <label for="hobby" class="form-label">취미</label>
+                    <input type="text" id="hobby" name="hobby" class="form-input"
+                           value="{{ profile.hobby if profile and profile.hobby else '' }}"
+                           placeholder="독서, 운동, 여행 등">
+                </div>
+
+                <div class="form-group">
+                    <label for="specialty" class="form-label">특기</label>
+                    <input type="text" id="specialty" name="specialty" class="form-input"
+                           value="{{ profile.specialty if profile and profile.specialty else '' }}"
+                           placeholder="프로그래밍, 외국어 등">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

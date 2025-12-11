@@ -5,296 +5,53 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/cards.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/employee-detail.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/employee-form.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="detail-page-layout">
-    {# 좌측 섹션 네비게이션 #}
-    <aside class="section-nav" id="sectionNav">
-        <div class="section-nav-header">
-            <div class="section-nav-title">프로필 수정</div>
-            <div class="section-nav-subtitle">{{ profile.name if profile and profile.name else user.username }}</div>
-        </div>
-        <nav class="section-nav-menu">
-            <div class="section-nav-group">
-                <div class="section-nav-group-title">기본정보</div>
-                <a href="#basic-info" class="section-nav-item active">
-                    <i class="fas fa-user"></i>
-                    <span>기본 정보</span>
-                </a>
-                <a href="#contact-info" class="section-nav-item">
-                    <i class="fas fa-phone"></i>
-                    <span>연락처 정보</span>
-                </a>
-                <a href="#address-info" class="section-nav-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>주소 정보</span>
-                </a>
-            </div>
-            <div class="section-nav-group">
-                <div class="section-nav-group-title">부가정보</div>
-                <a href="#other-info" class="section-nav-item">
-                    <i class="fas fa-info-circle"></i>
-                    <span>기타 정보</span>
-                </a>
-                <a href="#visibility-settings" class="section-nav-item">
-                    <i class="fas fa-eye"></i>
-                    <span>공개 설정</span>
-                </a>
-            </div>
-        </nav>
-    </aside>
+{% from 'macros/_navigation.html' import section_nav %}
+<div class="form-page-layout-with-sidebar">
+    {# 좌측: 섹션 네비게이션 #}
+    {{ section_nav('프로필 수정', profile.name if profile and profile.name else user.username, variant='profile') }}
 
-    {# 메인 콘텐츠 #}
-    <div class="detail-main-content">
+    {# 메인 콘텐츠: 폼 #}
+    <main class="form-main-content">
         {# 페이지 헤더 #}
-        <div class="detail-page-header">
-            <h1 class="detail-page-title">프로필 수정</h1>
-            <div class="detail-page-actions">
+        <div class="form-page-header">
+            <h1 class="form-page-title">프로필 수정</h1>
+            <div class="form-page-actions">
                 <a href="{{ url_for('personal.profile') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                     <span>프로필로</span>
                 </a>
-                <button type="submit" form="profileForm" class="btn btn-primary">
-                    <i class="fas fa-save"></i>
-                    <span>저장</span>
-                </button>
             </div>
         </div>
 
-        <form method="POST" class="employee-form" id="profileForm">
-            {# 섹션 1: 기본 정보 - 법인과 동일한 필드 구조 #}
-            <section class="form-section" id="basic-info">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-user"></i>
-                            기본 정보
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">
-                                    성명 (한글) <span class="required">*</span>
-                                </label>
-                                <input type="text" name="name" class="form-input"
-                                       value="{{ profile.name if profile else '' }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">여권명 (영문)</label>
-                                <input type="text" name="english_name" class="form-input"
-                                       placeholder="Hong Gildong"
-                                       value="{{ profile.english_name or '' if profile else '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">한자 이름</label>
-                                <input type="text" name="chinese_name" class="form-input"
-                                       value="{{ profile.chinese_name or '' if profile else '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">주민등록번호</label>
-                                <input type="text" name="resident_number" class="form-input"
-                                       placeholder="850520-1******" maxlength="14"
-                                       value="{{ profile.resident_number or '' if profile else '' }}">
-                                <small class="form-help">마스킹 처리된 형식으로 입력 (예: 850520-1******)</small>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">생년월일</label>
-                                <input type="date" name="birth_date" class="form-input"
-                                       value="{{ profile.birth_date or '' if profile else '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">음력 여부</label>
-                                <select name="lunar_birth" class="form-input">
-                                    <option value="false" {% if not profile or not profile.lunar_birth %}selected{% endif %}>양력</option>
-                                    <option value="true" {% if profile and profile.lunar_birth %}selected{% endif %}>음력</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">성별</label>
-                                <select name="gender" class="form-input">
-                                    <option value="">선택</option>
-                                    <option value="남성" {% if profile and profile.gender == '남성' %}selected{% endif %}>남성</option>
-                                    <option value="여성" {% if profile and profile.gender == '여성' %}selected{% endif %}>여성</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        <form method="POST" action="{{ url_for('personal.profile_edit') }}" class="employee-form" id="profileForm" enctype="multipart/form-data">
+
+            {# 섹션 1: 개인 기본정보 #}
+            {% include 'partials/profile_form/_personal_basic_info.html' %}
 
             {# 섹션 2: 연락처 정보 #}
-            <section class="form-section" id="contact-info">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-phone"></i>
-                            연락처 정보
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">휴대전화</label>
-                                <input type="tel" name="mobile_phone" class="form-input"
-                                       placeholder="010-0000-0000"
-                                       value="{{ profile.mobile_phone or '' if profile else '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">자택전화</label>
-                                <input type="tel" name="home_phone" class="form-input"
-                                       placeholder="02-000-0000"
-                                       value="{{ profile.home_phone or '' if profile else '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">이메일</label>
-                                <input type="email" name="email" class="form-input"
-                                       placeholder="user@example.com"
-                                       value="{{ profile.email or '' if profile else '' }}">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            {% include 'partials/profile_form/_contact_info.html' %}
 
             {# 섹션 3: 주소 정보 #}
-            <section class="form-section" id="address-info">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-map-marker-alt"></i>
-                            주소 정보
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-grid">
-                            <div class="form-group form-group-sm">
-                                <label class="form-label">우편번호</label>
-                                <input type="text" name="postal_code" class="form-input"
-                                       placeholder="00000"
-                                       value="{{ profile.postal_code or '' if profile else '' }}">
-                            </div>
-                            <div class="form-group form-group-lg">
-                                <label class="form-label">주소</label>
-                                <input type="text" name="address" class="form-input"
-                                       placeholder="서울시 강남구"
-                                       value="{{ profile.address or '' if profile else '' }}">
-                            </div>
-                            <div class="form-group form-group-full">
-                                <label class="form-label">상세주소</label>
-                                <input type="text" name="detailed_address" class="form-input"
-                                       placeholder="OO아파트 O동 O호"
-                                       value="{{ profile.detailed_address or '' if profile else '' }}">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            {% include 'partials/profile_form/_address_info.html' %}
 
             {# 섹션 4: 기타 정보 #}
-            <section class="form-section" id="other-info">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-info-circle"></i>
-                            기타 정보
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">국적</label>
-                                <input type="text" name="nationality" class="form-input"
-                                       placeholder="대한민국"
-                                       value="{{ profile.nationality or '' if profile else '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">혈액형</label>
-                                <select name="blood_type" class="form-input">
-                                    <option value="">선택</option>
-                                    <option value="A형" {% if profile and profile.blood_type == 'A형' %}selected{% endif %}>A형</option>
-                                    <option value="B형" {% if profile and profile.blood_type == 'B형' %}selected{% endif %}>B형</option>
-                                    <option value="O형" {% if profile and profile.blood_type == 'O형' %}selected{% endif %}>O형</option>
-                                    <option value="AB형" {% if profile and profile.blood_type == 'AB형' %}selected{% endif %}>AB형</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">종교</label>
-                                <input type="text" name="religion" class="form-input"
-                                       value="{{ profile.religion or '' if profile else '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">취미</label>
-                                <input type="text" name="hobby" class="form-input"
-                                       value="{{ profile.hobby or '' if profile else '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">특기</label>
-                                <input type="text" name="specialty" class="form-input"
-                                       value="{{ profile.specialty or '' if profile else '' }}">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            {% include 'partials/profile_form/_other_info.html' %}
 
             {# 섹션 5: 공개 설정 #}
-            <section class="form-section" id="visibility-settings">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-eye"></i>
-                            공개 설정
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="visibility-option">
-                            <div class="visibility-toggle">
-                                <input type="checkbox" id="is_public" name="is_public" value="true"
-                                       {% if profile and profile.is_public %}checked{% endif %}>
-                                <label for="is_public" class="toggle-label">
-                                    <span class="toggle-text">프로필 공개</span>
-                                    <span class="toggle-description">
-                                        프로필을 공개하면 기업이 회원님의 정보를 조회할 수 있습니다.
-                                        구직 활동 시 공개로 설정하세요.
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            {% include 'partials/profile_form/_visibility_settings.html' %}
 
-            {# 폼 제출 버튼 (하단 고정) #}
-            <div class="form-submit-section">
-                <div class="form-submit-info">
-                    입력하신 정보는 즉시 저장됩니다.
-                </div>
-                <div class="form-submit-actions">
-                    <a href="{{ url_for('personal.profile') }}" class="btn btn-secondary btn-lg">
-                        <i class="fas fa-times"></i>
-                        <span>취소</span>
-                    </a>
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        <i class="fas fa-save"></i>
-                        <span>저장하기</span>
-                    </button>
-                </div>
-            </div>
+            {# 폼 제출 버튼 #}
+            {% with cancel_url=url_for('personal.profile') %}
+            {% include 'partials/profile_form/_submit_section.html' %}
+            {% endwith %}
+
         </form>
-    </div>
+    </main>
 </div>
-
-{# 모바일 섹션 네비게이션 토글 버튼 #}
-<button class="mobile-section-nav-toggle" id="mobileNavToggle">
-    <i class="fas fa-bars"></i>
-</button>
-
-{# 모바일 오버레이 #}
-<div class="section-nav-overlay" id="sectionNavOverlay"></div>
 {% endblock %}
 
 {% block extra_js %}
@@ -342,22 +99,62 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 모바일 네비게이션 토글
-    const mobileToggle = document.getElementById('mobileNavToggle');
-    const sectionNav = document.getElementById('sectionNav');
-    const overlay = document.getElementById('sectionNavOverlay');
+    // 프로필 사진 업로드
+    const selectPhotoBtn = document.getElementById('selectPhotoBtn');
+    const photoFile = document.getElementById('photoFile');
+    const photoPreview = document.getElementById('photoPreview');
+    const photoInput = document.getElementById('photo');
+    const deletePhotoBtn = document.getElementById('deletePhotoBtn');
 
-    if (mobileToggle && sectionNav && overlay) {
-        mobileToggle.addEventListener('click', function() {
-            sectionNav.classList.toggle('active');
-            overlay.classList.toggle('active');
+    if (selectPhotoBtn && photoFile) {
+        selectPhotoBtn.addEventListener('click', function() {
+            photoFile.click();
         });
 
-        overlay.addEventListener('click', function() {
-            sectionNav.classList.remove('active');
-            overlay.classList.remove('active');
+        photoFile.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // 파일 크기 검사 (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('파일 크기는 5MB 이하여야 합니다.');
+                    return;
+                }
+
+                // 미리보기 표시
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoPreview.innerHTML = '<img src="' + e.target.result + '" alt="프로필 사진" id="previewImage">';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    if (deletePhotoBtn) {
+        deletePhotoBtn.addEventListener('click', function() {
+            if (confirm('프로필 사진을 삭제하시겠습니까?')) {
+                photoPreview.innerHTML = '<div class="photo-placeholder" id="photoPlaceholder"><i class="fas fa-user"></i><span>사진 미등록</span></div>';
+                if (photoInput) photoInput.value = '';
+                if (photoFile) photoFile.value = '';
+            }
+        });
+    }
+
+    // 주소 검색 (카카오 주소 API)
+    const searchAddressBtn = document.getElementById('searchAddressBtn');
+    if (searchAddressBtn) {
+        searchAddressBtn.addEventListener('click', function() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    document.getElementById('postal_code').value = data.zonecode;
+                    document.getElementById('address').value = data.roadAddress || data.jibunAddress;
+                    document.getElementById('detailed_address').focus();
+                }
+            }).open();
         });
     }
 });
 </script>
+{# 카카오 주소 API #}
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 {% endblock %}

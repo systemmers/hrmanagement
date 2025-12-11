@@ -47,8 +47,9 @@ class PersonalProfileRepository(BaseRepository):
     def update_profile(self, profile: PersonalProfile, data: Dict) -> PersonalProfile:
         """프로필 정보 수정"""
         allowed_fields = [
-            'name', 'english_name', 'chinese_name', 'birth_date', 'lunar_birth',
-            'gender', 'mobile_phone', 'home_phone', 'email', 'postal_code',
+            'name', 'english_name', 'chinese_name', 'resident_number',
+            'birth_date', 'lunar_birth', 'gender', 'photo',
+            'mobile_phone', 'home_phone', 'email', 'postal_code',
             'address', 'detailed_address', 'nationality', 'blood_type',
             'religion', 'hobby', 'specialty', 'is_public'
         ]

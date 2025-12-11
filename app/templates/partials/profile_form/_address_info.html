@@ -1,0 +1,45 @@
+{#
+    개인 프로필 폼 - 주소 섹션
+    profile: PersonalProfile 객체
+
+    법인 직원과 동일한 주소 검색 UI
+#}
+<section class="form-section" id="address-info" aria-labelledby="address-info-title">
+    <div class="card">
+        <div class="card-header">
+            <h2 id="address-info-title" class="card-title">
+                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                주소 정보
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="form-grid">
+                <div class="form-group form-group-sm">
+                    <label for="postal_code" class="form-label">우편번호</label>
+                    <div class="input-with-button">
+                        <input type="text" id="postal_code" name="postal_code" class="form-input"
+                               value="{{ profile.postal_code if profile and profile.postal_code else '' }}"
+                               placeholder="00000" readonly>
+                        <button type="button" class="btn btn-secondary" id="searchAddressBtn" aria-label="주소 검색">
+                            <i class="fas fa-search" aria-hidden="true"></i> 주소 검색
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group form-group-lg">
+                    <label for="address" class="form-label">주소</label>
+                    <input type="text" id="address" name="address" class="form-input"
+                           value="{{ profile.address if profile and profile.address else '' }}"
+                           placeholder="주소 검색 버튼을 클릭하세요" readonly>
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="detailed_address" class="form-label">상세주소</label>
+                    <input type="text" id="detailed_address" name="detailed_address" class="form-input"
+                           value="{{ profile.detailed_address if profile and profile.detailed_address else '' }}"
+                           placeholder="동/호수, 건물명 등">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
