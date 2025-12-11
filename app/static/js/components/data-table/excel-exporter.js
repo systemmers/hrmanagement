@@ -106,7 +106,6 @@ export class ExcelExporter {
             });
         }
 
-        console.log(`엑셀 파일 내보내기 완료: ${fullFilename} (${data.length}행, ${columns.length}열)`);
         return true;
     }
 }

@@ -16,4 +16,4 @@ classification_bp = Blueprint('classification', __name__)
 def classification_options_page():
     """분류 옵션 관리 페이지"""
     options = classification_repo.get_all()
-    return render_template('classification_options.html', classification_options=options)
+    return render_template('admin/classification_options.html', classification_options=options)

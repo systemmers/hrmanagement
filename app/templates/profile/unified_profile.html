@@ -50,51 +50,13 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- JS: pages/profile/profile-navigation.js -->
+<script src="{{ url_for('static', filename='js/pages/profile/profile-navigation.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 섹션 네비게이션 스크롤 동작
-    const navItems = document.querySelectorAll('.section-nav-item');
-    const sections = document.querySelectorAll('.profile-section');
-
-    // 스크롤 시 활성 섹션 업데이트
-    function updateActiveNav() {
-        let currentSection = '';
-        const scrollPosition = window.scrollY + 100;
-
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.offsetHeight;
-
-            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                currentSection = section.getAttribute('id');
-            }
-        });
-
-        navItems.forEach(item => {
-            item.classList.remove('active');
-            if (item.getAttribute('href') === '#' + currentSection) {
-                item.classList.add('active');
-            }
-        });
+    if (window.ProfileNavigation) {
+        window.ProfileNavigation.initProfileNavigation();
     }
-
-    window.addEventListener('scroll', updateActiveNav);
-
-    // 네비게이션 클릭 시 부드러운 스크롤
-    navItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            const targetSection = document.getElementById(targetId);
-
-            if (targetSection) {
-                targetSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
 });
 </script>
 {% endblock %}

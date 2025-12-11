@@ -35,7 +35,7 @@ export function initFileUpload() {
         fileListId: 'fileList',
         employeeId: employeeId,
         onUploadComplete: (attachment) => {
-            console.log('파일 업로드 완료:', attachment);
+            // 업로드 완료 후 추가 처리가 필요하면 여기에 구현
         }
     });
 }

@@ -55,93 +55,16 @@
     </div>
 </section>
 
+<!-- JS: pages/profile/personnel-movement.js -->
+<script src="{{ url_for('static', filename='js/pages/profile/personnel-movement.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 승진 이력 로드
-    fetch('{{ url_for("profile.promotions") }}')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('promotionContainer');
-            if (data.success && data.data && data.data.length > 0) {
-                let html = '<table class="data-table"><thead><tr>';
-                html += '<th>승진일</th><th>이전 직급</th><th>승진 직급</th><th>비고</th>';
-                html += '</tr></thead><tbody>';
-
-                data.data.forEach(item => {
-                    html += '<tr>';
-                    html += '<td>' + (item.promotion_date || '-') + '</td>';
-                    html += '<td>' + (item.previous_position || '-') + '</td>';
-                    html += '<td>' + (item.new_position || '-') + '</td>';
-                    html += '<td>' + (item.notes || '-') + '</td>';
-                    html += '</tr>';
-                });
-
-                html += '</tbody></table>';
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<div class="empty-state empty-state--small"><p>승진 이력이 없습니다.</p></div>';
-            }
-        })
-        .catch(() => {
-            document.getElementById('promotionContainer').innerHTML = '<div class="error-state"><p>데이터 로드 실패</p></div>';
+    if (window.PersonnelMovement) {
+        window.PersonnelMovement.initPersonnelMovement({
+            promotions: '{{ url_for("profile.promotions") }}',
+            evaluations: '{{ url_for("profile.evaluations") }}',
+            trainings: '{{ url_for("profile.trainings") }}'
         });
-
-    // 인사평가 로드
-    fetch('{{ url_for("profile.evaluations") }}')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('evaluationContainer');
-            if (data.success && data.data && data.data.length > 0) {
-                let html = '<table class="data-table"><thead><tr>';
-                html += '<th>평가기간</th><th>평가등급</th><th>점수</th><th>비고</th>';
-                html += '</tr></thead><tbody>';
-
-                data.data.forEach(item => {
-                    html += '<tr>';
-                    html += '<td>' + (item.evaluation_period || '-') + '</td>';
-                    html += '<td>' + (item.grade || '-') + '</td>';
-                    html += '<td>' + (item.score || '-') + '</td>';
-                    html += '<td>' + (item.notes || '-') + '</td>';
-                    html += '</tr>';
-                });
-
-                html += '</tbody></table>';
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<div class="empty-state empty-state--small"><p>평가 이력이 없습니다.</p></div>';
-            }
-        })
-        .catch(() => {
-            document.getElementById('evaluationContainer').innerHTML = '<div class="error-state"><p>데이터 로드 실패</p></div>';
-        });
-
-    // 교육 이력 로드
-    fetch('{{ url_for("profile.trainings") }}')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('trainingContainer');
-            if (data.success && data.data && data.data.length > 0) {
-                let html = '<table class="data-table"><thead><tr>';
-                html += '<th>교육명</th><th>교육기간</th><th>교육기관</th><th>수료여부</th>';
-                html += '</tr></thead><tbody>';
-
-                data.data.forEach(item => {
-                    html += '<tr>';
-                    html += '<td>' + (item.training_name || '-') + '</td>';
-                    html += '<td>' + (item.start_date || '-') + ' ~ ' + (item.end_date || '-') + '</td>';
-                    html += '<td>' + (item.institution || '-') + '</td>';
-                    html += '<td>' + (item.completion_status || '-') + '</td>';
-                    html += '</tr>';
-                });
-
-                html += '</tbody></table>';
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<div class="empty-state empty-state--small"><p>교육 이력이 없습니다.</p></div>';
-            }
-        })
-        .catch(() => {
-            document.getElementById('trainingContainer').innerHTML = '<div class="error-state"><p>데이터 로드 실패</p></div>';
-        });
+    }
 });
 </script>

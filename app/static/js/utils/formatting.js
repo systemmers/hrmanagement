@@ -142,3 +142,74 @@ export function formatFileSize(bytes) {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
+
+/**
+ * 날짜만 포맷팅 (시간 제외)
+ * @param {string} dateStr - ISO 날짜 문자열
+ * @returns {string} 포맷된 날짜 문자열 (YYYY-MM-DD)
+ */
+export function formatDateOnly(dateStr) {
+    if (!dateStr) return '-';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('ko-KR');
+}
+
+/**
+ * 전화번호 입력 필드에 자동 포맷 이벤트 바인딩
+ * @param {string} selector - CSS 선택자 (기본값: 'input[type="tel"]')
+ */
+export function initPhoneInputs(selector = 'input[type="tel"]') {
+    document.querySelectorAll(selector).forEach(function(input) {
+        input.addEventListener('input', function(e) {
+            let cleaned = e.target.value.replace(/[^0-9]/g, '');
+            if (cleaned.length > 11) cleaned = cleaned.slice(0, 11);
+
+            if (cleaned.length > 7) {
+                e.target.value = cleaned.slice(0, 3) + '-' + cleaned.slice(3, 7) + '-' + cleaned.slice(7);
+            } else if (cleaned.length > 3) {
+                e.target.value = cleaned.slice(0, 3) + '-' + cleaned.slice(3);
+            } else {
+                e.target.value = cleaned;
+            }
+        });
+    });
+}
+
+/**
+ * 사업자등록번호 입력 필드에 자동 포맷 이벤트 바인딩
+ * @param {string} selector - CSS 선택자
+ */
+export function initBusinessNumberInputs(selector = '.business-number-input') {
+    document.querySelectorAll(selector).forEach(function(input) {
+        input.addEventListener('input', function(e) {
+            let cleaned = e.target.value.replace(/[^0-9]/g, '');
+            if (cleaned.length > 10) cleaned = cleaned.slice(0, 10);
+
+            if (cleaned.length > 5) {
+                e.target.value = cleaned.slice(0, 3) + '-' + cleaned.slice(3, 5) + '-' + cleaned.slice(5);
+            } else if (cleaned.length > 3) {
+                e.target.value = cleaned.slice(0, 3) + '-' + cleaned.slice(3);
+            } else {
+                e.target.value = cleaned;
+            }
+        });
+    });
+}
+
+// 전역 함수로 노출 (레거시 환경 호환)
+if (typeof window !== 'undefined') {
+    window.HRFormatters = {
+        formatNumber,
+        parseNumber,
+        formatCurrency,
+        formatPercent,
+        formatDate,
+        formatDateKorean,
+        formatDateOnly,
+        formatPhone,
+        formatBusinessNumber,
+        formatFileSize,
+        initPhoneInputs,
+        initBusinessNumberInputs
+    };
+}

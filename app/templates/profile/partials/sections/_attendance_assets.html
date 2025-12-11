@@ -41,68 +41,15 @@
     </div>
 </section>
 
+<!-- JS: pages/profile/attendance-assets.js -->
+<script src="{{ url_for('static', filename='js/pages/profile/attendance-assets.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 근태 현황 로드
-    fetch('{{ url_for("profile.attendances") }}')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('attendanceContainer');
-            if (data.success && data.data && data.data.length > 0) {
-                // 최근 10건만 표시
-                const recentData = data.data.slice(0, 10);
-
-                let html = '<table class="data-table"><thead><tr>';
-                html += '<th>날짜</th><th>출근</th><th>퇴근</th><th>근무시간</th><th>상태</th>';
-                html += '</tr></thead><tbody>';
-
-                recentData.forEach(item => {
-                    html += '<tr>';
-                    html += '<td>' + (item.date || '-') + '</td>';
-                    html += '<td>' + (item.check_in || '-') + '</td>';
-                    html += '<td>' + (item.check_out || '-') + '</td>';
-                    html += '<td>' + (item.work_hours || '-') + '</td>';
-                    html += '<td><span class="status-badge status-badge--' + (item.status || 'default') + '">' + (item.status || '-') + '</span></td>';
-                    html += '</tr>';
-                });
-
-                html += '</tbody></table>';
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<div class="empty-state empty-state--small"><p>근태 기록이 없습니다.</p></div>';
-            }
-        })
-        .catch(() => {
-            document.getElementById('attendanceContainer').innerHTML = '<div class="error-state"><p>데이터 로드 실패</p></div>';
+    if (window.AttendanceAssets) {
+        window.AttendanceAssets.initAttendanceAssets({
+            attendances: '{{ url_for("profile.attendances") }}',
+            assets: '{{ url_for("profile.assets") }}'
         });
-
-    // 비품 현황 로드
-    fetch('{{ url_for("profile.assets") }}')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('assetContainer');
-            if (data.success && data.data && data.data.length > 0) {
-                let html = '<table class="data-table"><thead><tr>';
-                html += '<th>품목명</th><th>관리번호</th><th>지급일</th><th>상태</th>';
-                html += '</tr></thead><tbody>';
-
-                data.data.forEach(item => {
-                    html += '<tr>';
-                    html += '<td>' + (item.asset_name || item.name || '-') + '</td>';
-                    html += '<td>' + (item.asset_number || '-') + '</td>';
-                    html += '<td>' + (item.issue_date || '-') + '</td>';
-                    html += '<td><span class="status-badge status-badge--' + (item.status || 'default') + '">' + (item.status || '-') + '</span></td>';
-                    html += '</tr>';
-                });
-
-                html += '</tbody></table>';
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<div class="empty-state empty-state--small"><p>지급된 비품이 없습니다.</p></div>';
-            }
-        })
-        .catch(() => {
-            document.getElementById('assetContainer').innerHTML = '<div class="error-state"><p>데이터 로드 실패</p></div>';
-        });
+    }
 });
 </script>

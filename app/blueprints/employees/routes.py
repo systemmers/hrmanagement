@@ -90,7 +90,7 @@ def register_routes(bp: Blueprint):
             )
 
         classification_options = classification_repo.get_all()
-        return render_template('employee_list.html',
+        return render_template('employees/list.html',
                                employees=employees,
                                classification_options=classification_options)
 
@@ -137,7 +137,7 @@ def register_routes(bp: Blueprint):
         """기본정보 페이지 렌더링"""
         family_list = family_repo.get_by_employee_id(employee_id)
         attachment_list = attachment_repo.get_by_employee_id(employee_id)
-        return render_template('employee_detail_basic.html',
+        return render_template('employees/detail_basic.html',
                                employee=employee,
                                family_list=family_list,
                                attachment_list=attachment_list)
@@ -152,7 +152,7 @@ def register_routes(bp: Blueprint):
         project_list = project_repo.get_by_employee_id(employee_id)
         award_list = award_repo.get_by_employee_id(employee_id)
         attachment_list = attachment_repo.get_by_employee_id(employee_id)
-        return render_template('employee_detail_history.html',
+        return render_template('employees/detail_history.html',
                                employee=employee,
                                education_list=education_list,
                                career_list=career_list,
@@ -207,7 +207,7 @@ def register_routes(bp: Blueprint):
             (session.get('user_role') == 'employee' and session.get('employee_id') == employee_id)
         )
 
-        return render_template('employee_detail.html',
+        return render_template('employees/detail.html',
                                employee=employee,
                                education_list=education_list,
                                career_list=career_list,
@@ -242,7 +242,7 @@ def register_routes(bp: Blueprint):
     def employee_new():
         """직원 등록 폼"""
         classification_options = classification_repo.get_all_options()
-        return render_template('employee_form.html',
+        return render_template('employees/form.html',
                                employee=None,
                                action='create',
                                classification_options=classification_options)
@@ -306,7 +306,7 @@ def register_routes(bp: Blueprint):
         business_card_back = attachment_repo.get_one_by_category(employee_id, 'business_card_back')
         classification_options = classification_repo.get_all_options()
 
-        return render_template('employee_form.html',
+        return render_template('employees/form.html',
                                employee=employee,
                                action='update',
                                attachment_list=attachment_list,
@@ -374,7 +374,7 @@ def register_routes(bp: Blueprint):
             return redirect(url_for('main.index'))
 
         family_list = family_repo.get_by_employee_id(employee_id)
-        return render_template('employee_form_basic.html',
+        return render_template('employees/form_basic.html',
                                employee=employee,
                                family_list=family_list,
                                action='update')
@@ -442,7 +442,7 @@ def register_routes(bp: Blueprint):
         project_list = project_repo.get_by_employee_id(employee_id)
         award_list = award_repo.get_by_employee_id(employee_id)
 
-        return render_template('employee_form_history.html',
+        return render_template('employees/form_history.html',
                                employee=employee,
                                education_list=education_list,
                                career_list=career_list,

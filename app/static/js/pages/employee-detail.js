@@ -77,7 +77,6 @@ function initFileUpload() {
  * @param {FileList} files - 업로드할 파일 목록
  */
 function handleFileUpload(files) {
-    console.log('Files to upload:', files);
     alert(`${files.length}개의 파일이 선택되었습니다.\n파일 업로드 기능은 향후 구현 예정입니다.`);
 }
 

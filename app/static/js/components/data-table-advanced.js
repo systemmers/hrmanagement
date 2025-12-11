@@ -1011,7 +1011,6 @@ class DataTableAdvanced {
             });
         }
 
-        console.log(`엑셀 파일 내보내기 완료: ${fullFilename} (${exportData.length}행, ${visibleColumns.length}열)`);
     }
 }
 
