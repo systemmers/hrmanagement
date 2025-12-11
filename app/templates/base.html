@@ -20,6 +20,7 @@
     <!-- Layouts -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/header.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/main-content.css') }}">
 
     <!-- Components -->
@@ -105,13 +106,7 @@
                 </div>
 
                 <nav class="sidebar-nav" role="navigation" aria-label="메인 메뉴">
-                    {% if current_user and current_user.account_type == 'personal' %}
-                        {% include 'components/navigation/_sidebar_personal.html' %}
-                    {% elif current_user and current_user.role == 'employee' and current_user.employee_id %}
-                        {% include 'components/navigation/_sidebar_employee.html' %}
-                    {% else %}
-                        {% include 'components/navigation/_sidebar_corporate.html' %}
-                    {% endif %}
+                    {% include 'components/navigation/_sidebar_unified.html' %}
                 </nav>
 
                 <div class="sidebar-footer">

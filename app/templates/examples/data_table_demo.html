@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}고급 데이터 테이블 데모{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/data-table-advanced.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-container" style="max-width: 1400px; margin: 0 auto; padding: var(--space-6);">
+    <div class="page-header" style="margin-bottom: var(--space-6);">
+        <h1 style="font-size: var(--text-2xl); font-weight: 700; color: var(--color-gray-900);">
+            고급 데이터 테이블 데모
+        </h1>
+        <p style="color: var(--color-gray-600); margin-top: var(--space-2);">
+            소팅, 검색, 행선택, 컬럼 추가/제외, 컬럼 위치변경 기능을 포함한 고급 테이블
+        </p>
+    </div>
+
+    <!-- 기능 설명 카드 -->
+    <div class="feature-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+        <div class="feature-card" style="padding: var(--space-4); background: var(--color-pure-white); border: 1px solid var(--color-gray-200); border-radius: var(--radius-lg);">
+            <i class="fas fa-sort" style="color: #2563eb; font-size: var(--text-xl); margin-bottom: var(--space-2);"></i>
+            <h3 style="font-weight: 600; color: var(--color-gray-800);">소팅</h3>
+            <p style="font-size: var(--text-sm); color: var(--color-gray-600);">컬럼 헤더 클릭으로 오름/내림차순 정렬</p>
+        </div>
+        <div class="feature-card" style="padding: var(--space-4); background: var(--color-pure-white); border: 1px solid var(--color-gray-200); border-radius: var(--radius-lg);">
+            <i class="fas fa-search" style="color: #2563eb; font-size: var(--text-xl); margin-bottom: var(--space-2);"></i>
+            <h3 style="font-weight: 600; color: var(--color-gray-800);">검색</h3>
+            <p style="font-size: var(--text-sm); color: var(--color-gray-600);">모든 컬럼에서 실시간 검색</p>
+        </div>
+        <div class="feature-card" style="padding: var(--space-4); background: var(--color-pure-white); border: 1px solid var(--color-gray-200); border-radius: var(--radius-lg);">
+            <i class="fas fa-check-square" style="color: #2563eb; font-size: var(--text-xl); margin-bottom: var(--space-2);"></i>
+            <h3 style="font-weight: 600; color: var(--color-gray-800);">행 선택</h3>
+            <p style="font-size: var(--text-sm); color: var(--color-gray-600);">체크박스로 다중 선택 지원</p>
+        </div>
+        <div class="feature-card" style="padding: var(--space-4); background: var(--color-pure-white); border: 1px solid var(--color-gray-200); border-radius: var(--radius-lg);">
+            <i class="fas fa-columns" style="color: #2563eb; font-size: var(--text-xl); margin-bottom: var(--space-2);"></i>
+            <h3 style="font-weight: 600; color: var(--color-gray-800);">컬럼 설정</h3>
+            <p style="font-size: var(--text-sm); color: var(--color-gray-600);">컬럼 표시/숨김 및 순서 변경</p>
+        </div>
+        <div class="feature-card" style="padding: var(--space-4); background: var(--color-pure-white); border: 1px solid var(--color-gray-200); border-radius: var(--radius-lg);">
+            <i class="fas fa-arrows-alt-h" style="color: #2563eb; font-size: var(--text-xl); margin-bottom: var(--space-2);"></i>
+            <h3 style="font-weight: 600; color: var(--color-gray-800);">드래그 앤 드롭</h3>
+            <p style="font-size: var(--text-sm); color: var(--color-gray-600);">헤더 드래그로 컬럼 재정렬</p>
+        </div>
+    </div>
+
+    <!-- 데이터 테이블 -->
+    <div id="demoTable"></div>
+
+    <!-- 선택된 행 정보 -->
+    <div id="selectedInfo" style="margin-top: var(--space-4); padding: var(--space-4); background: var(--color-gray-50); border-radius: var(--radius-lg); display: none;">
+        <h3 style="font-weight: 600; color: var(--color-gray-800); margin-bottom: var(--space-3);">
+            <i class="fas fa-check-circle" style="color: #2563eb; margin-right: var(--space-2);"></i>
+            선택된 항목 (<span id="selectedCount">0</span>명)
+        </h3>
+        <div id="selectedData" style="display: flex; flex-wrap: wrap; gap: var(--space-2);"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- SheetJS (xlsx) for Excel Export -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<script src="{{ url_for('static', filename='js/components/data-table-advanced.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 샘플 데이터
+    const sampleData = [
+        { id: 1, name: '김철수', email: 'chulsoo.kim@company.com', department: '영업팀', position: '차장', status: 'Active', salary: 5500000 },
+        { id: 2, name: '박영희', email: 'younghee.park@company.com', department: '개발팀', position: '대리', status: 'Active', salary: 4200000 },
+        { id: 3, name: '이민수', email: 'minsoo.lee@company.com', department: '인사팀', position: '과장', status: 'Active', salary: 4800000 },
+        { id: 4, name: '정수진', email: 'sujin.jung@company.com', department: '마케팅팀', position: '사원', status: 'Inactive', salary: 3500000 },
+        { id: 5, name: '최동현', email: 'donghyun.choi@company.com', department: '개발팀', position: '부장', status: 'Active', salary: 6500000 },
+        { id: 6, name: '한지원', email: 'jiwon.han@company.com', department: '디자인팀', position: '대리', status: 'Active', salary: 4000000 },
+        { id: 7, name: '오세훈', email: 'sehoon.oh@company.com', department: '영업팀', position: '사원', status: 'Suspended', salary: 3200000 },
+        { id: 8, name: '윤서연', email: 'seoyeon.yoon@company.com', department: '기획팀', position: '과장', status: 'Active', salary: 5000000 },
+        { id: 9, name: '장현우', email: 'hyunwoo.jang@company.com', department: '개발팀', position: '차장', status: 'Active', salary: 5800000 },
+        { id: 10, name: '임수빈', email: 'subin.lim@company.com', department: '인사팀', position: '대리', status: 'Active', salary: 4100000 },
+        { id: 11, name: '강민정', email: 'minjung.kang@company.com', department: '마케팅팀', position: '과장', status: 'Active', salary: 4900000 },
+        { id: 12, name: '조성민', email: 'sungmin.cho@company.com', department: '디자인팀', position: '사원', status: 'Inactive', salary: 3400000 },
+        { id: 13, name: '백지훈', email: 'jihoon.baek@company.com', department: '영업팀', position: '과장', status: 'Active', salary: 5100000 },
+        { id: 14, name: '송유진', email: 'yujin.song@company.com', department: '개발팀', position: '대리', status: 'Active', salary: 4300000 },
+        { id: 15, name: '안태희', email: 'taehee.ahn@company.com', department: '기획팀', position: '부장', status: 'Active', salary: 6200000 },
+    ];
+
+    // 컬럼 정의
+    const columns = [
+        { key: 'name', label: '이름', width: '150px', sortable: true },
+        { key: 'email', label: '이메일', width: '250px', sortable: true },
+        { key: 'department', label: '부서', width: '120px', sortable: true },
+        { key: 'position', label: '직급', width: '100px', sortable: true },
+        { key: 'status', label: '상태', width: '100px', sortable: true, type: 'status' },
+        { key: 'salary', label: '급여', width: '150px', sortable: true, type: 'currency', sum: true }
+    ];
+
+    // 테이블 초기화
+    const table = new DataTableAdvanced('demoTable', {
+        columns: columns,
+        data: sampleData,
+        features: {
+            sorting: true,
+            search: true,
+            rowSelection: true,
+            columnToggle: true,
+            columnReorder: true,
+            pagination: true,
+            excelExport: true
+        },
+        exportFilename: '직원목록',
+        pageSize: 10,
+        storageKey: 'demoTable',
+        onRowSelect: function(selectedIds, selectedData) {
+            const infoDiv = document.getElementById('selectedInfo');
+            const dataDiv = document.getElementById('selectedData');
+            const countSpan = document.getElementById('selectedCount');
+
+            if (selectedIds.length > 0) {
+                infoDiv.style.display = 'block';
+                countSpan.textContent = selectedIds.length;
+
+                // 선택된 직원을 태그 형태로 표시
+                dataDiv.innerHTML = selectedData.map(emp => `
+                    <span style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: var(--space-2);
+                        padding: var(--space-2) var(--space-3);
+                        background: var(--color-pure-white);
+                        border: 1px solid var(--color-gray-200);
+                        border-radius: var(--radius-md);
+                        font-size: var(--text-sm);
+                    ">
+                        <strong style="color: var(--color-gray-800);">${emp.name}</strong>
+                        <span style="color: var(--color-gray-500);">${emp.department} / ${emp.position}</span>
+                    </span>
+                `).join('');
+            } else {
+                infoDiv.style.display = 'none';
+            }
+        },
+        onSort: function(column, direction) {
+            console.log('Sorted by:', column, direction);
+        },
+        onSearch: function(query, filteredData) {
+            console.log('Search:', query, 'Results:', filteredData.length);
+        }
+    });
+
+    // 전역에서 접근 가능하도록
+    window.demoTable = table;
+});
+</script>
+{% endblock %}

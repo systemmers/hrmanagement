@@ -1,15 +1,18 @@
 """
 Profile Routes - 통합 프로필 라우트
 
-법인 직원과 개인 계정의 프로필을 통합 처리하는 라우트
+법인 직원, 법인 관리자, 개인 계정의 프로필을 통합 처리하는 라우트
 """
-from flask import render_template, g, jsonify
+from flask import render_template, g, jsonify, request, flash, redirect, url_for, session
 
 from app.blueprints.profile import profile_bp
 from app.blueprints.profile.decorators import (
     unified_profile_required,
-    corporate_only
+    corporate_only,
+    corporate_admin_only
 )
+from app.services.corporate_admin_profile_service import corporate_admin_profile_service
+from app.models.user import User
 
 
 @profile_bp.route('/')
@@ -239,4 +242,187 @@ def awards():
     return jsonify({
         'success': True,
         'data': adapter.get_award_list()
+    })
+
+
+# ========================================
+# 법인 관리자 프로필 라우트
+# ========================================
+
+@profile_bp.route('/admin/create', methods=['GET', 'POST'])
+def admin_profile_create():
+    """법인 관리자 프로필 생성"""
+    user_id = session.get('user_id')
+    account_type = session.get('account_type')
+
+    # 인증 및 권한 확인
+    if not user_id or account_type != 'corporate':
+        flash('접근 권한이 없습니다.', 'warning')
+        return redirect(url_for('auth.login'))
+
+    # 이미 프로필이 있는지 확인
+    if corporate_admin_profile_service.has_profile(user_id):
+        flash('이미 프로필이 존재합니다.', 'info')
+        return redirect(url_for('profile.view'))
+
+    # 사용자 정보 조회
+    user = User.query.get(user_id)
+    if not user:
+        flash('사용자 정보를 찾을 수 없습니다.', 'error')
+        return redirect(url_for('auth.login'))
+
+    if request.method == 'POST':
+        data = {
+            'name': request.form.get('name', '').strip(),
+            'english_name': request.form.get('english_name', '').strip() or None,
+            'position': request.form.get('position', '').strip() or None,
+            'department': request.form.get('department', '').strip() or None,
+            'mobile_phone': request.form.get('mobile_phone', '').strip() or None,
+            'office_phone': request.form.get('office_phone', '').strip() or None,
+            'email': request.form.get('email', '').strip() or None,
+            'bio': request.form.get('bio', '').strip() or None,
+        }
+
+        # 필수 필드 검증
+        if not data['name']:
+            flash('이름은 필수 입력 항목입니다.', 'error')
+            return render_template(
+                'profile/admin_profile_create.html',
+                user=user,
+                form_data=data
+            )
+
+        # 프로필 생성
+        success, profile, error = corporate_admin_profile_service.create_profile(
+            user_id=user_id,
+            company_id=user.company_id,
+            data=data
+        )
+
+        if success:
+            flash('프로필이 생성되었습니다.', 'success')
+            return redirect(url_for('profile.view'))
+        else:
+            flash(f'프로필 생성 중 오류가 발생했습니다: {error}', 'error')
+
+    return render_template(
+        'profile/admin_profile_create.html',
+        user=user,
+        form_data={}
+    )
+
+
+@profile_bp.route('/admin/edit', methods=['GET', 'POST'])
+@corporate_admin_only
+def admin_profile_edit():
+    """법인 관리자 프로필 수정"""
+    adapter = g.profile
+    admin_profile = g.admin_profile
+
+    if request.method == 'POST':
+        data = {
+            'name': request.form.get('name', '').strip(),
+            'english_name': request.form.get('english_name', '').strip() or None,
+            'position': request.form.get('position', '').strip() or None,
+            'department': request.form.get('department', '').strip() or None,
+            'mobile_phone': request.form.get('mobile_phone', '').strip() or None,
+            'office_phone': request.form.get('office_phone', '').strip() or None,
+            'email': request.form.get('email', '').strip() or None,
+            'bio': request.form.get('bio', '').strip() or None,
+        }
+
+        # 필수 필드 검증
+        if not data['name']:
+            flash('이름은 필수 입력 항목입니다.', 'error')
+            return render_template(
+                'profile/admin_profile_edit.html',
+                adapter=adapter,
+                form_data=data
+            )
+
+        # 프로필 수정
+        success, error = corporate_admin_profile_service.update_profile(
+            user_id=session.get('user_id'),
+            data=data
+        )
+
+        if success:
+            flash('프로필이 수정되었습니다.', 'success')
+            return redirect(url_for('profile.view'))
+        else:
+            flash(f'프로필 수정 중 오류가 발생했습니다: {error}', 'error')
+
+    return render_template(
+        'profile/admin_profile_edit.html',
+        adapter=adapter,
+        form_data=adapter.get_basic_info()
+    )
+
+
+# ========================================
+# 법인 관리자 프로필 API
+# ========================================
+
+@profile_bp.route('/api/admin/profile', methods=['GET'])
+@corporate_admin_only
+def api_admin_profile_get():
+    """법인 관리자 프로필 조회 API"""
+    adapter = g.profile
+
+    return jsonify({
+        'success': True,
+        'data': adapter.get_basic_info()
+    })
+
+
+@profile_bp.route('/api/admin/profile', methods=['PUT'])
+@corporate_admin_only
+def api_admin_profile_update():
+    """법인 관리자 프로필 수정 API"""
+    user_id = session.get('user_id')
+    data = request.get_json()
+
+    if not data:
+        return jsonify({
+            'success': False,
+            'error': '요청 데이터가 없습니다.'
+        }), 400
+
+    # 필수 필드 검증
+    if 'name' in data and not data['name'].strip():
+        return jsonify({
+            'success': False,
+            'error': '이름은 필수 입력 항목입니다.'
+        }), 400
+
+    # 프로필 수정
+    success, error = corporate_admin_profile_service.update_profile(
+        user_id=user_id,
+        data=data
+    )
+
+    if success:
+        # 업데이트된 프로필 반환
+        adapter = corporate_admin_profile_service.get_adapter(user_id)
+        return jsonify({
+            'success': True,
+            'data': adapter.get_basic_info() if adapter else None,
+            'message': '프로필이 수정되었습니다.'
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'error': error
+        }), 500
+
+
+@profile_bp.route('/api/admin/company', methods=['GET'])
+@corporate_admin_only
+def api_admin_company_get():
+    """법인 관리자 소속 회사 정보 조회 API"""
+    adapter = g.profile
+
+    return jsonify({
+        'success': True,
+        'data': adapter.get_organization_info()
     })

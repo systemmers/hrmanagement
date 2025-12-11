@@ -11,6 +11,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app.services.personal_service import personal_service
 from app.utils.decorators import personal_login_required
 from app.utils.personal_helpers import get_current_profile, profile_required_no_inject
+from app.adapters.profile_adapter import PersonalProfileAdapter
 
 personal_bp = Blueprint('personal', __name__, url_prefix='/personal')
 
@@ -94,7 +95,7 @@ def dashboard():
 @personal_bp.route('/profile')
 @personal_login_required
 def profile():
-    """프로필 조회"""
+    """프로필 조회 - 통합 프로필 템플릿 사용"""
     user_id = session.get('user_id')
     user, profile_obj = personal_service.get_user_with_profile(user_id)
 
@@ -102,9 +103,34 @@ def profile():
         flash('프로필을 먼저 작성해주세요.', 'info')
         return redirect(url_for('personal.profile_edit'))
 
-    return render_template('personal/profile.html',
-                           user=user,
-                           profile=profile_obj)
+    # PersonalProfileAdapter를 사용하여 통합 템플릿에 데이터 전달
+    adapter = PersonalProfileAdapter(profile_obj)
+
+    context = {
+        'is_corporate': False,
+        'profile_name': adapter.get_display_name(),
+        # 기본 정보 (공통)
+        'basic_info': adapter.get_basic_info(),
+        # 법인 전용 정보 (개인은 None)
+        'organization_info': None,
+        'contract_info': None,
+        'salary_info': None,
+        'benefit_info': None,
+        'insurance_info': None,
+        # 이력 정보 (공통)
+        'education_list': adapter.get_education_list(),
+        'career_list': adapter.get_career_list(),
+        'certificate_list': adapter.get_certificate_list(),
+        'language_list': adapter.get_language_list(),
+        'military_info': adapter.get_military_info(),
+        # 메타 정보
+        'sections': adapter.get_available_sections(),
+        # 기존 호환성 유지
+        'user': user,
+        'profile': profile_obj,
+    }
+
+    return render_template('profile/unified_profile.html', **context)
 
 
 @personal_bp.route('/profile/edit', methods=['GET', 'POST'])

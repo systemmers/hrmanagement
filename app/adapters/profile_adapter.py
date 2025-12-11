@@ -4,6 +4,7 @@ Profile Adapter - 법인/개인 계정 데이터 모델 통합 어댑터
 데이터 모델 차이를 추상화하여 템플릿에서 일관된 인터페이스 제공
 - EmployeeProfileAdapter: 법인 직원용 (Employee 모델)
 - PersonalProfileAdapter: 일반 개인용 (PersonalProfile 모델)
+- CorporateAdminProfileAdapter: 법인 관리자용 (CorporateAdminProfile 모델)
 """
 from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Optional
@@ -365,3 +366,134 @@ class PersonalProfileAdapter(ProfileAdapter):
     def get_user_id(self) -> int:
         """연결된 User ID"""
         return self.profile.user_id
+
+
+class CorporateAdminProfileAdapter(ProfileAdapter):
+    """법인 관리자용 어댑터 (CorporateAdminProfile 모델 래핑)
+
+    법인 관리자(account_type='corporate', employee_id=None)를 위한 경량 프로필 시스템.
+    직원 정보 없이 회사 관리 기능에 필요한 최소한의 프로필 정보만 제공.
+    """
+
+    AVAILABLE_SECTIONS = [
+        'basic', 'company_info'
+    ]
+
+    def __init__(self, admin_profile):
+        """
+        Args:
+            admin_profile: CorporateAdminProfile 모델 인스턴스
+        """
+        self.admin_profile = admin_profile
+
+    def get_basic_info(self) -> Dict[str, Any]:
+        """기본 정보 반환"""
+        return {
+            'id': self.admin_profile.id,
+            'name': self.admin_profile.name,
+            'english_name': self.admin_profile.english_name,
+            'chinese_name': None,
+            'birth_date': None,
+            'lunar_birth': None,
+            'gender': None,
+            'mobile_phone': self.admin_profile.mobile_phone,
+            'home_phone': None,
+            'email': self.admin_profile.email,
+            'address': None,
+            'detailed_address': None,
+            'postal_code': None,
+            'photo': self.admin_profile.photo,
+            'employee_number': None,
+            'nationality': None,
+            'blood_type': None,
+            'religion': None,
+            'hobby': None,
+            'specialty': None,
+            'disability_info': None,
+            'position': self.admin_profile.position,
+            'department': self.admin_profile.department,
+            'office_phone': self.admin_profile.office_phone,
+            'bio': self.admin_profile.bio,
+        }
+
+    def get_organization_info(self) -> Optional[Dict[str, Any]]:
+        """소속 정보 반환 (회사 정보)"""
+        if self.admin_profile.company:
+            return {
+                'company': self.admin_profile.company.to_dict() if hasattr(self.admin_profile.company, 'to_dict') else None,
+                'company_id': self.admin_profile.company_id,
+                'department': self.admin_profile.department,
+                'position': self.admin_profile.position,
+            }
+        return None
+
+    def get_contract_info(self) -> Optional[Dict[str, Any]]:
+        """계약 정보 반환 (관리자는 None)"""
+        return None
+
+    def get_salary_info(self) -> Optional[Dict[str, Any]]:
+        """급여 정보 반환 (관리자는 None)"""
+        return None
+
+    def get_benefit_info(self) -> Optional[Dict[str, Any]]:
+        """복리후생 정보 반환 (관리자는 None)"""
+        return None
+
+    def get_insurance_info(self) -> Optional[Dict[str, Any]]:
+        """4대보험 정보 반환 (관리자는 None)"""
+        return None
+
+    def get_education_list(self) -> List[Dict[str, Any]]:
+        """학력 정보 목록 반환 (관리자는 빈 목록)"""
+        return []
+
+    def get_career_list(self) -> List[Dict[str, Any]]:
+        """경력 정보 목록 반환 (관리자는 빈 목록)"""
+        return []
+
+    def get_certificate_list(self) -> List[Dict[str, Any]]:
+        """자격증 목록 반환 (관리자는 빈 목록)"""
+        return []
+
+    def get_language_list(self) -> List[Dict[str, Any]]:
+        """언어능력 목록 반환 (관리자는 빈 목록)"""
+        return []
+
+    def get_military_info(self) -> Optional[Dict[str, Any]]:
+        """병역 정보 반환 (관리자는 None)"""
+        return None
+
+    def is_corporate(self) -> bool:
+        """법인 소속 여부 (항상 True)"""
+        return True
+
+    def is_admin(self) -> bool:
+        """관리자 여부 (항상 True)"""
+        return True
+
+    def get_available_sections(self) -> List[str]:
+        """사용 가능한 섹션 목록"""
+        return self.AVAILABLE_SECTIONS.copy()
+
+    def get_profile_id(self) -> int:
+        """프로필 ID (admin_profile.id)"""
+        return self.admin_profile.id
+
+    def get_display_name(self) -> str:
+        """표시용 이름 (이름 + 직책)"""
+        parts = [self.admin_profile.name]
+        if self.admin_profile.position:
+            parts.append(self.admin_profile.position)
+        return ' '.join(parts)
+
+    def get_photo_url(self) -> Optional[str]:
+        """프로필 사진 URL"""
+        return self.admin_profile.photo
+
+    def get_user_id(self) -> int:
+        """연결된 User ID"""
+        return self.admin_profile.user_id
+
+    def get_company_id(self) -> int:
+        """연결된 Company ID"""
+        return self.admin_profile.company_id

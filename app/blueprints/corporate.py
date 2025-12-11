@@ -10,6 +10,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app.database import db
 from app.models.company import Company
 from app.models.user import User
+from app.models.corporate_admin_profile import CorporateAdminProfile
 from app.repositories.company_repository import company_repository
 from app.utils.decorators import corporate_login_required, corporate_admin_required
 from app.utils.corporate_helpers import (

@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>포괄임금제 급여 계산기 모달 프로토타입 (수당 관리 확장)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 디자인 시스템 변수 */
+        :root {
+            --color-pure-white: #ffffff;
+            --color-gray-25: #fcfcfc;
+            --color-gray-50: #f9f9f9;
+            --color-gray-75: #f6f6f6;
+            --color-gray-100: #f1f1f1;
+            --color-gray-200: #e4e4e4;
+            --color-gray-300: #d1d1d1;
+            --color-gray-400: #b4b4b4;
+            --color-gray-500: #888888;
+            --color-gray-600: #6b6b6b;
+            --color-gray-700: #515151;
+            --color-gray-800: #343434;
+            --color-gray-900: #1a1a1a;
+
+            --color-blue-50: #eff6ff;
+            --color-blue-100: #dbeafe;
+            --color-blue-500: #2563eb;
+            --color-blue-600: #1d4ed8;
+            --color-green-500: #059669;
+            --color-green-100: #d1fae5;
+            --color-red-500: #dc2626;
+            --color-red-100: #fee2e2;
+            --color-yellow-500: #d97706;
+            --color-yellow-100: #fef3c7;
+            --color-purple-500: #7c3aed;
+            --color-purple-100: #ede9fe;
+
+            --text-xs: 0.75rem;
+            --text-sm: 0.8125rem;
+            --text-base: 0.875rem;
+            --text-lg: 1rem;
+            --text-xl: 1.125rem;
+            --text-2xl: 1.25rem;
+            --text-3xl: 1.5rem;
+
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+
+            --radius-sm: 0.25rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.08);
+            --shadow-xl: 0 8px 25px rgba(0, 0, 0, 0.15);
+
+            --transition-normal: 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: var(--space-4);
+        }
+
+        /* 모달 오버레이 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background-color: var(--color-pure-white);
+            border-radius: var(--radius-xl);
+            width: 95%;
+            max-width: 1100px;
+            max-height: 95vh;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 모달 헤더 */
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-5) var(--space-6);
+            border-bottom: 1px solid var(--color-gray-200);
+            background: var(--color-gray-25);
+        }
+
+        .modal-title {
+            font-size: var(--text-xl);
+            font-weight: 600;
+            color: var(--color-gray-900);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .modal-title i {
+            color: var(--color-blue-500);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--text-2xl);
+            color: var(--color-gray-500);
+            cursor: pointer;
+            padding: 0;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            transition: all var(--transition-normal);
+        }
+
+        .modal-close:hover {
+            background: var(--color-gray-100);
+            color: var(--color-gray-900);
+        }
+
+        /* 모달 바디 */
+        .modal-body {
+            padding: var(--space-6);
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* 모달 푸터 */
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-5) var(--space-6);
+            border-top: 1px solid var(--color-gray-200);
+            background: var(--color-gray-25);
+        }
+
+        .footer-info {
+            font-size: var(--text-sm);
+            color: var(--color-gray-600);
+        }
+
+        .footer-buttons {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        /* 버튼 스타일 */
+        .btn {
+            padding: var(--space-3) var(--space-5);
+            border-radius: var(--radius-md);
+            border: none;
+            font-size: var(--text-sm);
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            transition: all var(--transition-normal);
+        }
+
+        .btn-primary {
+            background: var(--color-blue-500);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-blue-600);
+        }
+
+        .btn-secondary {
+            background: var(--color-gray-200);
+            color: var(--color-gray-700);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-gray-300);
+        }
+
+        .btn-sm {
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--text-xs);
+        }
+
+        .btn-icon {
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+        }
+
+        .btn-danger {
+            background: var(--color-red-100);
+            color: var(--color-red-500);
+        }
+
+        .btn-danger:hover {
+            background: var(--color-red-500);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--color-green-100);
+            color: var(--color-green-500);
+        }
+
+        .btn-success:hover {
+            background: var(--color-green-500);
+            color: white;
+        }
+
+        /* 2열 레이아웃 */
+        .calculator-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: var(--space-6);
+        }
+
+        @media (max-width: 900px) {
+            .calculator-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 입력 섹션 */
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-5);
+        }
+
+        .section-card {
+            background: var(--color-gray-50);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            border: 1px solid var(--color-gray-200);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .section-title {
+            font-size: var(--text-base);
+            font-weight: 600;
+            color: var(--color-gray-900);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .section-title i {
+            color: var(--color-blue-500);
+            font-size: var(--text-sm);
+        }
+
+        /* 폼 스타일 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-4);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--color-gray-700);
+        }
+
+        .form-label .unit {
+            font-weight: 400;
+            color: var(--color-gray-500);
+        }
+
+        .form-input,
+        .form-select {
+            padding: var(--space-3) var(--space-4);
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--radius-md);
+            font-size: var(--text-base);
+            color: var(--color-gray-900);
+            background: var(--color-pure-white);
+            transition: all var(--transition-normal);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--color-blue-500);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-input.readonly {
+            background: var(--color-gray-100);
+            color: var(--color-gray-600);
+        }
+
+        .form-help {
+            font-size: var(--text-xs);
+            color: var(--color-gray-500);
+        }
+
+        /* ========================================
+           수당 관리 섹션 스타일
+           ======================================== */
+        .allowance-section {
+            background: var(--color-pure-white);
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-lg);
+        }
+
+        .allowance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-4) var(--space-5);
+            background: var(--color-gray-50);
+            border-bottom: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .allowance-title {
+            font-size: var(--text-base);
+            font-weight: 600;
+            color: var(--color-gray-900);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .allowance-title i {
+            color: var(--color-purple-500);
+        }
+
+        /* 수당 목록 테이블 */
+        .allowance-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .allowance-table th {
+            padding: var(--space-3) var(--space-4);
+            text-align: left;
+            font-size: var(--text-xs);
+            font-weight: 600;
+            color: var(--color-gray-600);
+            background: var(--color-gray-50);
+            border-bottom: 1px solid var(--color-gray-200);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .allowance-table td {
+            padding: var(--space-3) var(--space-4);
+            border-bottom: 1px solid var(--color-gray-100);
+            vertical-align: middle;
+        }
+
+        .allowance-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .allowance-table tr:hover {
+            background: var(--color-gray-25);
+        }
+
+        /* 수당명 */
+        .allowance-name {
+            font-weight: 500;
+            color: var(--color-gray-900);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .allowance-name .badge {
+            font-size: var(--text-xs);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+        }
+
+        .badge-taxfree {
+            background: var(--color-green-100);
+            color: var(--color-green-500);
+        }
+
+        .badge-taxable {
+            background: var(--color-gray-100);
+            color: var(--color-gray-600);
+        }
+
+        /* 금액 입력 */
+        .allowance-amount-input {
+            width: 120px;
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--radius-sm);
+            font-size: var(--text-sm);
+            text-align: right;
+            background: var(--color-pure-white);
+        }
+
+        .allowance-amount-input:focus {
+            outline: none;
+            border-color: var(--color-blue-500);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        /* 통상임금 포함 토글 */
+        .toggle-switch {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+
+        .toggle-slider {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--color-gray-300);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            top: 3px;
+            left: 3px;
+            transition: all var(--transition-normal);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--color-blue-500);
+        }
+
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+        }
+
+        .toggle-label {
+            font-size: var(--text-xs);
+            color: var(--color-gray-600);
+            min-width: 40px;
+        }
+
+        .toggle-label.active {
+            color: var(--color-blue-500);
+            font-weight: 500;
+        }
+
+        /* 수당 추가 행 */
+        .allowance-add-row {
+            padding: var(--space-4);
+            background: var(--color-gray-25);
+            border-top: 1px dashed var(--color-gray-300);
+        }
+
+        .allowance-add-inline {
+            display: flex;
+            gap: var(--space-3);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .allowance-add-inline .form-input {
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--text-sm);
+        }
+
+        .allowance-add-inline .name-input {
+            width: 140px;
+        }
+
+        .allowance-add-inline .amount-input {
+            width: 120px;
+            text-align: right;
+        }
+
+        /* 수당 합계 */
+        .allowance-summary {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-4) var(--space-5);
+            background: var(--color-blue-50);
+            border-top: 1px solid var(--color-blue-100);
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .summary-label {
+            font-size: var(--text-xs);
+            color: var(--color-gray-600);
+        }
+
+        .summary-value {
+            font-size: var(--text-base);
+            font-weight: 600;
+            color: var(--color-gray-900);
+        }
+
+        .summary-value.included {
+            color: var(--color-blue-500);
+        }
+
+        .summary-value.excluded {
+            color: var(--color-purple-500);
+        }
+
+        /* 결과 섹션 */
+        .result-section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-5);
+        }
+
+        .result-card {
+            background: var(--color-pure-white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-gray-200);
+            overflow: hidden;
+        }
+
+        .result-header {
+            padding: var(--space-4) var(--space-5);
+            background: var(--color-gray-900);
+            color: white;
+        }
+
+        .result-header h3 {
+            font-size: var(--text-base);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .result-body {
+            padding: var(--space-5);
+        }
+
+        /* 계산 결과 아이템 */
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-3) 0;
+            border-bottom: 1px solid var(--color-gray-100);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-item.total {
+            margin-top: var(--space-3);
+            padding-top: var(--space-4);
+            border-top: 2px solid var(--color-gray-300);
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-size: var(--text-sm);
+            color: var(--color-gray-700);
+        }
+
+        .result-label .formula {
+            display: block;
+            font-size: var(--text-xs);
+            color: var(--color-gray-500);
+            margin-top: var(--space-1);
+        }
+
+        .result-value {
+            font-size: var(--text-base);
+            font-weight: 600;
+            color: var(--color-gray-900);
+            text-align: right;
+        }
+
+        .result-value.highlight {
+            color: var(--color-blue-500);
+            font-size: var(--text-lg);
+        }
+
+        .result-value.total {
+            font-size: var(--text-xl);
+            color: var(--color-blue-500);
+        }
+
+        /* 결과 그룹 헤더 */
+        .result-group-header {
+            font-size: var(--text-xs);
+            font-weight: 600;
+            color: var(--color-gray-500);
+            padding: var(--space-2) 0;
+            margin-top: var(--space-2);
+            border-bottom: 1px solid var(--color-gray-100);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .result-group-header.included {
+            color: var(--color-blue-500);
+        }
+
+        .result-group-header.excluded {
+            color: var(--color-purple-500);
+        }
+
+        /* 검증 상태 */
+        .validation-status {
+            padding: var(--space-4);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .validation-status.success {
+            background: var(--color-green-100);
+            color: var(--color-green-500);
+        }
+
+        .validation-status.error {
+            background: var(--color-red-100);
+            color: var(--color-red-500);
+        }
+
+        .validation-status.warning {
+            background: var(--color-yellow-100);
+            color: var(--color-yellow-500);
+        }
+
+        .validation-icon {
+            font-size: var(--text-xl);
+        }
+
+        .validation-text {
+            flex: 1;
+        }
+
+        .validation-text strong {
+            display: block;
+            font-size: var(--text-sm);
+            margin-bottom: var(--space-1);
+        }
+
+        .validation-text span {
+            font-size: var(--text-xs);
+        }
+
+        /* 통상임금 정보 박스 */
+        .hourly-wage-box {
+            background: linear-gradient(135deg, var(--color-blue-500), var(--color-blue-600));
+            color: white;
+            padding: var(--space-5);
+            border-radius: var(--radius-lg);
+            text-align: center;
+        }
+
+        .hourly-wage-label {
+            font-size: var(--text-sm);
+            opacity: 0.9;
+            margin-bottom: var(--space-2);
+        }
+
+        .hourly-wage-value {
+            font-size: var(--text-3xl);
+            font-weight: 700;
+        }
+
+        .hourly-wage-unit {
+            font-size: var(--text-sm);
+            opacity: 0.9;
+            margin-top: var(--space-1);
+        }
+
+        .hourly-wage-compare {
+            font-size: var(--text-xs);
+            margin-top: var(--space-3);
+            padding-top: var(--space-3);
+            border-top: 1px solid rgba(255,255,255,0.2);
+            opacity: 0.9;
+        }
+
+        /* 한도 초과 경고 스타일 */
+        .form-input.warning {
+            border-color: var(--color-red-500);
+            background-color: var(--color-red-100);
+        }
+
+        .form-input.warning:focus {
+            border-color: var(--color-red-500);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .form-help.warning {
+            color: var(--color-red-500);
+            font-weight: 500;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .allowance-add-inline {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .allowance-add-inline .form-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-calculator"></i>
+                    포괄임금제 급여 계산기
+                </h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="calculator-layout">
+                    <!-- 왼쪽: 입력 섹션 -->
+                    <div class="input-section">
+                        <!-- 기본 정보 -->
+                        <div class="section-card">
+                            <h3 class="section-title">
+                                <i class="fas fa-cog"></i>
+                                기본 정보
+                            </h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">급여 형태</label>
+                                    <select class="form-select" id="salaryType">
+                                        <option value="comprehensive" selected>포괄임금제</option>
+                                        <option value="monthly">월급제</option>
+                                        <option value="hourly">시급제</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">연봉 <span class="unit">(원)</span></label>
+                                    <input type="text" class="form-input" id="annualSalary" value="52,000,000" placeholder="52,000,000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 수당 관리 섹션 (신규) -->
+                        <div class="allowance-section">
+                            <div class="allowance-header">
+                                <h3 class="allowance-title">
+                                    <i class="fas fa-coins"></i>
+                                    수당 관리
+                                </h3>
+                                <button class="btn btn-sm btn-success" onclick="showAddAllowance()">
+                                    <i class="fas fa-plus"></i>
+                                    수당 추가
+                                </button>
+                            </div>
+
+                            <table class="allowance-table">
+                                <thead>
+                                    <tr>
+                                        <th>수당명</th>
+                                        <th>금액</th>
+                                        <th>통상임금</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="allowanceList">
+                                    <!-- 기본 수당: 식대 -->
+                                    <tr data-id="meal">
+                                        <td>
+                                            <span class="allowance-name">
+                                                식대
+                                                <span class="badge badge-taxfree">비과세</span>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="allowance-amount-input" value="200,000" data-field="amount">
+                                        </td>
+                                        <td>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" data-field="included">
+                                                <span class="toggle-slider"></span>
+                                                <span class="toggle-label" id="mealToggleLabel">미포함</span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-icon btn-danger" onclick="removeAllowance('meal')" title="삭제" disabled>
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <!-- 직책수당 -->
+                                    <tr data-id="position">
+                                        <td>
+                                            <span class="allowance-name">
+                                                직책수당
+                                                <span class="badge badge-taxable">과세</span>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="allowance-amount-input" value="150,000" data-field="amount">
+                                        </td>
+                                        <td>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked data-field="included">
+                                                <span class="toggle-slider"></span>
+                                                <span class="toggle-label active">포함</span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-icon btn-danger" onclick="removeAllowance('position')" title="삭제">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <!-- 기술수당 -->
+                                    <tr data-id="technical">
+                                        <td>
+                                            <span class="allowance-name">
+                                                기술수당
+                                                <span class="badge badge-taxable">과세</span>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="allowance-amount-input" value="100,000" data-field="amount">
+                                        </td>
+                                        <td>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked data-field="included">
+                                                <span class="toggle-slider"></span>
+                                                <span class="toggle-label active">포함</span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-icon btn-danger" onclick="removeAllowance('technical')" title="삭제">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- 수당 추가 인라인 폼 (숨김) -->
+                            <div class="allowance-add-row" id="addAllowanceForm" style="display: none;">
+                                <div class="allowance-add-inline">
+                                    <input type="text" class="form-input name-input" id="newAllowanceName" placeholder="수당명">
+                                    <input type="text" class="form-input amount-input" id="newAllowanceAmount" placeholder="금액">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="newAllowanceIncluded">
+                                        <span class="toggle-slider"></span>
+                                        <span class="toggle-label">미포함</span>
+                                    </label>
+                                    <select class="form-select" id="newAllowanceTaxable" style="width: auto;">
+                                        <option value="taxable">과세</option>
+                                        <option value="taxfree">비과세</option>
+                                    </select>
+                                    <button class="btn btn-sm btn-primary" onclick="addAllowance()">
+                                        <i class="fas fa-check"></i>
+                                        추가
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary" onclick="hideAddAllowance()">
+                                        <i class="fas fa-times"></i>
+                                        취소
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 수당 합계 -->
+                            <div class="allowance-summary">
+                                <div class="summary-item">
+                                    <span class="summary-label">통상임금 포함 합계</span>
+                                    <span class="summary-value included" id="includedSum">250,000원</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">통상임금 미포함 합계</span>
+                                    <span class="summary-value excluded" id="excludedSum">200,000원</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">수당 총합계</span>
+                                    <span class="summary-value" id="totalAllowanceSum">450,000원</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 포괄임금 포함 근무시간 -->
+                        <div class="section-card">
+                            <h3 class="section-title">
+                                <i class="fas fa-clock"></i>
+                                포괄임금 포함 근무시간
+                            </h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">연장근로 <span class="unit">(월/시간)</span></label>
+                                    <input type="number" class="form-input" id="overtimeHours" value="24" min="0" max="52">
+                                    <small class="form-help" id="overtimeHelp">법정 한도: 주 12시간 (가용: <span id="availableOvertimeHours">52</span>시간)</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">야간근로 <span class="unit">(월/시간)</span></label>
+                                    <input type="number" class="form-input" id="nightHours" value="8" min="0">
+                                    <small class="form-help">22:00 ~ 06:00 근무시간</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">휴일근로 <span class="unit">(월/일)</span></label>
+                                    <input type="number" class="form-input" id="holidayDays" value="1" min="0">
+                                    <small class="form-help">1일 = 8시간 기준</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">월 소정근로시간</label>
+                                    <input type="text" class="form-input readonly" value="209시간" readonly>
+                                    <small class="form-help">주 40시간 기준 (자동 계산)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 오른쪽: 결과 섹션 -->
+                    <div class="result-section">
+                        <!-- 통상임금 -->
+                        <div class="hourly-wage-box">
+                            <div class="hourly-wage-label">통상임금 (시간당)</div>
+                            <div class="hourly-wage-value" id="hourlyWage">15,789원</div>
+                            <div class="hourly-wage-unit">(기본급 + 통상임금 포함 수당) / 209시간</div>
+                            <div class="hourly-wage-compare">
+                                최저임금(10,030원) 대비 <strong id="minWagePercent">157.4%</strong>
+                            </div>
+                        </div>
+
+                        <!-- 검증 상태 -->
+                        <div class="validation-status success" id="validationStatus">
+                            <i class="fas fa-check-circle validation-icon"></i>
+                            <div class="validation-text">
+                                <strong>검증 통과</strong>
+                                <span>통상임금이 최저임금 기준을 충족합니다.</span>
+                            </div>
+                        </div>
+
+                        <!-- 급여 구성 결과 -->
+                        <div class="result-card">
+                            <div class="result-header">
+                                <h3>
+                                    <i class="fas fa-list"></i>
+                                    급여 구성 상세
+                                </h3>
+                            </div>
+                            <div class="result-body">
+                                <div class="result-item">
+                                    <div class="result-label">
+                                        월 기본급 (역산)
+                                        <span class="formula">연봉/12 - 수당합계 후 역산</span>
+                                    </div>
+                                    <div class="result-value" id="baseSalary">3,049,880원</div>
+                                </div>
+
+                                <!-- 통상임금 포함 수당 그룹 -->
+                                <div class="result-group-header included">통상임금 포함 수당</div>
+                                <div class="result-item" id="includedAllowancesResult">
+                                    <div class="result-label">
+                                        직책수당 + 기술수당
+                                        <span class="formula">통상임금 계산에 포함</span>
+                                    </div>
+                                    <div class="result-value">250,000원</div>
+                                </div>
+
+                                <!-- 통상임금 미포함 수당 그룹 -->
+                                <div class="result-group-header excluded">통상임금 미포함 수당</div>
+                                <div class="result-item" id="excludedAllowancesResult">
+                                    <div class="result-label">
+                                        식대
+                                        <span class="formula">비과세 항목</span>
+                                    </div>
+                                    <div class="result-value">200,000원</div>
+                                </div>
+
+                                <!-- 법정 수당 그룹 -->
+                                <div class="result-group-header">법정 수당 (자동 계산)</div>
+                                <div class="result-item">
+                                    <div class="result-label">
+                                        연장근로수당
+                                        <span class="formula" id="overtimeFormula">통상임금 x 1.5 x 24시간</span>
+                                    </div>
+                                    <div class="result-value" id="overtimeAllowance">568,407원</div>
+                                </div>
+                                <div class="result-item">
+                                    <div class="result-label">
+                                        야간근로수당
+                                        <span class="formula" id="nightFormula">통상임금 x 0.5 x 8시간</span>
+                                    </div>
+                                    <div class="result-value" id="nightAllowance">63,156원</div>
+                                </div>
+                                <div class="result-item">
+                                    <div class="result-label">
+                                        휴일근로수당
+                                        <span class="formula" id="holidayFormula">통상임금 x 1.5 x 8시간</span>
+                                    </div>
+                                    <div class="result-value" id="holidayAllowance">189,468원</div>
+                                </div>
+
+                                <div class="result-item total">
+                                    <div class="result-label">
+                                        <strong>월 급여 합계</strong>
+                                    </div>
+                                    <div class="result-value total" id="totalSalary">4,333,333원</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="footer-info">
+                    <i class="fas fa-info-circle"></i>
+                    계산 결과는 참고용이며, 실제 급여는 세부 조건에 따라 달라질 수 있습니다.
+                </div>
+                <div class="footer-buttons">
+                    <button class="btn btn-secondary" onclick="closeModal()">
+                        <i class="fas fa-times"></i>
+                        취소
+                    </button>
+                    <button class="btn btn-primary" onclick="applyCalculation()">
+                        <i class="fas fa-check"></i>
+                        적용
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * 포괄임금제 급여 계산기 (수당 관리 확장 버전)
+         * 2025년 기준
+         */
+
+        // 상수 정의
+        const CONSTANTS = {
+            MINIMUM_WAGE: 10030,           // 원/시간 (2025년)
+            MONTHLY_WORK_HOURS: 209,       // 월 소정근로시간
+            MAX_OVERTIME_HOURS: 52,        // 월 최대 연장근로시간
+            OVERTIME_RATE: 1.5,            // 연장근로 가산율
+            NIGHT_RATE: 0.5,               // 야간근로 가산율
+            HOLIDAY_RATE: 1.5,             // 휴일근로 가산율
+            HOLIDAY_HOURS_PER_DAY: 8       // 휴일 1일 = 8시간
+        };
+
+        // 기본 수당 템플릿
+        const DEFAULT_ALLOWANCES = [
+            { id: 'meal', name: '식대', amount: 200000, includedInOrdinaryWage: false, taxable: false, removable: false },
+            { id: 'position', name: '직책수당', amount: 150000, includedInOrdinaryWage: true, taxable: true, removable: true },
+            { id: 'technical', name: '기술수당', amount: 100000, includedInOrdinaryWage: true, taxable: true, removable: true }
+        ];
+
+        /**
+         * AllowanceManager 클래스
+         * 수당 목록 관리 담당
+         */
+        class AllowanceManager {
+            constructor() {
+                this.allowances = [...DEFAULT_ALLOWANCES];
+                this.idCounter = 100;
+            }
+
+            addAllowance(allowance) {
+                const newAllowance = {
+                    id: `custom_${this.idCounter++}`,
+                    name: allowance.name,
+                    amount: allowance.amount,
+                    includedInOrdinaryWage: allowance.includedInOrdinaryWage,
+                    taxable: allowance.taxable,
+                    removable: true
+                };
+                this.allowances.push(newAllowance);
+                return newAllowance;
+            }
+
+            removeAllowance(id) {
+                const index = this.allowances.findIndex(a => a.id === id);
+                if (index > -1 && this.allowances[index].removable !== false) {
+                    this.allowances.splice(index, 1);
+                    return true;
+                }
+                return false;
+            }
+
+            updateAllowance(id, updates) {
+                const allowance = this.allowances.find(a => a.id === id);
+                if (allowance) {
+                    Object.assign(allowance, updates);
+                    return true;
+                }
+                return false;
+            }
+
+            getOrdinaryWageIncludedSum() {
+                return this.allowances
+                    .filter(a => a.includedInOrdinaryWage)
+                    .reduce((sum, a) => sum + a.amount, 0);
+            }
+
+            getOrdinaryWageExcludedSum() {
+                return this.allowances
+                    .filter(a => !a.includedInOrdinaryWage)
+                    .reduce((sum, a) => sum + a.amount, 0);
+            }
+
+            getTotalSum() {
+                return this.allowances.reduce((sum, a) => sum + a.amount, 0);
+            }
+
+            getIncludedAllowances() {
+                return this.allowances.filter(a => a.includedInOrdinaryWage);
+            }
+
+            getExcludedAllowances() {
+                return this.allowances.filter(a => !a.includedInOrdinaryWage);
+            }
+        }
+
+        /**
+         * SalaryCalculator 클래스 (확장)
+         */
+        class SalaryCalculator {
+            constructor(allowanceManager) {
+                this.allowanceManager = allowanceManager;
+            }
+
+            calculate(params) {
+                const {
+                    annualSalary,
+                    overtimeHours,
+                    nightHours,
+                    holidayDays
+                } = params;
+
+                // 1. 월 급여 계산
+                const monthlySalary = Math.floor(annualSalary / 12);
+
+                // 2. 수당 분류
+                const ordinaryIncluded = this.allowanceManager.getOrdinaryWageIncludedSum();
+                const ordinaryExcluded = this.allowanceManager.getOrdinaryWageExcludedSum();
+
+                // 3. 휴일근로시간 변환
+                const holidayHours = holidayDays * CONSTANTS.HOLIDAY_HOURS_PER_DAY;
+
+                // 4. 수당 계수 계산
+                const overtimeCoeff = (CONSTANTS.OVERTIME_RATE * overtimeHours) / CONSTANTS.MONTHLY_WORK_HOURS;
+                const nightCoeff = (CONSTANTS.NIGHT_RATE * nightHours) / CONSTANTS.MONTHLY_WORK_HOURS;
+                const holidayCoeff = (CONSTANTS.HOLIDAY_RATE * holidayHours) / CONSTANTS.MONTHLY_WORK_HOURS;
+                const totalCoeff = 1 + overtimeCoeff + nightCoeff + holidayCoeff;
+
+                // 5. 기본급 역산 (수정된 알고리즘)
+                // 과세 대상 급여 = 월급여 - 통상임금 미포함 수당
+                const taxableSalary = monthlySalary - ordinaryExcluded;
+
+                // 기본급 = (과세 대상 급여 / 총계수) - 통상임금 포함 수당
+                const baseSalary = Math.floor(taxableSalary / totalCoeff) - ordinaryIncluded;
+
+                // 6. 통상임금 계산 (기본급 + 통상임금 포함 수당)
+                const ordinaryWageBase = baseSalary + ordinaryIncluded;
+                const hourlyWage = Math.floor(ordinaryWageBase / CONSTANTS.MONTHLY_WORK_HOURS);
+
+                // 7. 법정 수당 계산
+                const overtimeAllowance = Math.floor(hourlyWage * CONSTANTS.OVERTIME_RATE * overtimeHours);
+                const nightAllowance = Math.floor(hourlyWage * CONSTANTS.NIGHT_RATE * nightHours);
+                const holidayAllowance = Math.floor(hourlyWage * CONSTANTS.HOLIDAY_RATE * holidayHours);
+
+                // 8. 검증 (휴일근로시간 포함)
+                const validation = this.validate({ hourlyWage, overtimeHours, holidayHours });
+
+                return {
+                    monthlySalary,
+                    baseSalary,
+                    hourlyWage,
+                    ordinaryWageBase,
+                    ordinaryIncluded,
+                    ordinaryExcluded,
+                    overtimeAllowance,
+                    nightAllowance,
+                    holidayAllowance,
+                    input: { annualSalary, overtimeHours, nightHours, holidayDays, holidayHours },
+                    validation,
+                    comparison: {
+                        minimumWagePercent: ((hourlyWage / CONSTANTS.MINIMUM_WAGE) * 100).toFixed(1)
+                    }
+                };
+            }
+
+            validate(params) {
+                const { hourlyWage, overtimeHours, holidayHours } = params;
+                const result = {
+                    isValid: true,
+                    errors: [],
+                    warnings: []
+                };
+
+                if (hourlyWage < CONSTANTS.MINIMUM_WAGE) {
+                    result.isValid = false;
+                    result.errors.push({
+                        type: 'MINIMUM_WAGE_VIOLATION',
+                        message: `통상임금(${formatNumber(hourlyWage)}원/시간)이 최저임금(${formatNumber(CONSTANTS.MINIMUM_WAGE)}원/시간)보다 낮습니다.`
+                    });
+                }
+
+                // 연장근로 + 휴일근로 합계가 52시간 초과하는지 검증
+                const totalExtendedHours = overtimeHours + (holidayHours || 0);
+                const availableOvertimeHours = CONSTANTS.MAX_OVERTIME_HOURS - (holidayHours || 0);
+
+                if (totalExtendedHours > CONSTANTS.MAX_OVERTIME_HOURS) {
+                    result.isValid = false;
+                    result.errors.push({
+                        type: 'TOTAL_EXTENDED_HOURS_EXCEEDED',
+                        message: `연장근로(${overtimeHours}h) + 휴일근로(${holidayHours || 0}h) = ${totalExtendedHours}시간이 법정 한도(${CONSTANTS.MAX_OVERTIME_HOURS}시간)를 초과합니다.`
+                    });
+                }
+
+                // 연장근로만 초과하는 경우 (기존 로직 유지, 가용시간 기준으로 변경)
+                if (overtimeHours > availableOvertimeHours && totalExtendedHours <= CONSTANTS.MAX_OVERTIME_HOURS) {
+                    result.warnings.push({
+                        type: 'OVERTIME_EXCEEDS_AVAILABLE',
+                        message: `연장근로(${overtimeHours}시간)가 가용시간(${availableOvertimeHours}시간)을 초과합니다.`
+                    });
+                }
+
+                const overtimeThreshold = CONSTANTS.MAX_OVERTIME_HOURS * 0.8;
+                if (totalExtendedHours > overtimeThreshold && totalExtendedHours <= CONSTANTS.MAX_OVERTIME_HOURS) {
+                    result.warnings.push({
+                        type: 'OVERTIME_NEAR_LIMIT',
+                        message: `연장+휴일근로 합계(${totalExtendedHours}시간)가 법정 한도의 ${((totalExtendedHours / CONSTANTS.MAX_OVERTIME_HOURS) * 100).toFixed(0)}%입니다.`
+                    });
+                }
+
+                return result;
+            }
+        }
+
+        // 유틸리티 함수
+        function formatNumber(num) {
+            if (num === null || num === undefined || isNaN(num)) return '0';
+            return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        function parseNumber(str) {
+            if (typeof str === 'number') return str;
+            return parseInt(String(str).replace(/[^0-9]/g, ''), 10) || 0;
+        }
+
+        // 전역 인스턴스
+        const allowanceManager = new AllowanceManager();
+        const calculator = new SalaryCalculator(allowanceManager);
+
+        // DOM 요소
+        let elements = {};
+
+        /**
+         * 초기화
+         */
+        function init() {
+            elements = {
+                annualSalary: document.getElementById('annualSalary'),
+                overtimeHours: document.getElementById('overtimeHours'),
+                nightHours: document.getElementById('nightHours'),
+                holidayDays: document.getElementById('holidayDays'),
+                allowanceList: document.getElementById('allowanceList'),
+                addAllowanceForm: document.getElementById('addAllowanceForm'),
+                newAllowanceName: document.getElementById('newAllowanceName'),
+                newAllowanceAmount: document.getElementById('newAllowanceAmount'),
+                newAllowanceIncluded: document.getElementById('newAllowanceIncluded'),
+                newAllowanceTaxable: document.getElementById('newAllowanceTaxable'),
+                // 결과 표시
+                hourlyWage: document.getElementById('hourlyWage'),
+                minWagePercent: document.getElementById('minWagePercent'),
+                baseSalary: document.getElementById('baseSalary'),
+                includedSum: document.getElementById('includedSum'),
+                excludedSum: document.getElementById('excludedSum'),
+                totalAllowanceSum: document.getElementById('totalAllowanceSum'),
+                includedAllowancesResult: document.getElementById('includedAllowancesResult'),
+                excludedAllowancesResult: document.getElementById('excludedAllowancesResult'),
+                overtimeAllowance: document.getElementById('overtimeAllowance'),
+                nightAllowance: document.getElementById('nightAllowance'),
+                holidayAllowance: document.getElementById('holidayAllowance'),
+                totalSalary: document.getElementById('totalSalary'),
+                validationStatus: document.getElementById('validationStatus'),
+                overtimeFormula: document.getElementById('overtimeFormula'),
+                nightFormula: document.getElementById('nightFormula'),
+                holidayFormula: document.getElementById('holidayFormula'),
+                // 가용시간 경고 관련
+                overtimeHelp: document.getElementById('overtimeHelp'),
+                availableOvertimeHours: document.getElementById('availableOvertimeHours')
+            };
+
+            bindEvents();
+            updateCalculation();
+        }
+
+        /**
+         * 이벤트 바인딩
+         */
+        function bindEvents() {
+            // 연봉 입력
+            elements.annualSalary.addEventListener('blur', function() {
+                formatNumberInput(this);
+                updateCalculation();
+            });
+            elements.annualSalary.addEventListener('input', debounce(updateCalculation, 300));
+
+            // 근무시간 입력
+            ['overtimeHours', 'nightHours', 'holidayDays'].forEach(id => {
+                elements[id].addEventListener('input', debounce(updateCalculation, 300));
+            });
+
+            // 수당 목록 이벤트 위임
+            elements.allowanceList.addEventListener('input', function(e) {
+                if (e.target.dataset.field === 'amount') {
+                    const row = e.target.closest('tr');
+                    const id = row.dataset.id;
+                    const amount = parseNumber(e.target.value);
+                    allowanceManager.updateAllowance(id, { amount });
+                    updateCalculation();
+                }
+            });
+
+            elements.allowanceList.addEventListener('change', function(e) {
+                if (e.target.dataset.field === 'included') {
+                    const row = e.target.closest('tr');
+                    const id = row.dataset.id;
+                    const included = e.target.checked;
+                    allowanceManager.updateAllowance(id, { includedInOrdinaryWage: included });
+
+                    // 토글 레이블 업데이트
+                    const label = row.querySelector('.toggle-label');
+                    if (label) {
+                        label.textContent = included ? '포함' : '미포함';
+                        label.classList.toggle('active', included);
+                    }
+
+                    updateCalculation();
+                }
+            });
+
+            // 금액 입력 포맷팅
+            elements.allowanceList.addEventListener('blur', function(e) {
+                if (e.target.dataset.field === 'amount') {
+                    formatNumberInput(e.target);
+                }
+            }, true);
+
+            // 새 수당 통상임금 토글 레이블 업데이트
+            elements.newAllowanceIncluded.addEventListener('change', function() {
+                const label = this.parentElement.querySelector('.toggle-label');
+                if (label) {
+                    label.textContent = this.checked ? '포함' : '미포함';
+                    label.classList.toggle('active', this.checked);
+                }
+            });
+        }
+
+        /**
+         * 계산 실행 및 UI 업데이트
+         */
+        function updateCalculation() {
+            const params = {
+                annualSalary: parseNumber(elements.annualSalary.value),
+                overtimeHours: parseInt(elements.overtimeHours.value, 10) || 0,
+                nightHours: parseInt(elements.nightHours.value, 10) || 0,
+                holidayDays: parseInt(elements.holidayDays.value, 10) || 0
+            };
+
+            const result = calculator.calculate(params);
+
+            // 결과 업데이트
+            elements.hourlyWage.textContent = formatNumber(result.hourlyWage) + '원';
+            elements.minWagePercent.textContent = result.comparison.minimumWagePercent + '%';
+            elements.baseSalary.textContent = formatNumber(result.baseSalary) + '원';
+
+            // 수당 합계
+            elements.includedSum.textContent = formatNumber(result.ordinaryIncluded) + '원';
+            elements.excludedSum.textContent = formatNumber(result.ordinaryExcluded) + '원';
+            elements.totalAllowanceSum.textContent = formatNumber(allowanceManager.getTotalSum()) + '원';
+
+            // 수당 그룹별 결과
+            updateAllowanceResults();
+
+            // 법정 수당
+            elements.overtimeAllowance.textContent = formatNumber(result.overtimeAllowance) + '원';
+            elements.nightAllowance.textContent = formatNumber(result.nightAllowance) + '원';
+            elements.holidayAllowance.textContent = formatNumber(result.holidayAllowance) + '원';
+
+            // 수식 업데이트
+            elements.overtimeFormula.textContent = `통상임금 x 1.5 x ${result.input.overtimeHours}시간`;
+            elements.nightFormula.textContent = `통상임금 x 0.5 x ${result.input.nightHours}시간`;
+            elements.holidayFormula.textContent = `통상임금 x 1.5 x ${result.input.holidayHours}시간`;
+
+            // 총 급여
+            elements.totalSalary.textContent = formatNumber(result.monthlySalary) + '원';
+
+            // 검증 상태
+            updateValidationStatus(result.validation);
+
+            // 가용 연장근로시간 업데이트 및 경고 표시
+            updateOvertimeAvailability(result.input.overtimeHours, result.input.holidayHours);
+        }
+
+        /**
+         * 수당 그룹별 결과 업데이트
+         */
+        function updateAllowanceResults() {
+            const included = allowanceManager.getIncludedAllowances();
+            const excluded = allowanceManager.getExcludedAllowances();
+
+            // 통상임금 포함 수당
+            if (included.length > 0) {
+                const names = included.map(a => a.name).join(' + ');
+                const sum = included.reduce((s, a) => s + a.amount, 0);
+                elements.includedAllowancesResult.querySelector('.result-label').innerHTML = `
+                    ${names}
+                    <span class="formula">통상임금 계산에 포함</span>
+                `;
+                elements.includedAllowancesResult.querySelector('.result-value').textContent = formatNumber(sum) + '원';
+            }
+
+            // 통상임금 미포함 수당
+            if (excluded.length > 0) {
+                const names = excluded.map(a => a.name + (a.taxable ? '' : ' (비과세)')).join(' + ');
+                const sum = excluded.reduce((s, a) => s + a.amount, 0);
+                elements.excludedAllowancesResult.querySelector('.result-label').innerHTML = `
+                    ${names}
+                    <span class="formula">통상임금 미포함</span>
+                `;
+                elements.excludedAllowancesResult.querySelector('.result-value').textContent = formatNumber(sum) + '원';
+            }
+        }
+
+        /**
+         * 검증 상태 업데이트
+         */
+        function updateValidationStatus(validation) {
+            const statusEl = elements.validationStatus;
+
+            if (!validation.isValid) {
+                statusEl.className = 'validation-status error';
+                statusEl.innerHTML = `
+                    <i class="fas fa-exclamation-circle validation-icon"></i>
+                    <div class="validation-text">
+                        <strong>검증 실패</strong>
+                        <span>${validation.errors.map(e => e.message).join(' ')}</span>
+                    </div>
+                `;
+            } else if (validation.warnings.length > 0) {
+                statusEl.className = 'validation-status warning';
+                statusEl.innerHTML = `
+                    <i class="fas fa-exclamation-triangle validation-icon"></i>
+                    <div class="validation-text">
+                        <strong>주의</strong>
+                        <span>${validation.warnings.map(w => w.message).join(' ')}</span>
+                    </div>
+                `;
+            } else {
+                statusEl.className = 'validation-status success';
+                statusEl.innerHTML = `
+                    <i class="fas fa-check-circle validation-icon"></i>
+                    <div class="validation-text">
+                        <strong>검증 통과</strong>
+                        <span>통상임금이 최저임금 기준을 충족합니다.</span>
+                    </div>
+                `;
+            }
+        }
+
+        /**
+         * 가용 연장근로시간 업데이트 및 경고 표시
+         */
+        function updateOvertimeAvailability(overtimeHours, holidayHours) {
+            const availableHours = CONSTANTS.MAX_OVERTIME_HOURS - holidayHours;
+            const totalExtendedHours = overtimeHours + holidayHours;
+            const isExceeded = totalExtendedHours > CONSTANTS.MAX_OVERTIME_HOURS;
+
+            // 가용시간 텍스트 업데이트
+            elements.availableOvertimeHours.textContent = availableHours;
+
+            // 연장근로 입력 필드와 도움말에 경고 스타일 적용
+            const overtimeInput = elements.overtimeHours;
+            const overtimeHelp = elements.overtimeHelp;
+
+            if (isExceeded) {
+                overtimeInput.classList.add('warning');
+                overtimeHelp.classList.add('warning');
+                overtimeHelp.innerHTML = `연장+휴일 합계 ${totalExtendedHours}h > 법정 한도 ${CONSTANTS.MAX_OVERTIME_HOURS}h (가용: <span id="availableOvertimeHours">${availableHours}</span>시간)`;
+            } else {
+                overtimeInput.classList.remove('warning');
+                overtimeHelp.classList.remove('warning');
+                overtimeHelp.innerHTML = `법정 한도: 주 12시간 (가용: <span id="availableOvertimeHours">${availableHours}</span>시간)`;
+            }
+
+            // availableOvertimeHours 요소 참조 재설정
+            elements.availableOvertimeHours = document.getElementById('availableOvertimeHours');
+        }
+
+        /**
+         * 수당 추가 폼 표시
+         */
+        function showAddAllowance() {
+            elements.addAllowanceForm.style.display = 'block';
+            elements.newAllowanceName.focus();
+        }
+
+        /**
+         * 수당 추가 폼 숨김
+         */
+        function hideAddAllowance() {
+            elements.addAllowanceForm.style.display = 'none';
+            elements.newAllowanceName.value = '';
+            elements.newAllowanceAmount.value = '';
+            elements.newAllowanceIncluded.checked = false;
+        }
+
+        /**
+         * 수당 추가
+         */
+        function addAllowance() {
+            const name = elements.newAllowanceName.value.trim();
+            const amount = parseNumber(elements.newAllowanceAmount.value);
+            const included = elements.newAllowanceIncluded.checked;
+            const taxable = elements.newAllowanceTaxable.value === 'taxable';
+
+            if (!name) {
+                alert('수당명을 입력해주세요.');
+                return;
+            }
+
+            if (amount <= 0) {
+                alert('금액을 입력해주세요.');
+                return;
+            }
+
+            // 중복 검사
+            const exists = allowanceManager.allowances.some(a => a.name === name);
+            if (exists) {
+                alert('이미 동일한 이름의 수당이 있습니다.');
+                return;
+            }
+
+            const newAllowance = allowanceManager.addAllowance({
+                name,
+                amount,
+                includedInOrdinaryWage: included,
+                taxable
+            });
+
+            // DOM에 행 추가
+            addAllowanceRow(newAllowance);
+
+            // 폼 초기화 및 숨김
+            hideAddAllowance();
+
+            // 재계산
+            updateCalculation();
+        }
+
+        /**
+         * 수당 목록에 행 추가
+         */
+        function addAllowanceRow(allowance) {
+            const row = document.createElement('tr');
+            row.dataset.id = allowance.id;
+            row.innerHTML = `
+                <td>
+                    <span class="allowance-name">
+                        ${allowance.name}
+                        <span class="badge ${allowance.taxable ? 'badge-taxable' : 'badge-taxfree'}">
+                            ${allowance.taxable ? '과세' : '비과세'}
+                        </span>
+                    </span>
+                </td>
+                <td>
+                    <input type="text" class="allowance-amount-input" value="${formatNumber(allowance.amount)}" data-field="amount">
+                </td>
+                <td>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ${allowance.includedInOrdinaryWage ? 'checked' : ''} data-field="included">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label ${allowance.includedInOrdinaryWage ? 'active' : ''}">
+                            ${allowance.includedInOrdinaryWage ? '포함' : '미포함'}
+                        </span>
+                    </label>
+                </td>
+                <td>
+                    <button class="btn btn-icon btn-danger" onclick="removeAllowance('${allowance.id}')" title="삭제">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </td>
+            `;
+            elements.allowanceList.appendChild(row);
+        }
+
+        /**
+         * 수당 삭제
+         */
+        function removeAllowance(id) {
+            if (allowanceManager.removeAllowance(id)) {
+                const row = elements.allowanceList.querySelector(`tr[data-id="${id}"]`);
+                if (row) {
+                    row.remove();
+                }
+                updateCalculation();
+            }
+        }
+
+        /**
+         * 숫자 입력 포맷팅
+         */
+        function formatNumberInput(input) {
+            const value = parseNumber(input.value);
+            if (value > 0) {
+                input.value = formatNumber(value);
+            }
+        }
+
+        /**
+         * Debounce 유틸리티
+         */
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        /**
+         * 모달 닫기
+         */
+        function closeModal() {
+            document.querySelector('.modal-overlay').style.display = 'none';
+        }
+
+        /**
+         * 계산 결과 적용
+         */
+        function applyCalculation() {
+            const params = {
+                annualSalary: parseNumber(elements.annualSalary.value),
+                overtimeHours: parseInt(elements.overtimeHours.value, 10) || 0,
+                nightHours: parseInt(elements.nightHours.value, 10) || 0,
+                holidayDays: parseInt(elements.holidayDays.value, 10) || 0
+            };
+
+            const result = calculator.calculate(params);
+
+            if (!result.validation.isValid) {
+                alert('검증 오류가 있습니다. 수정 후 다시 시도해주세요.');
+                return;
+            }
+
+            console.log('적용할 계산 결과:', result);
+            console.log('수당 목록:', allowanceManager.allowances);
+
+            alert(`계산 결과가 적용되었습니다.
+
+기본급: ${formatNumber(result.baseSalary)}원
+통상임금 포함 수당: ${formatNumber(result.ordinaryIncluded)}원
+통상임금 미포함 수당: ${formatNumber(result.ordinaryExcluded)}원
+통상임금(시급): ${formatNumber(result.hourlyWage)}원`);
+
+            closeModal();
+        }
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

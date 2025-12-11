@@ -36,6 +36,7 @@ from .personal_profile_repository import (
     PersonalLanguageRepository,
     PersonalMilitaryRepository
 )
+from .corporate_admin_profile_repository import CorporateAdminProfileRepository
 
 __all__ = [
     'EmployeeRepository',
@@ -68,4 +69,5 @@ __all__ = [
     'PersonalCertificateRepository',
     'PersonalLanguageRepository',
     'PersonalMilitaryRepository',
+    'CorporateAdminProfileRepository',
 ]

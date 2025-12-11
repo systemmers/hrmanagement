@@ -44,6 +44,7 @@ from .person_contract import (
 )
 from .notification import Notification, NotificationPreference
 from .audit_log import AuditLog
+from .corporate_admin_profile import CorporateAdminProfile
 
 __all__ = [
     'Employee',
@@ -84,4 +85,5 @@ __all__ = [
     'Notification',
     'NotificationPreference',
     'AuditLog',
+    'CorporateAdminProfile',
 ]
