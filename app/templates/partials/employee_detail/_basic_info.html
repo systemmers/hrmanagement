@@ -40,7 +40,8 @@
     </div>
 </section>
 
-{# 섹션 2: 소속정보 #}
+{# 섹션 2: 소속정보 (법인 전용) #}
+{% if is_corporate %}
 <section id="organization-info" class="content-section">
     {{ section_title('소속정보') }}
     <div class="card">
@@ -68,8 +69,10 @@
         </div>
     </div>
 </section>
+{% endif %}
 
-{# 섹션 3: 계약정보 #}
+{# 섹션 3: 계약정보 (법인 전용) #}
+{% if is_corporate %}
 <section id="contract-info" class="content-section">
     {{ section_title('계약정보') }}
     <div class="card">
@@ -91,8 +94,10 @@
         </div>
     </div>
 </section>
+{% endif %}
 
-{# 섹션 4: 급여정보 #}
+{# 섹션 4: 급여정보 (법인 전용) #}
+{% if is_corporate %}
 <section id="salary-info" class="content-section">
     {{ section_title('급여정보') }}
     <div class="card">
@@ -112,8 +117,10 @@
         </div>
     </div>
 </section>
+{% endif %}
 
-{# 섹션 5: 연차 및 복리후생 #}
+{# 섹션 5: 연차 및 복리후생 (법인 전용) #}
+{% if is_corporate %}
 <section id="benefit-info" class="content-section">
     {{ section_title('연차 및 복리후생') }}
     <div class="card">
@@ -134,8 +141,10 @@
         </div>
     </div>
 </section>
+{% endif %}
 
-{# 섹션 6: 4대보험 #}
+{# 섹션 6: 4대보험 (법인 전용) #}
+{% if is_corporate %}
 <section id="insurance-info" class="content-section">
     {{ section_title('4대보험') }}
     <div class="card">
@@ -172,3 +181,4 @@
         </div>
     </div>
 </section>
+{% endif %}

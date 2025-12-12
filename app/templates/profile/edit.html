@@ -1,0 +1,270 @@
+{#
+    통합 프로필 수정/등록 페이지
+
+    법인 직원(corporate)과 개인 계정(personal) 모두 지원
+    account_type에 따라 편집 가능한 섹션이 다름
+
+    컨텍스트 변수:
+    - employee 또는 profile: 프로필 데이터 객체 (신규 등록 시 None)
+    - is_corporate: 법인 소속 여부
+    - account_type: 'corporate', 'personal', 'corporate_admin'
+    - sections: 사용 가능한 섹션 목록
+    - action: 'create' 또는 'update'
+#}
+{% extends "base.html" %}
+
+{# 변수 통합: employee 또는 profile 중 사용 가능한 것 사용 #}
+{% set profile_data = employee if employee is defined else profile %}
+{% set profile_name = profile_data.name if profile_data else '신규 등록' %}
+{# action 변수 기본값 설정: profile_data가 없으면 create, 있으면 update #}
+{% set form_action_type = action if action is defined else ('create' if not profile_data else 'update') %}
+{% set is_create_mode = form_action_type == 'create' %}
+
+{% block title %}{% if is_create_mode %}직원 등록{% else %}정보 수정{% endif %} - {{ '인사카드' if is_corporate else '프로필' }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/cards.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/employee-form.css') }}">
+{% if is_corporate %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/right-sidebar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/tree-selector.css') }}">
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{# Employee role 여부 플래그 (법인에서만 사용) #}
+{% set is_employee_role = is_corporate and current_user and current_user.role == 'employee' %}
+
+{% from 'macros/_navigation.html' import section_nav %}
+<div class="form-page-layout-with-sidebar">
+    {# 좌측: 섹션 네비게이션 #}
+    {% if is_corporate %}
+        {{ section_nav('인사정보 ' ~ ('등록' if is_create_mode else '수정'), profile_name, variant='form', employee=profile_data, is_employee_role=is_employee_role) }}
+    {% else %}
+        {{ section_nav('프로필 수정', profile_name, variant='profile') }}
+    {% endif %}
+
+    {# 메인 콘텐츠: 폼 #}
+    <main class="form-main-content">
+        {# 페이지 헤더 #}
+        <div class="form-page-header">
+            {% if is_corporate %}
+                {% if is_employee_role %}
+                <h1 class="form-page-title">내 정보 수정</h1>
+                {% elif is_create_mode %}
+                <h1 class="form-page-title">신규 직원 등록</h1>
+                {% else %}
+                <h1 class="form-page-title">직원 정보 수정</h1>
+                {% endif %}
+            {% else %}
+                <h1 class="form-page-title">프로필 수정</h1>
+            {% endif %}
+
+            <div class="form-page-actions">
+                {# 취소 링크: 신규 등록은 목록으로, 수정은 프로필로 #}
+                {% if is_create_mode %}
+                <a href="{{ url_for('employees.employee_list') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>취소</span>
+                </a>
+                {% else %}
+                <a href="{{ url_for('profile.view') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>취소</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        {# 권한 안내 (법인 직원용) #}
+        {% if is_employee_role %}
+        <div class="alert alert-info alert-info-box">
+            <i class="fas fa-info-circle"></i>
+            <span>연락처, 주소, 이력 정보 등 일부 항목만 수정 가능합니다. 소속정보, 급여 등은 인사담당자에게 문의하세요.</span>
+        </div>
+        {% endif %}
+
+        {# 계정 타입별 폼 액션 설정 #}
+        {% if is_corporate and account_type != 'corporate_admin' %}
+            {% if is_create_mode %}
+                {% set form_action = url_for('employees.employee_create') %}
+            {% else %}
+                {% set form_action = url_for('employees.employee_update', employee_id=profile_data.id) %}
+            {% endif %}
+        {% elif account_type == 'corporate_admin' %}
+            {% set form_action = url_for('profile.admin_profile_edit') %}
+        {% else %}
+            {% set form_action = url_for('personal.profile_edit') %}
+        {% endif %}
+
+        <form method="POST" action="{{ form_action }}" class="employee-form" id="profileEditForm" enctype="multipart/form-data">
+
+            {# 섹션 1: 개인 기본정보 #}
+            {% include 'partials/employee_form/_personal_info.html' %}
+
+            {# 법인 전용 섹션 #}
+            {% if is_corporate and account_type != 'corporate_admin' %}
+                {# 섹션 2: 소속정보 - Employee는 읽기전용으로 표시 #}
+                {% if not is_employee_role %}
+                    {% include 'partials/employee_form/_organization_info.html' %}
+                {% else %}
+                    {# Employee용 소속정보 (읽기 전용) #}
+                    <section class="form-section" id="organization-info">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">
+                                    <i class="fas fa-building"></i>
+                                    소속정보 <span class="badge badge-secondary">읽기 전용</span>
+                                </h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">사번</label>
+                                        <input type="text" class="form-input" value="{{ profile_data.employee_number or '-' }}" readonly disabled>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">부서</label>
+                                        <input type="text" class="form-input" value="{{ profile_data.department or '-' }}" readonly disabled>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">팀</label>
+                                        <input type="text" class="form-input" value="{{ profile_data.team or '-' }}" readonly disabled>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">직급</label>
+                                        <input type="text" class="form-input" value="{{ profile_data.position or '-' }}" readonly disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                {% endif %}
+
+                {# 섹션 3: 계약정보 - Employee는 숨김 #}
+                {% if not is_employee_role %}
+                    {% include 'partials/employee_form/_contract_info.html' %}
+                {% endif %}
+            {% endif %}
+
+            {# 공통 섹션: 학력정보 #}
+            {% include 'partials/employee_form/_education_info.html' %}
+
+            {# 공통 섹션: 경력정보 #}
+            {% include 'partials/employee_form/_career_info.html' %}
+
+            {# 공통 섹션: 자격증 #}
+            {% include 'partials/employee_form/_certificate_info.html' %}
+
+            {# 공통 섹션: 언어능력 #}
+            {% include 'partials/employee_form/_language_info.html' %}
+
+            {# 법인 전용: 프로젝트 - Employee는 숨김 #}
+            {% if is_corporate and not is_employee_role and account_type != 'corporate_admin' %}
+                {% include 'partials/employee_form/_project_info.html' %}
+            {% endif %}
+
+            {# 공통 섹션: 병역정보 #}
+            {% include 'partials/employee_form/_military_info.html' %}
+
+            {# 법인 전용: 가족사항 #}
+            {% if is_corporate and account_type != 'corporate_admin' %}
+                {% include 'partials/employee_form/_family_info.html' %}
+            {% endif %}
+
+            {# 법인 전용: 급여정보 - Employee는 숨김 #}
+            {% if is_corporate and not is_employee_role and account_type != 'corporate_admin' %}
+                {% include 'partials/employee_form/_salary_info.html' %}
+            {% endif %}
+
+            {# 법인 전용: 4대보험 - Employee는 숨김 #}
+            {% if is_corporate and not is_employee_role and account_type != 'corporate_admin' %}
+                {% include 'partials/employee_form/_insurance_info.html' %}
+            {% endif %}
+
+            {# 폼 제출 버튼 #}
+            <section class="form-section form-submit-section">
+                <div class="form-submit-info">
+                    <span class="required">*</span> 표시는 필수 입력 항목입니다.
+                </div>
+                <div class="form-submit-actions">
+                    {% if is_create_mode %}
+                    <a href="{{ url_for('employees.employee_list') }}" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times"></i>
+                        <span>취소</span>
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('profile.view') }}" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times"></i>
+                        <span>취소</span>
+                    </a>
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i>
+                        <span>{% if is_create_mode %}등록 완료{% else %}수정 완료{% endif %}</span>
+                    </button>
+                </div>
+            </section>
+
+        </form>
+    </main>
+
+    {# 우측 사이드바 (법인 관리자용) #}
+    {% if is_corporate and not is_employee_role and account_type != 'corporate_admin' %}
+        {% include 'partials/_attachment_sidebar.html' %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if is_corporate %}
+<script src="{{ url_for('static', filename='js/components/tree-selector.js') }}"></script>
+{% endif %}
+<script type="module" src="{{ url_for('static', filename='js/pages/employee-form.js') }}"></script>
+<script src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 전화번호 입력 필드 자동 포맷팅 초기화
+    if (window.HRFormatters) {
+        window.HRFormatters.initPhoneInputs();
+    }
+
+    // 섹션 네비게이션 활성화
+    const navItems = document.querySelectorAll('.section-nav-item');
+    const sections = document.querySelectorAll('.form-section');
+
+    function updateActiveNav() {
+        let currentSection = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 150;
+            if (window.scrollY >= sectionTop) {
+                currentSection = section.getAttribute('id');
+            }
+        });
+
+        navItems.forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('href') === '#' + currentSection) {
+                item.classList.add('active');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', updateActiveNav);
+
+    navItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) {
+                targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+});
+</script>
+{# 카카오 주소 API #}
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+{% endblock %}

@@ -26,42 +26,56 @@ def view():
     """
     adapter = g.profile
 
-    context = {
-        # 기본 정보 (공통)
-        'basic_info': adapter.get_basic_info(),
+    # 어댑터의 to_template_context 메서드 사용
+    # 기존 파셜과의 호환성을 위해 항상 'employee' 변수 사용
+    # (profile/detail.html에서 profile_data = employee if employee is defined else profile 처리)
+    context = adapter.to_template_context(variable_name='employee')
 
-        # 법인 전용 정보
-        'organization_info': adapter.get_organization_info(),
-        'contract_info': adapter.get_contract_info(),
-        'salary_info': adapter.get_salary_info(),
-        'benefit_info': adapter.get_benefit_info(),
-        'insurance_info': adapter.get_insurance_info(),
+    # 추가 컨텍스트 (법인 직원 전용)
+    if adapter.is_corporate() and hasattr(adapter, 'get_family_list'):
+        context['family_list'] = adapter.get_family_list()
+        context['project_list'] = adapter.get_project_list()
+        context['award_list'] = adapter.get_award_list()
 
-        # 이력 정보 (공통)
-        'education_list': adapter.get_education_list(),
-        'career_list': adapter.get_career_list(),
-        'certificate_list': adapter.get_certificate_list(),
-        'language_list': adapter.get_language_list(),
-        'military_info': adapter.get_military_info(),
+    # 메타 정보
+    context['sections'] = adapter.get_available_sections()
 
-        # 메타 정보
-        'sections': adapter.get_available_sections(),
-    }
-
-    return render_template('profile/unified_profile.html', **context)
+    return render_template('profile/detail.html', **context)
 
 
-# TODO: unified_profile_edit.html 템플릿 구현 후 활성화
-# @profile_bp.route('/edit')
-# @unified_profile_required
-# def edit():
-#     """통합 프로필 수정 폼"""
-#     adapter = g.profile
-#     context = {
-#         'basic_info': adapter.get_basic_info(),
-#         'sections': adapter.get_available_sections(),
-#     }
-#     return render_template('profile/unified_profile_edit.html', **context)
+@profile_bp.route('/edit', methods=['GET', 'POST'])
+@unified_profile_required
+def edit():
+    """
+    통합 프로필 수정
+
+    법인 직원과 개인 계정 모두 동일한 템플릿 사용
+    계정 유형에 따라 편집 가능한 섹션이 다름
+    """
+    adapter = g.profile
+
+    if request.method == 'POST':
+        # POST 처리는 각 계정 타입별 서비스로 위임
+        account_type = adapter.get_account_type()
+
+        if account_type == 'corporate':
+            # 법인 직원 수정은 기존 employees 라우트로
+            employee_id = adapter.get_profile_id()
+            return redirect(url_for('employees.employee_edit', employee_id=employee_id))
+        elif account_type == 'personal':
+            # 개인 프로필 수정
+            return redirect(url_for('personal.profile_edit'))
+        elif account_type == 'corporate_admin':
+            # 법인 관리자 프로필 수정
+            return redirect(url_for('profile.admin_profile_edit'))
+
+    # GET: 수정 폼 표시
+    # 기존 파셜과의 호환성을 위해 항상 'employee' 변수 사용
+    context = adapter.to_template_context(variable_name='employee')
+    context['sections'] = adapter.get_available_sections()
+    context['action'] = 'update'
+
+    return render_template('profile/edit.html', **context)
 
 
 @profile_bp.route('/section/<section_name>')

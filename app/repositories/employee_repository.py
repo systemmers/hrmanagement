@@ -78,9 +78,17 @@ class EmployeeRepository(BaseRepository):
         return [emp.to_dict() for emp in employees]
 
     def get_by_id(self, employee_id: str) -> Optional[Dict]:
-        """ID로 직원 조회"""
+        """ID로 직원 조회 (dict 반환)"""
         employee = Employee.query.get(employee_id)
         return employee.to_dict() if employee else None
+
+    def get_model_by_id(self, employee_id: int) -> Optional[Employee]:
+        """ID로 직원 모델 인스턴스 조회 (관계 접근 필요시 사용)
+
+        Returns:
+            Employee 모델 인스턴스 또는 None
+        """
+        return Employee.query.get(employee_id)
 
     def create(self, data: Dict) -> Dict:
         """새 직원 생성"""

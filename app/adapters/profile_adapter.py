@@ -5,9 +5,10 @@ Profile Adapter - 법인/개인 계정 데이터 모델 통합 어댑터
 - EmployeeProfileAdapter: 법인 직원용 (Employee 모델)
 - PersonalProfileAdapter: 일반 개인용 (PersonalProfile 모델)
 - CorporateAdminProfileAdapter: 법인 관리자용 (CorporateAdminProfile 모델)
+- create_profile_adapter(): 팩토리 함수
 """
 from abc import ABC, abstractmethod
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Union
 
 
 class ProfileAdapter(ABC):
@@ -92,6 +93,55 @@ class ProfileAdapter(ABC):
     def get_photo_url(self) -> Optional[str]:
         """프로필 사진 URL 반환"""
         pass
+
+    @abstractmethod
+    def get_account_type(self) -> str:
+        """계정 타입 반환 ('corporate', 'personal', 'corporate_admin')"""
+        pass
+
+    def to_template_context(self, variable_name: str = 'profile') -> Dict[str, Any]:
+        """
+        템플릿 렌더링용 통합 컨텍스트 생성
+
+        Args:
+            variable_name: 템플릿에서 사용할 변수명 ('employee' 또는 'profile')
+
+        Returns:
+            템플릿에 전달할 컨텍스트 딕셔너리
+        """
+        basic = self.get_basic_info()
+
+        # 통합 프로필 객체 생성 (템플릿에서 employee.name 또는 profile.name 형태로 접근)
+        profile_obj = type('ProfileContext', (), {
+            **basic,
+            'id': self.get_profile_id(),
+            'photo': self.get_photo_url(),
+        })()
+
+        context = {
+            variable_name: profile_obj,
+            'is_corporate': self.is_corporate(),
+            'account_type': self.get_account_type(),
+            'available_sections': self.get_available_sections(),
+            'basic_info': basic,
+            'organization_info': self.get_organization_info(),
+            'education_list': self.get_education_list(),
+            'career_list': self.get_career_list(),
+            'certificate_list': self.get_certificate_list(),
+            'language_list': self.get_language_list(),
+            'military_info': self.get_military_info(),
+        }
+
+        # 법인 전용 필드
+        if self.is_corporate():
+            context.update({
+                'contract_info': self.get_contract_info(),
+                'salary_info': self.get_salary_info(),
+                'benefit_info': self.get_benefit_info(),
+                'insurance_info': self.get_insurance_info(),
+            })
+
+        return context
 
 
 class EmployeeProfileAdapter(ProfileAdapter):
@@ -258,6 +308,10 @@ class EmployeeProfileAdapter(ProfileAdapter):
         """프로필 사진 URL"""
         return self.employee.photo
 
+    def get_account_type(self) -> str:
+        """계정 타입 반환"""
+        return 'corporate'
+
 
 class PersonalProfileAdapter(ProfileAdapter):
     """일반 개인용 어댑터 (PersonalProfile 모델 래핑)"""
@@ -367,6 +421,10 @@ class PersonalProfileAdapter(ProfileAdapter):
     def get_user_id(self) -> int:
         """연결된 User ID"""
         return self.profile.user_id
+
+    def get_account_type(self) -> str:
+        """계정 타입 반환"""
+        return 'personal'
 
 
 class CorporateAdminProfileAdapter(ProfileAdapter):
@@ -498,3 +556,52 @@ class CorporateAdminProfileAdapter(ProfileAdapter):
     def get_company_id(self) -> int:
         """연결된 Company ID"""
         return self.admin_profile.company_id
+
+    def get_account_type(self) -> str:
+        """계정 타입 반환"""
+        return 'corporate_admin'
+
+
+# =============================================================================
+# Factory Functions
+# =============================================================================
+
+def create_profile_adapter(
+    model_instance,
+    model_type: Optional[str] = None
+) -> ProfileAdapter:
+    """
+    모델 인스턴스에 맞는 어댑터 생성
+
+    Args:
+        model_instance: Employee, PersonalProfile, 또는 CorporateAdminProfile 인스턴스
+        model_type: 모델 타입 힌트 ('employee', 'personal', 'corporate_admin')
+                   None이면 자동 감지
+
+    Returns:
+        적절한 ProfileAdapter 서브클래스 인스턴스
+
+    Raises:
+        ValueError: 지원하지 않는 모델 타입
+    """
+    # 모델 타입 자동 감지
+    if model_type is None:
+        class_name = model_instance.__class__.__name__
+        if class_name == 'Employee':
+            model_type = 'employee'
+        elif class_name == 'PersonalProfile':
+            model_type = 'personal'
+        elif class_name == 'CorporateAdminProfile':
+            model_type = 'corporate_admin'
+        else:
+            raise ValueError(f"지원하지 않는 모델 타입: {class_name}")
+
+    # 어댑터 생성
+    if model_type == 'employee':
+        return EmployeeProfileAdapter(model_instance)
+    elif model_type == 'personal':
+        return PersonalProfileAdapter(model_instance)
+    elif model_type == 'corporate_admin':
+        return CorporateAdminProfileAdapter(model_instance)
+    else:
+        raise ValueError(f"지원하지 않는 모델 타입: {model_type}")

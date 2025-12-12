@@ -43,7 +43,6 @@ def save_personal_photo(file, user_id):
     return f"/static/uploads/personal_photos/{unique_filename}"
 from app.utils.decorators import personal_login_required
 from app.utils.personal_helpers import get_current_profile, profile_required_no_inject
-from app.adapters.profile_adapter import PersonalProfileAdapter
 
 personal_bp = Blueprint('personal', __name__, url_prefix='/personal')
 
@@ -127,49 +126,26 @@ def dashboard():
 @personal_bp.route('/profile')
 @personal_login_required
 def profile():
-    """프로필 조회 - 통합 프로필 템플릿 사용"""
-    user_id = session.get('user_id')
-    user, profile_obj = personal_service.get_user_with_profile(user_id)
-
-    if not profile_obj:
-        flash('프로필을 먼저 작성해주세요.', 'info')
-        return redirect(url_for('personal.profile_edit'))
-
-    # PersonalProfileAdapter를 사용하여 통합 템플릿에 데이터 전달
-    adapter = PersonalProfileAdapter(profile_obj)
-
-    context = {
-        'is_corporate': False,
-        'profile_name': adapter.get_display_name(),
-        # 기본 정보 (공통)
-        'basic_info': adapter.get_basic_info(),
-        # 법인 전용 정보 (개인은 None)
-        'organization_info': None,
-        'contract_info': None,
-        'salary_info': None,
-        'benefit_info': None,
-        'insurance_info': None,
-        # 이력 정보 (공통)
-        'education_list': adapter.get_education_list(),
-        'career_list': adapter.get_career_list(),
-        'certificate_list': adapter.get_certificate_list(),
-        'language_list': adapter.get_language_list(),
-        'military_info': adapter.get_military_info(),
-        # 메타 정보
-        'sections': adapter.get_available_sections(),
-        # 기존 호환성 유지
-        'user': user,
-        'profile': profile_obj,
-    }
-
-    return render_template('profile/unified_profile.html', **context)
+    """프로필 조회 - 통합 프로필로 리다이렉트"""
+    # 통합 프로필 시스템으로 리다이렉트 (301 영구 이동)
+    return redirect(url_for('profile.view'), code=301)
 
 
 @personal_bp.route('/profile/edit', methods=['GET', 'POST'])
 @personal_login_required
 def profile_edit():
-    """프로필 수정"""
+    """
+    프로필 수정
+    - GET: 통합 프로필 수정 페이지로 리다이렉트
+    - POST: 폼 데이터 저장 처리 (통합 템플릿에서 이 엔드포인트로 POST)
+    """
     user_id = session.get('user_id')
+
+    # GET 요청: 통합 프로필 수정 페이지로 리다이렉트
+    if request.method == 'GET':
+        return redirect(url_for('profile.edit'), code=301)
+
+    # POST 요청: 폼 데이터 저장 처리
     user, profile_obj = personal_service.get_user_with_profile(user_id)
 
     if not user:
@@ -180,60 +156,56 @@ def profile_edit():
     if not profile_obj:
         profile_obj = personal_service.ensure_profile_exists(user_id, user.username)
 
-    if request.method == 'POST':
-        # 사진 업로드 처리
-        photo_path = profile_obj.photo  # 기존 사진 경로 유지
-        if 'photoFile' in request.files:
-            photo_file = request.files['photoFile']
-            if photo_file and photo_file.filename:
-                if allowed_image_file(photo_file.filename):
-                    # 파일 크기 검사
-                    photo_file.seek(0, os.SEEK_END)
-                    file_size = photo_file.tell()
-                    photo_file.seek(0)
+    # 사진 업로드 처리
+    photo_path = profile_obj.photo  # 기존 사진 경로 유지
+    if 'photoFile' in request.files:
+        photo_file = request.files['photoFile']
+        if photo_file and photo_file.filename:
+            if allowed_image_file(photo_file.filename):
+                # 파일 크기 검사
+                photo_file.seek(0, os.SEEK_END)
+                file_size = photo_file.tell()
+                photo_file.seek(0)
 
-                    if file_size <= MAX_IMAGE_SIZE:
-                        photo_path = save_personal_photo(photo_file, user_id)
-                    else:
-                        flash('사진 파일 크기는 5MB 이하여야 합니다.', 'warning')
+                if file_size <= MAX_IMAGE_SIZE:
+                    photo_path = save_personal_photo(photo_file, user_id)
                 else:
-                    flash('이미지 파일만 업로드 가능합니다. (jpg, png, gif, webp)', 'warning')
+                    flash('사진 파일 크기는 5MB 이하여야 합니다.', 'warning')
+            else:
+                flash('이미지 파일만 업로드 가능합니다. (jpg, png, gif, webp)', 'warning')
 
-        # 폼 데이터 수집 - 법인과 동일한 필드 구조
-        data = {
-            'name': request.form.get('name', profile_obj.name).strip(),
-            'english_name': request.form.get('english_name', '').strip() or None,
-            'chinese_name': request.form.get('chinese_name', '').strip() or None,
-            'resident_number': request.form.get('resident_number', '').strip() or None,
-            'birth_date': request.form.get('birth_date', '').strip() or None,
-            'lunar_birth': request.form.get('lunar_birth') == 'true',
-            'gender': request.form.get('gender', '').strip() or None,
-            'mobile_phone': request.form.get('mobile_phone', '').strip() or None,
-            'home_phone': request.form.get('home_phone', '').strip() or None,
-            'email': request.form.get('email', '').strip() or None,
-            'postal_code': request.form.get('postal_code', '').strip() or None,
-            'address': request.form.get('address', '').strip() or None,
-            'detailed_address': request.form.get('detailed_address', '').strip() or None,
-            'nationality': request.form.get('nationality', '').strip() or None,
-            'blood_type': request.form.get('blood_type', '').strip() or None,
-            'religion': request.form.get('religion', '').strip() or None,
-            'hobby': request.form.get('hobby', '').strip() or None,
-            'specialty': request.form.get('specialty', '').strip() or None,
-            'is_public': request.form.get('is_public') == 'true',
-            'photo': photo_path,
-        }
+    # 폼 데이터 수집 - 법인과 동일한 필드 구조
+    data = {
+        'name': request.form.get('name', profile_obj.name).strip(),
+        'english_name': request.form.get('english_name', '').strip() or None,
+        'chinese_name': request.form.get('chinese_name', '').strip() or None,
+        'resident_number': request.form.get('resident_number', '').strip() or None,
+        'birth_date': request.form.get('birth_date', '').strip() or None,
+        'lunar_birth': request.form.get('lunar_birth') == 'true',
+        'gender': request.form.get('gender', '').strip() or None,
+        'mobile_phone': request.form.get('mobile_phone', '').strip() or None,
+        'home_phone': request.form.get('home_phone', '').strip() or None,
+        'email': request.form.get('email', '').strip() or None,
+        'postal_code': request.form.get('postal_code', '').strip() or None,
+        'address': request.form.get('address', '').strip() or None,
+        'detailed_address': request.form.get('detailed_address', '').strip() or None,
+        'nationality': request.form.get('nationality', '').strip() or None,
+        'blood_type': request.form.get('blood_type', '').strip() or None,
+        'religion': request.form.get('religion', '').strip() or None,
+        'hobby': request.form.get('hobby', '').strip() or None,
+        'specialty': request.form.get('specialty', '').strip() or None,
+        'is_public': request.form.get('is_public') == 'true',
+        'photo': photo_path,
+    }
 
-        success, error_msg = personal_service.update_profile(user_id, data)
+    success, error_msg = personal_service.update_profile(user_id, data)
 
-        if success:
-            flash('프로필이 수정되었습니다.', 'success')
-            return redirect(url_for('personal.profile'))
-        else:
-            flash(f'수정 중 오류가 발생했습니다: {error_msg}', 'error')
-
-    return render_template('personal/profile_edit.html',
-                           user=user,
-                           profile=profile_obj)
+    if success:
+        flash('프로필이 수정되었습니다.', 'success')
+        return redirect(url_for('profile.view'))
+    else:
+        flash(f'수정 중 오류가 발생했습니다: {error_msg}', 'error')
+        return redirect(url_for('profile.edit'))
 
 
 # ============================================================

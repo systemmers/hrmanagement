@@ -52,7 +52,8 @@
       "Bash(pytest:*)",
       "Bash(DATABASE_URL=sqlite:///test.db pytest:*)",
       "Bash(DATABASE_URL=sqlite:///test.db python:*)",
-      "Bash(DATABASE_URL=\"postgresql://hrm_user:hrm_secure_password_2024@localhost:5432/hrmanagement_db\" python -m flask:*)"
+      "Bash(DATABASE_URL=\"postgresql://hrm_user:hrm_secure_password_2024@localhost:5432/hrmanagement_db\" python -m flask:*)",
+      "Bash(ls -la \"D:\\projects\\hrmanagement\\app\\templates\\partials\\profile_form\"\" 2>/dev/null || dir /b \"D:projectshrmanagementapptemplatespartialsprofile_form\" 2>nul || echo \"Directory does not exist \")"
     ],
     "deny": [],
     "ask": []

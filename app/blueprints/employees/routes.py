@@ -207,8 +207,10 @@ def register_routes(bp: Blueprint):
             (session.get('user_role') == 'employee' and session.get('employee_id') == employee_id)
         )
 
-        return render_template('employees/detail.html',
+        return render_template('profile/detail.html',
                                employee=employee,
+                               is_corporate=True,
+                               account_type='corporate',
                                education_list=education_list,
                                career_list=career_list,
                                certificate_list=certificate_list,
@@ -240,11 +242,13 @@ def register_routes(bp: Blueprint):
     @bp.route('/employees/new', methods=['GET'])
     @manager_or_admin_required
     def employee_new():
-        """직원 등록 폼"""
+        """직원 등록 폼 - 통합 템플릿 사용"""
         classification_options = classification_repo.get_all_options()
-        return render_template('employees/form.html',
+        return render_template('profile/edit.html',
                                employee=None,
                                action='create',
+                               is_corporate=True,
+                               account_type='corporate',
                                classification_options=classification_options)
 
     @bp.route('/employees', methods=['POST'])
@@ -296,7 +300,7 @@ def register_routes(bp: Blueprint):
                 flash('접근 권한이 없습니다.', 'error')
                 return redirect(url_for('main.index'))
 
-        employee = employee_repo.get_by_id(employee_id)
+        employee = employee_repo.get_model_by_id(employee_id)
         if not employee:
             flash('직원을 찾을 수 없습니다.', 'error')
             return redirect(url_for('main.index'))
@@ -306,13 +310,19 @@ def register_routes(bp: Blueprint):
         business_card_back = attachment_repo.get_one_by_category(employee_id, 'business_card_back')
         classification_options = classification_repo.get_all_options()
 
-        return render_template('employees/form.html',
+        return render_template('profile/edit.html',
                                employee=employee,
                                action='update',
+                               is_corporate=True,
+                               account_type='corporate',
                                attachment_list=attachment_list,
                                business_card_front=business_card_front,
                                business_card_back=business_card_back,
-                               classification_options=classification_options)
+                               classification_options=classification_options,
+                               language_list=list(employee.languages),
+                               project_list=list(employee.projects),
+                               salary=employee.salary,
+                               insurance=employee.insurance)
 
     @bp.route('/employees/<int:employee_id>/update', methods=['POST'])
     @login_required

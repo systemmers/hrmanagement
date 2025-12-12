@@ -15,8 +15,8 @@
         </div>
         <div class="card-body">
             <div class="dynamic-list" id="careerList">
-                {% if employee and employee.career %}
-                    {% for career in employee.career %}
+                {% if employee and employee.careers %}
+                    {% for career in employee.careers %}
                     <div class="dynamic-item" data-index="{{ loop.index0 }}">
                         <div class="form-grid">
                             <div class="form-group">

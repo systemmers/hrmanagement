@@ -234,7 +234,8 @@
         </div>
     </div>
 
-    {# 유사사업 참여경력 #}
+    {# 유사사업 참여경력 (법인 전용) #}
+    {% if is_corporate %}
     <div class="card" style="margin-top: var(--space-4);">
         <div class="card-header">
             <h3 class="card-title">
@@ -280,8 +281,10 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
-    {# 수상내역 #}
+    {# 수상내역 (법인 전용) #}
+    {% if is_corporate %}
     <div class="card" style="margin-top: var(--space-4);">
         <div class="card-header">
             <h3 class="card-title">
@@ -323,4 +326,5 @@
             </div>
         </div>
     </div>
+    {% endif %}
 </section>
