@@ -96,3 +96,5 @@ scripts/*.pyc
 
 # Database files directory
 data/db_files/
+# Playwright test screenshots
+.playwright-mcp/*.png
