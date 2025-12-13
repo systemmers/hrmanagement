@@ -40,37 +40,6 @@
     background-color: var(--color-gray-25);
 }
 
-/* 프로필 레이아웃 (section-nav + content) */
-.profile-layout {
-    display: flex;
-    gap: var(--space-6);
-    align-items: flex-start;
-}
-
-.profile-layout .section-nav {
-    position: sticky;
-    top: var(--space-6);
-    flex-shrink: 0;
-    height: auto;
-    border-right: none;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--color-gray-200);
-    overflow: hidden;
-}
-
-.profile-layout .section-nav-header {
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-
-.profile-layout .profile-content {
-    flex: 1;
-    min-width: 0;
-    padding: 0;
-    max-width: none;
-    margin: 0;
-}
-
 .profile-nav {
     width: var(--profile-nav-width);
     background: var(--color-pure-white);
@@ -713,15 +682,6 @@
 
 /* 1024px 이하 (태블릿) */
 @media (max-width: 1024px) {
-    .profile-layout {
-        flex-direction: column;
-    }
-
-    .profile-layout .section-nav {
-        position: static;
-        width: 100%;
-    }
-
     .profile-nav {
         display: none;
     }
