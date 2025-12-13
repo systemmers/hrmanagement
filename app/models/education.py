@@ -19,6 +19,7 @@ class Education(db.Model):
     admission_date = db.Column(db.String(20), nullable=True)
     graduation_date = db.Column(db.String(20), nullable=True)
     graduation_status = db.Column(db.String(50), nullable=True)
+    gpa = db.Column(db.String(20), nullable=True)
     location = db.Column(db.String(200), nullable=True)
     note = db.Column(db.Text, nullable=True)
 
@@ -41,7 +42,7 @@ class Education(db.Model):
             'graduation_year': graduation_year,  # 템플릿: edu.graduation_year
             'graduation_status': self.graduation_status,
             'location': self.location,
-            'gpa': None,  # 템플릿: edu.gpa (모델에 없음)
+            'gpa': self.gpa,
             'note': self.note,
         }
 

@@ -73,8 +73,8 @@
 <!-- 내 정보 섹션 (통합) -->
 <div class="nav-section">
     <h2 class="nav-section-title">내 정보</h2>
-    <a href="{{ url_for('employees.employee_detail', employee_id=current_user.employee_id) }}"
-       class="nav-item {% if request.endpoint == 'employees.employee_detail' %}active{% endif %}">
+    <a href="{{ url_for('profile.view') }}"
+       class="nav-item {% if request.endpoint and request.endpoint.startswith('profile.') %}active{% endif %}">
         <i class="fas fa-user"></i>
         <span>프로필</span>
     </a>

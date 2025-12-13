@@ -25,6 +25,11 @@
                                        value="{{ career.company_name }}" placeholder="회사명">
                             </div>
                             <div class="form-group">
+                                <label class="form-label">부서</label>
+                                <input type="text" name="career_department[]" class="form-input"
+                                       value="{{ career.department }}" placeholder="개발팀">
+                            </div>
+                            <div class="form-group">
                                 <label class="form-label">직급/직책</label>
                                 <input type="text" name="career_position[]" class="form-input"
                                        value="{{ career.position }}" placeholder="대리">
@@ -33,6 +38,11 @@
                                 <label class="form-label">담당업무</label>
                                 <input type="text" name="career_duties[]" class="form-input"
                                        value="{{ career.job_description }}" placeholder="웹 개발">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">연봉</label>
+                                <input type="number" name="career_salary[]" class="form-input"
+                                       value="{{ career.salary }}" placeholder="연봉 (원)">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">입사일</label>
@@ -58,12 +68,20 @@
                             <input type="text" name="career_company_name[]" class="form-input" placeholder="회사명">
                         </div>
                         <div class="form-group">
+                            <label class="form-label">부서</label>
+                            <input type="text" name="career_department[]" class="form-input" placeholder="개발팀">
+                        </div>
+                        <div class="form-group">
                             <label class="form-label">직급/직책</label>
                             <input type="text" name="career_position[]" class="form-input" placeholder="대리">
                         </div>
                         <div class="form-group">
                             <label class="form-label">담당업무</label>
                             <input type="text" name="career_duties[]" class="form-input" placeholder="웹 개발">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">연봉</label>
+                            <input type="number" name="career_salary[]" class="form-input" placeholder="연봉 (원)">
                         </div>
                         <div class="form-group">
                             <label class="form-label">입사일</label>

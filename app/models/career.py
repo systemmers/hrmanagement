@@ -18,6 +18,7 @@ class Career(db.Model):
     job_description = db.Column(db.Text, nullable=True)
     start_date = db.Column(db.String(20), nullable=True)
     end_date = db.Column(db.String(20), nullable=True)
+    salary = db.Column(db.Integer, nullable=True)
     resignation_reason = db.Column(db.String(500), nullable=True)
     is_current = db.Column(db.Boolean, default=False)
     note = db.Column(db.Text, nullable=True)
@@ -37,7 +38,7 @@ class Career(db.Model):
             'end_date': self.end_date,
             'resignation_reason': self.resignation_reason,
             'is_current': self.is_current,
-            'salary': None,  # 템플릿: career.salary (모델에 없음)
+            'salary': self.salary,
             'note': self.note,
         }
 

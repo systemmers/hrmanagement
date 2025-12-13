@@ -31,19 +31,10 @@
             </div>
         </div>
 
-        {# 헤더 카드 (개인 계정용) #}
-        {% set employee = {
-            'name': profile.name if profile else current_user.name,
-            'email': profile.email if profile else current_user.email,
-            'phone': profile.phone if profile else '-',
-            'address': profile.address if profile else '-',
-            'birth_date': profile.birth_date if profile else '-',
-            'contract_count': contract_count|default(1),
-            'created_at': current_user.created_at|default('-'),
-            'id': current_user.id,
-            'photo': profile.photo if profile and profile.photo else url_for('static', filename='images/default-avatar.png')
-        } %}
-        {% include 'partials/employee_detail/_employee_header.html' with context %}
+        {# 헤더 카드 - 전달된 employee 데이터 사용 #}
+        {% if employee %}
+        {% include 'partials/employee_detail/_employee_header.html' %}
+        {% endif %}
 
         {# 섹션 1: 소속정보 #}
         <section id="organization-info" class="content-section">

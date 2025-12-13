@@ -11,7 +11,10 @@ from ..extensions import (
     employee_repo, system_setting_repo,
     salary_repo, benefit_repo, contract_repo, salary_history_repo,
     promotion_repo, evaluation_repo, training_repo, attendance_repo,
-    insurance_repo, asset_repo, salary_payment_repo
+    insurance_repo, asset_repo, salary_payment_repo,
+    # 파셜 통합을 위한 추가 레포지토리
+    education_repo, career_repo, certificate_repo, family_repo,
+    language_repo, military_repo, project_repo, award_repo
 )
 
 mypage_bp = Blueprint('mypage', __name__, url_prefix='/my')
@@ -69,6 +72,16 @@ def company_info():
     attendance_summary = attendance_repo.get_summary_by_employee(employee_id, 2025)
     asset_list = asset_repo.get_by_employee_id(employee_id)
 
+    # 이력 및 경력 데이터 조회 (파셜 통합용)
+    education_list = education_repo.get_by_employee_id(employee_id)
+    career_list = career_repo.get_by_employee_id(employee_id)
+    certificate_list = certificate_repo.get_by_employee_id(employee_id)
+    family_list = family_repo.get_by_employee_id(employee_id)
+    language_list = language_repo.get_by_employee_id(employee_id)
+    military = military_repo.get_by_employee_id(employee_id)
+    project_list = project_repo.get_by_employee_id(employee_id)
+    award_list = award_repo.get_by_employee_id(employee_id)
+
     return render_template('mypage/company_info.html',
                            employee=employee,
                            company_info=company_data,
@@ -83,4 +96,14 @@ def company_info():
                            training_list=training_list,
                            attendance_summary=attendance_summary,
                            asset_list=asset_list,
-                           is_readonly=True)
+                           # 이력 및 경력 데이터 (파셜 통합용)
+                           education_list=education_list,
+                           career_list=career_list,
+                           certificate_list=certificate_list,
+                           family_list=family_list,
+                           language_list=language_list,
+                           military=military,
+                           project_list=project_list,
+                           award_list=award_list,
+                           is_readonly=True,
+                           page_mode='hr_card')

@@ -106,14 +106,18 @@ Parameters:
         </div>
 
         {% elif variant == 'form' %}
-        {# 폼 네비게이션 (역할 기반) #}
+        {# 폼 네비게이션 (역할 기반) - 상세 페이지와 순서 통일 #}
         <div class="nav-group">
             <div class="nav-group-title">기본정보</div>
             {{ section_nav_item('#personal-info', 'fa-user', '개인 기본정보', true) }}
             {{ section_nav_item('#organization-info', 'fa-building', '소속정보', false, ' (읽기전용)' if is_employee_role else '') }}
             {% if not is_employee_role %}
             {{ section_nav_item('#contract-info', 'fa-file-contract', '계약정보') }}
+            {{ section_nav_item('#salary-info', 'fa-won-sign', '급여정보') }}
+            {{ section_nav_item('#benefit-info', 'fa-umbrella-beach', '복리후생') }}
+            {{ section_nav_item('#insurance-info', 'fa-shield-alt', '4대보험') }}
             {% endif %}
+            {{ section_nav_item('#family-info', 'fa-users', '가족사항') }}
         </div>
         <div class="nav-group">
             <div class="nav-group-title">이력 및 경력</div>
@@ -121,22 +125,15 @@ Parameters:
             {{ section_nav_item('#career-info', 'fa-briefcase', '경력정보') }}
             {{ section_nav_item('#certificate-info', 'fa-certificate', '자격증') }}
             {{ section_nav_item('#language-info', 'fa-language', '언어능력') }}
+        </div>
+        <div class="nav-group">
+            <div class="nav-group-title">부가정보</div>
+            {{ section_nav_item('#military-info', 'fa-medal', '병역정보') }}
+            {{ section_nav_item('#award-info', 'fa-trophy', '수상내역') }}
             {% if not is_employee_role %}
             {{ section_nav_item('#project-info', 'fa-project-diagram', '프로젝트') }}
             {% endif %}
         </div>
-        <div class="nav-group">
-            <div class="nav-group-title">부가정보</div>
-            {{ section_nav_item('#military-info', 'fa-shield-alt', '병역정보') }}
-            {{ section_nav_item('#family-info', 'fa-users', '가족사항') }}
-        </div>
-        {% if not is_employee_role %}
-        <div class="nav-group">
-            <div class="nav-group-title">급여 및 보험</div>
-            {{ section_nav_item('#salary-info', 'fa-won-sign', '급여정보') }}
-            {{ section_nav_item('#insurance-info', 'fa-shield-alt', '4대보험') }}
-        </div>
-        {% endif %}
 
         {% elif variant == 'profile' %}
         {# 개인 프로필 네비게이션 (상세/수정 공통) #}

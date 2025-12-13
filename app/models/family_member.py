@@ -31,7 +31,9 @@ class FamilyMember(db.Model):
             'birth_date': self.birth_date,
             'occupation': self.occupation,
             'contact': self.contact,
+            'phone': self.contact,  # 템플릿: family.phone
             'is_cohabitant': self.is_cohabitant,
+            'living_together': self.is_cohabitant,  # 템플릿: family.living_together
             'is_dependent': self.is_dependent,
             'note': self.note,
         }

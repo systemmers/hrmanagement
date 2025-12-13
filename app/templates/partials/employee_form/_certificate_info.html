@@ -30,6 +30,11 @@
                                        value="{{ cert.issuing_organization }}" placeholder="한국산업인력공단">
                             </div>
                             <div class="form-group">
+                                <label class="form-label">등급/점수</label>
+                                <input type="text" name="certificate_grade[]" class="form-input"
+                                       value="{{ cert.grade }}" placeholder="1급, 900점">
+                            </div>
+                            <div class="form-group">
                                 <label class="form-label">취득일</label>
                                 <input type="date" name="certificate_date[]" class="form-input"
                                        value="{{ cert.acquisition_date }}">
@@ -38,6 +43,11 @@
                                 <label class="form-label">자격번호</label>
                                 <input type="text" name="certificate_number[]" class="form-input"
                                        value="{{ cert.certificate_number }}" placeholder="자격번호">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">만료일</label>
+                                <input type="date" name="certificate_expiry_date[]" class="form-input"
+                                       value="{{ cert.expiry_date }}">
                             </div>
                         </div>
                         <button type="button" class="btn-remove" title="삭제">
@@ -57,12 +67,20 @@
                             <input type="text" name="certificate_issuer[]" class="form-input" placeholder="한국산업인력공단">
                         </div>
                         <div class="form-group">
+                            <label class="form-label">등급/점수</label>
+                            <input type="text" name="certificate_grade[]" class="form-input" placeholder="1급, 900점">
+                        </div>
+                        <div class="form-group">
                             <label class="form-label">취득일</label>
                             <input type="date" name="certificate_date[]" class="form-input">
                         </div>
                         <div class="form-group">
                             <label class="form-label">자격번호</label>
                             <input type="text" name="certificate_number[]" class="form-input" placeholder="자격번호">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">만료일</label>
+                            <input type="date" name="certificate_expiry_date[]" class="form-input">
                         </div>
                     </div>
                     <button type="button" class="btn-remove" title="삭제">

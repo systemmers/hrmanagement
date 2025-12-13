@@ -432,4 +432,5 @@ def company_card_detail(contract_id):
                            salary=card_data.get('salary'),
                            benefit=card_data.get('benefit'),
                            insurance=card_data.get('insurance'),
-                           contract_info=card_data.get('contract_info'))
+                           contract_info=card_data.get('contract_info'),
+                           page_mode='hr_card')

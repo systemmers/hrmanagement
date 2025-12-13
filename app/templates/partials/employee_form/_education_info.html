@@ -45,6 +45,26 @@
                                 <input type="text" name="education_graduation_year[]" class="form-input"
                                        value="{{ edu.graduation_year }}" placeholder="2020">
                             </div>
+                            <div class="form-group">
+                                <label class="form-label">학점</label>
+                                <input type="text" name="education_gpa[]" class="form-input"
+                                       value="{{ edu.gpa }}" placeholder="4.0/4.5">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">졸업유무</label>
+                                <select name="education_graduation_status[]" class="form-input">
+                                    <option value="">선택하세요</option>
+                                    <option value="graduated" {% if edu.graduation_status == 'graduated' %}selected{% endif %}>졸업</option>
+                                    <option value="enrolled" {% if edu.graduation_status == 'enrolled' %}selected{% endif %}>재학</option>
+                                    <option value="leave" {% if edu.graduation_status == 'leave' %}selected{% endif %}>휴학</option>
+                                    <option value="dropout" {% if edu.graduation_status == 'dropout' %}selected{% endif %}>중퇴</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">비고</label>
+                                <input type="text" name="education_note[]" class="form-input"
+                                       value="{{ edu.note }}" placeholder="비고">
+                            </div>
                         </div>
                         <button type="button" class="btn-remove" title="삭제">
                             <i class="fas fa-times"></i>
@@ -76,6 +96,24 @@
                         <div class="form-group">
                             <label class="form-label">졸업년도</label>
                             <input type="text" name="education_graduation_year[]" class="form-input" placeholder="2020">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">학점</label>
+                            <input type="text" name="education_gpa[]" class="form-input" placeholder="4.0/4.5">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">졸업유무</label>
+                            <select name="education_graduation_status[]" class="form-input">
+                                <option value="">선택하세요</option>
+                                <option value="graduated">졸업</option>
+                                <option value="enrolled">재학</option>
+                                <option value="leave">휴학</option>
+                                <option value="dropout">중퇴</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">비고</label>
+                            <input type="text" name="education_note[]" class="form-input" placeholder="비고">
                         </div>
                     </div>
                     <button type="button" class="btn-remove" title="삭제">

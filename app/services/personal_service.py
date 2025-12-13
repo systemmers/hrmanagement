@@ -272,6 +272,7 @@ class PersonalService:
         """회사 인사카드 데이터 조회
 
         특정 계약에 대한 회사 인사카드 정보를 반환합니다.
+        employee 데이터도 포함하여 헤더 카드 표시를 지원합니다.
         """
         from app.models.person_contract import PersonCorporateContract
         from app.models.company import Company
@@ -291,8 +292,34 @@ class PersonalService:
         if not company:
             return None
 
+        # 개인 프로필 조회 (헤더 표시용)
+        profile = self.profile_repo.get_by_user_id(user_id)
+        user = User.query.get(user_id)
+
+        # 승인된 계약 수 조회
+        contract_count = PersonCorporateContract.query.filter_by(
+            person_user_id=user_id,
+            status='approved'
+        ).count()
+
+        # employee 데이터 구성 (헤더 카드용)
+        employee_data = None
+        if profile:
+            employee_data = {
+                'id': user.id if user else user_id,
+                'name': profile.name,
+                'photo': profile.photo or 'https://i.pravatar.cc/150',
+                'email': profile.email,
+                'phone': profile.mobile_phone or profile.phone,
+                'address': profile.address,
+                'birth_date': profile.birth_date,
+                'contract_count': contract_count,
+                'created_at': user.created_at.strftime('%Y-%m-%d') if user and user.created_at else '-',
+            }
+
         # 인사카드 데이터 구성
         return {
+            'employee': employee_data,
             'contract': {
                 'id': contract.id,
                 'position': contract.position,

@@ -233,6 +233,13 @@ class RelatedDataUpdater:
 def _get_family_updater():
     """가족정보 Updater 생성"""
     from ...models import FamilyMember
+
+    def parse_living_together(value):
+        """living_together 값을 boolean으로 변환"""
+        if value is None or value == '':
+            return False
+        return value == 'true' or value is True
+
     return RelatedDataUpdater(
         model_class=FamilyMember,
         repository=family_repo,
@@ -244,9 +251,9 @@ def _get_family_updater():
             'birth_date': 'birth_date',
             'occupation': 'occupation',
             'phone': 'contact',
-            'cohabiting': 'is_cohabitant',
+            'living_together': 'is_cohabitant',
         },
-        converters={'is_cohabitant': bool}
+        converters={'is_cohabitant': parse_living_together}
     )
 
 
@@ -265,6 +272,8 @@ def _get_education_updater():
             'major': 'major',
             'degree': 'degree',
             'graduation_status': 'graduation_status',
+            'gpa': 'gpa',
+            'note': 'note',
         }
     )
 
@@ -272,6 +281,16 @@ def _get_education_updater():
 def _get_career_updater():
     """경력정보 Updater 생성"""
     from ...models import Career
+
+    def parse_salary(value):
+        """salary 값을 정수로 변환"""
+        if value is None or value == '':
+            return None
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            return None
+
     return RelatedDataUpdater(
         model_class=Career,
         repository=career_repo,
@@ -284,7 +303,9 @@ def _get_career_updater():
             'department': 'department',
             'position': 'position',
             'duties': 'job_description',
-        }
+            'salary': 'salary',
+        },
+        converters={'salary': parse_salary}
     )
 
 
@@ -302,6 +323,7 @@ def _get_certificate_updater():
             'issuer': 'issuing_organization',
             'number': 'certificate_number',
             'date': 'acquisition_date',
+            'expiry_date': 'expiry_date',
         }
     )
 
