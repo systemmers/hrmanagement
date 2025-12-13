@@ -40,6 +40,9 @@ def view():
     # 메타 정보
     context['sections'] = adapter.get_available_sections()
 
+    # 페이지 모드: 프로필 (개인정보만 표시)
+    context['page_mode'] = 'profile'
+
     return render_template('profile/detail.html', **context)
 
 
@@ -74,6 +77,9 @@ def edit():
     context = adapter.to_template_context(variable_name='employee')
     context['sections'] = adapter.get_available_sections()
     context['action'] = 'update'
+
+    # 페이지 모드: 프로필 (개인정보만 표시)
+    context['page_mode'] = 'profile'
 
     return render_template('profile/edit.html', **context)
 

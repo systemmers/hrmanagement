@@ -20,7 +20,7 @@
 {% set form_action_type = action if action is defined else ('create' if not profile_data else 'update') %}
 {% set is_create_mode = form_action_type == 'create' %}
 
-{% block title %}{% if is_create_mode %}직원 등록{% else %}정보 수정{% endif %} - {{ '인사카드' if is_corporate else '프로필' }}{% endblock %}
+{% block title %}{% if is_create_mode %}직원 등록{% else %}정보 수정{% endif %} - {{ '인사카드' if page_mode == 'hr_card' else '프로필' }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
@@ -39,7 +39,7 @@
 {% from 'macros/_navigation.html' import section_nav %}
 <div class="form-page-layout-with-sidebar">
     {# 좌측: 섹션 네비게이션 #}
-    {% if is_corporate %}
+    {% if page_mode == 'hr_card' %}
         {{ section_nav('인사정보 ' ~ ('등록' if is_create_mode else '수정'), profile_name, variant='form', employee=profile_data, is_employee_role=is_employee_role) }}
     {% else %}
         {{ section_nav('프로필 수정', profile_name, variant='profile') }}
@@ -49,10 +49,8 @@
     <main class="form-main-content">
         {# 페이지 헤더 #}
         <div class="form-page-header">
-            {% if is_corporate %}
-                {% if is_employee_role %}
-                <h1 class="form-page-title">내 정보 수정</h1>
-                {% elif is_create_mode %}
+            {% if page_mode == 'hr_card' %}
+                {% if is_create_mode %}
                 <h1 class="form-page-title">신규 직원 등록</h1>
                 {% else %}
                 <h1 class="form-page-title">직원 정보 수정</h1>
@@ -103,49 +101,13 @@
             {# 섹션 1: 개인 기본정보 #}
             {% include 'partials/employee_form/_personal_info.html' %}
 
-            {# 법인 전용 섹션 #}
-            {% if is_corporate and account_type != 'corporate_admin' %}
-                {# 섹션 2: 소속정보 - Employee는 읽기전용으로 표시 #}
-                {% if not is_employee_role %}
-                    {% include 'partials/employee_form/_organization_info.html' %}
-                {% else %}
-                    {# Employee용 소속정보 (읽기 전용) #}
-                    <section class="form-section" id="organization-info">
-                        <div class="card">
-                            <div class="card-header">
-                                <h2 class="card-title">
-                                    <i class="fas fa-building"></i>
-                                    소속정보 <span class="badge badge-secondary">읽기 전용</span>
-                                </h2>
-                            </div>
-                            <div class="card-body">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label class="form-label">사번</label>
-                                        <input type="text" class="form-input" value="{{ profile_data.employee_number or '-' }}" readonly disabled>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">부서</label>
-                                        <input type="text" class="form-input" value="{{ profile_data.department or '-' }}" readonly disabled>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">팀</label>
-                                        <input type="text" class="form-input" value="{{ profile_data.team or '-' }}" readonly disabled>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">직급</label>
-                                        <input type="text" class="form-input" value="{{ profile_data.position or '-' }}" readonly disabled>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                {% endif %}
+            {# 인사카드 전용 섹션 #}
+            {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
+                {# 섹션 2: 소속정보 #}
+                {% include 'partials/employee_form/_organization_info.html' %}
 
-                {# 섹션 3: 계약정보 - Employee는 숨김 #}
-                {% if not is_employee_role %}
-                    {% include 'partials/employee_form/_contract_info.html' %}
-                {% endif %}
+                {# 섹션 3: 계약정보 #}
+                {% include 'partials/employee_form/_contract_info.html' %}
             {% endif %}
 
             {# 공통 섹션: 학력정보 #}
@@ -160,8 +122,8 @@
             {# 공통 섹션: 언어능력 #}
             {% include 'partials/employee_form/_language_info.html' %}
 
-            {# 법인 전용: 프로젝트 - Employee는 숨김 #}
-            {% if is_corporate and not is_employee_role and account_type != 'corporate_admin' %}
+            {# 인사카드 전용: 프로젝트 #}
+            {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
                 {% include 'partials/employee_form/_project_info.html' %}
             {% endif %}
 
@@ -176,18 +138,18 @@
                 {% include 'partials/employee_form/_family_info.html' %}
             {% endif %}
 
-            {# 법인 전용: 급여정보 - Employee는 숨김 #}
-            {% if is_corporate and not is_employee_role and account_type != 'corporate_admin' %}
+            {# 인사카드 전용: 급여정보 #}
+            {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
                 {% include 'partials/employee_form/_salary_info.html' %}
             {% endif %}
 
-            {# 법인 전용: 복리후생 - 읽기 전용 (Employee도 볼 수 있음) #}
-            {% if is_corporate and account_type != 'corporate_admin' %}
+            {# 인사카드 전용: 복리후생 #}
+            {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
                 {% include 'partials/employee_form/_benefit_info.html' %}
             {% endif %}
 
-            {# 법인 전용: 4대보험 - Employee는 숨김 #}
-            {% if is_corporate and not is_employee_role and account_type != 'corporate_admin' %}
+            {# 인사카드 전용: 4대보험 #}
+            {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
                 {% include 'partials/employee_form/_insurance_info.html' %}
             {% endif %}
 
@@ -218,8 +180,8 @@
         </form>
     </main>
 
-    {# 우측 사이드바 (법인 관리자용) #}
-    {% if is_corporate and not is_employee_role and account_type != 'corporate_admin' %}
+    {# 우측 사이드바 (인사카드 수정 시) #}
+    {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
         {% include 'partials/_attachment_sidebar.html' %}
     {% endif %}
 </div>

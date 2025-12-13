@@ -17,13 +17,13 @@
 {% set profile_data = employee if employee is defined else profile %}
 {% set profile_name = profile_data.name if profile_data else '프로필' %}
 
-{% block title %}{{ profile_name }} - {{ '인사카드' if is_corporate else '프로필' }}{% endblock %}
+{% block title %}{{ profile_name }} - {{ '인사카드' if page_mode == 'hr_card' else '프로필' }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/right-sidebar.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/employee-header.css') }}">
-{% if is_corporate %}
+{% if page_mode == 'hr_card' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/business-card.css') }}">
 {% endif %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/cards.css') }}">
@@ -37,7 +37,7 @@
 {# 계정 타입에 따른 body 클래스 #}
 <div class="detail-page-layout" data-account-type="{{ account_type }}">
     {# 좌측 섹션 네비게이션 #}
-    {% if is_corporate %}
+    {% if page_mode == 'hr_card' %}
         {{ section_nav('인사카드', profile_name, variant='full', employee=profile_data) }}
     {% else %}
         {{ section_nav('프로필', profile_name, variant='profile') }}
@@ -47,19 +47,15 @@
     <div class="detail-main-content">
         {# 페이지 헤더 #}
         <div class="detail-page-header">
-            {% if is_corporate %}
-                {% if current_user and current_user.role == 'employee' %}
-                <h1 class="detail-page-title">내 인사카드</h1>
-                {% else %}
+            {% if page_mode == 'hr_card' %}
                 <h1 class="detail-page-title">직원 상세 정보</h1>
-                {% endif %}
             {% else %}
                 <h1 class="detail-page-title">내 프로필</h1>
             {% endif %}
 
             <div class="detail-page-actions">
-                {# 목록으로 버튼 (법인 관리자만) #}
-                {% if is_corporate and current_user and current_user.role != 'employee' %}
+                {# 목록으로 버튼 (인사카드 페이지에서 관리자만) #}
+                {% if page_mode == 'hr_card' and current_user and current_user.role != 'employee' %}
                 <a href="{{ url_for('employees.employee_list') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                     <span>목록으로</span>
@@ -72,8 +68,8 @@
                     <span>수정</span>
                 </a>
 
-                {# 삭제 버튼 (법인 관리자만) #}
-                {% if is_corporate and current_user and current_user.is_admin and account_type != 'corporate_admin' %}
+                {# 삭제 버튼 (인사카드 페이지에서 관리자만) #}
+                {% if page_mode == 'hr_card' and current_user and current_user.is_admin and account_type != 'corporate_admin' %}
                 <button class="btn btn-danger" onclick="deleteEmployee({{ profile_data.id }}, '{{ profile_name }}')">
                     <i class="fas fa-trash"></i>
                     <span>삭제</span>
@@ -92,8 +88,8 @@
         {# 섹션 7-11: 이력 및 경력 (학력, 경력, 자격증, 언어능력, 병역/프로젝트/수상) #}
         {% include 'partials/employee_detail/_history_info.html' %}
 
-        {# 섹션 12-14: 인사기록 (법인 전용) #}
-        {% if is_corporate and account_type != 'corporate_admin' %}
+        {# 섹션 12-14: 인사기록 (인사카드 페이지 전용) #}
+        {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
             {% include 'partials/employee_detail/_hr_records.html' %}
         {% endif %}
     </div>
@@ -107,21 +103,21 @@
 {# 모바일 오버레이 #}
 <div class="section-nav-overlay" id="sectionNavOverlay"></div>
 
-{# 명함 업로드 모달 (법인 전용) #}
-{% if is_corporate and can_edit_business_card %}
+{# 명함 업로드 모달 (인사카드 페이지 전용) #}
+{% if page_mode == 'hr_card' and can_edit_business_card %}
 {% include 'partials/_business_card_modal.html' %}
 {% endif %}
 {% endblock %}
 
 {% block sidebar_right %}
-{% if is_corporate %}
+{% if page_mode == 'hr_card' %}
 {% include 'partials/_attachment_sidebar.html' %}
 {% endif %}
 {% endblock %}
 
 {% block extra_js %}
 <script type="module" src="{{ url_for('static', filename='js/pages/employee-detail.js') }}"></script>
-{% if is_corporate %}
+{% if page_mode == 'hr_card' %}
 <script src="{{ url_for('static', filename='js/components/business-card.js') }}"></script>
 {% endif %}
 {% endblock %}

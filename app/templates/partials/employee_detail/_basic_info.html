@@ -41,20 +41,18 @@
                 {{ info_item('주민등록상 주소', employee.address) }}
                 {{ info_item('상세주소', employee.detailed_address) }}
             </div>
-            {# 실제 거주 주소 (주민등록상 주소와 다른 경우) #}
-            {% if employee.actual_address %}
+            {# 실제 거주 주소 (항상 표시) #}
             <div class="mt-4">
                 <h5 class="info-subsection-title">실제 거주 주소</h5>
                 {{ info_item('실제 거주지', employee.actual_address) }}
                 {{ info_item('상세주소', employee.actual_detailed_address) }}
             </div>
-            {% endif %}
         </div>
     </div>
 </section>
 
-{# 섹션 2: 소속정보 (법인 전용) #}
-{% if is_corporate %}
+{# 섹션 2: 소속정보 (인사카드 전용) #}
+{% if page_mode == 'hr_card' %}
 <section id="organization-info" class="content-section">
     {{ section_title('소속정보') }}
     <div class="card">
@@ -87,8 +85,8 @@
 </section>
 {% endif %}
 
-{# 섹션 3: 계약정보 (법인 전용) #}
-{% if is_corporate %}
+{# 섹션 3: 계약정보 (인사카드 전용) #}
+{% if page_mode == 'hr_card' %}
 <section id="contract-info" class="content-section">
     {{ section_title('계약정보') }}
     <div class="card">
@@ -112,8 +110,8 @@
 </section>
 {% endif %}
 
-{# 섹션 4: 급여정보 (법인 전용) #}
-{% if is_corporate %}
+{# 섹션 4: 급여정보 (인사카드 전용) #}
+{% if page_mode == 'hr_card' %}
 <section id="salary-info" class="content-section">
     {{ section_title('급여정보') }}
     <div class="card">
@@ -135,8 +133,8 @@
 </section>
 {% endif %}
 
-{# 섹션 5: 연차 및 복리후생 (법인 전용) #}
-{% if is_corporate %}
+{# 섹션 5: 연차 및 복리후생 (인사카드 전용) #}
+{% if page_mode == 'hr_card' %}
 <section id="benefit-info" class="content-section">
     {{ section_title('연차 및 복리후생') }}
     <div class="card">
@@ -159,8 +157,8 @@
 </section>
 {% endif %}
 
-{# 섹션 6: 4대보험 (법인 전용) #}
-{% if is_corporate %}
+{# 섹션 6: 4대보험 (인사카드 전용) #}
+{% if page_mode == 'hr_card' %}
 <section id="insurance-info" class="content-section">
     {{ section_title('4대보험') }}
     <div class="card">

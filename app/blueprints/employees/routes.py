@@ -169,6 +169,7 @@ def register_routes(bp: Blueprint):
                                employee=employee,
                                is_corporate=True,
                                account_type='corporate',
+                               page_mode='hr_card',
                                education_list=education_list,
                                career_list=career_list,
                                certificate_list=certificate_list,

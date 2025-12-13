@@ -279,7 +279,7 @@
 </section>
 
 {# 섹션 13: 유사사업 참여경력 (인사카드 전용) #}
-{% if is_corporate %}
+{% if page_mode == 'hr_card' %}
 <section id="project-info" class="content-section">
     {{ section_title('유사사업 참여경력') }}
     <div class="card">
