@@ -15,5 +15,15 @@ body {
     background-color: var(--color-gray-25);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+/* 앱 내부 페이지 (대시보드, 직원관리 등) - 자체 스크롤 영역 사용 */
+body:not(.public-page) {
     overflow: hidden;
+}
+
+/* 공개 페이지 (랜딩, 로그인, 회원가입 등) - 전체 페이지 스크롤 허용 */
+body.public-page {
+    overflow-y: auto;
+    overflow-x: hidden;
 }
