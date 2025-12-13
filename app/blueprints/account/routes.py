@@ -14,8 +14,10 @@ from ...extensions import user_repo, employee_repo
 @login_required
 def settings():
     """계정 설정 메인 페이지"""
+    from app.models import User
+
     user_id = session.get('user_id')
-    user = user_repo.get_by_id(user_id)
+    user = User.query.get(user_id)
 
     if not user:
         flash('사용자 정보를 찾을 수 없습니다.', 'error')
@@ -75,8 +77,10 @@ def password():
 @login_required
 def privacy():
     """개인정보 공개 설정"""
+    from app.models import User
+
     user_id = session.get('user_id')
-    user = user_repo.get_by_id(user_id)
+    user = User.query.get(user_id)
 
     if not user:
         flash('사용자 정보를 찾을 수 없습니다.', 'error')
@@ -111,8 +115,10 @@ def privacy():
 @login_required
 def delete():
     """계정 탈퇴"""
+    from app.models import User
+
     user_id = session.get('user_id')
-    user = user_repo.get_by_id(user_id)
+    user = User.query.get(user_id)
 
     if not user:
         flash('사용자 정보를 찾을 수 없습니다.', 'error')
