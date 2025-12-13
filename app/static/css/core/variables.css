@@ -132,4 +132,30 @@
     --color-text-muted: var(--color-gray-500);
     --color-bg-page: var(--color-gray-50);
     --color-bg-card: var(--color-pure-white);
+
+    /* Semantic Colors - Background (Extended) */
+    --color-bg-primary: var(--color-pure-white);
+    --color-bg-secondary: var(--color-gray-50);
+    --color-bg-tertiary: var(--color-gray-100);
+    --color-border: var(--color-gray-200);
+
+    /* Semantic Colors - Text (Extended) */
+    --color-text-tertiary: var(--color-gray-400);
+
+    /* Semantic Colors - Primary */
+    --color-primary: var(--color-blue-600);
+    --color-primary-bg: var(--color-blue-50);
+
+    /* Semantic Colors - Danger */
+    --color-danger: var(--color-error-500);
+    --color-danger-dark: var(--color-error-600);
+    --color-danger-bg: var(--color-error-50);
+
+    /* Spacing Aliases (for template compatibility) */
+    --spacing-xs: var(--space-1);
+    --spacing-sm: var(--space-2);
+    --spacing-md: var(--space-4);
+    --spacing-lg: var(--space-6);
+    --spacing-xl: var(--space-8);
+    --spacing-xxl: var(--space-12);
 }
