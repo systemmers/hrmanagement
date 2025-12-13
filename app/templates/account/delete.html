@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}계정 탈퇴 - 인사카드 관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-section">
+        <h2 class="page-title text-danger">
+            <i class="fas fa-user-times"></i>
+            계정 탈퇴
+        </h2>
+        <p class="page-subtitle">계정을 탈퇴하고 모든 데이터를 삭제합니다</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('account.settings') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            계정 설정으로
+        </a>
+    </div>
+</div>
+
+<div class="content-card max-w-500">
+    <div class="delete-warning">
+        <div class="delete-warning-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="delete-warning-content">
+            <h4>계정 탈퇴 전 확인해주세요</h4>
+            <ul>
+                <li>탈퇴 시 모든 개인 정보가 삭제됩니다.</li>
+                <li>진행 중인 계약 및 요청이 자동 취소됩니다.</li>
+                <li>탈퇴 후 동일한 이메일로 재가입이 가능합니다.</li>
+                <li>법적 의무에 따라 일부 데이터는 일정 기간 보관될 수 있습니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <form method="POST" class="delete-form" aria-label="계정 탈퇴 폼">
+        <div class="form-group">
+            <label for="password" class="form-label">
+                <i class="fas fa-lock" aria-hidden="true"></i>
+                비밀번호 확인
+            </label>
+            <input type="password"
+                   id="password"
+                   name="password"
+                   class="form-input"
+                   placeholder="현재 비밀번호를 입력하세요"
+                   required
+                   aria-required="true">
+        </div>
+
+        <div class="form-group">
+            <label for="confirm_text" class="form-label">
+                <i class="fas fa-keyboard" aria-hidden="true"></i>
+                확인 텍스트
+            </label>
+            <input type="text"
+                   id="confirm_text"
+                   name="confirm_text"
+                   class="form-input"
+                   placeholder="계정 탈퇴"
+                   required
+                   aria-required="true"
+                   aria-describedby="confirm_text_hint">
+            <span id="confirm_text_hint" class="form-hint">위 입력란에 <strong>"계정 탈퇴"</strong>를 정확히 입력해주세요.</span>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('account.settings') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                취소
+            </a>
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-user-times"></i>
+                계정 탈퇴
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+.text-danger {
+    color: var(--color-danger);
+}
+
+.delete-warning {
+    display: flex;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    background: var(--color-danger-bg);
+    border: 1px solid var(--color-danger);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.delete-warning-icon {
+    font-size: 2rem;
+    color: var(--color-danger);
+}
+
+.delete-warning-content h4 {
+    color: var(--color-danger);
+    margin-bottom: var(--spacing-sm);
+}
+
+.delete-warning-content ul {
+    margin: 0;
+    padding-left: var(--spacing-lg);
+    color: var(--color-text-primary);
+}
+
+.delete-warning-content li {
+    margin-bottom: var(--spacing-xs);
+}
+
+.delete-form {
+    margin-top: var(--spacing-lg);
+}
+
+.btn-danger {
+    background: var(--color-danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: var(--color-danger-dark);
+}
+</style>
+{% endblock %}

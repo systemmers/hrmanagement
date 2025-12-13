@@ -25,6 +25,16 @@
     </a>
 </div>
 
+<!-- 회사 인사카드 섹션 (개인) - Phase 3 신규 -->
+<div class="nav-section">
+    <h2 class="nav-section-title">회사 인사카드</h2>
+    <a href="{{ url_for('personal.company_card_list') }}"
+       class="nav-item {% if 'company_card' in (request.endpoint or '') %}active{% endif %}">
+        <i class="fas fa-building"></i>
+        <span>인사카드 목록</span>
+    </a>
+</div>
+
 <!-- 계약 관리 섹션 (개인) -->
 <div class="nav-section">
     <h2 class="nav-section-title">계약 관리</h2>
@@ -40,23 +50,33 @@
     </a>
 </div>
 
+<!-- 계정 관리 섹션 (개인) - Phase 3 신규 -->
+<div class="nav-section">
+    <h2 class="nav-section-title">계정 관리</h2>
+    <a href="{{ url_for('account.settings') }}"
+       class="nav-item {% if request.endpoint == 'account.settings' %}active{% endif %}">
+        <i class="fas fa-cog"></i>
+        <span>계정 설정</span>
+    </a>
+    <a href="{{ url_for('account.privacy') }}"
+       class="nav-item {% if request.endpoint == 'account.privacy' %}active{% endif %}">
+        <i class="fas fa-user-shield"></i>
+        <span>공개 설정</span>
+    </a>
+</div>
+
 {# ========================================
    법인 직원 (Employee Sub) 메뉴
    ======================================== #}
 {% elif current_user and current_user.role == 'employee' and current_user.employee_id %}
 
-<!-- 내 정보 섹션 -->
+<!-- 내 정보 섹션 (통합) -->
 <div class="nav-section">
     <h2 class="nav-section-title">내 정보</h2>
-    <a href="{{ url_for('employees.employee_detail', employee_id=current_user.employee_id, view='basic') }}"
-       class="nav-item {% if request.endpoint == 'employees.employee_detail' and request.args.get('view') == 'basic' %}active{% endif %}">
-        <i class="fas fa-id-card"></i>
-        <span>기본정보</span>
-    </a>
-    <a href="{{ url_for('employees.employee_detail', employee_id=current_user.employee_id, view='history') }}"
-       class="nav-item {% if request.endpoint == 'employees.employee_detail' and request.args.get('view') == 'history' %}active{% endif %}">
-        <i class="fas fa-history"></i>
-        <span>이력정보</span>
+    <a href="{{ url_for('employees.employee_detail', employee_id=current_user.employee_id) }}"
+       class="nav-item {% if request.endpoint == 'employees.employee_detail' %}active{% endif %}">
+        <i class="fas fa-user"></i>
+        <span>프로필</span>
     </a>
 </div>
 
@@ -70,13 +90,18 @@
     </a>
 </div>
 
-<!-- 계정관리 섹션 -->
+<!-- 계정관리 섹션 (확장) -->
 <div class="nav-section">
-    <h2 class="nav-section-title">계정관리</h2>
-    <a href="{{ url_for('auth.change_password') }}"
-       class="nav-item {% if request.endpoint == 'auth.change_password' %}active{% endif %}">
-        <i class="fas fa-key"></i>
-        <span>계정정보</span>
+    <h2 class="nav-section-title">계정 관리</h2>
+    <a href="{{ url_for('account.settings') }}"
+       class="nav-item {% if request.endpoint == 'account.settings' %}active{% endif %}">
+        <i class="fas fa-cog"></i>
+        <span>계정 설정</span>
+    </a>
+    <a href="{{ url_for('account.privacy') }}"
+       class="nav-item {% if request.endpoint == 'account.privacy' %}active{% endif %}">
+        <i class="fas fa-user-shield"></i>
+        <span>공개 설정</span>
     </a>
 </div>
 

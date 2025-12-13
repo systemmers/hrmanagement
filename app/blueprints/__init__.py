@@ -22,6 +22,7 @@ def register_blueprints(app):
     from .audit import audit_bp  # Phase 4: 감사 로그
     from .notifications import notifications_bp  # Phase 5: 알림 시스템
     from .profile import profile_bp  # 통합 프로필 (법인/개인 인터페이스 통합)
+    from .account import account_bp  # 계정 관리 (설정, 비밀번호, 공개설정, 탈퇴)
 
     # 인증 관련 (/auth/*)
     app.register_blueprint(auth_bp)
@@ -49,6 +50,9 @@ def register_blueprints(app):
 
     # 통합 프로필 (/profile/*) - 법인/개인 인터페이스 통합
     app.register_blueprint(profile_bp)
+
+    # 계정 관리 (/account/*) - 설정, 비밀번호, 공개설정, 탈퇴
+    app.register_blueprint(account_bp)
 
     # 마이페이지 - 일반 직원용 (/my/*)
     app.register_blueprint(mypage_bp)

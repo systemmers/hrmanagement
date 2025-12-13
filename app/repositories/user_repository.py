@@ -130,3 +130,25 @@ class UserRepository(BaseRepository):
             'managers': managers,
             'employees': employees,
         }
+
+    def get_privacy_settings(self, user_id: int) -> Optional[Dict]:
+        """개인정보 공개 설정 조회"""
+        user = User.query.get(user_id)
+        if user:
+            return user.privacy_settings or {
+                'show_email': True,
+                'show_phone': False,
+                'show_address': False,
+                'show_birth_date': False,
+                'show_profile_photo': True,
+            }
+        return None
+
+    def update_privacy_settings(self, user_id: int, settings: Dict) -> bool:
+        """개인정보 공개 설정 업데이트"""
+        user = User.query.get(user_id)
+        if user:
+            user.privacy_settings = settings
+            db.session.commit()
+            return True
+        return False

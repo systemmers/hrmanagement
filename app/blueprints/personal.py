@@ -387,3 +387,49 @@ def military_save():
     data = request.get_json()
     military = personal_service.save_military(profile.id, data)
     return jsonify({'success': True, 'military': military})
+
+
+# ============================================================
+# 회사 인사카드 (Phase 2: 개인 계정용)
+# ============================================================
+
+@personal_bp.route('/company-cards')
+@personal_login_required
+def company_card_list():
+    """계약된 회사 인사카드 목록
+
+    개인 계정이 계약한 법인들의 인사카드 목록을 표시합니다.
+    """
+    user_id = session.get('user_id')
+
+    # 승인된 계약 목록 조회
+    contracts = personal_service.get_approved_contracts(user_id)
+
+    return render_template('personal/company_card_list.html',
+                           contracts=contracts)
+
+
+@personal_bp.route('/company-cards/<int:contract_id>')
+@personal_login_required
+def company_card_detail(contract_id):
+    """특정 회사 인사카드 상세
+
+    개인 계정의 특정 법인 계약에 대한 인사카드 상세 정보를 표시합니다.
+    """
+    user_id = session.get('user_id')
+
+    # 계약 정보 및 회사 인사카드 데이터 조회
+    card_data = personal_service.get_company_card_data(user_id, contract_id)
+
+    if not card_data:
+        flash('인사카드 정보를 찾을 수 없습니다.', 'error')
+        return redirect(url_for('personal.company_card_list'))
+
+    return render_template('personal/company_card_detail.html',
+                           contract=card_data['contract'],
+                           company=card_data['company'],
+                           employee=card_data.get('employee'),
+                           salary=card_data.get('salary'),
+                           benefit=card_data.get('benefit'),
+                           insurance=card_data.get('insurance'),
+                           contract_info=card_data.get('contract_info'))

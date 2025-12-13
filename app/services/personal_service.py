@@ -233,6 +233,90 @@ class PersonalService:
         military = self.military_repo.save(profile_id, data)
         return military.to_dict()
 
+    # ========================================
+    # 회사 인사카드 (Phase 2)
+    # ========================================
+
+    def get_approved_contracts(self, user_id: int) -> List[Dict]:
+        """승인된 계약 목록 조회
+
+        개인 계정이 계약한 법인들의 목록을 반환합니다.
+        """
+        from app.models.person_contract import PersonCorporateContract
+        from app.models.company import Company
+
+        contracts = PersonCorporateContract.query.filter_by(
+            person_user_id=user_id,
+            status='approved'
+        ).all()
+
+        result = []
+        for contract in contracts:
+            company = Company.query.get(contract.company_id)
+            if company:
+                result.append({
+                    'id': contract.id,
+                    'company_id': contract.company_id,
+                    'company_name': company.name,
+                    'company_logo': getattr(company, 'logo_url', None),
+                    'position': contract.position,
+                    'department': contract.department,
+                    'contract_start_date': contract.contract_start_date,
+                    'contract_end_date': contract.contract_end_date,
+                    'approved_at': contract.approved_at,
+                })
+
+        return result
+
+    def get_company_card_data(self, user_id: int, contract_id: int) -> Optional[Dict]:
+        """회사 인사카드 데이터 조회
+
+        특정 계약에 대한 회사 인사카드 정보를 반환합니다.
+        """
+        from app.models.person_contract import PersonCorporateContract
+        from app.models.company import Company
+
+        # 계약 정보 조회 및 권한 확인
+        contract = PersonCorporateContract.query.filter_by(
+            id=contract_id,
+            person_user_id=user_id,
+            status='approved'
+        ).first()
+
+        if not contract:
+            return None
+
+        # 회사 정보 조회
+        company = Company.query.get(contract.company_id)
+        if not company:
+            return None
+
+        # 인사카드 데이터 구성
+        return {
+            'contract': {
+                'id': contract.id,
+                'position': contract.position,
+                'department': contract.department,
+                'employee_number': contract.employee_number,
+                'contract_type': contract.contract_type,
+                'contract_start_date': contract.contract_start_date,
+                'contract_end_date': contract.contract_end_date,
+                'approved_at': contract.approved_at,
+            },
+            'company': {
+                'id': company.id,
+                'name': company.name,
+                'business_number': getattr(company, 'business_number', None),
+                'address': getattr(company, 'address', None),
+                'phone': getattr(company, 'phone', None),
+            },
+            'contract_info': {
+                'contract_type': contract.contract_type,
+                'start_date': contract.contract_start_date,
+                'end_date': contract.contract_end_date,
+            }
+        }
+
 
 # 싱글톤 인스턴스
 personal_service = PersonalService()

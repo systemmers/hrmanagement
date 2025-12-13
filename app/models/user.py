@@ -43,6 +43,8 @@ class User(db.Model):
         db.ForeignKey('users.id'),
         nullable=True
     )
+    # 개인정보 공개 설정 (JSON)
+    privacy_settings = db.Column(db.JSON, nullable=True, default=dict)
 
     # Relationships
     employee = db.relationship('Employee', backref=db.backref('user', uselist=False))
@@ -164,6 +166,7 @@ class User(db.Model):
             'account_type_label': self.get_account_type_label(),
             'company_id': self.company_id,
             'parent_user_id': self.parent_user_id,
+            'privacy_settings': self.privacy_settings or {},
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'last_login': self.last_login.isoformat() if self.last_login else None,
         }

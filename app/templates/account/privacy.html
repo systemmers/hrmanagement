@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}개인정보 공개 설정 - 인사카드 관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-section">
+        <h2 class="page-title">
+            <i class="fas fa-user-shield"></i>
+            개인정보 공개 설정
+        </h2>
+        <p class="page-subtitle">다른 사용자에게 공개할 정보를 설정합니다</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('account.settings') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            계정 설정으로
+        </a>
+    </div>
+</div>
+
+<div class="content-card max-w-600">
+    <form method="POST" aria-label="개인정보 공개 설정 폼">
+        <div class="privacy-section">
+            <h4 class="privacy-section-title">
+                <i class="fas fa-address-card"></i>
+                기본 정보 공개
+            </h4>
+            <p class="privacy-section-desc">다른 사용자가 회원님의 프로필에서 볼 수 있는 정보를 설정합니다.</p>
+
+            <div class="privacy-options">
+                <label class="privacy-option">
+                    <input type="checkbox"
+                           name="show_email"
+                           {% if privacy_settings.get('show_email', True) %}checked{% endif %}>
+                    <span class="privacy-option-content">
+                        <span class="privacy-option-title">
+                            <i class="fas fa-envelope"></i>
+                            이메일 주소
+                        </span>
+                        <span class="privacy-option-desc">이메일 주소를 공개합니다</span>
+                    </span>
+                </label>
+
+                <label class="privacy-option">
+                    <input type="checkbox"
+                           name="show_phone"
+                           {% if privacy_settings.get('show_phone', False) %}checked{% endif %}>
+                    <span class="privacy-option-content">
+                        <span class="privacy-option-title">
+                            <i class="fas fa-phone"></i>
+                            전화번호
+                        </span>
+                        <span class="privacy-option-desc">전화번호를 공개합니다</span>
+                    </span>
+                </label>
+
+                <label class="privacy-option">
+                    <input type="checkbox"
+                           name="show_address"
+                           {% if privacy_settings.get('show_address', False) %}checked{% endif %}>
+                    <span class="privacy-option-content">
+                        <span class="privacy-option-title">
+                            <i class="fas fa-map-marker-alt"></i>
+                            주소
+                        </span>
+                        <span class="privacy-option-desc">주소 정보를 공개합니다</span>
+                    </span>
+                </label>
+
+                <label class="privacy-option">
+                    <input type="checkbox"
+                           name="show_birth_date"
+                           {% if privacy_settings.get('show_birth_date', False) %}checked{% endif %}>
+                    <span class="privacy-option-content">
+                        <span class="privacy-option-title">
+                            <i class="fas fa-birthday-cake"></i>
+                            생년월일
+                        </span>
+                        <span class="privacy-option-desc">생년월일을 공개합니다</span>
+                    </span>
+                </label>
+
+                <label class="privacy-option">
+                    <input type="checkbox"
+                           name="show_profile_photo"
+                           {% if privacy_settings.get('show_profile_photo', True) %}checked{% endif %}>
+                    <span class="privacy-option-content">
+                        <span class="privacy-option-title">
+                            <i class="fas fa-image"></i>
+                            프로필 사진
+                        </span>
+                        <span class="privacy-option-desc">프로필 사진을 공개합니다</span>
+                    </span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('account.settings') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                취소
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                설정 저장
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+.privacy-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.privacy-section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+}
+
+.privacy-section-desc {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.privacy-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.privacy-option {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.privacy-option:hover {
+    background: var(--color-bg-tertiary);
+}
+
+.privacy-option input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.privacy-option-content {
+    flex: 1;
+}
+
+.privacy-option-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.privacy-option-title i {
+    color: var(--color-primary);
+    width: 16px;
+}
+
+.privacy-option-desc {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+}
+</style>
+{% endblock %}

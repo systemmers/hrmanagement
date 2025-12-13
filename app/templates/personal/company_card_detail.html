@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% from 'macros/_navigation.html' import section_nav %}
+{% from 'macros/_info_display.html' import info_item, card_header, section_title %}
+
+{% block title %}{{ company.name }} 인사카드 - 인사카드 관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-section">
+        <h2 class="page-title">
+            <i class="fas fa-building"></i>
+            {{ company.name }}
+        </h2>
+        <p class="page-subtitle">회사 인사카드 정보</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('personal.company_card_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            목록으로
+        </a>
+    </div>
+</div>
+
+<div class="profile-layout">
+    {{ section_nav('회사 인사카드', company.name, variant='company') }}
+
+    <div class="profile-content">
+        <section id="organization-info" class="content-section">
+            {{ section_title('소속정보') }}
+            <div class="card">
+                {{ card_header('소속정보', 'fas fa-building') }}
+                <div class="card-body">
+                    <div class="info-grid">
+                        {{ info_item('회사명', company.name, highlight=true) }}
+                        {{ info_item('부서', contract.department) }}
+                        {{ info_item('직급/직위', contract.position) }}
+                        {{ info_item('사원번호', contract.employee_number) }}
+                        {{ info_item('사업자번호', company.business_number) }}
+                        {{ info_item('회사주소', company.address) }}
+                        {{ info_item('회사전화', company.phone) }}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contract-info" class="content-section">
+            {{ section_title('계약정보') }}
+            <div class="card">
+                {{ card_header('계약정보', 'fas fa-file-contract') }}
+                <div class="card-body">
+                    <div class="info-grid">
+                        {{ info_item('계약유형', contract_info.contract_type) }}
+                        {{ info_item('계약시작일', contract_info.start_date) }}
+                        {{ info_item('계약종료일', contract_info.end_date or '무기한') }}
+                        {{ info_item('계약승인일', contract.approved_at) }}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {% if salary %}
+        <section id="salary-info" class="content-section">
+            {{ section_title('급여정보') }}
+            <div class="card">
+                {{ card_header('급여정보', 'fas fa-won-sign') }}
+                <div class="card-body">
+                    <div class="info-grid">
+                        {{ info_item('급여형태', salary.salary_type) }}
+                        {{ info_item('기본급', ('{:,}'.format(salary.base_salary) ~ '원') if salary.base_salary else none) }}
+                        {{ info_item('급여지급일', ('매월 ' ~ salary.payment_day ~ '일') if salary.payment_day else none) }}
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        {% if benefit %}
+        <section id="benefit-info" class="content-section">
+            {{ section_title('연차 및 복리후생') }}
+            <div class="card">
+                {{ card_header('연차 및 복리후생', 'fas fa-umbrella-beach') }}
+                <div class="card-body">
+                    <div class="info-grid">
+                        {{ info_item('연차 발생일수', (benefit.annual_leave_granted|string ~ '일') if benefit.annual_leave_granted else none) }}
+                        {{ info_item('연차 사용일수', (benefit.annual_leave_used|string ~ '일') if benefit.annual_leave_used else none) }}
+                        {{ info_item('연차 잔여일수', (benefit.annual_leave_remaining|string ~ '일') if benefit.annual_leave_remaining else none, highlight=true) }}
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        {% if insurance %}
+        <section id="insurance-info" class="content-section">
+            {{ section_title('4대보험') }}
+            <div class="card">
+                {{ card_header('4대보험', 'fas fa-shield-alt') }}
+                <div class="card-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">국민연금</div>
+                            <div class="info-value">
+                                {% if insurance.national_pension %}<span class="badge badge-success">가입</span>{% else %}<span class="badge badge-secondary">미가입</span>{% endif %}
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">건강보험</div>
+                            <div class="info-value">
+                                {% if insurance.health_insurance %}<span class="badge badge-success">가입</span>{% else %}<span class="badge badge-secondary">미가입</span>{% endif %}
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">고용보험</div>
+                            <div class="info-value">
+                                {% if insurance.employment_insurance %}<span class="badge badge-success">가입</span>{% else %}<span class="badge badge-secondary">미가입</span>{% endif %}
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">산재보험</div>
+                            <div class="info-value">
+                                {% if insurance.industrial_accident %}<span class="badge badge-success">가입</span>{% else %}<span class="badge badge-secondary">미가입</span>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <section id="employment-contract" class="content-section">
+            {{ section_title('근로계약 및 연봉') }}
+            <div class="card">
+                {{ card_header('근로계약 이력', 'fas fa-file-signature') }}
+                <div class="card-body">
+                    <p class="text-muted">근로계약 이력이 없습니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="personnel-movement" class="content-section">
+            {{ section_title('인사이동 및 고과') }}
+            <div class="card">
+                {{ card_header('인사이동 이력', 'fas fa-arrow-up') }}
+                <div class="card-body">
+                    <p class="text-muted">인사이동 이력이 없습니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="attendance-assets" class="content-section">
+            {{ section_title('근태 및 비품') }}
+            <div class="card">
+                {{ card_header('근태 현황', 'fas fa-calendar-check') }}
+                <div class="card-body">
+                    <p class="text-muted">근태 정보가 없습니다.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
