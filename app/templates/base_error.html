@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}오류 - 인사카드 관리 시스템{% endblock %}</title>
+
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Core CSS Only (사이드바/헤더 레이아웃 제외) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/core/variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/core/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/core/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/buttons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/core/utilities.css') }}">
+
+    <style>
+        /* 에러 페이지 전용 스타일 */
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--color-gray-50);
+        }
+
+        .error-header {
+            background: var(--color-white);
+            border-bottom: 1px solid var(--color-gray-200);
+            padding: var(--space-4) var(--space-6);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .error-header-logo {
+            width: 36px;
+            height: 36px;
+            background: var(--color-primary);
+            color: var(--color-white);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: var(--text-sm);
+        }
+
+        .error-header-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--color-gray-900);
+        }
+
+        .error-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-8);
+        }
+
+        .error-content {
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .error-code {
+            font-size: 120px;
+            font-weight: 700;
+            color: var(--color-gray-200);
+            line-height: 1;
+            margin-bottom: var(--space-4);
+        }
+
+        .error-title {
+            font-size: var(--text-2xl);
+            font-weight: 600;
+            color: var(--color-gray-900);
+            margin-bottom: var(--space-3);
+        }
+
+        .error-message {
+            font-size: var(--text-base);
+            color: var(--color-gray-600);
+            margin-bottom: var(--space-8);
+            line-height: 1.6;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: var(--space-3);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .error-footer {
+            background: var(--color-white);
+            border-top: 1px solid var(--color-gray-200);
+            padding: var(--space-4) var(--space-6);
+            text-align: center;
+            color: var(--color-gray-500);
+            font-size: var(--text-sm);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- 단순화된 헤더 (사이드바 없음) -->
+    <header class="error-header">
+        <div class="error-header-logo">HR</div>
+        <span class="error-header-title">인사카드 관리 시스템</span>
+    </header>
+
+    <!-- 에러 콘텐츠 -->
+    <div class="error-container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- 단순화된 푸터 -->
+    <footer class="error-footer">
+        &copy; 2024 인사카드 관리 시스템
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

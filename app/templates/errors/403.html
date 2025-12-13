@@ -1,107 +1,25 @@
-{% extends "base.html" %}
+{% extends "base_error.html" %}
 
-{% block title %}접근 권한 없음 - 인사카드 관리 시스템{% endblock %}
+{% block title %}403 - 접근 권한 없음{% endblock %}
 
 {% block content %}
-<div class="error-page">
-    <div class="error-content">
-        <div class="error-icon">
-            <i class="fas fa-lock"></i>
-        </div>
-        <h1 class="error-code">403</h1>
-        <h2 class="error-title">접근 권한이 없습니다</h2>
-        <p class="error-message">
-            요청하신 페이지에 대한 접근 권한이 없습니다.<br>
-            필요한 권한이 있다고 생각되시면 관리자에게 문의해주세요.
-        </p>
-        <div class="error-actions">
-            <a href="{{ url_for('main.index') }}" class="btn btn-primary">
-                <i class="fas fa-home"></i>
-                대시보드로 이동
-            </a>
-            <a href="javascript:history.back()" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i>
-                이전 페이지
-            </a>
-        </div>
+<div class="error-content">
+    <div class="error-code" style="color: var(--color-error-500);">
+        <i class="fas fa-lock" style="font-size: 64px; display: block; margin-bottom: var(--space-4);"></i>
+        403
+    </div>
+    <div class="error-title">접근 권한이 없습니다</div>
+    <div class="error-message">
+        요청하신 페이지에 대한 접근 권한이 없습니다.<br>
+        필요한 권한이 있다고 생각되시면 관리자에게 문의해주세요.
+    </div>
+    <div class="error-actions">
+        <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+            <i class="fas fa-home"></i> 홈으로 돌아가기
+        </a>
+        <a href="javascript:history.back()" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 이전 페이지
+        </a>
     </div>
 </div>
-
-<style>
-.error-page {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 60vh;
-    text-align: center;
-}
-
-.error-content {
-    max-width: 500px;
-    padding: 40px;
-}
-
-.error-icon {
-    font-size: 64px;
-    color: var(--red-500);
-    margin-bottom: 24px;
-}
-
-.error-code {
-    font-size: 72px;
-    font-weight: 700;
-    color: var(--gray-900);
-    margin-bottom: 16px;
-}
-
-.error-title {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--gray-800);
-    margin-bottom: 16px;
-}
-
-.error-message {
-    font-size: 16px;
-    color: var(--gray-600);
-    line-height: 1.6;
-    margin-bottom: 32px;
-}
-
-.error-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-}
-
-.error-actions .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    font-size: 14px;
-    font-weight: 500;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.2s;
-}
-
-.error-actions .btn-primary {
-    background: var(--primary-600);
-    color: white;
-}
-
-.error-actions .btn-primary:hover {
-    background: var(--primary-700);
-}
-
-.error-actions .btn-secondary {
-    background: var(--gray-100);
-    color: var(--gray-700);
-}
-
-.error-actions .btn-secondary:hover {
-    background: var(--gray-200);
-}
-</style>
 {% endblock %}
