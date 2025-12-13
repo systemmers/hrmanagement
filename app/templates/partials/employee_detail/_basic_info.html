@@ -182,3 +182,48 @@
     </div>
 </section>
 {% endif %}
+
+{# 섹션 7: 가족정보 #}
+<section id="family-info" class="content-section">
+    {{ section_title('가족정보') }}
+    <div class="card">
+        {{ card_header('가족정보', 'fas fa-users') }}
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>관계</th>
+                            <th>성명</th>
+                            <th>생년월일</th>
+                            <th>직업</th>
+                            <th>연락처</th>
+                            <th>동거여부</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if family_list %}
+                        {% for family in family_list %}
+                        <tr>
+                            <td>{{ get_relation_label(family.relation) }}</td>
+                            <td>{{ family.name }}</td>
+                            <td>{{ family.birth_date or '-' }}</td>
+                            <td>{{ family.occupation or '-' }}</td>
+                            <td>{{ family.phone or '-' }}</td>
+                            <td>{% if family.living_together %}<span class="badge badge-success">동거</span>{% else %}<span class="badge badge-secondary">별거</span>{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="table-empty">
+                                <i class="fas fa-users"></i>
+                                <p>등록된 가족정보가 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

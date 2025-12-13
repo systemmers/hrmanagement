@@ -97,17 +97,15 @@ def register_routes(bp: Blueprint):
     @bp.route('/employees/<int:employee_id>')
     @login_required
     def employee_detail(employee_id):
-        """직원 상세 정보 (멀티테넌시 적용)"""
+        """직원 상세 정보 (멀티테넌시 적용) - 통합 템플릿 사용"""
         user_role = session.get('user_role')
-        view_type = request.args.get('view', 'full')
 
         # Employee role은 본인 정보만 접근 가능
         if user_role == 'employee':
             my_employee_id = session.get('employee_id')
             if my_employee_id != employee_id:
                 flash('본인 정보만 열람할 수 있습니다.', 'warning')
-                return redirect(url_for('employees.employee_detail',
-                                       employee_id=my_employee_id, view=view_type))
+                return redirect(url_for('employees.employee_detail', employee_id=my_employee_id))
 
         # 관리자/매니저는 자사 소속 직원만 접근 가능
         if user_role in ['admin', 'manager']:
@@ -120,48 +118,8 @@ def register_routes(bp: Blueprint):
             flash('직원을 찾을 수 없습니다.', 'error')
             return redirect(url_for('main.index'))
 
-        # Employee role: view 파라미터에 따라 분기
-        if user_role == 'employee':
-            if view_type == 'basic':
-                return _render_employee_basic_view(employee_id, employee)
-            elif view_type == 'history':
-                return _render_employee_history_view(employee_id, employee)
-            else:
-                return redirect(url_for('employees.employee_detail',
-                                       employee_id=employee_id, view='basic'))
-
-        # 관리자/매니저: 전체 정보 페이지
+        # 모든 role에서 통합 템플릿 사용
         return _render_employee_full_view(employee_id, employee)
-
-    def _render_employee_basic_view(employee_id, employee):
-        """기본정보 페이지 렌더링"""
-        family_list = family_repo.get_by_employee_id(employee_id)
-        attachment_list = attachment_repo.get_by_employee_id(employee_id)
-        return render_template('employees/detail_basic.html',
-                               employee=employee,
-                               family_list=family_list,
-                               attachment_list=attachment_list)
-
-    def _render_employee_history_view(employee_id, employee):
-        """이력정보 페이지 렌더링"""
-        education_list = education_repo.get_by_employee_id(employee_id)
-        career_list = career_repo.get_by_employee_id(employee_id)
-        certificate_list = certificate_repo.get_by_employee_id(employee_id)
-        language_list = language_repo.get_by_employee_id(employee_id)
-        military = military_repo.get_by_employee_id(employee_id)
-        project_list = project_repo.get_by_employee_id(employee_id)
-        award_list = award_repo.get_by_employee_id(employee_id)
-        attachment_list = attachment_repo.get_by_employee_id(employee_id)
-        return render_template('employees/detail_history.html',
-                               employee=employee,
-                               education_list=education_list,
-                               career_list=career_list,
-                               certificate_list=certificate_list,
-                               language_list=language_list,
-                               military=military,
-                               project_list=project_list,
-                               award_list=award_list,
-                               attachment_list=attachment_list)
 
     def _render_employee_full_view(employee_id, employee):
         """전체 정보 페이지 렌더링 (관리자/매니저용)"""
@@ -358,48 +316,26 @@ def register_routes(bp: Blueprint):
             return redirect(url_for('employees.employee_edit', employee_id=employee_id))
 
     # ========================================
-    # Employee 전용 수정 (기본정보/이력정보 분리)
+    # Employee 전용 수정 (레거시 - 통합 템플릿으로 리다이렉트)
     # ========================================
 
     @bp.route('/employees/<int:employee_id>/edit/basic', methods=['GET'])
     @login_required
     def employee_edit_basic(employee_id):
-        """기본정보 전용 수정 폼 (Employee role 전용)"""
-        user_role = session.get('user_role')
-
-        if user_role == 'employee':
-            my_employee_id = session.get('employee_id')
-            if my_employee_id != employee_id:
-                flash('본인 정보만 수정할 수 있습니다.', 'warning')
-                return redirect(url_for('employees.employee_edit_basic', employee_id=my_employee_id))
-
-        if user_role in ['admin', 'manager']:
-            if not verify_employee_access(employee_id):
-                flash('접근 권한이 없습니다.', 'error')
-                return redirect(url_for('main.index'))
-
-        employee = employee_repo.get_by_id(employee_id)
-        if not employee:
-            flash('직원을 찾을 수 없습니다.', 'error')
-            return redirect(url_for('main.index'))
-
-        family_list = family_repo.get_by_employee_id(employee_id)
-        return render_template('employees/form_basic.html',
-                               employee=employee,
-                               family_list=family_list,
-                               action='update')
+        """기본정보 전용 수정 폼 - 통합 템플릿으로 리다이렉트"""
+        return redirect(url_for('employees.employee_edit', employee_id=employee_id))
 
     @bp.route('/employees/<int:employee_id>/update/basic', methods=['POST'])
     @login_required
     def employee_update_basic(employee_id):
-        """기본정보 전용 수정 처리"""
+        """기본정보 전용 수정 처리 - 통합 라우트로 리다이렉트"""
         user_role = session.get('user_role')
 
         if user_role == 'employee':
             my_employee_id = session.get('employee_id')
             if my_employee_id != employee_id:
                 flash('본인 정보만 수정할 수 있습니다.', 'warning')
-                return redirect(url_for('employees.employee_edit_basic', employee_id=my_employee_id))
+                return redirect(url_for('employees.employee_edit', employee_id=my_employee_id))
 
         if user_role in ['admin', 'manager']:
             if not verify_employee_access(employee_id):
@@ -413,55 +349,20 @@ def register_routes(bp: Blueprint):
 
             if updated_employee:
                 flash('기본정보가 수정되었습니다.', 'success')
-                return redirect(url_for('employees.employee_detail', employee_id=employee_id, view='basic'))
+                return redirect(url_for('employees.employee_detail', employee_id=employee_id))
             else:
                 flash('직원을 찾을 수 없습니다.', 'error')
                 return redirect(url_for('main.index'))
 
         except Exception as e:
             flash(f'기본정보 수정 중 오류가 발생했습니다: {str(e)}', 'error')
-            return redirect(url_for('employees.employee_edit_basic', employee_id=employee_id))
+            return redirect(url_for('employees.employee_edit', employee_id=employee_id))
 
     @bp.route('/employees/<int:employee_id>/edit/history', methods=['GET'])
     @login_required
     def employee_edit_history(employee_id):
-        """이력정보 전용 수정 폼 (Employee role 전용)"""
-        user_role = session.get('user_role')
-
-        if user_role == 'employee':
-            my_employee_id = session.get('employee_id')
-            if my_employee_id != employee_id:
-                flash('본인 정보만 수정할 수 있습니다.', 'warning')
-                return redirect(url_for('employees.employee_edit_history', employee_id=my_employee_id))
-
-        if user_role in ['admin', 'manager']:
-            if not verify_employee_access(employee_id):
-                flash('접근 권한이 없습니다.', 'error')
-                return redirect(url_for('main.index'))
-
-        employee = employee_repo.get_by_id(employee_id)
-        if not employee:
-            flash('직원을 찾을 수 없습니다.', 'error')
-            return redirect(url_for('main.index'))
-
-        education_list = education_repo.get_by_employee_id(employee_id)
-        career_list = career_repo.get_by_employee_id(employee_id)
-        certificate_list = certificate_repo.get_by_employee_id(employee_id)
-        language_list = language_repo.get_by_employee_id(employee_id)
-        military = military_repo.get_by_employee_id(employee_id)
-        project_list = project_repo.get_by_employee_id(employee_id)
-        award_list = award_repo.get_by_employee_id(employee_id)
-
-        return render_template('employees/form_history.html',
-                               employee=employee,
-                               education_list=education_list,
-                               career_list=career_list,
-                               certificate_list=certificate_list,
-                               language_list=language_list,
-                               military=military,
-                               project_list=project_list,
-                               award_list=award_list,
-                               action='update')
+        """이력정보 전용 수정 폼 - 통합 템플릿으로 리다이렉트"""
+        return redirect(url_for('employees.employee_edit', employee_id=employee_id))
 
     @bp.route('/employees/<int:employee_id>/update/history', methods=['POST'])
     @login_required
@@ -473,7 +374,7 @@ def register_routes(bp: Blueprint):
             my_employee_id = session.get('employee_id')
             if my_employee_id != employee_id:
                 flash('본인 정보만 수정할 수 있습니다.', 'warning')
-                return redirect(url_for('employees.employee_edit_history', employee_id=my_employee_id))
+                return redirect(url_for('employees.employee_edit', employee_id=my_employee_id))
 
         if user_role in ['admin', 'manager']:
             if not verify_employee_access(employee_id):
@@ -490,11 +391,11 @@ def register_routes(bp: Blueprint):
             update_award_data(employee_id, request.form)
 
             flash('이력정보가 수정되었습니다.', 'success')
-            return redirect(url_for('employees.employee_detail', employee_id=employee_id, view='history'))
+            return redirect(url_for('employees.employee_detail', employee_id=employee_id))
 
         except Exception as e:
             flash(f'이력정보 수정 중 오류가 발생했습니다: {str(e)}', 'error')
-            return redirect(url_for('employees.employee_edit_history', employee_id=employee_id))
+            return redirect(url_for('employees.employee_edit', employee_id=employee_id))
 
     # ========================================
     # 직원 삭제
