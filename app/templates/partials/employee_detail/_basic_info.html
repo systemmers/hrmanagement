@@ -18,24 +18,37 @@
                 {{ info_item('성별', get_gender_label(employee.gender)) }}
                 <div class="info-item">
                     <div class="info-label">결혼여부</div>
-                    <div class="info-value{% if not family_list %} empty{% endif %}">
-                        {% if family_list|selectattr('relation', 'equalto', 'spouse')|list %}기혼{% else %}미혼{% endif %}
+                    <div class="info-value{% if not employee.marital_status %} empty{% endif %}">
+                        {{ get_marital_status_label(employee.marital_status) or '정보 없음' }}
                     </div>
                 </div>
                 {{ info_item('휴대전화', format_phone(employee.phone)) }}
-                {{ info_item('내선번호', employee.internal_phone) }}
                 {{ info_item('개인 이메일', employee.email, highlight=true) }}
-                {{ info_item('회사 이메일', employee.company_email) }}
                 <div class="info-item">
                     <div class="info-label">비상연락처</div>
                     <div class="info-value{% if not employee.emergency_contact %} empty{% endif %}">
                         {{ employee.emergency_contact or '정보 없음' }}{% if employee.emergency_relation %} ({{ employee.emergency_relation }}){% endif %}
                     </div>
                 </div>
+                {# 신규 필드: 혈액형, 종교, 취미, 특기, 장애정보 #}
+                {{ info_item('혈액형', employee.blood_type) }}
+                {{ info_item('종교', employee.religion) }}
+                {{ info_item('취미', employee.hobby) }}
+                {{ info_item('특기', employee.specialty) }}
+                {{ info_item('장애정보', employee.disability_info) }}
             </div>
             <div class="mt-5">
                 {{ info_item('주민등록상 주소', employee.address) }}
+                {{ info_item('상세주소', employee.detailed_address) }}
             </div>
+            {# 실제 거주 주소 (주민등록상 주소와 다른 경우) #}
+            {% if employee.actual_address %}
+            <div class="mt-4">
+                <h5 class="info-subsection-title">실제 거주 주소</h5>
+                {{ info_item('실제 거주지', employee.actual_address) }}
+                {{ info_item('상세주소', employee.actual_detailed_address) }}
+            </div>
+            {% endif %}
         </div>
     </div>
 </section>
@@ -55,6 +68,9 @@
                 {{ info_item('사원번호', employee.employee_number or 'EMP-%03d'|format(employee.id)) }}
                 {{ info_item('근무형태', get_employment_type_label(employee.employment_type)) }}
                 {{ info_item('근무지', employee.work_location or '본사') }}
+                {# 내선번호/회사이메일 - 프로필에서 소속정보로 이동 #}
+                {{ info_item('내선번호', employee.internal_phone) }}
+                {{ info_item('회사 이메일', employee.company_email) }}
                 <div class="info-item">
                     <div class="info-label">재직상태</div>
                     <div class="info-value">

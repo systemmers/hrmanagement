@@ -8,11 +8,12 @@
     - business_card_front: 명함 앞면 첨부파일 객체 (선택적)
     - business_card_back: 명함 뒷면 첨부파일 객체 (선택적)
     - can_edit_business_card: 명함 편집 권한 여부 (선택적)
-    - variant: 'corporate' | 'personal' (기본: 'corporate')
-        - corporate: 회사 소속정보, 명함 표시
-        - personal: 개인 연락처, 명함 없음
+    - variant: 'corporate' | 'personal' (기본: 자동 감지)
+        - corporate: 회사 소속정보, 명함 표시 (파란 테마)
+        - personal: 개인 연락처, 명함 없음 (그린 테마)
 #}
-{% set header_variant = variant|default('corporate') %}
+{# variant 자동 감지: is_corporate가 false이면 'personal', 아니면 'corporate' #}
+{% set header_variant = variant|default('personal' if not is_corporate else 'corporate') %}
 <div class="employee-header{% if header_variant == 'personal' %} employee-header--personal{% endif %}">
     <div class="employee-header-content">
         <div class="employee-header-left">

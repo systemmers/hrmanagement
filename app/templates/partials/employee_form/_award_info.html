@@ -1,0 +1,88 @@
+{#
+    직원 폼 - 수상내역 섹션 (동적 폼)
+    employee: 직원 객체 (수정 모드일 때)
+    award_list: 수상내역 목록 (개인 프로필용)
+#}
+<section class="form-section" id="award-info">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-trophy"></i>
+                수상내역
+            </h2>
+            <button type="button" class="btn btn-sm btn-secondary" id="addAward">
+                <i class="fas fa-plus"></i> 추가
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="dynamic-list" id="awardList">
+                {% set awards = award_list if award_list is defined and award_list else (employee.awards.all() if employee and employee.awards else []) %}
+                {% if awards %}
+                    {% for award in awards %}
+                    <div class="dynamic-item" data-index="{{ loop.index0 }}">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">수상명 <span class="required">*</span></label>
+                                <input type="text" name="award_name[]" class="form-input"
+                                       value="{{ award.award_name }}" placeholder="수상명" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">수상일</label>
+                                <input type="date" name="award_date[]" class="form-input"
+                                       value="{{ award.award_date }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">수여기관</label>
+                                <input type="text" name="award_institution[]" class="form-input"
+                                       value="{{ award.institution }}" placeholder="수여기관">
+                            </div>
+                            <div class="form-group form-group-full">
+                                <label class="form-label">수상내용</label>
+                                <textarea name="award_description[]" class="form-input" rows="2"
+                                          placeholder="수상 내용">{{ award.description or '' }}</textarea>
+                            </div>
+                            <div class="form-group form-group-full">
+                                <label class="form-label">비고</label>
+                                <input type="text" name="award_notes[]" class="form-input"
+                                       value="{{ award.notes or '' }}" placeholder="비고">
+                            </div>
+                        </div>
+                        <button type="button" class="btn-remove" title="삭제">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="dynamic-item" data-index="0">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">수상명 <span class="required">*</span></label>
+                            <input type="text" name="award_name[]" class="form-input" placeholder="수상명">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">수상일</label>
+                            <input type="date" name="award_date[]" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">수여기관</label>
+                            <input type="text" name="award_institution[]" class="form-input" placeholder="수여기관">
+                        </div>
+                        <div class="form-group form-group-full">
+                            <label class="form-label">수상내용</label>
+                            <textarea name="award_description[]" class="form-input" rows="2"
+                                      placeholder="수상 내용"></textarea>
+                        </div>
+                        <div class="form-group form-group-full">
+                            <label class="form-label">비고</label>
+                            <input type="text" name="award_notes[]" class="form-input" placeholder="비고">
+                        </div>
+                    </div>
+                    <button type="button" class="btn-remove" title="삭제">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>

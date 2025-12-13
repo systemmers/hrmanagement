@@ -167,6 +167,16 @@ def register_template_utils(app):
             }
             return labels.get(emp_type, emp_type or '정보 없음')
 
+        def get_marital_status_label(status):
+            """결혼여부 레이블 변환"""
+            labels = {
+                'single': '미혼',
+                'married': '기혼',
+                'divorced': '이혼',
+                'widowed': '사별'
+            }
+            return labels.get(status, status or '정보 없음')
+
         return {
             'format_phone': format_phone,
             'get_status_badge_class': get_status_badge_class,
@@ -180,5 +190,6 @@ def register_template_utils(app):
             'get_military_status_label': get_military_status_label,
             'get_branch_label': get_branch_label,
             'get_gender_label': get_gender_label,
-            'get_employment_type_label': get_employment_type_label
+            'get_employment_type_label': get_employment_type_label,
+            'get_marital_status_label': get_marital_status_label
         }

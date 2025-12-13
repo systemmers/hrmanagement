@@ -134,17 +134,31 @@
 
 /* ========================================
    개인 계정용 헤더 스타일
+   - 그린 테마 적용
    - 명함 영역 없이 전체 너비 사용
    ======================================== */
+
+.employee-header--personal {
+    /* 그린 그래디언트 테마 */
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
 
 .employee-header--personal .employee-header-content {
     justify-content: flex-start;
 }
 
-.employee-header--personal .employee-header-left--full {
+.employee-header--personal .employee-header-left {
     flex: none;
     width: 100%;
     max-width: 100%;
+}
+
+.employee-header--personal .employee-photo {
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.employee-header--personal .employee-stats {
+    border-top-color: rgba(255, 255, 255, 0.25);
 }
 
 .employee-header--personal .stat-item--wide {
@@ -155,6 +169,10 @@
 .employee-header--personal .stat-item--wide .stat-value {
     font-size: var(--text-base);
     font-weight: 500;
+}
+
+.employee-header--personal .header-action-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
 }
 
 /* 반응형 */

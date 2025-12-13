@@ -168,14 +168,22 @@
             {# 공통 섹션: 병역정보 #}
             {% include 'partials/employee_form/_military_info.html' %}
 
-            {# 법인 전용: 가족사항 #}
-            {% if is_corporate and account_type != 'corporate_admin' %}
+            {# 공통 섹션: 수상내역 #}
+            {% include 'partials/employee_form/_award_info.html' %}
+
+            {# 공통 섹션: 가족사항 (프로필 공통) #}
+            {% if account_type != 'corporate_admin' %}
                 {% include 'partials/employee_form/_family_info.html' %}
             {% endif %}
 
             {# 법인 전용: 급여정보 - Employee는 숨김 #}
             {% if is_corporate and not is_employee_role and account_type != 'corporate_admin' %}
                 {% include 'partials/employee_form/_salary_info.html' %}
+            {% endif %}
+
+            {# 법인 전용: 복리후생 - 읽기 전용 (Employee도 볼 수 있음) #}
+            {% if is_corporate and account_type != 'corporate_admin' %}
+                {% include 'partials/employee_form/_benefit_info.html' %}
             {% endif %}
 
             {# 법인 전용: 4대보험 - Employee는 숨김 #}
@@ -222,7 +230,7 @@
 <script src="{{ url_for('static', filename='js/components/tree-selector.js') }}"></script>
 {% endif %}
 <script type="module" src="{{ url_for('static', filename='js/pages/employee-form.js') }}"></script>
-<script src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // 전화번호 입력 필드 자동 포맷팅 초기화

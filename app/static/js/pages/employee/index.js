@@ -41,8 +41,7 @@ export {
     initFileUpload,
     getEmployeeIdFromForm,
     showToast,
-    validateImageFile,
-    initTreeSelector
+    validateImageFile
 };
 
 /**

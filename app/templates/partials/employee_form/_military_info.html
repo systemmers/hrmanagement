@@ -42,5 +42,26 @@
                value="{{ employee.military_period if employee and employee.military_period else '' }}"
                placeholder="2018.01 ~ 2019.10">
     </div>
+
+    <div class="form-group">
+        <label for="military_duty" class="form-label">보직</label>
+        <input type="text" id="military_duty" name="military_duty" class="form-input"
+               value="{{ employee.military_duty if employee and employee.military_duty else '' }}"
+               placeholder="운전병, 행정병 등">
+    </div>
+
+    <div class="form-group">
+        <label for="military_specialty" class="form-label">병과</label>
+        <input type="text" id="military_specialty" name="military_specialty" class="form-input"
+               value="{{ employee.military_specialty if employee and employee.military_specialty else '' }}"
+               placeholder="보병, 통신, 의무 등">
+    </div>
+
+    <div class="form-group form-group-full">
+        <label for="military_exemption_reason" class="form-label">면제사유</label>
+        <input type="text" id="military_exemption_reason" name="military_exemption_reason" class="form-input"
+               value="{{ employee.military_exemption_reason if employee and employee.military_exemption_reason else '' }}"
+               placeholder="병역면제 사유 (해당 시 입력)">
+    </div>
 </div>
 {% endcall %}

@@ -83,37 +83,8 @@
         </div>
 
         {# 직원/프로필 헤더 카드 #}
-        {% if is_corporate %}
-            {% include 'partials/employee_detail/_employee_header.html' %}
-        {% else %}
-            {# 개인 계정용 간소화된 헤더 #}
-            <div class="employee-header-card">
-                <div class="header-content">
-                    <div class="header-photo">
-                        {% if profile_data.photo %}
-                        <img src="{{ profile_data.photo }}" alt="{{ profile_name }} 프로필 사진">
-                        {% else %}
-                        <div class="photo-placeholder">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="header-info">
-                        <h2 class="employee-name">{{ profile_name }}</h2>
-                        {% if basic_info.email %}
-                        <p class="employee-contact">
-                            <i class="fas fa-envelope"></i> {{ basic_info.email }}
-                        </p>
-                        {% endif %}
-                        {% if basic_info.mobile_phone %}
-                        <p class="employee-contact">
-                            <i class="fas fa-phone"></i> {{ basic_info.mobile_phone }}
-                        </p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        {% endif %}
+        {# 개인/법인 모두 동일한 헤더 컴포넌트 사용, 개인은 그린 테마 적용 #}
+        {% include 'partials/employee_detail/_employee_header.html' %}
 
         {# 섹션 1-6: 기본정보 (개인정보, 소속정보, 계약정보, 급여정보, 복리후생, 4대보험) #}
         {% include 'partials/employee_detail/_basic_info.html' %}

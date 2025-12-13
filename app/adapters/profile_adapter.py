@@ -185,6 +185,14 @@ class EmployeeProfileAdapter(ProfileAdapter):
             'hobby': self.employee.hobby,
             'specialty': self.employee.specialty,
             'disability_info': self.employee.disability_info,
+            'marital_status': self.employee.marital_status,
+            # 실제 거주 주소
+            'actual_postal_code': self.employee.actual_postal_code,
+            'actual_address': self.employee.actual_address,
+            'actual_detailed_address': self.employee.actual_detailed_address,
+            # 비상연락처
+            'emergency_contact': self.employee.emergency_contact,
+            'emergency_relation': self.employee.emergency_relation,
         }
 
     def get_organization_info(self) -> Optional[Dict[str, Any]]:
@@ -318,7 +326,7 @@ class PersonalProfileAdapter(ProfileAdapter):
 
     AVAILABLE_SECTIONS = [
         'basic', 'education', 'career',
-        'certificate', 'language', 'military'
+        'certificate', 'language', 'military', 'award'
     ]
 
     def __init__(self, profile):
@@ -353,6 +361,14 @@ class PersonalProfileAdapter(ProfileAdapter):
             'hobby': self.profile.hobby,
             'specialty': self.profile.specialty,
             'disability_info': self.profile.disability_info,
+            'marital_status': self.profile.marital_status,
+            # 실제 거주 주소
+            'actual_postal_code': self.profile.actual_postal_code,
+            'actual_address': self.profile.actual_address,
+            'actual_detailed_address': self.profile.actual_detailed_address,
+            # 비상연락처
+            'emergency_contact': self.profile.emergency_contact,
+            'emergency_relation': self.profile.emergency_relation,
             'is_public': self.profile.is_public,
         }
 
@@ -397,6 +413,10 @@ class PersonalProfileAdapter(ProfileAdapter):
         if self.profile.military_service:
             return self.profile.military_service.to_dict()
         return None
+
+    def get_award_list(self) -> List[Dict[str, Any]]:
+        """수상 내역 목록 반환 (PersonalAward 사용)"""
+        return [award.to_dict() for award in self.profile.awards.all()]
 
     def is_corporate(self) -> bool:
         """법인 직원 여부 (항상 False)"""

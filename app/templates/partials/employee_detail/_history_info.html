@@ -198,9 +198,9 @@
     </div>
 </section>
 
-{# 섹션 11: 병역/프로젝트/수상 #}
+{# 섹션 11: 병역정보 (단독 섹션) #}
 <section id="military-info" class="content-section">
-    {{ section_title('병역 / 프로젝트 / 수상') }}
+    {{ section_title('병역정보') }}
 
     {# 병역정보 #}
     <div class="card">
@@ -233,10 +233,56 @@
             </div>
         </div>
     </div>
+</section>
 
-    {# 유사사업 참여경력 (법인 전용) #}
-    {% if is_corporate %}
-    <div class="card" style="margin-top: var(--space-4);">
+{# 섹션 12: 수상내역 (프로필 공통) #}
+<section id="award-info" class="content-section">
+    {{ section_title('수상내역') }}
+    <div class="card">
+        {{ card_header('수상내역', 'fas fa-trophy') }}
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>수상일</th>
+                            <th>수상명</th>
+                            <th>수여기관</th>
+                            <th>수상내용</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if award_list %}
+                        {% for award in award_list|sort(attribute='award_date', reverse=True) %}
+                        <tr>
+                            <td>{{ award.award_date or '-' }}</td>
+                            <td>{{ award.award_name }}</td>
+                            <td>{{ award.institution or '-' }}</td>
+                            <td>{{ award.description or '-' }}</td>
+                            <td>{{ award.notes or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="table-empty">
+                                <i class="fas fa-trophy"></i>
+                                <p>등록된 수상내역이 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# 섹션 13: 유사사업 참여경력 (인사카드 전용) #}
+{% if is_corporate %}
+<section id="project-info" class="content-section">
+    {{ section_title('유사사업 참여경력') }}
+    <div class="card">
         <div class="card-header">
             <h3 class="card-title">
                 <i class="fas fa-project-diagram"></i>
@@ -281,50 +327,5 @@
             </div>
         </div>
     </div>
-    {% endif %}
-
-    {# 수상내역 (법인 전용) #}
-    {% if is_corporate %}
-    <div class="card" style="margin-top: var(--space-4);">
-        <div class="card-header">
-            <h3 class="card-title">
-                <i class="fas fa-trophy"></i>
-                수상내역
-            </h3>
-        </div>
-        <div class="card-body">
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>수상일</th>
-                            <th>수상명</th>
-                            <th>수여기관</th>
-                            <th>비고</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if award_list %}
-                        {% for award in award_list|sort(attribute='award_date', reverse=True) %}
-                        <tr>
-                            <td>{{ award.award_date }}</td>
-                            <td>{{ award.award_name }}</td>
-                            <td>{{ award.institution }}</td>
-                            <td>{{ award.note or '-' }}</td>
-                        </tr>
-                        {% endfor %}
-                        {% else %}
-                        <tr>
-                            <td colspan="4" class="table-empty">
-                                <i class="fas fa-trophy"></i>
-                                <p>등록된 수상내역이 없습니다</p>
-                            </td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 </section>
+{% endif %}

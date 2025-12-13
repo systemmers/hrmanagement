@@ -59,83 +59,7 @@
                 </div>
             </div>
 
-            {# 명함 영역 (수정 모드에서만 표시) #}
-            {% if action == 'update' and employee %}
-            <div class="business-card-section" id="businessCardSection">
-                <label class="form-label">명함</label>
-                <div class="business-card-upload-area">
-                    <div class="business-card-grid">
-                        {# 앞면 #}
-                        <div class="business-card-item" data-side="front">
-                            <div class="card-label">앞면</div>
-                            <div class="card-preview" id="businessCardFrontPreview">
-                                {% if business_card_front %}
-                                <img src="{{ business_card_front.file_path }}" alt="명함 앞면">
-                                {% else %}
-                                <div class="card-placeholder">
-                                    <i class="fas fa-id-card"></i>
-                                    <span>앞면 미등록</span>
-                                </div>
-                                {% endif %}
-                            </div>
-                            <div class="card-actions">
-                                <input type="file" id="businessCardFrontFile"
-                                       accept="image/jpeg,image/png,image/gif,image/webp"
-                                       style="display: none;">
-                                <button type="button" class="btn btn-secondary btn-sm"
-                                        onclick="document.getElementById('businessCardFrontFile').click()">
-                                    <i class="fas fa-upload"></i> 업로드
-                                </button>
-                                {% if business_card_front %}
-                                <button type="button" class="btn btn-outline-danger btn-sm delete-card-btn"
-                                        data-side="front">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {# 뒷면 #}
-                        <div class="business-card-item" data-side="back">
-                            <div class="card-label">뒷면</div>
-                            <div class="card-preview" id="businessCardBackPreview">
-                                {% if business_card_back %}
-                                <img src="{{ business_card_back.file_path }}" alt="명함 뒷면">
-                                {% else %}
-                                <div class="card-placeholder">
-                                    <i class="fas fa-id-card"></i>
-                                    <span>뒷면 미등록</span>
-                                </div>
-                                {% endif %}
-                            </div>
-                            <div class="card-actions">
-                                <input type="file" id="businessCardBackFile"
-                                       accept="image/jpeg,image/png,image/gif,image/webp"
-                                       style="display: none;">
-                                <button type="button" class="btn btn-secondary btn-sm"
-                                        onclick="document.getElementById('businessCardBackFile').click()">
-                                    <i class="fas fa-upload"></i> 업로드
-                                </button>
-                                {% if business_card_back %}
-                                <button type="button" class="btn btn-outline-danger btn-sm delete-card-btn"
-                                        data-side="back">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    <small class="form-help">JPG, PNG, GIF, WebP (최대 5MB)</small>
-                </div>
-            </div>
-            {% elif action == 'create' %}
-            <div class="business-card-section disabled">
-                <label class="form-label">명함</label>
-                <div class="disabled-message">
-                    <i class="fas fa-info-circle"></i>
-                    <span>직원 등록 완료 후 명함을 업로드할 수 있습니다.</span>
-                </div>
-            </div>
-            {% endif %}
+            {# 명함 영역은 인사카드 전용 - 프로필에서는 표시하지 않음 #}
 
             <div class="form-grid">
                 <div class="form-group">
@@ -164,6 +88,17 @@
                         <option value="">선택하세요</option>
                         <option value="male" {% if employee and employee.gender == 'male' %}selected{% endif %}>남성</option>
                         <option value="female" {% if employee and employee.gender == 'female' %}selected{% endif %}>여성</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="marital_status" class="form-label">결혼여부</label>
+                    <select id="marital_status" name="marital_status" class="form-input">
+                        <option value="">선택하세요</option>
+                        <option value="single" {% if employee and employee.marital_status == 'single' %}selected{% endif %}>미혼</option>
+                        <option value="married" {% if employee and employee.marital_status == 'married' %}selected{% endif %}>기혼</option>
+                        <option value="divorced" {% if employee and employee.marital_status == 'divorced' %}selected{% endif %}>이혼</option>
+                        <option value="widowed" {% if employee and employee.marital_status == 'widowed' %}selected{% endif %}>사별</option>
                     </select>
                 </div>
 
@@ -222,6 +157,76 @@
                            aria-describedby="rrn_help">
                     <small id="rrn_help" class="form-help">마스킹 처리된 형식으로 입력 (예: 850520-1******)</small>
                 </div>
+
+                {# 신규 필드: 혈액형, 종교, 취미, 특기, 장애정보 #}
+                <div class="form-group">
+                    <label for="blood_type" class="form-label">혈액형</label>
+                    <select id="blood_type" name="blood_type" class="form-input">
+                        <option value="">선택하세요</option>
+                        <option value="A" {% if employee and employee.blood_type == 'A' %}selected{% endif %}>A형</option>
+                        <option value="B" {% if employee and employee.blood_type == 'B' %}selected{% endif %}>B형</option>
+                        <option value="O" {% if employee and employee.blood_type == 'O' %}selected{% endif %}>O형</option>
+                        <option value="AB" {% if employee and employee.blood_type == 'AB' %}selected{% endif %}>AB형</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="religion" class="form-label">종교</label>
+                    <input type="text" id="religion" name="religion" class="form-input"
+                           value="{{ employee.religion if employee and employee.religion else '' }}"
+                           placeholder="기독교, 불교, 무교 등">
+                </div>
+
+                <div class="form-group">
+                    <label for="hobby" class="form-label">취미</label>
+                    <input type="text" id="hobby" name="hobby" class="form-input"
+                           value="{{ employee.hobby if employee and employee.hobby else '' }}"
+                           placeholder="독서, 운동, 여행 등">
+                </div>
+
+                <div class="form-group">
+                    <label for="specialty" class="form-label">특기</label>
+                    <input type="text" id="specialty" name="specialty" class="form-input"
+                           value="{{ employee.specialty if employee and employee.specialty else '' }}"
+                           placeholder="악기 연주, 외국어, 프로그래밍 등">
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="disability_info" class="form-label">장애정보</label>
+                    <textarea id="disability_info" name="disability_info" class="form-input" rows="2"
+                              placeholder="장애 정보가 있는 경우 입력하세요">{{ employee.disability_info if employee and employee.disability_info else '' }}</textarea>
+                </div>
+
+                {# 실제 거주 주소 (주민등록상 주소와 다른 경우) #}
+                <div class="form-group form-group-full mt-4">
+                    <h5 class="form-subsection-title">실제 거주 주소</h5>
+                    <small class="form-help mb-3">주민등록상 주소와 다른 경우 입력하세요</small>
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="actual_address" class="form-label">실제 거주지</label>
+                    <div class="input-with-button">
+                        <input type="text" id="actual_address" name="actual_address" class="form-input"
+                               value="{{ employee.actual_address if employee and employee.actual_address else '' }}"
+                               placeholder="주소 검색 버튼을 클릭하세요" readonly>
+                        <button type="button" class="btn btn-secondary" id="searchActualAddressBtn" aria-label="실제 거주지 검색">
+                            <i class="fas fa-search" aria-hidden="true"></i> 주소 검색
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="actual_detailed_address" class="form-label">실제 거주지 상세주소</label>
+                    <input type="text" id="actual_detailed_address" name="actual_detailed_address" class="form-input"
+                           value="{{ employee.actual_detailed_address if employee and employee.actual_detailed_address else '' }}"
+                           placeholder="동/호수, 건물명 등">
+                </div>
+
+                {# 숨김 필드: 우편번호 #}
+                <input type="hidden" id="postal_code" name="postal_code"
+                       value="{{ employee.postal_code if employee and employee.postal_code else '' }}">
+                <input type="hidden" id="actual_postal_code" name="actual_postal_code"
+                       value="{{ employee.actual_postal_code if employee and employee.actual_postal_code else '' }}">
             </div>
         </div>
     </div>

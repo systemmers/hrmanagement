@@ -55,6 +55,16 @@ class Employee(db.Model):
     hobby = db.Column(db.String(200), nullable=True)
     specialty = db.Column(db.String(200), nullable=True)
     disability_info = db.Column(db.Text, nullable=True)
+    marital_status = db.Column(db.String(20), nullable=True)  # 결혼여부: single, married, divorced, widowed
+
+    # 실제 거주 주소 (주민등록상 주소와 분리)
+    actual_postal_code = db.Column(db.String(20), nullable=True)
+    actual_address = db.Column(db.String(500), nullable=True)
+    actual_detailed_address = db.Column(db.String(500), nullable=True)
+
+    # 비상연락처
+    emergency_contact = db.Column(db.String(50), nullable=True)
+    emergency_relation = db.Column(db.String(50), nullable=True)
 
     # 1:N 관계
     educations = db.relationship('Education', backref='employee', lazy='dynamic', cascade='all, delete-orphan')
@@ -111,6 +121,14 @@ class Employee(db.Model):
             'hobby': self.hobby,
             'specialty': self.specialty,
             'disability_info': self.disability_info,
+            'marital_status': self.marital_status,
+            # 실제 거주 주소
+            'actual_postal_code': self.actual_postal_code,
+            'actual_address': self.actual_address,
+            'actual_detailed_address': self.actual_detailed_address,
+            # 비상연락처
+            'emergency_contact': self.emergency_contact,
+            'emergency_relation': self.emergency_relation,
             # 소속 정보 추가 필드
             'team': self.team,
             'job_title': self.job_title,
@@ -160,6 +178,14 @@ class Employee(db.Model):
             hobby=data.get('hobby'),
             specialty=data.get('specialty'),
             disability_info=data.get('disability_info') or data.get('disabilityInfo'),
+            marital_status=data.get('marital_status') or data.get('maritalStatus'),
+            # 실제 거주 주소
+            actual_postal_code=data.get('actual_postal_code') or data.get('actualPostalCode'),
+            actual_address=data.get('actual_address') or data.get('actualAddress'),
+            actual_detailed_address=data.get('actual_detailed_address') or data.get('actualDetailedAddress'),
+            # 비상연락처
+            emergency_contact=data.get('emergency_contact') or data.get('emergencyContact'),
+            emergency_relation=data.get('emergency_relation') or data.get('emergencyRelation'),
         )
 
     def __repr__(self):
