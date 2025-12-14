@@ -254,6 +254,18 @@
     font-size: var(--text-xl);
 }
 
+/* ========================================
+   Form Utility Classes
+   ======================================== */
+
+.form-group--fixed-width {
+    flex: 0 0 150px;
+}
+
+.field-error {
+    border-color: var(--color-error-500) !important;
+}
+
 /* 반응형 */
 @media (max-width: 767px) {
     .form-row {

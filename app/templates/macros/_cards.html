@@ -116,7 +116,7 @@
 {% macro employee_card(employee, status='active') %}
 <div class="employee-card" data-employee-id="{{ employee.id }}">
     <div class="employee-status {{ status }}"></div>
-    <img src="{{ employee.photo or 'https://i.pravatar.cc/80?img=' ~ employee.id }}"
+    <img src="{{ employee.photo or url_for('static', filename='images/face/face_01_m.png') }}"
          alt="{{ employee.name }}" class="employee-photo">
     <div class="employee-name">{{ employee.name }}</div>
     <div class="employee-position">{{ employee.position or '직원' }}</div>

@@ -311,7 +311,7 @@ class PersonalService:
                 'name': profile.name,
                 'english_name': getattr(profile, 'english_name', None),
                 'chinese_name': getattr(profile, 'chinese_name', None),
-                'photo': profile.photo or 'https://i.pravatar.cc/150',
+                'photo': profile.photo or '/static/images/face/face_01_m.png',
                 'email': profile.email,
                 'phone': profile.mobile_phone or getattr(profile, 'phone', None),
                 'home_phone': getattr(profile, 'home_phone', None),

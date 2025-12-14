@@ -19,7 +19,7 @@ export class FormValidator {
         const inputs = document.querySelectorAll('.form-input');
         inputs.forEach(input => {
             input.addEventListener('focus', () => {
-                input.style.borderColor = '';
+                input.classList.remove('field-error');
             });
         });
     }
@@ -31,9 +31,9 @@ export class FormValidator {
         requiredFields.forEach(field => {
             if (!field.value.trim()) {
                 isValid = false;
-                field.style.borderColor = '#ef4444';
+                field.classList.add('field-error');
             } else {
-                field.style.borderColor = '';
+                field.classList.remove('field-error');
             }
         });
 

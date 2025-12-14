@@ -261,7 +261,7 @@ class EmployeeService:
         return Employee(
             id=employee_id,
             name=form_data.get('name', ''),
-            photo=form_data.get('photo') or 'https://i.pravatar.cc/150',
+            photo=form_data.get('photo') or '/static/images/face/face_01_m.png',
             department=form_data.get('department', ''),
             position=form_data.get('position', ''),
             status=form_data.get('status', 'active'),

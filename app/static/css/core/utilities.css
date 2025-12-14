@@ -291,3 +291,21 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ========================================
+   Error Page Utilities
+   ======================================== */
+
+.error-icon {
+    font-size: 64px;
+    display: block;
+    margin-bottom: var(--space-4);
+}
+
+.error-code--forbidden {
+    color: var(--color-error-500);
+}
+
+.error-code--server {
+    color: var(--color-error-400);
+}

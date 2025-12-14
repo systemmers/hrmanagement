@@ -2,313 +2,7 @@
 {% block title %}AI 문서 분석 테스트{% endblock %}
 
 {% block extra_css %}
-<style>
-.ai-test-container {
-    padding: 24px;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.page-header {
-    margin-bottom: 24px;
-}
-
-.page-header h1 {
-    font-size: 24px;
-    font-weight: 600;
-    color: #1a1a2e;
-    margin-bottom: 8px;
-}
-
-.page-header .subtitle {
-    color: #666;
-    font-size: 14px;
-}
-
-.page-header .badge {
-    display: inline-block;
-    background: #ffeaa7;
-    color: #d35400;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 500;
-    margin-left: 8px;
-}
-
-.test-layout {
-    display: grid;
-    grid-template-columns: 400px 1fr;
-    gap: 24px;
-}
-
-@media (max-width: 1024px) {
-    .test-layout {
-        grid-template-columns: 1fr;
-    }
-}
-
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.card h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1a1a2e;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.card h3 i {
-    color: #667eea;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
-    font-size: 14px;
-    color: #333;
-}
-
-.form-group input[type="file"],
-.form-group select {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: border-color 0.2s;
-}
-
-.form-group input[type="file"]:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: #667eea;
-}
-
-.form-divider {
-    text-align: center;
-    color: #999;
-    font-size: 12px;
-    margin: 16px 0;
-    position: relative;
-}
-
-.form-divider::before,
-.form-divider::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 40%;
-    height: 1px;
-    background: #ddd;
-}
-
-.form-divider::before { left: 0; }
-.form-divider::after { right: 0; }
-
-.btn-primary {
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.result-section .card {
-    margin-bottom: 20px;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: #999;
-}
-
-.empty-state i {
-    font-size: 48px;
-    margin-bottom: 16px;
-    color: #ddd;
-}
-
-.empty-state p {
-    font-size: 14px;
-}
-
-.loading-state {
-    text-align: center;
-    padding: 40px 20px;
-}
-
-.loading-state .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #667eea;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 16px;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.result-meta {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-bottom: 20px;
-}
-
-.meta-item {
-    background: #f8f9fa;
-    padding: 12px;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.meta-item .label {
-    font-size: 12px;
-    color: #666;
-    margin-bottom: 4px;
-}
-
-.meta-item .value {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1a1a2e;
-}
-
-.confidence-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.confidence-high {
-    background: #d4edda;
-    color: #155724;
-}
-
-.confidence-medium {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.confidence-low {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-.result-json {
-    background: #1e1e1e;
-    color: #d4d4d4;
-    padding: 16px;
-    border-radius: 8px;
-    overflow-x: auto;
-    font-family: 'Consolas', 'Monaco', monospace;
-    font-size: 13px;
-    line-height: 1.5;
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.fields-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.fields-table th,
-.fields-table td {
-    padding: 10px 12px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-    font-size: 13px;
-}
-
-.fields-table th {
-    background: #f8f9fa;
-    font-weight: 600;
-    color: #333;
-}
-
-.fields-table tr:hover {
-    background: #f8f9fa;
-}
-
-.error-message {
-    background: #f8d7da;
-    color: #721c24;
-    padding: 16px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.error-message i {
-    font-size: 20px;
-}
-
-.provider-tag {
-    display: inline-block;
-    padding: 2px 8px;
-    background: #e3f2fd;
-    color: #1565c0;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.file-preview {
-    margin-top: 12px;
-    padding: 12px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    font-size: 13px;
-    color: #666;
-}
-
-.file-preview i {
-    margin-right: 8px;
-    color: #667eea;
-}
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/ai-test.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -347,7 +41,7 @@
                         </select>
                     </div>
 
-                    <div id="filePreview" class="file-preview" style="display: none;">
+                    <div id="filePreview" class="file-preview hidden">
                         <i class="fas fa-file"></i>
                         <span id="selectedFileName"></span>
                     </div>
@@ -402,7 +96,7 @@
             </div>
 
             <!-- 추출된 필드 테이블 -->
-            <div class="card" id="fieldsCard" style="display: none;">
+            <div class="card hidden" id="fieldsCard">
                 <h3><i class="fas fa-table"></i> 3. 추출된 필드</h3>
                 <div id="extractedFields"></div>
             </div>
@@ -433,11 +127,11 @@ document.getElementById('sampleSelect').addEventListener('change', function(e) {
 
 function showFilePreview(filename) {
     document.getElementById('selectedFileName').textContent = filename;
-    document.getElementById('filePreview').style.display = 'block';
+    document.getElementById('filePreview').classList.remove('hidden');
 }
 
 function hideFilePreview() {
-    document.getElementById('filePreview').style.display = 'none';
+    document.getElementById('filePreview').classList.add('hidden');
 }
 
 // 폼 제출
@@ -512,10 +206,10 @@ function displayResult(result) {
                 <div class="value">${result.processing_time?.toFixed(2) || '-'}초</div>
             </div>
         </div>
-        <div style="margin-bottom: 12px;">
+        <div class="provider-wrapper">
             <span class="provider-tag">${result.provider || 'unknown'}</span>
         </div>
-        <h4 style="font-size: 14px; margin-bottom: 8px; color: #666;">Raw JSON 응답:</h4>
+        <h4 class="raw-json-title">Raw JSON 응답:</h4>
         <pre class="result-json">${JSON.stringify(result.extracted_fields || result, null, 2)}</pre>
     `;
 
@@ -532,17 +226,17 @@ function displayError(message) {
             <i class="fas fa-exclamation-circle"></i>
             <div>
                 <strong>오류 발생</strong>
-                <p style="margin: 4px 0 0 0; font-size: 13px;">${message}</p>
+                <p>${message}</p>
             </div>
         </div>
     `;
-    document.getElementById('fieldsCard').style.display = 'none';
+    document.getElementById('fieldsCard').classList.add('hidden');
 }
 
 function displayFields(fields, confidences) {
     const card = document.getElementById('fieldsCard');
     const container = document.getElementById('extractedFields');
-    card.style.display = 'block';
+    card.classList.remove('hidden');
 
     const flatFields = flattenObject(fields);
     let html = `

@@ -2,214 +2,7 @@
 {% block title %}AI 설정{% endblock %}
 
 {% block extra_css %}
-<style>
-.ai-settings-container {
-    padding: 24px;
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-.page-header {
-    margin-bottom: 24px;
-}
-
-.page-header h1 {
-    font-size: 24px;
-    font-weight: 600;
-    color: #1a1a2e;
-    margin-bottom: 8px;
-}
-
-.page-header .subtitle {
-    color: #666;
-    font-size: 14px;
-}
-
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    margin-bottom: 24px;
-}
-
-.card h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1a1a2e;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.card h3 i {
-    color: #667eea;
-}
-
-.config-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.config-table tr {
-    border-bottom: 1px solid #eee;
-}
-
-.config-table tr:last-child {
-    border-bottom: none;
-}
-
-.config-table td {
-    padding: 12px 0;
-    vertical-align: middle;
-}
-
-.config-table .label {
-    font-weight: 500;
-    color: #333;
-    width: 200px;
-}
-
-.config-table .value {
-    color: #666;
-    font-family: monospace;
-    font-size: 13px;
-}
-
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.status-configured {
-    background: #d4edda;
-    color: #155724;
-}
-
-.status-not-configured {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-.provider-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.provider-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-.provider-badge.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.provider-badge i {
-    font-size: 16px;
-}
-
-.info-box {
-    background: #e7f3ff;
-    border: 1px solid #b8daff;
-    border-radius: 8px;
-    padding: 16px;
-    margin-top: 16px;
-}
-
-.info-box h4 {
-    font-size: 14px;
-    font-weight: 600;
-    color: #004085;
-    margin-bottom: 8px;
-}
-
-.info-box p {
-    font-size: 13px;
-    color: #004085;
-    margin: 0;
-    line-height: 1.5;
-}
-
-.info-box code {
-    background: rgba(0,0,0,0.1);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 12px;
-}
-
-.code-block {
-    background: #1e1e1e;
-    color: #d4d4d4;
-    padding: 16px;
-    border-radius: 8px;
-    font-family: monospace;
-    font-size: 13px;
-    overflow-x: auto;
-    margin-top: 12px;
-}
-
-.code-block .comment {
-    color: #6a9955;
-}
-
-.code-block .key {
-    color: #9cdcfe;
-}
-
-.code-block .value {
-    color: #ce9178;
-}
-
-.warning-box {
-    background: #fff3cd;
-    border: 1px solid #ffc107;
-    border-radius: 8px;
-    padding: 16px;
-    margin-top: 16px;
-}
-
-.warning-box h4 {
-    font-size: 14px;
-    font-weight: 600;
-    color: #856404;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.warning-box p {
-    font-size: 13px;
-    color: #856404;
-    margin: 0;
-}
-
-.empty-providers {
-    text-align: center;
-    padding: 40px 20px;
-    color: #999;
-}
-
-.empty-providers i {
-    font-size: 48px;
-    margin-bottom: 16px;
-    color: #ddd;
-}
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/ai-test.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -246,7 +39,7 @@
         <div class="empty-providers">
             <i class="fas fa-exclamation-circle"></i>
             <p>사용 가능한 Provider가 없습니다.</p>
-            <p style="font-size: 12px; margin-top: 8px;">
+            <p class="text-xs mt-2">
                 환경 변수를 설정하거나 AI Service를 구현해주세요.
             </p>
         </div>
@@ -265,7 +58,7 @@
                     <span class="status-badge status-configured">
                         <i class="fas fa-check"></i> 설정됨
                     </span>
-                    <span style="margin-left: 12px;">{{ config.gemini_api_key_preview }}</span>
+                    <span class="ml-3">{{ config.gemini_api_key_preview }}</span>
                     {% else %}
                     <span class="status-badge status-not-configured">
                         <i class="fas fa-times"></i> 미설정

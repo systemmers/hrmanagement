@@ -109,7 +109,7 @@ def extract_employee_from_form(form_data, employee_id=0):
         id=employee_id,
         # 기본 필드
         name=form_data.get('name', ''),
-        photo=form_data.get('photo') or 'https://i.pravatar.cc/150',
+        photo=form_data.get('photo') or '/static/images/face/face_01_m.png',
         department=form_data.get('department', ''),
         position=form_data.get('position', ''),
         status=form_data.get('status', 'active'),
@@ -147,7 +147,7 @@ def extract_basic_fields_from_form(form_data):
     """폼 데이터에서 기본정보 필드만 추출"""
     return {
         'name': form_data.get('name', ''),
-        'photo': form_data.get('photo') or 'https://i.pravatar.cc/150',
+        'photo': form_data.get('photo') or '/static/images/face/face_01_m.png',
         'english_name': form_data.get('english_name') or form_data.get('name_en') or None,
         'birth_date': form_data.get('birth_date') or None,
         'gender': form_data.get('gender') or None,

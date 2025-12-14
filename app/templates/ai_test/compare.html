@@ -2,253 +2,7 @@
 {% block title %}AI Provider 비교{% endblock %}
 
 {% block extra_css %}
-<style>
-.ai-test-container {
-    padding: 24px;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.page-header {
-    margin-bottom: 24px;
-}
-
-.page-header h1 {
-    font-size: 24px;
-    font-weight: 600;
-    color: #1a1a2e;
-    margin-bottom: 8px;
-}
-
-.page-header .subtitle {
-    color: #666;
-    font-size: 14px;
-}
-
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    margin-bottom: 24px;
-}
-
-.card h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1a1a2e;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.card h3 i {
-    color: #667eea;
-}
-
-.form-row {
-    display: flex;
-    gap: 16px;
-    align-items: flex-end;
-}
-
-.form-group {
-    flex: 1;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
-    font-size: 14px;
-    color: #333;
-}
-
-.form-group input[type="file"],
-.form-group select {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-.btn-primary {
-    padding: 10px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-}
-
-.btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.compare-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 20px;
-}
-
-.provider-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    overflow: hidden;
-}
-
-.provider-header {
-    padding: 16px 20px;
-    background: #f8f9fa;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.provider-name {
-    font-weight: 600;
-    font-size: 16px;
-    color: #1a1a2e;
-}
-
-.provider-status {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.status-success {
-    background: #d4edda;
-    color: #155724;
-}
-
-.status-error {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-.status-pending {
-    background: #e9ecef;
-    color: #6c757d;
-}
-
-.provider-body {
-    padding: 20px;
-}
-
-.provider-meta {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.meta-item {
-    text-align: center;
-    padding: 12px;
-    background: #f8f9fa;
-    border-radius: 8px;
-}
-
-.meta-item .label {
-    font-size: 11px;
-    color: #666;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-}
-
-.meta-item .value {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1a1a2e;
-}
-
-.confidence-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.confidence-high { background: #d4edda; color: #155724; }
-.confidence-medium { background: #fff3cd; color: #856404; }
-.confidence-low { background: #f8d7da; color: #721c24; }
-
-.result-preview {
-    background: #1e1e1e;
-    color: #d4d4d4;
-    padding: 12px;
-    border-radius: 8px;
-    font-family: monospace;
-    font-size: 12px;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.error-message {
-    color: #721c24;
-    padding: 12px;
-    background: #f8d7da;
-    border-radius: 8px;
-    font-size: 13px;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: #999;
-}
-
-.empty-state i {
-    font-size: 48px;
-    margin-bottom: 16px;
-    color: #ddd;
-}
-
-.loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255,255,255,0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #667eea;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/ai-test.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -291,7 +45,7 @@
         <div class="empty-state">
             <i class="fas fa-columns"></i>
             <p>파일을 선택하고 비교 분석을 시작하세요</p>
-            <p style="font-size: 12px; margin-top: 8px;">
+            <p class="text-xs mt-2">
                 사용 가능한 Provider: {{ providers | join(', ') if providers else '없음' }}
             </p>
         </div>
@@ -341,7 +95,7 @@ document.getElementById('compareForm').addEventListener('submit', async (e) => {
                         <span class="provider-name">${getProviderName(p)}</span>
                         <span class="provider-status status-pending">대기중</span>
                     </div>
-                    <div class="provider-body" style="position: relative; min-height: 150px;">
+                    <div class="provider-body">
                         <div class="loading-overlay">
                             <div class="spinner"></div>
                         </div>
@@ -405,9 +159,9 @@ function updateProviderCard(provider, result) {
                     <div class="value">${data.processing_time?.toFixed(2) || '-'}초</div>
                 </div>
             </div>
-            <div class="meta-item" style="margin-bottom: 12px;">
+            <div class="meta-item mb-3">
                 <div class="label">문서 유형</div>
-                <div class="value" style="font-size: 14px;">${data.document_type || '-'}</div>
+                <div class="value text-sm">${data.document_type || '-'}</div>
             </div>
             <pre class="result-preview">${JSON.stringify(data.extracted_fields || data, null, 2)}</pre>
         `;
