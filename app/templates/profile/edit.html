@@ -96,7 +96,8 @@
             {% set form_action = url_for('personal.profile_edit') %}
         {% endif %}
 
-        <form method="POST" action="{{ form_action }}" class="employee-form" id="profileEditForm" enctype="multipart/form-data">
+        <form method="POST" action="{{ form_action }}" class="employee-form" id="profileEditForm" enctype="multipart/form-data"
+              {% if profile_data and profile_data.id %}data-employee-id="{{ profile_data.id }}"{% endif %}>
 
             {# 섹션 1: 개인 기본정보 #}
             {% include 'partials/employee_form/_personal_info.html' %}

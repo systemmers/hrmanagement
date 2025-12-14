@@ -16,7 +16,8 @@
         </div>
         <div class="card-body">
             <div class="dynamic-list" id="awardList">
-                {% set awards = award_list if award_list is defined and award_list else (employee.awards.all() if employee and employee.awards else []) %}
+                {# award_list 우선 사용, 없으면 employee.awards 사용 (리스트/관계 모두 반복 가능) #}
+                {% set awards = award_list if award_list is defined and award_list else (employee.awards if employee and employee.awards else []) %}
                 {% if awards %}
                     {% for award in awards %}
                     <div class="dynamic-item" data-index="{{ loop.index0 }}">

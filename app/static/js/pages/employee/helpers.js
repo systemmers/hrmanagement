@@ -7,12 +7,20 @@
 
 /**
  * 폼에서 직원 ID 추출
+ * 프로필 수정 페이지(profileEditForm)와 직원 수정 페이지(employeeForm) 모두 지원
  * @returns {number|null} 직원 ID 또는 null
  */
 export function getEmployeeIdFromForm() {
-    const form = document.getElementById('employeeForm');
+    // 여러 폼 ID 지원 (직원 수정, 프로필 수정)
+    const form = document.getElementById('employeeForm')
+              || document.getElementById('profileEditForm');
     if (!form) return null;
 
+    // data-employee-id 속성 우선 사용 (프로필 수정 페이지)
+    const dataId = form.dataset.employeeId;
+    if (dataId) return parseInt(dataId, 10);
+
+    // URL 패턴에서 ID 추출 (직원 수정 페이지 폴백)
     const actionUrl = form.getAttribute('action');
     const match = actionUrl.match(/\/employees\/(\d+)\/update/);
     return match ? parseInt(match[1], 10) : null;
