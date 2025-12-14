@@ -57,41 +57,11 @@
     padding: var(--space-8);
 }
 
-/* 정보 그리드 */
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-6);
-}
-
-.info-item {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-}
-
-.info-label {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: var(--text-xs);
-    font-weight: 600;
-    color: var(--color-gray-600);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.info-value {
-    font-size: var(--text-base);
-    color: var(--color-gray-900);
-    font-weight: 500;
-}
+/* .info-grid, .info-item, .info-label, .info-value는 components/info-grid.css에서 정의 */
 
 /* 반응형 */
 @media (max-width: 767px) {
-    .info-grid {
-        grid-template-columns: 1fr;
-    }
+    /* .info-grid 반응형은 info-grid.css에서 정의 */
 
     .detail-header {
         flex-direction: column;

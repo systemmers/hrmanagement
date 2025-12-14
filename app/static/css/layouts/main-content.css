@@ -88,44 +88,7 @@
 
         /* 버튼 스타일은 components/button.css에서 정의됨 */
 
-        /* 대시보드 통계 */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: var(--space-4);
-            margin-bottom: var(--space-8);
-        }
-
-        .stat-card {
-            background-color: var(--color-pure-white);
-            border: 1px solid var(--color-gray-200);
-            border-radius: var(--radius-lg);
-            padding: var(--space-5);
-            transition: all var(--transition-fast);
-        }
-
-        .stat-card:hover {
-            box-shadow: var(--shadow-md);
-            border-color: var(--color-gray-300);
-        }
-
-        .stat-label {
-            font-size: var(--text-xs);
-            color: var(--color-gray-600);
-            margin-bottom: var(--space-2);
-        }
-
-        .stat-value {
-            font-size: var(--text-3xl);
-            font-weight: 700;
-            color: var(--color-gray-900);
-            margin-bottom: var(--space-1);
-        }
-
-        .stat-change {
-            font-size: var(--text-xs);
-            color: var(--color-gray-500);
-        }
+        /* .dashboard-grid, .stat-card, .stat-label, .stat-value는 pages/dashboard.css 또는 components/stats-cards.css에서 정의 */
 
         /* 직원 카드 그리드 */
         .employee-grid {
@@ -308,53 +271,7 @@
             color: var(--color-gray-700);
         }
 
-        .recent-employees-list {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-3);
-        }
-
-        .recent-employee-item {
-            display: flex;
-            align-items: center;
-            gap: var(--space-3);
-            padding: var(--space-3);
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: all var(--transition-fast);
-        }
-
-        .recent-employee-item:hover {
-            background-color: var(--color-gray-50);
-        }
-
-        .recent-employee-photo {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .recent-employee-info {
-            flex: 1;
-        }
-
-        .recent-employee-name {
-            font-size: var(--text-sm);
-            font-weight: 600;
-            color: var(--color-gray-900);
-            margin-bottom: var(--space-0-5);
-        }
-
-        .recent-employee-meta {
-            font-size: var(--text-xs);
-            color: var(--color-gray-600);
-        }
-
-        .recent-employee-date {
-            font-size: var(--text-xs);
-            color: var(--color-gray-500);
-        }
+        /* .recent-employee-* 스타일은 pages/dashboard.css에서 관리 */
 
         .empty-message {
             text-align: center;

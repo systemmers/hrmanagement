@@ -43,14 +43,15 @@
     scroll-margin-top: 80px;
 }
 
-/* 카드 헤더 (타이틀 + 버튼) */
-.card-header {
+/* 카드 헤더는 components/card.css에서 정의 */
+/* 폼 페이지 카드 헤더 확장 - 버튼 배치 */
+.form-section .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.card-header .btn {
+.form-section .card-header .btn {
     flex-shrink: 0;
 }
 

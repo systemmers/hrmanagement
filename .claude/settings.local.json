@@ -76,7 +76,10 @@
       "mcp__playwright__browser_handle_dialog",
       "Bash(set -a)",
       "mcp__playwright__browser_select_option",
-      "mcp__playwright__browser_press_key"
+      "mcp__playwright__browser_press_key",
+      "Bash(paste:*)",
+      "Bash(bc:*)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []

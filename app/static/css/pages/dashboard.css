@@ -3,43 +3,14 @@
  * 대시보드 통계, 카드, 그리드 레이아웃
  */
 
+/* .stat-card, .stat-label, .stat-value는 components/stats-cards.css에서 정의 */
+
 /* 대시보드 통계 그리드 */
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--space-4);
     margin-bottom: var(--space-8);
-}
-
-.stat-card {
-    background-color: var(--color-pure-white);
-    border: 1px solid var(--color-gray-200);
-    border-radius: var(--radius-lg);
-    padding: var(--space-5);
-    transition: all var(--transition-fast);
-}
-
-.stat-card:hover {
-    box-shadow: var(--shadow-md);
-    border-color: var(--color-gray-300);
-}
-
-.stat-label {
-    font-size: var(--text-xs);
-    color: var(--color-gray-600);
-    margin-bottom: var(--space-2);
-}
-
-.stat-value {
-    font-size: var(--text-3xl);
-    font-weight: 700;
-    color: var(--color-gray-900);
-    margin-bottom: var(--space-1);
-}
-
-.stat-change {
-    font-size: var(--text-xs);
-    color: var(--color-gray-500);
 }
 
 /* 직원 카드 그리드 */

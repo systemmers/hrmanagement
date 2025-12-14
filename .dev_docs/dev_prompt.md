@@ -1,5 +1,5 @@
 
-
+AIzaSyCs-KuzV3vZ4yl8TUNHOj0dGtLV30JwrDE
 ---
 
 # git master id
@@ -21,7 +21,8 @@
 - 구조화
 - 스타일 일관성 준수
 - 지시한 것만 진행
-- 다른 코드에 영향을 주지말것것
+- 다른 코드에 영향을 주지말것
+- 코드 및 클래스 중복 
 
 # rememeber 
 - 최대한 분할 작업
@@ -29,7 +30,9 @@
 - git > plan > implement > test > debugging
 - db 마이그레이션
 - 스크린샷, test --play, 비교
-- 패턴턴
+- 패턴
+
+- 
 
 ---
 # today working
@@ -470,6 +473,8 @@ modular
 convention 준수수
 네이밍 스페이스, 네이밍
 
+코드 재정의
+
 
 re-check
 
@@ -495,3 +500,29 @@ ai, api을 설정오류를 수정하여 진행할 수 있게하여라.
 
 
 - 스타일이 누락된것인지 삭제된것인지 기존의 스타일은 있었으나 클래스 이름 
+
+스캔
+
+
+
+js, py 기능 분리가 명확한지 검토하여라.
+
+
+
+단일 책임 원칙 (SRP - Single Responsibility Principle)
+하나의 함수/클래스/모듈은 하나의 변경 이유만 가져야 함
+예: 사용자 인증 함수는 인증만, UI 렌더링은 별도로
+관심사의 분리 (SoC - Separation of Concerns)
+비즈니스 로직, 데이터 처리, UI가 명확히 분리
+예: Python(백엔드 로직) ↔ JavaScript(프론트엔드 상호작용)
+모듈화 (Modularity)
+독립적이고 재사용 가능한 단위로 구성
+예: _form_controls.html, _alerts.html 같은 매크로
+당신의 문서 맥락에서:
+"js, py 기능 분리가 명확한지 검토" → 각 언어가 자신의 책임(서버 로직 vs 클라이언트 상호작용)만 담당하는지 확인
+"soc, modular" → 각 컴포넌트가 명확한 책임을 가지고 독립적으로 동작
+CSS 중복 제거 → 각 스타일 파일이 특정 컴포넌트/레이아웃에 대한 책임만 가짐
+결과: 유지보수성 향상, 버그 감소, 테스트 용이성 증가
+
+
+ js, py 백엔드 프론트엔드

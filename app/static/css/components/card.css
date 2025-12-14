@@ -110,9 +110,7 @@
         padding: var(--space-4);
     }
 
-    .info-grid {
-        grid-template-columns: 1fr;
-    }
+    /* .info-grid 반응형은 info-grid.css에서 정의 */
 
     .section-grid {
         grid-template-columns: 1fr;

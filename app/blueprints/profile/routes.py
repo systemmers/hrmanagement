@@ -324,7 +324,8 @@ def admin_profile_create():
         if not data['name']:
             flash('이름은 필수 입력 항목입니다.', 'error')
             return render_template(
-                'profile/admin_profile_create.html',
+                'profile/admin_profile_form.html',
+                mode='create',
                 user=user,
                 form_data=data
             )
@@ -343,7 +344,8 @@ def admin_profile_create():
             flash(f'프로필 생성 중 오류가 발생했습니다: {error}', 'error')
 
     return render_template(
-        'profile/admin_profile_create.html',
+        'profile/admin_profile_form.html',
+        mode='create',
         user=user,
         form_data={}
     )
@@ -372,7 +374,8 @@ def admin_profile_edit():
         if not data['name']:
             flash('이름은 필수 입력 항목입니다.', 'error')
             return render_template(
-                'profile/admin_profile_edit.html',
+                'profile/admin_profile_form.html',
+                mode='edit',
                 adapter=adapter,
                 form_data=data
             )
@@ -390,7 +393,8 @@ def admin_profile_edit():
             flash(f'프로필 수정 중 오류가 발생했습니다: {error}', 'error')
 
     return render_template(
-        'profile/admin_profile_edit.html',
+        'profile/admin_profile_form.html',
+        mode='edit',
         adapter=adapter,
         form_data=adapter.get_basic_info()
     )

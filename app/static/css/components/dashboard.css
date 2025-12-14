@@ -120,25 +120,7 @@
     text-align: center;
 }
 
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-5);
-    border-radius: var(--radius-full);
-    font-weight: 600;
-    font-size: var(--text-sm);
-}
-
-.status-badge.public {
-    background: #dcfce7;
-    color: #16a34a;
-}
-
-.status-badge.private {
-    background: #f3f4f6;
-    color: #6b7280;
-}
+/* .status-badge는 components/badge.css에서 정의 */
 
 .status-description {
     color: var(--color-gray-600);
