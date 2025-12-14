@@ -26,9 +26,12 @@ class Certificate(db.Model):
             'id': self.id,
             'employee_id': self.employee_id,
             'certificate_name': self.certificate_name,
+            'name': self.certificate_name,  # 템플릿 alias: cert.name
             'issuing_organization': self.issuing_organization,
+            'issuer': self.issuing_organization,  # 템플릿 alias: cert.issuer
             'certificate_number': self.certificate_number,
             'acquisition_date': self.acquisition_date,
+            'acquired_date': self.acquisition_date,  # 템플릿 alias: cert.acquired_date
             'expiry_date': self.expiry_date,
             'grade': self.grade,
             'note': self.note,

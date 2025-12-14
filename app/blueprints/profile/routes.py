@@ -13,6 +13,7 @@ from app.blueprints.profile.decorators import (
 )
 from app.services.corporate_admin_profile_service import corporate_admin_profile_service
 from app.models.user import User
+from app.extensions import attachment_repo
 
 
 @profile_bp.route('/')
@@ -42,6 +43,14 @@ def view():
 
     # 페이지 모드: 프로필 (개인정보만 표시)
     context['page_mode'] = 'profile'
+
+    # 첨부파일 목록 조회 (프로필에서는 수정/삭제 가능)
+    profile_id = adapter.get_profile_id()
+    if profile_id:
+        context['attachment_list'] = attachment_repo.get_by_employee_id(profile_id)
+    else:
+        context['attachment_list'] = []
+    context['is_readonly'] = False  # 프로필에서는 수정 가능
 
     return render_template('profile/detail.html', **context)
 
@@ -80,6 +89,14 @@ def edit():
 
     # 페이지 모드: 프로필 (개인정보만 표시)
     context['page_mode'] = 'profile'
+
+    # 첨부파일 목록 조회 (프로필 수정에서도 수정/삭제 가능)
+    profile_id = adapter.get_profile_id()
+    if profile_id:
+        context['attachment_list'] = attachment_repo.get_by_employee_id(profile_id)
+    else:
+        context['attachment_list'] = []
+    context['is_readonly'] = False  # 프로필에서는 수정 가능
 
     return render_template('profile/edit.html', **context)
 

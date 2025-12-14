@@ -1,19 +1,24 @@
 {# ========================================
    첨부파일 사이드바 공유 템플릿
    - 필요 변수: attachment_list
-   - 사용처: employee_detail.html, employee_form.html
+   - 선택 변수: is_readonly (True일 경우 업로드/삭제 버튼 숨김)
+   - 사용처: employee_detail.html, employee_form.html, profile, mypage
    ======================================== #}
 <aside class="right-sidebar">
     <div class="right-sidebar-header">
         <div class="right-sidebar-header-row">
             <h2 class="right-sidebar-title">개인 첨부서류</h2>
+            {% if not is_readonly %}
             <button type="button" class="btn-ai-analyze" id="btnAiAnalyze" title="AI 첨부서류 분석">
                 <i class="fas fa-wand-magic-sparkles"></i>
                 <span>AI 분석</span>
             </button>
+            {% endif %}
         </div>
     </div>
     <div class="right-sidebar-content">
+        {# 조회 전용 모드가 아닐 때만 업로드 영역 표시 #}
+        {% if not is_readonly %}
         <div class="file-upload-area" id="fileUploadArea">
             <div class="file-upload-icon">
                 <i class="fas fa-cloud-upload-alt"></i>
@@ -21,20 +26,28 @@
             <div class="file-upload-text">파일을 드래그하거나 클릭</div>
             <div class="file-upload-hint">PDF, JPG, PNG (최대 10MB)</div>
         </div>
+        {% endif %}
 
         <div id="fileList">
             {% if attachment_list %}
                 {% for attachment in attachment_list|sort(attribute='category') %}
                 <div class="file-card" data-attachment-id="{{ attachment.id }}">
-                    <div class="file-icon">
-                        {% if attachment.file_type in ['jpg', 'jpeg', 'png', 'gif'] %}
-                            <i class="fas fa-file-image"></i>
+                    <div class="file-icon {% if attachment.file_type in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'] %}file-thumbnail{% endif %}">
+                        {% if attachment.file_type in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'] %}
+                            <img src="{{ attachment.file_path }}"
+                                 alt="{{ attachment.file_name }}"
+                                 class="thumbnail-img"
+                                 loading="lazy">
                         {% elif attachment.file_type == 'pdf' %}
                             <i class="fas fa-file-pdf"></i>
                         {% elif attachment.file_type in ['doc', 'docx'] %}
                             <i class="fas fa-file-word"></i>
                         {% elif attachment.file_type in ['xls', 'xlsx'] %}
                             <i class="fas fa-file-excel"></i>
+                        {% elif attachment.file_type in ['ppt', 'pptx'] %}
+                            <i class="fas fa-file-powerpoint"></i>
+                        {% elif attachment.file_type == 'zip' %}
+                            <i class="fas fa-file-archive"></i>
                         {% else %}
                             <i class="fas fa-file"></i>
                         {% endif %}
@@ -53,9 +66,12 @@
                         <a href="{{ attachment.file_path }}" download class="btn-icon" title="다운로드">
                             <i class="fas fa-download"></i>
                         </a>
+                        {# 조회 전용 모드가 아닐 때만 삭제 버튼 표시 #}
+                        {% if not is_readonly %}
                         <button type="button" class="btn-icon btn-delete-attachment" data-id="{{ attachment.id }}" title="삭제">
                             <i class="fas fa-trash"></i>
                         </button>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}

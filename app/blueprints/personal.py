@@ -415,6 +415,7 @@ def company_card_detail(contract_id):
     """특정 회사 인사카드 상세
 
     개인 계정의 특정 법인 계약에 대한 인사카드 상세 정보를 표시합니다.
+    공유 파셜 템플릿을 사용하여 법인 직원 인사카드와 동일한 구조로 표시합니다.
     """
     user_id = session.get('user_id')
 
@@ -426,11 +427,36 @@ def company_card_detail(contract_id):
         return redirect(url_for('personal.company_card_list'))
 
     return render_template('personal/company_card_detail.html',
+                           # 기본 정보
                            contract=card_data['contract'],
                            company=card_data['company'],
                            employee=card_data.get('employee'),
+                           contract_info=card_data.get('contract_info'),
+                           # 급여/복리후생 (현재 미구현)
                            salary=card_data.get('salary'),
                            benefit=card_data.get('benefit'),
                            insurance=card_data.get('insurance'),
-                           contract_info=card_data.get('contract_info'),
-                           page_mode='hr_card')
+                           # 이력 정보 (공유 파셜용 - _history_info.html)
+                           education_list=card_data.get('education_list', []),
+                           career_list=card_data.get('career_list', []),
+                           certificate_list=card_data.get('certificate_list', []),
+                           language_list=card_data.get('language_list', []),
+                           military=card_data.get('military'),
+                           award_list=card_data.get('award_list', []),
+                           family_list=card_data.get('family_list', []),
+                           # 인사기록 정보 - 개인 계정은 데이터 없음 (섹션 숨김 처리용)
+                           salary_history_list=card_data.get('salary_history_list', []),
+                           salary_payment_list=card_data.get('salary_payment_list', []),
+                           promotion_list=card_data.get('promotion_list', []),
+                           evaluation_list=card_data.get('evaluation_list', []),
+                           training_list=card_data.get('training_list', []),
+                           attendance_summary=card_data.get('attendance_summary'),
+                           asset_list=card_data.get('asset_list', []),
+                           # 첨부파일 (인사카드에서는 조회 전용)
+                           # 개인 계정 첨부파일은 추후 구현 예정
+                           attachment_list=[],
+                           is_readonly=True,
+                           # 페이지 모드 및 계정 타입
+                           page_mode='hr_card',
+                           account_type='personal',
+                           is_corporate=False)

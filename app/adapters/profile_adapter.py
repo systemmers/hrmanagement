@@ -111,11 +111,28 @@ class ProfileAdapter(ABC):
         """
         basic = self.get_basic_info()
 
+        # 이력 데이터 조회 (템플릿에서 employee.educations 형태로 접근 가능하도록)
+        educations = self.get_education_list()
+        careers = self.get_career_list()
+        certificates = self.get_certificate_list()
+        languages = self.get_language_list()
+        military = self.get_military_info()
+        awards = self.get_award_list() if hasattr(self, 'get_award_list') else []
+        family = self.get_family_list() if hasattr(self, 'get_family_list') else []
+
         # 통합 프로필 객체 생성 (템플릿에서 employee.name 또는 profile.name 형태로 접근)
         profile_obj = type('ProfileContext', (), {
             **basic,
             'id': self.get_profile_id(),
             'photo': self.get_photo_url(),
+            # 이력 데이터 속성 추가 (템플릿에서 employee.educations 접근 가능)
+            'educations': educations,
+            'careers': careers,
+            'certificates': certificates,
+            'languages': languages,
+            'military_service': military,
+            'awards': awards,
+            'family_members': family,
         })()
 
         context = {

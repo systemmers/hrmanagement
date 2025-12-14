@@ -14,7 +14,9 @@ from ..extensions import (
     insurance_repo, asset_repo, salary_payment_repo,
     # 파셜 통합을 위한 추가 레포지토리
     education_repo, career_repo, certificate_repo, family_repo,
-    language_repo, military_repo, project_repo, award_repo
+    language_repo, military_repo, project_repo, award_repo,
+    # 명함 첨부파일
+    attachment_repo
 )
 
 mypage_bp = Blueprint('mypage', __name__, url_prefix='/my')
@@ -82,6 +84,13 @@ def company_info():
     project_list = project_repo.get_by_employee_id(employee_id)
     award_list = award_repo.get_by_employee_id(employee_id)
 
+    # 명함 데이터 조회 (조회 전용)
+    business_card_front = attachment_repo.get_one_by_category(employee_id, 'business_card_front')
+    business_card_back = attachment_repo.get_one_by_category(employee_id, 'business_card_back')
+
+    # 첨부파일 목록 조회 (인사카드에서는 조회만 가능)
+    attachment_list = attachment_repo.get_by_employee_id(employee_id)
+
     return render_template('mypage/company_info.html',
                            employee=employee,
                            company_info=company_data,
@@ -106,4 +115,10 @@ def company_info():
                            project_list=project_list,
                            award_list=award_list,
                            is_readonly=True,
-                           page_mode='hr_card')
+                           page_mode='hr_card',
+                           # 명함 데이터 (조회 전용 - 직원은 업로드/삭제 불가)
+                           business_card_front=business_card_front,
+                           business_card_back=business_card_back,
+                           can_edit_business_card=False,
+                           # 첨부파일 (조회 전용)
+                           attachment_list=attachment_list)

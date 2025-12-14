@@ -17,7 +17,9 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/right-sidebar.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/employee-header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/business-card.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/cards.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/tables.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/employee-detail.css') }}">
@@ -59,6 +61,12 @@
 <div class="section-nav-overlay" id="sectionNavOverlay"></div>
 {% endblock %}
 
+{% block sidebar_right %}
+{# 첨부파일 사이드바 (조회 전용) #}
+{% include 'partials/_attachment_sidebar.html' %}
+{% endblock %}
+
 {% block extra_js %}
 <script type="module" src="{{ url_for('static', filename='js/pages/employee-detail.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/business-card.js') }}"></script>
 {% endblock %}

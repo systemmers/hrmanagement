@@ -182,8 +182,9 @@
         </form>
     </main>
 
-    {# 우측 사이드바 (인사카드 수정 시) #}
-    {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
+    {# 우측 사이드바 (첨부파일) #}
+    {# 프로필/인사카드 모두 표시, 법인관리자만 제외 #}
+    {% if account_type != 'corporate_admin' %}
         {% include 'partials/_attachment_sidebar.html' %}
     {% endif %}
 </div>

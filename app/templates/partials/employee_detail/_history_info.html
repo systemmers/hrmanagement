@@ -17,7 +17,6 @@
                             <th>학력구분</th>
                             <th>학교명</th>
                             <th>졸업년월</th>
-                            <th>학부/학과</th>
                             <th>전공</th>
                             <th>학점</th>
                             <th>졸업유무</th>
@@ -31,8 +30,7 @@
                             <td>{{ get_degree_label(edu.degree) }}</td>
                             <td>{{ edu.school }}</td>
                             <td>{{ edu.graduation_year }}</td>
-                            <td>{{ edu.major }}</td>
-                            <td>{{ edu.major }}</td>
+                            <td>{{ edu.major or '-' }}</td>
                             <td>{{ edu.gpa or '-' }}</td>
                             <td><span class="badge badge-success">졸업</span></td>
                             <td>{{ edu.note or '-' }}</td>
@@ -40,7 +38,7 @@
                         {% endfor %}
                         {% else %}
                         <tr>
-                            <td colspan="8" class="table-empty">
+                            <td colspan="7" class="table-empty">
                                 <i class="fas fa-graduation-cap"></i>
                                 <p>등록된 학력정보가 없습니다</p>
                             </td>
@@ -134,7 +132,7 @@
                         <tr>
                             <td>자격증</td>
                             <td>{{ cert.name }}</td>
-                            <td>{{ cert.certificate_number or '-' }}</td>
+                            <td>{{ cert.grade or '-' }}</td>
                             <td>{{ cert.issuer }}</td>
                             <td>{{ cert.acquired_date }}</td>
                             <td>{% if cert.expiry_date %}만료: {{ cert.expiry_date }}{% else %}-{% endif %}</td>

@@ -62,11 +62,18 @@
                 </a>
                 {% endif %}
 
-                {# 수정 버튼 #}
+                {# 수정 버튼 - 인사카드 모드에서는 직원 수정, 프로필 모드에서는 프로필 수정 #}
+                {% if page_mode == 'hr_card' and profile_data and profile_data.id %}
+                <a href="{{ url_for('employees.employee_edit', employee_id=profile_data.id) }}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i>
+                    <span>수정</span>
+                </a>
+                {% else %}
                 <a href="{{ url_for('profile.edit') }}" class="btn btn-primary">
                     <i class="fas fa-edit"></i>
                     <span>수정</span>
                 </a>
+                {% endif %}
 
                 {# 삭제 버튼 (인사카드 페이지에서 관리자만) #}
                 {% if page_mode == 'hr_card' and current_user and current_user.is_admin and account_type != 'corporate_admin' %}
@@ -110,9 +117,9 @@
 {% endblock %}
 
 {% block sidebar_right %}
-{% if page_mode == 'hr_card' %}
+{# 프로필/인사카드 모두 첨부파일 사이드바 표시 #}
+{# 프로필: is_readonly=False (수정/삭제 가능), 인사카드: is_readonly=True (조회만) #}
 {% include 'partials/_attachment_sidebar.html' %}
-{% endif %}
 {% endblock %}
 
 {% block extra_js %}

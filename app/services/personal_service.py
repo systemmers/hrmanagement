@@ -272,7 +272,7 @@ class PersonalService:
         """회사 인사카드 데이터 조회
 
         특정 계약에 대한 회사 인사카드 정보를 반환합니다.
-        employee 데이터도 포함하여 헤더 카드 표시를 지원합니다.
+        employee 데이터, 이력 정보를 포함하여 공유 파셜 템플릿과 호환됩니다.
         """
         from app.models.person_contract import PersonCorporateContract
         from app.models.company import Company
@@ -302,20 +302,74 @@ class PersonalService:
             status='approved'
         ).count()
 
-        # employee 데이터 구성 (헤더 카드용)
+        # employee 데이터 구성 (공유 파셜 템플릿 호환 - _basic_info.html 필드 포함)
         employee_data = None
         if profile:
             employee_data = {
                 'id': user.id if user else user_id,
+                # 개인 기본정보 필드
                 'name': profile.name,
+                'english_name': getattr(profile, 'english_name', None),
+                'chinese_name': getattr(profile, 'chinese_name', None),
                 'photo': profile.photo or 'https://i.pravatar.cc/150',
                 'email': profile.email,
-                'phone': profile.mobile_phone or profile.phone,
+                'phone': profile.mobile_phone or getattr(profile, 'phone', None),
+                'home_phone': getattr(profile, 'home_phone', None),
                 'address': profile.address,
+                'detailed_address': getattr(profile, 'detailed_address', None),
+                'postal_code': getattr(profile, 'postal_code', None),
+                'actual_address': getattr(profile, 'actual_address', None),
+                'actual_detailed_address': getattr(profile, 'actual_detailed_address', None),
                 'birth_date': profile.birth_date,
+                'lunar_birth': getattr(profile, 'lunar_birth', False),
+                'gender': getattr(profile, 'gender', None),
+                'marital_status': getattr(profile, 'marital_status', None),
+                'resident_number': getattr(profile, 'resident_number', None),
+                'nationality': getattr(profile, 'nationality', None),
+                'emergency_contact': getattr(profile, 'emergency_contact', None),
+                'emergency_relation': getattr(profile, 'emergency_relation', None),
+                'blood_type': getattr(profile, 'blood_type', None),
+                'religion': getattr(profile, 'religion', None),
+                'hobby': getattr(profile, 'hobby', None),
+                'specialty': getattr(profile, 'specialty', None),
+                'disability_info': getattr(profile, 'disability_info', None),
+                # 소속정보 (계약 기반)
+                'department': contract.department,
+                'team': contract.department,  # team이 없으면 department 사용
+                'position': contract.position,
+                'job_title': getattr(contract, 'job_title', None),
+                'employee_number': contract.employee_number or f'EMP-{user_id:03d}',
+                'employment_type': getattr(contract, 'employment_type', contract.contract_type),
+                'work_location': getattr(contract, 'work_location', '본사'),
+                'internal_phone': getattr(contract, 'internal_phone', None),
+                'company_email': getattr(contract, 'company_email', None),
+                'hire_date': contract.contract_start_date,
+                'status': 'active',
+                # 계약 관련 추가 필드
+                'contract_period': getattr(contract, 'contract_period', '무기한'),
+                'probation_end': getattr(contract, 'probation_end', None),
+                'resignation_date': getattr(contract, 'resignation_date', None),
+                # 통계
                 'contract_count': contract_count,
                 'created_at': user.created_at.strftime('%Y-%m-%d') if user and user.created_at else '-',
             }
+
+        # 이력 정보 조회 (프로필 ID 기반)
+        education_list = []
+        career_list = []
+        certificate_list = []
+        language_list = []
+        military = None
+        award_list = []
+        family_list = []
+
+        if profile:
+            education_list = self.get_educations(profile.id)
+            career_list = self.get_careers(profile.id)
+            certificate_list = self.get_certificates(profile.id)
+            language_list = self.get_languages(profile.id)
+            military = self.get_military(profile.id)
+            # award_list와 family_list는 별도 repository 필요 (현재 미구현)
 
         # 인사카드 데이터 구성
         return {
@@ -329,6 +383,11 @@ class PersonalService:
                 'contract_start_date': contract.contract_start_date,
                 'contract_end_date': contract.contract_end_date,
                 'approved_at': contract.approved_at,
+                # 계약정보 추가 필드
+                'contract_date': contract.contract_start_date,
+                'contract_period': getattr(contract, 'contract_period', '무기한'),
+                'employee_type': getattr(contract, 'employee_type', None),
+                'work_type': getattr(contract, 'work_type', None),
             },
             'company': {
                 'id': company.id,
@@ -341,7 +400,24 @@ class PersonalService:
                 'contract_type': contract.contract_type,
                 'start_date': contract.contract_start_date,
                 'end_date': contract.contract_end_date,
-            }
+            },
+            # 이력 정보 (공유 파셜용 - _history_info.html)
+            'education_list': education_list,
+            'career_list': career_list,
+            'certificate_list': certificate_list,
+            'language_list': language_list,
+            'military': military,
+            'award_list': award_list,
+            'family_list': family_list,
+            # 인사기록 정보 (공유 파셜용 - _hr_records.html)
+            # 현재 개인 계정에서는 해당 데이터가 없으므로 빈 값으로 반환
+            'salary_history_list': [],
+            'salary_payment_list': [],
+            'promotion_list': [],
+            'evaluation_list': [],
+            'training_list': [],
+            'attendance_summary': None,
+            'asset_list': [],
         }
 
 
