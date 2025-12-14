@@ -30,11 +30,11 @@ def index():
         return redirect(url_for('personal.dashboard'))
 
     # 법인 계정(corporate) 또는 직원 하위계정(employee_sub)인 경우
-    # Employee role은 본인 인사카드로 리다이렉트
+    # Employee role은 본인 프로필로 리다이렉트 (인사카드는 사이드바에서 접근)
     if session.get('user_role') == 'employee':
         employee_id = session.get('employee_id')
         if employee_id:
-            return redirect(url_for('employees.employee_detail', employee_id=employee_id))
+            return redirect(url_for('profile.view'))
         else:
             # employee_id가 없는 경우 (계정이 직원과 연결되지 않음)
             from flask import flash

@@ -31,8 +31,9 @@ Parameters:
   - variant: 'full' | 'basic' | 'history' | 'company' | 'form'
   - employee: 직원 객체 (선택적)
   - is_employee_role: 직원 역할 여부 (폼에서 사용)
+  - is_create_mode: 신규 등록 모드 여부 (복리후생 숨김)
 #}
-{% macro section_nav(title, subtitle, variant='full', employee=none, is_employee_role=false) %}
+{% macro section_nav(title, subtitle, variant='full', employee=none, is_employee_role=false, is_create_mode=false) %}
 <aside class="section-nav" id="sectionNav">
     <div class="section-nav-header">
         <div class="section-nav-title">{{ title }}</div>
@@ -114,7 +115,9 @@ Parameters:
             {% if not is_employee_role %}
             {{ section_nav_item('#contract-info', 'fa-file-contract', '계약정보') }}
             {{ section_nav_item('#salary-info', 'fa-won-sign', '급여정보') }}
+            {% if not is_create_mode %}
             {{ section_nav_item('#benefit-info', 'fa-umbrella-beach', '복리후생') }}
+            {% endif %}
             {{ section_nav_item('#insurance-info', 'fa-shield-alt', '4대보험') }}
             {% endif %}
             {{ section_nav_item('#family-info', 'fa-users', '가족사항') }}

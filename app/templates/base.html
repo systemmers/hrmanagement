@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{% block title %}인사카드 관리 시스템{% endblock %}</title>
     
     <!-- Google Fonts Inter -->
@@ -24,13 +25,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/main-content.css') }}">
 
     <!-- Components -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/buttons.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/badges.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/alerts.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/button.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/badge.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/alert.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/forms.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/tables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/table.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/details.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/modals.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/modal.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/misc.css') }}">
     <!-- Salary Calculator (Split from salary-calculator.css) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/salary-modal.css') }}">
@@ -41,9 +42,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/stats-cards.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/info-grid.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/contracts.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/contract.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/quick-links.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/empty-state.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/notification.css') }}">
 
     <!-- Pages -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/profile.css') }}">
@@ -134,18 +136,8 @@
             <!-- 메인 컨텐츠 -->
             <main class="main-content" role="main" aria-label="메인 콘텐츠">
                 <!-- Flash 메시지 -->
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        <div class="flash-messages" role="alert" aria-live="polite">
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }}">
-                                    <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'error' %}exclamation-circle{% else %}info-circle{% endif %}" aria-hidden="true"></i>
-                                    <span>{{ message }}</span>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                {% endwith %}
+                {% from 'macros/_alerts.html' import render_flash_messages %}
+                {{ render_flash_messages() }}
                 
                 {% block content %}{% endblock %}
             </main>
@@ -162,6 +154,7 @@
 
     <!-- JavaScript -->
     <script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/notification-dropdown.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

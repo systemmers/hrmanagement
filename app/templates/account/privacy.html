@@ -21,6 +21,7 @@
 
 <div class="content-card max-w-600">
     <form method="POST" aria-label="개인정보 공개 설정 폼">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="privacy-section">
             <h4 class="privacy-section-title">
                 <i class="fas fa-address-card"></i>

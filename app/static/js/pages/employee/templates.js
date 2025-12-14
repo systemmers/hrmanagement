@@ -15,7 +15,7 @@ export function getEducationTemplate() {
             <div class="form-grid">
                 <div class="form-group">
                     <label class="form-label">학교명</label>
-                    <input type="text" name="education_school[]" class="form-input" placeholder="대학교명">
+                    <input type="text" name="education_school_name[]" class="form-input" placeholder="대학교명">
                 </div>
                 <div class="form-group">
                     <label class="form-label">학위</label>
@@ -34,7 +34,25 @@ export function getEducationTemplate() {
                 </div>
                 <div class="form-group">
                     <label class="form-label">졸업년도</label>
-                    <input type="text" name="education_year[]" class="form-input" placeholder="2020">
+                    <input type="text" name="education_graduation_year[]" class="form-input" placeholder="2020">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">학점</label>
+                    <input type="text" name="education_gpa[]" class="form-input" placeholder="4.0/4.5">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">졸업유무</label>
+                    <select name="education_graduation_status[]" class="form-input">
+                        <option value="">선택하세요</option>
+                        <option value="graduated">졸업</option>
+                        <option value="enrolled">재학</option>
+                        <option value="leave">휴학</option>
+                        <option value="dropout">중퇴</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">비고</label>
+                    <input type="text" name="education_note[]" class="form-input" placeholder="비고">
                 </div>
             </div>
             <button type="button" class="btn-remove" title="삭제">
@@ -54,7 +72,11 @@ export function getCareerTemplate() {
             <div class="form-grid">
                 <div class="form-group">
                     <label class="form-label">회사명</label>
-                    <input type="text" name="career_company[]" class="form-input" placeholder="회사명">
+                    <input type="text" name="career_company_name[]" class="form-input" placeholder="회사명">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">부서</label>
+                    <input type="text" name="career_department[]" class="form-input" placeholder="개발팀">
                 </div>
                 <div class="form-group">
                     <label class="form-label">직급/직책</label>
@@ -62,11 +84,19 @@ export function getCareerTemplate() {
                 </div>
                 <div class="form-group">
                     <label class="form-label">담당업무</label>
-                    <input type="text" name="career_duty[]" class="form-input" placeholder="웹 개발">
+                    <input type="text" name="career_duties[]" class="form-input" placeholder="웹 개발">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">재직기간</label>
-                    <input type="text" name="career_period[]" class="form-input" placeholder="2020.01 ~ 2023.12">
+                    <label class="form-label">연봉</label>
+                    <input type="number" name="career_salary[]" class="form-input" placeholder="연봉 (원)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">입사일</label>
+                    <input type="date" name="career_start_date[]" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">퇴사일</label>
+                    <input type="date" name="career_end_date[]" class="form-input">
                 </div>
             </div>
             <button type="button" class="btn-remove" title="삭제">
@@ -86,19 +116,27 @@ export function getCertificateTemplate() {
             <div class="form-grid">
                 <div class="form-group">
                     <label class="form-label">자격증명</label>
-                    <input type="text" name="cert_name[]" class="form-input" placeholder="정보처리기사">
+                    <input type="text" name="certificate_name[]" class="form-input" placeholder="정보처리기사">
                 </div>
                 <div class="form-group">
                     <label class="form-label">발급기관</label>
-                    <input type="text" name="cert_issuer[]" class="form-input" placeholder="한국산업인력공단">
+                    <input type="text" name="certificate_issuer[]" class="form-input" placeholder="한국산업인력공단">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">등급/점수</label>
+                    <input type="text" name="certificate_grade[]" class="form-input" placeholder="1급, 900점">
                 </div>
                 <div class="form-group">
                     <label class="form-label">취득일</label>
-                    <input type="date" name="cert_date[]" class="form-input">
+                    <input type="date" name="certificate_date[]" class="form-input">
                 </div>
                 <div class="form-group">
                     <label class="form-label">자격번호</label>
-                    <input type="text" name="cert_number[]" class="form-input" placeholder="자격번호">
+                    <input type="text" name="certificate_number[]" class="form-input" placeholder="자격번호">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">만료일</label>
+                    <input type="date" name="certificate_expiry_date[]" class="form-input">
                 </div>
             </div>
             <button type="button" class="btn-remove" title="삭제">
@@ -132,11 +170,23 @@ export function getFamilyTemplate() {
                 </div>
                 <div class="form-group">
                     <label class="form-label">생년월일</label>
-                    <input type="date" name="family_birth[]" class="form-input">
+                    <input type="date" name="family_birth_date[]" class="form-input">
                 </div>
                 <div class="form-group">
                     <label class="form-label">직업</label>
-                    <input type="text" name="family_job[]" class="form-input" placeholder="직업">
+                    <input type="text" name="family_occupation[]" class="form-input" placeholder="직업">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">연락처</label>
+                    <input type="tel" name="family_phone[]" class="form-input" placeholder="010-0000-0000">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">동거여부</label>
+                    <select name="family_living_together[]" class="form-input">
+                        <option value="">선택하세요</option>
+                        <option value="true">동거</option>
+                        <option value="false">별거</option>
+                    </select>
                 </div>
             </div>
             <button type="button" class="btn-remove" title="삭제">
@@ -181,12 +231,16 @@ export function getLanguageTemplate() {
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">자격증/점수</label>
-                    <input type="text" name="language_cert[]" class="form-input" placeholder="TOEIC 900, JLPT N1 등">
+                    <label class="form-label">시험명</label>
+                    <input type="text" name="language_test_name[]" class="form-input" placeholder="TOEIC, JLPT 등">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">점수/급수</label>
+                    <input type="text" name="language_score[]" class="form-input" placeholder="900점, N1 등">
                 </div>
                 <div class="form-group">
                     <label class="form-label">취득일</label>
-                    <input type="date" name="language_cert_date[]" class="form-input">
+                    <input type="date" name="language_test_date[]" class="form-input">
                 </div>
             </div>
             <button type="button" class="btn-remove" title="삭제">
@@ -241,20 +295,24 @@ export function getAwardTemplate() {
         <div class="dynamic-item" data-index="0">
             <div class="form-grid">
                 <div class="form-group">
+                    <label class="form-label">수상명 <span class="required">*</span></label>
+                    <input type="text" name="award_name[]" class="form-input" placeholder="수상명">
+                </div>
+                <div class="form-group">
                     <label class="form-label">수상일</label>
                     <input type="date" name="award_date[]" class="form-input">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">수상명</label>
-                    <input type="text" name="award_name[]" class="form-input" placeholder="수상명">
-                </div>
-                <div class="form-group">
                     <label class="form-label">수여기관</label>
-                    <input type="text" name="award_issuer[]" class="form-input" placeholder="수여기관">
+                    <input type="text" name="award_institution[]" class="form-input" placeholder="수여기관">
                 </div>
-                <div class="form-group">
+                <div class="form-group form-group-full">
+                    <label class="form-label">수상내용</label>
+                    <textarea name="award_description[]" class="form-input" rows="2" placeholder="수상 내용"></textarea>
+                </div>
+                <div class="form-group form-group-full">
                     <label class="form-label">비고</label>
-                    <input type="text" name="award_note[]" class="form-input" placeholder="비고">
+                    <input type="text" name="award_notes[]" class="form-input" placeholder="비고">
                 </div>
             </div>
             <button type="button" class="btn-remove" title="삭제">

@@ -6,12 +6,30 @@
  */
 
 /**
+ * CSRF 토큰 가져오기
+ * @returns {string|null} CSRF 토큰
+ */
+function getCsrfToken() {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.getAttribute('content') : null;
+}
+
+/**
  * API 기본 설정
  */
-const DEFAULT_HEADERS = {
-    'Content-Type': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest'
-};
+function getDefaultHeaders() {
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+    };
+
+    const csrfToken = getCsrfToken();
+    if (csrfToken) {
+        headers['X-CSRFToken'] = csrfToken;
+    }
+
+    return headers;
+}
 
 /**
  * API 에러 클래스
@@ -67,7 +85,7 @@ export async function request(url, options = {}) {
     try {
         const fetchOptions = {
             method,
-            headers: { ...DEFAULT_HEADERS, ...headers },
+            headers: { ...getDefaultHeaders(), ...headers },
             signal: controller.signal,
             ...rest
         };
@@ -231,6 +249,10 @@ export function uploadFile(url, files, fieldName = 'file', additionalData = {}, 
 
         xhr.open('POST', url);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        const csrfToken = getCsrfToken();
+        if (csrfToken) {
+            xhr.setRequestHeader('X-CSRFToken', csrfToken);
+        }
         xhr.send(formData);
     });
 }

@@ -8,9 +8,9 @@
 
 {% macro render_tree_node(org) %}
 <div class="tree-node" data-id="{{ org.id }}" data-type="{{ org.org_type }}">
-    <div class="tree-node-content" onclick="selectOrganization({{ org.id }})">
+    <div class="tree-node-content" data-action="select-org" data-org-id="{{ org.id }}">
         {% if org.children and org.children|length > 0 %}
-        <span class="tree-toggle" onclick="event.stopPropagation(); toggleNode(this)">
+        <span class="tree-toggle" data-action="toggle-node">
             <i class="fas fa-chevron-right"></i>
         </span>
         {% else %}
@@ -54,7 +54,7 @@
         <p class="page-subtitle">회사의 조직 구조를 관리합니다</p>
     </div>
     <div class="page-actions">
-        <button class="btn btn-primary" onclick="showAddOrgModal()">
+        <button class="btn btn-primary" data-action="add-org">
             <i class="fas fa-plus"></i>
             조직 추가
         </button>
@@ -107,10 +107,10 @@
         <div class="panel-header">
             <h3><i class="fas fa-folder-tree"></i> 조직 구조</h3>
             <div class="panel-actions">
-                <button class="btn btn-icon" onclick="expandAll()" title="전체 펼치기">
+                <button class="btn btn-icon" data-action="expand-all" title="전체 펼치기">
                     <i class="fas fa-expand-alt"></i>
                 </button>
-                <button class="btn btn-icon" onclick="collapseAll()" title="전체 접기">
+                <button class="btn btn-icon" data-action="collapse-all" title="전체 접기">
                     <i class="fas fa-compress-alt"></i>
                 </button>
             </div>
@@ -123,7 +123,7 @@
                     <div class="empty-tree">
                         <i class="fas fa-folder-open"></i>
                         <p>등록된 조직이 없습니다.</p>
-                        <button class="btn btn-primary" onclick="showAddOrgModal()">
+                        <button class="btn btn-primary" data-action="add-org">
                             첫 번째 조직 추가
                         </button>
                     </div>
@@ -151,9 +151,9 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3 id="orgModalTitle">조직 추가</h3>
-            <button class="modal-close" onclick="closeOrgModal()">&times;</button>
+            <button class="modal-close" data-action="close-org-modal">&times;</button>
         </div>
-        <form id="orgForm" onsubmit="saveOrganization(event)">
+        <form id="orgForm" data-action="save-org">
             <div class="modal-body">
                 <input type="hidden" id="orgId" name="id">
 
@@ -196,7 +196,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeOrgModal()">취소</button>
+                <button type="button" class="btn btn-secondary" data-action="close-org-modal">취소</button>
                 <button type="submit" class="btn btn-primary">저장</button>
             </div>
         </form>
@@ -208,7 +208,7 @@
     <div class="modal-content modal-sm">
         <div class="modal-header">
             <h3>조직 삭제</h3>
-            <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            <button class="modal-close" data-action="close-delete-modal">&times;</button>
         </div>
         <div class="modal-body">
             <p id="deleteMessage">이 조직을 삭제하시겠습니까?</p>
@@ -220,8 +220,8 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">취소</button>
-            <button type="button" class="btn btn-danger" onclick="confirmDelete()">삭제</button>
+            <button type="button" class="btn btn-secondary" data-action="close-delete-modal">취소</button>
+            <button type="button" class="btn btn-danger" data-action="confirm-delete">삭제</button>
         </div>
     </div>
 </div>
@@ -229,251 +229,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-let selectedOrgId = null;
-let deleteOrgId = null;
-
-// 트리 노드 토글
-function toggleNode(el) {
-    const node = el.closest('.tree-node');
-    const children = node.querySelector('.tree-children');
-    const icon = el.querySelector('i');
-
-    if (children) {
-        children.classList.toggle('collapsed');
-        icon.classList.toggle('fa-chevron-right');
-        icon.classList.toggle('fa-chevron-down');
-    }
-}
-
-// 전체 펼치기
-function expandAll() {
-    document.querySelectorAll('.tree-children').forEach(el => {
-        el.classList.remove('collapsed');
-    });
-    document.querySelectorAll('.tree-toggle i').forEach(el => {
-        el.classList.remove('fa-chevron-right');
-        el.classList.add('fa-chevron-down');
-    });
-}
-
-// 전체 접기
-function collapseAll() {
-    document.querySelectorAll('.tree-children').forEach(el => {
-        el.classList.add('collapsed');
-    });
-    document.querySelectorAll('.tree-toggle i').forEach(el => {
-        el.classList.add('fa-chevron-right');
-        el.classList.remove('fa-chevron-down');
-    });
-}
-
-// 조직 선택
-async function selectOrganization(orgId) {
-    selectedOrgId = orgId;
-
-    // 기존 선택 해제
-    document.querySelectorAll('.tree-node-content.selected').forEach(el => {
-        el.classList.remove('selected');
-    });
-
-    // 새로운 선택
-    const node = document.querySelector(`.tree-node[data-id="${orgId}"] > .tree-node-content`);
-    if (node) {
-        node.classList.add('selected');
-    }
-
-    // 상세 정보 로드
-    try {
-        const response = await fetch(`/admin/api/organizations/${orgId}`);
-        const result = await response.json();
-
-        if (result.success) {
-            renderOrgDetail(result.data);
-        }
-    } catch (error) {
-        console.error('Error loading organization:', error);
-    }
-}
-
-// 조직 상세 정보 렌더링
-function renderOrgDetail(org) {
-    const panel = document.getElementById('orgDetailPanel');
-    const typeLabels = {
-        'company': '회사',
-        'division': '본부',
-        'department': '부서',
-        'team': '팀',
-        'unit': '파트'
-    };
-
-    panel.querySelector('.panel-body').innerHTML = `
-        <div class="org-detail">
-            <div class="detail-header">
-                <h4>${org.name}</h4>
-                <span class="org-type-badge ${org.org_type}">${typeLabels[org.org_type] || org.org_type}</span>
-            </div>
-
-            <div class="detail-info">
-                <div class="info-row">
-                    <span class="info-label">조직 코드</span>
-                    <span class="info-value">${org.code || '-'}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">조직 경로</span>
-                    <span class="info-value">${org.path || org.name}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">설명</span>
-                    <span class="info-value">${org.description || '-'}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">등록일</span>
-                    <span class="info-value">${org.created_at ? new Date(org.created_at).toLocaleDateString('ko-KR') : '-'}</span>
-                </div>
-            </div>
-
-            <div class="detail-actions">
-                <button class="btn btn-secondary" onclick="showEditOrgModal(${org.id})">
-                    <i class="fas fa-edit"></i> 수정
-                </button>
-                <button class="btn btn-secondary" onclick="showAddChildModal(${org.id})">
-                    <i class="fas fa-plus"></i> 하위 조직 추가
-                </button>
-                <button class="btn btn-danger" onclick="showDeleteModal(${org.id}, '${org.name}')">
-                    <i class="fas fa-trash"></i> 삭제
-                </button>
-            </div>
-        </div>
-    `;
-}
-
-// 조직 추가 모달 표시
-function showAddOrgModal() {
-    document.getElementById('orgModalTitle').textContent = '조직 추가';
-    document.getElementById('orgForm').reset();
-    document.getElementById('orgId').value = '';
-    document.getElementById('orgModal').classList.add('show');
-}
-
-// 하위 조직 추가 모달
-function showAddChildModal(parentId) {
-    showAddOrgModal();
-    document.getElementById('orgParent').value = parentId;
-}
-
-// 조직 수정 모달
-async function showEditOrgModal(orgId) {
-    try {
-        const response = await fetch(`/admin/api/organizations/${orgId}`);
-        const result = await response.json();
-
-        if (result.success) {
-            const org = result.data;
-            document.getElementById('orgModalTitle').textContent = '조직 수정';
-            document.getElementById('orgId').value = org.id;
-            document.getElementById('orgName').value = org.name;
-            document.getElementById('orgCode').value = org.code || '';
-            document.getElementById('orgType').value = org.org_type;
-            document.getElementById('orgParent').value = org.parent_id || '';
-            document.getElementById('orgDescription').value = org.description || '';
-            document.getElementById('orgModal').classList.add('show');
-        }
-    } catch (error) {
-        console.error('Error loading organization:', error);
-    }
-}
-
-// 조직 저장
-async function saveOrganization(event) {
-    event.preventDefault();
-
-    const orgId = document.getElementById('orgId').value;
-    const data = {
-        name: document.getElementById('orgName').value,
-        code: document.getElementById('orgCode').value || null,
-        org_type: document.getElementById('orgType').value,
-        parent_id: document.getElementById('orgParent').value || null,
-        description: document.getElementById('orgDescription').value || null
-    };
-
-    try {
-        const url = orgId ? `/admin/api/organizations/${orgId}` : '/admin/api/organizations';
-        const method = orgId ? 'PUT' : 'POST';
-
-        const response = await fetch(url, {
-            method: method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            closeOrgModal();
-            location.reload();
-        } else {
-            alert(result.error || '저장에 실패했습니다.');
-        }
-    } catch (error) {
-        console.error('Error saving organization:', error);
-        alert('저장 중 오류가 발생했습니다.');
-    }
-}
-
-// 모달 닫기
-function closeOrgModal() {
-    document.getElementById('orgModal').classList.remove('show');
-}
-
-// 삭제 모달 표시
-function showDeleteModal(orgId, orgName) {
-    deleteOrgId = orgId;
-    document.getElementById('deleteMessage').textContent = `'${orgName}' 조직을 삭제하시겠습니까?`;
-    document.getElementById('cascadeDelete').checked = false;
-    document.getElementById('deleteModal').classList.add('show');
-}
-
-// 삭제 모달 닫기
-function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.remove('show');
-    deleteOrgId = null;
-}
-
-// 삭제 확인
-async function confirmDelete() {
-    if (!deleteOrgId) return;
-
-    const cascade = document.getElementById('cascadeDelete').checked;
-
-    try {
-        const response = await fetch(`/admin/api/organizations/${deleteOrgId}?cascade=${cascade}`, {
-            method: 'DELETE'
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            closeDeleteModal();
-            location.reload();
-        } else {
-            alert(result.error || '삭제에 실패했습니다.');
-        }
-    } catch (error) {
-        console.error('Error deleting organization:', error);
-        alert('삭제 중 오류가 발생했습니다.');
-    }
-}
-
-// 페이지 로드 시 첫 번째 레벨 펼치기
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.tree-node[data-type="company"] > .tree-children').forEach(el => {
-        el.classList.remove('collapsed');
-    });
-    document.querySelectorAll('.tree-node[data-type="company"] > .tree-node-content .tree-toggle i').forEach(el => {
-        el.classList.remove('fa-chevron-right');
-        el.classList.add('fa-chevron-down');
-    });
-});
-</script>
+<script src="{{ url_for('static', filename='js/pages/organization.js') }}"></script>
 {% endblock %}

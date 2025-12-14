@@ -2,6 +2,10 @@
 
 {% block title %}계약 상세 - 인사카드 관리 시스템{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/contract-detail.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="page-header">
     <div class="page-title-row">
@@ -121,20 +125,20 @@
         {% if contract.status == 'requested' %}
         <div class="card-footer">
             {% if is_person and contract.requested_by == 'company' %}
-            <button type="button" class="btn btn-success" onclick="approveContract({{ contract.id }})">
+            <button type="button" class="btn btn-success" data-action="approve-contract" data-contract-id="{{ contract.id }}">
                 <i class="fas fa-check"></i>
                 <span>승인</span>
             </button>
-            <button type="button" class="btn btn-danger" onclick="rejectContract({{ contract.id }})">
+            <button type="button" class="btn btn-danger" data-action="reject-contract" data-contract-id="{{ contract.id }}">
                 <i class="fas fa-times"></i>
                 <span>거절</span>
             </button>
             {% elif is_company and contract.requested_by == 'person' %}
-            <button type="button" class="btn btn-success" onclick="approveContract({{ contract.id }})">
+            <button type="button" class="btn btn-success" data-action="approve-contract" data-contract-id="{{ contract.id }}">
                 <i class="fas fa-check"></i>
                 <span>승인</span>
             </button>
-            <button type="button" class="btn btn-danger" onclick="rejectContract({{ contract.id }})">
+            <button type="button" class="btn btn-danger" data-action="reject-contract" data-contract-id="{{ contract.id }}">
                 <i class="fas fa-times"></i>
                 <span>거절</span>
             </button>
@@ -142,7 +146,7 @@
         </div>
         {% elif contract.status == 'approved' %}
         <div class="card-footer">
-            <button type="button" class="btn btn-danger" onclick="terminateContract({{ contract.id }})">
+            <button type="button" class="btn btn-danger" data-action="terminate-contract" data-contract-id="{{ contract.id }}">
                 <i class="fas fa-ban"></i>
                 <span>계약 종료</span>
             </button>
@@ -162,7 +166,7 @@
         <div class="card-body">
             <p class="setting-description">기업에 공개할 정보를 선택하세요.</p>
 
-            <form id="sharingSettingsForm" class="sharing-form">
+            <form id="sharingSettingsForm" class="sharing-form" data-contract-id="{{ contract.id }}">
                 <div class="sharing-grid">
                     <label class="sharing-item">
                         <input type="checkbox" name="share_basic_info" {% if sharing_settings and sharing_settings.share_basic_info %}checked{% endif %}>
@@ -235,295 +239,9 @@
     </div>
     {% endif %}
 </div>
+{% endblock %}
 
-<style>
-.detail-layout {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-6);
-}
-
-.detail-card {
-    background: var(--color-pure-white);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--color-gray-200);
-    overflow: hidden;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-4) var(--space-5);
-    border-bottom: 1px solid var(--color-gray-200);
-    background: var(--color-gray-50);
-}
-
-.card-title {
-    font-size: var(--text-base);
-    font-weight: 600;
-    color: var(--color-gray-700);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-}
-
-.card-title i {
-    color: #10b981;
-}
-
-.card-body {
-    padding: var(--space-5);
-}
-
-.card-footer {
-    display: flex;
-    gap: var(--space-2);
-    padding: var(--space-4) var(--space-5);
-    border-top: 1px solid var(--color-gray-200);
-    background: var(--color-gray-50);
-}
-
-.status-badge {
-    padding: var(--space-1) var(--space-3);
-    border-radius: var(--radius-full);
-    font-size: var(--text-xs);
-    font-weight: 600;
-}
-
-.status-approved { background: #dcfce7; color: #16a34a; }
-.status-requested { background: #fef3c7; color: #d97706; }
-.status-rejected { background: #fee2e2; color: #dc2626; }
-.status-terminated { background: #f3f4f6; color: #6b7280; }
-.status-expired { background: #f3f4f6; color: #6b7280; }
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--space-4);
-}
-
-.info-group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-}
-
-.info-label {
-    font-size: var(--text-xs);
-    color: var(--color-gray-500);
-    font-weight: 500;
-}
-
-.info-value {
-    font-size: var(--text-sm);
-    color: var(--color-gray-900);
-}
-
-.notes-section, .reason-section {
-    margin-top: var(--space-5);
-    padding-top: var(--space-5);
-    border-top: 1px solid var(--color-gray-200);
-}
-
-.notes-content, .reason-content {
-    margin: var(--space-2) 0 0;
-    font-size: var(--text-sm);
-    color: var(--color-gray-700);
-    background: var(--color-gray-50);
-    padding: var(--space-3);
-    border-radius: var(--radius-md);
-}
-
-.reason-section.rejection .reason-content {
-    background: #fee2e2;
-    color: #dc2626;
-}
-
-.reason-section.termination .reason-content {
-    background: #f3f4f6;
-    color: #6b7280;
-}
-
-/* 공유 설정 폼 */
-.setting-description {
-    color: var(--color-gray-600);
-    font-size: var(--text-sm);
-    margin: 0 0 var(--space-4);
-}
-
-.sharing-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: var(--space-3);
-    margin-bottom: var(--space-5);
-}
-
-.sharing-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3);
-    background: var(--color-gray-50);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.sharing-item:hover {
-    background: var(--color-gray-100);
-}
-
-.sharing-item input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: #10b981;
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: var(--text-sm);
-    color: var(--color-gray-700);
-}
-
-.checkbox-label i {
-    width: 16px;
-    color: var(--color-gray-400);
-}
-
-.sync-option {
-    margin-bottom: var(--space-5);
-    padding: var(--space-4);
-    background: #eff6ff;
-    border-radius: var(--radius-md);
-}
-
-.sync-description {
-    margin: var(--space-2) 0 0 28px;
-    font-size: var(--text-xs);
-    color: var(--color-gray-500);
-}
-
-@media (max-width: 768px) {
-    .info-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .sharing-grid {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
-
-<script>
-async function approveContract(contractId) {
-    if (!confirm('이 계약 요청을 승인하시겠습니까?')) return;
-
-    try {
-        const response = await fetch(`/contracts/api/${contractId}/approve`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            alert('계약이 승인되었습니다.');
-            location.reload();
-        } else {
-            alert(result.message || '오류가 발생했습니다.');
-        }
-    } catch (error) {
-        alert('요청 처리 중 오류가 발생했습니다.');
-    }
-}
-
-async function rejectContract(contractId) {
-    const reason = prompt('거절 사유를 입력해주세요 (선택사항):');
-    if (reason === null) return;
-
-    try {
-        const response = await fetch(`/contracts/api/${contractId}/reject`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ reason })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            alert('계약 요청이 거절되었습니다.');
-            location.reload();
-        } else {
-            alert(result.message || '오류가 발생했습니다.');
-        }
-    } catch (error) {
-        alert('요청 처리 중 오류가 발생했습니다.');
-    }
-}
-
-async function terminateContract(contractId) {
-    const reason = prompt('계약 종료 사유를 입력해주세요 (선택사항):');
-    if (reason === null) return;
-
-    if (!confirm('정말 이 계약을 종료하시겠습니까?')) return;
-
-    try {
-        const response = await fetch(`/contracts/api/${contractId}/terminate`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ reason })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            alert('계약이 종료되었습니다.');
-            location.reload();
-        } else {
-            alert(result.message || '오류가 발생했습니다.');
-        }
-    } catch (error) {
-        alert('요청 처리 중 오류가 발생했습니다.');
-    }
-}
-
-// 공유 설정 폼 제출
-document.getElementById('sharingSettingsForm')?.addEventListener('submit', async function(e) {
-    e.preventDefault();
-
-    const formData = new FormData(this);
-    const settings = {
-        share_basic_info: formData.has('share_basic_info'),
-        share_contact: formData.has('share_contact'),
-        share_education: formData.has('share_education'),
-        share_career: formData.has('share_career'),
-        share_certificates: formData.has('share_certificates'),
-        share_languages: formData.has('share_languages'),
-        share_military: formData.has('share_military'),
-        is_realtime_sync: formData.has('is_realtime_sync')
-    };
-
-    try {
-        const response = await fetch(`/contracts/api/{{ contract.id }}/sharing-settings`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(settings)
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            alert('공유 설정이 저장되었습니다.');
-        } else {
-            alert(result.message || '오류가 발생했습니다.');
-        }
-    } catch (error) {
-        alert('요청 처리 중 오류가 발생했습니다.');
-    }
-});
-</script>
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/utils/contract-api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/pages/contract-detail.js') }}"></script>
 {% endblock %}

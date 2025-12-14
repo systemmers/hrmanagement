@@ -3,7 +3,7 @@
 
 직원 CRUD 및 상세 정보 관련 라우트를 제공합니다.
 """
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 
 from ...utils.employee_number import generate_employee_number
 from ...utils.decorators import login_required, admin_required, manager_or_admin_required
@@ -21,8 +21,12 @@ from .helpers import (
     verify_employee_access, extract_employee_from_form, extract_basic_fields_from_form,
     update_family_data, update_education_data, update_career_data,
     update_certificate_data, update_language_data, update_military_data,
-    update_project_data, update_award_data
+    update_project_data, update_award_data,
+    allowed_image_file, get_file_extension, get_profile_photo_folder, get_business_card_folder,
+    generate_unique_filename, MAX_IMAGE_SIZE
 )
+import os
+from datetime import datetime
 
 
 def register_routes(bp: Blueprint):
@@ -93,6 +97,41 @@ def register_routes(bp: Blueprint):
         return render_template('employees/list.html',
                                employees=employees,
                                classification_options=classification_options)
+
+    @bp.route('/api/employees')
+    @manager_or_admin_required
+    def api_employee_list():
+        """직원 목록 API - 내보내기 등에서 사용"""
+        try:
+            org_id = get_current_organization_id()
+            employees = employee_repo.get_all(organization_id=org_id)
+
+            # 직원 데이터를 딕셔너리로 변환
+            employee_list = []
+            for emp in employees:
+                emp_dict = emp.to_dict() if hasattr(emp, 'to_dict') else emp
+                employee_list.append({
+                    'id': emp_dict.get('id'),
+                    'employee_number': emp_dict.get('employee_number', ''),
+                    'name': emp_dict.get('name', ''),
+                    'department': emp_dict.get('department', ''),
+                    'position': emp_dict.get('position', ''),
+                    'email': emp_dict.get('email', ''),
+                    'phone': emp_dict.get('phone', ''),
+                    'hire_date': str(emp_dict.get('hire_date', '')) if emp_dict.get('hire_date') else '',
+                    'status': emp_dict.get('status', '')
+                })
+
+            return jsonify({
+                'success': True,
+                'employees': employee_list,
+                'total': len(employee_list)
+            })
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'error': str(e)
+            }), 500
 
     @bp.route('/employees/<int:employee_id>')
     @login_required
@@ -208,6 +247,7 @@ def register_routes(bp: Blueprint):
                                action='create',
                                is_corporate=True,
                                account_type='corporate',
+                               page_mode='hr_card',
                                classification_options=classification_options)
 
     @bp.route('/employees', methods=['POST'])
@@ -229,8 +269,83 @@ def register_routes(bp: Blueprint):
             # Employee 객체를 Dict로 변환하여 repository에 전달
             employee_data = employee.to_dict() if hasattr(employee, 'to_dict') else vars(employee)
             created_employee = employee_repo.create(employee_data)
-            flash(f'{created_employee["name"]} 직원이 등록되었습니다. 사진과 명함을 추가해주세요.', 'success')
-            return redirect(url_for('employees.employee_edit', employee_id=created_employee['id']))
+            employee_id = created_employee['id']
+
+            # 프로필 사진 파일 처리
+            photo_uploaded = False
+            if 'photoFile' in request.files:
+                file = request.files['photoFile']
+                if file and file.filename and allowed_image_file(file.filename):
+                    # 파일 크기 확인
+                    file.seek(0, os.SEEK_END)
+                    file_size = file.tell()
+                    file.seek(0)
+
+                    if file_size <= MAX_IMAGE_SIZE:
+                        # 파일 저장
+                        ext = get_file_extension(file.filename)
+                        unique_filename = generate_unique_filename(employee_id, file.filename, 'profile')
+                        upload_folder = get_profile_photo_folder()
+                        file_path = os.path.join(upload_folder, unique_filename)
+                        file.save(file_path)
+
+                        # 웹 접근 경로
+                        web_path = f"/static/uploads/profile_photos/{unique_filename}"
+
+                        # DB 저장
+                        attachment_data = {
+                            'employeeId': employee_id,
+                            'fileName': file.filename,
+                            'filePath': web_path,
+                            'fileType': ext,
+                            'fileSize': file_size,
+                            'category': 'profile_photo',
+                            'uploadDate': datetime.now().strftime('%Y-%m-%d')
+                        }
+                        attachment_repo.create(attachment_data)
+                        photo_uploaded = True
+
+            # 명함 파일 처리 (앞면/뒷면)
+            business_card_uploaded = False
+            for side in ['Front', 'Back']:
+                file_key = f'businessCard{side}File'
+                if file_key in request.files:
+                    file = request.files[file_key]
+                    if file and file.filename and allowed_image_file(file.filename):
+                        # 파일 크기 확인
+                        file.seek(0, os.SEEK_END)
+                        file_size = file.tell()
+                        file.seek(0)
+
+                        if file_size <= MAX_IMAGE_SIZE:
+                            # 파일 저장
+                            ext = get_file_extension(file.filename)
+                            unique_filename = generate_unique_filename(employee_id, file.filename, f'business_card_{side.lower()}')
+                            upload_folder = get_business_card_folder()
+                            file_path = os.path.join(upload_folder, unique_filename)
+                            file.save(file_path)
+
+                            # 웹 접근 경로
+                            web_path = f"/static/uploads/business_cards/{unique_filename}"
+
+                            # DB 저장
+                            attachment_data = {
+                                'employeeId': employee_id,
+                                'fileName': file.filename,
+                                'filePath': web_path,
+                                'fileType': ext,
+                                'fileSize': file_size,
+                                'category': f'business_card_{side.lower()}',
+                                'uploadDate': datetime.now().strftime('%Y-%m-%d')
+                            }
+                            attachment_repo.create(attachment_data)
+                            business_card_uploaded = True
+
+            if photo_uploaded or business_card_uploaded:
+                flash(f'{created_employee["name"]} 직원이 등록되었습니다.', 'success')
+            else:
+                flash(f'{created_employee["name"]} 직원이 등록되었습니다. 사진과 명함을 추가해주세요.', 'success')
+            return redirect(url_for('employees.employee_edit', employee_id=employee_id))
 
         except Exception as e:
             flash(f'직원 등록 중 오류가 발생했습니다: {str(e)}', 'error')
@@ -274,6 +389,7 @@ def register_routes(bp: Blueprint):
                                action='update',
                                is_corporate=True,
                                account_type='corporate',
+                               page_mode='hr_card',
                                attachment_list=attachment_list,
                                business_card_front=business_card_front,
                                business_card_back=business_card_back,

@@ -41,6 +41,7 @@
 
         <!-- 회원가입 폼 -->
         <form method="POST" class="auth-form" id="registerForm" aria-label="개인 회원가입 폼">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <!-- 계정 정보 섹션 -->
             <div class="auth-form__section pt-0 border-t-0">
                 <h3 class="auth-form__section-title">
@@ -157,12 +158,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- JS: utils/formatting.js -->
+<!-- JS: utils/formatting.js - 전화번호 자동 포맷팅 (DOMContentLoaded 시 자동 초기화) -->
 <script src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
-<script>
-    // 전화번호 입력 필드 자동 포맷팅 초기화
-    if (window.HRFormatters) {
-        window.HRFormatters.initPhoneInputs();
-    }
-</script>
 {% endblock %}

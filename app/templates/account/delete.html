@@ -36,6 +36,7 @@
     </div>
 
     <form method="POST" class="delete-form" aria-label="계정 탈퇴 폼">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label for="password" class="form-label">
                 <i class="fas fa-lock" aria-hidden="true"></i>

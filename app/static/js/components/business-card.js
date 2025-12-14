@@ -261,12 +261,38 @@ function showToast(message, type) {
     }
 }
 
-// 모달 외부 클릭 시 닫기
+// 이벤트 위임 - data-action 기반 클릭 핸들러
 document.addEventListener('click', (e) => {
+    // 모달 외부 클릭 시 닫기
     const modal = document.getElementById('businessCardModal');
     if (modal && e.target === modal) {
         closeBusinessCardModal();
+        return;
     }
+
+    // data-action 기반 이벤트 처리
+    const target = e.target.closest('[data-action]');
+    if (!target) return;
+
+    const action = target.dataset.action;
+
+    switch (action) {
+        case 'close-business-card-modal':
+            closeBusinessCardModal();
+            break;
+        case 'upload-business-cards':
+            uploadBusinessCards();
+            break;
+    }
+});
+
+// 파일 선택 이벤트 위임
+document.addEventListener('change', (e) => {
+    const target = e.target.closest('[data-action="file-select"]');
+    if (!target) return;
+
+    const side = target.dataset.side;
+    handleFileSelect(target, side);
 });
 
 // ESC 키로 모달 닫기

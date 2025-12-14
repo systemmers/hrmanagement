@@ -26,8 +26,8 @@
 {% if page_mode == 'hr_card' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/business-card.css') }}">
 {% endif %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/cards.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/tables.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/card.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/table.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/employee-detail.css') }}">
 {% endblock %}
 
@@ -77,7 +77,7 @@
 
                 {# 삭제 버튼 (인사카드 페이지에서 관리자만) #}
                 {% if page_mode == 'hr_card' and current_user and current_user.is_admin and account_type != 'corporate_admin' %}
-                <button class="btn btn-danger" onclick="deleteEmployee({{ profile_data.id }}, '{{ profile_name }}')">
+                <button class="btn btn-danger" data-action="delete-employee" data-employee-id="{{ profile_data.id }}" data-employee-name="{{ profile_name }}">
                     <i class="fas fa-trash"></i>
                     <span>삭제</span>
                 </button>

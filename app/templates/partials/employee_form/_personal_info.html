@@ -46,20 +46,85 @@
                         <small class="form-help">JPG, PNG, GIF, WebP (최대 5MB)</small>
                     </div>
                     {% else %}
-                    {# 신규 등록 모드: 비활성화 안내 #}
+                    {# 신규 등록 모드: 파일 선택 가능 #}
                     <label class="form-label">프로필 사진</label>
-                    <div class="photo-upload-disabled">
-                        <div class="disabled-message">
-                            <i class="fas fa-info-circle"></i>
-                            <span>직원 등록 완료 후 사진을 업로드할 수 있습니다.</span>
-                        </div>
+                    <div class="photo-file-upload" id="photoFileUpload">
+                        <input type="file" id="photoFile" name="photoFile"
+                               accept="image/jpeg,image/png,image/gif,image/webp"
+                               class="form-input-file" style="display: none;">
                         <input type="hidden" id="photo" name="photo" value="{{ url_for('static', filename='images/face/face_01_m.png') }}">
+                        <div class="photo-upload-buttons">
+                            <button type="button" class="btn btn-secondary btn-sm" id="selectPhotoBtn">
+                                <i class="fas fa-camera"></i> 사진 선택
+                            </button>
+                        </div>
+                        <small class="form-help">JPG, PNG, GIF, WebP (최대 5MB) - 등록 시 함께 저장됩니다</small>
                     </div>
                     {% endif %}
                 </div>
             </div>
 
-            {# 명함 영역은 인사카드 전용 - 프로필에서는 표시하지 않음 #}
+            {# 명함 영역 - 인사카드 전용 (page_mode == 'hr_card') #}
+            {% if page_mode == 'hr_card' %}
+            <div class="business-card-upload-section">
+                <label class="form-label">명함</label>
+                <div class="business-card-grid">
+                    {# 앞면 #}
+                    <div class="business-card-item" data-side="front">
+                        <div class="card-preview" id="businessCardFrontPreview">
+                            {% if business_card_front %}
+                            <img src="{{ url_for('static', filename='uploads/business_cards/' ~ business_card_front.file_path.split('/')[-1]) }}" alt="명함 앞면">
+                            {% else %}
+                            <div class="card-placeholder">
+                                <i class="fas fa-id-card"></i>
+                                <span>앞면</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-actions">
+                            <input type="file" id="businessCardFrontFile" name="businessCardFrontFile"
+                                   accept="image/jpeg,image/png,image/gif,image/webp"
+                                   class="form-input-file" style="display: none;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('businessCardFrontFile').click()">
+                                <i class="fas fa-upload"></i> 앞면 선택
+                            </button>
+                            {% if action == 'update' and business_card_front %}
+                            <button type="button" class="btn btn-outline-danger btn-sm delete-card-btn" data-side="front">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {# 뒷면 #}
+                    <div class="business-card-item" data-side="back">
+                        <div class="card-preview" id="businessCardBackPreview">
+                            {% if business_card_back %}
+                            <img src="{{ url_for('static', filename='uploads/business_cards/' ~ business_card_back.file_path.split('/')[-1]) }}" alt="명함 뒷면">
+                            {% else %}
+                            <div class="card-placeholder">
+                                <i class="fas fa-id-card"></i>
+                                <span>뒷면</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-actions">
+                            <input type="file" id="businessCardBackFile" name="businessCardBackFile"
+                                   accept="image/jpeg,image/png,image/gif,image/webp"
+                                   class="form-input-file" style="display: none;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('businessCardBackFile').click()">
+                                <i class="fas fa-upload"></i> 뒷면 선택
+                            </button>
+                            {% if action == 'update' and business_card_back %}
+                            <button type="button" class="btn btn-outline-danger btn-sm delete-card-btn" data-side="back">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <small class="form-help">JPG, PNG, GIF, WebP (최대 5MB){% if action == 'create' %} - 등록 시 함께 저장됩니다{% endif %}</small>
+            </div>
+            {% endif %}
 
             <div class="form-grid">
                 <div class="form-group">

@@ -2,6 +2,10 @@
 
 {% block title %}사용자 관리 - {{ company.name }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/corporate-users.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="page-header">
     <div class="page-title-row">
@@ -64,11 +68,11 @@
                 <td>{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else '-' }}</td>
                 <td>
                     <div class="table-actions">
-                        <button class="btn-icon" title="수정" onclick="editUser({{ user.id }})">
+                        <button class="btn-icon" title="수정" data-action="edit-user" data-user-id="{{ user.id }}">
                             <i class="fas fa-edit"></i>
                         </button>
                         {% if user.id != session.get('user_id') %}
-                        <button class="btn-icon btn-icon-danger" title="비활성화" onclick="toggleUserStatus({{ user.id }})">
+                        <button class="btn-icon btn-icon-danger" title="비활성화" data-action="toggle-user-status" data-user-id="{{ user.id }}">
                             <i class="fas fa-{% if user.is_active %}ban{% else %}check{% endif %}"></i>
                         </button>
                         {% endif %}
@@ -90,42 +94,8 @@
     </a>
 </div>
 {% endif %}
+{% endblock %}
 
-<style>
-.user-avatar-small {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    color: var(--color-pure-white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--text-sm);
-    font-weight: 600;
-}
-
-.btn-icon-danger:hover {
-    color: var(--color-red-500);
-}
-
-.empty-state {
-    text-align: center;
-    padding: var(--space-10);
-}
-</style>
-
-<script>
-function editUser(userId) {
-    // 추후 구현
-    alert('사용자 수정 기능은 추후 구현 예정입니다.');
-}
-
-function toggleUserStatus(userId) {
-    if (confirm('사용자 상태를 변경하시겠습니까?')) {
-        // 추후 구현
-        alert('상태 변경 기능은 추후 구현 예정입니다.');
-    }
-}
-</script>
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/pages/corporate-users.js') }}"></script>
 {% endblock %}

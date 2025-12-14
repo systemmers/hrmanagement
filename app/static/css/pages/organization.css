@@ -315,10 +315,6 @@
 /* 모달 스타일은 components/modal.css에서 정의됨
  * 조직도 페이지 전용 모달 확장이 필요한 경우 아래에 추가 */
 
-.modal.show {
-    display: flex;
-}
-
 .modal-content.modal-sm {
     max-width: 400px;
 }

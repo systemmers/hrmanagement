@@ -139,11 +139,11 @@
 
             {% if can_edit_business_card %}
             <div class="business-card-actions">
-                <button type="button" class="btn-upload-card" onclick="openBusinessCardModal()">
+                <button type="button" class="btn-upload-card" data-action="open-business-card-modal">
                     <i class="fas fa-upload"></i> 업로드
                 </button>
                 {% if business_card_front or business_card_back %}
-                <button type="button" class="btn-delete-card" onclick="deleteAllBusinessCards()">
+                <button type="button" class="btn-delete-card" data-action="delete-all-business-cards">
                     <i class="fas fa-trash"></i> 삭제
                 </button>
                 {% endif %}

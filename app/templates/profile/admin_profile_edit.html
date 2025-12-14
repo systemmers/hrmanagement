@@ -4,128 +4,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/register.css') }}">
-<style>
-.admin-profile-form {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: var(--spacing-6);
-}
-
-.admin-profile-form__header {
-    text-align: center;
-    margin-bottom: var(--spacing-8);
-}
-
-.admin-profile-form__title {
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-gray-900);
-    margin-bottom: var(--spacing-2);
-}
-
-.admin-profile-form__subtitle {
-    font-size: var(--font-size-base);
-    color: var(--color-gray-600);
-}
-
-.admin-profile-form__section {
-    background: var(--color-white);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-6);
-    margin-bottom: var(--spacing-6);
-    box-shadow: var(--shadow-sm);
-}
-
-.admin-profile-form__section-title {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-gray-800);
-    margin-bottom: var(--spacing-4);
-    padding-bottom: var(--spacing-2);
-    border-bottom: 1px solid var(--color-gray-200);
-}
-
-.admin-profile-form__row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-4);
-}
-
-.admin-profile-form__group {
-    margin-bottom: var(--spacing-4);
-}
-
-.admin-profile-form__label {
-    display: block;
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-gray-700);
-    margin-bottom: var(--spacing-2);
-}
-
-.admin-profile-form__input,
-.admin-profile-form__textarea {
-    width: 100%;
-    padding: var(--spacing-3);
-    border: 1px solid var(--color-gray-300);
-    border-radius: var(--radius-md);
-    font-size: var(--font-size-base);
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.admin-profile-form__input:focus,
-.admin-profile-form__textarea:focus {
-    outline: none;
-    border-color: var(--color-primary-500);
-    box-shadow: 0 0 0 3px var(--color-primary-100);
-}
-
-.admin-profile-form__textarea {
-    min-height: 100px;
-    resize: vertical;
-}
-
-.admin-profile-form__actions {
-    display: flex;
-    gap: var(--spacing-4);
-    justify-content: flex-end;
-}
-
-.admin-profile-form__btn {
-    padding: var(--spacing-3) var(--spacing-6);
-    border-radius: var(--radius-md);
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-medium);
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.admin-profile-form__btn--primary {
-    background: var(--color-primary-600);
-    color: var(--color-white);
-    border: none;
-}
-
-.admin-profile-form__btn--primary:hover {
-    background: var(--color-primary-700);
-}
-
-.admin-profile-form__btn--secondary {
-    background: var(--color-white);
-    color: var(--color-gray-700);
-    border: 1px solid var(--color-gray-300);
-}
-
-.admin-profile-form__btn--secondary:hover {
-    background: var(--color-gray-50);
-}
-
-@media (max-width: 768px) {
-    .admin-profile-form__row {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin-profile.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -147,6 +26,7 @@
     {% endwith %}
 
     <form method="POST" class="admin-profile-form__form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <!-- 기본 정보 섹션 -->
         <div class="admin-profile-form__section">
             <h3 class="admin-profile-form__section-title">
@@ -283,11 +163,6 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- JS: utils/formatting.js - 전화번호 자동 포맷팅 (DOMContentLoaded 시 자동 초기화) -->
 <script src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
-<script>
-    // 전화번호 입력 필드 자동 포맷팅 초기화
-    if (window.HRFormatters) {
-        window.HRFormatters.initPhoneInputs();
-    }
-</script>
 {% endblock %}

@@ -169,11 +169,11 @@
             <span>상세보기</span>
         </a>
         {% if show_actions and contract.status == 'requested' and contract.requested_by == 'company' %}
-        <button type="button" class="btn btn-sm btn-success" onclick="approveContract({{ contract.id }})">
+        <button type="button" class="btn btn-sm btn-success" data-action="approve-contract" data-contract-id="{{ contract.id }}">
             <i class="fas fa-check"></i>
             <span>승인</span>
         </button>
-        <button type="button" class="btn btn-sm btn-danger" onclick="rejectContract({{ contract.id }})">
+        <button type="button" class="btn btn-sm btn-danger" data-action="reject-contract" data-contract-id="{{ contract.id }}">
             <i class="fas fa-times"></i>
             <span>거절</span>
         </button>
@@ -230,11 +230,11 @@
             <span>승인 시 기업이 귀하의 정보에 접근할 수 있습니다.</span>
         </div>
         <div class="action-buttons">
-            <button type="button" class="btn btn-success" onclick="approveContract({{ contract.id }})">
+            <button type="button" class="btn btn-success" data-action="approve-contract" data-contract-id="{{ contract.id }}">
                 <i class="fas fa-check"></i>
                 <span>승인</span>
             </button>
-            <button type="button" class="btn btn-danger" onclick="rejectContract({{ contract.id }})">
+            <button type="button" class="btn btn-danger" data-action="reject-contract" data-contract-id="{{ contract.id }}">
                 <i class="fas fa-times"></i>
                 <span>거절</span>
             </button>
@@ -314,7 +314,7 @@
     <p>{{ message }}</p>
     {% endif %}
     {% if action_url and action_text %}
-    <a href="{{ action_url }}" class="btn btn-primary" style="margin-top: 16px;">
+    <a href="{{ action_url }}" class="btn btn-primary mt-4">
         <i class="fas fa-plus"></i>
         <span>{{ action_text }}</span>
     </a>
@@ -370,7 +370,7 @@
                 <i class="fas fa-eye"></i>
             </a>
             {% if contract.status == 'approved' %}
-            <button type="button" class="btn btn-sm btn-danger" onclick="terminateContract({{ contract.id }})" title="계약 종료">
+            <button type="button" class="btn btn-sm btn-danger" data-action="terminate-contract" data-contract-id="{{ contract.id }}" title="계약 종료">
                 <i class="fas fa-ban"></i>
             </button>
             {% endif %}

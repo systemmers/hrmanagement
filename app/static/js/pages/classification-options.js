@@ -268,31 +268,75 @@ function deleteStatus(value) {
     );
 }
 
-// 모달 외부 클릭 시 닫기
+// 이벤트 위임 패턴 - 클릭 이벤트
 document.addEventListener('click', (e) => {
+    // 모달 외부 클릭 시 닫기
     if (e.target.classList.contains('modal')) {
         e.target.style.display = 'none';
+        return;
+    }
+
+    // data-action 기반 이벤트 처리
+    const target = e.target.closest('[data-action]');
+    if (!target) return;
+
+    const action = target.dataset.action;
+    const value = target.dataset.value;
+    const label = target.dataset.label;
+
+    switch (action) {
+        // 부서 관련
+        case 'add-department':
+            showAddDepartmentModal();
+            break;
+        case 'edit-department':
+            editDepartment(value);
+            break;
+        case 'delete-department':
+            deleteDepartment(value);
+            break;
+        case 'close-department-modal':
+            closeDepartmentModal();
+            break;
+        case 'save-department':
+            saveDepartment();
+            break;
+
+        // 직급 관련
+        case 'add-position':
+            showAddPositionModal();
+            break;
+        case 'edit-position':
+            editPosition(value);
+            break;
+        case 'delete-position':
+            deletePosition(value);
+            break;
+        case 'close-position-modal':
+            closePositionModal();
+            break;
+        case 'save-position':
+            savePosition();
+            break;
+
+        // 상태 관련
+        case 'add-status':
+            showAddStatusModal();
+            break;
+        case 'edit-status':
+            editStatus(value, label);
+            break;
+        case 'delete-status':
+            deleteStatus(value);
+            break;
+        case 'close-status-modal':
+            closeStatusModal();
+            break;
+        case 'save-status':
+            saveStatus();
+            break;
     }
 });
-
-// window에 함수 노출 (inline onclick 호환성)
-window.showAddDepartmentModal = showAddDepartmentModal;
-window.editDepartment = editDepartment;
-window.closeDepartmentModal = closeDepartmentModal;
-window.saveDepartment = saveDepartment;
-window.deleteDepartment = deleteDepartment;
-
-window.showAddPositionModal = showAddPositionModal;
-window.editPosition = editPosition;
-window.closePositionModal = closePositionModal;
-window.savePosition = savePosition;
-window.deletePosition = deletePosition;
-
-window.showAddStatusModal = showAddStatusModal;
-window.editStatus = editStatus;
-window.closeStatusModal = closeStatusModal;
-window.saveStatus = saveStatus;
-window.deleteStatus = deleteStatus;
 
 // export for module usage
 export {

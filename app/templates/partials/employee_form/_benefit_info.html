@@ -3,7 +3,9 @@
     인사카드 전용: 직원 본인이 수정할 수 없고, 관리자만 별도 관리
     employee: 직원 객체 (수정 모드일 때)
     benefit: 복리후생 객체
+    action: 'create' 또는 'update' (신규 등록 시 숨김)
 #}
+{% if action != 'create' %}
 <section class="form-section" id="benefit-info">
     <div class="card">
         <div class="card-header">
@@ -61,3 +63,4 @@
         </div>
     </div>
 </section>
+{% endif %}

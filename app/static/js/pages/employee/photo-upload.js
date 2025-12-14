@@ -112,6 +112,50 @@ async function handleDeletePhoto(employeeId, deleteBtn) {
 }
 
 /**
+ * 프로필 사진 파일 미리보기 초기화 (신규 등록 모드)
+ * 파일을 선택하면 미리보기만 표시하고, 실제 업로드는 폼 제출 시 서버에서 처리
+ */
+export function initPhotoPreviewForCreate() {
+    const selectPhotoBtn = document.getElementById('selectPhotoBtn');
+    const photoFileInput = document.getElementById('photoFile');
+    const photoPreview = document.getElementById('photoPreview');
+
+    if (!selectPhotoBtn || !photoFileInput) return;
+
+    // 직원 ID가 있으면 수정 모드이므로 여기서 처리하지 않음
+    const employeeId = getEmployeeIdFromForm();
+    if (employeeId) return;
+
+    // 사진 선택 버튼 클릭
+    selectPhotoBtn.addEventListener('click', () => {
+        photoFileInput.click();
+    });
+
+    // 파일 선택 시 미리보기만 표시
+    photoFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // 파일 유효성 검사
+        const validation = validateImageFile(file);
+        if (!validation.valid) {
+            showToast(validation.error, 'error');
+            photoFileInput.value = '';
+            return;
+        }
+
+        // FileReader로 미리보기 생성
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            photoPreview.innerHTML = `<img src="${event.target.result}" alt="프로필 사진 미리보기" id="previewImage">`;
+        };
+        reader.readAsDataURL(file);
+
+        showToast('사진이 선택되었습니다. 등록 시 함께 저장됩니다.', 'info');
+    });
+}
+
+/**
  * 프로필 사진 파일 업로드 초기화 (수정 모드)
  */
 export function initProfilePhotoUpload() {
@@ -125,7 +169,11 @@ export function initProfilePhotoUpload() {
 
     // 직원 ID 추출
     const employeeId = getEmployeeIdFromForm();
-    if (!employeeId) return;
+    if (!employeeId) {
+        // 신규 등록 모드면 미리보기 전용 초기화 실행
+        initPhotoPreviewForCreate();
+        return;
+    }
 
     // 사진 선택 버튼 클릭
     selectPhotoBtn.addEventListener('click', () => {
@@ -191,5 +239,6 @@ export function initProfilePhotoUpload() {
 
 export default {
     initPhotoPreview,
+    initPhotoPreviewForCreate,
     initProfilePhotoUpload
 };

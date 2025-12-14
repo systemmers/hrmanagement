@@ -68,25 +68,28 @@ export function initContractFilters(config = {}) {
  */
 export function initContractActions(containerSelector = '.contracts-list, .contracts-table-wrapper') {
     const containers = document.querySelectorAll(containerSelector);
-    
+
     containers.forEach(container => {
         container.addEventListener('click', async (e) => {
             const btn = e.target.closest('[data-action]');
-            if (\!btn) return;
-            
+            if (!btn) return;
+
             const action = btn.dataset.action;
             const contractId = btn.dataset.contractId;
-            
-            if (\!contractId) return;
-            
+
+            if (!contractId) return;
+
             switch (action) {
                 case 'approve':
+                case 'approve-contract':
                     await approveContract(contractId);
                     break;
                 case 'reject':
+                case 'reject-contract':
                     await rejectContract(contractId);
                     break;
                 case 'terminate':
+                case 'terminate-contract':
                     await terminateContract(contractId);
                     break;
             }

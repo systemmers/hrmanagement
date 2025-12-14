@@ -72,26 +72,18 @@ function resetFilters() {
 }
 
 /**
- * 필터 제거 버튼 설정
+ * 필터 제거 버튼 설정 - data-action 기반 이벤트 위임
  */
 function initFilterRemove() {
-    const activeFilters = document.getElementById('active-filters');
-    if (!activeFilters) return;
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('[data-action="remove-filter"]');
+        if (!target) return;
 
-    activeFilters.addEventListener('click', (e) => {
-        const btn = e.target.closest('button');
-        if (!btn) return;
+        const filterType = target.dataset.filterType;
+        const filterValue = target.dataset.filterValue;
 
-        const tag = btn.closest('.filter-tag');
-        if (!tag) return;
-
-        // 버튼의 onclick에서 파라미터 추출
-        const onclickAttr = btn.getAttribute('onclick');
-        if (onclickAttr) {
-            const match = onclickAttr.match(/removeFilter\('([^']+)',\s*'([^']+)'\)/);
-            if (match) {
-                removeFilter(match[1], match[2]);
-            }
+        if (filterType && filterValue) {
+            removeFilter(filterType, filterValue);
         }
     });
 }

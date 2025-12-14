@@ -1,47 +1,71 @@
 /**
  * Info Grid Component
  * 정보 표시 그리드 공통 스타일
- * 사용: contracts/, corporate/dashboard, personal/profile
+ * 사용: contracts/, corporate/dashboard, personal/profile, card.css
  */
 
-/* Info Grid */
+/* Info Grid - 기본 (2열 고정) */
 .info-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-4);
 }
 
-/* Contract Info Grid - auto-fit variant */
+/* Info Grid - 자동 맞춤 변형 */
+.info-grid--auto {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-5);
+}
+
+/* Contract Info Grid - 좁은 너비 자동 맞춤 */
 .contract-info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: var(--space-4);
 }
 
-/* Info Item */
-.info-item {
+/* Info Item / Info Group */
+.info-item,
+.info-group {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
 }
 
+/* 전체 너비 아이템 */
+.info-group--full {
+    grid-column: 1 / -1;
+}
+
 /* Info Label */
 .info-label {
-    font-size: var(--text-xs);
-    color: var(--color-gray-500);
+    font-size: var(--text-sm);
+    color: var(--color-gray-600);
     font-weight: 500;
 }
 
 /* Info Value */
 .info-value {
-    font-size: var(--text-sm);
+    font-size: var(--text-base);
     color: var(--color-gray-900);
-    font-weight: 500;
+    font-weight: 400;
+}
+
+/* Info Value 변형 */
+.info-value--highlight {
+    color: var(--color-primary-600, #2563eb);
+    font-weight: 600;
+}
+
+.info-value--empty {
+    color: var(--color-gray-400);
+    font-style: italic;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .info-grid {
+    .info-grid,
+    .info-grid--auto {
         grid-template-columns: 1fr;
     }
 }

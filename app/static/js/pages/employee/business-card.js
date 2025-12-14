@@ -150,7 +150,61 @@ async function handleBusinessCardUpload(e, side, employeeId) {
 }
 
 /**
- * 명함 업로드 초기화
+ * 명함 파일 미리보기 초기화 (신규 등록 모드)
+ * 파일을 선택하면 미리보기만 표시하고, 실제 업로드는 폼 제출 시 서버에서 처리
+ */
+export function initBusinessCardPreviewForCreate() {
+    const frontFileInput = document.getElementById('businessCardFrontFile');
+    const backFileInput = document.getElementById('businessCardBackFile');
+
+    if (!frontFileInput && !backFileInput) return;
+
+    // 직원 ID가 있으면 수정 모드이므로 여기서 처리하지 않음
+    const employeeId = getEmployeeIdFromForm();
+    if (employeeId) return;
+
+    // 파일 선택 시 미리보기 표시
+    const handleFilePreview = (e, side) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // 파일 유효성 검사
+        const validation = validateImageFile(file);
+        if (!validation.valid) {
+            showToast(validation.error, 'error');
+            e.target.value = '';
+            return;
+        }
+
+        const previewId = side === 'front' ? 'businessCardFrontPreview' : 'businessCardBackPreview';
+        const sideLabel = side === 'front' ? '앞면' : '뒷면';
+        const preview = document.getElementById(previewId);
+
+        if (preview) {
+            // FileReader로 미리보기 생성
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                preview.innerHTML = `<img src="${event.target.result}" alt="명함 ${sideLabel} 미리보기">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        showToast(`명함 ${sideLabel}이 선택되었습니다. 등록 시 함께 저장됩니다.`, 'info');
+    };
+
+    // 앞면 미리보기
+    if (frontFileInput) {
+        frontFileInput.addEventListener('change', (e) => handleFilePreview(e, 'front'));
+    }
+
+    // 뒷면 미리보기
+    if (backFileInput) {
+        backFileInput.addEventListener('change', (e) => handleFilePreview(e, 'back'));
+    }
+}
+
+/**
+ * 명함 업로드 초기화 (수정 모드)
  */
 export function initBusinessCardUpload() {
     const frontFileInput = document.getElementById('businessCardFrontFile');
@@ -159,7 +213,11 @@ export function initBusinessCardUpload() {
     if (!frontFileInput && !backFileInput) return;
 
     const employeeId = getEmployeeIdFromForm();
-    if (!employeeId) return;
+    if (!employeeId) {
+        // 신규 등록 모드면 미리보기 전용 초기화 실행
+        initBusinessCardPreviewForCreate();
+        return;
+    }
 
     // 앞면 업로드
     if (frontFileInput) {
@@ -180,5 +238,6 @@ export function initBusinessCardUpload() {
 }
 
 export default {
-    initBusinessCardUpload
+    initBusinessCardUpload,
+    initBusinessCardPreviewForCreate
 };

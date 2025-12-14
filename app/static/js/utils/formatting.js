@@ -155,6 +155,19 @@ export function formatDateOnly(dateStr) {
 }
 
 /**
+ * 날짜와 시간을 한국어 형식으로 포맷팅
+ * @param {Date|string} date - 날짜 객체 또는 문자열
+ * @param {string} fallback - 빈 값일 때 반환할 문자열
+ * @returns {string} 포맷된 날짜/시간 (예: 2024. 1. 15. 오후 3:30:00)
+ */
+export function formatDateTime(date, fallback = '-') {
+    if (!date) return fallback;
+    const d = date instanceof Date ? date : new Date(date);
+    if (isNaN(d.getTime())) return fallback;
+    return d.toLocaleString('ko-KR');
+}
+
+/**
  * 전화번호 입력 필드에 자동 포맷 이벤트 바인딩
  * @param {string} selector - CSS 선택자 (기본값: 'input[type="tel"]')
  */
@@ -206,10 +219,20 @@ if (typeof window !== 'undefined') {
         formatDate,
         formatDateKorean,
         formatDateOnly,
+        formatDateTime,
         formatPhone,
         formatBusinessNumber,
         formatFileSize,
         initPhoneInputs,
         initBusinessNumberInputs
     };
+
+    // DOMContentLoaded 시 자동 초기화
+    // data-auto-format="phone" 또는 type="tel" 입력 필드 자동 포맷팅
+    document.addEventListener('DOMContentLoaded', function() {
+        // 전화번호 입력 필드 자동 초기화
+        initPhoneInputs();
+        // 사업자등록번호 입력 필드 자동 초기화
+        initBusinessNumberInputs();
+    });
 }

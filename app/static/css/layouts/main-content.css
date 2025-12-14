@@ -86,40 +86,7 @@
             color: var(--color-gray-600);
         }
 
-        /* 버튼 */
-        .btn {
-            padding: var(--space-2-5) var(--space-4);
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: var(--text-sm);
-            font-weight: 500;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-2);
-        }
-
-        .btn-primary {
-            background-color: var(--color-gray-900);
-            color: var(--color-pure-white);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--color-gray-800);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-secondary {
-            background-color: var(--color-pure-white);
-            color: var(--color-gray-700);
-            border: 1px solid var(--color-gray-300);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--color-gray-50);
-            border-color: var(--color-gray-400);
-        }
+        /* 버튼 스타일은 components/button.css에서 정의됨 */
 
         /* 대시보드 통계 */
         .dashboard-grid {

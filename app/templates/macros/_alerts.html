@@ -1,0 +1,66 @@
+{#
+    알림 메시지 매크로
+    Flash 메시지 및 알림 박스 렌더링을 위한 재사용 가능한 매크로
+#}
+
+{# Flash 메시지 렌더링 #}
+{% macro render_flash_messages() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'error' or category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}" aria-hidden="true"></i>
+            <span>{{ message }}</span>
+            <button type="button" class="alert-close" data-action="close-alert" aria-label="닫기">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endwith %}
+{% endmacro %}
+
+{# 인증 페이지용 Flash 메시지 (스타일 다름) #}
+{% macro render_auth_flash_messages() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="auth-alert auth-alert--{{ category }}" role="alert">
+            <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'error' or category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}" aria-hidden="true"></i>
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+{% endmacro %}
+
+{# 단일 알림 박스 #}
+{% macro alert(message, category='info', dismissible=true) %}
+<div class="alert alert-{{ category }}" role="alert">
+    <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'error' or category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}" aria-hidden="true"></i>
+    <span>{{ message }}</span>
+    {% if dismissible %}
+    <button type="button" class="alert-close" data-action="close-alert" aria-label="닫기">
+        <i class="fas fa-times" aria-hidden="true"></i>
+    </button>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 정보 박스 (닫기 버튼 없음) #}
+{% macro info_box(message, category='info') %}
+<div class="alert alert-{{ category }} alert-info-box" role="note">
+    <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'error' or category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}" aria-hidden="true"></i>
+    <span>{{ message }}</span>
+</div>
+{% endmacro %}
+
+{# 빈 상태 메시지 #}
+{% macro empty_state(message, icon='inbox', size='') %}
+<div class="empty-state {% if size %}empty-state-{{ size }}{% endif %}">
+    <i class="fas fa-{{ icon }}" aria-hidden="true"></i>
+    <p>{{ message }}</p>
+</div>
+{% endmacro %}

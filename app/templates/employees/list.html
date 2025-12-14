@@ -70,7 +70,7 @@
         {% for dept in request.args.getlist('department') %}
         <span class="filter-tag">
             부서: {{ dept }}
-            <button onclick="removeFilter('department', '{{ dept }}')">×</button>
+            <button data-action="remove-filter" data-filter-type="department" data-filter-value="{{ dept }}">×</button>
         </span>
         {% endfor %}
     {% endif %}
@@ -78,7 +78,7 @@
         {% for pos in request.args.getlist('position') %}
         <span class="filter-tag">
             직급: {{ pos }}
-            <button onclick="removeFilter('position', '{{ pos }}')">×</button>
+            <button data-action="remove-filter" data-filter-type="position" data-filter-value="{{ pos }}">×</button>
         </span>
         {% endfor %}
     {% endif %}
@@ -88,7 +88,7 @@
                 {% if status.value == status_val %}
                 <span class="filter-tag">
                     상태: {{ status.label }}
-                    <button onclick="removeFilter('status', '{{ status_val }}')">×</button>
+                    <button data-action="remove-filter" data-filter-type="status" data-filter-value="{{ status_val }}">×</button>
                 </span>
                 {% endif %}
             {% endfor %}

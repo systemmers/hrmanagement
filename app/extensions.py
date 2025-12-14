@@ -4,6 +4,10 @@
 App Factory 패턴에서 저장소 인스턴스의 지연 초기화를 관리합니다.
 SQLAlchemy 기반 Repository를 사용합니다.
 """
+from flask_wtf.csrf import CSRFProtect
+
+# CSRF 보호 인스턴스
+csrf = CSRFProtect()
 
 # 저장소 인스턴스 (지연 초기화)
 # 기본 저장소
@@ -66,6 +70,9 @@ def init_extensions(app):
     global salary_payment_repo, attachment_repo
     global user_repo, organization_repo, system_setting_repo
     global person_contract_repo
+
+    # CSRF 보호 초기화
+    csrf.init_app(app)
 
     # SQLAlchemy 기반 Repository import
     from .repositories import (

@@ -2,6 +2,23 @@
    통합 프로필 페이지 스타일
    - 법인/개인 계정 공통 프로필 뷰
    - 테마 변수를 통한 계정 유형별 스타일링
+   ========================================
+
+   INDEX:
+   1. CSS Variables / Theme           (line ~10)
+   2. Profile Page Layout             (line ~36)
+   3. Profile Header                  (line ~63)
+   4. Profile Navigation Override     (line ~149)
+   5. Profile Content / Section       (line ~171)
+   6. Subsection                      (line ~220)
+   7. Info Grid                       (line ~246)
+   8. Timeline                        (line ~287)
+   9. Card List (Certificate/Language)(line ~362)
+   10. Data Table                     (line ~479)
+   11. Status Badge                   (line ~524)
+   12. Empty/Loading/Error State      (line ~566)
+   13. Mobile Navigation              (line ~634)
+   14. Responsive Layout              (line ~675)
    ======================================== */
 
 /* ----------------------------------------

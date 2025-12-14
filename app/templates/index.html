@@ -11,7 +11,7 @@
     <div class="page-title-row">
         <h1 class="page-title">직원 관리</h1>
         <div class="page-actions">
-            <button class="btn btn-secondary" onclick="window.print()">
+            <button class="btn btn-secondary" data-action="print-page">
                 <i class="fas fa-download"></i>
                 <span>내보내기</span>
             </button>
@@ -121,14 +121,14 @@
             {% if recent_employees %}
             <div class="recent-employees-list">
                 {% for employee in recent_employees %}
-                <div class="recent-employee-item" onclick="window.location.href='{{ url_for('employees.employee_detail', employee_id=employee.id) }}'">
+                <a href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}" class="recent-employee-item">
                     <img src="{{ employee.photo }}" alt="{{ employee.name }}" class="recent-employee-photo">
                     <div class="recent-employee-info">
                         <div class="recent-employee-name">{{ employee.name }}</div>
                         <div class="recent-employee-meta">{{ employee.department }} · {{ employee.position }}</div>
                     </div>
                     <div class="recent-employee-date">{{ employee.hire_date }}</div>
-                </div>
+                </a>
                 {% endfor %}
             </div>
             {% else %}
@@ -148,4 +148,10 @@
     </a>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<!-- SheetJS for Excel Export -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<script src="{{ url_for('static', filename='js/pages/dashboard.js') }}"></script>
 {% endblock %}

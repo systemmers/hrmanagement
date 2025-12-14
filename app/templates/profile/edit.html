@@ -24,7 +24,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/cards.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/card.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/employee-form.css') }}">
 {% if is_corporate %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/right-sidebar.css') }}">
@@ -40,7 +40,7 @@
 <div class="form-page-layout-with-sidebar">
     {# 좌측: 섹션 네비게이션 #}
     {% if page_mode == 'hr_card' %}
-        {{ section_nav('인사정보 ' ~ ('등록' if is_create_mode else '수정'), profile_name, variant='form', employee=profile_data, is_employee_role=is_employee_role) }}
+        {{ section_nav('인사정보 ' ~ ('등록' if is_create_mode else '수정'), profile_name, variant='form', employee=profile_data, is_employee_role=is_employee_role, is_create_mode=is_create_mode) }}
     {% else %}
         {{ section_nav('프로필 수정', profile_name, variant='profile') }}
     {% endif %}
@@ -98,6 +98,7 @@
 
         <form method="POST" action="{{ form_action }}" class="employee-form" id="profileEditForm" enctype="multipart/form-data"
               {% if profile_data and profile_data.id %}data-employee-id="{{ profile_data.id }}"{% endif %}>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             {# 섹션 1: 개인 기본정보 #}
             {% include 'partials/employee_form/_personal_info.html' %}
@@ -196,48 +197,6 @@
 {% endif %}
 <script type="module" src="{{ url_for('static', filename='js/pages/employee-form.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 전화번호 입력 필드 자동 포맷팅 초기화
-    if (window.HRFormatters) {
-        window.HRFormatters.initPhoneInputs();
-    }
-
-    // 섹션 네비게이션 활성화
-    const navItems = document.querySelectorAll('.section-nav-item');
-    const sections = document.querySelectorAll('.form-section');
-
-    function updateActiveNav() {
-        let currentSection = '';
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop - 150;
-            if (window.scrollY >= sectionTop) {
-                currentSection = section.getAttribute('id');
-            }
-        });
-
-        navItems.forEach(item => {
-            item.classList.remove('active');
-            if (item.getAttribute('href') === '#' + currentSection) {
-                item.classList.add('active');
-            }
-        });
-    }
-
-    window.addEventListener('scroll', updateActiveNav);
-
-    navItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            const targetSection = document.getElementById(targetId);
-            if (targetSection) {
-                targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        });
-    });
-});
-</script>
 {# 카카오 주소 API #}
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 {% endblock %}
