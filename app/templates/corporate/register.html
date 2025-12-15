@@ -255,8 +255,8 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- JS: utils/formatting.js, utils/contract-api.js, pages/corporate-register.js -->
+<!-- JS: utils/formatting.js, services/contract-service.js, pages/corporate-register.js -->
 <script src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
-<script src="{{ url_for('static', filename='js/utils/contract-api.js') }}"></script>
-<script src="{{ url_for('static', filename='js/pages/corporate-register.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/services/contract-service.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/pages/corporate-register.js') }}"></script>
 {% endblock %}

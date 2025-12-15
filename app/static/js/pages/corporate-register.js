@@ -7,7 +7,7 @@
  *
  * Dependencies:
  * - js/utils/formatting.js (HRFormatters)
- * - js/utils/contract-api.js (HRContractAPI)
+ * - js/services/contract-service.js (HRContractAPI)
  */
 
 document.addEventListener('DOMContentLoaded', function() {

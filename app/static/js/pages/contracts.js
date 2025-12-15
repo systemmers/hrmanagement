@@ -7,7 +7,7 @@
  * - initContractActions: 계약 액션 버튼 초기화
  */
 
-import { approveContract, rejectContract, terminateContract } from '../utils/contract-api.js';
+import { approveContract, rejectContract, terminateContract } from '../services/contract-service.js';
 
 /**
  * 테이블 필터링 기능

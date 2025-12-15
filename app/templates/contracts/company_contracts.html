@@ -61,7 +61,7 @@
 </div>
 
 <!-- CSS: components/stats-cards.css, contract.css, badge.css, info-grid.css, empty-state.css -->
-<!-- JS: utils/contract-api.js, pages/contracts.js -->
-<script src="{{ url_for('static', filename='js/utils/contract-api.js') }}"></script>
-<script src="{{ url_for('static', filename='js/pages/contracts.js') }}"></script>
+<!-- JS: services/contract-service.js, pages/contracts.js -->
+<script type="module" src="{{ url_for('static', filename='js/services/contract-service.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/pages/contracts.js') }}"></script>
 {% endblock %}
