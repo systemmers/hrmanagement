@@ -50,6 +50,7 @@ class AnalysisResult:
 @dataclass
 class ProviderConfig:
     """Provider 설정"""
+    # Gemini / Vertex AI
     api_key: Optional[str] = None
     project_id: Optional[str] = None
     location: str = "asia-northeast3"
@@ -58,6 +59,10 @@ class ProviderConfig:
     model_name: str = "gemini-1.5-flash"
     max_tokens: int = 4096
     temperature: float = 0.1
+
+    # Local LLM (LM Studio)
+    endpoint_url: Optional[str] = None
+    timeout: int = 120
 
 
 class BaseAIProvider(ABC):
@@ -116,3 +121,27 @@ class BaseAIProvider(ABC):
             error=error,
             provider=self.name
         )
+
+    def _extract_json(self, text: str) -> str:
+        """응답에서 JSON 추출 (공통 유틸리티)
+
+        마크다운 코드 블록 또는 순수 JSON을 추출합니다.
+        GeminiProvider, LocalLlamaProvider 등에서 공통 사용.
+        """
+        # 마크다운 코드 블록 제거
+        if '```json' in text:
+            start = text.find('```json') + 7
+            end = text.find('```', start)
+            return text[start:end].strip()
+        elif '```' in text:
+            start = text.find('```') + 3
+            end = text.find('```', start)
+            return text[start:end].strip()
+
+        # JSON 객체 직접 추출
+        start = text.find('{')
+        end = text.rfind('}') + 1
+        if start >= 0 and end > start:
+            return text[start:end]
+
+        return text

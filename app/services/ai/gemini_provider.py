@@ -127,22 +127,4 @@ class GeminiProvider(BaseAIProvider):
         except Exception:
             return None
 
-    def _extract_json(self, text: str) -> str:
-        """응답에서 JSON 추출"""
-        # 마크다운 코드 블록 제거
-        if '```json' in text:
-            start = text.find('```json') + 7
-            end = text.find('```', start)
-            return text[start:end].strip()
-        elif '```' in text:
-            start = text.find('```') + 3
-            end = text.find('```', start)
-            return text[start:end].strip()
-
-        # JSON 객체 직접 추출
-        start = text.find('{')
-        end = text.rfind('}') + 1
-        if start >= 0 and end > start:
-            return text[start:end]
-
-        return text
+    # _extract_json() 메서드는 BaseAIProvider에서 상속받아 사용

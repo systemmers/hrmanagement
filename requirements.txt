@@ -14,3 +14,15 @@ alembic>=1.13.1,<2.0.0
 
 # AI Service (Gemini API)
 google-generativeai>=0.8.0,<1.0.0
+
+# Google Cloud Vision (OCR)
+google-cloud-vision>=3.7.0,<4.0.0
+
+# Google Cloud Document AI
+google-cloud-documentai>=2.20.0,<3.0.0
+
+# PDF Processing
+PyMuPDF>=1.23.0,<2.0.0
+
+# HTTP Client (Local LLM)
+requests>=2.31.0,<3.0.0

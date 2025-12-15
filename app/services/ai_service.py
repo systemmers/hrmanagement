@@ -8,6 +8,9 @@ from flask import current_app
 
 from .ai.base import BaseAIProvider, AnalysisResult, ProviderConfig
 from .ai.gemini_provider import GeminiProvider
+from .ai.local_llama_provider import LocalLlamaProvider, LocalLlamaOCRProvider
+from .ai.document_ai_provider import DocumentAIProvider
+from .ai.vision_ocr import VisionOCR
 
 
 class AIService:
@@ -16,8 +19,9 @@ class AIService:
     # 등록된 Provider들
     _providers: Dict[str, Type[BaseAIProvider]] = {
         'gemini': GeminiProvider,
-        # 'vertex_ai': VertexAIProvider,  # 추후 구현
-        # 'document_ai': DocumentAIProvider,  # 추후 구현
+        'local_llama': LocalLlamaProvider,
+        'local_llama_ocr': LocalLlamaOCRProvider,
+        'document_ai': DocumentAIProvider,
     }
 
     @classmethod
@@ -34,6 +38,37 @@ class AIService:
     @classmethod
     def _get_config(cls, provider_name: str) -> ProviderConfig:
         """Flask config에서 Provider 설정 로드"""
+        if provider_name == 'local_llama':
+            return ProviderConfig(
+                endpoint_url=current_app.config.get('LOCAL_LLM_ENDPOINT'),
+                model_name=current_app.config.get('LOCAL_LLM_MODEL', 'local-model'),
+                timeout=current_app.config.get('LOCAL_LLM_TIMEOUT', 120),
+                max_tokens=4096,
+                temperature=0.1
+            )
+
+        if provider_name == 'local_llama_ocr':
+            # OCR 모드: LM Studio + Google Vision OCR
+            return ProviderConfig(
+                endpoint_url=current_app.config.get('LOCAL_LLM_ENDPOINT'),
+                model_name=current_app.config.get('LOCAL_LLM_MODEL', 'local-model'),
+                timeout=current_app.config.get('LOCAL_LLM_TIMEOUT', 120),
+                credentials_path=current_app.config.get('GOOGLE_APPLICATION_CREDENTIALS'),
+                project_id=current_app.config.get('GOOGLE_PROJECT_ID'),
+                max_tokens=4096,
+                temperature=0.1
+            )
+
+        if provider_name == 'document_ai':
+            # Document AI: 별도 리전 설정 지원
+            return ProviderConfig(
+                project_id=current_app.config.get('GOOGLE_PROJECT_ID'),
+                location=current_app.config.get('DOCUMENTAI_LOCATION', 'us'),
+                credentials_path=current_app.config.get('GOOGLE_APPLICATION_CREDENTIALS'),
+                processor_id=current_app.config.get('DOCUMENTAI_PROCESSOR_ID'),
+            )
+
+        # Gemini 및 기타 GCP 기반 Provider
         return ProviderConfig(
             api_key=current_app.config.get('GEMINI_API_KEY'),
             project_id=current_app.config.get('GOOGLE_PROJECT_ID'),
@@ -89,3 +124,11 @@ class AIService:
             )
 
         return provider.analyze_document(file_path, document_type)
+
+    @classmethod
+    def get_vision_ocr(cls) -> VisionOCR:
+        """Vision OCR 인스턴스 반환"""
+        return VisionOCR(
+            credentials_path=current_app.config.get('GOOGLE_APPLICATION_CREDENTIALS'),
+            project_id=current_app.config.get('GOOGLE_PROJECT_ID')
+        )

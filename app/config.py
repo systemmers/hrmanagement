@@ -15,11 +15,20 @@ class Config:
     # AI 서비스 설정 (Gemini API)
     GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 
-    # Google Cloud 설정 (Vertex AI, Document AI)
+    # Google Cloud 설정 (Vertex AI, Document AI, Vision OCR)
     GOOGLE_APPLICATION_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
     GOOGLE_PROJECT_ID = os.environ.get('GOOGLE_PROJECT_ID')
     GOOGLE_LOCATION = os.environ.get('GOOGLE_LOCATION', 'asia-northeast3')
     DOCUMENTAI_PROCESSOR_ID = os.environ.get('DOCUMENTAI_PROCESSOR_ID')
+    DOCUMENTAI_LOCATION = os.environ.get('DOCUMENTAI_LOCATION', 'us')
+
+    # Local LLM 설정 (LM Studio)
+    LOCAL_LLM_ENDPOINT = os.environ.get('LOCAL_LLM_ENDPOINT', 'http://localhost:1234')
+    LOCAL_LLM_MODEL = os.environ.get('LOCAL_LLM_MODEL', 'local-model')
+    LOCAL_LLM_TIMEOUT = int(os.environ.get('LOCAL_LLM_TIMEOUT', '120'))
+
+    # Vision OCR 설정
+    VISION_OCR_ENABLED = os.environ.get('VISION_OCR_ENABLED', 'true').lower() == 'true'
 
     # SQLAlchemy 설정 (PostgreSQL 필수)
     # DATABASE_URL 환경변수 필수 - dotenv 로드 후 사용
