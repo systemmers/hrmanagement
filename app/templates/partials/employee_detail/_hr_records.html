@@ -273,7 +273,52 @@
     </div>
 </section>
 
-{# 섹션 14: 근태 및 비품 #}
+{# 섹션 14: 프로젝트 #}
+<section id="hr-project-info" class="content-section">
+    {{ section_title('프로젝트') }}
+    <div class="card">
+        {{ card_header('프로젝트', 'fas fa-project-diagram') }}
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>프로젝트명</th>
+                            <th>참여기간</th>
+                            <th>기간</th>
+                            <th>담당업무</th>
+                            <th>역할/직책</th>
+                            <th>발주처</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if hr_project_list %}
+                        {% for project in hr_project_list %}
+                        <tr>
+                            <td>{{ project.project_name }}</td>
+                            <td>{{ project.start_date }} ~ {{ project.end_date }}</td>
+                            <td>{{ project.duration }}</td>
+                            <td>{{ project.duty }}</td>
+                            <td>{{ project.role }}</td>
+                            <td>{{ project.client }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="table-empty">
+                                <i class="fas fa-project-diagram"></i>
+                                <p>등록된 프로젝트가 없습니다</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# 섹션 15: 근태 및 비품 #}
 <section id="attendance-assets" class="content-section">
     {{ section_title('근태 및 비품') }}
 

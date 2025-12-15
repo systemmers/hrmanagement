@@ -19,7 +19,8 @@ from .evaluation import Evaluation
 from .training import Training
 from .attendance import Attendance
 from .insurance import Insurance
-from .project import Project
+from .hr_project import HrProject
+from .project_participation import ProjectParticipation
 from .award import Award
 from .asset import Asset
 from .salary_payment import SalaryPayment
@@ -63,7 +64,8 @@ __all__ = [
     'Training',
     'Attendance',
     'Insurance',
-    'Project',
+    'HrProject',
+    'ProjectParticipation',
     'Award',
     'Asset',
     'SalaryPayment',

@@ -30,7 +30,7 @@ from app.models import (
     Education, Career, Certificate, FamilyMember, Language, MilitaryService,
     Salary, Benefit, Contract, SalaryHistory,
     Promotion, Evaluation, Training, Attendance,
-    Insurance, Project, Award, Asset,
+    Insurance, HrProject, ProjectParticipation, Award, Asset,
     SalaryPayment, Attachment, SystemSetting,
     Company  # Phase 1: Company model
 )

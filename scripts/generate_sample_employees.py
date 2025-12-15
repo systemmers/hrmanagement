@@ -28,7 +28,7 @@ from app.models.insurance import Insurance
 from app.models.promotion import Promotion
 from app.models.evaluation import Evaluation
 from app.models.training import Training
-from app.models.project import Project
+from app.models.hr_project import HrProject
 from app.models.award import Award
 from app.models.asset import Asset
 from app.models.attendance import Attendance
@@ -682,7 +682,7 @@ def generate_projects(employee_id: int, hire_date: str) -> list:
         end_year = start_year if end_month <= 12 else start_year + 1
         end_month = end_month if end_month <= 12 else end_month - 12
 
-        projects.append(Project(
+        projects.append(HrProject(
             employee_id=employee_id,
             project_name=project_name,
             start_date=f"{start_year}-{start_month:02d}-01",

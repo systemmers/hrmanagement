@@ -1,58 +1,58 @@
 {#
-    직원 폼 - 프로젝트 섹션 (동적 폼)
-    현재 소속 회사에서의 프로젝트 이력
+    직원 폼 - 프로젝트 참여이력 섹션 (동적 폼)
+    과거 경력에서 참여했던 프로젝트/사업 이력
     employee: 직원 객체 (수정 모드일 때)
-    hr_project_list: 프로젝트 목록
+    project_participation_list: 프로젝트 참여이력 목록
 #}
-<section class="form-section" id="hr-project-info">
+<section class="form-section" id="project-participation-info">
     <div class="card">
         <div class="card-header">
             <h2 class="card-title">
-                <i class="fas fa-project-diagram"></i>
-                프로젝트
+                <i class="fas fa-briefcase"></i>
+                프로젝트 참여이력
             </h2>
-            <button type="button" class="btn btn-sm btn-secondary" id="addHrProject">
+            <button type="button" class="btn btn-sm btn-secondary" id="addProjectParticipation">
                 <i class="fas fa-plus"></i> 추가
             </button>
         </div>
         <div class="card-body">
-            <div class="dynamic-list" id="hrProjectList">
-                {% if hr_project_list and hr_project_list|length > 0 %}
-                    {% for project in hr_project_list %}
+            <div class="dynamic-list" id="projectParticipationList">
+                {% if project_participation_list and project_participation_list|length > 0 %}
+                    {% for participation in project_participation_list %}
                     <div class="dynamic-item" data-index="{{ loop.index0 }}">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label class="form-label">프로젝트명</label>
-                                <input type="text" name="hr_project_name[]" class="form-input"
-                                       value="{{ project.project_name }}"
-                                       placeholder="프로젝트명">
+                                <label class="form-label">사업명</label>
+                                <input type="text" name="participation_project_name[]" class="form-input"
+                                       value="{{ participation.project_name }}"
+                                       placeholder="프로젝트/사업명">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">역할/직책</label>
-                                <input type="text" name="hr_project_role[]" class="form-input"
-                                       value="{{ project.role }}"
+                                <input type="text" name="participation_role[]" class="form-input"
+                                       value="{{ participation.role }}"
                                        placeholder="PM, 개발자, 디자이너 등">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">시작일</label>
-                                <input type="date" name="hr_project_start_date[]" class="form-input"
-                                       value="{{ project.start_date }}">
+                                <input type="date" name="participation_start_date[]" class="form-input"
+                                       value="{{ participation.start_date }}">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">종료일</label>
-                                <input type="date" name="hr_project_end_date[]" class="form-input"
-                                       value="{{ project.end_date }}">
+                                <input type="date" name="participation_end_date[]" class="form-input"
+                                       value="{{ participation.end_date }}">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">담당업무</label>
-                                <input type="text" name="hr_project_duty[]" class="form-input"
-                                       value="{{ project.duty }}"
+                                <input type="text" name="participation_duty[]" class="form-input"
+                                       value="{{ participation.duty }}"
                                        placeholder="담당업무">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">발주처</label>
-                                <input type="text" name="hr_project_client[]" class="form-input"
-                                       value="{{ project.client }}"
+                                <input type="text" name="participation_client[]" class="form-input"
+                                       value="{{ participation.client }}"
                                        placeholder="발주처/클라이언트">
                             </div>
                         </div>
@@ -65,28 +65,28 @@
                 <div class="dynamic-item" data-index="0">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label class="form-label">프로젝트명</label>
-                            <input type="text" name="hr_project_name[]" class="form-input" placeholder="프로젝트명">
+                            <label class="form-label">사업명</label>
+                            <input type="text" name="participation_project_name[]" class="form-input" placeholder="프로젝트/사업명">
                         </div>
                         <div class="form-group">
                             <label class="form-label">역할/직책</label>
-                            <input type="text" name="hr_project_role[]" class="form-input" placeholder="PM, 개발자, 디자이너 등">
+                            <input type="text" name="participation_role[]" class="form-input" placeholder="PM, 개발자, 디자이너 등">
                         </div>
                         <div class="form-group">
                             <label class="form-label">시작일</label>
-                            <input type="date" name="hr_project_start_date[]" class="form-input">
+                            <input type="date" name="participation_start_date[]" class="form-input">
                         </div>
                         <div class="form-group">
                             <label class="form-label">종료일</label>
-                            <input type="date" name="hr_project_end_date[]" class="form-input">
+                            <input type="date" name="participation_end_date[]" class="form-input">
                         </div>
                         <div class="form-group">
                             <label class="form-label">담당업무</label>
-                            <input type="text" name="hr_project_duty[]" class="form-input" placeholder="담당업무">
+                            <input type="text" name="participation_duty[]" class="form-input" placeholder="담당업무">
                         </div>
                         <div class="form-group">
                             <label class="form-label">발주처</label>
-                            <input type="text" name="hr_project_client[]" class="form-input" placeholder="발주처/클라이언트">
+                            <input type="text" name="participation_client[]" class="form-input" placeholder="발주처/클라이언트">
                         </div>
                     </div>
                     <button type="button" class="btn-remove" title="삭제">
@@ -95,7 +95,7 @@
                 </div>
                 {% endif %}
             </div>
-            <p class="form-help">현재 소속 회사에서 진행한 프로젝트 이력을 입력해 주세요.</p>
+            <p class="form-help">과거 경력에서 참여했던 프로젝트/사업 이력을 입력해 주세요.</p>
         </div>
     </div>
 </section>

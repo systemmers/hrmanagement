@@ -36,7 +36,8 @@ attendance_repo = None
 
 # Phase 4: 부가 기능 저장소
 insurance_repo = None
-project_repo = None
+hr_project_repo = None
+project_participation_repo = None
 award_repo = None
 asset_repo = None
 
@@ -66,7 +67,7 @@ def init_extensions(app):
     global family_repo, language_repo, military_repo
     global salary_repo, benefit_repo, contract_repo, salary_history_repo
     global promotion_repo, evaluation_repo, training_repo, attendance_repo
-    global insurance_repo, project_repo, award_repo, asset_repo
+    global insurance_repo, hr_project_repo, project_participation_repo, award_repo, asset_repo
     global salary_payment_repo, attachment_repo
     global user_repo, organization_repo, system_setting_repo
     global person_contract_repo
@@ -81,7 +82,7 @@ def init_extensions(app):
         FamilyMemberRepository, LanguageRepository, MilitaryServiceRepository,
         SalaryRepository, BenefitRepository, ContractRepository, SalaryHistoryRepository,
         PromotionRepository, EvaluationRepository, TrainingRepository, AttendanceRepository,
-        InsuranceRepository, ProjectRepository, AwardRepository, AssetRepository,
+        InsuranceRepository, HrProjectRepository, ProjectParticipationRepository, AwardRepository, AssetRepository,
         SalaryPaymentRepository, AttachmentRepository
     )
 
@@ -111,7 +112,8 @@ def init_extensions(app):
 
     # Phase 4: 부가 기능 저장소 초기화
     insurance_repo = InsuranceRepository()
-    project_repo = ProjectRepository()
+    hr_project_repo = HrProjectRepository()
+    project_participation_repo = ProjectParticipationRepository()
     award_repo = AwardRepository()
     asset_repo = AssetRepository()
 

@@ -21,7 +21,8 @@ from .evaluation_repository import EvaluationRepository
 from .training_repository import TrainingRepository
 from .attendance_repository import AttendanceRepository
 from .insurance_repository import InsuranceRepository
-from .project_repository import ProjectRepository
+from .hr_project_repository import HrProjectRepository
+from .project_participation_repository import ProjectParticipationRepository
 from .award_repository import AwardRepository
 from .asset_repository import AssetRepository
 from .salary_payment_repository import SalaryPaymentRepository
@@ -56,7 +57,8 @@ __all__ = [
     'TrainingRepository',
     'AttendanceRepository',
     'InsuranceRepository',
-    'ProjectRepository',
+    'HrProjectRepository',
+    'ProjectParticipationRepository',
     'AwardRepository',
     'AssetRepository',
     'SalaryPaymentRepository',

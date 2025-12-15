@@ -35,7 +35,8 @@ def view():
     # 추가 컨텍스트 (법인 직원 전용)
     if adapter.is_corporate() and hasattr(adapter, 'get_family_list'):
         context['family_list'] = adapter.get_family_list()
-        context['project_list'] = adapter.get_project_list()
+        context['hr_project_list'] = adapter.get_hr_project_list()
+        context['project_participation_list'] = adapter.get_project_participation_list()
         context['award_list'] = adapter.get_award_list()
 
     # 메타 정보
@@ -244,13 +245,13 @@ def family():
     })
 
 
-@profile_bp.route('/projects')
+@profile_bp.route('/hr-projects')
 @unified_profile_required
-def projects():
-    """프로젝트 목록 조회"""
+def hr_projects():
+    """인사이력 프로젝트 목록 조회 (법인 전용)"""
     adapter = g.profile
 
-    # 법인 직원만 프로젝트 정보 있음
+    # 법인 직원만 인사이력 프로젝트 정보 있음
     if not g.is_corporate:
         return jsonify({
             'success': True,
@@ -259,7 +260,19 @@ def projects():
 
     return jsonify({
         'success': True,
-        'data': adapter.get_project_list()
+        'data': adapter.get_hr_project_list()
+    })
+
+
+@profile_bp.route('/project-participations')
+@unified_profile_required
+def project_participations():
+    """프로젝트 참여이력 목록 조회"""
+    adapter = g.profile
+
+    return jsonify({
+        'success': True,
+        'data': adapter.get_project_participation_list()
     })
 
 

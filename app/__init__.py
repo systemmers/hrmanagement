@@ -33,7 +33,7 @@ def create_app(config_name=None):
         Employee, Education, Career, Certificate, FamilyMember,
         Language, MilitaryService, Salary, Benefit, Contract,
         SalaryHistory, Promotion, Evaluation, Training, Attendance,
-        Insurance, Project, Award, Asset, SalaryPayment, Attachment,
+        Insurance, HrProject, ProjectParticipation, Award, Asset, SalaryPayment, Attachment,
         ClassificationOption
     )
 

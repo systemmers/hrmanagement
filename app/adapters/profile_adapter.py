@@ -298,9 +298,13 @@ class EmployeeProfileAdapter(ProfileAdapter):
         """근태 기록 목록 반환 (법인 전용)"""
         return [att.to_dict() for att in self.employee.attendances.all()]
 
-    def get_project_list(self) -> List[Dict[str, Any]]:
-        """프로젝트 목록 반환"""
-        return [proj.to_dict() for proj in self.employee.projects.all()]
+    def get_hr_project_list(self) -> List[Dict[str, Any]]:
+        """인사이력 프로젝트 목록 반환 (법인 전용)"""
+        return [proj.to_dict() for proj in self.employee.hr_projects.all()]
+
+    def get_project_participation_list(self) -> List[Dict[str, Any]]:
+        """프로젝트 참여이력 목록 반환"""
+        return [proj.to_dict() for proj in self.employee.project_participations.all()]
 
     def get_award_list(self) -> List[Dict[str, Any]]:
         """수상 이력 목록 반환"""
@@ -434,6 +438,12 @@ class PersonalProfileAdapter(ProfileAdapter):
     def get_award_list(self) -> List[Dict[str, Any]]:
         """수상 내역 목록 반환 (PersonalAward 사용)"""
         return [award.to_dict() for award in self.profile.awards.all()]
+
+    def get_project_participation_list(self) -> List[Dict[str, Any]]:
+        """프로젝트 참여이력 목록 반환 (PersonalProjectParticipation 사용)"""
+        if hasattr(self.profile, 'project_participations'):
+            return [proj.to_dict() for proj in self.profile.project_participations.all()]
+        return []
 
     def is_corporate(self) -> bool:
         """법인 직원 여부 (항상 False)"""

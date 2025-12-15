@@ -15,7 +15,7 @@ from .helpers import (
     verify_employee_access, extract_employee_from_form, extract_basic_fields_from_form,
     update_family_data, update_education_data, update_career_data,
     update_certificate_data, update_language_data, update_military_data,
-    update_project_data, update_award_data,
+    update_hr_project_data, update_project_participation_data, update_award_data,
     allowed_image_file, get_file_extension, get_profile_photo_folder, get_business_card_folder,
     generate_unique_filename, MAX_IMAGE_SIZE
 )
@@ -158,7 +158,8 @@ def register_mutation_routes(bp: Blueprint):
             update_certificate_data(employee_id, request.form)
             update_language_data(employee_id, request.form)
             update_military_data(employee_id, request.form)
-            update_project_data(employee_id, request.form)
+            update_hr_project_data(employee_id, request.form)
+            update_project_participation_data(employee_id, request.form)
             update_award_data(employee_id, request.form)
 
             flash('이력정보가 수정되었습니다.', 'success')

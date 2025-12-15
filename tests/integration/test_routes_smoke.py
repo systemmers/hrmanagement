@@ -66,7 +66,8 @@ class TestAuthenticatedPersonalRoutes:
     def test_personal_profile(self, auth_client_personal):
         """개인 프로필 접근"""
         response = auth_client_personal.get('/personal/profile')
-        assert response.status_code in [200, 302]
+        # 301: trailing slash 리다이렉트 (Flask 기본 동작)
+        assert response.status_code in [200, 301, 302]
 
 
 class TestAuthenticatedCorporateRoutes:

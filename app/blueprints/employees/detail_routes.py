@@ -12,7 +12,7 @@ from ...extensions import (
     family_repo, language_repo, military_repo,
     salary_repo, benefit_repo, contract_repo, salary_history_repo,
     promotion_repo, evaluation_repo, training_repo, attendance_repo,
-    insurance_repo, project_repo, award_repo, asset_repo,
+    insurance_repo, hr_project_repo, project_participation_repo, award_repo, asset_repo,
     salary_payment_repo, attachment_repo
 )
 from .helpers import verify_employee_access
@@ -101,7 +101,8 @@ def register_detail_routes(bp: Blueprint):
                                business_card_back=business_card_back,
                                classification_options=classification_options,
                                language_list=list(employee.languages),
-                               project_list=list(employee.projects),
+                               hr_project_list=list(employee.hr_projects),
+                               project_participation_list=list(employee.project_participations),
                                salary=employee.salary,
                                insurance=employee.insurance)
 
@@ -146,7 +147,8 @@ def _render_employee_full_view(employee_id, employee):
 
     # 부가 기능 데이터 조회
     insurance = insurance_repo.get_by_employee_id(employee_id)
-    project_list = project_repo.get_by_employee_id(employee_id)
+    hr_project_list = hr_project_repo.get_by_employee_id(employee_id)
+    project_participation_list = project_participation_repo.get_by_employee_id(employee_id)
     award_list = award_repo.get_by_employee_id(employee_id)
     asset_list = asset_repo.get_by_employee_id(employee_id)
 
@@ -186,7 +188,8 @@ def _render_employee_full_view(employee_id, employee):
                            training_list=training_list,
                            attendance_summary=attendance_summary,
                            insurance=insurance,
-                           project_list=project_list,
+                           hr_project_list=hr_project_list,
+                           project_participation_list=project_participation_list,
                            award_list=award_list,
                            asset_list=asset_list,
                            salary_payment_list=salary_payment_list,

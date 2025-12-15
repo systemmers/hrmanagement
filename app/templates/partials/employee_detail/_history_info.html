@@ -276,15 +276,14 @@
     </div>
 </section>
 
-{# 섹션 13: 유사사업 참여경력 (인사카드 전용) #}
-{% if page_mode == 'hr_card' %}
-<section id="project-info" class="content-section">
-    {{ section_title('유사사업 참여경력') }}
+{# 섹션 13: 프로젝트 참여이력 (모든 계정) #}
+<section id="project-participation-info" class="content-section">
+    {{ section_title('프로젝트 참여이력') }}
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">
-                <i class="fas fa-project-diagram"></i>
-                유사사업 참여경력
+                <i class="fas fa-briefcase"></i>
+                프로젝트 참여이력
             </h3>
         </div>
         <div class="card-body">
@@ -301,22 +300,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% if project_list %}
-                        {% for project in project_list %}
+                        {% if project_participation_list %}
+                        {% for participation in project_participation_list %}
                         <tr>
-                            <td>{{ project.project_name }}</td>
-                            <td>{{ project.start_date }} ~ {{ project.end_date }}</td>
-                            <td>{{ project.duration }}</td>
-                            <td>{{ project.duty }}</td>
-                            <td>{{ project.role }}</td>
-                            <td>{{ project.client }}</td>
+                            <td>{{ participation.project_name }}</td>
+                            <td>{{ participation.start_date }} ~ {{ participation.end_date }}</td>
+                            <td>{{ participation.duration }}</td>
+                            <td>{{ participation.duty }}</td>
+                            <td>{{ participation.role }}</td>
+                            <td>{{ participation.client }}</td>
                         </tr>
                         {% endfor %}
                         {% else %}
                         <tr>
                             <td colspan="6" class="table-empty">
-                                <i class="fas fa-project-diagram"></i>
-                                <p>등록된 프로젝트 정보가 없습니다</p>
+                                <i class="fas fa-briefcase"></i>
+                                <p>등록된 프로젝트 참여이력이 없습니다</p>
                             </td>
                         </tr>
                         {% endif %}
@@ -326,4 +325,3 @@
         </div>
     </div>
 </section>
-{% endif %}

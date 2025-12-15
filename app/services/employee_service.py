@@ -17,7 +17,7 @@ from app.utils.tenant import get_current_organization_id
 from app.extensions import (
     employee_repo, family_repo, education_repo, career_repo,
     certificate_repo, language_repo, military_repo,
-    project_repo, award_repo, attachment_repo
+    hr_project_repo, project_participation_repo, award_repo, attachment_repo
 )
 
 
@@ -32,7 +32,8 @@ class EmployeeService:
         self.certificate_repo = certificate_repo
         self.language_repo = language_repo
         self.military_repo = military_repo
-        self.project_repo = project_repo
+        self.hr_project_repo = hr_project_repo
+        self.project_participation_repo = project_participation_repo
         self.award_repo = award_repo
         self.attachment_repo = attachment_repo
 

@@ -6,7 +6,7 @@
 from ...extensions import (
     family_repo, education_repo, career_repo,
     certificate_repo, language_repo, military_repo,
-    project_repo, award_repo
+    hr_project_repo, project_participation_repo, award_repo
 )
 
 
@@ -185,19 +185,38 @@ def _get_language_updater():
     )
 
 
-def _get_project_updater():
-    """프로젝트정보 Updater 생성"""
-    from ...models import Project
+def _get_hr_project_updater():
+    """인사이력 프로젝트 Updater 생성"""
+    from ...models import HrProject
     return RelatedDataUpdater(
-        model_class=Project,
-        repository=project_repo,
-        form_prefix='project_',
+        model_class=HrProject,
+        repository=hr_project_repo,
+        form_prefix='hr_project_',
         required_field='name',
         field_mapping={
             'name': 'project_name',
             'start_date': 'start_date',
             'end_date': 'end_date',
-            'duties': 'duties',
+            'duty': 'duty',
+            'role': 'role',
+            'client': 'client',
+        }
+    )
+
+
+def _get_project_participation_updater():
+    """프로젝트 참여이력 Updater 생성"""
+    from ...models import ProjectParticipation
+    return RelatedDataUpdater(
+        model_class=ProjectParticipation,
+        repository=project_participation_repo,
+        form_prefix='participation_',
+        required_field='project_name',
+        field_mapping={
+            'project_name': 'project_name',
+            'start_date': 'start_date',
+            'end_date': 'end_date',
+            'duty': 'duty',
             'role': 'role',
             'client': 'client',
         }
@@ -270,9 +289,14 @@ def update_military_data(employee_id, form_data):
         military_repo.create(military)
 
 
-def update_project_data(employee_id, form_data):
-    """프로젝트정보 업데이트 (RelatedDataUpdater 사용)"""
-    _get_project_updater().update(employee_id, form_data)
+def update_hr_project_data(employee_id, form_data):
+    """인사이력 프로젝트 업데이트 (RelatedDataUpdater 사용)"""
+    _get_hr_project_updater().update(employee_id, form_data)
+
+
+def update_project_participation_data(employee_id, form_data):
+    """프로젝트 참여이력 업데이트 (RelatedDataUpdater 사용)"""
+    _get_project_participation_updater().update(employee_id, form_data)
 
 
 def update_award_data(employee_id, form_data):

@@ -26,8 +26,11 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/card.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/employee-form.css') }}">
-{% if is_corporate %}
+{# 첨부파일 사이드바는 법인관리자 외 모든 계정에서 표시되므로 CSS도 동일하게 로드 #}
+{% if account_type != 'corporate_admin' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/right-sidebar.css') }}">
+{% endif %}
+{% if is_corporate %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/tree-selector.css') }}">
 {% endif %}
 {% endblock %}
@@ -151,8 +154,13 @@
             {# 공통 섹션: 수상내역 #}
             {% include 'partials/employee_form/_award_info.html' %}
 
-            {# 인사카드 전용: 프로젝트 #}
-            {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
+            {# 공통 섹션: 프로젝트 참여이력 (모든 계정) #}
+            {% if account_type != 'corporate_admin' %}
+                {% include 'partials/employee_form/_project_participation_info.html' %}
+            {% endif %}
+
+            {# 인사카드 전용: 프로젝트 (수정 모드에서만 표시 - 등록 후 인사이력에서 발생) #}
+            {% if page_mode == 'hr_card' and account_type != 'corporate_admin' and not is_create_mode %}
                 {% include 'partials/employee_form/_project_info.html' %}
             {% endif %}
 

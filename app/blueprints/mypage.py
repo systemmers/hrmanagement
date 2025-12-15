@@ -14,7 +14,7 @@ from ..extensions import (
     insurance_repo, asset_repo, salary_payment_repo,
     # 파셜 통합을 위한 추가 레포지토리
     education_repo, career_repo, certificate_repo, family_repo,
-    language_repo, military_repo, project_repo, award_repo,
+    language_repo, military_repo, hr_project_repo, project_participation_repo, award_repo,
     # 명함 첨부파일
     attachment_repo
 )
@@ -81,7 +81,8 @@ def company_info():
     family_list = family_repo.get_by_employee_id(employee_id)
     language_list = language_repo.get_by_employee_id(employee_id)
     military = military_repo.get_by_employee_id(employee_id)
-    project_list = project_repo.get_by_employee_id(employee_id)
+    hr_project_list = hr_project_repo.get_by_employee_id(employee_id)
+    project_participation_list = project_participation_repo.get_by_employee_id(employee_id)
     award_list = award_repo.get_by_employee_id(employee_id)
 
     # 명함 데이터 조회 (조회 전용)
@@ -112,7 +113,8 @@ def company_info():
                            family_list=family_list,
                            language_list=language_list,
                            military=military,
-                           project_list=project_list,
+                           hr_project_list=hr_project_list,
+                           project_participation_list=project_participation_list,
                            award_list=award_list,
                            is_readonly=True,
                            page_mode='hr_card',

@@ -19,7 +19,7 @@ from app.models.insurance import Insurance
 from app.models.promotion import Promotion
 from app.models.evaluation import Evaluation
 from app.models.training import Training
-from app.models.project import Project
+from app.models.hr_project import HrProject
 from app.models.award import Award
 from app.models.asset import Asset
 from app.models.attendance import Attendance
@@ -33,7 +33,7 @@ def main():
         Attendance.query.delete()
         Asset.query.delete()
         Award.query.delete()
-        Project.query.delete()
+        HrProject.query.delete()
         Training.query.delete()
         Evaluation.query.delete()
         Promotion.query.delete()

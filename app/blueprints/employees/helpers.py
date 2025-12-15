@@ -69,7 +69,8 @@ from .relation_updaters import (
     update_certificate_data,
     update_language_data,
     update_military_data,
-    update_project_data,
+    update_hr_project_data,
+    update_project_participation_data,
     update_award_data,
 )
 
@@ -101,6 +102,7 @@ __all__ = [
     'update_certificate_data',
     'update_language_data',
     'update_military_data',
-    'update_project_data',
+    'update_hr_project_data',
+    'update_project_participation_data',
     'update_award_data',
 ]
