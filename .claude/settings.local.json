@@ -79,7 +79,8 @@
       "mcp__playwright__browser_press_key",
       "Bash(paste:*)",
       "Bash(bc:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nrefactor(frontend): CSS 중복 제거 및 템플릿 통합\n\n- CSS 중복 스타일 제거 (912줄 감소)\n  - dashboard.css, profile.css, organization.css 등 정리\n  - components 및 layouts CSS 최적화\n- 프로필 템플릿 통합\n  - admin_profile_create/edit.html → admin_profile_form.html\n  - _attachment_sidebar_personal.html 제거\n- JS 모듈 개선\n  - contract-api.js 리팩토링\n  - corporate-register.js 신규 추가\n- CSS 중복 분석 문서 추가\n\nGenerated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []

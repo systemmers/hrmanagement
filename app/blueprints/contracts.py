@@ -6,19 +6,14 @@
 - 법인 측면: 계약 요청, 계약 승인 거절, 계약 관리
 
 Phase 6: 백엔드 리팩토링 - contract_helpers 적용
+Phase 7: Service 레이어 적용 - ContractService 도입
 """
 from flask import Blueprint, render_template, request, jsonify, session, flash, redirect, url_for
 
-from ..extensions import person_contract_repo, user_repo
-from ..database import db
-from ..models.company import Company
-from ..models.user import User
-from ..models.person_contract import PersonCorporateContract
+from ..services import contract_service
 from ..utils.decorators import login_required, personal_account_required, corporate_account_required
 from ..utils.contract_helpers import (
     get_contract_context,
-    check_contract_party,
-    check_approve_reject_permission,
     contract_party_required,
     approve_reject_permission_required
 )
@@ -35,8 +30,8 @@ contracts_bp = Blueprint('contracts', __name__, url_prefix='/contracts')
 def my_contracts():
     """내 계약 목록 (개인 계정)"""
     user_id = session.get('user_id')
-    contracts = person_contract_repo.get_by_person_user_id(user_id)
-    stats = person_contract_repo.get_statistics_by_person(user_id)
+    contracts = contract_service.get_personal_contracts(user_id)
+    stats = contract_service.get_personal_statistics(user_id)
 
     return render_template(
         'contracts/my_contracts.html',
@@ -51,7 +46,7 @@ def my_contracts():
 def pending_contracts():
     """대기 중인 계약 요청 (개인 계정)"""
     user_id = session.get('user_id')
-    contracts = person_contract_repo.get_pending_contracts_by_person(user_id)
+    contracts = contract_service.get_personal_pending_contracts(user_id)
 
     return render_template(
         'contracts/pending_contracts.html',
@@ -63,7 +58,7 @@ def pending_contracts():
 @login_required
 def contract_detail(contract_id):
     """계약 상세 조회"""
-    contract = person_contract_repo.get_by_id(contract_id)
+    contract = contract_service.get_contract_by_id(contract_id)
     if not contract:
         flash('계약을 찾을 수 없습니다.', 'error')
         return redirect(url_for('contracts.my_contracts'))
@@ -77,7 +72,7 @@ def contract_detail(contract_id):
         return redirect(url_for('main.index'))
 
     # 데이터 공유 설정 조회
-    sharing_settings = person_contract_repo.get_sharing_settings(contract_id)
+    sharing_settings = contract_service.get_sharing_settings(contract_id)
 
     return render_template(
         'contracts/contract_detail.html',
@@ -100,8 +95,8 @@ def company_contracts():
         flash('법인 정보가 없습니다.', 'error')
         return redirect(url_for('main.index'))
 
-    contracts = person_contract_repo.get_by_company_id(company_id)
-    stats = person_contract_repo.get_statistics_by_company(company_id)
+    contracts = contract_service.get_company_contracts(company_id)
+    stats = contract_service.get_company_statistics(company_id)
 
     return render_template(
         'contracts/company_contracts.html',
@@ -120,7 +115,7 @@ def company_pending():
         flash('법인 정보가 없습니다.', 'error')
         return redirect(url_for('main.index'))
 
-    contracts = person_contract_repo.get_pending_contracts_by_company(company_id)
+    contracts = contract_service.get_company_pending_contracts(company_id)
 
     return render_template(
         'contracts/company_pending.html',
@@ -145,30 +140,20 @@ def request_contract():
         department = request.form.get('department')
         notes = request.form.get('notes')
 
-        # 개인 사용자 조회
-        person_user = User.query.filter_by(
-            email=person_email,
-            account_type='personal'
-        ).first()
+        success, contract, error = contract_service.create_contract_request(
+            person_email=person_email,
+            company_id=company_id,
+            contract_type=contract_type,
+            position=position,
+            department=department,
+            notes=notes
+        )
 
-        if not person_user:
-            flash('해당 이메일의 개인 계정을 찾을 수 없습니다.', 'error')
-            return redirect(url_for('contracts.request_contract'))
-
-        try:
-            contract = person_contract_repo.create_contract_request(
-                person_user_id=person_user.id,
-                company_id=company_id,
-                requested_by='company',
-                contract_type=contract_type,
-                position=position,
-                department=department,
-                notes=notes
-            )
+        if success:
             flash('계약 요청이 전송되었습니다.', 'success')
             return redirect(url_for('contracts.company_contracts'))
-        except ValueError as e:
-            flash(str(e), 'error')
+        else:
+            flash(error, 'error')
             return redirect(url_for('contracts.request_contract'))
 
     return render_template('contracts/request_contract.html')
@@ -183,11 +168,10 @@ def api_approve_contract(contract, contract_id):
     """계약 승인 API"""
     user_id = session.get('user_id')
 
-    try:
-        result = person_contract_repo.approve_contract(contract_id, user_id)
+    success, result, error = contract_service.approve_contract(contract_id, user_id)
+    if success:
         return api_success(result)
-    except ValueError as e:
-        return api_error(str(e))
+    return api_error(error)
 
 
 @contracts_bp.route('/api/<int:contract_id>/reject', methods=['POST'])
@@ -199,11 +183,10 @@ def api_reject_contract(contract, contract_id):
     data = request.get_json() or {}
     reason = data.get('reason')
 
-    try:
-        result = person_contract_repo.reject_contract(contract_id, user_id, reason)
+    success, result, error = contract_service.reject_contract(contract_id, user_id, reason)
+    if success:
         return api_success(result)
-    except ValueError as e:
-        return api_error(str(e))
+    return api_error(error)
 
 
 @contracts_bp.route('/api/<int:contract_id>/terminate', methods=['POST'])
@@ -215,11 +198,10 @@ def api_terminate_contract(contract, contract_id):
     data = request.get_json() or {}
     reason = data.get('reason')
 
-    try:
-        result = person_contract_repo.terminate_contract(contract_id, user_id, reason)
+    success, result, error = contract_service.terminate_contract(contract_id, user_id, reason)
+    if success:
         return api_success(result)
-    except ValueError as e:
-        return api_error(str(e))
+    return api_error(error)
 
 
 @contracts_bp.route('/api/<int:contract_id>/sharing-settings', methods=['GET', 'PUT'])
@@ -228,7 +210,7 @@ def api_sharing_settings(contract_id):
     """데이터 공유 설정 API"""
     ctx = get_contract_context()
 
-    contract = person_contract_repo.get_model_by_id(contract_id)
+    contract = contract_service.get_contract_model_by_id(contract_id)
     if not contract:
         return api_not_found('계약')
 
@@ -237,17 +219,16 @@ def api_sharing_settings(contract_id):
         return api_forbidden()
 
     if request.method == 'GET':
-        settings = person_contract_repo.get_sharing_settings(contract_id)
+        settings = contract_service.get_sharing_settings(contract_id)
         return api_success(settings)
 
     # PUT: 설정 업데이트
     data = request.get_json() or {}
 
-    try:
-        result = person_contract_repo.update_sharing_settings(contract_id, data)
+    success, result, error = contract_service.update_sharing_settings(contract_id, data)
+    if success:
         return api_success(result)
-    except ValueError as e:
-        return api_error(str(e))
+    return api_error(error)
 
 
 @contracts_bp.route('/api/<int:contract_id>/sync-logs')
@@ -256,7 +237,7 @@ def api_sharing_settings(contract_id):
 def api_sync_logs(contract, contract_id):
     """동기화 로그 조회 API"""
     limit = request.args.get('limit', 50, type=int)
-    logs = person_contract_repo.get_sync_logs(contract_id, limit)
+    logs = contract_service.get_sync_logs(contract_id, limit)
 
     return api_success(logs)
 
@@ -274,7 +255,7 @@ def api_search_contracts():
     contract_type = request.args.get('contract_type')
     search_term = request.args.get('q')
 
-    contracts = person_contract_repo.search_contracts(
+    contracts = contract_service.search_contracts(
         company_id=company_id,
         status=status,
         contract_type=contract_type,
@@ -293,7 +274,7 @@ def api_company_stats():
     if not company_id:
         return api_error('법인 정보가 없습니다.')
 
-    stats = person_contract_repo.get_statistics_by_company(company_id)
+    stats = contract_service.get_company_statistics(company_id)
     return api_success(stats)
 
 
@@ -303,5 +284,5 @@ def api_company_stats():
 def api_personal_stats():
     """개인 계약 통계 API"""
     user_id = session.get('user_id')
-    stats = person_contract_repo.get_statistics_by_person(user_id)
+    stats = contract_service.get_personal_statistics(user_id)
     return api_success(stats)
