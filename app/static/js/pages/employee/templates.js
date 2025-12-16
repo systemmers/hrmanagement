@@ -79,16 +79,46 @@ export function getCareerTemplate() {
                     <input type="text" name="career_department[]" class="form-input" placeholder="개발팀">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">직급/직책</label>
-                    <input type="text" name="career_position[]" class="form-input" placeholder="대리">
+                    <label class="form-label">직위</label>
+                    <input type="text" name="career_position[]" class="form-input" placeholder="사원, 대리, 과장">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">직급</label>
+                    <input type="text" name="career_job_grade[]" class="form-input" placeholder="L3, Senior">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">직책</label>
+                    <input type="text" name="career_job_title[]" class="form-input" placeholder="팀장, 본부장">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">직무</label>
+                    <input type="text" name="career_job_role[]" class="form-input" placeholder="인사기획, 회계관리">
                 </div>
                 <div class="form-group">
                     <label class="form-label">담당업무</label>
-                    <input type="text" name="career_duties[]" class="form-input" placeholder="웹 개발">
+                    <input type="text" name="career_duties[]" class="form-input" placeholder="웹 개발, API 설계">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">급여유형</label>
+                    <select name="career_salary_type[]" class="form-input">
+                        <option value="">선택</option>
+                        <option value="annual">연봉제</option>
+                        <option value="monthly">월급제</option>
+                        <option value="hourly">시급제</option>
+                        <option value="pay_step">호봉제</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">연봉</label>
                     <input type="number" name="career_salary[]" class="form-input" placeholder="연봉 (원)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">월급</label>
+                    <input type="number" name="career_monthly_salary[]" class="form-input" placeholder="월급 (원)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">호봉</label>
+                    <input type="number" name="career_pay_step[]" class="form-input" placeholder="1~50">
                 </div>
                 <div class="form-group">
                     <label class="form-label">입사일</label>

@@ -14,6 +14,7 @@ import { initFormValidation, validateField, validateForm } from './validators.js
 import { initAddressSearch } from './address-search.js';
 import { initFileUpload } from './file-upload-init.js';
 import { getEmployeeIdFromForm, showToast, validateImageFile } from './helpers.js';
+import { initAccountSection, validateAccountFields } from './account-section.js';
 
 // 템플릿 re-export
 export {
@@ -41,7 +42,9 @@ export {
     initFileUpload,
     getEmployeeIdFromForm,
     showToast,
-    validateImageFile
+    validateImageFile,
+    initAccountSection,
+    validateAccountFields
 };
 
 /**
@@ -82,6 +85,7 @@ export function initEmployeeForm() {
     initAddressSearch();
     initFileUpload();
     initTreeSelector();
+    initAccountSection();  // 21번/22번 원칙: 계정 섹션 초기화
 }
 
 // DOMContentLoaded에서 자동 초기화
@@ -104,5 +108,7 @@ export default {
     initFileUpload,
     getEmployeeIdFromForm,
     showToast,
-    validateImageFile
+    validateImageFile,
+    initAccountSection,
+    validateAccountFields
 };

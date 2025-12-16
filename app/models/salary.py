@@ -39,6 +39,26 @@ class Salary(db.Model):
     night_allowance = db.Column(db.Integer, default=0)         # 야간근로수당
     holiday_allowance = db.Column(db.Integer, default=0)       # 휴일근로수당
 
+    # 템플릿 호환성 프로퍼티 (transport_allowance -> transportation_allowance)
+    @property
+    def transport_allowance(self):
+        """템플릿 호환성: transport_allowance -> transportation_allowance"""
+        return self.transportation_allowance
+
+    @transport_allowance.setter
+    def transport_allowance(self, value):
+        self.transportation_allowance = value
+
+    # 템플릿 호환성 프로퍼티 (pay_type -> salary_type)
+    @property
+    def pay_type(self):
+        """템플릿 호환성: pay_type -> salary_type"""
+        return self.salary_type
+
+    @pay_type.setter
+    def pay_type(self, value):
+        self.salary_type = value
+
     def to_dict(self):
         """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
         return {
@@ -68,14 +88,16 @@ class Salary(db.Model):
 
     @classmethod
     def from_dict(cls, data):
-        """딕셔너리에서 모델 생성 (snake_case 지원)"""
+        """딕셔너리에서 모델 생성 (snake_case 지원, 템플릿 호환성 필드 포함)"""
         return cls(
             employee_id=data.get('employee_id') or data.get('employeeId'),
-            salary_type=data.get('salary_type') or data.get('salaryType'),
+            # pay_type -> salary_type 매핑 지원
+            salary_type=data.get('salary_type') or data.get('salaryType') or data.get('pay_type'),
             base_salary=data.get('base_salary') or data.get('baseSalary', 0),
             position_allowance=data.get('position_allowance') or data.get('positionAllowance', 0),
             meal_allowance=data.get('meal_allowance') or data.get('mealAllowance', 0),
-            transportation_allowance=data.get('transportation_allowance') or data.get('transportationAllowance', 0),
+            # transport_allowance -> transportation_allowance 매핑 지원
+            transportation_allowance=data.get('transportation_allowance') or data.get('transportationAllowance') or data.get('transport_allowance', 0),
             total_salary=data.get('total_salary') or data.get('totalSalary', 0),
             payment_day=data.get('payment_day') or data.get('paymentDay', 25),
             payment_method=data.get('payment_method') or data.get('paymentMethod'),

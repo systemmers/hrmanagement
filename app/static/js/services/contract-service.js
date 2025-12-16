@@ -151,4 +151,27 @@ if (typeof window !== 'undefined') {
     window.approveContract = function(id) { return approveContract(id); };
     window.rejectContract = function(id) { return rejectContract(id); };
     window.terminateContract = function(id) { return terminateContract(id); };
+
+    // 이벤트 위임: data-action 기반 버튼 클릭 핸들러
+    document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('click', async (e) => {
+            const target = e.target.closest('[data-action]');
+            if (!target) return;
+
+            const action = target.dataset.action;
+            const contractId = target.dataset.contractId;
+
+            if (!contractId) return;
+
+            e.preventDefault();
+
+            if (action === 'approve-contract') {
+                await approveContract(contractId);
+            } else if (action === 'reject-contract') {
+                await rejectContract(contractId);
+            } else if (action === 'terminate-contract') {
+                await terminateContract(contractId);
+            }
+        });
+    });
 }

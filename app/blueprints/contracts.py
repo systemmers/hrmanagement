@@ -11,7 +11,12 @@ Phase 7: Service 레이어 적용 - ContractService 도입
 from flask import Blueprint, render_template, request, jsonify, session, flash, redirect, url_for
 
 from ..services import contract_service
-from ..utils.decorators import login_required, personal_account_required, corporate_account_required
+from ..utils.decorators import (
+    login_required,
+    personal_account_required,
+    corporate_account_required,
+    personal_or_employee_account_required
+)
 from ..utils.contract_helpers import (
     get_contract_context,
     contract_party_required,
@@ -22,13 +27,16 @@ from ..utils.api_helpers import api_success, api_error, api_not_found, api_forbi
 contracts_bp = Blueprint('contracts', __name__, url_prefix='/contracts')
 
 
-# ===== 개인 계정용 라우트 =====
+# ===== 개인/직원 계정용 라우트 (21번 원칙) =====
 
 @contracts_bp.route('/my')
 @login_required
-@personal_account_required
+@personal_or_employee_account_required
 def my_contracts():
-    """내 계약 목록 (개인 계정)"""
+    """내 계약 목록 (개인/직원 계정)
+
+    21번 원칙: personal, employee_sub 계정 모두 지원
+    """
     user_id = session.get('user_id')
     contracts = contract_service.get_personal_contracts(user_id)
     stats = contract_service.get_personal_statistics(user_id)
@@ -42,9 +50,12 @@ def my_contracts():
 
 @contracts_bp.route('/pending')
 @login_required
-@personal_account_required
+@personal_or_employee_account_required
 def pending_contracts():
-    """대기 중인 계약 요청 (개인 계정)"""
+    """대기 중인 계약 요청 (개인/직원 계정)
+
+    21번 원칙: personal, employee_sub 계정 모두 지원
+    """
     user_id = session.get('user_id')
     contracts = contract_service.get_personal_pending_contracts(user_id)
 
@@ -280,9 +291,43 @@ def api_company_stats():
 
 @contracts_bp.route('/api/stats/personal')
 @login_required
-@personal_account_required
+@personal_or_employee_account_required
 def api_personal_stats():
-    """개인 계약 통계 API"""
+    """개인/직원 계약 통계 API (21번 원칙)"""
     user_id = session.get('user_id')
     stats = contract_service.get_personal_statistics(user_id)
     return api_success(stats)
+
+
+# ===== 21번 원칙: 직원 계약 요청 API =====
+
+@contracts_bp.route('/api/employee/<int:user_id>/request', methods=['POST'])
+@login_required
+@corporate_account_required
+def api_request_employee_contract(user_id):
+    """직원에게 계약 요청 API (21번 원칙)
+
+    직원 목록에서 계약 요청 버튼 클릭 시 호출
+    """
+    company_id = session.get('company_id')
+    if not company_id:
+        return api_error('법인 정보가 없습니다.')
+
+    data = request.get_json() or {}
+    contract_type = data.get('contract_type', 'employment')
+    position = data.get('position')
+    department = data.get('department')
+    notes = data.get('notes')
+
+    success, contract, error = contract_service.create_employee_contract_request(
+        employee_user_id=user_id,
+        company_id=company_id,
+        contract_type=contract_type,
+        position=position,
+        department=department,
+        notes=notes
+    )
+
+    if success:
+        return api_success(contract, message='계약 요청이 전송되었습니다.')
+    return api_error(error)

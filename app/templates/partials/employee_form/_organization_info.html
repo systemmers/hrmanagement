@@ -50,7 +50,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="position" class="form-label">직급 <span class="required">*</span></label>
+                    <label for="position" class="form-label">직위 <span class="required">*</span></label>
                     <select id="position" name="position" class="form-input" required>
                         <option value="">선택하세요</option>
                         {% if classification_options and classification_options.positions %}
@@ -63,6 +63,15 @@
                             {% endfor %}
                         {% endif %}
                     </select>
+                    <small class="form-help">서열 기준 (사원, 대리, 과장, 부장...)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="job_grade" class="form-label">직급</label>
+                    <input type="text" id="job_grade" name="job_grade" class="form-input"
+                           value="{{ employee.job_grade if employee and employee.job_grade else '' }}"
+                           placeholder="L3, Senior, 2호봉">
+                    <small class="form-help">역량 레벨 (L3, Senior, 2호봉...)</small>
                 </div>
 
                 <div class="form-group">
@@ -75,7 +84,15 @@
                             {% endfor %}
                         {% endif %}
                     </select>
-                    <small class="form-help">직책이 없으면 선택하지 않아도 됩니다</small>
+                    <small class="form-help">책임자 역할 (팀장, 본부장, CFO...)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="job_role" class="form-label">직무</label>
+                    <input type="text" id="job_role" name="job_role" class="form-input"
+                           value="{{ employee.job_role if employee and employee.job_role else '' }}"
+                           placeholder="인사기획, 웹개발, 회계관리">
+                    <small class="form-help">수행 업무 (인사기획, 회계관리...)</small>
                 </div>
 
                 <div class="form-group">

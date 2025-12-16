@@ -32,7 +32,11 @@ class Employee(db.Model):
 
     # 소속 정보 추가 필드
     team = db.Column(db.String(100), nullable=True)
-    job_title = db.Column(db.String(100), nullable=True)
+    # 직급 체계 (Career 모델과 일관성 유지)
+    # position: 직위 (서열 - 사원, 대리, 과장, 부장) - 기본정보에 이미 존재
+    job_grade = db.Column(db.String(50), nullable=True)  # 직급 (역량 레벨 - L3, 2호봉, Senior)
+    job_title = db.Column(db.String(100), nullable=True)  # 직책 (책임자 역할 - 팀장, 본부장, CFO)
+    job_role = db.Column(db.String(100), nullable=True)  # 직무 (수행 업무 - 인사기획, 회계관리)
     work_location = db.Column(db.String(200), nullable=True)
     internal_phone = db.Column(db.String(50), nullable=True)
     company_email = db.Column(db.String(200), nullable=True)
@@ -91,6 +95,12 @@ class Employee(db.Model):
     contract = db.relationship('Contract', backref='employee', uselist=False, cascade='all, delete-orphan')
     insurance = db.relationship('Insurance', backref='employee', uselist=False, cascade='all, delete-orphan')
 
+    # 템플릿 호환성 프로퍼티 (employment_type -> contract.employee_type)
+    @property
+    def employment_type(self):
+        """템플릿 호환성: employment_type -> contract.employee_type"""
+        return self.contract.employee_type if self.contract else None
+
     def to_dict(self):
         """딕셔너리 반환 (snake_case 통일)"""
         return {
@@ -132,7 +142,10 @@ class Employee(db.Model):
             'emergency_relation': self.emergency_relation,
             # 소속 정보 추가 필드
             'team': self.team,
-            'job_title': self.job_title,
+            # 직급 체계
+            'job_grade': self.job_grade,  # 직급
+            'job_title': self.job_title,  # 직책
+            'job_role': self.job_role,  # 직무
             'work_location': self.work_location,
             'internal_phone': self.internal_phone,
             'company_email': self.company_email,
@@ -157,7 +170,10 @@ class Employee(db.Model):
             # 소속정보 추가 필드
             employee_number=data.get('employee_number') or data.get('employeeNumber'),
             team=data.get('team'),
+            # 직급 체계
+            job_grade=data.get('job_grade') or data.get('jobGrade'),
             job_title=data.get('job_title') or data.get('jobTitle'),
+            job_role=data.get('job_role') or data.get('jobRole'),
             work_location=data.get('work_location') or data.get('workLocation'),
             internal_phone=data.get('internal_phone') or data.get('internalPhone'),
             company_email=data.get('company_email') or data.get('companyEmail'),

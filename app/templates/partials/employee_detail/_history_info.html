@@ -67,13 +67,15 @@
                     <thead>
                         <tr>
                             <th>직장명</th>
-                            <th>입사일</th>
-                            <th>퇴사일</th>
-                            <th>경력</th>
                             <th>부서</th>
+                            <th>직위</th>
                             <th>직급</th>
+                            <th>직책</th>
+                            <th>직무</th>
+                            <th>재직기간</th>
+                            <th>급여유형</th>
+                            <th>연봉/월급</th>
                             <th>담당업무</th>
-                            <th>연봉</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -81,18 +83,26 @@
                         {% for career in career_list %}
                         <tr>
                             <td>{{ career.company }}</td>
-                            <td>{{ career.start_date }}</td>
-                            <td>{{ career.end_date or '재직중' }}</td>
-                            <td>-</td>
                             <td>{{ career.department or '-' }}</td>
                             <td>{{ career.position or '-' }}</td>
+                            <td>{{ career.job_grade or '-' }}</td>
+                            <td>{{ career.job_title or '-' }}</td>
+                            <td>{{ career.job_role or '-' }}</td>
+                            <td>{{ career.start_date }} ~ {{ career.end_date or '재직중' }}</td>
+                            <td>{% if career.salary_type %}
+                                {% if career.salary_type == 'annual' %}연봉제
+                                {% elif career.salary_type == 'monthly' %}월급제
+                                {% elif career.salary_type == 'hourly' %}시급제
+                                {% elif career.salary_type == 'pay_step' %}호봉제
+                                {% else %}{{ career.salary_type }}{% endif %}
+                            {% else %}-{% endif %}</td>
+                            <td>{% if career.salary %}{{ '{:,}'.format(career.salary) }}원{% elif career.monthly_salary %}{{ '{:,}'.format(career.monthly_salary) }}원/월{% else %}-{% endif %}{% if career.pay_step %} ({{ career.pay_step }}호봉){% endif %}</td>
                             <td>{{ career.duty or '-' }}</td>
-                            <td>{{ '{:,}'.format(career.salary) if career.salary else '-' }}{% if career.salary %}원{% endif %}</td>
                         </tr>
                         {% endfor %}
                         {% else %}
                         <tr>
-                            <td colspan="8" class="table-empty">
+                            <td colspan="10" class="table-empty">
                                 <i class="fas fa-briefcase"></i>
                                 <p>등록된 경력정보가 없습니다</p>
                             </td>

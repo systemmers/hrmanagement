@@ -7,6 +7,8 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 from app.database import db
 from app.models.person_contract import PersonCorporateContract, DataSharingSettings, SyncLog
+from app.models.user import User
+from app.models.employee import Employee
 from .base_repository import BaseRepository
 
 
@@ -125,12 +127,23 @@ class PersonContractRepository(BaseRepository):
     # ===== 승인/거절/종료 메서드 =====
 
     def approve_contract(self, contract_id: int, approved_by_user_id: int = None) -> Dict:
-        """계약 승인"""
+        """계약 승인
+
+        21번 원칙: 계약 승인 시 Employee.status = 'active' 연동
+        """
         contract = self.get_model_by_id(contract_id)
         if not contract:
             raise ValueError("계약을 찾을 수 없습니다.")
 
         contract.approve(approved_by_user_id)
+
+        # Employee.status 연동: 계약 승인 시 active로 변경
+        user = User.query.get(contract.person_user_id)
+        if user and user.employee_id:
+            employee = db.session.get(Employee, user.employee_id)
+            if employee:
+                employee.status = 'active'
+
         db.session.commit()
 
         return contract.to_dict(include_relations=True)
@@ -147,12 +160,23 @@ class PersonContractRepository(BaseRepository):
         return contract.to_dict(include_relations=True)
 
     def terminate_contract(self, contract_id: int, terminated_by_user_id: int = None, reason: str = None) -> Dict:
-        """계약 종료"""
+        """계약 종료
+
+        21번 원칙: 계약 종료 시 Employee.status = 'inactive' 연동
+        """
         contract = self.get_model_by_id(contract_id)
         if not contract:
             raise ValueError("계약을 찾을 수 없습니다.")
 
         contract.terminate(terminated_by_user_id, reason)
+
+        # Employee.status 연동: 계약 종료 시 inactive로 변경
+        user = User.query.get(contract.person_user_id)
+        if user and user.employee_id:
+            employee = db.session.get(Employee, user.employee_id)
+            if employee:
+                employee.status = 'inactive'
+
         db.session.commit()
 
         return contract.to_dict(include_relations=True)

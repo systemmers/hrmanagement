@@ -121,8 +121,8 @@ def _get_career_updater():
     """경력정보 Updater 생성"""
     from ...models import Career
 
-    def parse_salary(value):
-        """salary 값을 정수로 변환"""
+    def parse_int(value):
+        """정수 값으로 변환"""
         if value is None or value == '':
             return None
         try:
@@ -140,11 +140,23 @@ def _get_career_updater():
             'start_date': 'start_date',
             'end_date': 'end_date',
             'department': 'department',
-            'position': 'position',
-            'duties': 'job_description',
-            'salary': 'salary',
+            # 직급 체계
+            'position': 'position',  # 직위
+            'job_grade': 'job_grade',  # 직급
+            'job_title': 'job_title',  # 직책
+            'job_role': 'job_role',  # 직무
+            'duties': 'job_description',  # 담당업무 상세
+            # 급여 체계
+            'salary': 'salary',  # 연봉
+            'salary_type': 'salary_type',  # 급여유형
+            'monthly_salary': 'monthly_salary',  # 월급
+            'pay_step': 'pay_step',  # 호봉
         },
-        converters={'salary': parse_salary}
+        converters={
+            'salary': parse_int,
+            'monthly_salary': parse_int,
+            'pay_step': parse_int,
+        }
     )
 
 
@@ -176,11 +188,11 @@ def _get_language_updater():
         form_prefix='language_',
         required_field='name',
         field_mapping={
-            'name': 'language',
+            'name': 'language_name',
             'level': 'level',
-            'test_name': 'test_name',
+            'test_name': 'exam_name',
             'score': 'score',
-            'test_date': 'test_date',
+            'test_date': 'acquisition_date',
         }
     )
 

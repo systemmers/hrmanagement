@@ -34,13 +34,14 @@ class Contract(db.Model):
 
     @classmethod
     def from_dict(cls, data):
-        """딕셔너리에서 모델 생성 (snake_case 지원)"""
+        """딕셔너리에서 모델 생성 (snake_case 지원, 템플릿 호환성 필드 포함)"""
         return cls(
             employee_id=data.get('employee_id') or data.get('employeeId'),
             contract_date=data.get('contract_date') or data.get('contractDate'),
             contract_type=data.get('contract_type') or data.get('contractType'),
             contract_period=data.get('contract_period') or data.get('contractPeriod'),
-            employee_type=data.get('employee_type') or data.get('employeeType'),
+            # employment_type -> employee_type 매핑 지원
+            employee_type=data.get('employee_type') or data.get('employeeType') or data.get('employment_type'),
             work_type=data.get('work_type') or data.get('workType'),
             note=data.get('note'),
         )

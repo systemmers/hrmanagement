@@ -1,80 +1,154 @@
-- note
-- setting
-- rules
+# CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-# Github
-- git : https://github.com/systemmers/hrmanagement.git
-- kim sang jin
-- sangjin@gmail.com
+## Project Overview
 
-# account
-- 일반 직원: testuser@example.com / test1234
-- 관리자: company@example.com / admin1234
+**HR Management System (인사카드 관리 시스템)** - Flask 기반 인사 관리 웹 애플리케이션
 
+- **계정 체계**: 개인(personal), 법인(corporate), 직원(employee_sub) 3가지 계정 타입
+- **핵심 기능**: 직원 관리, 계약 관리, 프로필 관리, 조직 관리, AI 문서 처리
 
+## Commands
 
+```bash
+# 개발 서버 실행 (포트 5200)
+python run.py
 
-## rules
+# 환경변수 로드 필수 (.env 파일)
+# DATABASE_URL=postgresql://... (필수)
+# GEMINI_API_KEY=... (AI 기능용)
 
-# 공통
-- 모든 작업은 한국어로 커뮤니케이션하여라.
-- 모든 작업에서 이모지를 사용하지 말아라.
-- 모든 작업시 적용되는 날짜는 시스템 날짜를 적용하고 별도 지시나 기준이 있을시 해당 기준을 따른다.  
+# 데이터베이스 마이그레이션
+alembic upgrade head
+alembic revision --autogenerate -m "migration message"
+```
 
-- 정확한 워딩 : 프롬프트는 워딩을 정확하게 사용하여 AI가 정확한 의도를 파악하여 목적 이탈을 최소화하고 달성을 극대화 한다. 
-- 핵심 정리 : 각 문장을 목적에 부합하는 명확한 핵심만 정리하여 AI 최적화 프롬프트로 작성합니다.
-- MECE 원칙 준수 : MECE (상호 배타적이고 집합적으로 완전한) 원칙을 준수합니다.
-- 프롬프트 체이닝(Prompt Chaining : 단계적 구체화)을 적용하며. 준수합니다.
-- CQRS(Command Query Responsibility Segregation : 명령과 조회)을 적용하며, 준수합니다.
-- 원본 유지 및 비교 : 원본 문장을 유지하고, 변경한 문장을 추가하여 비교할 수 있게 합니다.
-- 문장 개선 : 문맥과 부자연스러운 문장을 검증하여 최대한 자연스럽게 문장을 제안하고 개선합니다.
-- 중복과 중의적이고 모호하며 유사한 의미의 문장은 그중 가장 목적에 부합하는 문장을 기준으로 합치고 개선하며, 필요에 따라 확장한다.  
-- 한 번에 여러 다른 종류의 지시를 혼합하지 않고, 하나의 지시 문장에는 최대한 하나의 지시사항만 포함한다.
-- 단계별 접근 : 작업을 논리적 단계로 나누어 지시합니다 (CoT: Chain of Thought 활용).
-- 질문 유도 : AI가 충분한 정보를 얻을 때까지 지속적으로 질문하도록 유도합니다 (`질문 유도` 명시).
-- 사고 유도 : "심호흡하고 차근차근", "단계별 사고 유도" 등의 문구를 사용하여 신중한 접근을 유도합니다.(Step by Step)
-- 편견 제거 : 제안 및 기획 요청 시 편견 없는 창의적 답변을 요구합니다 (`당신의 대답에 편견이 없도록 주의`).
-- 자료 제공 : 필요시 참고자료를 첨부하거나 참고할 수 있도록 합니다.
+## Architecture
 
+### Layer Structure (3-Tier + Repository Pattern)
+```
+blueprints/     → Routes (URL 라우팅, 요청 처리)
+    ├── employees/   # 모듈 분할된 CRUD (list_routes, mutation_routes, detail_routes)
+    ├── profile/     # 통합 프로필 (개인/법인 인터페이스 통합)
+    └── [domain].py  # 도메인별 라우트
 
-# 코드
-- 중복된 코드, 함수, 기능 파일 금지하고 체크
-- 코드 재활용 적극 권장 (DRY 원칙 준수)
-- 프로젝트 컨벤션 규칙 체크
-- 코드, 파일, 폴더 네이밍 규칙 준수 (snake_case, camelCase 등 일관성 유지)
-- 코드, 파일, 폴더 작성 패턴 준수
-- 프로젝트 구조가 개발문서에 최신 업데이트가 되고 있는지 체크
-- 코드 작업전후 의존성 항상 파악
-- 모듈화가 일관성있게 진행되고 준수하고 있는지 체크 (SOLID 원칙 적용)
-- 코드 최상단에 일관된 형식으로 코드 인덱스 작성 (docstring, header comment)
-- 최신 코드 베이스 유지
-- 매직 넘버 및 하드코딩 금지 (상수화 또는 환경변수 사용)
-- 단위 테스트 작성 권장
-- 코드 리뷰 및 정적 분석 도구 활용
-- 필요이상의 오버엔지니어링 금지.
-- 승인하지 않은 작업 금지.
-- 각 파일의 코드라인수는 최대 500~800라인 이내를 유지하는 아키텍쳐 구조로 작성하여라.
+services/       → Business Logic (비즈니스 로직)
+repositories/   → Data Access (BaseRepository, BaseRelationRepository 상속)
+models/         → SQLAlchemy Models (to_dict, from_dict 메서드 필수)
+```
 
+### Account Type System
+| Type | Description | Session Keys |
+|------|-------------|--------------|
+| `personal` | 개인 계정 | user_id, personal_profile_id |
+| `corporate` | 법인 관리자 | user_id, company_id, user_role |
+| `employee_sub` | 법인 직원 | user_id, employee_id, company_id |
 
-# 프로세스
-- 질문 : 지시에 대하여 의도 파악이 어렵거나 더 높은 퀄리티의 정보를 얻기 위하여 필요한 경우 질문하여 정보를 수집하여라.
-- 균형적인 대안 : 모든 계획 및 작업에 대하여 극단적 작업과 설정은 지양하고, 가장 효율적인 적절한 대안을 찾고 균형점을 찾아 제안하여라.
-- 비판적 사고 : 지시 내용에 대하여 무조건 진행하지 말고 현재 전후 상황과 기술 표준에 근거하여 판단할수 있도록 피드백하여 판단할 수 있도록 하여라.
-- 용어 교정 : 프롬프트에 포함된 용어, 접근법, 또는 기술적 내용이 현재 상황이나 표준과 상충하거나 부적절할 경우, 해당 사항을 명확히 지적하고 대안을 제시한다.
-- rules에 벗어난 진행을 불가피하게 해야 할 경우 피드백과 승인 후 진행.
-- 변경사항 추적 및 버전 관리 철저히 이행
+### Key Decorators (`app/utils/decorators.py`)
+```python
+@login_required              # 로그인 필수
+@corporate_login_required    # 법인 계정만
+@personal_login_required     # 개인 계정만
+@corporate_admin_required    # 법인 관리자만 (admin/manager)
+@api_login_required          # API용 (JSON 응답)
+```
 
+### Frontend Structure
+```
+static/js/
+├── components/    # 재사용 UI (data-table, salary-calculator, toast)
+├── services/      # API 통신 (employee-service, contract-service)
+├── pages/         # 페이지별 로직
+│   └── employee/  # 모듈화된 직원 폼 (validators, dynamic-sections)
+└── utils/         # 공통 유틸 (api.js, validation.js)
+```
 
-# 문서
-- 기본적으로 확정되고 진행되고 있는 계획을 수정시, 기존 계획을 유지하고 추가 수정계획, 완료된 사항을 추가하는 방식으로 추적가능하게 작성
-- API 문서화 및 README 파일 유지보수
-- 변경 로그(CHANGELOG) 작성
+### Template Macros (`templates/macros/`)
+- `_form_controls.html`: 폼 입력 컴포넌트
+- `_navigation.html`: 사이드바/섹션 네비게이션
+- `_alerts.html`: 알림 메시지
 
+## Key Patterns
 
-# 개발
-- 스타일 가이드 작성 후 가이드대로 디자인 설계
-- 각 코드별 모듈, 컴포넌트화 하여 계획하고 진행
-- 보안 취약점 점검 (OWASP 가이드라인 준수)
-- 성능 최적화 고려
-- 접근성(Accessibility) 고려
+### Model Convention
+```python
+class SomeModel(db.Model):
+    def to_dict(self):      # 직렬화 (camelCase 반환)
+        return {...}
+
+    @staticmethod
+    def from_dict(data):    # 역직렬화 (snake_case 변환)
+        return SomeModel(...)
+```
+
+### Repository Pattern
+```python
+# 1:N 관계: BaseRelationRepository 상속
+class EducationRepository(BaseRelationRepository):
+    def __init__(self):
+        super().__init__(Education)
+
+# 1:1 관계: BaseOneToOneRepository 상속
+class SalaryRepository(BaseOneToOneRepository):
+    ...
+```
+
+### Blueprint Module Split (employees 예시)
+```
+employees/
+├── __init__.py          # Blueprint 정의
+├── routes.py            # 공통 라우트
+├── list_routes.py       # 목록 조회
+├── mutation_routes.py   # 생성/수정/삭제
+├── detail_routes.py     # 상세 조회
+├── helpers.py           # 헬퍼 함수
+└── form_extractors.py   # 폼 데이터 추출
+```
+
+## Test Accounts
+
+### 개인계정 (personal)
+| Email | Password |
+|-------|----------|
+| personal1@test.com | personal1234 |
+| personal2@test.com | personal1234 |
+| personal3@test.com | personal1234 |
+
+### 법인계정 (corporate)
+| 법인 | Email | Password | Company ID |
+|------|-------|----------|------------|
+| 테스트기업 A | corp_a@test.com | corp1234 | 1 |
+| 테스트기업 B | corp_b@test.com | corp1234 | 3 |
+
+### 법인소속 직원계정 (employee_sub)
+| 소속 | Email | Password |
+|------|-------|----------|
+| 법인 A | emp_a1@test.com ~ emp_a5@test.com | emp1234 |
+| 법인 B | emp_b1@test.com ~ emp_b3@test.com | emp1234 |
+
+### 기존 테스트 계정
+| Email | Password | 유형 |
+|-------|----------|------|
+| testuser@example.com | test1234 | 일반 직원 |
+| company@example.com | admin1234 | 관리자 |
+
+## Rules
+
+### Communication
+- 한국어로 커뮤니케이션
+- 이모지 사용 금지
+
+### Code Standards
+- 파일당 500~800 라인 이내 유지
+- DRY 원칙 준수, 코드 중복 금지
+- snake_case (Python), camelCase (JavaScript) 일관성
+- 하드코딩 금지 (상수화 또는 환경변수 사용)
+- 인라인 스타일/스크립트 금지
+- 승인하지 않은 작업 금지
+
+### Process
+- git > plan > implement > test > debugging 순서
+- 지시한 것만 진행, 다른 코드에 영향 금지
+- 변경 전 의도 파악이 어려우면 질문
+- rules 위반 시 피드백 후 승인 받아 진행

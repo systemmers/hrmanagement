@@ -111,6 +111,8 @@ Parameters:
         <div class="nav-group">
             <div class="nav-group-title">기본정보</div>
             {{ section_nav_item('#personal-info', 'fa-user', '개인 기본정보', true) }}
+            {# 21번/22번 원칙: 계정정보 섹션 (신규 등록 또는 계정 있을 때 표시) #}
+            {{ section_nav_item('#account-info', 'fa-user-circle', '계정정보') }}
             {{ section_nav_item('#organization-info', 'fa-building', '소속정보', false, ' (읽기전용)' if is_employee_role else '') }}
             {% if not is_employee_role %}
             {{ section_nav_item('#contract-info', 'fa-file-contract', '계약정보') }}

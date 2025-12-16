@@ -106,6 +106,11 @@
             {# 섹션 1: 개인 기본정보 #}
             {% include 'partials/employee_form/_personal_info.html' %}
 
+            {# 인사카드 전용: 계정정보 (21번/22번 원칙 - 직원 등록 시 계정 동시 생성) #}
+            {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
+                {% include 'partials/employee_form/_account_info.html' %}
+            {% endif %}
+
             {# 인사카드 전용: 소속정보 #}
             {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
                 {% include 'partials/employee_form/_organization_info.html' %}

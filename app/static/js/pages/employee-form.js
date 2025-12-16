@@ -50,7 +50,9 @@ export {
     getFamilyTemplate,
     getLanguageTemplate,
     getProjectTemplate,
-    getAwardTemplate
+    getAwardTemplate,
+    initAccountSection,
+    validateAccountFields
 } from './employee/index.js';
 
 // 기본 export

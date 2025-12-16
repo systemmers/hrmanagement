@@ -28,7 +28,10 @@ def extract_employee_from_form(form_data, employee_id=0):
         # 소속정보 추가 필드
         employee_number=form_data.get('employee_number') or None,
         team=form_data.get('team') or None,
-        job_title=form_data.get('job_title') or None,
+        # 직급 체계 (Career 모델과 일관성)
+        job_grade=form_data.get('job_grade') or None,  # 직급
+        job_title=form_data.get('job_title') or None,  # 직책
+        job_role=form_data.get('job_role') or None,  # 직무
         work_location=form_data.get('work_location') or None,
         internal_phone=form_data.get('internal_phone') or None,
         company_email=form_data.get('company_email') or None,

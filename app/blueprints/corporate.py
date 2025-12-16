@@ -111,7 +111,11 @@ def settings():
 @corporate_bp.route('/users')
 @corporate_admin_required
 def users():
-    """법인 사용자 관리"""
+    """법인 계정관리 (employee_sub만 표시)
+
+    21번 원칙: 법인 계정(employee_sub)만 표시
+    personal 계정은 외부 사용자이므로 제외
+    """
     company_id = session.get('company_id')
     if not company_id:
         flash('법인 정보를 찾을 수 없습니다.', 'error')
@@ -122,8 +126,11 @@ def users():
         flash('법인 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
 
-    # 법인에 속한 사용자 목록
-    users = User.query.filter_by(company_id=company_id).all()
+    # 법인 계정(employee_sub)만 표시
+    users = User.query.filter_by(
+        company_id=company_id,
+        account_type=User.ACCOUNT_EMPLOYEE_SUB
+    ).all()
 
     return render_template('corporate/users.html', company=company, users=users)
 

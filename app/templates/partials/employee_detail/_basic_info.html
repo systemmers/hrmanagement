@@ -61,8 +61,10 @@
             <div class="info-grid">
                 {{ info_item('소속', employee.department, highlight=true) }}
                 {{ info_item('부서', employee.team or employee.department, highlight=true) }}
-                {{ info_item('직급', employee.position) }}
+                {{ info_item('직위', employee.position) }}
+                {{ info_item('직급', employee.job_grade) }}
                 {{ info_item('직책', employee.job_title) }}
+                {{ info_item('직무', employee.job_role) }}
                 {{ info_item('사원번호', employee.employee_number or 'EMP-%03d'|format(employee.id)) }}
                 {{ info_item('근무형태', get_employment_type_label(employee.employment_type)) }}
                 {{ info_item('근무지', employee.work_location or '본사') }}

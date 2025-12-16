@@ -6,6 +6,10 @@ Contract Service
 - 계약 요청/승인/거절/종료
 - 데이터 공유 설정
 - 계약 통계
+
+21번 원칙 확장:
+- personal 계정: 기존 개인-법인 계약
+- employee_sub 계정: 직원-법인 계약 (동일한 프로세스)
 """
 from typing import Dict, Optional, List, Any, Tuple
 from flask import session
@@ -97,19 +101,21 @@ class ContractService:
         department: str = None,
         notes: str = None
     ) -> Tuple[bool, Optional[Dict], Optional[str]]:
-        """계약 요청 생성 (법인 -> 개인)
+        """계약 요청 생성 (법인 -> 개인/직원)
+
+        21번 원칙: personal, employee_sub 계정 모두 지원
 
         Returns:
             Tuple[성공여부, 계약정보, 에러메시지]
         """
-        # 개인 사용자 조회
-        person_user = User.query.filter_by(
-            email=person_email,
-            account_type='personal'
+        # 개인 또는 직원 사용자 조회 (21번 원칙)
+        person_user = User.query.filter(
+            User.email == person_email,
+            User.account_type.in_(['personal', 'employee_sub'])
         ).first()
 
         if not person_user:
-            return False, None, '해당 이메일의 개인 계정을 찾을 수 없습니다.'
+            return False, None, '해당 이메일의 계정을 찾을 수 없습니다.'
 
         try:
             contract = self.contract_repo.create_contract_request(
@@ -124,6 +130,73 @@ class ContractService:
             return True, contract, None
         except ValueError as e:
             return False, None, str(e)
+
+    def create_employee_contract_request(
+        self,
+        employee_user_id: int,
+        company_id: int,
+        contract_type: str = 'employment',
+        position: str = None,
+        department: str = None,
+        notes: str = None
+    ) -> Tuple[bool, Optional[Dict], Optional[str]]:
+        """직원/개인 계정에 대한 계약 요청 (21번 원칙)
+
+        직원 등록 후 계약 요청 시 사용
+        employee_user_id로 직접 계약 요청
+        21번 원칙: personal, employee_sub 계정 모두 지원
+
+        Returns:
+            Tuple[성공여부, 계약정보, 에러메시지]
+        """
+        # 직원 또는 개인 계정 확인 (21번 원칙)
+        employee_user = User.query.filter(
+            User.id == employee_user_id,
+            User.account_type.in_(['personal', 'employee_sub'])
+        ).first()
+
+        if not employee_user:
+            return False, None, '해당 계정을 찾을 수 없습니다.'
+
+        # 이미 해당 법인과 계약이 있는지 확인
+        existing = self.contract_repo.get_contract_between(
+            person_user_id=employee_user_id,
+            company_id=company_id
+        )
+        if existing:
+            return False, None, '이미 계약이 존재하거나 대기 중입니다.'
+
+        try:
+            contract = self.contract_repo.create_contract_request(
+                person_user_id=employee_user_id,
+                company_id=company_id,
+                requested_by='company',
+                contract_type=contract_type,
+                position=position,
+                department=department,
+                notes=notes
+            )
+            return True, contract, None
+        except ValueError as e:
+            return False, None, str(e)
+
+    def get_employee_contract_status(
+        self,
+        employee_user_id: int,
+        company_id: int
+    ) -> Optional[str]:
+        """직원의 계약 상태 조회
+
+        Returns:
+            'none' | 'pending' | 'approved' | 'rejected' | 'terminated'
+        """
+        contract = self.contract_repo.get_contract_between(
+            person_user_id=employee_user_id,
+            company_id=company_id
+        )
+        if not contract:
+            return 'none'
+        return contract.get('status', 'none')
 
     def update_sharing_settings(self, contract_id: int, settings: Dict) -> Tuple[bool, Optional[Dict], Optional[str]]:
         """데이터 공유 설정 업데이트

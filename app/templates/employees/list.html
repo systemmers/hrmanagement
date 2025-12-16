@@ -125,6 +125,7 @@
                 <th>전화번호</th>
                 <th>이메일</th>
                 <th data-sort="status">상태</th>
+                <th>계약</th>
                 <th>작업</th>
             </tr>
         </thead>
@@ -147,6 +148,28 @@
                     <span class="badge {{ get_status_badge_class(employee.status) }}">
                         {{ get_status_text(employee.status) }}
                     </span>
+                </td>
+                <td>
+                    {# 21번 원칙: 계약 상태 표시 및 요청 버튼 #}
+                    {% if employee.contract_status == 'no_account' %}
+                        <span class="badge badge-secondary" title="계정 없음">-</span>
+                    {% elif employee.contract_status == 'none' %}
+                        <button class="btn btn-sm btn-outline-primary btn-contract-request"
+                                data-user-id="{{ employee.user_id }}"
+                                data-employee-name="{{ employee.name }}"
+                                title="계약 요청">
+                            <i class="fas fa-file-signature"></i>
+                            <span>요청</span>
+                        </button>
+                    {% elif employee.contract_status == 'requested' %}
+                        <span class="badge badge-warning">대기중</span>
+                    {% elif employee.contract_status == 'approved' %}
+                        <span class="badge badge-success">계약완료</span>
+                    {% elif employee.contract_status == 'rejected' %}
+                        <span class="badge badge-danger">거절됨</span>
+                    {% elif employee.contract_status == 'terminated' %}
+                        <span class="badge badge-secondary">종료</span>
+                    {% endif %}
                 </td>
                 <td>
                     <div class="table-actions">
@@ -181,6 +204,23 @@
                 <i class="fas fa-phone"></i>
                 <span>{{ employee.phone }}</span>
             </div>
+            {# 21번 원칙: 계약 상태 표시 #}
+            <div class="employee-meta-item">
+                <i class="fas fa-file-contract"></i>
+                {% if employee.contract_status == 'no_account' %}
+                    <span class="text-muted">계정 없음</span>
+                {% elif employee.contract_status == 'none' %}
+                    <span class="text-info">계약 미요청</span>
+                {% elif employee.contract_status == 'requested' %}
+                    <span class="text-warning">계약 대기중</span>
+                {% elif employee.contract_status == 'approved' %}
+                    <span class="text-success">계약 완료</span>
+                {% elif employee.contract_status == 'rejected' %}
+                    <span class="text-danger">계약 거절</span>
+                {% elif employee.contract_status == 'terminated' %}
+                    <span class="text-secondary">계약 종료</span>
+                {% endif %}
+            </div>
         </div>
         <div class="employee-actions">
             <a href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}" class="btn btn-secondary btn-small">
@@ -191,6 +231,15 @@
                 <i class="fas fa-edit"></i>
                 <span>수정</span>
             </a>
+            {# 21번 원칙: 계약 요청 버튼 (계정 있고 계약 없는 경우만) #}
+            {% if employee.contract_status == 'none' %}
+            <button class="btn btn-primary btn-small btn-contract-request"
+                    data-user-id="{{ employee.user_id }}"
+                    data-employee-name="{{ employee.name }}">
+                <i class="fas fa-file-signature"></i>
+                <span>계약</span>
+            </button>
+            {% endif %}
         </div>
     </div>
     {% endfor %}

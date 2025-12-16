@@ -330,6 +330,23 @@ def personal_account_required(f):
     return decorated_function
 
 
+def personal_or_employee_account_required(f):
+    """
+    개인 또는 직원 계정 필수 데코레이터 (21번 원칙)
+
+    개인(personal) 또는 직원(employee_sub) 계정으로 로그인한 경우에만 접근 가능합니다.
+    계약 승인/거절 등 개인-법인 계약 관련 기능에서 사용합니다.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        account_type = session.get('account_type')
+        if account_type not in ('personal', 'employee_sub'):
+            flash('개인 또는 직원 계정으로만 접근할 수 있습니다.', 'warning')
+            return redirect(url_for('main.index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 def corporate_account_required(f):
     """
     법인 계정 필수 데코레이터 (API용)

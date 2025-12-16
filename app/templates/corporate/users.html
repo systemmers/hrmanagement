@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}사용자 관리 - {{ company.name }}{% endblock %}
+{% block title %}계정관리 - {{ company.name }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/corporate-users.css') }}">
@@ -9,7 +9,7 @@
 {% block content %}
 <div class="page-header">
     <div class="page-title-row">
-        <h1 class="page-title">사용자 관리</h1>
+        <h1 class="page-title">계정관리</h1>
         <div class="page-actions">
             <a href="{{ url_for('corporate.dashboard') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i>
@@ -17,11 +17,11 @@
             </a>
             <a href="{{ url_for('corporate.add_user') }}" class="btn btn-primary">
                 <i class="fas fa-user-plus"></i>
-                <span>사용자 추가</span>
+                <span>계정 추가</span>
             </a>
         </div>
     </div>
-    <p class="page-description">{{ company.name }}에 속한 사용자 목록입니다. ({{ users|length }}명)</p>
+    <p class="page-description">{{ company.name }} 법인 계정 목록입니다. ({{ users|length }}명)</p>
 </div>
 
 <!-- 사용자 목록 테이블 -->
