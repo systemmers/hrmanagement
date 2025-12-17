@@ -23,6 +23,7 @@ def register_blueprints(app):
     from .notifications import notifications_bp  # Phase 5: 알림 시스템
     from .profile import profile_bp  # 통합 프로필 (법인/개인 인터페이스 통합)
     from .account import account_bp  # 계정 관리 (설정, 비밀번호, 공개설정, 탈퇴)
+    from .corporate_settings_api import corporate_settings_api_bp  # 법인 세팅 API
 
     # 인증 관련 (/auth/*)
     app.register_blueprint(auth_bp)
@@ -71,3 +72,6 @@ def register_blueprints(app):
 
     # AI 테스트 (프로토타입) (/ai-test/*)
     app.register_blueprint(ai_test_bp)
+
+    # 법인 세팅 API (/api/corporate/*)
+    app.register_blueprint(corporate_settings_api_bp)

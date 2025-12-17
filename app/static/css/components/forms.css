@@ -55,7 +55,7 @@
 }
 
 .required {
-    color: #ef4444;
+    color: var(--color-error-500);
 }
 
 /* 폼 입력 */
@@ -276,10 +276,185 @@
     border-color: var(--color-error-500) !important;
 }
 
+/* ========================================
+   Form Section Variants
+   ======================================== */
+
+/* Card Style Section */
+.form-section--card {
+    background-color: var(--color-pure-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+}
+
+/* Settings Row Layout */
+.form-row--settings {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+}
+
+/* ========================================
+   Form Toggle Component
+   ======================================== */
+
+.form-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-gray-300);
+    transition: var(--transition-base);
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: var(--transition-base);
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--color-primary);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+.toggle-label {
+    font-size: var(--text-sm);
+    color: var(--color-gray-600);
+}
+
+/* ========================================
+   Form Preview Component
+   ======================================== */
+
+.form-preview {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background-color: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-gray-200);
+}
+
+.form-preview-label {
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+}
+
+.form-preview-value {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-gray-900);
+    font-family: var(--font-mono, monospace);
+}
+
+/* ========================================
+   Form Subsection & Options
+   ======================================== */
+
+.form-subsection {
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-gray-100);
+}
+
+.form-subsection:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.form-subsection-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-gray-700);
+    margin-bottom: var(--space-4);
+}
+
+.form-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.form-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-gray-50);
+    border-radius: var(--radius-md);
+}
+
+.form-option-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.form-option-title {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-gray-900);
+}
+
+.form-option-desc {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+}
+
+/* ========================================
+   Responsive Styles
+   ======================================== */
+
 /* 반응형 */
 @media (max-width: 767px) {
     .form-row {
         grid-template-columns: 1fr;
+    }
+
+    .form-row--settings {
+        grid-template-columns: 1fr;
+    }
+
+    .form-option {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     .photo-upload-section {

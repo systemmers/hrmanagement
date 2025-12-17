@@ -38,6 +38,10 @@ from .personal_profile_repository import (
     PersonalMilitaryRepository
 )
 from .corporate_admin_profile_repository import CorporateAdminProfileRepository
+from .company_settings_repository import CompanySettingsRepository
+from .number_category_repository import NumberCategoryRepository
+from .company_visibility_repository import CompanyVisibilityRepository
+from .company_document_repository import CompanyDocumentRepository
 
 __all__ = [
     'EmployeeRepository',
@@ -72,4 +76,8 @@ __all__ = [
     'PersonalLanguageRepository',
     'PersonalMilitaryRepository',
     'CorporateAdminProfileRepository',
+    'CompanySettingsRepository',
+    'NumberCategoryRepository',
+    'CompanyVisibilityRepository',
+    'CompanyDocumentRepository',
 ]

@@ -46,6 +46,13 @@ from .person_contract import (
 from .notification import Notification, NotificationPreference
 from .audit_log import AuditLog
 from .corporate_admin_profile import CorporateAdminProfile
+from .company_settings import CompanySettings
+from .number_category import NumberCategory
+from .number_registry import NumberRegistry
+from .ip_range import IpRange
+from .ip_assignment import IpAssignment
+from .company_document import CompanyDocument
+from .company_visibility_settings import CompanyVisibilitySettings
 
 __all__ = [
     'Employee',
@@ -88,4 +95,11 @@ __all__ = [
     'NotificationPreference',
     'AuditLog',
     'CorporateAdminProfile',
+    'CompanySettings',
+    'NumberCategory',
+    'NumberRegistry',
+    'IpRange',
+    'IpAssignment',
+    'CompanyDocument',
+    'CompanyVisibilitySettings',
 ]
