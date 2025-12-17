@@ -82,6 +82,7 @@ class ClassificationOptionsRepository(BaseRepository):
             'work_location': self._get_by_category('work_location', company_id),
             'job_role': self._get_by_category('job_role', company_id),
             'job_grade': self._get_by_category('job_grade', company_id),
+            'org_unit': self._get_by_category('org_unit', company_id),
         }
 
     def get_employment_options(self, company_id: int = None) -> Dict[str, List[Dict]]:
@@ -176,16 +177,13 @@ class ClassificationOptionsRepository(BaseRepository):
 
     def delete_option_for_company(self, option_id: int, company_id: int) -> bool:
         """법인 옵션 삭제"""
-        option = ClassificationOption.query.filter_by(
-            id=option_id,
-            company_id=company_id
-        ).first()
+        option = ClassificationOption.query.filter_by(id=option_id).first()
 
         if not option:
             return False
 
-        # 시스템 옵션은 삭제 불가
-        if option.is_system:
+        # 글로벌 옵션(company_id=None) 또는 해당 법인 옵션만 삭제 가능
+        if option.company_id is not None and option.company_id != company_id:
             return False
 
         db.session.delete(option)
@@ -273,57 +271,37 @@ class ClassificationOptionsRepository(BaseRepository):
 
     def _get_by_category(self, category: str, company_id: int = None,
                          include_system: bool = False) -> List[Dict]:
-        """카테고리별 옵션 조회 (법인 필터링 + 글로벌 폴백)"""
+        """카테고리별 옵션 조회 (글로벌 + 법인별 모두 포함)"""
+        # 글로벌 옵션 (company_id=None) + 해당 법인 옵션 조회
+        query = ClassificationOption.query.filter(
+            ClassificationOption.category == category,
+            ClassificationOption.is_active == True
+        )
+
         if company_id:
-            # 법인별: 법인 옵션 + 활성화된 시스템 옵션
-            system_options = ClassificationOption.query.filter(
-                ClassificationOption.category == category,
-                ClassificationOption.company_id.is_(None),
-                ClassificationOption.is_system == True,
-                ClassificationOption.is_active == True
-            ).all()
-
-            company_options = ClassificationOption.query.filter(
-                ClassificationOption.category == category,
-                ClassificationOption.company_id == company_id,
-                ClassificationOption.is_active == True
-            ).all()
-
-            # 법인에서 비활성화한 시스템 옵션 제외
-            disabled_values = {
-                opt.value for opt in company_options
-                if not opt.is_active
-            }
-
-            options = []
-            for opt in system_options:
-                if opt.value not in disabled_values:
-                    options.append(opt)
-
-            # 법인 커스텀 옵션 추가
-            for opt in company_options:
-                if opt.is_active and not opt.is_system:
-                    options.append(opt)
-
-            # 정렬
-            options.sort(key=lambda x: x.sort_order)
-
-            return [
-                {'value': opt.value, 'label': opt.label or opt.value, 'id': opt.id}
-                for opt in options
-            ]
+            # 글로벌 옵션 또는 해당 법인 옵션
+            query = query.filter(
+                db.or_(
+                    ClassificationOption.company_id.is_(None),
+                    ClassificationOption.company_id == company_id
+                )
+            )
         else:
-            # 글로벌: 시스템 옵션만
-            options = ClassificationOption.query.filter(
-                ClassificationOption.category == category,
-                ClassificationOption.company_id.is_(None),
-                ClassificationOption.is_active == True
-            ).order_by(ClassificationOption.sort_order).all()
+            # 글로벌 옵션만
+            query = query.filter(ClassificationOption.company_id.is_(None))
 
-            return [
-                {'value': opt.value, 'label': opt.label or opt.value, 'id': opt.id}
-                for opt in options
-            ]
+        options = query.order_by(ClassificationOption.sort_order).all()
+
+        return [
+            {
+                'value': opt.value,
+                'label': opt.label or opt.value,
+                'id': opt.id,
+                'isSystem': opt.is_system,
+                'companyId': opt.company_id
+            }
+            for opt in options
+        ]
 
     def _add_option(self, category: str, value: str, label: str = None) -> Dict:
         """옵션 추가 (글로벌)"""

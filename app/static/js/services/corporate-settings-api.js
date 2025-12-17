@@ -138,6 +138,34 @@ export const DocumentsApi = {
 
     async delete(documentId) {
         return del(`${BASE_URL}/documents/${documentId}`);
+    },
+
+    /**
+     * 파일과 함께 서류 업로드
+     * @param {FormData} formData - 파일과 메타데이터가 포함된 FormData
+     * @returns {Promise<Object>} 생성된 서류 정보
+     */
+    async upload(formData) {
+        const response = await fetch(`${BASE_URL}/documents/upload`, {
+            method: 'POST',
+            body: formData
+            // Content-Type은 자동 설정됨 (multipart/form-data)
+        });
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({ error: '업로드 실패' }));
+            throw new Error(error.error || '서류 업로드에 실패했습니다.');
+        }
+
+        return response.json();
+    },
+
+    /**
+     * 서류 다운로드
+     * @param {number} documentId - 문서 ID
+     */
+    download(documentId) {
+        window.location.href = `${BASE_URL}/documents/${documentId}/download`;
     }
 };
 

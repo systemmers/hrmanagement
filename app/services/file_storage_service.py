@@ -28,6 +28,10 @@ CATEGORY_ATTACHMENT = 'attachments'
 CATEGORY_PROFILE_PHOTO = 'profile_photo'
 CATEGORY_BUSINESS_CARD_FRONT = 'business_card_front'
 CATEGORY_BUSINESS_CARD_BACK = 'business_card_back'
+CATEGORY_COMPANY_DOCUMENT = 'documents'
+
+# 법인 서류 허용 확장자
+ALLOWED_DOCUMENT_EXTENSIONS = {'pdf', 'doc', 'docx', 'xls', 'xlsx', 'hwp', 'jpg', 'jpeg', 'png'}
 
 
 class FileStorageService:
@@ -326,6 +330,87 @@ class FileStorageService:
         folder_path = self.get_personal_path(user_id, category)
         file_path = os.path.join(folder_path, filename)
         return self.delete_file(file_path)
+
+    # ========================================
+    # 법인 서류 파일 관리
+    # ========================================
+
+    def get_company_documents_path(self, company_id: int) -> str:
+        """법인 서류 경로 생성
+
+        Args:
+            company_id: 회사 ID
+
+        Returns:
+            절대 경로
+        """
+        base = self._get_base_path()
+        path = os.path.join(base, 'corporate', str(company_id), CATEGORY_COMPANY_DOCUMENT)
+        os.makedirs(path, exist_ok=True)
+        return path
+
+    def get_company_documents_web_path(self, company_id: int, filename: str) -> str:
+        """법인 서류 웹 접근 경로"""
+        return f"/static/uploads/corporate/{company_id}/{CATEGORY_COMPANY_DOCUMENT}/{filename}"
+
+    @staticmethod
+    def allowed_document_file(filename: str) -> bool:
+        """허용된 서류 파일 확장자 검사"""
+        return '.' in filename and \
+               filename.rsplit('.', 1)[1].lower() in ALLOWED_DOCUMENT_EXTENSIONS
+
+    def validate_document_file(self, file) -> Tuple[bool, Optional[str]]:
+        """법인 서류 파일 유효성 검사
+
+        Args:
+            file: 업로드된 파일 객체
+
+        Returns:
+            (성공여부, 에러메시지)
+        """
+        if not file or file.filename == '':
+            return False, '파일이 선택되지 않았습니다.'
+
+        if not self.allowed_document_file(file.filename):
+            return False, '허용되지 않는 파일 형식입니다. (pdf, doc, docx, xls, xlsx, hwp, jpg, png)'
+
+        file_size = self.get_file_size(file)
+        if file_size > MAX_FILE_SIZE:
+            return False, '파일 크기가 10MB를 초과합니다.'
+
+        return True, None
+
+    def save_company_document(self, file, company_id: int,
+                              prefix: str = 'doc') -> Tuple[str, str, int, str]:
+        """법인 서류 파일 저장
+
+        Args:
+            file: 업로드된 파일 객체
+            company_id: 회사 ID
+            prefix: 파일명 접두사
+
+        Returns:
+            (절대경로, 웹경로, 파일크기, 저장된 파일명)
+        """
+        folder_path = self.get_company_documents_path(company_id)
+        filename = self.generate_filename(file.filename, prefix)
+        file_size = self.get_file_size(file)
+
+        full_path = self.save_file(file, folder_path, filename)
+        web_path = self.get_company_documents_web_path(company_id, filename)
+
+        return full_path, web_path, file_size, filename
+
+    def delete_company_document(self, company_id: int, filename: str) -> bool:
+        """법인 서류 파일 삭제"""
+        folder_path = self.get_company_documents_path(company_id)
+        file_path = os.path.join(folder_path, filename)
+        return self.delete_file(file_path)
+
+    def get_company_document_full_path(self, company_id: int, filename: str) -> str:
+        """법인 서류 전체 경로 반환"""
+        folder_path = self.get_company_documents_path(company_id)
+        return os.path.join(folder_path, filename)
 
     # ========================================
     # 접근 권한 검사

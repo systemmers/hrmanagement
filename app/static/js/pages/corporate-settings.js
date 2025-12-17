@@ -18,6 +18,8 @@ const TOAST_COLORS = {
 };
 
 function showLoadingError(loadingEl) {
+    if (!loadingEl) return;
+    loadingEl.classList.remove('d-none');
     loadingEl.innerHTML = `
         <div class="category-empty">
             <i class="fas fa-exclamation-circle"></i>
@@ -98,10 +100,11 @@ async function loadOrganizationData() {
         Object.entries(data).forEach(([category, options]) => {
             renderCategoryList(`#tab-organization [data-category="${category}"]`, category, options);
         });
-        toggleLoadingState(loading, content, false);
     } catch (error) {
         console.error('조직 구조 데이터 로드 실패:', error);
         showLoadingError(loading);
+    } finally {
+        toggleLoadingState(loading, content, false);
     }
 }
 
@@ -114,10 +117,11 @@ async function loadEmploymentData() {
         Object.entries(data).forEach(([category, options]) => {
             renderCategoryList(`#tab-employment [data-category="${category}"]`, category, options);
         });
-        toggleLoadingState(loading, content, false);
     } catch (error) {
         console.error('고용 정책 데이터 로드 실패:', error);
         showLoadingError(loading);
+    } finally {
+        toggleLoadingState(loading, content, false);
     }
 }
 
@@ -129,10 +133,11 @@ async function loadPatternsData() {
         const data = await SettingsApi.getAll();
         applySettingsToForm(data);
         updatePreviews();
-        toggleLoadingState(loading, content, false);
     } catch (error) {
         console.error('패턴 규칙 데이터 로드 실패:', error);
         showLoadingError(loading);
+    } finally {
+        toggleLoadingState(loading, content, false);
     }
 }
 
@@ -143,10 +148,11 @@ async function loadVisibilityData() {
     try {
         const data = await VisibilityApi.get();
         applyVisibilityToForm(data);
-        toggleLoadingState(loading, content, false);
     } catch (error) {
         console.error('노출 설정 데이터 로드 실패:', error);
         showLoadingError(loading);
+    } finally {
+        toggleLoadingState(loading, content, false);
     }
 }
 
@@ -176,11 +182,11 @@ async function loadDocumentsData() {
             );
             renderDocumentList(category, categoryDocs);
         });
-
-        toggleLoadingState(loading, content, false);
     } catch (error) {
         console.error('법인 서류 데이터 로드 실패:', error);
         showLoadingError(loading);
+    } finally {
+        toggleLoadingState(loading, content, false);
     }
 }
 
@@ -309,9 +315,8 @@ function renderCategoryList(selector, category, options) {
     const listContainer = section.querySelector('.category-list');
     const countEl = section.querySelector('.category-count');
 
-    // 활성 옵션만 카운트
-    const activeCount = options.filter(o => o.isActive !== false).length;
-    countEl.textContent = `(${activeCount}개)`;
+    // 옵션 개수 표시
+    countEl.textContent = `(${options.length}개)`;
 
     if (options.length === 0) {
         listContainer.innerHTML = `
@@ -324,31 +329,18 @@ function renderCategoryList(selector, category, options) {
     }
 
     listContainer.innerHTML = options.map(option => {
-        const isSystem = option.isSystem;
-        const isActive = option.isActive !== false;
-        const itemClass = `category-item ${isSystem ? 'is-system' : ''} ${!isActive ? 'is-disabled' : ''}`;
-
         return `
-            <div class="${itemClass}" data-id="${option.id}" data-value="${option.value}">
+            <div class="category-item" data-id="${option.id}" data-value="${option.value}">
                 <div class="category-item-content">
                     <span class="category-item-value">${escapeHtml(option.label || option.value)}</span>
-                    ${isSystem ? '<span class="category-item-badge">시스템</span>' : ''}
                 </div>
                 <div class="category-item-actions">
-                    ${isSystem ? `
-                        <label class="toggle-switch">
-                            <input type="checkbox" ${isActive ? 'checked' : ''}
-                                   data-action="toggle" data-category="${category}" data-value="${option.value}">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    ` : `
-                        <button class="btn-icon" data-action="edit" title="수정">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-icon" data-action="delete" title="삭제">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    `}
+                    <button class="btn-icon" data-action="edit" title="수정">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon" data-action="delete" title="삭제">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             </div>
         `;
@@ -767,9 +759,10 @@ function startInlineEdit(item, category, optionId) {
 async function refreshCategory(tabId, category) {
     try {
         const data = await ClassificationApi.getByCategory(category);
-        renderCategoryList(`#tab-${tabId} [data-category="${category}"]`, category, data.options);
+        renderCategoryList(`#tab-${tabId} [data-category="${category}"]`, category, data.options || []);
     } catch (error) {
         console.error(`카테고리 갱신 실패: ${category}`, error);
+        showToast(`${category} 목록 갱신에 실패했습니다`, 'error');
     }
 }
 
@@ -976,27 +969,22 @@ async function handleDocumentUpload(e) {
 
     const category = form.querySelector('[name="category"]')?.value;
     const documentType = form.querySelector('[name="documentType"]')?.value;
-    const description = form.querySelector('[name="description"]')?.value.trim();
-    const expiresAt = form.querySelector('[name="expiresAt"]')?.value;
-    const isRequired = form.querySelector('[name="isRequired"]')?.checked;
+    const description = form.querySelector('[name="description"]')?.value?.trim() || '';
+    const expiresAt = form.querySelector('[name="expiresAt"]')?.value || '';
+    const isRequired = form.querySelector('[name="isRequired"]')?.checked || false;
 
     try {
-        // 먼저 문서 메타데이터 생성
-        const docData = {
-            title,
-            category,
-            documentType,
-            description,
-            expiresAt: expiresAt || null,
-            isRequired
-        };
+        // FormData로 파일과 메타데이터 함께 전송
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('title', title);
+        formData.append('category', category);
+        formData.append('documentType', documentType);
+        formData.append('description', description);
+        formData.append('expiresAt', expiresAt);
+        formData.append('isRequired', isRequired);
 
-        const result = await DocumentsApi.create(docData);
-
-        // TODO: 파일 업로드는 별도 API 필요 (현재는 메타데이터만 저장)
-        // const formData = new FormData();
-        // formData.append('file', file);
-        // await uploadDocumentFile(result.id, formData);
+        await DocumentsApi.upload(formData);
 
         showToast('서류가 등록되었습니다', 'success');
 
@@ -1089,8 +1077,11 @@ async function handleDocumentAction(e) {
  * @param {number} documentId - 문서 ID
  */
 function handleDocumentDownload(documentId) {
-    // TODO: 다운로드 API 구현 후 연동
-    showToast('다운로드 기능은 준비 중입니다', 'info');
+    if (!documentId) {
+        showToast('문서 ID가 없습니다', 'warning');
+        return;
+    }
+    DocumentsApi.download(documentId);
 }
 
 /**
