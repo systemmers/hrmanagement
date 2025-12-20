@@ -13,7 +13,7 @@ from ...utils.decorators import manager_or_admin_required
 from ...utils.tenant import get_current_organization_id
 from ...services.employee_service import employee_service
 from ...services.contract_service import contract_service
-from ...repositories.user_repository import user_repository
+from ...extensions import user_repo
 
 
 def register_list_routes(bp: Blueprint):
@@ -84,7 +84,7 @@ def register_list_routes(bp: Blueprint):
             emp_dict = emp if isinstance(emp, dict) else emp.to_dict()
 
             # 직원의 연결된 User 계정 조회
-            user = user_repository.get_by_employee_id(emp_dict.get('id'))
+            user = user_repo.get_by_employee_id(emp_dict.get('id'))
             contract_status = 'no_account'
 
             if user and company_id:
@@ -117,7 +117,7 @@ def register_list_routes(bp: Blueprint):
 
         # employee_sub 계정 중 계약 없거나 pending인 경우
         pending_employees = []
-        users = user_repository.get_employee_sub_users_with_employee(company_id)
+        users = user_repo.get_employee_sub_users_with_employee(company_id)
 
         for user in users:
             # 해당 법인과의 계약 상태 확인

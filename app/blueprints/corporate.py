@@ -14,7 +14,7 @@ from app.models.company import Company
 from app.models.user import User
 from app.models.corporate_admin_profile import CorporateAdminProfile
 from app.repositories.company_repository import company_repository
-from app.repositories.user_repository import user_repository
+from app.extensions import user_repo
 from app.utils.decorators import corporate_login_required, corporate_admin_required
 from app.utils.corporate_helpers import (
     extract_registration_data,
@@ -130,7 +130,7 @@ def users():
         return redirect(url_for('main.index'))
 
     # 법인 계정(employee_sub)만 표시
-    users = user_repository.get_by_company_and_account_type(
+    users = user_repo.get_by_company_and_account_type(
         company_id, User.ACCOUNT_EMPLOYEE_SUB
     )
 
@@ -172,9 +172,9 @@ def add_user():
             errors.append('비밀번호를 입력해주세요.')
         if len(password) < 8:
             errors.append('비밀번호는 최소 8자 이상이어야 합니다.')
-        if user_repository.get_by_username(username):
+        if user_repo.get_by_username(username):
             errors.append('이미 사용 중인 아이디입니다.')
-        if user_repository.get_by_email(email):
+        if user_repo.get_by_email(email):
             errors.append('이미 사용 중인 이메일입니다.')
         if role not in User.VALID_ROLES:
             errors.append('유효하지 않은 역할입니다.')
