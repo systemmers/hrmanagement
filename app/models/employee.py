@@ -2,7 +2,10 @@
 Employee SQLAlchemy 모델
 
 직원 기본 정보 및 확장 정보를 포함합니다.
+Phase 4: 통합 프로필 연결 및 스냅샷 기능 추가
 """
+from datetime import datetime
+from sqlalchemy.dialects.postgresql import JSONB
 from app.database import db
 
 
@@ -13,6 +16,15 @@ class Employee(db.Model):
     # 기본 정보 (10개 필드)
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_number = db.Column(db.String(20), unique=True, nullable=True)  # 사번 (EMP-YYYY-NNNN)
+
+    # 통합 프로필 연결 (Phase 4)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.id'), nullable=True)
+
+    # 스냅샷 관련 필드 (퇴사자 데이터 보관용)
+    profile_snapshot = db.Column(JSONB, nullable=True)  # 퇴사 시점 프로필 전체
+    snapshot_at = db.Column(db.DateTime, nullable=True)  # 스냅샷 생성 시점
+    resignation_date = db.Column(db.Date, nullable=True)  # 퇴직일
+    data_retention_until = db.Column(db.Date, nullable=True)  # 데이터 보관 만료일
     name = db.Column(db.String(100), nullable=False)
     photo = db.Column(db.String(500), nullable=True)
     department = db.Column(db.String(100), nullable=True)
@@ -98,6 +110,13 @@ class Employee(db.Model):
     contract = db.relationship('Contract', backref='employee', uselist=False, cascade='all, delete-orphan')
     insurance = db.relationship('Insurance', backref='employee', uselist=False, cascade='all, delete-orphan')
 
+    # 통합 프로필 관계 (Phase 4)
+    profile = db.relationship(
+        'Profile',
+        backref=db.backref('employees', lazy='dynamic'),
+        foreign_keys=[profile_id]
+    )
+
     # 템플릿 호환성 프로퍼티 (employment_type -> contract.employee_type)
     @property
     def employment_type(self):
@@ -153,6 +172,12 @@ class Employee(db.Model):
             'internal_phone': self.internal_phone,
             'company_email': self.company_email,
             'employee_number': self.employee_number,
+            # 통합 프로필 (Phase 4)
+            'profile_id': self.profile_id,
+            'profile_snapshot': self.profile_snapshot,
+            'snapshot_at': self.snapshot_at.isoformat() if self.snapshot_at else None,
+            'resignation_date': self.resignation_date.isoformat() if self.resignation_date else None,
+            'data_retention_until': self.data_retention_until.isoformat() if self.data_retention_until else None,
         }
 
     @classmethod
