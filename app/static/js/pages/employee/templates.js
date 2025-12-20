@@ -21,11 +21,11 @@ export function getEducationTemplate() {
                     <label class="form-label">학위</label>
                     <select name="education_degree[]" class="form-input">
                         <option value="">선택하세요</option>
-                        <option value="highschool">고등학교 졸업</option>
-                        <option value="associate">전문학사</option>
-                        <option value="bachelor">학사</option>
-                        <option value="master">석사</option>
-                        <option value="doctor">박사</option>
+                        <option value="고졸">고등학교 졸업</option>
+                        <option value="전문학사">전문학사</option>
+                        <option value="학사">학사</option>
+                        <option value="석사">석사</option>
+                        <option value="박사">박사</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -44,10 +44,10 @@ export function getEducationTemplate() {
                     <label class="form-label">졸업유무</label>
                     <select name="education_graduation_status[]" class="form-input">
                         <option value="">선택하세요</option>
-                        <option value="graduated">졸업</option>
-                        <option value="enrolled">재학</option>
-                        <option value="leave">휴학</option>
-                        <option value="dropout">중퇴</option>
+                        <option value="졸업">졸업</option>
+                        <option value="재학">재학</option>
+                        <option value="휴학">휴학</option>
+                        <option value="중퇴">중퇴</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -188,10 +188,12 @@ export function getFamilyTemplate() {
                     <label class="form-label">관계</label>
                     <select name="family_relation[]" class="form-input">
                         <option value="">선택하세요</option>
-                        <option value="spouse">배우자</option>
-                        <option value="child">자녀</option>
-                        <option value="parent">부모</option>
-                        <option value="sibling">형제/자매</option>
+                        <option value="배우자">배우자</option>
+                        <option value="자녀">자녀</option>
+                        <option value="부">부</option>
+                        <option value="모">모</option>
+                        <option value="형제">형제</option>
+                        <option value="자매">자매</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -214,8 +216,8 @@ export function getFamilyTemplate() {
                     <label class="form-label">동거여부</label>
                     <select name="family_living_together[]" class="form-input">
                         <option value="">선택하세요</option>
-                        <option value="true">동거</option>
-                        <option value="false">별거</option>
+                        <option value="동거">동거</option>
+                        <option value="별거">별거</option>
                     </select>
                 </div>
             </div>
@@ -254,10 +256,10 @@ export function getLanguageTemplate() {
                     <label class="form-label">수준</label>
                     <select name="language_level[]" class="form-input">
                         <option value="">선택하세요</option>
-                        <option value="native">원어민</option>
-                        <option value="advanced">상</option>
-                        <option value="intermediate">중</option>
-                        <option value="basic">하</option>
+                        <option value="원어민">원어민</option>
+                        <option value="고급">상</option>
+                        <option value="중급">중</option>
+                        <option value="초급">하</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -352,6 +354,46 @@ export function getAwardTemplate() {
     `;
 }
 
+/**
+ * 프로젝트 참여이력 템플릿
+ * @returns {string} HTML 템플릿
+ */
+export function getProjectParticipationTemplate() {
+    return `
+        <div class="dynamic-item" data-index="0">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">사업명</label>
+                    <input type="text" name="participation_project_name[]" class="form-input" placeholder="프로젝트/사업명">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">역할/직책</label>
+                    <input type="text" name="participation_role[]" class="form-input" placeholder="PM, 개발자, 디자이너 등">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">시작일</label>
+                    <input type="date" name="participation_start_date[]" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">종료일</label>
+                    <input type="date" name="participation_end_date[]" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">담당업무</label>
+                    <input type="text" name="participation_duty[]" class="form-input" placeholder="담당업무">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">발주처</label>
+                    <input type="text" name="participation_client[]" class="form-input" placeholder="발주처/클라이언트">
+                </div>
+            </div>
+            <button type="button" class="btn-remove" title="삭제">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+}
+
 export default {
     getEducationTemplate,
     getCareerTemplate,
@@ -359,5 +401,6 @@ export default {
     getFamilyTemplate,
     getLanguageTemplate,
     getProjectTemplate,
-    getAwardTemplate
+    getAwardTemplate,
+    getProjectParticipationTemplate
 };

@@ -168,6 +168,10 @@ class PersonalService:
         """학력 삭제"""
         return self.education_repo.delete_by_id_and_profile(education_id, profile_id)
 
+    def delete_all_educations(self, profile_id: int) -> int:
+        """프로필의 모든 학력 삭제"""
+        return self.education_repo.delete_all_by_profile(profile_id)
+
     # ========================================
     # 경력 CRUD
     # ========================================
@@ -184,6 +188,10 @@ class PersonalService:
     def delete_career(self, career_id: int, profile_id: int) -> bool:
         """경력 삭제"""
         return self.career_repo.delete_by_id_and_profile(career_id, profile_id)
+
+    def delete_all_careers(self, profile_id: int) -> int:
+        """프로필의 모든 경력 삭제"""
+        return self.career_repo.delete_all_by_profile(profile_id)
 
     # ========================================
     # 자격증 CRUD
@@ -202,6 +210,10 @@ class PersonalService:
         """자격증 삭제"""
         return self.certificate_repo.delete_by_id_and_profile(certificate_id, profile_id)
 
+    def delete_all_certificates(self, profile_id: int) -> int:
+        """프로필의 모든 자격증 삭제"""
+        return self.certificate_repo.delete_all_by_profile(profile_id)
+
     # ========================================
     # 어학 CRUD
     # ========================================
@@ -218,6 +230,10 @@ class PersonalService:
     def delete_language(self, language_id: int, profile_id: int) -> bool:
         """어학 삭제"""
         return self.language_repo.delete_by_id_and_profile(language_id, profile_id)
+
+    def delete_all_languages(self, profile_id: int) -> int:
+        """프로필의 모든 어학 삭제"""
+        return self.language_repo.delete_all_by_profile(profile_id)
 
     # ========================================
     # 병역 CRUD

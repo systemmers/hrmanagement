@@ -22,16 +22,43 @@ class EmployeeRepository(BaseRepository):
     def _build_query(self, organization_id: int = None):
         """organization_id 필터가 적용된 기본 쿼리 생성
 
+        루트 조직과 모든 하위 조직의 직원을 포함합니다.
+
         Args:
-            organization_id: 조직 ID (None이면 필터 미적용)
+            organization_id: 루트 조직 ID (None이면 필터 미적용)
 
         Returns:
             SQLAlchemy Query 객체
         """
         query = Employee.query
         if organization_id:
-            query = query.filter_by(organization_id=organization_id)
+            # 루트 조직과 모든 하위 조직 ID 수집
+            org_ids = self._get_organization_ids_under_root(organization_id)
+            if org_ids:
+                query = query.filter(Employee.organization_id.in_(org_ids))
+            else:
+                # 하위 조직이 없으면 루트만 포함
+                query = query.filter_by(organization_id=organization_id)
         return query
+
+    def _get_organization_ids_under_root(self, root_org_id: int) -> List[int]:
+        """루트 조직과 모든 하위 조직의 ID 목록 반환
+
+        Args:
+            root_org_id: 루트 조직 ID
+
+        Returns:
+            조직 ID 목록 (루트 포함)
+        """
+        from app.models.organization import Organization
+        root_org = Organization.query.get(root_org_id)
+        if not root_org:
+            return []
+        # 루트 조직 ID + 모든 하위 조직 ID
+        org_ids = [root_org_id]
+        descendants = root_org.get_descendants()
+        org_ids.extend([d.id for d in descendants])
+        return org_ids
 
     def get_by_company(self, company_id: int) -> List[Dict]:
         """회사 ID로 직원 조회 (편의 메서드)
@@ -48,20 +75,25 @@ class EmployeeRepository(BaseRepository):
             return []
         return self.get_all(organization_id=company.root_organization_id)
 
-    def verify_ownership(self, employee_id: int, organization_id: int) -> bool:
-        """직원이 해당 조직에 속하는지 확인
+    def verify_ownership(self, employee_id: int, root_organization_id: int) -> bool:
+        """직원이 해당 조직 계층에 속하는지 확인
 
         Args:
             employee_id: 직원 ID
-            organization_id: 조직 ID
+            root_organization_id: 루트 조직 ID (회사의 root_organization_id)
 
         Returns:
-            소속 여부 (True/False)
+            소속 여부 (True/False) - 직원의 organization이 root 아래 계층에 있으면 True
         """
         employee = Employee.query.get(employee_id)
         if not employee:
             return False
-        return employee.organization_id == organization_id
+        if not employee.organization_id:
+            return False
+        # 조직 계층 구조를 고려하여 검증
+        from .organization_repository import OrganizationRepository
+        org_repo = OrganizationRepository()
+        return org_repo.verify_ownership(employee.organization_id, root_organization_id)
 
     # ========================================
     # CRUD 메서드

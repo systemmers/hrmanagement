@@ -26,12 +26,18 @@ class Language(db.Model):
             'id': self.id,
             'employee_id': self.employee_id,
             'language_name': self.language_name,
+            'language': self.language_name,  # Personal 호환 alias
             'exam_name': self.exam_name,
+            'test_name': self.exam_name,  # Personal 호환 alias
             'score': self.score,
             'level': self.level,
+            'proficiency': self.level,  # Personal 호환 alias
             'acquisition_date': self.acquisition_date,
+            'test_date': self.acquisition_date,  # Personal 호환 alias
+            'acquired_date': self.acquisition_date,  # 템플릿 호환 alias
             'expiry_date': self.expiry_date,
             'note': self.note,
+            'notes': self.note,  # Personal 호환 alias
         }
 
     @classmethod

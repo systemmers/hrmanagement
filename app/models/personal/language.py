@@ -27,11 +27,17 @@ class PersonalLanguage(db.Model):
         return {
             'id': self.id,
             'language': self.language,
+            'language_name': self.language,  # Employee 호환 alias
             'proficiency': self.proficiency,
+            'level': self.proficiency,  # 템플릿 호환 필드
             'test_name': self.test_name,
+            'exam_name': self.test_name,  # Employee 호환 alias
             'score': self.score,
             'test_date': self.test_date,
+            'acquisition_date': self.test_date,  # Employee 호환 alias
+            'acquired_date': self.test_date,  # 템플릿 호환 필드
             'notes': self.notes,
+            'note': self.notes,  # Employee 호환 alias
         }
 
     def __repr__(self):

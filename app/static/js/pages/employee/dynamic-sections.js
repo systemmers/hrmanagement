@@ -12,7 +12,8 @@ import {
     getFamilyTemplate,
     getLanguageTemplate,
     getProjectTemplate,
-    getAwardTemplate
+    getAwardTemplate,
+    getProjectParticipationTemplate
 } from './templates.js';
 
 /**
@@ -73,7 +74,8 @@ const BUTTON_CONFIG = {
     addLanguage: { listId: 'languageList', getTemplate: getLanguageTemplate },
     addProject: { listId: 'projectList', getTemplate: getProjectTemplate },
     addFamily: { listId: 'familyList', getTemplate: getFamilyTemplate },
-    addAward: { listId: 'awardList', getTemplate: getAwardTemplate }
+    addAward: { listId: 'awardList', getTemplate: getAwardTemplate },
+    addProjectParticipation: { listId: 'projectParticipationList', getTemplate: getProjectParticipationTemplate }
 };
 
 /**

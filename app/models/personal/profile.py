@@ -110,6 +110,18 @@ class PersonalProfile(db.Model):
         lazy='dynamic',
         cascade='all, delete-orphan'
     )
+    families = db.relationship(
+        'PersonalFamily',
+        backref='profile',
+        lazy='dynamic',
+        cascade='all, delete-orphan'
+    )
+    project_participations = db.relationship(
+        'PersonalProjectParticipation',
+        backref='profile',
+        lazy='dynamic',
+        cascade='all, delete-orphan'
+    )
 
     # 1:1 관계
     military_service = db.relationship(
@@ -175,6 +187,7 @@ class PersonalProfile(db.Model):
             'detailed_address': self.detailed_address,
             'full_address': self.full_address,
             'nationality': self.nationality,
+            'resident_number': self.resident_number,
             'blood_type': self.blood_type,
             'religion': self.religion,
             'hobby': self.hobby,

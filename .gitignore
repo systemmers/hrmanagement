@@ -98,3 +98,6 @@ scripts/*.pyc
 data/db_files/
 # Playwright test screenshots
 .playwright-mcp/*.png
+
+# Development documentation (local only)
+.dev_docs/

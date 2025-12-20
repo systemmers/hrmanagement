@@ -58,8 +58,12 @@ class Career(db.Model):
             'monthly_salary': self.monthly_salary,  # 월급
             'pay_step': self.pay_step,  # 호봉
             'resignation_reason': self.resignation_reason,
+            'reason_for_leaving': self.resignation_reason,  # Personal 호환 alias
             'is_current': self.is_current,
             'note': self.note,
+            'notes': self.note,  # Personal 호환 alias
+            'responsibilities': self.job_description,  # Personal 호환 alias
+            'achievements': None,  # Personal 호환 필드 (Employee에는 없음)
         }
 
     @classmethod

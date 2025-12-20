@@ -143,8 +143,8 @@
                             <td>자격증</td>
                             <td>{{ cert.name }}</td>
                             <td>{{ cert.grade or '-' }}</td>
-                            <td>{{ cert.issuer }}</td>
-                            <td>{{ cert.acquired_date }}</td>
+                            <td>{{ cert.issuer or '-' }}</td>
+                            <td>{{ cert.acquired_date or '-' }}</td>
                             <td>{% if cert.expiry_date %}만료: {{ cert.expiry_date }}{% else %}-{% endif %}</td>
                         </tr>
                         {% endfor %}
@@ -184,8 +184,8 @@
                         {% if language_list %}
                         {% for lang in language_list %}
                         <tr>
-                            <td>{{ lang.language }}</td>
-                            <td>{{ get_level_label(lang.level) }}</td>
+                            <td>{{ lang.language or '-' }}</td>
+                            <td>{{ get_level_label(lang.level) if lang.level else '-' }}</td>
                             <td>{{ lang.test_name or '-' }}</td>
                             <td>{{ lang.score or '-' }}</td>
                             <td>{{ lang.acquired_date or '-' }}</td>

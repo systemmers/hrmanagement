@@ -36,6 +36,8 @@ class FamilyMember(db.Model):
             'living_together': self.is_cohabitant,  # 템플릿: family.living_together
             'is_dependent': self.is_dependent,
             'note': self.note,
+            'notes': self.note,  # Personal 호환 alias
+            'education': None,  # Personal 호환 필드 (Employee에는 없음)
         }
 
     @classmethod

@@ -18,6 +18,8 @@ from .personal import (
     PersonalCertificate,
     PersonalLanguage,
     PersonalMilitaryService,
+    PersonalAward,
+    PersonalFamily,
 )
 
 __all__ = [
@@ -27,4 +29,6 @@ __all__ = [
     'PersonalCertificate',
     'PersonalLanguage',
     'PersonalMilitaryService',
+    'PersonalAward',
+    'PersonalFamily',
 ]

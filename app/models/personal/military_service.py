@@ -21,6 +21,7 @@ class PersonalMilitaryService(db.Model):
     end_date = db.Column(db.String(20), nullable=True)
     discharge_type = db.Column(db.String(50), nullable=True)  # 만기전역, 의가사 등
     specialty = db.Column(db.String(100), nullable=True)  # 병과/특기
+    duty = db.Column(db.String(100), nullable=True)  # 보직
     notes = db.Column(db.Text, nullable=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -29,13 +30,21 @@ class PersonalMilitaryService(db.Model):
         return {
             'id': self.id,
             'service_type': self.service_type,
+            'military_status': self.service_type,  # Employee 호환 alias
+            'status': self.service_type,  # 템플릿 호환 필드
             'branch': self.branch,
             'rank': self.rank,
             'start_date': self.start_date,
+            'enlistment_date': self.start_date,  # Employee 호환 alias
             'end_date': self.end_date,
+            'discharge_date': self.end_date,  # Employee 호환 alias
             'discharge_type': self.discharge_type,
+            'discharge_reason': self.discharge_type,  # Employee 호환 alias
             'specialty': self.specialty,
+            'duty': self.duty,  # 보직
+            'exemption_reason': self.notes,  # 템플릿 호환 필드 (notes를 면제사유로 사용)
             'notes': self.notes,
+            'note': self.notes,  # Employee 호환 alias
         }
 
     def __repr__(self):

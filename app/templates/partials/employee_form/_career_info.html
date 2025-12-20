@@ -22,72 +22,72 @@
                             <div class="form-group">
                                 <label class="form-label">회사명</label>
                                 <input type="text" name="career_company_name[]" class="form-input"
-                                       value="{{ career.company_name }}" placeholder="회사명">
+                                       value="{{ career.company_name if career.company_name else '' }}" placeholder="회사명">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">부서</label>
                                 <input type="text" name="career_department[]" class="form-input"
-                                       value="{{ career.department }}" placeholder="개발팀">
+                                       value="{{ career.department if career.department else '' }}" placeholder="개발팀">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">직위</label>
                                 <input type="text" name="career_position[]" class="form-input"
-                                       value="{{ career.position }}" placeholder="사원, 대리, 과장">
+                                       value="{{ career.position if career.position else '' }}" placeholder="사원, 대리, 과장">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">직급</label>
                                 <input type="text" name="career_job_grade[]" class="form-input"
-                                       value="{{ career.job_grade }}" placeholder="L3, Senior">
+                                       value="{{ career.job_grade if career.job_grade else '' }}" placeholder="L3, Senior">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">직책</label>
                                 <input type="text" name="career_job_title[]" class="form-input"
-                                       value="{{ career.job_title }}" placeholder="팀장, 본부장">
+                                       value="{{ career.job_title if career.job_title else '' }}" placeholder="팀장, 본부장">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">직무</label>
                                 <input type="text" name="career_job_role[]" class="form-input"
-                                       value="{{ career.job_role }}" placeholder="인사기획, 회계관리">
+                                       value="{{ career.job_role if career.job_role else '' }}" placeholder="인사기획, 회계관리">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">담당업무</label>
                                 <input type="text" name="career_duties[]" class="form-input"
-                                       value="{{ career.job_description }}" placeholder="웹 개발, API 설계">
+                                       value="{{ career.job_description if career.job_description else '' }}" placeholder="웹 개발, API 설계">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">급여유형</label>
                                 <select name="career_salary_type[]" class="form-input">
                                     <option value="">선택</option>
-                                    <option value="annual" {{ 'selected' if career.salary_type == 'annual' }}>연봉제</option>
-                                    <option value="monthly" {{ 'selected' if career.salary_type == 'monthly' }}>월급제</option>
-                                    <option value="hourly" {{ 'selected' if career.salary_type == 'hourly' }}>시급제</option>
-                                    <option value="pay_step" {{ 'selected' if career.salary_type == 'pay_step' }}>호봉제</option>
+                                    <option value="연봉제" {{ 'selected' if career.salary_type == '연봉제' or career.salary_type == 'annual' }}>연봉제</option>
+                                    <option value="월급제" {{ 'selected' if career.salary_type == '월급제' or career.salary_type == 'monthly' }}>월급제</option>
+                                    <option value="시급제" {{ 'selected' if career.salary_type == '시급제' or career.salary_type == 'hourly' }}>시급제</option>
+                                    <option value="호봉제" {{ 'selected' if career.salary_type == '호봉제' or career.salary_type == 'pay_step' }}>호봉제</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">연봉</label>
                                 <input type="number" name="career_salary[]" class="form-input"
-                                       value="{{ career.salary }}" placeholder="연봉 (원)">
+                                       value="{{ career.salary if career.salary else '' }}" placeholder="연봉 (원)">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">월급</label>
                                 <input type="number" name="career_monthly_salary[]" class="form-input"
-                                       value="{{ career.monthly_salary }}" placeholder="월급 (원)">
+                                       value="{{ career.monthly_salary if career.monthly_salary else '' }}" placeholder="월급 (원)">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">호봉</label>
                                 <input type="number" name="career_pay_step[]" class="form-input"
-                                       value="{{ career.pay_step }}" placeholder="1~50">
+                                       value="{{ career.pay_step if career.pay_step else '' }}" placeholder="1~50">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">입사일</label>
                                 <input type="date" name="career_start_date[]" class="form-input"
-                                       value="{{ career.start_date }}">
+                                       value="{{ career.start_date if career.start_date else '' }}">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">퇴사일</label>
                                 <input type="date" name="career_end_date[]" class="form-input"
-                                       value="{{ career.end_date }}">
+                                       value="{{ career.end_date if career.end_date else '' }}">
                             </div>
                         </div>
                         <button type="button" class="btn-remove" title="삭제">
@@ -130,10 +130,10 @@
                             <label class="form-label">급여유형</label>
                             <select name="career_salary_type[]" class="form-input">
                                 <option value="">선택</option>
-                                <option value="annual">연봉제</option>
-                                <option value="monthly">월급제</option>
-                                <option value="hourly">시급제</option>
-                                <option value="pay_step">호봉제</option>
+                                <option value="연봉제">연봉제</option>
+                                <option value="월급제">월급제</option>
+                                <option value="시급제">시급제</option>
+                                <option value="호봉제">호봉제</option>
                             </select>
                         </div>
                         <div class="form-group">

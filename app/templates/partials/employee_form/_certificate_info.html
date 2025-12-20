@@ -22,32 +22,32 @@
                             <div class="form-group">
                                 <label class="form-label">자격증명</label>
                                 <input type="text" name="certificate_name[]" class="form-input"
-                                       value="{{ cert.certificate_name }}" placeholder="정보처리기사">
+                                       value="{{ cert.certificate_name if cert.certificate_name else (cert.name if cert.name else '') }}" placeholder="정보처리기사">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">발급기관</label>
                                 <input type="text" name="certificate_issuer[]" class="form-input"
-                                       value="{{ cert.issuing_organization }}" placeholder="한국산업인력공단">
+                                       value="{{ cert.issuing_organization if cert.issuing_organization else '' }}" placeholder="한국산업인력공단">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">등급/점수</label>
                                 <input type="text" name="certificate_grade[]" class="form-input"
-                                       value="{{ cert.grade }}" placeholder="1급, 900점">
+                                       value="{{ cert.grade if cert.grade else '' }}" placeholder="1급, 900점">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">취득일</label>
                                 <input type="date" name="certificate_date[]" class="form-input"
-                                       value="{{ cert.acquisition_date }}">
+                                       value="{{ cert.acquisition_date if cert.acquisition_date else '' }}">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">자격번호</label>
                                 <input type="text" name="certificate_number[]" class="form-input"
-                                       value="{{ cert.certificate_number }}" placeholder="자격번호">
+                                       value="{{ cert.certificate_number if cert.certificate_number else '' }}" placeholder="자격번호">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">만료일</label>
                                 <input type="date" name="certificate_expiry_date[]" class="form-input"
-                                       value="{{ cert.expiry_date }}">
+                                       value="{{ cert.expiry_date if cert.expiry_date else '' }}">
                             </div>
                         </div>
                         <button type="button" class="btn-remove" title="삭제">

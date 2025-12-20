@@ -40,7 +40,9 @@ class MilitaryService(db.Model):
             'exemption_reason': self.exemption_reason,
             'duty': self.service_type,  # 템플릿: military.duty (service_type 매핑)
             'specialty': None,  # 템플릿: military.specialty
+            'discharge_type': self.discharge_reason,  # Personal 호환 alias
             'note': self.note,
+            'notes': self.note,  # Personal 호환 alias
         }
 
     @classmethod

@@ -106,6 +106,83 @@ class BaseRelationRepository(BaseRepository):
         return self.create(data)
 
 
+class BaseProfileRelationRepository(BaseRepository):
+    """
+    Profile 관계형 데이터 Repository 기본 클래스
+
+    PersonalProfile과 1:N 관계를 가진 모델용 Repository입니다.
+    Employee와의 관계에서는 BaseRelationRepository를 사용합니다.
+    """
+
+    def get_by_profile_id(self, profile_id: int) -> List[Dict]:
+        """특정 프로필의 모든 레코드 조회"""
+        records = self.model_class.query.filter_by(profile_id=profile_id).all()
+        return [record.to_dict() for record in records]
+
+    def create_for_profile(self, profile_id: int, data: Dict) -> db.Model:
+        """특정 프로필에 레코드 추가 (from_dict 없이 직접 생성)"""
+        record = self.model_class(profile_id=profile_id, **data)
+        db.session.add(record)
+        db.session.commit()
+        return record
+
+    def delete_by_id_and_profile(self, record_id: int, profile_id: int) -> bool:
+        """레코드 삭제 (소유권 확인)"""
+        record = self.model_class.query.filter_by(
+            id=record_id, profile_id=profile_id
+        ).first()
+        if not record:
+            return False
+        db.session.delete(record)
+        db.session.commit()
+        return True
+
+    def delete_all_by_profile(self, profile_id: int) -> int:
+        """프로필의 모든 레코드 삭제"""
+        count = self.model_class.query.filter_by(profile_id=profile_id).delete()
+        db.session.commit()
+        return count
+
+
+class BaseProfileOneToOneRepository(BaseRepository):
+    """
+    Profile 1:1 관계 데이터 Repository 기본 클래스
+
+    PersonalProfile과 1:1 관계를 가진 모델용 Repository입니다.
+    """
+
+    def get_by_profile_id(self, profile_id: int) -> Optional[db.Model]:
+        """특정 프로필의 레코드 조회 (1:1)"""
+        return self.model_class.query.filter_by(profile_id=profile_id).first()
+
+    def save_for_profile(self, profile_id: int, data: Dict) -> db.Model:
+        """특정 프로필의 레코드 저장 (upsert)"""
+        record = self.get_by_profile_id(profile_id)
+
+        if record:
+            # 기존 레코드 업데이트
+            for key, value in data.items():
+                if hasattr(record, key):
+                    setattr(record, key, value)
+            db.session.commit()
+            return record
+        else:
+            # 새 레코드 생성
+            record = self.model_class(profile_id=profile_id, **data)
+            db.session.add(record)
+            db.session.commit()
+            return record
+
+    def delete_by_profile_id(self, profile_id: int) -> bool:
+        """특정 프로필의 레코드 삭제"""
+        record = self.get_by_profile_id(profile_id)
+        if record:
+            db.session.delete(record)
+            db.session.commit()
+            return True
+        return False
+
+
 class BaseOneToOneRepository(BaseRepository):
     """
     1:1 관계 데이터 Repository 기본 클래스

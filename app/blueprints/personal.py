@@ -177,13 +177,13 @@ def profile_edit():
     # 폼 데이터 수집 - 법인과 동일한 필드 구조
     data = {
         'name': request.form.get('name', profile_obj.name).strip(),
-        'english_name': request.form.get('english_name', '').strip() or None,
+        'english_name': request.form.get('name_en', '').strip() or None,  # 템플릿은 'name_en' 사용
         'chinese_name': request.form.get('chinese_name', '').strip() or None,
-        'resident_number': request.form.get('resident_number', '').strip() or None,
+        'resident_number': request.form.get('rrn', '').strip() or None,  # 템플릿은 'rrn' 사용
         'birth_date': request.form.get('birth_date', '').strip() or None,
         'lunar_birth': request.form.get('lunar_birth') == 'true',
         'gender': request.form.get('gender', '').strip() or None,
-        'mobile_phone': request.form.get('mobile_phone', '').strip() or None,
+        'mobile_phone': request.form.get('phone', '').strip() or None,  # 템플릿은 'phone' 사용
         'home_phone': request.form.get('home_phone', '').strip() or None,
         'email': request.form.get('email', '').strip() or None,
         'postal_code': request.form.get('postal_code', '').strip() or None,
@@ -200,12 +200,149 @@ def profile_edit():
 
     success, error_msg = personal_service.update_profile(user_id, data)
 
-    if success:
-        flash('프로필이 수정되었습니다.', 'success')
-        return redirect(url_for('profile.view'))
-    else:
-        flash(f'수정 중 오류가 발생했습니다: {error_msg}', 'error')
+    if not success:
+        flash(f'프로필 수정 중 오류가 발생했습니다: {error_msg}', 'error')
         return redirect(url_for('profile.edit'))
+
+    # ========================================
+    # 학력 정보 저장
+    # ========================================
+    education_school_names = request.form.getlist('education_school_name[]')
+    education_degrees = request.form.getlist('education_degree[]')
+    education_majors = request.form.getlist('education_major[]')
+    education_graduation_years = request.form.getlist('education_graduation_year[]')
+    education_gpas = request.form.getlist('education_gpa[]')
+    education_graduation_statuses = request.form.getlist('education_graduation_status[]')
+    education_notes = request.form.getlist('education_note[]')
+
+    # 기존 학력 삭제 후 새로 저장
+    personal_service.delete_all_educations(profile_obj.id)
+    for i, school_name in enumerate(education_school_names):
+        if school_name.strip():  # 학교명이 있는 경우만 저장
+            edu_data = {
+                'school_name': school_name.strip(),
+                'degree': education_degrees[i] if i < len(education_degrees) else None,
+                'major': education_majors[i] if i < len(education_majors) else None,
+                'graduation_date': education_graduation_years[i] if i < len(education_graduation_years) else None,
+                'gpa': education_gpas[i] if i < len(education_gpas) else None,
+                'status': education_graduation_statuses[i] if i < len(education_graduation_statuses) else None,
+                'notes': education_notes[i] if i < len(education_notes) else None,
+            }
+            personal_service.add_education(profile_obj.id, edu_data)
+
+    # ========================================
+    # 경력 정보 저장
+    # ========================================
+    career_company_names = request.form.getlist('career_company_name[]')
+    career_departments = request.form.getlist('career_department[]')
+    career_positions = request.form.getlist('career_position[]')
+    career_job_grades = request.form.getlist('career_job_grade[]')
+    career_job_titles = request.form.getlist('career_job_title[]')
+    career_job_roles = request.form.getlist('career_job_role[]')
+    career_duties = request.form.getlist('career_duties[]')
+    career_salary_types = request.form.getlist('career_salary_type[]')
+    career_salaries = request.form.getlist('career_salary[]')
+    career_monthly_salaries = request.form.getlist('career_monthly_salary[]')
+    career_pay_steps = request.form.getlist('career_pay_step[]')
+    career_start_dates = request.form.getlist('career_start_date[]')
+    career_end_dates = request.form.getlist('career_end_date[]')
+
+    # 기존 경력 삭제 후 새로 저장
+    personal_service.delete_all_careers(profile_obj.id)
+    for i, company_name in enumerate(career_company_names):
+        if company_name.strip():  # 회사명이 있는 경우만 저장
+            career_data = {
+                'company_name': company_name.strip(),
+                'department': career_departments[i] if i < len(career_departments) else None,
+                'position': career_positions[i] if i < len(career_positions) else None,
+                'job_grade': career_job_grades[i] if i < len(career_job_grades) else None,
+                'job_title': career_job_titles[i] if i < len(career_job_titles) else None,
+                'job_role': career_job_roles[i] if i < len(career_job_roles) else None,
+                'responsibilities': career_duties[i] if i < len(career_duties) else None,
+                'salary_type': career_salary_types[i] if i < len(career_salary_types) else None,
+                'salary': int(career_salaries[i]) if i < len(career_salaries) and career_salaries[i] else None,
+                'monthly_salary': int(career_monthly_salaries[i]) if i < len(career_monthly_salaries) and career_monthly_salaries[i] else None,
+                'pay_step': int(career_pay_steps[i]) if i < len(career_pay_steps) and career_pay_steps[i] else None,
+                'start_date': career_start_dates[i] if i < len(career_start_dates) else None,
+                'end_date': career_end_dates[i] if i < len(career_end_dates) else None,
+            }
+            personal_service.add_career(profile_obj.id, career_data)
+
+    # ========================================
+    # 자격증 정보 저장
+    # ========================================
+    cert_names = request.form.getlist('certificate_name[]')
+    cert_issuers = request.form.getlist('certificate_issuer[]')
+    cert_acquisition_dates = request.form.getlist('certificate_acquisition_date[]')
+    cert_expiry_dates = request.form.getlist('certificate_expiry_date[]')
+    cert_numbers = request.form.getlist('certificate_number[]')
+    cert_grades = request.form.getlist('certificate_grade[]')
+
+    # 기존 자격증 삭제 후 새로 저장
+    personal_service.delete_all_certificates(profile_obj.id)
+    for i, cert_name in enumerate(cert_names):
+        if cert_name.strip():  # 자격증명이 있는 경우만 저장
+            cert_data = {
+                'name': cert_name.strip(),
+                'issuing_organization': cert_issuers[i] if i < len(cert_issuers) else None,
+                'issue_date': cert_acquisition_dates[i] if i < len(cert_acquisition_dates) else None,
+                'expiry_date': cert_expiry_dates[i] if i < len(cert_expiry_dates) else None,
+                'certificate_number': cert_numbers[i] if i < len(cert_numbers) else None,
+                'grade': cert_grades[i] if i < len(cert_grades) else None,
+            }
+            personal_service.add_certificate(profile_obj.id, cert_data)
+
+    # ========================================
+    # 어학 정보 저장
+    # ========================================
+    lang_names = request.form.getlist('language_name[]')
+    lang_proficiencies = request.form.getlist('language_proficiency[]')
+    lang_test_names = request.form.getlist('language_test_name[]')
+    lang_scores = request.form.getlist('language_score[]')
+    lang_test_dates = request.form.getlist('language_test_date[]')
+
+    # 기존 어학 삭제 후 새로 저장
+    personal_service.delete_all_languages(profile_obj.id)
+    for i, lang_name in enumerate(lang_names):
+        if lang_name.strip():  # 언어명이 있는 경우만 저장
+            lang_data = {
+                'language': lang_name.strip(),
+                'proficiency': lang_proficiencies[i] if i < len(lang_proficiencies) else None,
+                'test_name': lang_test_names[i] if i < len(lang_test_names) else None,
+                'score': lang_scores[i] if i < len(lang_scores) else None,
+                'test_date': lang_test_dates[i] if i < len(lang_test_dates) else None,
+            }
+            personal_service.add_language(profile_obj.id, lang_data)
+
+    # ========================================
+    # 병역 정보 저장
+    # ========================================
+    military_status = request.form.get('military_status', '').strip()
+    if military_status:
+        # 복무기간 파싱 (2018.01 ~ 2019.10 형식)
+        military_period = request.form.get('military_period', '').strip()
+        start_date = None
+        end_date = None
+        if military_period and '~' in military_period:
+            parts = military_period.split('~')
+            if len(parts) == 2:
+                start_date = parts[0].strip()
+                end_date = parts[1].strip()
+
+        military_data = {
+            'service_type': military_status,
+            'branch': request.form.get('military_branch', '').strip() or None,
+            'rank': request.form.get('military_rank', '').strip() or None,
+            'start_date': start_date,
+            'end_date': end_date,
+            'specialty': request.form.get('military_specialty', '').strip() or None,
+            'duty': request.form.get('military_duty', '').strip() or None,
+            'notes': request.form.get('military_exemption_reason', '').strip() or None,
+        }
+        personal_service.save_military(profile_obj.id, military_data)
+
+    flash('프로필이 수정되었습니다.', 'success')
+    return redirect(url_for('profile.view'))
 
 
 # ============================================================

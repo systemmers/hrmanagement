@@ -30,6 +30,9 @@ class Employee(db.Model):
         backref=db.backref('employees', lazy='dynamic')
     )
 
+    # 회사 연결 (직접 참조)
+    company_id = db.Column(db.Integer, db.ForeignKey('companies.id'), nullable=True)
+
     # 소속 정보 추가 필드
     team = db.Column(db.String(100), nullable=True)
     # 직급 체계 (Career 모델과 일관성 유지)

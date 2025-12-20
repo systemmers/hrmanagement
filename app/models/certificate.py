@@ -35,6 +35,8 @@ class Certificate(db.Model):
             'expiry_date': self.expiry_date,
             'grade': self.grade,
             'note': self.note,
+            'notes': self.note,  # Personal 호환 alias
+            'issue_date': self.acquisition_date,  # Personal 호환 alias
         }
 
     @classmethod

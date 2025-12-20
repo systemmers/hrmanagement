@@ -27,17 +27,26 @@ class PersonalEducation(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
+        # graduation_date에서 연도 추출
+        graduation_year = None
+        if self.graduation_date:
+            graduation_year = self.graduation_date[:4] if len(self.graduation_date) >= 4 else self.graduation_date
+
         return {
             'id': self.id,
             'school_type': self.school_type,
             'school_name': self.school_name,
+            'school': self.school_name,  # 템플릿 호환 필드
             'major': self.major,
             'degree': self.degree,
             'admission_date': self.admission_date,
             'graduation_date': self.graduation_date,
+            'graduation_year': graduation_year,  # 템플릿 호환 필드
             'status': self.status,
+            'graduation_status': self.status,  # 템플릿 호환 필드
             'gpa': self.gpa,
             'notes': self.notes,
+            'note': self.notes,  # 템플릿 호환 필드
         }
 
     def __repr__(self):

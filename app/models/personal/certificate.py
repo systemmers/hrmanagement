@@ -29,11 +29,16 @@ class PersonalCertificate(db.Model):
             'id': self.id,
             'name': self.name,
             'issuing_organization': self.issuing_organization,
+            'issuer': self.issuing_organization,  # 템플릿 호환 필드
             'issue_date': self.issue_date,
+            'acquired_date': self.issue_date,  # 템플릿 호환 필드
+            'acquisition_date': self.issue_date,  # 템플릿 호환 필드
             'expiry_date': self.expiry_date,
             'certificate_number': self.certificate_number,
             'grade': self.grade,
             'notes': self.notes,
+            'note': self.notes,  # Employee 호환 alias
+            'certificate_name': self.name,  # Employee 호환 alias
         }
 
     def __repr__(self):

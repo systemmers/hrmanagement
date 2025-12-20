@@ -32,12 +32,17 @@ def view():
     # (profile/detail.html에서 profile_data = employee if employee is defined else profile 처리)
     context = adapter.to_template_context(variable_name='employee')
 
-    # 추가 컨텍스트 (법인 직원 전용)
-    if adapter.is_corporate() and hasattr(adapter, 'get_family_list'):
+    # 추가 컨텍스트 - 가족정보, 수상내역 등 (법인/개인 공통)
+    if hasattr(adapter, 'get_family_list'):
         context['family_list'] = adapter.get_family_list()
-        context['hr_project_list'] = adapter.get_hr_project_list()
-        context['project_participation_list'] = adapter.get_project_participation_list()
+    if hasattr(adapter, 'get_award_list'):
         context['award_list'] = adapter.get_award_list()
+    if hasattr(adapter, 'get_project_participation_list'):
+        context['project_participation_list'] = adapter.get_project_participation_list()
+
+    # 추가 컨텍스트 (법인 직원 전용)
+    if adapter.is_corporate() and hasattr(adapter, 'get_hr_project_list'):
+        context['hr_project_list'] = adapter.get_hr_project_list()
 
     # 메타 정보
     context['sections'] = adapter.get_available_sections()

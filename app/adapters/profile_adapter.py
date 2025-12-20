@@ -99,9 +99,43 @@ class ProfileAdapter(ABC):
         """계정 타입 반환 ('corporate', 'personal', 'corporate_admin')"""
         pass
 
+    def is_section_visible(self, section_name: str) -> bool:
+        """
+        섹션 가시성 확인
+
+        Phase 6 최적화: 섹션 가시성 로직 통합
+        템플릿에서 {% if adapter.is_section_visible('education') %} 형태로 사용
+
+        Args:
+            section_name: 섹션 이름
+
+        Returns:
+            해당 섹션이 표시 가능한지 여부
+        """
+        return section_name in self.get_available_sections()
+
+    def get_section_visibility(self) -> Dict[str, bool]:
+        """
+        모든 섹션의 가시성 딕셔너리 반환
+
+        템플릿에서 {% if sections.education %} 형태로 사용
+        """
+        all_sections = [
+            'basic', 'organization', 'contract', 'salary',
+            'benefit', 'insurance', 'education', 'career',
+            'certificate', 'language', 'military', 'family',
+            'award', 'project_participation', 'hr_project',
+            'employment_contract', 'personnel_movement', 'attendance_assets',
+            'company_info'
+        ]
+        available = set(self.get_available_sections())
+        return {section: section in available for section in all_sections}
+
     def to_template_context(self, variable_name: str = 'profile') -> Dict[str, Any]:
         """
         템플릿 렌더링용 통합 컨텍스트 생성
+
+        Phase 6 최적화: 중복 호출 제거, 캐싱 적용
 
         Args:
             variable_name: 템플릿에서 사용할 변수명 ('employee' 또는 'profile')
@@ -109,9 +143,10 @@ class ProfileAdapter(ABC):
         Returns:
             템플릿에 전달할 컨텍스트 딕셔너리
         """
+        # 기본 정보 (1회만 호출)
         basic = self.get_basic_info()
 
-        # 이력 데이터 조회 (템플릿에서 employee.educations 형태로 접근 가능하도록)
+        # 이력 데이터 (1회만 호출, 캐싱 효과)
         educations = self.get_education_list()
         careers = self.get_career_list()
         certificates = self.get_certificate_list()
@@ -119,6 +154,7 @@ class ProfileAdapter(ABC):
         military = self.get_military_info()
         awards = self.get_award_list() if hasattr(self, 'get_award_list') else []
         family = self.get_family_list() if hasattr(self, 'get_family_list') else []
+        project_participations = self.get_project_participation_list() if hasattr(self, 'get_project_participation_list') else []
 
         # 통합 프로필 객체 생성 (템플릿에서 employee.name 또는 profile.name 형태로 접근)
         profile_obj = type('ProfileContext', (), {
@@ -133,23 +169,31 @@ class ProfileAdapter(ABC):
             'military_service': military,
             'awards': awards,
             'family_members': family,
+            'project_participations': project_participations,
         })()
 
+        # 컨텍스트 구성 (중복 호출 제거)
         context = {
             variable_name: profile_obj,
+            'adapter': self,  # 어댑터 직접 접근 (섹션 가시성 확인용)
             'is_corporate': self.is_corporate(),
             'account_type': self.get_account_type(),
             'available_sections': self.get_available_sections(),
+            'sections': self.get_section_visibility(),  # 섹션 가시성 딕셔너리
+            # 기본/이력 데이터 (이미 조회한 값 재사용)
             'basic_info': basic,
             'organization_info': self.get_organization_info(),
-            'education_list': self.get_education_list(),
-            'career_list': self.get_career_list(),
-            'certificate_list': self.get_certificate_list(),
-            'language_list': self.get_language_list(),
-            'military_info': self.get_military_info(),
+            'education_list': educations,
+            'career_list': careers,
+            'certificate_list': certificates,
+            'language_list': languages,
+            'military': military,
+            'award_list': awards,
+            'family_list': family,
+            'project_participation_list': project_participations,
         }
 
-        # 법인 전용 필드
+        # 법인 전용 필드 (조건부 추가)
         if self.is_corporate():
             context.update({
                 'contract_info': self.get_contract_info(),
@@ -347,7 +391,7 @@ class PersonalProfileAdapter(ProfileAdapter):
 
     AVAILABLE_SECTIONS = [
         'basic', 'education', 'career',
-        'certificate', 'language', 'military', 'award'
+        'certificate', 'language', 'military', 'award', 'project_participation'
     ]
 
     def __init__(self, profile):
@@ -369,6 +413,7 @@ class PersonalProfileAdapter(ProfileAdapter):
             'lunar_birth': self.profile.lunar_birth,
             'gender': self.profile.gender,
             'mobile_phone': self.profile.mobile_phone,
+            'phone': self.profile.mobile_phone,  # 템플릿 호환 필드
             'home_phone': self.profile.home_phone,
             'email': self.profile.email,
             'address': self.profile.address,
@@ -438,6 +483,12 @@ class PersonalProfileAdapter(ProfileAdapter):
     def get_award_list(self) -> List[Dict[str, Any]]:
         """수상 내역 목록 반환 (PersonalAward 사용)"""
         return [award.to_dict() for award in self.profile.awards.all()]
+
+    def get_family_list(self) -> List[Dict[str, Any]]:
+        """가족 정보 목록 반환 (PersonalFamily 사용)"""
+        if hasattr(self.profile, 'families'):
+            return [member.to_dict() for member in self.profile.families.all()]
+        return []
 
     def get_project_participation_list(self) -> List[Dict[str, Any]]:
         """프로젝트 참여이력 목록 반환 (PersonalProjectParticipation 사용)"""

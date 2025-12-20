@@ -28,11 +28,11 @@
                                 <label class="form-label">학위</label>
                                 <select name="education_degree[]" class="form-input">
                                     <option value="">선택하세요</option>
-                                    <option value="highschool" {% if edu.degree == 'highschool' %}selected{% endif %}>고등학교 졸업</option>
-                                    <option value="associate" {% if edu.degree == 'associate' %}selected{% endif %}>전문학사</option>
-                                    <option value="bachelor" {% if edu.degree == 'bachelor' %}selected{% endif %}>학사</option>
-                                    <option value="master" {% if edu.degree == 'master' %}selected{% endif %}>석사</option>
-                                    <option value="doctor" {% if edu.degree == 'doctor' %}selected{% endif %}>박사</option>
+                                    <option value="고졸" {% if edu.degree == '고졸' %}selected{% endif %}>고등학교 졸업</option>
+                                    <option value="전문학사" {% if edu.degree == '전문학사' %}selected{% endif %}>전문학사</option>
+                                    <option value="학사" {% if edu.degree == '학사' %}selected{% endif %}>학사</option>
+                                    <option value="석사" {% if edu.degree == '석사' %}selected{% endif %}>석사</option>
+                                    <option value="박사" {% if edu.degree == '박사' %}selected{% endif %}>박사</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -48,16 +48,16 @@
                             <div class="form-group">
                                 <label class="form-label">학점</label>
                                 <input type="text" name="education_gpa[]" class="form-input"
-                                       value="{{ edu.gpa }}" placeholder="4.0/4.5">
+                                       value="{{ edu.gpa if edu.gpa else '' }}" placeholder="4.0/4.5">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">졸업유무</label>
                                 <select name="education_graduation_status[]" class="form-input">
                                     <option value="">선택하세요</option>
-                                    <option value="graduated" {% if edu.graduation_status == 'graduated' %}selected{% endif %}>졸업</option>
-                                    <option value="enrolled" {% if edu.graduation_status == 'enrolled' %}selected{% endif %}>재학</option>
-                                    <option value="leave" {% if edu.graduation_status == 'leave' %}selected{% endif %}>휴학</option>
-                                    <option value="dropout" {% if edu.graduation_status == 'dropout' %}selected{% endif %}>중퇴</option>
+                                    <option value="졸업" {% if edu.graduation_status == '졸업' or edu.status == '졸업' %}selected{% endif %}>졸업</option>
+                                    <option value="재학" {% if edu.graduation_status == '재학' or edu.status == '재학' %}selected{% endif %}>재학</option>
+                                    <option value="휴학" {% if edu.graduation_status == '휴학' or edu.status == '휴학' %}selected{% endif %}>휴학</option>
+                                    <option value="중퇴" {% if edu.graduation_status == '중퇴' or edu.status == '중퇴' %}selected{% endif %}>중퇴</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -82,11 +82,11 @@
                             <label class="form-label">학위</label>
                             <select name="education_degree[]" class="form-input">
                                 <option value="">선택하세요</option>
-                                <option value="highschool">고등학교 졸업</option>
-                                <option value="associate">전문학사</option>
-                                <option value="bachelor">학사</option>
-                                <option value="master">석사</option>
-                                <option value="doctor">박사</option>
+                                <option value="고졸">고등학교 졸업</option>
+                                <option value="전문학사">전문학사</option>
+                                <option value="학사">학사</option>
+                                <option value="석사">석사</option>
+                                <option value="박사">박사</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -105,10 +105,10 @@
                             <label class="form-label">졸업유무</label>
                             <select name="education_graduation_status[]" class="form-input">
                                 <option value="">선택하세요</option>
-                                <option value="graduated">졸업</option>
-                                <option value="enrolled">재학</option>
-                                <option value="leave">휴학</option>
-                                <option value="dropout">중퇴</option>
+                                <option value="졸업">졸업</option>
+                                <option value="재학">재학</option>
+                                <option value="휴학">휴학</option>
+                                <option value="중퇴">중퇴</option>
                             </select>
                         </div>
                         <div class="form-group">

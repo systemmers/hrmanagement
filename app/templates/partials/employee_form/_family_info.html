@@ -23,10 +23,12 @@
                                 <label class="form-label">관계</label>
                                 <select name="family_relation[]" class="form-input">
                                     <option value="">선택하세요</option>
-                                    <option value="spouse" {% if member.relation == 'spouse' %}selected{% endif %}>배우자</option>
-                                    <option value="child" {% if member.relation == 'child' %}selected{% endif %}>자녀</option>
-                                    <option value="parent" {% if member.relation == 'parent' %}selected{% endif %}>부모</option>
-                                    <option value="sibling" {% if member.relation == 'sibling' %}selected{% endif %}>형제/자매</option>
+                                    <option value="배우자" {% if member.relation == '배우자' %}selected{% endif %}>배우자</option>
+                                    <option value="자녀" {% if member.relation == '자녀' %}selected{% endif %}>자녀</option>
+                                    <option value="부" {% if member.relation == '부' %}selected{% endif %}>부</option>
+                                    <option value="모" {% if member.relation == '모' %}selected{% endif %}>모</option>
+                                    <option value="형제" {% if member.relation == '형제' %}selected{% endif %}>형제</option>
+                                    <option value="자매" {% if member.relation == '자매' %}selected{% endif %}>자매</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -53,8 +55,8 @@
                                 <label class="form-label">동거여부</label>
                                 <select name="family_living_together[]" class="form-input">
                                     <option value="">선택하세요</option>
-                                    <option value="true" {% if member.living_together %}selected{% endif %}>동거</option>
-                                    <option value="false" {% if member.living_together == false %}selected{% endif %}>별거</option>
+                                    <option value="동거" {% if member.is_cohabitant == True or member.living_together == True %}selected{% endif %}>동거</option>
+                                    <option value="별거" {% if member.is_cohabitant == False or member.living_together == False %}selected{% endif %}>별거</option>
                                 </select>
                             </div>
                         </div>
@@ -70,10 +72,12 @@
                             <label class="form-label">관계</label>
                             <select name="family_relation[]" class="form-input">
                                 <option value="">선택하세요</option>
-                                <option value="spouse">배우자</option>
-                                <option value="child">자녀</option>
-                                <option value="parent">부모</option>
-                                <option value="sibling">형제/자매</option>
+                                <option value="배우자">배우자</option>
+                                <option value="자녀">자녀</option>
+                                <option value="부">부</option>
+                                <option value="모">모</option>
+                                <option value="형제">형제</option>
+                                <option value="자매">자매</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -96,8 +100,8 @@
                             <label class="form-label">동거여부</label>
                             <select name="family_living_together[]" class="form-input">
                                 <option value="">선택하세요</option>
-                                <option value="true">동거</option>
-                                <option value="false">별거</option>
+                                <option value="동거">동거</option>
+                                <option value="별거">별거</option>
                             </select>
                         </div>
                     </div>

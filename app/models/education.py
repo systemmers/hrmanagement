@@ -41,9 +41,11 @@ class Education(db.Model):
             'graduation_date': self.graduation_date,
             'graduation_year': graduation_year,  # 템플릿: edu.graduation_year
             'graduation_status': self.graduation_status,
+            'status': self.graduation_status,  # Personal 호환 alias
             'location': self.location,
             'gpa': self.gpa,
             'note': self.note,
+            'notes': self.note,  # Personal 호환 alias
         }
 
     @classmethod

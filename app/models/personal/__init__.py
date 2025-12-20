@@ -12,6 +12,8 @@ Phase 2: 개인-법인 분리 아키텍처의 일부입니다.
 - language.py: PersonalLanguage (어학)
 - military_service.py: PersonalMilitaryService (병역)
 - award.py: PersonalAward (수상내역)
+- family.py: PersonalFamily (가족정보)
+- project_participation.py: PersonalProjectParticipation (프로젝트 참여이력)
 """
 from .profile import PersonalProfile
 from .education import PersonalEducation
@@ -20,6 +22,8 @@ from .certificate import PersonalCertificate
 from .language import PersonalLanguage
 from .military_service import PersonalMilitaryService
 from .award import PersonalAward
+from .family import PersonalFamily
+from .project_participation import PersonalProjectParticipation
 
 __all__ = [
     'PersonalProfile',
@@ -29,4 +33,6 @@ __all__ = [
     'PersonalLanguage',
     'PersonalMilitaryService',
     'PersonalAward',
+    'PersonalFamily',
+    'PersonalProjectParticipation',
 ]

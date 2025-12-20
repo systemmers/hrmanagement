@@ -36,8 +36,10 @@ from .personal_profile import (
     PersonalCareer,
     PersonalCertificate,
     PersonalLanguage,
-    PersonalMilitaryService
+    PersonalMilitaryService,
 )
+from .personal.family import PersonalFamily
+from .personal.award import PersonalAward
 from .person_contract import (
     PersonCorporateContract,
     DataSharingSettings,
@@ -88,6 +90,8 @@ __all__ = [
     'PersonalCertificate',
     'PersonalLanguage',
     'PersonalMilitaryService',
+    'PersonalFamily',
+    'PersonalAward',
     'PersonCorporateContract',
     'DataSharingSettings',
     'SyncLog',
