@@ -9,7 +9,7 @@ from app.models import Project
 from .base_repository import BaseRelationRepository
 
 
-class ProjectRepository(BaseRelationRepository):
+class ProjectRepository(BaseRelationRepository[Project]):
     """프로젝트 저장소"""
 
     def __init__(self):

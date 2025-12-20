@@ -2,9 +2,11 @@
 템플릿 컨텍스트 프로세서
 
 모든 템플릿에서 사용 가능한 전역 변수와 함수를 제공합니다.
+Phase 8: 상수 모듈 적용
 """
 from flask import session, g
 
+from ..constants.session_keys import SessionKeys, UserRole
 from ..extensions import user_repo
 
 
@@ -17,17 +19,17 @@ def register_context_processors(app):
         current_user = None
         is_authenticated = False
 
-        user_id = session.get('user_id')
+        user_id = session.get(SessionKeys.USER_ID)
         if user_id and user_repo:
             # 세션에서 기본 정보 가져오기 (DB 조회 최소화)
             current_user = {
                 'id': user_id,
-                'username': session.get('username'),
-                'role': session.get('user_role'),
-                'employee_id': session.get('employee_id'),
-                'is_admin': session.get('user_role') == 'admin',
-                'is_manager': session.get('user_role') == 'manager',
-                'account_type': session.get('account_type'),  # Phase 2: 계정 유형
+                'username': session.get(SessionKeys.USERNAME),
+                'role': session.get(SessionKeys.USER_ROLE),
+                'employee_id': session.get(SessionKeys.EMPLOYEE_ID),
+                'is_admin': session.get(SessionKeys.USER_ROLE) == UserRole.ADMIN,
+                'is_manager': session.get(SessionKeys.USER_ROLE) == UserRole.MANAGER,
+                'account_type': session.get(SessionKeys.ACCOUNT_TYPE),  # Phase 2: 계정 유형
             }
             is_authenticated = True
 
@@ -42,19 +44,19 @@ def register_context_processors(app):
 
         def has_role(role):
             """현재 사용자가 특정 역할을 가지고 있는지 확인"""
-            return session.get('user_role') == role
+            return session.get(SessionKeys.USER_ROLE) == role
 
         def has_any_role(*roles):
             """현재 사용자가 특정 역할 중 하나를 가지고 있는지 확인"""
-            return session.get('user_role') in roles
+            return session.get(SessionKeys.USER_ROLE) in roles
 
         def can_edit_employee(employee_id):
             """특정 직원 정보를 수정할 수 있는지 확인"""
-            if session.get('user_role') == 'admin':
+            if session.get(SessionKeys.USER_ROLE) == UserRole.ADMIN:
                 return True
-            if session.get('user_role') == 'manager':
+            if session.get(SessionKeys.USER_ROLE) == UserRole.MANAGER:
                 # 매니저의 부서 직원인지 확인
-                manager_employee_id = session.get('employee_id')
+                manager_employee_id = session.get(SessionKeys.EMPLOYEE_ID)
                 if manager_employee_id:
                     from ..models.employee import Employee
                     manager_employee = Employee.query.get(manager_employee_id)
@@ -62,7 +64,7 @@ def register_context_processors(app):
                     if manager_employee and target_employee:
                         return manager_employee.department == target_employee.department
                 return False
-            return session.get('employee_id') == employee_id
+            return session.get(SessionKeys.EMPLOYEE_ID) == employee_id
 
         return dict(
             has_role=has_role,

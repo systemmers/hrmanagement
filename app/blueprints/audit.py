@@ -4,10 +4,12 @@
 감사 로그 조회 및 통계 API를 제공합니다.
 Phase 4: 데이터 동기화 및 퇴사 처리
 Phase 7: 데코레이터 통합 리팩토링
+Phase 8: 상수 모듈 적용
 """
 from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify, session
 
+from app.constants.session_keys import SessionKeys, AccountType
 from app.services.audit_service import audit_service, AuditLog
 from app.utils.decorators import (
     api_login_required as login_required,
@@ -48,7 +50,7 @@ def get_logs():
     }
     """
     # 법인 계정인 경우 자사 로그만 조회
-    company_id = session.get('company_id') if session.get('account_type') == 'corporate' else None
+    company_id = session.get(SessionKeys.COMPANY_ID) if session.get(SessionKeys.ACCOUNT_TYPE) == AccountType.CORPORATE else None
 
     # 필터 파라미터
     user_id = request.args.get('user_id', type=int)
@@ -189,7 +191,7 @@ def get_my_logs():
         "period_days": 30
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     days = request.args.get('days', 30, type=int)
     limit = request.args.get('limit', 50, type=int)
 
@@ -233,7 +235,7 @@ def get_statistics():
         "period": {...}
     }
     """
-    company_id = session.get('company_id') if session.get('account_type') == 'corporate' else None
+    company_id = session.get(SessionKeys.COMPANY_ID) if session.get(SessionKeys.ACCOUNT_TYPE) == AccountType.CORPORATE else None
 
     days = request.args.get('days', 30, type=int)
     start_date = None
@@ -285,7 +287,7 @@ def get_company_statistics():
         "period_days": 30
     }
     """
-    company_id = session.get('company_id')
+    company_id = session.get(SessionKeys.COMPANY_ID)
     days = request.args.get('days', 30, type=int)
 
     start_date = datetime.utcnow() - timedelta(days=days)

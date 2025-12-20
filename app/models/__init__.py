@@ -31,16 +31,6 @@ from .organization import Organization
 from .system_setting import SystemSetting
 from .company import Company
 from .profile import Profile
-from .personal_profile import (
-    PersonalProfile,
-    PersonalEducation,
-    PersonalCareer,
-    PersonalCertificate,
-    PersonalLanguage,
-    PersonalMilitaryService,
-)
-from .personal.family import PersonalFamily
-from .personal.award import PersonalAward
 from .person_contract import (
     PersonCorporateContract,
     DataSharingSettings,
@@ -86,14 +76,6 @@ __all__ = [
     'SystemSetting',
     'Company',
     'Profile',
-    'PersonalProfile',
-    'PersonalEducation',
-    'PersonalCareer',
-    'PersonalCertificate',
-    'PersonalLanguage',
-    'PersonalMilitaryService',
-    'PersonalFamily',
-    'PersonalAward',
     'PersonCorporateContract',
     'DataSharingSettings',
     'SyncLog',

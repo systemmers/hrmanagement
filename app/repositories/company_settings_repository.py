@@ -9,7 +9,7 @@ from app.models import CompanySettings
 from .base_repository import BaseRepository
 
 
-class CompanySettingsRepository(BaseRepository):
+class CompanySettingsRepository(BaseRepository[CompanySettings]):
     """법인 설정 저장소"""
 
     def __init__(self):

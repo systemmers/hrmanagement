@@ -7,7 +7,7 @@ from app.models import Evaluation
 from .base_repository import BaseRelationRepository
 
 
-class EvaluationRepository(BaseRelationRepository):
+class EvaluationRepository(BaseRelationRepository[Evaluation]):
     """인사평가 저장소"""
 
     def __init__(self):

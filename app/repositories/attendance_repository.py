@@ -9,7 +9,7 @@ from app.models import Attendance
 from .base_repository import BaseRelationRepository
 
 
-class AttendanceRepository(BaseRelationRepository):
+class AttendanceRepository(BaseRelationRepository[Attendance]):
     """근태 저장소"""
 
     def __init__(self):

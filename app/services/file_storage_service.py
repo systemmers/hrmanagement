@@ -13,6 +13,8 @@ from typing import Optional, Tuple
 from werkzeug.utils import secure_filename
 from flask import current_app
 
+from app.constants.session_keys import AccountType
+
 
 # ========================================
 # 설정 상수
@@ -475,10 +477,10 @@ class FileStorageService:
         filename = os.path.basename(full_path)
 
         # 새 경로 생성
-        if account_type == 'corporate' and company_id and employee_id:
+        if account_type == AccountType.CORPORATE and company_id and employee_id:
             new_folder = self.get_corporate_path(company_id, employee_id, category)
             new_web_path = self.get_corporate_web_path(company_id, employee_id, filename, category)
-        elif account_type == 'personal' and user_id:
+        elif account_type == AccountType.PERSONAL and user_id:
             new_folder = self.get_personal_path(user_id, category)
             new_web_path = self.get_personal_web_path(user_id, filename, category)
         else:

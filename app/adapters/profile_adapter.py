@@ -6,9 +6,13 @@ Profile Adapter - 법인/개인 계정 데이터 모델 통합 어댑터
 - PersonalProfileAdapter: 일반 개인용 (PersonalProfile 모델)
 - CorporateAdminProfileAdapter: 법인 관리자용 (CorporateAdminProfile 모델)
 - create_profile_adapter(): 팩토리 함수
+
+Phase 1.2: 매직 스트링 상수화 적용
 """
 from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Optional, Union
+
+from app.constants.session_keys import AccountType
 
 
 class ProfileAdapter(ABC):
@@ -383,23 +387,30 @@ class EmployeeProfileAdapter(ProfileAdapter):
 
     def get_account_type(self) -> str:
         """계정 타입 반환"""
-        return 'corporate'
+        return AccountType.CORPORATE
 
 
 class PersonalProfileAdapter(ProfileAdapter):
-    """일반 개인용 어댑터 (PersonalProfile 모델 래핑)"""
+    """일반 개인용 어댑터 (Profile 모델 래핑)
+
+    Phase 7: 통합 Profile 모델 사용
+    - 기존 PersonalProfile 모델도 호환성 유지
+    - 새로운 Profile 모델 우선 사용 (통합 이력 테이블)
+    """
 
     AVAILABLE_SECTIONS = [
         'basic', 'education', 'career',
-        'certificate', 'language', 'military', 'award', 'project_participation'
+        'certificate', 'language', 'military', 'family', 'award', 'project_participation'
     ]
 
     def __init__(self, profile):
         """
         Args:
-            profile: PersonalProfile 모델 인스턴스
+            profile: Profile 또는 PersonalProfile 모델 인스턴스
         """
         self.profile = profile
+        # Profile 모델인 경우 통합 테이블 사용
+        self._is_unified = profile.__class__.__name__ == 'Profile'
 
     def get_basic_info(self) -> Dict[str, Any]:
         """기본 개인정보 반환 - 법인과 동일한 필드 구조"""
@@ -474,27 +485,38 @@ class PersonalProfileAdapter(ProfileAdapter):
         """언어능력 목록 반환 (PersonalLanguage 사용)"""
         return [lang.to_dict() for lang in self.profile.languages.all()]
 
-    def get_military_info(self) -> Optional[Dict[str, Any]]:
-        """병역 정보 반환 (PersonalMilitaryService 사용)"""
-        if self.profile.military_service:
-            return self.profile.military_service.to_dict()
-        return None
-
     def get_award_list(self) -> List[Dict[str, Any]]:
         """수상 내역 목록 반환 (PersonalAward 사용)"""
         return [award.to_dict() for award in self.profile.awards.all()]
 
     def get_family_list(self) -> List[Dict[str, Any]]:
-        """가족 정보 목록 반환 (PersonalFamily 사용)"""
-        if hasattr(self.profile, 'families'):
+        """가족 정보 목록 반환
+
+        Phase 7: Profile 모델은 family_members, PersonalProfile은 families
+        """
+        if self._is_unified and hasattr(self.profile, 'family_members'):
+            return [member.to_dict() for member in self.profile.family_members.all()]
+        elif hasattr(self.profile, 'families'):
             return [member.to_dict() for member in self.profile.families.all()]
         return []
 
     def get_project_participation_list(self) -> List[Dict[str, Any]]:
-        """프로젝트 참여이력 목록 반환 (PersonalProjectParticipation 사용)"""
+        """프로젝트 참여이력 목록 반환"""
         if hasattr(self.profile, 'project_participations'):
             return [proj.to_dict() for proj in self.profile.project_participations.all()]
         return []
+
+    def get_military_info(self) -> Optional[Dict[str, Any]]:
+        """병역 정보 반환
+
+        Phase 7: Profile 모델은 military_services, PersonalProfile은 military_service
+        """
+        if self._is_unified and hasattr(self.profile, 'military_services'):
+            military = self.profile.military_services.first()
+            return military.to_dict() if military else None
+        elif hasattr(self.profile, 'military_service') and self.profile.military_service:
+            return self.profile.military_service.to_dict()
+        return None
 
     def is_corporate(self) -> bool:
         """법인 직원 여부 (항상 False)"""
@@ -522,7 +544,7 @@ class PersonalProfileAdapter(ProfileAdapter):
 
     def get_account_type(self) -> str:
         """계정 타입 반환"""
-        return 'personal'
+        return AccountType.PERSONAL
 
 
 class CorporateAdminProfileAdapter(ProfileAdapter):
@@ -657,7 +679,7 @@ class CorporateAdminProfileAdapter(ProfileAdapter):
 
     def get_account_type(self) -> str:
         """계정 타입 반환"""
-        return 'corporate_admin'
+        return AccountType.CORPORATE_ADMIN
 
 
 # =============================================================================
@@ -672,7 +694,7 @@ def create_profile_adapter(
     모델 인스턴스에 맞는 어댑터 생성
 
     Args:
-        model_instance: Employee, PersonalProfile, 또는 CorporateAdminProfile 인스턴스
+        model_instance: Employee, Profile, PersonalProfile, 또는 CorporateAdminProfile 인스턴스
         model_type: 모델 타입 힌트 ('employee', 'personal', 'corporate_admin')
                    None이면 자동 감지
 
@@ -681,13 +703,16 @@ def create_profile_adapter(
 
     Raises:
         ValueError: 지원하지 않는 모델 타입
+
+    Phase 7: Profile 모델 지원 추가 (통합 프로필)
     """
     # 모델 타입 자동 감지
     if model_type is None:
         class_name = model_instance.__class__.__name__
         if class_name == 'Employee':
             model_type = 'employee'
-        elif class_name == 'PersonalProfile':
+        elif class_name in ('PersonalProfile', 'Profile'):
+            # Profile 모델도 personal로 처리 (통합 테이블 사용)
             model_type = 'personal'
         elif class_name == 'CorporateAdminProfile':
             model_type = 'corporate_admin'

@@ -4,14 +4,17 @@
 법인 회원가입, 법인 정보 관리, 법인 대시보드를 처리합니다.
 Phase 1: Company 모델 구현의 일부입니다.
 Phase 6: 백엔드 리팩토링 - register() 헬퍼 분할
+Phase 8: 상수 모듈 적용
 """
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 
+from app.constants.session_keys import SessionKeys, AccountType
 from app.database import db
 from app.models.company import Company
 from app.models.user import User
 from app.models.corporate_admin_profile import CorporateAdminProfile
 from app.repositories.company_repository import company_repository
+from app.repositories.user_repository import user_repository
 from app.utils.decorators import corporate_login_required, corporate_admin_required
 from app.utils.corporate_helpers import (
     extract_registration_data,
@@ -25,7 +28,7 @@ corporate_bp = Blueprint('corporate', __name__, url_prefix='/corporate')
 @corporate_bp.route('/register', methods=['GET', 'POST'])
 def register():
     """법인 회원가입"""
-    if session.get('user_id'):
+    if session.get(SessionKeys.USER_ID):
         return redirect(url_for('main.index'))
 
     if request.method == 'POST':
@@ -55,7 +58,7 @@ def register():
 @corporate_login_required
 def dashboard():
     """법인 대시보드"""
-    company_id = session.get('company_id')
+    company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
         flash('법인 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
@@ -66,7 +69,7 @@ def dashboard():
         return redirect(url_for('main.index'))
 
     return render_template('dashboard/base_dashboard.html',
-                           account_type='corporate',
+                           account_type=AccountType.CORPORATE,
                            company=company)
 
 
@@ -74,12 +77,12 @@ def dashboard():
 @corporate_admin_required
 def settings():
     """법인 정보 설정"""
-    company_id = session.get('company_id')
+    company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
         flash('법인 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
 
-    company = Company.query.get(company_id)
+    company = company_repository.get_model_by_id(company_id)
     if not company:
         flash('법인 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
@@ -116,21 +119,20 @@ def users():
     21번 원칙: 법인 계정(employee_sub)만 표시
     personal 계정은 외부 사용자이므로 제외
     """
-    company_id = session.get('company_id')
+    company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
         flash('법인 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
 
-    company = Company.query.get(company_id)
+    company = company_repository.get_model_by_id(company_id)
     if not company:
         flash('법인 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
 
     # 법인 계정(employee_sub)만 표시
-    users = User.query.filter_by(
-        company_id=company_id,
-        account_type=User.ACCOUNT_EMPLOYEE_SUB
-    ).all()
+    users = user_repository.get_by_company_and_account_type(
+        company_id, User.ACCOUNT_EMPLOYEE_SUB
+    )
 
     return render_template('corporate/users.html', company=company, users=users)
 
@@ -139,12 +141,12 @@ def users():
 @corporate_admin_required
 def add_user():
     """법인 하위 사용자 추가"""
-    company_id = session.get('company_id')
+    company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
         flash('법인 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
 
-    company = Company.query.get(company_id)
+    company = company_repository.get_model_by_id(company_id)
     if not company:
         flash('법인 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
@@ -170,9 +172,9 @@ def add_user():
             errors.append('비밀번호를 입력해주세요.')
         if len(password) < 8:
             errors.append('비밀번호는 최소 8자 이상이어야 합니다.')
-        if User.query.filter_by(username=username).first():
+        if user_repository.get_by_username(username):
             errors.append('이미 사용 중인 아이디입니다.')
-        if User.query.filter_by(email=email).first():
+        if user_repository.get_by_email(email):
             errors.append('이미 사용 중인 이메일입니다.')
         if role not in User.VALID_ROLES:
             errors.append('유효하지 않은 역할입니다.')
@@ -193,7 +195,7 @@ def add_user():
                 role=role,
                 account_type=User.ACCOUNT_EMPLOYEE_SUB,
                 company_id=company_id,
-                parent_user_id=session.get('user_id'),
+                parent_user_id=session.get(SessionKeys.USER_ID),
                 is_active=True
             )
             new_user.set_password(password)
@@ -228,7 +230,7 @@ def check_business_number():
 def get_company(company_id):
     """법인 정보 조회 API"""
     # 자신의 법인 정보만 조회 가능
-    if session.get('company_id') != company_id:
+    if session.get(SessionKeys.COMPANY_ID) != company_id:
         return jsonify({'error': '접근 권한이 없습니다.'}), 403
 
     company = company_repository.get_with_stats(company_id)

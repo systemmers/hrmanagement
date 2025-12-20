@@ -3,11 +3,13 @@
 
 조직 구조 CRUD 및 트리 관리 기능을 제공합니다.
 멀티테넌시: 현재 로그인한 회사의 조직만 접근 가능합니다.
+Phase 2: Service 계층 표준화
 """
 from flask import render_template, request, jsonify, flash, redirect, url_for, session
 
 from . import admin_bp
-from ...extensions import organization_repo, employee_repo
+from ...constants.session_keys import SessionKeys
+from ...services.organization_service import organization_service
 from ...utils.decorators import admin_required, login_required
 from ...models.company import Company
 
@@ -18,7 +20,7 @@ def get_current_root_organization_id():
     Returns:
         root_organization_id 또는 None
     """
-    company_id = session.get('company_id')
+    company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
         return None
     company = Company.query.get(company_id)
@@ -31,9 +33,9 @@ def organization_list():
     """조직 관리 페이지 (멀티테넌시 적용)"""
     root_org_id = get_current_root_organization_id()
 
-    tree = organization_repo.get_tree(root_organization_id=root_org_id)
-    flat_list = organization_repo.get_flat_list(root_organization_id=root_org_id)
-    stats = organization_repo.get_organization_statistics(root_organization_id=root_org_id)
+    tree = organization_service.get_tree(root_organization_id=root_org_id)
+    flat_list = organization_service.get_flat_list(root_organization_id=root_org_id)
+    stats = organization_service.get_organization_statistics(root_organization_id=root_org_id)
 
     return render_template('admin/organization.html',
                            tree=tree,
@@ -49,11 +51,11 @@ def api_get_organizations():
     format_type = request.args.get('format', 'tree')
 
     if format_type == 'tree':
-        data = organization_repo.get_tree(root_organization_id=root_org_id)
+        data = organization_service.get_tree(root_organization_id=root_org_id)
     elif format_type == 'flat':
-        data = organization_repo.get_flat_list(root_organization_id=root_org_id)
+        data = organization_service.get_flat_list(root_organization_id=root_org_id)
     else:
-        data = organization_repo.get_tree(root_organization_id=root_org_id)
+        data = organization_service.get_tree(root_organization_id=root_org_id)
 
     return jsonify({'success': True, 'data': data})
 
@@ -65,10 +67,10 @@ def api_get_organization(org_id):
     root_org_id = get_current_root_organization_id()
 
     # 멀티테넌시 검증
-    if root_org_id and not organization_repo.verify_ownership(org_id, root_org_id):
+    if root_org_id and not organization_service.verify_ownership(org_id, root_org_id):
         return jsonify({'success': False, 'error': '조직을 찾을 수 없습니다.'}), 404
 
-    org = organization_repo.get_by_id(org_id)
+    org = organization_service.get_by_id(org_id)
     if not org:
         return jsonify({'success': False, 'error': '조직을 찾을 수 없습니다.'}), 404
 
@@ -98,11 +100,11 @@ def api_create_organization():
         parent_id = root_org_id
 
     # 코드 중복 검사 (테넌트 범위 내)
-    if code and organization_repo.code_exists(code, root_organization_id=root_org_id):
+    if code and organization_service.code_exists(code, root_organization_id=root_org_id):
         return jsonify({'success': False, 'error': '이미 사용 중인 조직 코드입니다.'}), 400
 
     try:
-        org = organization_repo.create_organization(
+        org = organization_service.create_organization(
             name=name,
             org_type=org_type,
             parent_id=parent_id,
@@ -127,16 +129,16 @@ def api_update_organization(org_id):
     data = request.get_json()
 
     # 멀티테넌시 검증
-    if root_org_id and not organization_repo.verify_ownership(org_id, root_org_id):
+    if root_org_id and not organization_service.verify_ownership(org_id, root_org_id):
         return jsonify({'success': False, 'error': '조직을 찾을 수 없습니다.'}), 404
 
     # 코드 중복 검사 (자기 자신 제외, 테넌트 범위 내)
     code = data.get('code', '').strip() or None
-    if code and organization_repo.code_exists(code, exclude_id=org_id, root_organization_id=root_org_id):
+    if code and organization_service.code_exists(code, exclude_id=org_id, root_organization_id=root_org_id):
         return jsonify({'success': False, 'error': '이미 사용 중인 조직 코드입니다.'}), 400
 
     try:
-        org = organization_repo.update_organization(org_id, data, root_organization_id=root_org_id)
+        org = organization_service.update_organization(org_id, data, root_organization_id=root_org_id)
         if not org:
             return jsonify({'success': False, 'error': '조직을 찾을 수 없습니다.'}), 404
 
@@ -156,7 +158,7 @@ def api_delete_organization(org_id):
     cascade = request.args.get('cascade', 'false').lower() == 'true'
 
     try:
-        if organization_repo.deactivate(org_id, cascade=cascade, root_organization_id=root_org_id):
+        if organization_service.deactivate(org_id, cascade=cascade, root_organization_id=root_org_id):
             return jsonify({'success': True, 'message': '조직이 비활성화되었습니다.'})
         else:
             return jsonify({'success': False, 'error': '조직을 찾을 수 없습니다.'}), 404
@@ -174,7 +176,7 @@ def api_move_organization(org_id):
     new_parent_id = data.get('parent_id')
 
     try:
-        if organization_repo.move_organization(org_id, new_parent_id, root_organization_id=root_org_id):
+        if organization_service.move_organization(org_id, new_parent_id, root_organization_id=root_org_id):
             return jsonify({'success': True, 'message': '조직이 이동되었습니다.'})
         else:
             return jsonify({'success': False, 'error': '조직 이동에 실패했습니다.'}), 400
@@ -188,7 +190,7 @@ def api_move_organization(org_id):
 def api_get_children(org_id):
     """하위 조직 목록 API (멀티테넌시 적용)"""
     root_org_id = get_current_root_organization_id()
-    children = organization_repo.get_children(org_id, root_organization_id=root_org_id)
+    children = organization_service.get_children(org_id, root_organization_id=root_org_id)
     return jsonify({'success': True, 'data': children})
 
 
@@ -201,5 +203,5 @@ def api_search_organizations():
     if not query:
         return jsonify({'success': True, 'data': []})
 
-    results = organization_repo.search(query, root_organization_id=root_org_id)
+    results = organization_service.search(query, root_organization_id=root_org_id)
     return jsonify({'success': True, 'data': results})

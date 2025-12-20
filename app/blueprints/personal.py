@@ -5,6 +5,7 @@
 Phase 2: 개인-법인 분리 아키텍처의 일부입니다.
 Phase 6: 백엔드 리팩토링 - 프로필 헬퍼 통합
 Sprint 1: Repository 계층 적용 - ORM 직접 사용 제거
+Phase 8: 상수 모듈 적용
 """
 import os
 import uuid
@@ -12,6 +13,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, current_app
 from werkzeug.utils import secure_filename
 
+from app.constants.session_keys import SessionKeys, AccountType
 from app.services.personal_service import personal_service
 
 # 사진 업로드 설정
@@ -50,7 +52,7 @@ personal_bp = Blueprint('personal', __name__, url_prefix='/personal')
 @personal_bp.route('/register', methods=['GET', 'POST'])
 def register():
     """개인 회원가입"""
-    if session.get('user_id'):
+    if session.get(SessionKeys.USER_ID):
         return redirect(url_for('main.index'))
 
     if request.method == 'POST':
@@ -105,7 +107,7 @@ def register():
 @personal_login_required
 def dashboard():
     """개인 대시보드"""
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     data = personal_service.get_dashboard_data(user_id)
 
     if not data:
@@ -117,7 +119,7 @@ def dashboard():
         return redirect(url_for('personal.profile_edit'))
 
     return render_template('dashboard/base_dashboard.html',
-                           account_type='personal',
+                           account_type=AccountType.PERSONAL,
                            user=data['user'],
                            profile=data['profile'],
                            stats=data['stats'])
@@ -139,7 +141,7 @@ def profile_edit():
     - GET: 통합 프로필 수정 페이지로 리다이렉트
     - POST: 폼 데이터 저장 처리 (통합 템플릿에서 이 엔드포인트로 POST)
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
 
     # GET 요청: 통합 프로필 수정 페이지로 리다이렉트
     if request.method == 'GET':
@@ -537,7 +539,7 @@ def company_card_list():
 
     개인 계정이 계약한 법인들의 인사카드 목록을 표시합니다.
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
 
     # 승인된 계약 목록 조회
     contracts = personal_service.get_approved_contracts(user_id)
@@ -554,7 +556,7 @@ def company_card_detail(contract_id):
     개인 계정의 특정 법인 계약에 대한 인사카드 상세 정보를 표시합니다.
     공유 파셜 템플릿을 사용하여 법인 직원 인사카드와 동일한 구조로 표시합니다.
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
 
     # 계약 정보 및 회사 인사카드 데이터 조회
     card_data = personal_service.get_company_card_data(user_id, contract_id)
@@ -595,5 +597,5 @@ def company_card_detail(contract_id):
                            is_readonly=True,
                            # 페이지 모드 및 계정 타입
                            page_mode='hr_card',
-                           account_type='personal',
+                           account_type=AccountType.PERSONAL,
                            is_corporate=False)

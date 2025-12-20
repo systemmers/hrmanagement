@@ -4,6 +4,7 @@
 정보 접근 및 변경 사항을 기록하고 관리합니다.
 Phase 4: 데이터 동기화 및 퇴사 처리
 Phase 6: 백엔드 리팩토링 - AuditLog 모델 분리
+Phase 8: 상수 모듈 적용
 """
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
@@ -11,6 +12,7 @@ from functools import wraps
 import json
 
 from flask import request, session, g, current_app
+from app.constants.session_keys import SessionKeys
 from app.database import db
 from app.models.audit_log import AuditLog
 
@@ -84,9 +86,9 @@ class AuditService:
 
         try:
             # 세션에서 사용자 정보 가져오기
-            user_id = session.get('user_id')
-            account_type = session.get('account_type')
-            company_id = session.get('company_id')
+            user_id = session.get(SessionKeys.USER_ID)
+            account_type = session.get(SessionKeys.ACCOUNT_TYPE)
+            company_id = session.get(SessionKeys.COMPANY_ID)
 
             # 요청 정보
             ip_address = self._get_client_ip()

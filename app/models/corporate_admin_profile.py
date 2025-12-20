@@ -3,14 +3,28 @@ CorporateAdminProfile SQLAlchemy 모델
 
 법인 관리자의 프로필 정보를 관리하는 모델입니다.
 법인 관리자(account_type='corporate', employee_id=None)를 위한 경량 프로필 시스템을 제공합니다.
+Phase 8: DictSerializableMixin 적용
 """
 from datetime import datetime
 from app.database import db
+from app.models.mixins import DictSerializableMixin
 
 
-class CorporateAdminProfile(db.Model):
+class CorporateAdminProfile(DictSerializableMixin, db.Model):
     """법인 관리자 프로필 모델"""
     __tablename__ = 'corporate_admin_profiles'
+
+    # camelCase 매핑 (from_dict용)
+    __dict_camel_mapping__ = {
+        'user_id': ['userId'],
+        'company_id': ['companyId'],
+        'english_name': ['englishName'],
+        'mobile_phone': ['mobilePhone'],
+        'office_phone': ['officePhone'],
+        'is_active': ['isActive'],
+        'created_at': ['createdAt'],
+        'updated_at': ['updatedAt'],
+    }
 
     # 기본 키
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -61,44 +75,6 @@ class CorporateAdminProfile(db.Model):
         'Company',
         backref=db.backref('admin_profiles', lazy='dynamic')
     )
-
-    def to_dict(self):
-        """딕셔너리 변환"""
-        return {
-            'id': self.id,
-            'user_id': self.user_id,
-            'company_id': self.company_id,
-            'name': self.name,
-            'english_name': self.english_name,
-            'position': self.position,
-            'mobile_phone': self.mobile_phone,
-            'office_phone': self.office_phone,
-            'email': self.email,
-            'photo': self.photo,
-            'department': self.department,
-            'bio': self.bio,
-            'is_active': self.is_active,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-        }
-
-    @classmethod
-    def from_dict(cls, data):
-        """딕셔너리에서 모델 생성"""
-        return cls(
-            user_id=data.get('user_id'),
-            company_id=data.get('company_id'),
-            name=data.get('name'),
-            english_name=data.get('english_name'),
-            position=data.get('position'),
-            mobile_phone=data.get('mobile_phone'),
-            office_phone=data.get('office_phone'),
-            email=data.get('email'),
-            photo=data.get('photo'),
-            department=data.get('department'),
-            bio=data.get('bio'),
-            is_active=data.get('is_active', True),
-        )
 
     def __repr__(self):
         return f'<CorporateAdminProfile {self.name} - Company {self.company_id}>'

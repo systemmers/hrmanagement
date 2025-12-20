@@ -8,7 +8,7 @@ from app.models import Asset
 from .base_repository import BaseRelationRepository
 
 
-class AssetRepository(BaseRelationRepository):
+class AssetRepository(BaseRelationRepository[Asset]):
     """자산 배정 저장소"""
 
     def __init__(self):

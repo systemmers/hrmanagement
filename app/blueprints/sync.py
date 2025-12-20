@@ -3,9 +3,11 @@
 
 개인-법인 데이터 동기화 API를 제공합니다.
 Phase 4: 데이터 동기화 및 퇴사 처리
+Phase 8: 상수 모듈 적용
 """
 from flask import Blueprint, request, jsonify, session
 
+from app.constants.session_keys import SessionKeys, AccountType
 from app.services.sync_service import sync_service
 from app.services.termination_service import termination_service
 from app.models.person_contract import PersonCorporateContract, SyncLog
@@ -64,7 +66,7 @@ def sync_personal_to_employee(contract_id):
         "logs": [1, 2, 3]
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     sync_service.set_current_user(user_id)
 
     data = request.get_json() or {}
@@ -98,7 +100,7 @@ def sync_employee_to_personal(contract_id):
     Response:
     동기화 결과
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     sync_service.set_current_user(user_id)
 
     data = request.get_json() or {}
@@ -139,7 +141,7 @@ def sync_all_contracts():
         "results": [...]
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     sync_service.set_current_user(user_id)
 
     result = sync_service.sync_all_contracts_for_user(
@@ -177,7 +179,7 @@ def get_snapshot(contract_id):
         }
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     sync_service.set_current_user(user_id)
 
     include_relations = request.args.get('include_relations', 'true').lower() == 'true'
@@ -211,7 +213,7 @@ def apply_snapshot(contract_id):
         "employee_id": 123
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     sync_service.set_current_user(user_id)
 
     snapshot_data = request.get_json()
@@ -247,7 +249,7 @@ def get_my_contracts():
         "contracts": [...]
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     contracts = sync_service.get_contracts_for_user(user_id)
     return jsonify({'success': True, 'contracts': contracts})
 
@@ -316,7 +318,7 @@ def terminate_contract(contract_id):
         "archive_scheduled": {...}
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     termination_service.set_current_user(user_id)
 
     data = request.get_json() or {}
@@ -373,18 +375,18 @@ def get_termination_history():
         "contracts": [...]
     }
     """
-    account_type = session.get('account_type')
-    user_id = session.get('user_id')
-    company_id = session.get('company_id')
+    account_type = session.get(SessionKeys.ACCOUNT_TYPE)
+    user_id = session.get(SessionKeys.USER_ID)
+    company_id = session.get(SessionKeys.COMPANY_ID)
 
     limit = request.args.get('limit', 50, type=int)
 
-    if account_type == 'personal':
+    if account_type == AccountType.PERSONAL:
         history = termination_service.get_termination_history(
             person_user_id=user_id,
             limit=limit
         )
-    elif account_type == 'corporate':
+    elif account_type == AccountType.CORPORATE:
         history = termination_service.get_termination_history(
             company_id=company_id,
             limit=limit

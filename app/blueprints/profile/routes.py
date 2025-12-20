@@ -2,18 +2,21 @@
 Profile Routes - 통합 프로필 라우트
 
 법인 직원, 법인 관리자, 개인 계정의 프로필을 통합 처리하는 라우트
+Phase 8: 상수 모듈 적용
+Phase 2: Service 계층 표준화
 """
 from flask import render_template, g, jsonify, request, flash, redirect, url_for, session
 
 from app.blueprints.profile import profile_bp
+from app.constants.session_keys import SessionKeys, AccountType
 from app.blueprints.profile.decorators import (
     unified_profile_required,
     corporate_only,
     corporate_admin_only
 )
+from app.services.attachment_service import attachment_service
 from app.services.corporate_admin_profile_service import corporate_admin_profile_service
 from app.models.user import User
-from app.extensions import attachment_repo
 
 
 @profile_bp.route('/')
@@ -53,7 +56,7 @@ def view():
     # 첨부파일 목록 조회 (프로필에서는 수정/삭제 가능)
     profile_id = adapter.get_profile_id()
     if profile_id:
-        context['attachment_list'] = attachment_repo.get_by_employee_id(profile_id)
+        context['attachment_list'] = attachment_service.get_by_employee_id(profile_id)
     else:
         context['attachment_list'] = []
     context['is_readonly'] = False  # 프로필에서는 수정 가능
@@ -76,14 +79,14 @@ def edit():
         # POST 처리는 각 계정 타입별 서비스로 위임
         account_type = adapter.get_account_type()
 
-        if account_type == 'corporate':
+        if account_type == AccountType.CORPORATE:
             # 법인 직원 수정은 기존 employees 라우트로
             employee_id = adapter.get_profile_id()
             return redirect(url_for('employees.employee_edit', employee_id=employee_id))
-        elif account_type == 'personal':
+        elif account_type == AccountType.PERSONAL:
             # 개인 프로필 수정
             return redirect(url_for('personal.profile_edit'))
-        elif account_type == 'corporate_admin':
+        elif account_type == AccountType.CORPORATE_ADMIN:
             # 법인 관리자 프로필 수정
             return redirect(url_for('profile.admin_profile_edit'))
 
@@ -99,7 +102,7 @@ def edit():
     # 첨부파일 목록 조회 (프로필 수정에서도 수정/삭제 가능)
     profile_id = adapter.get_profile_id()
     if profile_id:
-        context['attachment_list'] = attachment_repo.get_by_employee_id(profile_id)
+        context['attachment_list'] = attachment_service.get_by_employee_id(profile_id)
     else:
         context['attachment_list'] = []
     context['is_readonly'] = False  # 프로필에서는 수정 가능
@@ -307,11 +310,11 @@ def awards():
 @profile_bp.route('/admin/create', methods=['GET', 'POST'])
 def admin_profile_create():
     """법인 관리자 프로필 생성"""
-    user_id = session.get('user_id')
-    account_type = session.get('account_type')
+    user_id = session.get(SessionKeys.USER_ID)
+    account_type = session.get(SessionKeys.ACCOUNT_TYPE)
 
     # 인증 및 권한 확인
-    if not user_id or account_type != 'corporate':
+    if not user_id or account_type != AccountType.CORPORATE:
         flash('접근 권한이 없습니다.', 'warning')
         return redirect(url_for('auth.login'))
 
@@ -400,7 +403,7 @@ def admin_profile_edit():
 
         # 프로필 수정
         success, error = corporate_admin_profile_service.update_profile(
-            user_id=session.get('user_id'),
+            user_id=session.get(SessionKeys.USER_ID),
             data=data
         )
 
@@ -438,7 +441,7 @@ def api_admin_profile_get():
 @corporate_admin_only
 def api_admin_profile_update():
     """법인 관리자 프로필 수정 API"""
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     data = request.get_json()
 
     if not data:

@@ -10,7 +10,7 @@ from app.models.organization import Organization
 from .base_repository import BaseRepository
 
 
-class OrganizationRepository(BaseRepository):
+class OrganizationRepository(BaseRepository[Organization]):
     """조직 저장소"""
 
     def __init__(self):

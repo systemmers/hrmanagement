@@ -2,13 +2,25 @@
 Attendance SQLAlchemy 모델
 
 직원 근태 정보를 관리합니다.
+Phase 8: DictSerializableMixin 적용
 """
 from app.database import db
+from app.models.mixins import DictSerializableMixin
 
 
-class Attendance(db.Model):
+class Attendance(DictSerializableMixin, db.Model):
     """근태 모델 (월별 집계)"""
     __tablename__ = 'attendances'
+
+    # camelCase 매핑 (from_dict용)
+    __dict_camel_mapping__ = {
+        'employee_id': ['employeeId'],
+        'work_days': ['workDays'],
+        'absent_days': ['absentDays'],
+        'late_count': ['lateCount'],
+        'early_leave_count': ['earlyLeaveCount'],
+        'annual_leave_used': ['annualLeaveUsed'],
+    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, index=True)
@@ -20,36 +32,6 @@ class Attendance(db.Model):
     early_leave_count = db.Column(db.Integer, default=0)
     annual_leave_used = db.Column(db.Integer, default=0)
     note = db.Column(db.Text, nullable=True)
-
-    def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
-        return {
-            'id': self.id,
-            'employee_id': self.employee_id,
-            'year': self.year,
-            'month': self.month,
-            'work_days': self.work_days,
-            'absent_days': self.absent_days,
-            'late_count': self.late_count,
-            'early_leave_count': self.early_leave_count,
-            'annual_leave_used': self.annual_leave_used,
-            'note': self.note,
-        }
-
-    @classmethod
-    def from_dict(cls, data):
-        """딕셔너리에서 모델 생성"""
-        return cls(
-            employee_id=data.get('employee_id') or data.get('employeeId'),
-            year=data.get('year'),
-            month=data.get('month'),
-            work_days=data.get('work_days') or data.get('workDays', 0),
-            absent_days=data.get('absent_days') or data.get('absentDays', 0),
-            late_count=data.get('late_count') or data.get('lateCount', 0),
-            early_leave_count=data.get('early_leave_count') or data.get('earlyLeaveCount', 0),
-            annual_leave_used=data.get('annual_leave_used') or data.get('annualLeaveUsed', 0),
-            note=data.get('note'),
-        )
 
     def __repr__(self):
         return f'<Attendance {self.id}: {self.employee_id} {self.year}-{self.month}>'

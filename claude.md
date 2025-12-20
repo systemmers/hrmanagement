@@ -108,30 +108,26 @@ employees/
 
 ## Test Accounts
 
-### 개인계정 (personal)
-| Email | Password |
-|-------|----------|
-| personal1@test.com | personal1234 |
-| personal2@test.com | personal1234 |
-| personal3@test.com | personal1234 |
+> 모든 테스트 계정의 비밀번호는 `test1234` 입니다.
 
 ### 법인계정 (corporate)
-| 법인 | Email | Password | Company ID |
-|------|-------|----------|------------|
-| 테스트기업 A | corp_a@test.com | corp1234 | 1 |
-| 테스트기업 B | corp_b@test.com | corp1234 | 3 |
+| 법인 | Username | Email | Company ID |
+|------|----------|-------|------------|
+| 테스트기업 A | admin_testa | admin@testcorp.co.kr | 1 |
+| 글로벌기업 | admin_global | admin@globalcorp.co.kr | 2 |
+
+### 개인계정 (personal)
+| Username | Email |
+|----------|-------|
+| personal_junhyuk.kim | junhyuk.kim@gmail.com |
+| personal_seojun.lee | seojun.lee@gmail.com |
+| personal_doyun.park | doyun.park@gmail.com |
 
 ### 법인소속 직원계정 (employee_sub)
-| 소속 | Email | Password |
-|------|-------|----------|
-| 법인 A | emp_a1@test.com ~ emp_a5@test.com | emp1234 |
-| 법인 B | emp_b1@test.com ~ emp_b3@test.com | emp1234 |
-
-### 기존 테스트 계정
-| Email | Password | 유형 |
-|-------|----------|------|
-| testuser@example.com | test1234 | 일반 직원 |
-| company@example.com | admin1234 | 관리자 |
+| 소속 | Username 패턴 | Email 패턴 |
+|------|---------------|------------|
+| 테스트기업 A | emp_0001 ~ emp_0010 | *@testcorp.co.kr |
+| 글로벌기업 | emp_0021 ~ emp_0035 | *@globalcorp.co.kr |
 
 ## Rules
 

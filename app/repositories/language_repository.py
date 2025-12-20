@@ -7,7 +7,7 @@ from app.models import Language
 from .base_repository import BaseRelationRepository
 
 
-class LanguageRepository(BaseRelationRepository):
+class LanguageRepository(BaseRelationRepository[Language]):
     """어학 저장소"""
 
     def __init__(self):

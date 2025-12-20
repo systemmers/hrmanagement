@@ -7,7 +7,7 @@ from app.models import Promotion
 from .base_repository import BaseRelationRepository
 
 
-class PromotionRepository(BaseRelationRepository):
+class PromotionRepository(BaseRelationRepository[Promotion]):
     """승진 저장소"""
 
     def __init__(self):

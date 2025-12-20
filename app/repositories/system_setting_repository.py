@@ -9,7 +9,7 @@ from app.models import SystemSetting
 from .base_repository import BaseRepository
 
 
-class SystemSettingRepository(BaseRepository):
+class SystemSettingRepository(BaseRepository[SystemSetting]):
     """시스템 설정 저장소"""
 
     # 메모리 캐시 (간단한 구현)

@@ -8,7 +8,7 @@ from app.models import Award
 from .base_repository import BaseRelationRepository
 
 
-class AwardRepository(BaseRelationRepository):
+class AwardRepository(BaseRelationRepository[Award]):
     """수상/징계 저장소"""
 
     def __init__(self):

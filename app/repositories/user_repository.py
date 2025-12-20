@@ -9,7 +9,7 @@ from app.models import User
 from .base_repository import BaseRepository
 
 
-class UserRepository(BaseRepository):
+class UserRepository(BaseRepository[User]):
     """사용자 저장소"""
 
     def __init__(self):
@@ -97,6 +97,21 @@ class UserRepository(BaseRepository):
         """역할별 사용자 조회"""
         users = User.query.filter_by(role=role, is_active=True).all()
         return [user.to_dict() for user in users]
+
+    def get_by_company_and_account_type(self, company_id: int, account_type: str) -> List[User]:
+        """법인 ID와 계정 타입으로 사용자 목록 조회"""
+        return User.query.filter_by(
+            company_id=company_id,
+            account_type=account_type
+        ).all()
+
+    def get_employee_sub_users_with_employee(self, company_id: int) -> List[User]:
+        """법인 소속 employee_sub 계정 중 employee_id가 있는 사용자 조회"""
+        return User.query.filter(
+            User.account_type == User.ACCOUNT_EMPLOYEE_SUB,
+            User.company_id == company_id,
+            User.employee_id.isnot(None)
+        ).all()
 
     def get_admins(self) -> List[Dict]:
         """관리자 목록 조회"""

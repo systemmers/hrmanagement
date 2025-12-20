@@ -14,6 +14,7 @@ Contract Service
 from typing import Dict, Optional, List, Any, Tuple
 from flask import session
 
+from ..constants.session_keys import AccountType
 from ..extensions import person_contract_repo, user_repo
 from ..database import db
 from ..models.user import User
@@ -111,7 +112,7 @@ class ContractService:
         # 개인 또는 직원 사용자 조회 (21번 원칙)
         person_user = User.query.filter(
             User.email == person_email,
-            User.account_type.in_(['personal', 'employee_sub'])
+            User.account_type.in_(AccountType.personal_types())
         ).first()
 
         if not person_user:
@@ -152,7 +153,7 @@ class ContractService:
         # 직원 또는 개인 계정 확인 (21번 원칙)
         employee_user = User.query.filter(
             User.id == employee_user_id,
-            User.account_type.in_(['personal', 'employee_sub'])
+            User.account_type.in_(AccountType.personal_types())
         ).first()
 
         if not employee_user:

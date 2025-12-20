@@ -2,10 +2,13 @@
 인증 Blueprint
 
 로그인/로그아웃 및 세션 관리를 처리합니다.
+Phase 2: Service 계층 표준화
 """
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 
-from ..extensions import user_repo
+from ..constants.session_keys import SessionKeys
+from ..constants.messages import FlashMessages
+from ..services.user_service import user_service
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -14,7 +17,7 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 def login():
     """로그인 페이지 및 처리"""
     # 이미 로그인된 경우 대시보드로
-    if session.get('user_id'):
+    if session.get(SessionKeys.USER_ID):
         return redirect(url_for('main.index'))
 
     if request.method == 'POST':
@@ -23,22 +26,22 @@ def login():
 
         # 필수 입력 검증
         if not username or not password:
-            flash('사용자명과 비밀번호를 입력해주세요.', 'error')
+            flash(FlashMessages.ENTER_USERNAME_PASSWORD, 'error')
             return render_template('auth/login.html')
 
         # 인증 시도
-        user = user_repo.authenticate(username, password)
+        user = user_service.authenticate(username, password)
         if user:
             # 세션에 사용자 정보 저장
-            session['user_id'] = user.id
-            session['username'] = user.username
-            session['user_role'] = user.role
-            session['employee_id'] = user.employee_id
+            session[SessionKeys.USER_ID] = user.id
+            session[SessionKeys.USERNAME] = user.username
+            session[SessionKeys.USER_ROLE] = user.role
+            session[SessionKeys.EMPLOYEE_ID] = user.employee_id
             # Phase 1: 계정 유형 및 법인 정보 추가
-            session['account_type'] = user.account_type
-            session['company_id'] = user.company_id
+            session[SessionKeys.ACCOUNT_TYPE] = user.account_type
+            session[SessionKeys.COMPANY_ID] = user.company_id
 
-            flash(f'{user.username}님, 환영합니다!', 'success')
+            flash(FlashMessages.WELCOME_TEMPLATE.format(user.username), 'success')
 
             # next 파라미터가 있으면 해당 페이지로, 없으면 대시보드로
             next_page = request.args.get('next')
@@ -46,7 +49,7 @@ def login():
                 return redirect(next_page)
             return redirect(url_for('main.index'))
         else:
-            flash('사용자명 또는 비밀번호가 올바르지 않습니다.', 'error')
+            flash(FlashMessages.INVALID_CREDENTIALS, 'error')
             return render_template('auth/login.html', username=username)
 
     return render_template('auth/login.html')
@@ -56,7 +59,7 @@ def login():
 def register():
     """회원가입 유형 선택 페이지"""
     # 이미 로그인된 경우 대시보드로
-    if session.get('user_id'):
+    if session.get(SessionKeys.USER_ID):
         return redirect(url_for('main.index'))
 
     return render_template('auth/register_select.html')
@@ -65,12 +68,12 @@ def register():
 @auth_bp.route('/logout')
 def logout():
     """로그아웃 처리"""
-    username = session.get('username', '사용자')
+    username = session.get(SessionKeys.USERNAME, '사용자')
 
     # 세션 클리어
     session.clear()
 
-    flash(f'{username}님이 로그아웃되었습니다.', 'success')
+    flash(FlashMessages.LOGGED_OUT_TEMPLATE.format(username), 'success')
     return redirect(url_for('auth.login'))
 
 
@@ -78,8 +81,8 @@ def logout():
 def change_password():
     """비밀번호 변경"""
     # 로그인 필요
-    if not session.get('user_id'):
-        flash('로그인이 필요합니다.', 'error')
+    if not session.get(SessionKeys.USER_ID):
+        flash(FlashMessages.LOGIN_REQUIRED, 'error')
         return redirect(url_for('auth.login'))
 
     if request.method == 'POST':
@@ -89,30 +92,30 @@ def change_password():
 
         # 필수 입력 검증
         if not all([current_password, new_password, confirm_password]):
-            flash('모든 필드를 입력해주세요.', 'error')
+            flash(FlashMessages.FILL_ALL_FIELDS, 'error')
             return render_template('auth/change_password.html')
 
         # 새 비밀번호 확인
         if new_password != confirm_password:
-            flash('새 비밀번호가 일치하지 않습니다.', 'error')
+            flash(FlashMessages.PASSWORD_MISMATCH, 'error')
             return render_template('auth/change_password.html')
 
         # 비밀번호 길이 검증
         if len(new_password) < 8:
-            flash('비밀번호는 최소 8자 이상이어야 합니다.', 'error')
+            flash(FlashMessages.PASSWORD_TOO_SHORT, 'error')
             return render_template('auth/change_password.html')
 
         # 현재 비밀번호 확인
-        user = user_repo.authenticate(session['username'], current_password)
+        user = user_service.authenticate(session[SessionKeys.USERNAME], current_password)
         if not user:
-            flash('현재 비밀번호가 올바르지 않습니다.', 'error')
+            flash(FlashMessages.INVALID_CURRENT_PASSWORD, 'error')
             return render_template('auth/change_password.html')
 
         # 비밀번호 변경
-        if user_repo.update_password(session['user_id'], new_password):
-            flash('비밀번호가 변경되었습니다.', 'success')
+        if user_service.update_password(session[SessionKeys.USER_ID], new_password):
+            flash(FlashMessages.PASSWORD_CHANGED, 'success')
             return redirect(url_for('main.index'))
         else:
-            flash('비밀번호 변경에 실패했습니다.', 'error')
+            flash(FlashMessages.PASSWORD_CHANGE_FAILED, 'error')
 
     return render_template('auth/change_password.html')

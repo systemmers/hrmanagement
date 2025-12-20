@@ -7,7 +7,7 @@ from app.models import Education
 from .base_repository import BaseRelationRepository
 
 
-class EducationRepository(BaseRelationRepository):
+class EducationRepository(BaseRelationRepository[Education]):
     """학력 저장소"""
 
     def __init__(self):

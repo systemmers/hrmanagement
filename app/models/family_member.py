@@ -2,16 +2,46 @@
 FamilyMember SQLAlchemy 모델
 
 직원 가족 정보를 관리합니다.
+
+Phase 8 리팩토링: DictSerializableMixin 적용
 """
 from app.database import db
+from app.models.mixins import DictSerializableMixin
 
 
-class FamilyMember(db.Model):
+class FamilyMember(DictSerializableMixin, db.Model):
     """가족 모델"""
     __tablename__ = 'family_members'
 
+    # ====================================
+    # Mixin 설정
+    # ====================================
+
+    __dict_aliases__ = {
+        'phone': 'contact',                    # 템플릿: family.phone
+        'living_together': 'is_cohabitant',    # 템플릿: family.living_together
+        'notes': 'note',                       # Personal 호환
+    }
+
+    __dict_computed__ = {
+        'education': lambda self: None,        # Personal 호환 필드 (Employee에는 없음)
+    }
+
+    __dict_camel_mapping__ = {
+        'employee_id': ['employeeId'],
+        'profile_id': ['profileId'],
+        'birth_date': ['birthDate'],
+        'is_cohabitant': ['isCohabitant'],
+        'is_dependent': ['isDependent'],
+    }
+
+    # ====================================
+    # 컬럼 정의
+    # ====================================
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, index=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=True, index=True)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.id', ondelete='CASCADE'), nullable=True, index=True)
     relation = db.Column(db.String(50), nullable=True)
     name = db.Column(db.String(100), nullable=True)
     birth_date = db.Column(db.String(20), nullable=True)
@@ -20,40 +50,6 @@ class FamilyMember(db.Model):
     is_cohabitant = db.Column(db.Boolean, default=False)
     is_dependent = db.Column(db.Boolean, default=False)
     note = db.Column(db.Text, nullable=True)
-
-    def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
-        return {
-            'id': self.id,
-            'employee_id': self.employee_id,
-            'relation': self.relation,
-            'name': self.name,
-            'birth_date': self.birth_date,
-            'occupation': self.occupation,
-            'contact': self.contact,
-            'phone': self.contact,  # 템플릿: family.phone
-            'is_cohabitant': self.is_cohabitant,
-            'living_together': self.is_cohabitant,  # 템플릿: family.living_together
-            'is_dependent': self.is_dependent,
-            'note': self.note,
-            'notes': self.note,  # Personal 호환 alias
-            'education': None,  # Personal 호환 필드 (Employee에는 없음)
-        }
-
-    @classmethod
-    def from_dict(cls, data):
-        """camelCase 딕셔너리에서 모델 생성"""
-        return cls(
-            employee_id=data.get('employeeId'),
-            relation=data.get('relation'),
-            name=data.get('name'),
-            birth_date=data.get('birthDate'),
-            occupation=data.get('occupation'),
-            contact=data.get('contact'),
-            is_cohabitant=data.get('isCohabitant', False),
-            is_dependent=data.get('isDependent', False),
-            note=data.get('note'),
-        )
 
     def __repr__(self):
         return f'<FamilyMember {self.id}: {self.name}>'

@@ -2,34 +2,23 @@
 법인 세팅 API Blueprint
 
 법인별 조직구조, 패턴규칙, 노출설정 API를 제공합니다.
+Phase 2: Service 계층 표준화
 """
 import os
 from flask import Blueprint, jsonify, request, session, send_file
 
+from app.constants.session_keys import SessionKeys
 from app.models import ClassificationOption
 from app.services.file_storage_service import file_storage
-from app.repositories import (
-    ClassificationOptionsRepository,
-    CompanySettingsRepository,
-    NumberCategoryRepository,
-    CompanyVisibilityRepository,
-    CompanyDocumentRepository
-)
+from app.services.corporate_settings_service import corporate_settings_service
 from app.utils.decorators import corporate_admin_required, api_login_required
 
 corporate_settings_api_bp = Blueprint('corporate_settings_api', __name__, url_prefix='/api/corporate')
 
-# Repository instances
-classification_repo = ClassificationOptionsRepository()
-settings_repo = CompanySettingsRepository()
-number_category_repo = NumberCategoryRepository()
-visibility_repo = CompanyVisibilityRepository()
-document_repo = CompanyDocumentRepository()
-
 
 def get_company_id():
     """세션에서 company_id 조회"""
-    return session.get('company_id')
+    return session.get(SessionKeys.COMPANY_ID)
 
 
 # ===== 분류 옵션 (조직 구조) API =====
@@ -42,7 +31,7 @@ def get_all_classifications():
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    options = classification_repo.get_all_options(company_id)
+    options = corporate_settings_service.get_all_classifications(company_id)
     return jsonify(options)
 
 
@@ -54,7 +43,7 @@ def get_organization_classifications():
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    options = classification_repo.get_organization_options(company_id)
+    options = corporate_settings_service.get_organization_options(company_id)
     return jsonify(options)
 
 
@@ -66,7 +55,7 @@ def get_employment_classifications():
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    options = classification_repo.get_employment_options(company_id)
+    options = corporate_settings_service.get_employment_options(company_id)
     return jsonify(options)
 
 
@@ -81,7 +70,7 @@ def get_classifications_by_category(category):
     if category not in ClassificationOption.VALID_CATEGORIES:
         return jsonify({'error': '유효하지 않은 카테고리입니다.'}), 400
 
-    options = classification_repo.get_by_category_for_company(category, company_id)
+    options = corporate_settings_service.get_classifications_by_category(category, company_id)
     return jsonify({
         'category': category,
         'categoryLabel': ClassificationOption.get_category_label(category),
@@ -107,7 +96,7 @@ def add_classification(category):
     if not value:
         return jsonify({'error': '값을 입력해주세요.'}), 400
 
-    result = classification_repo.add_option_for_company(
+    result = corporate_settings_service.add_classification(
         company_id=company_id,
         category=category,
         value=value,
@@ -126,7 +115,7 @@ def update_classification(category, option_id):
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
     data = request.get_json()
-    result = classification_repo.update_option(option_id, company_id, data)
+    result = corporate_settings_service.update_classification(option_id, company_id, data)
 
     if not result:
         return jsonify({'error': '옵션을 찾을 수 없거나 수정할 수 없습니다.'}), 404
@@ -142,7 +131,7 @@ def delete_classification(category, option_id):
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    success = classification_repo.delete_option_for_company(option_id, company_id)
+    success = corporate_settings_service.delete_classification(option_id, company_id)
 
     if not success:
         return jsonify({'error': '옵션을 찾을 수 없거나 삭제할 수 없습니다.'}), 404
@@ -165,7 +154,7 @@ def toggle_system_classification(category):
     if not value:
         return jsonify({'error': '값을 입력해주세요.'}), 400
 
-    result = classification_repo.toggle_system_option(company_id, category, value, is_active)
+    result = corporate_settings_service.toggle_system_option(company_id, category, value, is_active)
 
     return jsonify({'success': True, 'result': result})
 
@@ -180,7 +169,7 @@ def get_settings():
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    settings = settings_repo.get_by_company(company_id)
+    settings = corporate_settings_service.get_settings(company_id)
     return jsonify(settings)
 
 
@@ -195,7 +184,7 @@ def update_settings():
     data = request.get_json()
 
     # 키-값 쌍 저장
-    results = settings_repo.set_bulk_settings(company_id, data)
+    results = corporate_settings_service.update_settings(company_id, data)
 
     return jsonify({'success': True, 'updated': len(results)})
 
@@ -208,7 +197,7 @@ def get_setting(key):
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    value = settings_repo.get_setting(company_id, key)
+    value = corporate_settings_service.get_setting(company_id, key)
     return jsonify({'key': key, 'value': value})
 
 
@@ -223,7 +212,7 @@ def set_setting(key):
     data = request.get_json()
     value = data.get('value')
 
-    result = settings_repo.set_setting(company_id, key, value)
+    result = corporate_settings_service.set_setting(company_id, key, value)
     return jsonify(result)
 
 
@@ -235,7 +224,7 @@ def get_employee_number_settings():
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    settings = settings_repo.get_employee_number_settings(company_id)
+    settings = corporate_settings_service.get_employee_number_settings(company_id)
     return jsonify(settings)
 
 
@@ -247,7 +236,7 @@ def get_payroll_settings():
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    settings = settings_repo.get_payroll_settings(company_id)
+    settings = corporate_settings_service.get_payroll_settings(company_id)
     return jsonify(settings)
 
 
@@ -259,7 +248,7 @@ def initialize_settings():
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    results = settings_repo.initialize_defaults(company_id)
+    results = corporate_settings_service.initialize_settings(company_id)
     return jsonify({'success': True, 'initialized': len(results)})
 
 
@@ -274,7 +263,7 @@ def get_number_categories():
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
     type_filter = request.args.get('type')
-    categories = number_category_repo.get_by_company(company_id, type_filter)
+    categories = corporate_settings_service.get_number_categories(company_id, type_filter)
     return jsonify(categories)
 
 
@@ -286,7 +275,7 @@ def get_employee_number_categories():
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    categories = number_category_repo.get_employee_categories(company_id)
+    categories = corporate_settings_service.get_employee_categories(company_id)
     return jsonify(categories)
 
 
@@ -298,7 +287,7 @@ def get_asset_number_categories():
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    categories = number_category_repo.get_asset_categories(company_id)
+    categories = corporate_settings_service.get_asset_categories(company_id)
     return jsonify(categories)
 
 
@@ -319,7 +308,7 @@ def create_number_category():
     if not type_code or not code or not name:
         return jsonify({'error': '타입, 코드, 이름은 필수입니다.'}), 400
 
-    result = number_category_repo.create_category(
+    result = corporate_settings_service.create_number_category(
         company_id=company_id,
         type_code=type_code,
         code=code,
@@ -339,7 +328,7 @@ def update_number_category(category_id):
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
     data = request.get_json()
-    result = number_category_repo.update_category(category_id, company_id, data)
+    result = corporate_settings_service.update_number_category(category_id, company_id, data)
 
     if not result:
         return jsonify({'error': '분류코드를 찾을 수 없습니다.'}), 404
@@ -355,7 +344,7 @@ def delete_number_category(category_id):
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    success = number_category_repo.delete_category(category_id, company_id)
+    success = corporate_settings_service.delete_number_category(category_id, company_id)
 
     if not success:
         return jsonify({'error': '분류코드를 찾을 수 없거나 사용중인 번호가 있습니다.'}), 400
@@ -371,11 +360,11 @@ def preview_next_number(category_id):
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    company_code = settings_repo.get_setting(company_id, 'company_code') or ''
-    separator = settings_repo.get_setting(company_id, 'employee_number.separator') or '-'
-    digits = settings_repo.get_setting(company_id, 'employee_number.digits') or 6
+    company_code = corporate_settings_service.get_setting(company_id, 'company_code') or ''
+    separator = corporate_settings_service.get_setting(company_id, 'employee_number.separator') or '-'
+    digits = corporate_settings_service.get_setting(company_id, 'employee_number.digits') or 6
 
-    preview = number_category_repo.preview_next_number(
+    preview = corporate_settings_service.preview_next_number(
         category_id, company_code, separator, int(digits)
     )
 
@@ -390,7 +379,7 @@ def initialize_asset_categories():
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    results = number_category_repo.initialize_default_asset_categories(company_id)
+    results = corporate_settings_service.initialize_asset_categories(company_id)
     return jsonify({'success': True, 'initialized': len(results)})
 
 
@@ -404,7 +393,7 @@ def get_visibility_settings():
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    settings = visibility_repo.get_or_create(company_id)
+    settings = corporate_settings_service.get_visibility_settings(company_id)
     return jsonify(settings)
 
 
@@ -417,7 +406,7 @@ def update_visibility_settings():
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
     data = request.get_json()
-    result = visibility_repo.update_settings(company_id, data)
+    result = corporate_settings_service.update_visibility_settings(company_id, data)
 
     return jsonify(result)
 
@@ -430,7 +419,7 @@ def reset_visibility_settings():
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    result = visibility_repo.reset_to_defaults(company_id)
+    result = corporate_settings_service.reset_visibility_settings(company_id)
     return jsonify(result)
 
 
@@ -444,8 +433,8 @@ def get_documents():
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    documents = document_repo.get_by_company(company_id)
-    statistics = document_repo.get_statistics(company_id)
+    documents = corporate_settings_service.get_documents(company_id)
+    statistics = corporate_settings_service.get_document_statistics(company_id)
 
     return jsonify({
         'documents': documents,
@@ -461,7 +450,7 @@ def get_documents_by_category(category):
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    documents = document_repo.get_by_category(company_id, category)
+    documents = corporate_settings_service.get_documents_by_category(company_id, category)
     return jsonify({
         'category': category,
         'documents': documents
@@ -478,12 +467,12 @@ def create_document():
 
     data = request.get_json()
     data['companyId'] = company_id
-    data['uploadedBy'] = session.get('user_id')
+    data['uploadedBy'] = session.get(SessionKeys.USER_ID)
 
     if not data.get('title'):
         return jsonify({'error': '서류 제목은 필수입니다.'}), 400
 
-    result = document_repo.create(data)
+    result = corporate_settings_service.create_document(data)
     return jsonify(result), 201
 
 
@@ -496,7 +485,7 @@ def update_document(document_id):
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
     data = request.get_json()
-    result = document_repo.update(document_id, data)
+    result = corporate_settings_service.update_document(document_id, data)
 
     if not result:
         return jsonify({'error': '서류를 찾을 수 없습니다.'}), 404
@@ -512,7 +501,7 @@ def delete_document(document_id):
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    success = document_repo.delete(document_id)
+    success = corporate_settings_service.delete_document(document_id)
 
     if not success:
         return jsonify({'error': '서류를 찾을 수 없습니다.'}), 404
@@ -528,7 +517,7 @@ def get_document_statistics():
     if not company_id:
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
-    statistics = document_repo.get_statistics(company_id)
+    statistics = corporate_settings_service.get_document_statistics(company_id)
     return jsonify(statistics)
 
 
@@ -541,7 +530,7 @@ def get_expiring_documents():
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
     days = request.args.get('days', 30, type=int)
-    documents = document_repo.get_expiring_documents(company_id, days)
+    documents = corporate_settings_service.get_expiring_documents(company_id, days)
     return jsonify(documents)
 
 
@@ -592,11 +581,11 @@ def upload_document():
         'filePath': web_path,  # 웹 경로
         'fileSize': file_size,
         'fileType': file_ext,
-        'uploadedBy': session.get('user_id')
+        'uploadedBy': session.get(SessionKeys.USER_ID)
     }
 
     # DB에 저장
-    result = document_repo.create(data)
+    result = corporate_settings_service.create_document(data)
     return jsonify(result), 201
 
 
@@ -609,7 +598,7 @@ def download_document(document_id):
         return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
 
     # 문서 조회
-    doc = document_repo.get_by_id(document_id, company_id)
+    doc = corporate_settings_service.get_document_by_id(document_id, company_id)
     if not doc:
         return jsonify({'error': '서류를 찾을 수 없습니다.'}), 404
 

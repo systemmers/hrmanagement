@@ -3,17 +3,32 @@ AuditLog SQLAlchemy 모델
 
 감사 로그 정보를 저장합니다.
 Phase 6: 백엔드 리팩토링 - 모델 분리
+Phase 8: DictSerializableMixin 적용
 """
 from datetime import datetime
-import json
-from typing import Dict
-
 from app.database import db
+from app.models.mixins import DictSerializableMixin
 
 
-class AuditLog(db.Model):
+class AuditLog(DictSerializableMixin, db.Model):
     """감사 로그 모델"""
     __tablename__ = 'audit_logs'
+
+    # JSON 필드 (자동 파싱)
+    __dict_json_fields__ = ['details']
+
+    # camelCase 매핑 (from_dict용)
+    __dict_camel_mapping__ = {
+        'user_id': ['userId'],
+        'account_type': ['accountType'],
+        'company_id': ['companyId'],
+        'resource_type': ['resourceType'],
+        'resource_id': ['resourceId'],
+        'ip_address': ['ipAddress'],
+        'user_agent': ['userAgent'],
+        'error_message': ['errorMessage'],
+        'created_at': ['createdAt'],
+    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
@@ -56,26 +71,6 @@ class AuditLog(db.Model):
     STATUS_SUCCESS = 'success'
     STATUS_FAILURE = 'failure'
     STATUS_DENIED = 'denied'
-
-    def to_dict(self) -> Dict:
-        """딕셔너리 변환"""
-        return {
-            'id': self.id,
-            'user_id': self.user_id,
-            'account_type': self.account_type,
-            'company_id': self.company_id,
-            'action': self.action,
-            'resource_type': self.resource_type,
-            'resource_id': self.resource_id,
-            'details': json.loads(self.details) if self.details else None,
-            'ip_address': self.ip_address,
-            'user_agent': self.user_agent,
-            'endpoint': self.endpoint,
-            'method': self.method,
-            'status': self.status,
-            'error_message': self.error_message,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-        }
 
     def __repr__(self):
         return f'<AuditLog {self.id}: {self.action} {self.resource_type}>'

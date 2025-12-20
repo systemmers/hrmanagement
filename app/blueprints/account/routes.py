@@ -2,22 +2,23 @@
 계정 관리 라우트
 
 계정 설정, 비밀번호 변경, 개인정보 공개 설정, 계정 탈퇴 기능을 제공합니다.
+Phase 2: Service 계층 표준화
 """
 from flask import render_template, request, redirect, url_for, flash, session
 
 from . import account_bp
+from ...constants.session_keys import SessionKeys
 from ...utils.decorators import login_required
-from ...extensions import user_repo, employee_repo
+from ...services.user_service import user_service
+from ...services.employee_service import employee_service
 
 
 @account_bp.route('/settings')
 @login_required
 def settings():
     """계정 설정 메인 페이지"""
-    from app.models import User
-
-    user_id = session.get('user_id')
-    user = User.query.get(user_id)
+    user_id = session.get(SessionKeys.USER_ID)
+    user = user_service.get_by_id(user_id)
 
     if not user:
         flash('사용자 정보를 찾을 수 없습니다.', 'error')
@@ -26,7 +27,7 @@ def settings():
     # 직원 정보 (연결된 경우)
     employee = None
     if user.employee_id:
-        employee = employee_repo.get_by_id(user.employee_id)
+        employee = employee_service.get_employee_by_id(user.employee_id)
 
     return render_template('account/settings.html',
                            user=user,
@@ -58,13 +59,13 @@ def password():
             return render_template('account/password.html')
 
         # 현재 비밀번호 확인
-        user = user_repo.authenticate(session['username'], current_password)
+        user = user_service.authenticate(session['username'], current_password)
         if not user:
             flash('현재 비밀번호가 올바르지 않습니다.', 'error')
             return render_template('account/password.html')
 
         # 비밀번호 변경
-        if user_repo.update_password(session['user_id'], new_password):
+        if user_service.update_password(session[SessionKeys.USER_ID], new_password):
             flash('비밀번호가 변경되었습니다.', 'success')
             return redirect(url_for('account.settings'))
         else:
@@ -77,10 +78,8 @@ def password():
 @login_required
 def privacy():
     """개인정보 공개 설정"""
-    from app.models import User
-
-    user_id = session.get('user_id')
-    user = User.query.get(user_id)
+    user_id = session.get(SessionKeys.USER_ID)
+    user = user_service.get_by_id(user_id)
 
     if not user:
         flash('사용자 정보를 찾을 수 없습니다.', 'error')
@@ -97,14 +96,14 @@ def privacy():
         }
 
         # 사용자 privacy_settings 업데이트
-        if user_repo.update_privacy_settings(user_id, privacy_settings):
+        if user_service.update_privacy_settings(user_id, privacy_settings):
             flash('공개 설정이 저장되었습니다.', 'success')
             return redirect(url_for('account.settings'))
         else:
             flash('공개 설정 저장에 실패했습니다.', 'error')
 
     # 현재 공개 설정 조회
-    privacy_settings = user_repo.get_privacy_settings(user_id) or {}
+    privacy_settings = user_service.get_privacy_settings(user_id) or {}
 
     return render_template('account/privacy.html',
                            user=user,
@@ -115,10 +114,8 @@ def privacy():
 @login_required
 def delete():
     """계정 탈퇴"""
-    from app.models import User
-
-    user_id = session.get('user_id')
-    user = User.query.get(user_id)
+    user_id = session.get(SessionKeys.USER_ID)
+    user = user_service.get_by_id(user_id)
 
     if not user:
         flash('사용자 정보를 찾을 수 없습니다.', 'error')
@@ -129,7 +126,7 @@ def delete():
         confirm_text = request.form.get('confirm_text', '')
 
         # 비밀번호 확인
-        authenticated = user_repo.authenticate(session['username'], password)
+        authenticated = user_service.authenticate(session['username'], password)
         if not authenticated:
             flash('비밀번호가 올바르지 않습니다.', 'error')
             return render_template('account/delete.html', user=user)
@@ -140,7 +137,7 @@ def delete():
             return render_template('account/delete.html', user=user)
 
         # 계정 비활성화 (soft delete)
-        if user_repo.deactivate(user_id):
+        if user_service.deactivate(user_id):
             session.clear()
             flash('계정이 탈퇴 처리되었습니다.', 'success')
             return redirect(url_for('auth.login'))

@@ -3,10 +3,13 @@
 
 개인 프로필 관련 중복 로직을 통합합니다.
 Phase 6: 백엔드 리팩토링
+Phase 8: 상수 모듈 적용
 """
 from functools import wraps
 from typing import Optional, Tuple
 from flask import session, jsonify, g
+
+from ..constants.session_keys import SessionKeys
 
 from app.models.personal_profile import PersonalProfile
 
@@ -23,7 +26,7 @@ def get_current_profile() -> Optional[PersonalProfile]:
     if hasattr(g, '_current_profile'):
         return g._current_profile
 
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     if not user_id:
         return None
 

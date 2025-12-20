@@ -7,7 +7,7 @@ from app.models import FamilyMember
 from .base_repository import BaseRelationRepository
 
 
-class FamilyMemberRepository(BaseRelationRepository):
+class FamilyMemberRepository(BaseRelationRepository[FamilyMember]):
     """가족 저장소"""
 
     def __init__(self):

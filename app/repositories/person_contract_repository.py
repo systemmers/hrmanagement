@@ -12,7 +12,7 @@ from app.models.employee import Employee
 from .base_repository import BaseRepository
 
 
-class PersonContractRepository(BaseRepository):
+class PersonContractRepository(BaseRepository[PersonCorporateContract]):
     """개인-법인 계약 관리 Repository"""
 
     def __init__(self):

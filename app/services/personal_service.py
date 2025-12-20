@@ -4,33 +4,29 @@ Personal Service
 개인 계정 관련 비즈니스 로직을 처리합니다.
 - 회원가입
 - 프로필 관리
-- 학력/경력/자격증/어학/병역 CRUD
+- 이력 데이터 CRUD
+
+Phase 4.1: PersonalProfile → Profile 마이그레이션 완료
+- ProfileRepository 사용
+- 통합 이력 테이블 직접 접근
 """
 from typing import Dict, Optional, Tuple, List
 from app.database import db
 from app.models.user import User
-from app.repositories.user_repository import UserRepository
-from app.repositories.personal_profile_repository import (
-    PersonalProfileRepository,
-    PersonalEducationRepository,
-    PersonalCareerRepository,
-    PersonalCertificateRepository,
-    PersonalLanguageRepository,
-    PersonalMilitaryRepository
+from app.models.profile import Profile
+from app.models import (
+    Education, Career, Certificate, Language, MilitaryService
 )
+from app.repositories.user_repository import UserRepository
+from app.repositories.profile_repository import ProfileRepository
 
 
 class PersonalService:
-    """개인 계정 서비스"""
+    """개인 계정 서비스 (통합 Profile 모델 사용)"""
 
     def __init__(self):
         self.user_repo = UserRepository()
-        self.profile_repo = PersonalProfileRepository()
-        self.education_repo = PersonalEducationRepository()
-        self.career_repo = PersonalCareerRepository()
-        self.certificate_repo = PersonalCertificateRepository()
-        self.language_repo = PersonalLanguageRepository()
-        self.military_repo = PersonalMilitaryRepository()
+        self.profile_repo = ProfileRepository()
 
     # ========================================
     # 회원가입
@@ -65,7 +61,7 @@ class PersonalService:
 
     def register(self, username: str, email: str, password: str,
                  name: str, mobile_phone: str = None) -> Tuple[bool, Optional[User], Optional[str]]:
-        """개인 회원가입 처리
+        """개인 회원가입 처리 (통합 Profile 모델 사용)
 
         Returns:
             Tuple[성공여부, User객체, 에러메시지]
@@ -83,13 +79,15 @@ class PersonalService:
             db.session.add(user)
             db.session.flush()
 
-            # 개인 프로필 생성
-            self.profile_repo.create_profile(
+            # 통합 Profile 생성
+            profile = Profile(
                 user_id=user.id,
                 name=name,
                 email=email,
                 mobile_phone=mobile_phone
             )
+            db.session.add(profile)
+            db.session.commit()
 
             return True, user, None
 
@@ -101,16 +99,14 @@ class PersonalService:
     # 프로필 조회/수정
     # ========================================
 
-    def get_user_with_profile(self, user_id: int) -> Tuple[Optional[User], Optional[object]]:
+    def get_user_with_profile(self, user_id: int) -> Tuple[Optional[User], Optional[Profile]]:
         """사용자와 프로필 동시 조회"""
-        user = self.user_repo.get_by_id(user_id)
+        user = User.query.get(user_id)
         if not user:
             return None, None
 
-        # get_by_id는 Dict를 반환하므로 모델 객체 직접 조회
-        user_obj = User.query.get(user_id)
         profile = self.profile_repo.get_by_user_id(user_id)
-        return user_obj, profile
+        return user, profile
 
     def get_dashboard_data(self, user_id: int) -> Optional[Dict]:
         """대시보드용 데이터 조회
@@ -122,21 +118,26 @@ class PersonalService:
         if not user:
             return None
 
+        # 통합 Profile 모델에서 이력 통계 조회
+        stats = {}
+        if profile:
+            stats = {
+                'education_count': profile.educations.count() if profile.educations else 0,
+                'career_count': profile.careers.count() if profile.careers else 0,
+                'certificate_count': profile.certificates.count() if profile.certificates else 0,
+                'language_count': profile.languages.count() if profile.languages else 0,
+                'has_military': profile.military_services.count() > 0 if profile.military_services else False
+            }
+
         return {
             'user': user,
             'profile': profile,  # None일 수 있음
-            'stats': self.profile_repo.get_profile_stats(profile) if profile else {}
+            'stats': stats
         }
 
-    def ensure_profile_exists(self, user_id: int, default_name: str) -> object:
+    def ensure_profile_exists(self, user_id: int, default_name: str) -> Profile:
         """프로필이 없으면 생성, 있으면 반환"""
-        profile = self.profile_repo.get_by_user_id(user_id)
-        if not profile:
-            profile = self.profile_repo.create_profile(
-                user_id=user_id,
-                name=default_name
-            )
-        return profile
+        return self.profile_repo.get_or_create_for_user(user_id, default_name)
 
     def update_profile(self, user_id: int, data: Dict) -> Tuple[bool, Optional[str]]:
         """프로필 정보 수정"""
@@ -145,108 +146,234 @@ class PersonalService:
             return False, '프로필을 찾을 수 없습니다.'
 
         try:
-            self.profile_repo.update_profile(profile, data)
+            self.profile_repo.update_by_user_id(user_id, data)
             return True, None
         except Exception as e:
             db.session.rollback()
             return False, str(e)
 
     # ========================================
-    # 학력 CRUD
+    # 학력 (Education) CRUD
     # ========================================
 
     def get_educations(self, profile_id: int) -> List[Dict]:
         """학력 목록 조회"""
-        return self.education_repo.get_by_profile_id(profile_id)
+        profile = Profile.query.get(profile_id)
+        if not profile:
+            return []
+        return [e.to_dict() for e in profile.educations.all()]
 
     def add_education(self, profile_id: int, data: Dict) -> Dict:
         """학력 추가"""
-        education = self.education_repo.create(profile_id, data)
+        education = Education(
+            profile_id=profile_id,
+            school_name=data.get('school_name'),
+            degree=data.get('degree'),
+            major=data.get('major'),
+            graduation_date=data.get('graduation_date'),
+            gpa=data.get('gpa'),
+            graduation_status=data.get('status') or data.get('graduation_status'),
+            note=data.get('notes') or data.get('note')
+        )
+        db.session.add(education)
+        db.session.commit()
         return education.to_dict()
 
     def delete_education(self, education_id: int, profile_id: int) -> bool:
-        """학력 삭제"""
-        return self.education_repo.delete_by_id_and_profile(education_id, profile_id)
+        """학력 삭제 (소유권 확인)"""
+        education = Education.query.filter_by(
+            id=education_id, profile_id=profile_id
+        ).first()
+        if not education:
+            return False
+        db.session.delete(education)
+        db.session.commit()
+        return True
 
     def delete_all_educations(self, profile_id: int) -> int:
         """프로필의 모든 학력 삭제"""
-        return self.education_repo.delete_all_by_profile(profile_id)
+        count = Education.query.filter_by(profile_id=profile_id).delete()
+        db.session.commit()
+        return count
 
     # ========================================
-    # 경력 CRUD
+    # 경력 (Career) CRUD
     # ========================================
 
     def get_careers(self, profile_id: int) -> List[Dict]:
         """경력 목록 조회"""
-        return self.career_repo.get_by_profile_id(profile_id)
+        profile = Profile.query.get(profile_id)
+        if not profile:
+            return []
+        return [c.to_dict() for c in profile.careers.all()]
 
     def add_career(self, profile_id: int, data: Dict) -> Dict:
         """경력 추가"""
-        career = self.career_repo.create(profile_id, data)
+        career = Career(
+            profile_id=profile_id,
+            company_name=data.get('company_name'),
+            department=data.get('department'),
+            position=data.get('position'),
+            job_grade=data.get('job_grade'),
+            job_title=data.get('job_title'),
+            job_role=data.get('job_role'),
+            responsibilities=data.get('responsibilities'),
+            salary_type=data.get('salary_type'),
+            salary=data.get('salary'),
+            monthly_salary=data.get('monthly_salary'),
+            pay_step=data.get('pay_step'),
+            start_date=data.get('start_date'),
+            end_date=data.get('end_date')
+        )
+        db.session.add(career)
+        db.session.commit()
         return career.to_dict()
 
     def delete_career(self, career_id: int, profile_id: int) -> bool:
-        """경력 삭제"""
-        return self.career_repo.delete_by_id_and_profile(career_id, profile_id)
+        """경력 삭제 (소유권 확인)"""
+        career = Career.query.filter_by(
+            id=career_id, profile_id=profile_id
+        ).first()
+        if not career:
+            return False
+        db.session.delete(career)
+        db.session.commit()
+        return True
 
     def delete_all_careers(self, profile_id: int) -> int:
         """프로필의 모든 경력 삭제"""
-        return self.career_repo.delete_all_by_profile(profile_id)
+        count = Career.query.filter_by(profile_id=profile_id).delete()
+        db.session.commit()
+        return count
 
     # ========================================
-    # 자격증 CRUD
+    # 자격증 (Certificate) CRUD
     # ========================================
 
     def get_certificates(self, profile_id: int) -> List[Dict]:
         """자격증 목록 조회"""
-        return self.certificate_repo.get_by_profile_id(profile_id)
+        profile = Profile.query.get(profile_id)
+        if not profile:
+            return []
+        return [c.to_dict() for c in profile.certificates.all()]
 
     def add_certificate(self, profile_id: int, data: Dict) -> Dict:
         """자격증 추가"""
-        certificate = self.certificate_repo.create(profile_id, data)
+        certificate = Certificate(
+            profile_id=profile_id,
+            certificate_name=data.get('name') or data.get('certificate_name'),
+            issuing_organization=data.get('issuing_organization'),
+            acquisition_date=data.get('issue_date') or data.get('acquisition_date'),
+            expiry_date=data.get('expiry_date'),
+            certificate_number=data.get('certificate_number'),
+            grade=data.get('grade')
+        )
+        db.session.add(certificate)
+        db.session.commit()
         return certificate.to_dict()
 
     def delete_certificate(self, certificate_id: int, profile_id: int) -> bool:
-        """자격증 삭제"""
-        return self.certificate_repo.delete_by_id_and_profile(certificate_id, profile_id)
+        """자격증 삭제 (소유권 확인)"""
+        certificate = Certificate.query.filter_by(
+            id=certificate_id, profile_id=profile_id
+        ).first()
+        if not certificate:
+            return False
+        db.session.delete(certificate)
+        db.session.commit()
+        return True
 
     def delete_all_certificates(self, profile_id: int) -> int:
         """프로필의 모든 자격증 삭제"""
-        return self.certificate_repo.delete_all_by_profile(profile_id)
+        count = Certificate.query.filter_by(profile_id=profile_id).delete()
+        db.session.commit()
+        return count
 
     # ========================================
-    # 어학 CRUD
+    # 어학 (Language) CRUD
     # ========================================
 
     def get_languages(self, profile_id: int) -> List[Dict]:
         """어학 목록 조회"""
-        return self.language_repo.get_by_profile_id(profile_id)
+        profile = Profile.query.get(profile_id)
+        if not profile:
+            return []
+        return [lang.to_dict() for lang in profile.languages.all()]
 
     def add_language(self, profile_id: int, data: Dict) -> Dict:
         """어학 추가"""
-        language = self.language_repo.create(profile_id, data)
+        language = Language(
+            profile_id=profile_id,
+            language_name=data.get('language') or data.get('language_name'),
+            level=data.get('proficiency') or data.get('level'),
+            test_name=data.get('test_name'),
+            score=data.get('score'),
+            test_date=data.get('test_date')
+        )
+        db.session.add(language)
+        db.session.commit()
         return language.to_dict()
 
     def delete_language(self, language_id: int, profile_id: int) -> bool:
-        """어학 삭제"""
-        return self.language_repo.delete_by_id_and_profile(language_id, profile_id)
+        """어학 삭제 (소유권 확인)"""
+        language = Language.query.filter_by(
+            id=language_id, profile_id=profile_id
+        ).first()
+        if not language:
+            return False
+        db.session.delete(language)
+        db.session.commit()
+        return True
 
     def delete_all_languages(self, profile_id: int) -> int:
         """프로필의 모든 어학 삭제"""
-        return self.language_repo.delete_all_by_profile(profile_id)
+        count = Language.query.filter_by(profile_id=profile_id).delete()
+        db.session.commit()
+        return count
 
     # ========================================
-    # 병역 CRUD
+    # 병역 (MilitaryService) CRUD - 1:1 관계
     # ========================================
 
     def get_military(self, profile_id: int) -> Optional[Dict]:
         """병역 정보 조회"""
-        military = self.military_repo.get_by_profile_id(profile_id)
+        profile = Profile.query.get(profile_id)
+        if not profile:
+            return None
+        military = profile.military_services.first()
         return military.to_dict() if military else None
 
     def save_military(self, profile_id: int, data: Dict) -> Dict:
-        """병역 정보 저장/수정"""
-        military = self.military_repo.save(profile_id, data)
+        """병역 정보 저장/수정 (1:1)"""
+        # 기존 데이터 조회
+        military = MilitaryService.query.filter_by(profile_id=profile_id).first()
+
+        if military:
+            # 수정
+            military.military_status = data.get('service_type') or data.get('military_status')
+            military.branch = data.get('branch')
+            military.rank = data.get('rank')
+            military.start_date = data.get('start_date')
+            military.end_date = data.get('end_date')
+            military.service_type = data.get('specialty') or data.get('service_type')
+            military.duty = data.get('duty')
+            military.exemption_reason = data.get('notes') or data.get('exemption_reason')
+        else:
+            # 신규 생성
+            military = MilitaryService(
+                profile_id=profile_id,
+                military_status=data.get('service_type') or data.get('military_status'),
+                branch=data.get('branch'),
+                rank=data.get('rank'),
+                start_date=data.get('start_date'),
+                end_date=data.get('end_date'),
+                service_type=data.get('specialty') or data.get('service_type'),
+                duty=data.get('duty'),
+                exemption_reason=data.get('notes') or data.get('exemption_reason')
+            )
+            db.session.add(military)
+
+        db.session.commit()
         return military.to_dict()
 
     # ========================================
@@ -308,7 +435,7 @@ class PersonalService:
         if not company:
             return None
 
-        # 개인 프로필 조회 (헤더 표시용)
+        # 통합 Profile 모델 조회
         profile = self.profile_repo.get_by_user_id(user_id)
         user = User.query.get(user_id)
 
@@ -325,33 +452,33 @@ class PersonalService:
                 'id': user.id if user else user_id,
                 # 개인 기본정보 필드
                 'name': profile.name,
-                'english_name': getattr(profile, 'english_name', None),
-                'chinese_name': getattr(profile, 'chinese_name', None),
+                'english_name': profile.english_name,
+                'chinese_name': profile.chinese_name,
                 'photo': profile.photo or '/static/images/face/face_01_m.png',
                 'email': profile.email,
-                'phone': profile.mobile_phone or getattr(profile, 'phone', None),
-                'home_phone': getattr(profile, 'home_phone', None),
+                'phone': profile.mobile_phone,
+                'home_phone': profile.home_phone,
                 'address': profile.address,
-                'detailed_address': getattr(profile, 'detailed_address', None),
-                'postal_code': getattr(profile, 'postal_code', None),
-                'actual_address': getattr(profile, 'actual_address', None),
-                'actual_detailed_address': getattr(profile, 'actual_detailed_address', None),
+                'detailed_address': profile.detailed_address,
+                'postal_code': profile.postal_code,
+                'actual_address': profile.actual_address,
+                'actual_detailed_address': profile.actual_detailed_address,
                 'birth_date': profile.birth_date,
-                'lunar_birth': getattr(profile, 'lunar_birth', False),
-                'gender': getattr(profile, 'gender', None),
-                'marital_status': getattr(profile, 'marital_status', None),
-                'resident_number': getattr(profile, 'resident_number', None),
-                'nationality': getattr(profile, 'nationality', None),
-                'emergency_contact': getattr(profile, 'emergency_contact', None),
-                'emergency_relation': getattr(profile, 'emergency_relation', None),
-                'blood_type': getattr(profile, 'blood_type', None),
-                'religion': getattr(profile, 'religion', None),
-                'hobby': getattr(profile, 'hobby', None),
-                'specialty': getattr(profile, 'specialty', None),
-                'disability_info': getattr(profile, 'disability_info', None),
+                'lunar_birth': profile.lunar_birth,
+                'gender': profile.gender,
+                'marital_status': profile.marital_status,
+                'resident_number': profile.resident_number,
+                'nationality': profile.nationality,
+                'emergency_contact': profile.emergency_contact,
+                'emergency_relation': profile.emergency_relation,
+                'blood_type': profile.blood_type,
+                'religion': profile.religion,
+                'hobby': profile.hobby,
+                'specialty': profile.specialty,
+                'disability_info': profile.disability_info,
                 # 소속정보 (계약 기반)
                 'department': contract.department,
-                'team': contract.department,  # team이 없으면 department 사용
+                'team': contract.department,
                 'position': contract.position,
                 'job_title': getattr(contract, 'job_title', None),
                 'employee_number': contract.employee_number or f'EMP-{user_id:03d}',
@@ -370,7 +497,7 @@ class PersonalService:
                 'created_at': user.created_at.strftime('%Y-%m-%d') if user and user.created_at else '-',
             }
 
-        # 이력 정보 조회 (프로필 ID 기반)
+        # 이력 정보 조회 (통합 Profile 모델 사용)
         education_list = []
         career_list = []
         certificate_list = []
@@ -380,12 +507,14 @@ class PersonalService:
         family_list = []
 
         if profile:
-            education_list = self.get_educations(profile.id)
-            career_list = self.get_careers(profile.id)
-            certificate_list = self.get_certificates(profile.id)
-            language_list = self.get_languages(profile.id)
-            military = self.get_military(profile.id)
-            # award_list와 family_list는 별도 repository 필요 (현재 미구현)
+            education_list = [e.to_dict() for e in profile.educations.all()]
+            career_list = [c.to_dict() for c in profile.careers.all()]
+            certificate_list = [c.to_dict() for c in profile.certificates.all()]
+            language_list = [lang.to_dict() for lang in profile.languages.all()]
+            military_records = profile.military_services.first()
+            military = military_records.to_dict() if military_records else None
+            award_list = [a.to_dict() for a in profile.awards.all()]
+            family_list = [f.to_dict() for f in profile.family_members.all()]
 
         # 인사카드 데이터 구성
         return {

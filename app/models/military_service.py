@@ -2,16 +2,52 @@
 MilitaryService SQLAlchemy 모델
 
 직원 병역 정보를 관리합니다. (1:1 관계)
+
+Phase 8 리팩토링: DictSerializableMixin 적용
 """
 from app.database import db
+from app.models.mixins import DictSerializableMixin
 
 
-class MilitaryService(db.Model):
+class MilitaryService(DictSerializableMixin, db.Model):
     """병역 모델 (1:1)"""
     __tablename__ = 'military_services'
 
+    # ====================================
+    # Mixin 설정
+    # ====================================
+
+    __dict_aliases__ = {
+        'status': 'military_status',           # 템플릿: military.status
+        'start_date': 'enlistment_date',       # 템플릿: military.start_date
+        'end_date': 'discharge_date',          # 템플릿: military.end_date
+        'duty': 'service_type',                # 템플릿: military.duty
+        'discharge_type': 'discharge_reason',  # Personal 호환 alias
+        'notes': 'note',                       # Personal 호환 alias
+    }
+
+    __dict_computed__ = {
+        'specialty': lambda self: None,        # 템플릿: military.specialty
+    }
+
+    __dict_camel_mapping__ = {
+        'employee_id': ['employeeId'],
+        'profile_id': ['profileId'],
+        'military_status': ['militaryStatus'],
+        'service_type': ['serviceType'],
+        'enlistment_date': ['enlistmentDate'],
+        'discharge_date': ['dischargeDate'],
+        'discharge_reason': ['dischargeReason'],
+        'exemption_reason': ['exemptionReason'],
+    }
+
+    # ====================================
+    # 컬럼 정의
+    # ====================================
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, unique=True, index=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=True, index=True)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.id', ondelete='CASCADE'), nullable=True, index=True)
     military_status = db.Column(db.String(50), nullable=True)
     service_type = db.Column(db.String(100), nullable=True)
     branch = db.Column(db.String(100), nullable=True)
@@ -21,45 +57,6 @@ class MilitaryService(db.Model):
     discharge_reason = db.Column(db.String(200), nullable=True)
     exemption_reason = db.Column(db.String(500), nullable=True)
     note = db.Column(db.Text, nullable=True)
-
-    def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
-        return {
-            'id': self.id,
-            'employee_id': self.employee_id,
-            'status': self.military_status,  # 템플릿: military.status
-            'military_status': self.military_status,
-            'service_type': self.service_type,
-            'branch': self.branch,
-            'rank': self.rank,
-            'start_date': self.enlistment_date,  # 템플릿: military.start_date
-            'end_date': self.discharge_date,  # 템플릿: military.end_date
-            'enlistment_date': self.enlistment_date,
-            'discharge_date': self.discharge_date,
-            'discharge_reason': self.discharge_reason,
-            'exemption_reason': self.exemption_reason,
-            'duty': self.service_type,  # 템플릿: military.duty (service_type 매핑)
-            'specialty': None,  # 템플릿: military.specialty
-            'discharge_type': self.discharge_reason,  # Personal 호환 alias
-            'note': self.note,
-            'notes': self.note,  # Personal 호환 alias
-        }
-
-    @classmethod
-    def from_dict(cls, data):
-        """camelCase 딕셔너리에서 모델 생성"""
-        return cls(
-            employee_id=data.get('employeeId'),
-            military_status=data.get('militaryStatus'),
-            service_type=data.get('serviceType'),
-            branch=data.get('branch'),
-            rank=data.get('rank'),
-            enlistment_date=data.get('enlistmentDate'),
-            discharge_date=data.get('dischargeDate'),
-            discharge_reason=data.get('dischargeReason'),
-            exemption_reason=data.get('exemptionReason'),
-            note=data.get('note'),
-        )
 
     def __repr__(self):
         return f'<MilitaryService {self.id}: {self.employee_id}>'

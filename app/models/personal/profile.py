@@ -3,6 +3,7 @@ PersonalProfile SQLAlchemy 모델
 
 개인 계정의 프로필 정보를 관리합니다.
 Phase 2: 개인-법인 분리 아키텍처의 일부입니다.
+Phase 7: 이력 데이터는 통합 테이블 사용 (Profile 모델 참조)
 """
 from datetime import datetime
 from app.database import db
@@ -10,10 +11,19 @@ from app.database import db
 
 class PersonalProfile(db.Model):
     """
-    개인 프로필 모델
+    개인 프로필 모델 (기본 정보만 보관)
 
     개인 계정(account_type='personal')에 연결되는 프로필 정보입니다.
-    Employee 모델의 개인정보 부분을 분리한 것입니다.
+
+    Phase 7 Note: 이력 데이터(학력, 경력 등)는 통합 모델 사용
+    - Profile.educations → Education 모델
+    - Profile.careers → Career 모델
+    - Profile.certificates → Certificate 모델
+    - Profile.languages → Language 모델
+    - Profile.military_services → MilitaryService 모델
+    - Profile.family_members → FamilyMember 모델
+    - Profile.awards → Award 모델
+    - Profile.project_participations → ProjectParticipation 모델
     """
     __tablename__ = 'personal_profiles'
 
@@ -79,57 +89,8 @@ class PersonalProfile(db.Model):
         foreign_keys=[user_id]
     )
 
-    # 1:N 관계 - 개인이 관리하는 이력 정보
-    educations = db.relationship(
-        'PersonalEducation',
-        backref='profile',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
-    )
-    careers = db.relationship(
-        'PersonalCareer',
-        backref='profile',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
-    )
-    certificates = db.relationship(
-        'PersonalCertificate',
-        backref='profile',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
-    )
-    languages = db.relationship(
-        'PersonalLanguage',
-        backref='profile',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
-    )
-    awards = db.relationship(
-        'PersonalAward',
-        backref='profile',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
-    )
-    families = db.relationship(
-        'PersonalFamily',
-        backref='profile',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
-    )
-    project_participations = db.relationship(
-        'PersonalProjectParticipation',
-        backref='profile',
-        lazy='dynamic',
-        cascade='all, delete-orphan'
-    )
-
-    # 1:1 관계
-    military_service = db.relationship(
-        'PersonalMilitaryService',
-        backref='profile',
-        uselist=False,
-        cascade='all, delete-orphan'
-    )
+    # Note: 이력 관계는 통합 Profile 모델에서 관리
+    # Profile.educations, Profile.careers, etc.
 
     @property
     def full_address(self):

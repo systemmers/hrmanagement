@@ -7,7 +7,7 @@ from app.models import Salary
 from .base_repository import BaseOneToOneRepository
 
 
-class SalaryRepository(BaseOneToOneRepository):
+class SalaryRepository(BaseOneToOneRepository[Salary]):
     """급여 저장소 (1:1)"""
 
     def __init__(self):

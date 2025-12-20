@@ -1,38 +1,24 @@
 """
 개인 프로필 모델 패키지
 
-개인 계정의 프로필 및 이력 정보를 관리하는 모델입니다.
-Phase 2: 개인-법인 분리 아키텍처의 일부입니다.
+개인 계정의 기본 프로필 정보를 관리하는 모델입니다.
+Phase 7: 이력 데이터는 통합 테이블(educations, careers 등)로 마이그레이션됨
 
 모듈 구조:
-- profile.py: PersonalProfile (기본 프로필)
-- education.py: PersonalEducation (학력)
-- career.py: PersonalCareer (경력)
-- certificate.py: PersonalCertificate (자격증)
-- language.py: PersonalLanguage (어학)
-- military_service.py: PersonalMilitaryService (병역)
-- award.py: PersonalAward (수상내역)
-- family.py: PersonalFamily (가족정보)
-- project_participation.py: PersonalProjectParticipation (프로젝트 참여이력)
+- profile.py: PersonalProfile (기본 프로필, 회원가입용)
+
+Note: 이력 데이터(학력, 경력, 자격증 등)는 통합 모델 사용
+- app/models/education.py (Education)
+- app/models/career.py (Career)
+- app/models/certificate.py (Certificate)
+- app/models/language.py (Language)
+- app/models/military_service.py (MilitaryService)
+- app/models/family_member.py (FamilyMember)
+- app/models/award.py (Award)
+- app/models/project_participation.py (ProjectParticipation)
 """
 from .profile import PersonalProfile
-from .education import PersonalEducation
-from .career import PersonalCareer
-from .certificate import PersonalCertificate
-from .language import PersonalLanguage
-from .military_service import PersonalMilitaryService
-from .award import PersonalAward
-from .family import PersonalFamily
-from .project_participation import PersonalProjectParticipation
 
 __all__ = [
     'PersonalProfile',
-    'PersonalEducation',
-    'PersonalCareer',
-    'PersonalCertificate',
-    'PersonalLanguage',
-    'PersonalMilitaryService',
-    'PersonalAward',
-    'PersonalFamily',
-    'PersonalProjectParticipation',
 ]

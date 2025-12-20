@@ -2,12 +2,15 @@
 Profile Decorators - 통합 프로필 인증 데코레이터
 
 법인 직원, 법인 관리자, 개인 계정에 대한 통합 인증 처리
+Phase 8: 상수 모듈 적용
+Phase 4.1: PersonalProfile → Profile 마이그레이션 완료
 """
 from functools import wraps
 from flask import session, g, flash, redirect, url_for, current_app
 
+from app.constants.session_keys import SessionKeys, AccountType
 from app.models.employee import Employee
-from app.models.personal.profile import PersonalProfile
+from app.models.profile import Profile
 from app.models.corporate_admin_profile import CorporateAdminProfile
 from app.adapters.profile_adapter import (
     EmployeeProfileAdapter,
@@ -30,9 +33,9 @@ def unified_profile_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        user_id = session.get('user_id')
-        employee_id = session.get('employee_id')
-        account_type = session.get('account_type')
+        user_id = session.get(SessionKeys.USER_ID)
+        employee_id = session.get(SessionKeys.EMPLOYEE_ID)
+        account_type = session.get(SessionKeys.ACCOUNT_TYPE)
 
         # 인증 확인
         if not user_id and not employee_id:
@@ -41,7 +44,7 @@ def unified_profile_required(f):
 
         # 기능 플래그 확인 (비활성화시 기존 라우트로 리다이렉트)
         if not current_app.config.get('ENABLE_UNIFIED_PROFILE', False):
-            if employee_id or account_type == 'corporate':
+            if employee_id or account_type == AccountType.CORPORATE:
                 return redirect(url_for('mypage.company_info'))
             else:
                 return redirect(url_for('personal.profile'))
@@ -51,7 +54,7 @@ def unified_profile_required(f):
             employee = Employee.query.get(employee_id)
             if not employee:
                 flash('직원 정보를 찾을 수 없습니다.', 'error')
-                session.pop('employee_id', None)
+                session.pop(SessionKeys.EMPLOYEE_ID, None)
                 return redirect(url_for('auth.login'))
 
             g.profile = EmployeeProfileAdapter(employee)
@@ -60,7 +63,7 @@ def unified_profile_required(f):
             g.employee = employee
 
         # 법인 관리자 계정 (employee_id 없이 account_type이 corporate인 경우)
-        elif account_type == 'corporate':
+        elif account_type == AccountType.CORPORATE:
             # 법인 관리자 프로필 기능 플래그 확인
             if not current_app.config.get('ENABLE_CORPORATE_ADMIN_PROFILE', False):
                 flash('법인 관리자 프로필 기능이 비활성화되어 있습니다.', 'info')
@@ -78,13 +81,14 @@ def unified_profile_required(f):
             g.is_admin = True
             g.admin_profile = admin_profile
 
-        # 개인 계정 어댑터 생성
+        # 개인 계정 어댑터 생성 (Phase 4.1: 통합 Profile 모델 전용)
         else:
-            profile = PersonalProfile.query.filter_by(user_id=user_id).first()
+            # 통합 Profile 모델 조회
+            profile = Profile.query.filter_by(user_id=user_id).first()
             if not profile:
-                # 프로필이 없으면 기존 프로필 페이지로 리다이렉트
+                # 프로필이 없으면 프로필 수정 페이지로 리다이렉트
                 flash('프로필을 먼저 생성해주세요.', 'info')
-                return redirect(url_for('personal.profile'))
+                return redirect(url_for('personal.profile_edit'))
 
             g.profile = PersonalProfileAdapter(profile)
             g.is_corporate = False

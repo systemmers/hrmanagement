@@ -7,7 +7,7 @@ from app.models import Contract
 from .base_repository import BaseOneToOneRepository
 
 
-class ContractRepository(BaseOneToOneRepository):
+class ContractRepository(BaseOneToOneRepository[Contract]):
     """계약 저장소 (1:1)"""
 
     def __init__(self):

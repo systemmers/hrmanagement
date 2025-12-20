@@ -9,7 +9,7 @@ from app.models import Employee
 from .base_repository import BaseRepository
 
 
-class EmployeeRepository(BaseRepository):
+class EmployeeRepository(BaseRepository[Employee]):
     """직원 저장소 - 멀티테넌시 지원"""
 
     def __init__(self):

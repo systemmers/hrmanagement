@@ -3,9 +3,11 @@ PersonCorporateContract SQLAlchemy Model
 
 개인-법인 간 계약 관계를 관리하는 모델입니다.
 계약 요청, 승인/거절, 데이터 공유 설정 등을 처리합니다.
+Phase 8: DictSerializableMixin 적용 (DataSharingSettings, SyncLog)
 """
 from datetime import datetime
 from app.database import db
+from app.models.mixins import DictSerializableMixin
 
 
 class PersonCorporateContract(db.Model):
@@ -193,9 +195,24 @@ class PersonCorporateContract(db.Model):
         return self.status == self.STATUS_REQUESTED
 
 
-class DataSharingSettings(db.Model):
+class DataSharingSettings(DictSerializableMixin, db.Model):
     """데이터 공유 설정 모델"""
     __tablename__ = 'data_sharing_settings'
+
+    # camelCase 매핑 (from_dict용)
+    __dict_camel_mapping__ = {
+        'contract_id': ['contractId'],
+        'share_basic_info': ['shareBasicInfo'],
+        'share_contact': ['shareContact'],
+        'share_education': ['shareEducation'],
+        'share_career': ['shareCareer'],
+        'share_certificates': ['shareCertificates'],
+        'share_languages': ['shareLanguages'],
+        'share_military': ['shareMilitary'],
+        'is_realtime_sync': ['isRealtimeSync'],
+        'created_at': ['createdAt'],
+        'updated_at': ['updatedAt'],
+    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     contract_id = db.Column(
@@ -224,27 +241,22 @@ class DataSharingSettings(db.Model):
     def __repr__(self):
         return f'<DataSharingSettings contract_id={self.contract_id}>'
 
-    def to_dict(self):
-        """딕셔너리 변환"""
-        return {
-            'id': self.id,
-            'contract_id': self.contract_id,
-            'share_basic_info': self.share_basic_info,
-            'share_contact': self.share_contact,
-            'share_education': self.share_education,
-            'share_career': self.share_career,
-            'share_certificates': self.share_certificates,
-            'share_languages': self.share_languages,
-            'share_military': self.share_military,
-            'is_realtime_sync': self.is_realtime_sync,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-        }
 
-
-class SyncLog(db.Model):
+class SyncLog(DictSerializableMixin, db.Model):
     """동기화 이력 모델"""
     __tablename__ = 'sync_logs'
+
+    # camelCase 매핑 (from_dict용)
+    __dict_camel_mapping__ = {
+        'contract_id': ['contractId'],
+        'sync_type': ['syncType'],
+        'entity_type': ['entityType'],
+        'field_name': ['fieldName'],
+        'old_value': ['oldValue'],
+        'new_value': ['newValue'],
+        'executed_by': ['executedBy'],
+        'executed_at': ['executedAt'],
+    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     contract_id = db.Column(
@@ -273,21 +285,6 @@ class SyncLog(db.Model):
 
     def __repr__(self):
         return f'<SyncLog {self.id}: {self.sync_type} {self.entity_type}>'
-
-    def to_dict(self):
-        """딕셔너리 변환"""
-        return {
-            'id': self.id,
-            'contract_id': self.contract_id,
-            'sync_type': self.sync_type,
-            'entity_type': self.entity_type,
-            'field_name': self.field_name,
-            'old_value': self.old_value,
-            'new_value': self.new_value,
-            'direction': self.direction,
-            'executed_by': self.executed_by,
-            'executed_at': self.executed_at.isoformat() if self.executed_at else None,
-        }
 
     @classmethod
     def create_log(cls, contract_id, sync_type, entity_type, **kwargs):

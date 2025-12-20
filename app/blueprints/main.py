@@ -2,10 +2,12 @@
 메인 페이지 Blueprint
 
 대시보드 및 검색 기능을 제공합니다.
+Phase 2: Service 계층 표준화
 """
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
 
-from ..extensions import employee_repo, classification_repo
+from ..constants.session_keys import SessionKeys, AccountType, UserRole
+from ..services.employee_service import employee_service
 from ..utils.decorators import login_required
 from ..utils.tenant import get_current_organization_id
 
@@ -20,19 +22,19 @@ def index():
     로그인: 계정 유형에 따라 적절한 대시보드로 리다이렉트
     """
     # 비로그인 사용자는 랜딩페이지로
-    if not session.get('user_id'):
+    if not session.get(SessionKeys.USER_ID):
         return render_template('landing.html')
 
-    account_type = session.get('account_type')
+    account_type = session.get(SessionKeys.ACCOUNT_TYPE)
 
     # 개인 계정은 개인 대시보드로
-    if account_type == 'personal':
+    if account_type == AccountType.PERSONAL:
         return redirect(url_for('personal.dashboard'))
 
     # 법인 계정(corporate) 또는 직원 하위계정(employee_sub)인 경우
     # Employee role은 본인 프로필로 리다이렉트 (인사카드는 사이드바에서 접근)
-    if session.get('user_role') == 'employee':
-        employee_id = session.get('employee_id')
+    if session.get(SessionKeys.USER_ROLE) == 'employee':
+        employee_id = session.get(SessionKeys.EMPLOYEE_ID)
         if employee_id:
             return redirect(url_for('profile.view'))
         else:
@@ -44,10 +46,10 @@ def index():
     # 멀티테넌시: 현재 회사의 organization_id로 필터링
     org_id = get_current_organization_id()
 
-    stats = employee_repo.get_statistics(organization_id=org_id)
-    dept_stats = employee_repo.get_department_statistics(organization_id=org_id)
-    recent_employees = employee_repo.get_recent_employees(limit=5, organization_id=org_id)
-    classification_options = classification_repo.get_all_options()
+    stats = employee_service.get_statistics(organization_id=org_id)
+    dept_stats = employee_service.get_department_statistics(organization_id=org_id)
+    recent_employees = employee_service.get_recent_employees(organization_id=org_id, limit=5)
+    classification_options = employee_service.get_all_classification_options()
     return render_template('index.html',
                            stats=stats,
                            dept_stats=dept_stats,
@@ -86,18 +88,18 @@ def search():
 
     # 필터 적용 (organization_id 포함)
     if status_filter or department_filter or position_filter:
-        employees = employee_repo.filter_employees(
+        employees = employee_service.filter_employees(
             organization_id=org_id,
             department=department_filter if department_filter else None,
             position=position_filter if position_filter else None,
             status=status_filter if status_filter else None
         )
     elif query:
-        employees = employee_repo.search(query, organization_id=org_id)
+        employees = employee_service.search_employees(query, organization_id=org_id)
     else:
-        employees = employee_repo.get_all(organization_id=org_id)
+        employees = employee_service.get_all_employees(organization_id=org_id)
 
-    stats = employee_repo.get_statistics(organization_id=org_id)
+    stats = employee_service.get_statistics(organization_id=org_id)
 
     # AJAX 요청인 경우 JSON 반환
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -106,9 +108,9 @@ def search():
             'stats': stats
         })
 
-    dept_stats = employee_repo.get_department_statistics(organization_id=org_id)
-    recent_employees = employee_repo.get_recent_employees(limit=5, organization_id=org_id)
-    classification_options = classification_repo.get_all_options()
+    dept_stats = employee_service.get_department_statistics(organization_id=org_id)
+    recent_employees = employee_service.get_recent_employees(organization_id=org_id, limit=5)
+    classification_options = employee_service.get_all_classification_options()
     return render_template('index.html',
                            employees=employees,
                            stats=stats,

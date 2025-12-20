@@ -9,7 +9,7 @@ from app.models import HrProject
 from .base_repository import BaseRelationRepository
 
 
-class HrProjectRepository(BaseRelationRepository):
+class HrProjectRepository(BaseRelationRepository[HrProject]):
     """인사이력 프로젝트 저장소"""
 
     def __init__(self):

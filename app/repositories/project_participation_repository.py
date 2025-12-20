@@ -9,7 +9,7 @@ from app.models import ProjectParticipation
 from .base_repository import BaseRelationRepository
 
 
-class ProjectParticipationRepository(BaseRelationRepository):
+class ProjectParticipationRepository(BaseRelationRepository[ProjectParticipation]):
     """프로젝트 참여이력 저장소"""
 
     def __init__(self):

@@ -7,7 +7,7 @@ from app.models import SalaryHistory
 from .base_repository import BaseRelationRepository
 
 
-class SalaryHistoryRepository(BaseRelationRepository):
+class SalaryHistoryRepository(BaseRelationRepository[SalaryHistory]):
     """급여 이력 저장소"""
 
     def __init__(self):

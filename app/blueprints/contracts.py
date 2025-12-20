@@ -7,9 +7,11 @@
 
 Phase 6: 백엔드 리팩토링 - contract_helpers 적용
 Phase 7: Service 레이어 적용 - ContractService 도입
+Phase 8: 상수 모듈 적용
 """
 from flask import Blueprint, render_template, request, jsonify, session, flash, redirect, url_for
 
+from ..constants.session_keys import SessionKeys
 from ..services import contract_service
 from ..utils.decorators import (
     login_required,
@@ -37,7 +39,7 @@ def my_contracts():
 
     21번 원칙: personal, employee_sub 계정 모두 지원
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     contracts = contract_service.get_personal_contracts(user_id)
     stats = contract_service.get_personal_statistics(user_id)
 
@@ -56,7 +58,7 @@ def pending_contracts():
 
     21번 원칙: personal, employee_sub 계정 모두 지원
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     contracts = contract_service.get_personal_pending_contracts(user_id)
 
     return render_template(
@@ -101,7 +103,7 @@ def contract_detail(contract_id):
 @corporate_account_required
 def company_contracts():
     """법인 계약 목록"""
-    company_id = session.get('company_id')
+    company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
         flash('법인 정보가 없습니다.', 'error')
         return redirect(url_for('main.index'))
@@ -121,7 +123,7 @@ def company_contracts():
 @corporate_account_required
 def company_pending():
     """법인 대기 중인 요청"""
-    company_id = session.get('company_id')
+    company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
         flash('법인 정보가 없습니다.', 'error')
         return redirect(url_for('main.index'))
@@ -139,7 +141,7 @@ def company_pending():
 @corporate_account_required
 def request_contract():
     """계약 요청 (법인 -> 개인)"""
-    company_id = session.get('company_id')
+    company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
         flash('법인 정보가 없습니다.', 'error')
         return redirect(url_for('main.index'))
@@ -177,7 +179,7 @@ def request_contract():
 @approve_reject_permission_required
 def api_approve_contract(contract, contract_id):
     """계약 승인 API"""
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
 
     success, result, error = contract_service.approve_contract(contract_id, user_id)
     if success:
@@ -190,7 +192,7 @@ def api_approve_contract(contract, contract_id):
 @approve_reject_permission_required
 def api_reject_contract(contract, contract_id):
     """계약 거절 API"""
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     data = request.get_json() or {}
     reason = data.get('reason')
 
@@ -205,7 +207,7 @@ def api_reject_contract(contract, contract_id):
 @contract_party_required
 def api_terminate_contract(contract, contract_id):
     """계약 종료 API"""
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     data = request.get_json() or {}
     reason = data.get('reason')
 
@@ -258,7 +260,7 @@ def api_sync_logs(contract, contract_id):
 @corporate_account_required
 def api_search_contracts():
     """계약 검색 API (법인용)"""
-    company_id = session.get('company_id')
+    company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
         return api_error('법인 정보가 없습니다.')
 
@@ -281,7 +283,7 @@ def api_search_contracts():
 @corporate_account_required
 def api_company_stats():
     """법인 계약 통계 API"""
-    company_id = session.get('company_id')
+    company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
         return api_error('법인 정보가 없습니다.')
 
@@ -294,7 +296,7 @@ def api_company_stats():
 @personal_or_employee_account_required
 def api_personal_stats():
     """개인/직원 계약 통계 API (21번 원칙)"""
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     stats = contract_service.get_personal_statistics(user_id)
     return api_success(stats)
 
@@ -309,7 +311,7 @@ def api_request_employee_contract(user_id):
 
     직원 목록에서 계약 요청 버튼 클릭 시 호출
     """
-    company_id = session.get('company_id')
+    company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
         return api_error('법인 정보가 없습니다.')
 

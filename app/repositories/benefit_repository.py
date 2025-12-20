@@ -7,7 +7,7 @@ from app.models import Benefit
 from .base_repository import BaseOneToOneRepository
 
 
-class BenefitRepository(BaseOneToOneRepository):
+class BenefitRepository(BaseOneToOneRepository[Benefit]):
     """복리후생 저장소 (1:1)"""
 
     def __init__(self):

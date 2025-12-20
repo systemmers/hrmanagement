@@ -10,7 +10,7 @@ from app.models import Profile
 from .base_repository import BaseRepository
 
 
-class ProfileRepository(BaseRepository):
+class ProfileRepository(BaseRepository[Profile]):
     """통합 프로필 Repository"""
 
     def __init__(self):

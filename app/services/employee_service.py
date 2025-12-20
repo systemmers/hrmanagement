@@ -7,18 +7,24 @@ Employee Service
 - 멀티테넌시 접근 제어
 
 PersonalService와 동일한 아키텍처 패턴을 적용합니다.
+Phase 2: Service 계층 표준화 - 조회 메서드 추가
+Phase 4.2: SOLID 원칙 적용 - RelationDataUpdater 통합
 """
-from typing import Dict, Optional, Tuple, List, Any
+from typing import Any, Dict, List, Optional, Tuple
 from flask import request
 
 from app.database import db
-from app.models import Employee
+from app.models import Employee, MilitaryService
 from app.utils.tenant import get_current_organization_id
 from app.extensions import (
     employee_repo, family_repo, education_repo, career_repo,
     certificate_repo, language_repo, military_repo,
-    hr_project_repo, project_participation_repo, award_repo, attachment_repo
+    hr_project_repo, project_participation_repo, award_repo, attachment_repo,
+    salary_repo, benefit_repo, contract_repo, salary_history_repo,
+    promotion_repo, evaluation_repo, training_repo, attendance_repo,
+    insurance_repo, asset_repo, salary_payment_repo, classification_repo
 )
+from app.services.base import relation_updater, get_relation_config, SUPPORTED_RELATION_TYPES
 
 
 class EmployeeService:
@@ -36,6 +42,30 @@ class EmployeeService:
         self.project_participation_repo = project_participation_repo
         self.award_repo = award_repo
         self.attachment_repo = attachment_repo
+        self.salary_repo = salary_repo
+        self.benefit_repo = benefit_repo
+        self.contract_repo = contract_repo
+        self.salary_history_repo = salary_history_repo
+        self.promotion_repo = promotion_repo
+        self.evaluation_repo = evaluation_repo
+        self.training_repo = training_repo
+        self.attendance_repo = attendance_repo
+        self.insurance_repo = insurance_repo
+        self.asset_repo = asset_repo
+        self.salary_payment_repo = salary_payment_repo
+        self.classification_repo = classification_repo
+
+    def _get_repositories(self) -> Dict[str, Any]:
+        """RelationDataUpdater용 Repository 딕셔너리 반환"""
+        return {
+            'education': self.education_repo,
+            'career': self.career_repo,
+            'certificate': self.certificate_repo,
+            'language': self.language_repo,
+            'family': self.family_repo,
+            'award': self.award_repo,
+            'project_participation': self.project_participation_repo,
+        }
 
     # ========================================
     # 멀티테넌시 접근 제어
@@ -68,6 +98,208 @@ class EmployeeService:
         if not org_id:
             return []
         return self.employee_repo.get_by_company_id(org_id)
+
+    def get_employee_by_id(self, employee_id: int) -> Optional[Dict]:
+        """직원 ID로 조회 (Dict 반환)"""
+        return self.employee_repo.get_by_id(employee_id)
+
+    def get_employee_model_by_id(self, employee_id: int) -> Optional[Employee]:
+        """직원 ID로 모델 조회"""
+        return self.employee_repo.get_model_by_id(employee_id)
+
+    def filter_employees(self, **kwargs) -> List[Dict]:
+        """직원 필터링 조회"""
+        return self.employee_repo.filter_employees(**kwargs)
+
+    def get_all_employees(self, organization_id: int = None) -> List[Dict]:
+        """전체 직원 조회"""
+        return self.employee_repo.get_all(organization_id=organization_id)
+
+    def verify_ownership(self, employee_id: int, org_id: int) -> bool:
+        """직원 소유권 확인"""
+        return self.employee_repo.verify_ownership(employee_id, org_id)
+
+    # ========================================
+    # 직원 CRUD (직접 호출 - Blueprint용)
+    # ========================================
+
+    def create_employee_direct(self, employee_data: Dict) -> Dict:
+        """직원 생성 (Dict 데이터로 직접 생성)
+
+        Args:
+            employee_data: 직원 정보 Dict
+
+        Returns:
+            생성된 직원 Dict
+        """
+        return self.employee_repo.create(employee_data)
+
+    def update_employee_direct(self, employee_id: int, employee: Any) -> Optional[Any]:
+        """직원 수정 (모델 객체로 직접 수정)
+
+        Args:
+            employee_id: 직원 ID
+            employee: Employee 모델 객체
+
+        Returns:
+            수정된 Employee 또는 None
+        """
+        return self.employee_repo.update(employee_id, employee)
+
+    def update_employee_partial(self, employee_id: int, fields: Dict) -> Optional[Any]:
+        """직원 부분 수정
+
+        Args:
+            employee_id: 직원 ID
+            fields: 수정할 필드 Dict
+
+        Returns:
+            수정된 Employee 또는 None
+        """
+        return self.employee_repo.update_partial(employee_id, fields)
+
+    def delete_employee_direct(self, employee_id: int) -> bool:
+        """직원 삭제 (직접 호출)
+
+        Args:
+            employee_id: 직원 ID
+
+        Returns:
+            삭제 성공 여부
+        """
+        return self.employee_repo.delete(employee_id)
+
+    # ========================================
+    # 관계형 데이터 조회
+    # ========================================
+
+    def get_education_list(self, employee_id: int) -> List[Dict]:
+        """학력 목록 조회"""
+        return self.education_repo.get_by_employee_id(employee_id)
+
+    def get_career_list(self, employee_id: int) -> List[Dict]:
+        """경력 목록 조회"""
+        return self.career_repo.get_by_employee_id(employee_id)
+
+    def get_certificate_list(self, employee_id: int) -> List[Dict]:
+        """자격증 목록 조회"""
+        return self.certificate_repo.get_by_employee_id(employee_id)
+
+    def get_family_list(self, employee_id: int) -> List[Dict]:
+        """가족 목록 조회"""
+        return self.family_repo.get_by_employee_id(employee_id)
+
+    def get_language_list(self, employee_id: int) -> List[Dict]:
+        """어학 목록 조회"""
+        return self.language_repo.get_by_employee_id(employee_id)
+
+    def get_military_info(self, employee_id: int) -> Optional[Dict]:
+        """병역 정보 조회"""
+        return self.military_repo.get_by_employee_id(employee_id)
+
+    def get_salary_info(self, employee_id: int) -> Optional[Dict]:
+        """급여 정보 조회"""
+        return self.salary_repo.get_by_employee_id(employee_id)
+
+    def get_benefit_info(self, employee_id: int) -> Optional[Dict]:
+        """복리후생 정보 조회"""
+        return self.benefit_repo.get_by_employee_id(employee_id)
+
+    def get_contract_info(self, employee_id: int) -> Optional[Dict]:
+        """계약 정보 조회"""
+        return self.contract_repo.get_by_employee_id(employee_id)
+
+    def get_salary_history_list(self, employee_id: int) -> List[Dict]:
+        """급여 이력 조회"""
+        return self.salary_history_repo.get_by_employee_id(employee_id)
+
+    def get_promotion_list(self, employee_id: int) -> List[Dict]:
+        """승진 이력 조회"""
+        return self.promotion_repo.get_by_employee_id(employee_id)
+
+    def get_evaluation_list(self, employee_id: int) -> List[Dict]:
+        """평가 이력 조회"""
+        return self.evaluation_repo.get_by_employee_id(employee_id)
+
+    def get_training_list(self, employee_id: int) -> List[Dict]:
+        """교육 이력 조회"""
+        return self.training_repo.get_by_employee_id(employee_id)
+
+    def get_attendance_summary(self, employee_id: int, year: int) -> Optional[Dict]:
+        """근태 요약 조회"""
+        return self.attendance_repo.get_summary_by_employee(employee_id, year)
+
+    def get_insurance_info(self, employee_id: int) -> Optional[Dict]:
+        """보험 정보 조회"""
+        return self.insurance_repo.get_by_employee_id(employee_id)
+
+    def get_hr_project_list(self, employee_id: int) -> List[Dict]:
+        """인사 프로젝트 목록 조회"""
+        return self.hr_project_repo.get_by_employee_id(employee_id)
+
+    def get_project_participation_list(self, employee_id: int) -> List[Dict]:
+        """프로젝트 참여 목록 조회"""
+        return self.project_participation_repo.get_by_employee_id(employee_id)
+
+    def get_award_list(self, employee_id: int) -> List[Dict]:
+        """수상 목록 조회"""
+        return self.award_repo.get_by_employee_id(employee_id)
+
+    def get_asset_list(self, employee_id: int) -> List[Dict]:
+        """자산 목록 조회"""
+        return self.asset_repo.get_by_employee_id(employee_id)
+
+    def get_salary_payment_list(self, employee_id: int) -> List[Dict]:
+        """급여 지급 목록 조회"""
+        return self.salary_payment_repo.get_by_employee_id(employee_id)
+
+    def get_attachment_list(self, employee_id: int) -> List[Dict]:
+        """첨부파일 목록 조회"""
+        return self.attachment_repo.get_by_employee_id(employee_id)
+
+    def get_attachment_by_category(self, employee_id: int, category: str) -> Optional[Dict]:
+        """카테고리별 첨부파일 조회"""
+        return self.attachment_repo.get_one_by_category(employee_id, category)
+
+    def get_classification_options(self) -> List[Dict]:
+        """분류 옵션 조회"""
+        return self.classification_repo.get_all()
+
+    def get_all_classification_options(self) -> Dict:
+        """전체 분류 옵션 조회 (카테고리별)"""
+        return self.classification_repo.get_all_options()
+
+    # ========================================
+    # 첨부파일 관리
+    # ========================================
+
+    def create_attachment(self, attachment_data: Dict) -> Dict:
+        """첨부파일 생성"""
+        return self.attachment_repo.create(attachment_data)
+
+    def get_attachment_by_id(self, attachment_id: int) -> Optional[Dict]:
+        """첨부파일 ID로 조회"""
+        return self.attachment_repo.get_by_id(attachment_id)
+
+    def delete_attachment(self, attachment_id: int) -> bool:
+        """첨부파일 삭제"""
+        return self.attachment_repo.delete(attachment_id)
+
+    def delete_attachment_by_category(self, employee_id: int, category: str) -> bool:
+        """카테고리별 첨부파일 삭제"""
+        return self.attachment_repo.delete_by_category(employee_id, category)
+
+    # ========================================
+    # 병역 정보 관리
+    # ========================================
+
+    def delete_military_info(self, employee_id: int) -> bool:
+        """병역 정보 삭제"""
+        return self.military_repo.delete_by_employee_id(employee_id)
+
+    def create_military_info(self, military_data) -> Any:
+        """병역 정보 생성"""
+        return self.military_repo.create(military_data)
 
     def create_employee(self, form_data: Dict) -> Tuple[bool, Optional[Employee], Optional[str]]:
         """직원 생성
@@ -167,51 +399,33 @@ class EmployeeService:
             return False, str(e)
 
     # ========================================
-    # 관계형 데이터 개별 수정
+    # 관계형 데이터 개별 수정 (RelationDataUpdater 사용)
     # ========================================
+
+    def _update_relation(self, relation_type: str, employee_id: int,
+                         form_data: Dict) -> Tuple[bool, Optional[str]]:
+        """관계형 데이터 범용 수정 (내부 헬퍼)"""
+        config = get_relation_config(relation_type, self._get_repositories())
+        return relation_updater.update_with_commit(employee_id, form_data, config)
 
     def update_education(self, employee_id: int, form_data: Dict) -> Tuple[bool, Optional[str]]:
         """학력 정보 수정"""
-        try:
-            self._update_education_data(employee_id, form_data)
-            db.session.commit()
-            return True, None
-        except Exception as e:
-            db.session.rollback()
-            return False, str(e)
+        return self._update_relation('education', employee_id, form_data)
 
     def update_career(self, employee_id: int, form_data: Dict) -> Tuple[bool, Optional[str]]:
         """경력 정보 수정"""
-        try:
-            self._update_career_data(employee_id, form_data)
-            db.session.commit()
-            return True, None
-        except Exception as e:
-            db.session.rollback()
-            return False, str(e)
+        return self._update_relation('career', employee_id, form_data)
 
     def update_certificate(self, employee_id: int, form_data: Dict) -> Tuple[bool, Optional[str]]:
         """자격증 정보 수정"""
-        try:
-            self._update_certificate_data(employee_id, form_data)
-            db.session.commit()
-            return True, None
-        except Exception as e:
-            db.session.rollback()
-            return False, str(e)
+        return self._update_relation('certificate', employee_id, form_data)
 
     def update_language(self, employee_id: int, form_data: Dict) -> Tuple[bool, Optional[str]]:
         """어학 정보 수정"""
-        try:
-            self._update_language_data(employee_id, form_data)
-            db.session.commit()
-            return True, None
-        except Exception as e:
-            db.session.rollback()
-            return False, str(e)
+        return self._update_relation('language', employee_id, form_data)
 
     def update_military(self, employee_id: int, form_data: Dict) -> Tuple[bool, Optional[str]]:
-        """병역 정보 수정"""
+        """병역 정보 수정 (특수 처리: 1:1 관계)"""
         try:
             self._update_military_data(employee_id, form_data)
             db.session.commit()
@@ -222,33 +436,15 @@ class EmployeeService:
 
     def update_family(self, employee_id: int, form_data: Dict) -> Tuple[bool, Optional[str]]:
         """가족 정보 수정"""
-        try:
-            self._update_family_data(employee_id, form_data)
-            db.session.commit()
-            return True, None
-        except Exception as e:
-            db.session.rollback()
-            return False, str(e)
+        return self._update_relation('family', employee_id, form_data)
 
     def update_project(self, employee_id: int, form_data: Dict) -> Tuple[bool, Optional[str]]:
         """프로젝트 정보 수정"""
-        try:
-            self._update_project_data(employee_id, form_data)
-            db.session.commit()
-            return True, None
-        except Exception as e:
-            db.session.rollback()
-            return False, str(e)
+        return self._update_relation('project_participation', employee_id, form_data)
 
     def update_award(self, employee_id: int, form_data: Dict) -> Tuple[bool, Optional[str]]:
         """수상 정보 수정"""
-        try:
-            self._update_award_data(employee_id, form_data)
-            db.session.commit()
-            return True, None
-        except Exception as e:
-            db.session.rollback()
-            return False, str(e)
+        return self._update_relation('award', employee_id, form_data)
 
     # ========================================
     # Private: 폼 데이터 처리
@@ -314,117 +510,27 @@ class EmployeeService:
         }
 
     # ========================================
-    # Private: 관계형 데이터 업데이트
+    # Private: 관계형 데이터 업데이트 (RelationDataUpdater 사용)
     # ========================================
 
     def _update_all_related_data(self, employee_id: int, form_data: Dict):
-        """모든 관계형 데이터 일괄 업데이트"""
-        self._update_family_data(employee_id, form_data)
-        self._update_education_data(employee_id, form_data)
-        self._update_career_data(employee_id, form_data)
-        self._update_certificate_data(employee_id, form_data)
-        self._update_language_data(employee_id, form_data)
+        """모든 관계형 데이터 일괄 업데이트
+
+        RelationDataUpdater를 사용하여 7개 관계 타입을 처리합니다.
+        병역 정보는 1:1 관계이므로 별도 처리합니다.
+        """
+        repos = self._get_repositories()
+
+        # 1:N 관계 데이터 일괄 처리
+        for relation_type in SUPPORTED_RELATION_TYPES:
+            config = get_relation_config(relation_type, repos)
+            relation_updater.update(employee_id, form_data, config)
+
+        # 1:1 관계 (병역) 별도 처리
         self._update_military_data(employee_id, form_data)
-        self._update_project_data(employee_id, form_data)
-        self._update_award_data(employee_id, form_data)
-
-    def _update_family_data(self, employee_id: int, form_data: Dict):
-        """가족 정보 업데이트"""
-        from app.models import FamilyMember
-        self._update_related_data(
-            employee_id, form_data,
-            model_class=FamilyMember,
-            repository=self.family_repo,
-            form_prefix='family_',
-            required_field='name',
-            field_mapping={
-                'relation': 'relation',
-                'name': 'name',
-                'birth_date': 'birth_date',
-                'occupation': 'occupation',
-                'phone': 'contact',
-                'cohabiting': 'is_cohabitant',
-            },
-            converters={'is_cohabitant': bool}
-        )
-
-    def _update_education_data(self, employee_id: int, form_data: Dict):
-        """학력 정보 업데이트"""
-        from app.models import Education
-        self._update_related_data(
-            employee_id, form_data,
-            model_class=Education,
-            repository=self.education_repo,
-            form_prefix='education_',
-            required_field='school_name',
-            field_mapping={
-                'school_type': 'school_type',
-                'school_name': 'school_name',
-                'graduation_year': 'graduation_date',
-                'major': 'major',
-                'degree': 'degree',
-                'graduation_status': 'graduation_status',
-            }
-        )
-
-    def _update_career_data(self, employee_id: int, form_data: Dict):
-        """경력 정보 업데이트"""
-        from app.models import Career
-        self._update_related_data(
-            employee_id, form_data,
-            model_class=Career,
-            repository=self.career_repo,
-            form_prefix='career_',
-            required_field='company_name',
-            field_mapping={
-                'company_name': 'company_name',
-                'start_date': 'start_date',
-                'end_date': 'end_date',
-                'department': 'department',
-                'position': 'position',
-                'duties': 'job_description',
-            }
-        )
-
-    def _update_certificate_data(self, employee_id: int, form_data: Dict):
-        """자격증 정보 업데이트"""
-        from app.models import Certificate
-        self._update_related_data(
-            employee_id, form_data,
-            model_class=Certificate,
-            repository=self.certificate_repo,
-            form_prefix='certificate_',
-            required_field='name',
-            field_mapping={
-                'name': 'certificate_name',
-                'grade': 'grade',
-                'issuer': 'issuing_organization',
-                'number': 'certificate_number',
-                'date': 'acquisition_date',
-            }
-        )
-
-    def _update_language_data(self, employee_id: int, form_data: Dict):
-        """어학 정보 업데이트"""
-        from app.models import Language
-        self._update_related_data(
-            employee_id, form_data,
-            model_class=Language,
-            repository=self.language_repo,
-            form_prefix='language_',
-            required_field='name',
-            field_mapping={
-                'name': 'language',
-                'level': 'level',
-                'test_name': 'test_name',
-                'score': 'score',
-                'test_date': 'test_date',
-            }
-        )
 
     def _update_military_data(self, employee_id: int, form_data: Dict):
-        """병역 정보 업데이트"""
-        from app.models import MilitaryService
+        """병역 정보 업데이트 (1:1 관계, 특수 처리)"""
         self.military_repo.delete_by_employee_id(employee_id)
 
         military_status = form_data.get('military_status')
@@ -440,76 +546,25 @@ class EmployeeService:
             )
             self.military_repo.create(military)
 
-    def _update_project_data(self, employee_id: int, form_data: Dict):
-        """프로젝트 정보 업데이트"""
-        from app.models import Project
-        self._update_related_data(
-            employee_id, form_data,
-            model_class=Project,
-            repository=self.project_repo,
-            form_prefix='project_',
-            required_field='name',
-            field_mapping={
-                'name': 'project_name',
-                'start_date': 'start_date',
-                'end_date': 'end_date',
-                'duties': 'duties',
-                'role': 'role',
-                'client': 'client',
-            }
-        )
+    # ========================================
+    # 대시보드/검색용 메서드 (main.py용)
+    # ========================================
 
-    def _update_award_data(self, employee_id: int, form_data: Dict):
-        """수상 정보 업데이트"""
-        from app.models import Award
-        self._update_related_data(
-            employee_id, form_data,
-            model_class=Award,
-            repository=self.award_repo,
-            form_prefix='award_',
-            required_field='name',
-            field_mapping={
-                'date': 'award_date',
-                'name': 'award_name',
-                'issuer': 'issuer',
-                'note': 'note',
-            }
-        )
+    def get_statistics(self, organization_id: int = None) -> Dict:
+        """직원 통계 조회"""
+        return self.employee_repo.get_statistics(organization_id=organization_id)
 
-    def _update_related_data(self, employee_id: int, form_data: Dict,
-                             model_class, repository, form_prefix: str,
-                             required_field: str, field_mapping: Dict,
-                             converters: Dict = None):
-        """관계형 데이터 범용 업데이트"""
-        converters = converters or {}
+    def get_department_statistics(self, organization_id: int = None) -> List[Dict]:
+        """부서별 통계 조회"""
+        return self.employee_repo.get_department_statistics(organization_id=organization_id)
 
-        # 기존 데이터 삭제
-        repository.delete_by_employee_id(employee_id)
+    def get_recent_employees(self, organization_id: int = None, limit: int = 5) -> List[Dict]:
+        """최근 입사 직원 조회"""
+        return self.employee_repo.get_recent_employees(limit=limit, organization_id=organization_id)
 
-        # 폼 데이터 추출
-        form_lists = {}
-        for field_suffix in field_mapping.keys():
-            form_key = f"{form_prefix}{field_suffix}[]"
-            form_lists[field_suffix] = form_data.getlist(form_key)
-
-        # 필수 필드 리스트를 기준으로 반복
-        required_values = form_lists.get(required_field, [])
-
-        for i in range(len(required_values)):
-            if required_values[i]:
-                model_data = {'employee_id': employee_id}
-
-                for field_suffix, model_attr in field_mapping.items():
-                    values = form_lists.get(field_suffix, [])
-                    value = values[i] if i < len(values) else None
-
-                    if model_attr in converters and value is not None:
-                        value = converters[model_attr](value)
-
-                    model_data[model_attr] = value
-
-                instance = model_class(**model_data)
-                repository.create(instance)
+    def search_employees(self, query: str, organization_id: int = None) -> List[Dict]:
+        """직원 검색"""
+        return self.employee_repo.search(query, organization_id=organization_id)
 
 
 # 싱글턴 인스턴스

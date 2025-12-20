@@ -7,7 +7,7 @@ from app.models import Insurance
 from .base_repository import BaseOneToOneRepository
 
 
-class InsuranceRepository(BaseOneToOneRepository):
+class InsuranceRepository(BaseOneToOneRepository[Insurance]):
     """보험 저장소 (1:1)"""
 
     def __init__(self):

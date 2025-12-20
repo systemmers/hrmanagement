@@ -3,15 +3,17 @@
 
 직원 생성, 수정, 삭제 처리를 담당합니다.
 21번/22번 원칙: 직원 등록 시 계정 동시 생성 지원
+Phase 8: 상수 모듈 적용
 """
 import os
 from datetime import datetime
 from flask import Blueprint, request, redirect, url_for, flash, session
 
+from ...constants.session_keys import SessionKeys, UserRole
 from ...utils.employee_number import generate_employee_number
 from ...utils.decorators import login_required, admin_required, manager_or_admin_required
 from ...utils.tenant import get_current_organization_id
-from ...extensions import employee_repo, attachment_repo
+from ...services.employee_service import employee_service
 from ...services import employee_account_service
 from .helpers import (
     verify_employee_access, extract_employee_from_form, extract_basic_fields_from_form,
@@ -41,8 +43,8 @@ def register_mutation_routes(bp: Blueprint):
             # 계정 생성 여부 확인
             create_account = request.form.get('create_account') == 'true'
             org_id = get_current_organization_id()
-            company_id = session.get('company_id')
-            admin_user_id = session.get('user_id')
+            company_id = session.get(SessionKeys.COMPANY_ID)
+            admin_user_id = session.get(SessionKeys.USER_ID)
 
             if create_account and company_id:
                 # === 계정과 함께 직원 생성 (21번/22번 원칙) ===
@@ -81,9 +83,9 @@ def register_mutation_routes(bp: Blueprint):
                 if org_id and not employee.organization_id:
                     employee.organization_id = org_id
 
-                # Employee 객체를 Dict로 변환하여 repository에 전달
+                # Employee 객체를 Dict로 변환하여 service에 전달
                 employee_data = employee.to_dict() if hasattr(employee, 'to_dict') else vars(employee)
-                created_employee = employee_repo.create(employee_data)
+                created_employee = employee_service.create_employee_direct(employee_data)
                 employee_id = created_employee['id']
 
                 # 프로필 사진 파일 처리
@@ -110,24 +112,24 @@ def register_mutation_routes(bp: Blueprint):
     @login_required
     def employee_update(employee_id):
         """직원 수정 처리 (멀티테넌시 적용)"""
-        user_role = session.get('user_role')
+        user_role = session.get(SessionKeys.USER_ROLE)
 
         # Employee role은 본인 정보만 수정 가능
-        if user_role == 'employee':
-            my_employee_id = session.get('employee_id')
+        if user_role == UserRole.EMPLOYEE:
+            my_employee_id = session.get(SessionKeys.EMPLOYEE_ID)
             if my_employee_id != employee_id:
                 flash('본인 정보만 수정할 수 있습니다.', 'warning')
                 return redirect(url_for('employees.employee_edit', employee_id=my_employee_id))
 
         # 관리자/매니저는 자사 소속 직원만 수정 가능
-        if user_role in ['admin', 'manager']:
+        if user_role in [UserRole.ADMIN, UserRole.MANAGER]:
             if not verify_employee_access(employee_id):
                 flash('접근 권한이 없습니다.', 'error')
                 return redirect(url_for('main.index'))
 
         try:
             employee = extract_employee_from_form(request.form, employee_id=employee_id)
-            updated_employee = employee_repo.update(employee_id, employee)
+            updated_employee = employee_service.update_employee_direct(employee_id, employee)
             if updated_employee:
                 flash(f'{updated_employee.name} 직원 정보가 수정되었습니다.', 'success')
                 return redirect(url_for('employees.employee_detail', employee_id=employee_id))
@@ -143,22 +145,22 @@ def register_mutation_routes(bp: Blueprint):
     @login_required
     def employee_update_basic(employee_id):
         """기본정보 전용 수정 처리"""
-        user_role = session.get('user_role')
+        user_role = session.get(SessionKeys.USER_ROLE)
 
-        if user_role == 'employee':
-            my_employee_id = session.get('employee_id')
+        if user_role == UserRole.EMPLOYEE:
+            my_employee_id = session.get(SessionKeys.EMPLOYEE_ID)
             if my_employee_id != employee_id:
                 flash('본인 정보만 수정할 수 있습니다.', 'warning')
                 return redirect(url_for('employees.employee_edit', employee_id=my_employee_id))
 
-        if user_role in ['admin', 'manager']:
+        if user_role in [UserRole.ADMIN, UserRole.MANAGER]:
             if not verify_employee_access(employee_id):
                 flash('접근 권한이 없습니다.', 'error')
                 return redirect(url_for('main.index'))
 
         try:
             basic_fields = extract_basic_fields_from_form(request.form)
-            updated_employee = employee_repo.update_partial(employee_id, basic_fields)
+            updated_employee = employee_service.update_employee_partial(employee_id, basic_fields)
             update_family_data(employee_id, request.form)
 
             if updated_employee:
@@ -176,15 +178,15 @@ def register_mutation_routes(bp: Blueprint):
     @login_required
     def employee_update_history(employee_id):
         """이력정보 전용 수정 처리"""
-        user_role = session.get('user_role')
+        user_role = session.get(SessionKeys.USER_ROLE)
 
-        if user_role == 'employee':
-            my_employee_id = session.get('employee_id')
+        if user_role == UserRole.EMPLOYEE:
+            my_employee_id = session.get(SessionKeys.EMPLOYEE_ID)
             if my_employee_id != employee_id:
                 flash('본인 정보만 수정할 수 있습니다.', 'warning')
                 return redirect(url_for('employees.employee_edit', employee_id=my_employee_id))
 
-        if user_role in ['admin', 'manager']:
+        if user_role in [UserRole.ADMIN, UserRole.MANAGER]:
             if not verify_employee_access(employee_id):
                 flash('접근 권한이 없습니다.', 'error')
                 return redirect(url_for('main.index'))
@@ -219,10 +221,11 @@ def register_mutation_routes(bp: Blueprint):
             return redirect(url_for('main.index'))
 
         try:
-            employee = employee_repo.get_by_id(employee_id)
+            employee = employee_service.get_employee_by_id(employee_id)
             if employee:
-                if employee_repo.delete(employee_id):
-                    flash(f'{employee.name} 직원이 삭제되었습니다.', 'success')
+                if employee_service.delete_employee_direct(employee_id):
+                    employee_name = employee.get('name') if isinstance(employee, dict) else employee.name
+                    flash(f'{employee_name} 직원이 삭제되었습니다.', 'success')
                 else:
                     flash('직원 삭제에 실패했습니다.', 'error')
             else:
@@ -275,7 +278,7 @@ def _handle_profile_photo_upload(employee_id):
         'category': 'profile_photo',
         'uploadDate': datetime.now().strftime('%Y-%m-%d')
     }
-    attachment_repo.create(attachment_data)
+    employee_service.create_attachment(attachment_data)
     return True
 
 
@@ -320,7 +323,7 @@ def _handle_business_card_upload(employee_id):
             'category': f'business_card_{side.lower()}',
             'uploadDate': datetime.now().strftime('%Y-%m-%d')
         }
-        attachment_repo.create(attachment_data)
+        employee_service.create_attachment(attachment_data)
         uploaded = True
 
     return uploaded

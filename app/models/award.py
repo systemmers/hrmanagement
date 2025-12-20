@@ -2,42 +2,43 @@
 Award SQLAlchemy 모델
 
 직원 수상 정보를 관리합니다.
+
+Phase 8 리팩토링: DictSerializableMixin 적용
 """
 from app.database import db
+from app.models.mixins import DictSerializableMixin
 
 
-class Award(db.Model):
+class Award(DictSerializableMixin, db.Model):
     """수상 모델"""
     __tablename__ = 'awards'
 
+    # ====================================
+    # Mixin 설정
+    # ====================================
+
+    __dict_aliases__ = {
+        'notes': 'note',                       # Personal 호환
+    }
+
+    __dict_camel_mapping__ = {
+        'employee_id': ['employeeId'],
+        'profile_id': ['profileId'],
+        'award_date': ['awardDate'],
+        'award_name': ['awardName'],
+    }
+
+    # ====================================
+    # 컬럼 정의
+    # ====================================
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, index=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=True, index=True)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.id', ondelete='CASCADE'), nullable=True, index=True)
     award_date = db.Column(db.String(20), nullable=True)
     award_name = db.Column(db.String(200), nullable=True)
     institution = db.Column(db.String(200), nullable=True)
     note = db.Column(db.Text, nullable=True)
-
-    def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
-        return {
-            'id': self.id,
-            'employee_id': self.employee_id,
-            'award_date': self.award_date,
-            'award_name': self.award_name,
-            'institution': self.institution,
-            'note': self.note,
-        }
-
-    @classmethod
-    def from_dict(cls, data):
-        """딕셔너리에서 모델 생성"""
-        return cls(
-            employee_id=data.get('employee_id') or data.get('employeeId'),
-            award_date=data.get('award_date') or data.get('awardDate'),
-            award_name=data.get('award_name') or data.get('awardName'),
-            institution=data.get('institution'),
-            note=data.get('note'),
-        )
 
     def __repr__(self):
         return f'<Award {self.id}: {self.award_name}>'

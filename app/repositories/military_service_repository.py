@@ -7,7 +7,7 @@ from app.models import MilitaryService
 from .base_repository import BaseOneToOneRepository
 
 
-class MilitaryServiceRepository(BaseOneToOneRepository):
+class MilitaryServiceRepository(BaseOneToOneRepository[MilitaryService]):
     """병역 저장소 (1:1)"""
 
     def __init__(self):

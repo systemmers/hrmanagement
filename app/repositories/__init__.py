@@ -30,14 +30,6 @@ from .attachment_repository import AttachmentRepository
 from .company_repository import CompanyRepository
 from .user_repository import UserRepository
 from .profile_repository import ProfileRepository
-from .personal_profile_repository import (
-    PersonalProfileRepository,
-    PersonalEducationRepository,
-    PersonalCareerRepository,
-    PersonalCertificateRepository,
-    PersonalLanguageRepository,
-    PersonalMilitaryRepository
-)
 from .corporate_admin_profile_repository import CorporateAdminProfileRepository
 from .company_settings_repository import CompanySettingsRepository
 from .number_category_repository import NumberCategoryRepository
@@ -71,12 +63,6 @@ __all__ = [
     'CompanyRepository',
     'UserRepository',
     'ProfileRepository',
-    'PersonalProfileRepository',
-    'PersonalEducationRepository',
-    'PersonalCareerRepository',
-    'PersonalCertificateRepository',
-    'PersonalLanguageRepository',
-    'PersonalMilitaryRepository',
     'CorporateAdminProfileRepository',
     'CompanySettingsRepository',
     'NumberCategoryRepository',

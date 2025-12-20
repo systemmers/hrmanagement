@@ -4,9 +4,11 @@
 현재 로그인한 사용자의 회사/조직 정보를 조회하는 유틸리티 함수를 제공합니다.
 세션 기반으로 멀티테넌시 필터링에 필요한 ID를 반환합니다.
 Phase 6: 백엔드 리팩토링 - 요청 스코프 캐싱 추가
+Phase 8: 상수 모듈 적용
 """
 from flask import session, g
 
+from ..constants.session_keys import SessionKeys, AccountType
 from ..models.company import Company
 
 
@@ -16,7 +18,7 @@ def get_current_company_id():
     Returns:
         int or None: 회사 ID (로그인하지 않은 경우 None)
     """
-    return session.get('company_id')
+    return session.get(SessionKeys.COMPANY_ID)
 
 
 def get_current_company():
@@ -30,7 +32,7 @@ def get_current_company():
     if hasattr(g, '_current_company'):
         return g._current_company
 
-    company_id = session.get('company_id')
+    company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
         g._current_company = None
         return None
@@ -65,7 +67,7 @@ def get_current_user_id():
     Returns:
         int or None: 사용자 ID (로그인하지 않은 경우 None)
     """
-    return session.get('user_id')
+    return session.get(SessionKeys.USER_ID)
 
 
 def get_current_account_type():
@@ -74,7 +76,7 @@ def get_current_account_type():
     Returns:
         str or None: 'personal', 'corporate', 'employee_sub' 중 하나 (로그인하지 않은 경우 None)
     """
-    return session.get('account_type')
+    return session.get(SessionKeys.ACCOUNT_TYPE)
 
 
 def is_corporate_account():
@@ -83,7 +85,7 @@ def is_corporate_account():
     Returns:
         bool: 법인 계정이면 True
     """
-    return session.get('account_type') == 'corporate'
+    return session.get(SessionKeys.ACCOUNT_TYPE) == AccountType.CORPORATE
 
 
 def is_personal_account():
@@ -92,4 +94,4 @@ def is_personal_account():
     Returns:
         bool: 개인 계정이면 True
     """
-    return session.get('account_type') == 'personal'
+    return session.get(SessionKeys.ACCOUNT_TYPE) == AccountType.PERSONAL

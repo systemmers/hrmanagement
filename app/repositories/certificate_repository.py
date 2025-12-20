@@ -7,7 +7,7 @@ from app.models import Certificate
 from .base_repository import BaseRelationRepository
 
 
-class CertificateRepository(BaseRelationRepository):
+class CertificateRepository(BaseRelationRepository[Certificate]):
     """자격증 저장소"""
 
     def __init__(self):

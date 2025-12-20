@@ -9,7 +9,7 @@ from app.models import CompanyVisibilitySettings
 from .base_repository import BaseRepository
 
 
-class CompanyVisibilityRepository(BaseRepository):
+class CompanyVisibilityRepository(BaseRepository[CompanyVisibilitySettings]):
     """법인 노출 설정 저장소"""
 
     def __init__(self):

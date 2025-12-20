@@ -16,7 +16,7 @@ Phase 7: 모듈 분할 - 기능별 하위 모듈로 분리
 # ========================================
 
 from ...utils.tenant import get_current_organization_id
-from ...extensions import employee_repo
+from ...services.employee_service import employee_service
 
 
 def verify_employee_access(employee_id: int) -> bool:
@@ -31,7 +31,7 @@ def verify_employee_access(employee_id: int) -> bool:
     org_id = get_current_organization_id()
     if not org_id:
         return False
-    return employee_repo.verify_ownership(employee_id, org_id)
+    return employee_service.verify_ownership(employee_id, org_id)
 
 
 # ========================================

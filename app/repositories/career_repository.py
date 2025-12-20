@@ -7,7 +7,7 @@ from app.models import Career
 from .base_repository import BaseRelationRepository
 
 
-class CareerRepository(BaseRelationRepository):
+class CareerRepository(BaseRelationRepository[Career]):
     """경력 저장소"""
 
     def __init__(self):

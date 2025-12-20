@@ -3,10 +3,13 @@
 
 @login_required, @role_required 등 인증 관련 데코레이터를 제공합니다.
 Phase 6: 백엔드 리팩토링 - 중복 로직 통합
+Phase 8: 매직 스트링 상수화 적용
 """
 from functools import wraps
 from flask import session, redirect, url_for, flash, request, abort, jsonify
 from typing import Optional, Tuple, Callable
+
+from app.constants import SessionKeys, AccountType, UserRole, FlashMessages, ErrorMessages
 
 
 # ============================================================
@@ -21,8 +24,8 @@ def _check_login() -> Optional[Tuple]:
         None: 로그인됨
         Tuple: (redirect_response,) 로그인 필요시 리다이렉트
     """
-    if not session.get('user_id'):
-        flash('로그인이 필요합니다.', 'error')
+    if not session.get(SessionKeys.USER_ID):
+        flash(FlashMessages.LOGIN_REQUIRED, 'error')
         return (redirect(url_for('auth.login', next=request.url)),)
     return None
 
@@ -35,8 +38,8 @@ def _check_api_login() -> Optional[Tuple]:
         None: 로그인됨
         Tuple: (json_response, status_code) 로그인 필요시 JSON 응답
     """
-    if not session.get('user_id'):
-        return (jsonify({'success': False, 'error': '로그인이 필요합니다.'}), 401)
+    if not session.get(SessionKeys.USER_ID):
+        return (jsonify({'success': False, 'error': ErrorMessages.LOGIN_REQUIRED}), 401)
     return None
 
 
@@ -45,16 +48,18 @@ def _check_account_type(required_type: str, error_redirect: str = 'main.index') 
     계정 타입 확인 (웹 페이지용)
 
     Args:
-        required_type: 'personal' 또는 'corporate'
+        required_type: AccountType.PERSONAL 또는 AccountType.CORPORATE
         error_redirect: 권한 없을 때 리다이렉트할 URL
 
     Returns:
         None: 권한 있음
         Tuple: (redirect_response,) 권한 없을시 리다이렉트
     """
-    if session.get('account_type') != required_type:
-        type_name = '개인' if required_type == 'personal' else '법인'
-        flash(f'{type_name} 계정으로 로그인해주세요.', 'error')
+    if session.get(SessionKeys.ACCOUNT_TYPE) != required_type:
+        if required_type == AccountType.PERSONAL:
+            flash(FlashMessages.PERSONAL_ACCOUNT_REQUIRED, 'error')
+        else:
+            flash(FlashMessages.CORPORATE_ACCOUNT_REQUIRED, 'error')
         return (redirect(url_for(error_redirect)),)
     return None
 
@@ -64,15 +69,17 @@ def _check_api_account_type(required_type: str) -> Optional[Tuple]:
     계정 타입 확인 (API용)
 
     Args:
-        required_type: 'personal' 또는 'corporate'
+        required_type: AccountType.PERSONAL 또는 AccountType.CORPORATE
 
     Returns:
         None: 권한 있음
         Tuple: (json_response, status_code) 권한 없을시 JSON 응답
     """
-    if session.get('account_type') != required_type:
-        type_name = '개인' if required_type == 'personal' else '법인'
-        return (jsonify({'success': False, 'error': f'{type_name} 계정으로만 접근할 수 있습니다.'}), 403)
+    if session.get(SessionKeys.ACCOUNT_TYPE) != required_type:
+        if required_type == AccountType.PERSONAL:
+            return (jsonify({'success': False, 'error': ErrorMessages.PERSONAL_ONLY}), 403)
+        else:
+            return (jsonify({'success': False, 'error': ErrorMessages.CORPORATE_ONLY}), 403)
     return None
 
 
@@ -87,9 +94,9 @@ def _check_role(*roles) -> Optional[Tuple]:
         None: 권한 있음
         Tuple: (abort_response,) 권한 없을시 403
     """
-    user_role = session.get('user_role')
+    user_role = session.get(SessionKeys.USER_ROLE)
     if user_role not in roles:
-        flash('접근 권한이 없습니다.', 'error')
+        flash(FlashMessages.ACCESS_DENIED, 'error')
         return (abort(403),)
     return None
 
@@ -151,8 +158,8 @@ def admin_required(f):
         if login_check:
             return login_check[0]
 
-        if session.get('user_role') != 'admin':
-            flash('관리자만 접근 가능합니다.', 'error')
+        if session.get(SessionKeys.USER_ROLE) != UserRole.ADMIN:
+            flash(FlashMessages.ADMIN_REQUIRED, 'error')
             abort(403)
 
         return f(*args, **kwargs)
@@ -171,9 +178,9 @@ def manager_or_admin_required(f):
         if login_check:
             return login_check[0]
 
-        user_role = session.get('user_role')
-        if user_role not in ('admin', 'manager'):
-            flash('관리자 또는 매니저만 접근 가능합니다.', 'error')
+        user_role = session.get(SessionKeys.USER_ROLE)
+        if user_role not in UserRole.admin_roles():
+            flash(FlashMessages.ADMIN_OR_MANAGER_REQUIRED, 'error')
             abort(403)
 
         return f(*args, **kwargs)
@@ -199,15 +206,15 @@ def self_or_admin_required(employee_id_param='employee_id'):
                 return login_check[0]
 
             # admin은 모든 접근 가능
-            if session.get('user_role') == 'admin':
+            if session.get(SessionKeys.USER_ROLE) == UserRole.ADMIN:
                 return f(*args, **kwargs)
 
             # 본인 확인
             target_employee_id = kwargs.get(employee_id_param)
-            if target_employee_id and session.get('employee_id') == int(target_employee_id):
+            if target_employee_id and session.get(SessionKeys.EMPLOYEE_ID) == int(target_employee_id):
                 return f(*args, **kwargs)
 
-            flash('접근 권한이 없습니다.', 'error')
+            flash(FlashMessages.ACCESS_DENIED, 'error')
             abort(403)
 
         return decorated_function
@@ -223,11 +230,11 @@ def account_type_required(account_type: str, error_redirect: str = 'main.index')
     특정 계정 타입 필수 데코레이터
 
     Args:
-        account_type: 'personal' 또는 'corporate'
+        account_type: AccountType.PERSONAL 또는 AccountType.CORPORATE
         error_redirect: 권한 없을 때 리다이렉트할 URL
 
     사용 예:
-        @account_type_required('personal')
+        @account_type_required(AccountType.PERSONAL)
         def personal_only_view():
             ...
     """
@@ -259,7 +266,7 @@ def personal_login_required(f):
         if login_check:
             return login_check[0]
 
-        type_check = _check_account_type('personal')
+        type_check = _check_account_type(AccountType.PERSONAL)
         if type_check:
             return type_check[0]
 
@@ -279,7 +286,7 @@ def corporate_login_required(f):
         if login_check:
             return login_check[0]
 
-        type_check = _check_account_type('corporate')
+        type_check = _check_account_type(AccountType.CORPORATE)
         if type_check:
             return type_check[0]
 
@@ -299,12 +306,12 @@ def corporate_admin_required(f):
         if login_check:
             return login_check[0]
 
-        type_check = _check_account_type('corporate')
+        type_check = _check_account_type(AccountType.CORPORATE)
         if type_check:
             return type_check[0]
 
-        if session.get('user_role') not in ('admin', 'manager'):
-            flash('관리자 권한이 필요합니다.', 'error')
+        if session.get(SessionKeys.USER_ROLE) not in UserRole.admin_roles():
+            flash(FlashMessages.ADMIN_PERMISSION_REQUIRED, 'error')
             return redirect(url_for('corporate.dashboard'))
 
         return f(*args, **kwargs)
@@ -323,8 +330,8 @@ def personal_account_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get('account_type') != 'personal':
-            flash('개인 계정으로만 접근할 수 있습니다.', 'warning')
+        if session.get(SessionKeys.ACCOUNT_TYPE) != AccountType.PERSONAL:
+            flash(FlashMessages.PERSONAL_ONLY_ACCESS, 'warning')
             return redirect(url_for('main.index'))
         return f(*args, **kwargs)
     return decorated_function
@@ -339,9 +346,9 @@ def personal_or_employee_account_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        account_type = session.get('account_type')
-        if account_type not in ('personal', 'employee_sub'):
-            flash('개인 또는 직원 계정으로만 접근할 수 있습니다.', 'warning')
+        account_type = session.get(SessionKeys.ACCOUNT_TYPE)
+        if account_type not in AccountType.personal_types():
+            flash(FlashMessages.PERSONAL_OR_EMPLOYEE_ONLY, 'warning')
             return redirect(url_for('main.index'))
         return f(*args, **kwargs)
     return decorated_function
@@ -355,8 +362,8 @@ def corporate_account_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get('account_type') != 'corporate':
-            flash('법인 계정으로만 접근할 수 있습니다.', 'warning')
+        if session.get(SessionKeys.ACCOUNT_TYPE) != AccountType.CORPORATE:
+            flash(FlashMessages.CORPORATE_ONLY_ACCESS, 'warning')
             return redirect(url_for('main.index'))
         return f(*args, **kwargs)
     return decorated_function
@@ -373,22 +380,20 @@ def contract_access_required(f):
     def decorated_function(contract_id, *args, **kwargs):
         from ..models.person_contract import PersonCorporateContract
 
-        user_id = session.get('user_id')
-        account_type = session.get('account_type')
-        company_id = session.get('company_id')
+        user_id = session.get(SessionKeys.USER_ID)
+        account_type = session.get(SessionKeys.ACCOUNT_TYPE)
+        company_id = session.get(SessionKeys.COMPANY_ID)
 
         contract = PersonCorporateContract.query.get(contract_id)
         if not contract:
-            from flask import jsonify
-            return jsonify({'success': False, 'error': '계약을 찾을 수 없습니다.'}), 404
+            return jsonify({'success': False, 'error': ErrorMessages.CONTRACT_NOT_FOUND}), 404
 
         # 권한 확인
         is_person = contract.person_user_id == user_id
-        is_company = account_type == 'corporate' and contract.company_id == company_id
+        is_company = account_type == AccountType.CORPORATE and contract.company_id == company_id
 
         if not is_person and not is_company:
-            from flask import jsonify
-            return jsonify({'success': False, 'error': '접근 권한이 없습니다.'}), 403
+            return jsonify({'success': False, 'error': ErrorMessages.ACCESS_DENIED}), 403
 
         return f(contract_id, *args, **kwargs)
     return decorated_function
@@ -421,7 +426,7 @@ def api_personal_account_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        type_check = _check_api_account_type('personal')
+        type_check = _check_api_account_type(AccountType.PERSONAL)
         if type_check:
             return type_check
         return f(*args, **kwargs)
@@ -436,7 +441,7 @@ def api_corporate_account_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        type_check = _check_api_account_type('corporate')
+        type_check = _check_api_account_type(AccountType.CORPORATE)
         if type_check:
             return type_check
         return f(*args, **kwargs)
@@ -452,7 +457,7 @@ def api_admin_or_manager_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get('user_role') not in ['admin', 'manager']:
-            return jsonify({'success': False, 'error': '관리자 권한이 필요합니다.'}), 403
+        if session.get(SessionKeys.USER_ROLE) not in UserRole.admin_roles():
+            return jsonify({'success': False, 'error': ErrorMessages.ADMIN_PERMISSION_REQUIRED}), 403
         return f(*args, **kwargs)
     return decorated_function

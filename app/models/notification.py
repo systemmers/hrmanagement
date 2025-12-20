@@ -6,18 +6,39 @@ Phase 5: 알림 시스템
 - 동기화 완료 알림
 - 퇴사 처리 알림
 - 시스템 알림
+Phase 8: DictSerializableMixin 적용
 """
 from datetime import datetime
 from app.database import db
+from app.models.mixins import DictSerializableMixin
 
 
-class Notification(db.Model):
+class Notification(DictSerializableMixin, db.Model):
     """
     알림 모델
 
     사용자에게 전송되는 모든 알림을 저장합니다.
     """
     __tablename__ = 'notifications'
+
+    # JSON 필드 (자동 파싱)
+    __dict_json_fields__ = ['extra_data']
+
+    # camelCase 매핑 (from_dict용)
+    __dict_camel_mapping__ = {
+        'user_id': ['userId'],
+        'notification_type': ['notificationType'],
+        'resource_type': ['resourceType'],
+        'resource_id': ['resourceId'],
+        'sender_id': ['senderId'],
+        'is_read': ['isRead'],
+        'read_at': ['readAt'],
+        'action_url': ['actionUrl'],
+        'action_label': ['actionLabel'],
+        'extra_data': ['extraData'],
+        'created_at': ['createdAt'],
+        'expires_at': ['expiresAt'],
+    }
 
     # ===== 알림 유형 상수 =====
     TYPE_CONTRACT_REQUEST = 'contract_request'      # 계약 요청 받음
@@ -109,29 +130,6 @@ class Notification(db.Model):
             self.is_read = True
             self.read_at = datetime.utcnow()
 
-    def to_dict(self):
-        """딕셔너리 변환"""
-        import json
-
-        return {
-            'id': self.id,
-            'user_id': self.user_id,
-            'notification_type': self.notification_type,
-            'title': self.title,
-            'message': self.message,
-            'resource_type': self.resource_type,
-            'resource_id': self.resource_id,
-            'sender_id': self.sender_id,
-            'is_read': self.is_read,
-            'read_at': self.read_at.isoformat() if self.read_at else None,
-            'priority': self.priority,
-            'action_url': self.action_url,
-            'action_label': self.action_label,
-            'extra_data': json.loads(self.extra_data) if self.extra_data else None,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'expires_at': self.expires_at.isoformat() if self.expires_at else None,
-        }
-
     @classmethod
     def get_type_label(cls, notification_type):
         """알림 유형 라벨 조회"""
@@ -149,13 +147,26 @@ class Notification(db.Model):
         return priority
 
 
-class NotificationPreference(db.Model):
+class NotificationPreference(DictSerializableMixin, db.Model):
     """
     알림 설정 모델
 
     사용자별 알림 수신 설정을 저장합니다.
     """
     __tablename__ = 'notification_preferences'
+
+    # camelCase 매핑 (from_dict용)
+    __dict_camel_mapping__ = {
+        'user_id': ['userId'],
+        'receive_contract_notifications': ['receiveContractNotifications'],
+        'receive_sync_notifications': ['receiveSyncNotifications'],
+        'receive_termination_notifications': ['receiveTerminationNotifications'],
+        'receive_system_notifications': ['receiveSystemNotifications'],
+        'email_notifications_enabled': ['emailNotificationsEnabled'],
+        'email_digest_frequency': ['emailDigestFrequency'],
+        'created_at': ['createdAt'],
+        'updated_at': ['updatedAt'],
+    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True)
@@ -179,16 +190,3 @@ class NotificationPreference(db.Model):
 
     def __repr__(self):
         return f'<NotificationPreference for User {self.user_id}>'
-
-    def to_dict(self):
-        """딕셔너리 변환"""
-        return {
-            'id': self.id,
-            'user_id': self.user_id,
-            'receive_contract_notifications': self.receive_contract_notifications,
-            'receive_sync_notifications': self.receive_sync_notifications,
-            'receive_termination_notifications': self.receive_termination_notifications,
-            'receive_system_notifications': self.receive_system_notifications,
-            'email_notifications_enabled': self.email_notifications_enabled,
-            'email_digest_frequency': self.email_digest_frequency,
-        }

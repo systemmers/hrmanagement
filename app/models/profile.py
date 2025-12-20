@@ -81,6 +81,64 @@ class Profile(db.Model):
     # Employee 역참조 (employees.profile_id -> profiles.id)
     # employees = db.relationship('Employee', backref='profile', lazy='dynamic')
 
+    # 이력 관계 (profile_id 기반 통합 조회)
+    educations = db.relationship(
+        'Education',
+        primaryjoin='Profile.id == Education.profile_id',
+        foreign_keys='Education.profile_id',
+        backref='profile',
+        lazy='dynamic'
+    )
+    careers = db.relationship(
+        'Career',
+        primaryjoin='Profile.id == Career.profile_id',
+        foreign_keys='Career.profile_id',
+        backref='profile',
+        lazy='dynamic'
+    )
+    certificates = db.relationship(
+        'Certificate',
+        primaryjoin='Profile.id == Certificate.profile_id',
+        foreign_keys='Certificate.profile_id',
+        backref='profile',
+        lazy='dynamic'
+    )
+    languages = db.relationship(
+        'Language',
+        primaryjoin='Profile.id == Language.profile_id',
+        foreign_keys='Language.profile_id',
+        backref='profile',
+        lazy='dynamic'
+    )
+    military_services = db.relationship(
+        'MilitaryService',
+        primaryjoin='Profile.id == MilitaryService.profile_id',
+        foreign_keys='MilitaryService.profile_id',
+        backref='profile',
+        lazy='dynamic'
+    )
+    family_members = db.relationship(
+        'FamilyMember',
+        primaryjoin='Profile.id == FamilyMember.profile_id',
+        foreign_keys='FamilyMember.profile_id',
+        backref='profile',
+        lazy='dynamic'
+    )
+    awards = db.relationship(
+        'Award',
+        primaryjoin='Profile.id == Award.profile_id',
+        foreign_keys='Award.profile_id',
+        backref='profile',
+        lazy='dynamic'
+    )
+    project_participations = db.relationship(
+        'ProjectParticipation',
+        primaryjoin='Profile.id == ProjectParticipation.profile_id',
+        foreign_keys='ProjectParticipation.profile_id',
+        backref='profile',
+        lazy='dynamic'
+    )
+
     @property
     def full_address(self):
         """전체 주소 반환 (주민등록상)"""

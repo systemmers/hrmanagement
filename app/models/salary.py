@@ -3,13 +3,44 @@ Salary SQLAlchemy 모델
 
 직원 급여 정보를 관리합니다. (1:1 관계)
 포괄임금제 급여 계산 지원
+Phase 8: DictSerializableMixin 적용
 """
 from app.database import db
+from app.models.mixins import DictSerializableMixin
 
 
-class Salary(db.Model):
+class Salary(DictSerializableMixin, db.Model):
     """급여 모델 (1:1)"""
     __tablename__ = 'salaries'
+
+    # Alias 정의: 템플릿 호환성 (to_dict에서 추가 키로 포함)
+    __dict_aliases__ = {
+        'transport_allowance': 'transportation_allowance',
+        'pay_type': 'salary_type',
+    }
+
+    # camelCase 매핑 (from_dict용)
+    __dict_camel_mapping__ = {
+        'employee_id': ['employeeId'],
+        'salary_type': ['salaryType', 'pay_type'],
+        'base_salary': ['baseSalary'],
+        'position_allowance': ['positionAllowance'],
+        'meal_allowance': ['mealAllowance'],
+        'transportation_allowance': ['transportationAllowance', 'transport_allowance'],
+        'total_salary': ['totalSalary'],
+        'payment_day': ['paymentDay'],
+        'payment_method': ['paymentMethod'],
+        'bank_account': ['bankAccount'],
+        'annual_salary': ['annualSalary'],
+        'monthly_salary': ['monthlySalary'],
+        'hourly_wage': ['hourlyWage'],
+        'overtime_hours': ['overtimeHours'],
+        'night_hours': ['nightHours'],
+        'holiday_days': ['holidayDays'],
+        'overtime_allowance': ['overtimeAllowance'],
+        'night_allowance': ['nightAllowance'],
+        'holiday_allowance': ['holidayAllowance'],
+    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, unique=True, index=True)
@@ -58,62 +89,6 @@ class Salary(db.Model):
     @pay_type.setter
     def pay_type(self, value):
         self.salary_type = value
-
-    def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
-        return {
-            'id': self.id,
-            'employee_id': self.employee_id,
-            'salary_type': self.salary_type,
-            'base_salary': self.base_salary,
-            'position_allowance': self.position_allowance,
-            'meal_allowance': self.meal_allowance,
-            'transportation_allowance': self.transportation_allowance,
-            'total_salary': self.total_salary,
-            'payment_day': self.payment_day,
-            'payment_method': self.payment_method,
-            'bank_account': self.bank_account,
-            'note': self.note,
-            # 포괄임금제 관련 필드
-            'annual_salary': self.annual_salary,
-            'monthly_salary': self.monthly_salary,
-            'hourly_wage': self.hourly_wage,
-            'overtime_hours': self.overtime_hours,
-            'night_hours': self.night_hours,
-            'holiday_days': self.holiday_days,
-            'overtime_allowance': self.overtime_allowance,
-            'night_allowance': self.night_allowance,
-            'holiday_allowance': self.holiday_allowance,
-        }
-
-    @classmethod
-    def from_dict(cls, data):
-        """딕셔너리에서 모델 생성 (snake_case 지원, 템플릿 호환성 필드 포함)"""
-        return cls(
-            employee_id=data.get('employee_id') or data.get('employeeId'),
-            # pay_type -> salary_type 매핑 지원
-            salary_type=data.get('salary_type') or data.get('salaryType') or data.get('pay_type'),
-            base_salary=data.get('base_salary') or data.get('baseSalary', 0),
-            position_allowance=data.get('position_allowance') or data.get('positionAllowance', 0),
-            meal_allowance=data.get('meal_allowance') or data.get('mealAllowance', 0),
-            # transport_allowance -> transportation_allowance 매핑 지원
-            transportation_allowance=data.get('transportation_allowance') or data.get('transportationAllowance') or data.get('transport_allowance', 0),
-            total_salary=data.get('total_salary') or data.get('totalSalary', 0),
-            payment_day=data.get('payment_day') or data.get('paymentDay', 25),
-            payment_method=data.get('payment_method') or data.get('paymentMethod'),
-            bank_account=data.get('bank_account') or data.get('bankAccount'),
-            note=data.get('note'),
-            # 포괄임금제 관련 필드
-            annual_salary=data.get('annual_salary') or data.get('annualSalary', 0),
-            monthly_salary=data.get('monthly_salary') or data.get('monthlySalary', 0),
-            hourly_wage=data.get('hourly_wage') or data.get('hourlyWage', 0),
-            overtime_hours=data.get('overtime_hours') or data.get('overtimeHours', 0),
-            night_hours=data.get('night_hours') or data.get('nightHours', 0),
-            holiday_days=data.get('holiday_days') or data.get('holidayDays', 0),
-            overtime_allowance=data.get('overtime_allowance') or data.get('overtimeAllowance', 0),
-            night_allowance=data.get('night_allowance') or data.get('nightAllowance', 0),
-            holiday_allowance=data.get('holiday_allowance') or data.get('holidayAllowance', 0),
-        )
 
     def __repr__(self):
         return f'<Salary {self.id}: {self.employee_id}>'

@@ -8,7 +8,7 @@ from app.models import Attachment
 from .base_repository import BaseRelationRepository
 
 
-class AttachmentRepository(BaseRelationRepository):
+class AttachmentRepository(BaseRelationRepository[Attachment]):
     """첨부파일 저장소"""
 
     def __init__(self):

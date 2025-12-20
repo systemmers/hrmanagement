@@ -3,21 +3,14 @@
 
 일반 직원(employee role)의 개인 페이지 기능을 제공합니다.
 - 회사 인사카드 (소속정보, 계약정보, 급여정보, 복리후생, 4대보험, 인사기록 전체)
+Phase 8: 상수 모듈 적용
 """
 from flask import Blueprint, render_template, session, redirect, url_for, flash
 
+from ..constants.session_keys import SessionKeys
 from ..utils.decorators import login_required
-from ..extensions import (
-    employee_repo, system_setting_repo,
-    salary_repo, benefit_repo, contract_repo, salary_history_repo,
-    promotion_repo, evaluation_repo, training_repo, attendance_repo,
-    insurance_repo, asset_repo, salary_payment_repo,
-    # 파셜 통합을 위한 추가 레포지토리
-    education_repo, career_repo, certificate_repo, family_repo,
-    language_repo, military_repo, hr_project_repo, project_participation_repo, award_repo,
-    # 명함 첨부파일
-    attachment_repo
-)
+from ..services.employee_service import employee_service
+from ..services.system_setting_service import system_setting_service
 
 mypage_bp = Blueprint('mypage', __name__, url_prefix='/my')
 
@@ -31,7 +24,7 @@ def company_info():
     - 소속정보, 계약정보, 급여정보, 복리후생, 4대보험
     - 인사기록: 근로계약/연봉, 인사이동/고과, 근태/비품
     """
-    employee_id = session.get('employee_id')
+    employee_id = session.get(SessionKeys.EMPLOYEE_ID)
 
     # employee_id가 없는 경우 (계정과 직원이 연결되지 않음)
     if not employee_id:
@@ -39,58 +32,46 @@ def company_info():
         return redirect(url_for('main.index'))
 
     # 직원 정보 조회
-    employee = employee_repo.get_by_id(employee_id)
+    employee = employee_service.get_employee_by_id(employee_id)
     if not employee:
         flash('직원 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
 
     # 회사 정보 조회 (SystemSetting에서)
-    company_data = {}
-    company_keys = [
-        'company.name', 'company.name_en', 'company.ceo_name',
-        'company.business_number', 'company.corporate_number',
-        'company.address', 'company.phone', 'company.fax',
-        'company.website', 'company.established_date', 'company.logo_url'
-    ]
-
-    for key in company_keys:
-        setting = system_setting_repo.get_by_key(key)
-        if setting:
-            field_name = key.replace('company.', '')
-            company_data[field_name] = setting.get('value', '') if isinstance(setting, dict) else setting.value
+    company_data = system_setting_service.get_company_data()
 
     # 급여 및 복리후생 데이터 조회
-    salary = salary_repo.get_by_employee_id(employee_id)
-    benefit = benefit_repo.get_by_employee_id(employee_id)
-    contract = contract_repo.get_by_employee_id(employee_id)
-    insurance = insurance_repo.get_by_employee_id(employee_id)
+    salary = employee_service.get_salary_info(employee_id)
+    benefit = employee_service.get_benefit_info(employee_id)
+    contract = employee_service.get_contract_info(employee_id)
+    insurance = employee_service.get_insurance_info(employee_id)
 
     # 인사기록 데이터 조회
-    salary_history_list = salary_history_repo.get_by_employee_id(employee_id)
-    salary_payment_list = salary_payment_repo.get_by_employee_id(employee_id)
-    promotion_list = promotion_repo.get_by_employee_id(employee_id)
-    evaluation_list = evaluation_repo.get_by_employee_id(employee_id)
-    training_list = training_repo.get_by_employee_id(employee_id)
-    attendance_summary = attendance_repo.get_summary_by_employee(employee_id, 2025)
-    asset_list = asset_repo.get_by_employee_id(employee_id)
+    salary_history_list = employee_service.get_salary_history_list(employee_id)
+    salary_payment_list = employee_service.get_salary_payment_list(employee_id)
+    promotion_list = employee_service.get_promotion_list(employee_id)
+    evaluation_list = employee_service.get_evaluation_list(employee_id)
+    training_list = employee_service.get_training_list(employee_id)
+    attendance_summary = employee_service.get_attendance_summary(employee_id, 2025)
+    asset_list = employee_service.get_asset_list(employee_id)
 
     # 이력 및 경력 데이터 조회 (파셜 통합용)
-    education_list = education_repo.get_by_employee_id(employee_id)
-    career_list = career_repo.get_by_employee_id(employee_id)
-    certificate_list = certificate_repo.get_by_employee_id(employee_id)
-    family_list = family_repo.get_by_employee_id(employee_id)
-    language_list = language_repo.get_by_employee_id(employee_id)
-    military = military_repo.get_by_employee_id(employee_id)
-    hr_project_list = hr_project_repo.get_by_employee_id(employee_id)
-    project_participation_list = project_participation_repo.get_by_employee_id(employee_id)
-    award_list = award_repo.get_by_employee_id(employee_id)
+    education_list = employee_service.get_education_list(employee_id)
+    career_list = employee_service.get_career_list(employee_id)
+    certificate_list = employee_service.get_certificate_list(employee_id)
+    family_list = employee_service.get_family_list(employee_id)
+    language_list = employee_service.get_language_list(employee_id)
+    military = employee_service.get_military_info(employee_id)
+    hr_project_list = employee_service.get_hr_project_list(employee_id)
+    project_participation_list = employee_service.get_project_participation_list(employee_id)
+    award_list = employee_service.get_award_list(employee_id)
 
     # 명함 데이터 조회 (조회 전용)
-    business_card_front = attachment_repo.get_one_by_category(employee_id, 'business_card_front')
-    business_card_back = attachment_repo.get_one_by_category(employee_id, 'business_card_back')
+    business_card_front = employee_service.get_attachment_by_category(employee_id, 'business_card_front')
+    business_card_back = employee_service.get_attachment_by_category(employee_id, 'business_card_back')
 
     # 첨부파일 목록 조회 (인사카드에서는 조회만 가능)
-    attachment_list = attachment_repo.get_by_employee_id(employee_id)
+    attachment_list = employee_service.get_attachment_list(employee_id)
 
     return render_template('mypage/company_info.html',
                            employee=employee,

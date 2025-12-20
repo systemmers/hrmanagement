@@ -3,11 +3,14 @@
 
 계약 세션 및 권한 관련 중복 로직을 통합합니다.
 Phase 6: 백엔드 리팩토링
+Phase 8: 상수 모듈 적용
 """
 from dataclasses import dataclass
 from functools import wraps
 from typing import Optional, Tuple
 from flask import session, jsonify, g
+
+from ..constants.session_keys import SessionKeys, AccountType
 
 
 @dataclass
@@ -20,12 +23,12 @@ class ContractContext:
     @property
     def is_personal(self) -> bool:
         """개인 계정 여부"""
-        return self.account_type == 'personal'
+        return self.account_type == AccountType.PERSONAL
 
     @property
     def is_corporate(self) -> bool:
         """법인 계정 여부"""
-        return self.account_type == 'corporate'
+        return self.account_type == AccountType.CORPORATE
 
     def is_contract_party(self, contract) -> bool:
         """
@@ -97,9 +100,9 @@ def get_contract_context() -> ContractContext:
         return g._contract_context
 
     context = ContractContext(
-        user_id=session.get('user_id'),
-        account_type=session.get('account_type'),
-        company_id=session.get('company_id')
+        user_id=session.get(SessionKeys.USER_ID),
+        account_type=session.get(SessionKeys.ACCOUNT_TYPE),
+        company_id=session.get(SessionKeys.COMPANY_ID)
     )
     g._contract_context = context
     return context

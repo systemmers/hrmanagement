@@ -10,7 +10,7 @@ from app.models import ClassificationOption
 from .base_repository import BaseRepository
 
 
-class ClassificationOptionsRepository(BaseRepository):
+class ClassificationOptionsRepository(BaseRepository[ClassificationOption]):
     """분류 옵션 저장소"""
 
     def __init__(self):

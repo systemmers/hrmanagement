@@ -9,7 +9,7 @@ from app.models import SalaryPayment
 from .base_repository import BaseRelationRepository
 
 
-class SalaryPaymentRepository(BaseRelationRepository):
+class SalaryPaymentRepository(BaseRelationRepository[SalaryPayment]):
     """급여 지급 이력 저장소"""
 
     def __init__(self):

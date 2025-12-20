@@ -9,7 +9,7 @@ from app.models.corporate_admin_profile import CorporateAdminProfile
 from .base_repository import BaseRepository
 
 
-class CorporateAdminProfileRepository(BaseRepository):
+class CorporateAdminProfileRepository(BaseRepository[CorporateAdminProfile]):
     """법인 관리자 프로필 저장소"""
 
     def __init__(self):

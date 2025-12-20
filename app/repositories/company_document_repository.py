@@ -10,7 +10,7 @@ from app.models import CompanyDocument
 from .base_repository import BaseRepository
 
 
-class CompanyDocumentRepository(BaseRepository):
+class CompanyDocumentRepository(BaseRepository[CompanyDocument]):
     """법인 서류 저장소"""
 
     def __init__(self):

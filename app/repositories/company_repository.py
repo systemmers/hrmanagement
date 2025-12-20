@@ -9,7 +9,7 @@ from app.models.company import Company
 from app.repositories.base_repository import BaseRepository
 
 
-class CompanyRepository(BaseRepository):
+class CompanyRepository(BaseRepository[Company]):
     """법인(기업) Repository"""
 
     def __init__(self):

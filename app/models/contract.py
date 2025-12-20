@@ -2,13 +2,25 @@
 Contract SQLAlchemy 모델
 
 직원 계약 정보를 관리합니다. (1:1 관계)
+Phase 8: DictSerializableMixin 적용
 """
 from app.database import db
+from app.models.mixins import DictSerializableMixin
 
 
-class Contract(db.Model):
+class Contract(DictSerializableMixin, db.Model):
     """계약 모델 (1:1)"""
     __tablename__ = 'contracts'
+
+    # camelCase 매핑 (from_dict용)
+    __dict_camel_mapping__ = {
+        'employee_id': ['employeeId'],
+        'contract_date': ['contractDate'],
+        'contract_type': ['contractType'],
+        'contract_period': ['contractPeriod'],
+        'employee_type': ['employeeType', 'employment_type'],
+        'work_type': ['workType'],
+    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, unique=True, index=True)
@@ -18,33 +30,6 @@ class Contract(db.Model):
     employee_type = db.Column(db.String(50), nullable=True)
     work_type = db.Column(db.String(50), nullable=True)
     note = db.Column(db.Text, nullable=True)
-
-    def to_dict(self):
-        """템플릿 호환성을 위한 딕셔너리 반환 (snake_case)"""
-        return {
-            'id': self.id,
-            'employee_id': self.employee_id,
-            'contract_date': self.contract_date,
-            'contract_type': self.contract_type,
-            'contract_period': self.contract_period,
-            'employee_type': self.employee_type,
-            'work_type': self.work_type,
-            'note': self.note,
-        }
-
-    @classmethod
-    def from_dict(cls, data):
-        """딕셔너리에서 모델 생성 (snake_case 지원, 템플릿 호환성 필드 포함)"""
-        return cls(
-            employee_id=data.get('employee_id') or data.get('employeeId'),
-            contract_date=data.get('contract_date') or data.get('contractDate'),
-            contract_type=data.get('contract_type') or data.get('contractType'),
-            contract_period=data.get('contract_period') or data.get('contractPeriod'),
-            # employment_type -> employee_type 매핑 지원
-            employee_type=data.get('employee_type') or data.get('employeeType') or data.get('employment_type'),
-            work_type=data.get('work_type') or data.get('workType'),
-            note=data.get('note'),
-        )
 
     def __repr__(self):
         return f'<Contract {self.id}: {self.employee_id}>'

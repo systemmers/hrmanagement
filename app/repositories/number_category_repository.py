@@ -9,7 +9,7 @@ from app.models import NumberCategory, NumberRegistry
 from .base_repository import BaseRepository
 
 
-class NumberCategoryRepository(BaseRepository):
+class NumberCategoryRepository(BaseRepository[NumberCategory]):
     """번호 분류코드 저장소"""
 
     def __init__(self):

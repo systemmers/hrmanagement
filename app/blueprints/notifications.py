@@ -5,10 +5,12 @@ Phase 5: 알림 시스템
 - 알림 목록 조회
 - 알림 읽음 처리
 - 알림 설정 관리
+Phase 8: 상수 모듈 적용
 """
 from flask import Blueprint, request, jsonify, session
 from functools import wraps
 
+from app.constants.session_keys import SessionKeys
 from app.services.notification_service import notification_service
 from app.models.notification import Notification
 
@@ -21,7 +23,7 @@ def login_required(f):
     """로그인 필수 데코레이터"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get('user_id'):
+        if not session.get(SessionKeys.USER_ID):
             return jsonify({'success': False, 'error': '로그인이 필요합니다.'}), 401
         return f(*args, **kwargs)
     return decorated_function
@@ -49,7 +51,7 @@ def get_notifications():
         "total": 50
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
 
     unread_only = request.args.get('unread_only', 'false').lower() == 'true'
     notification_type = request.args.get('type')
@@ -87,7 +89,7 @@ def get_unread_count():
         "count": 5
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     count = notification_service.get_unread_count(user_id)
 
     return jsonify({
@@ -108,7 +110,7 @@ def get_notification(notification_id):
         "notification": {...}
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
 
     notification = notification_service.get_notification(
         notification_id=notification_id,
@@ -137,7 +139,7 @@ def mark_as_read(notification_id):
         "success": true
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
 
     result = notification_service.mark_as_read(
         notification_id=notification_id,
@@ -167,7 +169,7 @@ def mark_all_as_read():
         "count": 10  # 읽음 처리된 알림 수
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     data = request.get_json() or {}
     notification_type = data.get('type')
 
@@ -193,7 +195,7 @@ def delete_notification(notification_id):
         "success": true
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
 
     result = notification_service.delete_notification(
         notification_id=notification_id,
@@ -228,7 +230,7 @@ def get_stats():
         }
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     days = request.args.get('days', 30, type=int)
 
     stats = notification_service.get_notification_stats(
@@ -256,7 +258,7 @@ def get_preferences():
         "preferences": {...}
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     preferences = notification_service.get_preferences(user_id)
 
     return jsonify({
@@ -287,7 +289,7 @@ def update_preferences():
         "preferences": {...}
     }
     """
-    user_id = session.get('user_id')
+    user_id = session.get(SessionKeys.USER_ID)
     data = request.get_json()
 
     if not data:
