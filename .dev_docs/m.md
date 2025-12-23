@@ -1,1526 +1,1178 @@
-# HR 관리 시스템 프론트엔드/백엔드 통합 마이그레이션 설계서
+# 3개 계정 유형 디테일/수정 페이지 필드 순서 비교 분석 보고서
 
-## 개요
+## 분석 개요
 
-법인 직원(Corporate)과 개인 계정(Personal) 템플릿을 통합하여 유지보수성과 확장성을 향상시키는 마이그레이션 계획
-
-**총 기간**: 15-18일 (3-4주)
-**목표**: 코드 중복 50% 감소, 새 계정 타입 추가 시간 80% 단축, 레거시 파일 30% 정리
-
----
-
-## 현재 상태 요약 (2024-12-12 업데이트)
-
-**실제 완료 범위**:
-- Phase 1: CSS 스타일 일관성 개선 (완료)
-- Phase 2: 백엔드 서비스 레이어 개선 (부분 완료)
-- Phase 3: 파셜 템플릿 스타일 통일 (부분 완료) - **통합 템플릿 미생성**
-- Phase 4: 테스트 코드 작성 (미진행)
-- Phase 5: claudedocs/ 분석 문서 정리 (완료)
-
-**미완료 핵심 작업**:
-1. `profile/detail.html` 통합 템플릿 미생성
-2. `profile/edit.html` 통합 템플릿 미생성
-3. `profile.py` 통합 블루프린트 미생성
-4. 변수 어댑터 레이어 미구현 (`employee` ↔ `profile` 매핑)
-5. 레거시 URL 리다이렉트 미설정
-
-**현재 아키텍처**:
-```
-법인 (Corporate):
-├── employees/routes.py
-├── templates/employees/*.html (7개 파일 활성 사용 중)
-└── partials/employee_form/_*.html (변수: employee)
-
-개인 (Personal):
-├── blueprints/personal.py
-├── templates/personal/*.html
-└── partials/profile_form/_*.html (변수: profile)
-```
-
-두 시스템이 **분리 유지**되고 있으며, 완전한 통합을 위해서는 추가 작업 필요.
+**분석 대상**: personal(개인), corporate_admin(법인 관리자), employee(법인 직원) 3개 계정 유형
+**분석 범위**: 디테일 페이지(출력/조회) + 수정 페이지(입력/편집) + API 입출력(to_dict/from_dict)
+**분석 깊이**: Deep (--think-hard --depth deep)
 
 ---
 
-### Phase 구성
-| Phase | 기간 | 주요 작업 | 계획 상태 | 실제 상태 |
-|-------|------|----------|----------|----------|
-| Phase 1 | Day 1-3 | CSS 아키텍처 개선 | 완료 | 스타일 일관성 개선 |
-| Phase 2 | Day 4-7 | 백엔드 추상화 레이어 | 완료 | 서비스 레이어 개선 (부분) |
-| Phase 3 | Day 8-12 | 템플릿 통합 | 완료 | **파셜 스타일 통일만 완료** |
-| Phase 4 | Day 13-15 | 테스트 및 문서화 | 대기 | 미진행 |
-| Phase 5 | Day 16-18 | 레거시 정리 | 대기 | claudedocs/ 정리만 완료 |
+## 1. 법인 직원 (Employee) 상세 분석
+
+### 1.1 디테일 페이지 (출력) - 섹션 순서
+
+| 순서 | 섹션 ID | 섹션명 | 필드 수 | 주요 필드 |
+|:----:|---------|--------|:-------:|----------|
+| 1 | personal-info | 개인 기본정보 | 16 | 성명, 여권명, 주민등록번호, 생년월일, 성별, 결혼여부, 휴대전화, 개인이메일, 비상연락처, 혈액형, 종교, 취미, 특기, 장애정보, 주소, 실제거주주소 |
+| 2 | organization-info | 소속정보 | 14 | 소속, 부서, 직위, 직급, 직책, 직무, 사원번호, 근무형태, 근무지, 내선번호, 회사이메일, 재직상태, 입사일, 재직기간 |
+| 3 | contract-info | 계약정보 | 9 | 계약형태, 계약기간, 계약시작일, 직원유형, 근무형태, 시용기간종료, 근무시간, 휴게시간, 퇴사일 |
+| 4 | salary-info | 급여정보 | 9 | 급여형태, 기본급, 직책수당, 식대, 교통비, 총급여, 급여지급일, 급여지급방법, 급여계좌 |
+| 5 | benefit-info | 연차/복리후생 | 5 | 연차발생일수, 연차사용일수, 연차잔여일수, 퇴직금유형, 퇴직금적립방법 |
+| 6 | insurance-info | 4대보험 | 5 | 4대보험가입여부, 건강보험, 국민연금, 고용보험, 산재보험 |
+| 7 | family-info | 가족정보 | 6 | 관계, 성명, 생년월일, 직업, 연락처, 동거여부 |
+| 8 | education-info | 학력정보 | 7 | 학력구분, 학교명, 졸업년월, 전공, 학점, 졸업유무, 비고 |
+| 9 | career-info | 경력정보 | 10 | 직장명, 부서, 직위, 직급, 직책, 직무, 재직기간, 급여유형, 연봉/월급, 담당업무 |
+| 10 | certificate-info | 자격증/면허 | 6 | 구분, 종류, 등급/점수, 발행처, 취득일, 비고 |
+| 11 | language-info | 언어능력 | 5 | 언어, 수준, 시험명, 점수, 취득일 |
+| 12 | military-info | 병역정보 | 7 | 병역구분, 군별, 복무기간, 계급, 보직, 병과, 면제사유 |
+| 13 | award-info | 수상내역 | 5 | 수상일, 수상명, 수여기관, 수상내용, 비고 |
+| 14 | project-participation | 프로젝트 참여이력 | 7 | 사업명, 참여기간, 기간, 담당업무, 역할/직책, 발주처 |
+| 15 | employment-contract | 근로계약/연봉 | 3테이블 | **디테일 전용** - 근로계약이력, 연봉계약이력, 급여지급이력 |
+| 16 | personnel-movement | 인사이동/고과 | 3테이블 | **디테일 전용** - 인사이동/승진, 인사고과, 교육훈련 |
+| 17 | hr-project-info | 프로젝트 | 7 | **디테일 전용** - 프로젝트명, 참여기간, 기간, 담당업무, 역할/직책, 발주처 |
+| 18 | attendance-assets | 근태/비품 | 2테이블 | **디테일 전용** - 근태현황, 비품지급 |
+
+### 1.2 수정 페이지 (입력) - 섹션 순서
+
+| 순서 | 섹션 ID | 섹션명 | 필수 필드 | 선택 필드 |
+|:----:|---------|--------|----------|----------|
+| 1 | personal-info | 개인 기본정보 | 이름*, 휴대전화*, 이메일* | 영문이름, 생년월일, 성별, 결혼여부, 주소, 상세주소, 비상연락처, 비상연락처관계, 주민등록번호, 혈액형, 종교, 취미, 특기, 장애정보, 실제거주지, 실제거주지상세주소, **명함(앞/뒤)** |
+| 2 | account-info | 계정정보 | **수정 전용** (신규등록시) - username*, password*, user_role* | |
+| 3 | organization-info | 소속정보 | 소속조직*, 직위* | 사번(자동생성), 부서명, 팀, 직급, 직책, 직무, 근무지, 내선번호, 회사이메일 |
+| 4 | contract-info | 계약정보 | 입사일*, 재직상태* | 고용형태, 계약기간, 수습종료일, 퇴사일 |
+| 5 | salary-info | 급여정보 | (없음) | 기본급, 직책수당, 식대, 교통비, 상여금률, 급여지급방식, 은행, 계좌번호, **포괄임금제 8개(읽기전용)** |
+| 6 | benefit-info | 연차/복리후생 | **(읽기전용, 수정모드만)** | 연차발생/사용/잔여일수, 퇴직금유형, 퇴직금적립방법, 기준년도 |
+| 7 | insurance-info | 4대보험 | (없음) | 국민연금가입번호/취득일, 건강보험가입번호/취득일, 고용보험가입번호/취득일, 산재보험가입번호/취득일, 보험적용제외(체크박스) |
+| 8 | family-info | 가족정보 | (동적 추가) | 관계, 성명, 생년월일, 직업, 연락처, 동거여부 |
+| 9 | education-info | 학력정보 | (동적 추가) | 학력구분, 학교명, 졸업년월, 전공, 학점, 비고 |
+| 10 | career-info | 경력정보 | (동적 추가) | 직장명, 부서, 직위, 직급, 직책, 직무, 재직기간, 급여유형, 연봉/월급, 담당업무 |
+| 11 | certificate-info | 자격증 | (동적 추가) | 종류, 등급/점수, 발행처, 취득일, 만료일 |
+| 12 | language-info | 언어능력 | (동적 추가) | 언어, 수준, 시험명, 점수, 취득일 |
+| 13 | military-info | 병역정보 | (없음) | 병역구분, 군별, 복무시작, 복무종료, 계급, 보직, 병과, 면제사유 |
+| 14 | award-info | 수상내역 | (동적 추가) | 수상일, 수상명, 수여기관, 수상내용, 비고 |
+| 15 | project-participation | 프로젝트 참여이력 | (동적 추가) | 사업명, 참여기간, 기간, 담당업무, 역할/직책, 발주처 |
+| 16 | project-info | 프로젝트 | **(수정모드만, 동적 추가)** | 프로젝트명, 참여기간, 기간, 담당업무, 역할/직책, 발주처 |
+
+### 1.3 디테일 vs 수정 순서 차이 (Employee)
+
+| 순서 | 디테일 페이지 | 수정 페이지 | 차이 |
+|:----:|--------------|------------|------|
+| 1 | 개인 기본정보 | 개인 기본정보 | 동일 |
+| 2 | 소속정보 | **계정정보** | **수정에만 존재 (21번/22번 원칙)** |
+| 3 | 계약정보 | 소속정보 | 순서 밀림 |
+| 4 | 급여정보 | 계약정보 | 순서 밀림 |
+| 5 | 연차/복리후생 | 급여정보 | 순서 밀림 |
+| 6 | 4대보험 | 연차/복리후생 | 순서 밀림 |
+| 7 | 가족정보 | 4대보험 | 순서 밀림 |
+| 8 | 학력정보 | 가족정보 | 순서 밀림 |
+| 9-14 | ... | ... | 동일 (1칸씩 밀림) |
+| 15-18 | 인사기록 4개 | X | **디테일에만 존재** |
+| - | X | 프로젝트 (16번) | **수정에만 존재 (수정모드)** |
+
+**핵심 차이**:
+- 수정 페이지: 계정정보(2번) 삽입 → 이후 섹션 1칸씩 밀림
+- 디테일 페이지: 인사기록 4개 섹션 (15-18번) 추가
 
 ---
 
-## Phase 1: CSS 아키텍처 개선 (Day 1-3)
+## 2. 개인 계정 (Personal) 상세 분석
 
-### 1.1 디자인 토큰 시스템
+### 2.1 디테일 페이지 (출력) - 섹션 순서
 
-**파일 생성**: `app/static/css/core/variables.css`
+| 순서 | 섹션 ID | 섹션명 | 필드 수 | 비고 |
+|:----:|---------|--------|:-------:|------|
+| 1 | personal-info | 개인 기본정보 | 16 | Employee 1번과 동일 |
+| 2 | family-info | 가족정보 | 6 | Employee 7번과 동일 |
+| 3 | education-info | 학력정보 | 7 | Employee 8번과 동일 |
+| 4 | career-info | 경력정보 | 10 | Employee 9번과 동일 |
+| 5 | certificate-info | 자격증/면허 | 6 | Employee 10번과 동일 |
+| 6 | language-info | 언어능력 | 5 | Employee 11번과 동일 |
+| 7 | military-info | 병역정보 | 7 | Employee 12번과 동일 |
+| 8 | award-info | 수상내역 | 5 | Employee 13번과 동일 |
+| 9 | project-participation | 프로젝트 참여이력 | 7 | Employee 14번과 동일 |
 
-```css
-:root {
-  /* 색상 토큰 */
-  --color-primary: #2563eb;
-  --color-primary-dark: #1e40af;
-  --color-secondary: #64748b;
-  --color-success: #22c55e;
-  --color-danger: #ef4444;
+**제외된 섹션 (인사카드 전용)**: 소속정보, 계약정보, 급여정보, 복리후생, 4대보험, 인사기록 4개
 
-  /* 간격 토큰 */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
+### 2.2 수정 페이지 (입력) - 섹션 순서
 
-  /* 프로필 컴포넌트 */
-  --profile-header-padding: var(--space-8);
-  --profile-header-bg: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-}
+| 순서 | 섹션 ID | 섹션명 | 필수 필드 | 선택 필드 |
+|:----:|---------|--------|----------|----------|
+| 1 | personal-info | 개인 기본정보 | 이름*, 휴대전화*, 이메일* | Employee와 동일 (명함 제외) |
+| 2 | family-info | 가족정보 | (동적 추가) | Employee와 동일 |
+| 3 | education-info | 학력정보 | (동적 추가) | Employee와 동일 |
+| 4 | career-info | 경력정보 | (동적 추가) | Employee와 동일 |
+| 5 | certificate-info | 자격증 | (동적 추가) | Employee와 동일 |
+| 6 | language-info | 언어능력 | (동적 추가) | Employee와 동일 |
+| 7 | military-info | 병역정보 | (없음) | Employee와 동일 |
+| 8 | award-info | 수상내역 | (동적 추가) | Employee와 동일 |
+| 9 | project-participation | 프로젝트 참여이력 | (동적 추가) | Employee와 동일 |
 
-/* 계정 타입별 테마 */
-body.account-personal {
-  --profile-header-padding: var(--space-6);
-}
+### 2.3 디테일 vs 수정 순서 차이 (Personal)
 
-body.account-corporate {
-  --profile-show-business-card: true;
-}
-```
-
-### 1.2 CSS 디렉토리 구조
-
-```
-app/static/css/
-├── core/
-│   ├── variables.css       # 디자인 토큰 (신규)
-│   ├── reset.css           # 리셋 스타일
-│   └── utilities.css       # 유틸리티 클래스
-├── layouts/
-│   ├── section-nav.css     # 섹션 네비게이션
-│   ├── right-sidebar.css   # 우측 사이드바
-│   └── profile-layout.css  # 통합 프로필 레이아웃 (신규)
-├── components/
-│   ├── cards.css           # 카드 컴포넌트
-│   ├── tables.css          # 테이블
-│   ├── profile-header.css  # 프로필 헤더 (통합, 신규)
-│   └── forms.css           # 폼 컴포넌트
-├── pages/
-│   ├── employee-detail.css # 상세 페이지
-│   └── employee-form.css   # 폼 페이지
-└── variants/
-    ├── corporate.css       # 법인 전용 오버라이드 (신규)
-    └── personal.css        # 개인 전용 오버라이드 (신규)
-```
-
-### 1.3 BEM 네이밍 변환
-
-| 현재 | BEM 변환 |
-|------|----------|
-| `.card` | `.profile-card` |
-| `.card-header` | `.profile-card__header` |
-| `.card-body` | `.profile-card__body` |
-| `.detail-page-layout` | `.profile-layout` |
-| `.employee-header` | `.profile-header` |
-| `.employee-header--corporate` | Modifier |
-| `.employee-header--personal` | Modifier |
-
-### 1.4 Day별 작업 계획
-
-| Day | 작업 | 산출물 |
-|-----|------|--------|
-| Day 1 | 디자인 토큰 시스템 구축 | `core/variables.css` |
-| Day 2 | CSS 파일 재구성 및 BEM 변환 | `profile-*.css` 시리즈 |
-| Day 3 | variants 분리 및 테마 적용 | `corporate.css`, `personal.css` |
+**순서 완전 일치** - 법인 전용 섹션이 없어서 단순한 구조
 
 ---
 
-## Phase 2: 백엔드 추상화 레이어 (Day 4-7)
+## 3. 법인 관리자 (Corporate Admin) 상세 분석
 
-### 2.1 ProfileComponentFactory
+### 3.1 디테일 페이지 (출력) - 섹션 순서
 
-**파일 생성**: `app/components/profile_factory.py`
+| 순서 | 섹션 ID | 섹션명 | 필드 수 | 비고 |
+|:----:|---------|--------|:-------:|------|
+| 1 | personal-info | 개인 기본정보 | 16 | Employee 1번과 동일 |
+| 2 | education-info | 학력정보 | 7 | 빈 목록으로 표시 |
+| 3 | career-info | 경력정보 | 10 | 빈 목록으로 표시 |
+| 4 | certificate-info | 자격증/면허 | 6 | 빈 목록으로 표시 |
+| 5 | language-info | 언어능력 | 5 | 빈 목록으로 표시 |
+| 6 | military-info | 병역정보 | 7 | None으로 표시 |
+| 7 | award-info | 수상내역 | 5 | 빈 목록으로 표시 |
 
-```python
-from dataclasses import dataclass
-from typing import List, Dict, Optional
+**제외된 섹션**: 가족정보, 프로젝트 참여이력, 첨부파일 사이드바
 
-@dataclass
-class ProfileSection:
-    id: str
-    title: str
-    icon: str
-    visible: bool
-    editable: bool
-    fields: List['ProfileField']
+### 3.2 수정 페이지 (입력) - 섹션 순서
 
-@dataclass
-class ProfileField:
-    name: str
-    label: str
-    type: str
-    value: any
-    visible: bool
-    editable: bool
+| 순서 | 섹션 ID | 섹션명 | 필수 필드 | 선택 필드 |
+|:----:|---------|--------|----------|----------|
+| 1 | personal-info | 개인 기본정보 | 이름*, 휴대전화*, 이메일* | Employee와 동일 (명함 제외) |
+| 2 | education-info | 학력정보 | (동적 추가) | Employee와 동일 |
+| 3 | career-info | 경력정보 | (동적 추가) | Employee와 동일 |
+| 4 | certificate-info | 자격증 | (동적 추가) | Employee와 동일 |
+| 5 | language-info | 언어능력 | (동적 추가) | Employee와 동일 |
+| 6 | military-info | 병역정보 | (없음) | Employee와 동일 |
+| 7 | award-info | 수상내역 | (동적 추가) | Employee와 동일 |
 
-class ProfileComponentFactory:
-    """계정 타입별 프로필 컴포넌트 생성"""
+### 3.3 디테일 vs 수정 순서 차이 (Corporate Admin)
 
-    @staticmethod
-    def get_sections(account_type: str, role: str) -> List[ProfileSection]:
-        """계정 타입과 역할에 따른 섹션 구성 반환"""
-        config = PROFILE_CONFIG.get(account_type, {})
-        role_config = config.get(role, config.get('default', {}))
-        return [SectionRegistry.get(sid) for sid in role_config.get('sections', [])]
-
-    @staticmethod
-    def get_field_visibility(account_type: str, role: str, field_name: str) -> bool:
-        """필드 가시성 결정"""
-        pass
-
-    @staticmethod
-    def build_context(account_type: str, role: str, data: Dict) -> Dict:
-        """템플릿 렌더링용 전체 컨텍스트 빌드"""
-        pass
-```
-
-### 2.2 설정 파일
-
-**파일 생성**: `app/config/profile_config.py`
-
-```python
-PROFILE_SECTIONS = {
-    'basic': {
-        'title': '기본정보',
-        'icon': 'fas fa-user',
-        'order': 1,
-        'visibility': {
-            'corporate.admin': True,
-            'corporate.employee': True,
-            'personal.default': True
-        }
-    },
-    'organization': {
-        'title': '소속정보',
-        'icon': 'fas fa-building',
-        'order': 2,
-        'visibility': {
-            'corporate.admin': True,
-            'corporate.employee': True,  # 읽기 전용
-            'personal.default': False    # 계약 시에만 표시
-        }
-    },
-    # ... 나머지 섹션
-}
-
-ACCOUNT_TYPES = {
-    'corporate': {
-        'roles': ['admin', 'manager', 'employee'],
-        'default_sections': ['basic', 'organization', 'contract', 'education', 'career', 'certificate', 'language', 'project', 'military', 'family', 'salary', 'insurance'],
-        'css_variant': 'corporate'
-    },
-    'personal': {
-        'roles': ['default'],
-        'default_sections': ['basic', 'education', 'career', 'certificate', 'language', 'military', 'visibility'],
-        'css_variant': 'personal'
-    }
-}
-```
-
-### 2.3 컨텍스트 프로세서
-
-**파일 수정**: `app/context_processors.py`
-
-```python
-from flask import g
-from app.components.profile_factory import ProfileComponentFactory
-
-def register_context_processors(app):
-    @app.context_processor
-    def profile_context():
-        def get_profile_config(account_type: str, role: str) -> dict:
-            return ProfileComponentFactory.get_config(account_type, role)
-
-        def has_section(section_id: str) -> bool:
-            return ProfileComponentFactory.has_section(
-                g.account_type, g.user_role, section_id
-            )
-
-        def can_edit_field(field_name: str) -> bool:
-            return ProfileComponentFactory.can_edit_field(
-                g.account_type, g.user_role, field_name
-            )
-
-        return {
-            'get_profile_config': get_profile_config,
-            'has_section': has_section,
-            'can_edit_field': can_edit_field,
-            'profile_factory': ProfileComponentFactory
-        }
-```
-
-### 2.4 Day별 작업 계획
-
-| Day | 작업 | 산출물 |
-|-----|------|--------|
-| Day 4 | 설정 파일 및 Factory 기본 구조 | `profile_config.py`, `profile_factory.py` |
-| Day 5 | ProfileService 통합 | `profile_service.py` |
-| Day 6 | 컨텍스트 프로세서 구현 | `context_processors.py` 수정 |
-| Day 7 | Blueprint 통합 및 라우트 수정 | `profile.py` 신규 블루프린트 |
+**순서 완전 일치** - 가장 단순한 구조
 
 ---
 
-## Phase 3: 템플릿 통합 (Day 8-12)
+## 4. API 필드 순서 비교 (to_dict vs from_dict)
 
-### 3.1 통합 템플릿 구조
+### 4.1 Employee 모델
+
+#### to_dict() 출력 순서 (47개 필드)
+
+| 그룹 | 순서 | 필드명 |
+|------|:----:|--------|
+| 기본 | 1-9 | id, name, photo, department, position, status, hire_date, phone, email |
+| 조직 | 10-11 | organization_id, **organization (nested)** |
+| 개인 | 12-29 | english_name ~ marital_status |
+| 실거주 | 30-32 | actual_postal_code ~ actual_detailed_address |
+| 비상 | 33-34 | emergency_contact, emergency_relation |
+| 소속 | 35-42 | team ~ employee_number |
+| 스냅샷 | 43-47 | **profile_id ~ data_retention_until (출력 전용)** |
+
+#### from_dict() 입력 순서 (41개 필드)
+
+| 그룹 | 순서 | 필드명 |
+|------|:----:|--------|
+| 기본 | 1-10 | id ~ organization_id |
+| 소속 | 11-18 | employee_number ~ company_email |
+| 개인 | 19-41 | english_name ~ emergency_relation |
+
+**출력 전용 필드**: organization (nested), profile_snapshot, snapshot_at, resignation_date, data_retention_until
+
+### 4.2 Profile 모델
+
+#### to_dict() 출력 순서 (35개 필드)
+
+| 그룹 | 순서 | 필드명 |
+|------|:----:|--------|
+| 기본 | 1-9 | id ~ gender |
+| 계산 | 10 | **age (@property)** |
+| 연락 | 11-17 | mobile_phone ~ **full_address (@property)** |
+| 상세 | 18-25 | nationality ~ marital_status |
+| 실거주 | 26-29 | actual_* ~ **actual_full_address (@property)** |
+| 비상 | 30-31 | emergency_contact, emergency_relation |
+| 메타 | 32-35 | is_public, **is_personal (@property)**, created_at, updated_at |
+
+#### from_dict() 입력 순서 (28개 필드)
+
+**to_dict와 거의 동일 순서** (단순 개인정보 모델)
+
+**출력 전용 필드**: age, full_address, actual_full_address, is_personal, created_at, updated_at
+
+### 4.3 CorporateAdminProfile 모델
+
+**DictSerializableMixin 자동 생성** - 컬럼 정의 순서 = to_dict 출력 순서
+
+| 순서 | 필드명 | camelCase |
+|:----:|--------|-----------|
+| 1-3 | id, user_id, company_id | userId, companyId |
+| 4-6 | name, english_name, position | englishName |
+| 7-9 | mobile_phone, office_phone, email | mobilePhone, officePhone |
+| 10-12 | photo, department, bio | |
+| 13-15 | is_active, created_at, updated_at | isActive, createdAt, updatedAt |
+
+**출력 전용 필드**: created_at, updated_at
+
+---
+
+## 5. 관계 모델 필드 순서
+
+### 5.1 Education (DictSerializableMixin)
 
 ```
-app/templates/
-├── profile/
-│   ├── detail.html         # 통합 상세 페이지 (신규)
-│   ├── edit.html           # 통합 수정 페이지 (신규)
-│   └── components/
-│       ├── _header.html    # 프로필 헤더
-│       └── _section.html   # 범용 섹션 렌더러
-├── partials/
-│   └── profile/            # 통합 파셜 (신규)
-│       ├── _basic_info.html
-│       ├── _organization_info.html
-│       └── _section_renderer.html
+id → employee_id → profile_id → school_type → school_name → major → degree
+→ admission_date → graduation_date → graduation_status → gpa → location → note
 ```
 
-### 3.2 통합 detail.html 설계
+**Alias**: school→school_name, status→graduation_status, notes→note
+**Computed**: graduation_year
 
-```jinja2
-{% extends "base.html" %}
+### 5.2 Career (DictSerializableMixin)
 
-{% set account_type = profile.account_type %}
-{% set view_config = get_profile_config(account_type, user_role) %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/core/variables.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/profile-layout.css') }}">
-{% if account_type == 'corporate' %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/variants/corporate.css') }}">
-{% else %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/variants/personal.css') }}">
-{% endif %}
-{% endblock %}
-
-{% block content %}
-<body class="account-{{ account_type }}">
-<div class="profile-layout">
-    {{ section_nav(variant=account_type) }}
-
-    <main class="profile-main">
-        {% include 'profile/components/_header.html' %}
-
-        {% for section in view_config.sections %}
-            {% if has_section(section.id) %}
-                {% include 'partials/profile/_section_renderer.html' %}
-            {% endif %}
-        {% endfor %}
-    </main>
-</div>
-</body>
-{% endblock %}
+```
+id → employee_id → profile_id → company_name → department
+→ position → job_grade → job_title → job_role → job_description
+→ start_date → end_date → salary → salary_type → monthly_salary → pay_step
+→ resignation_reason → is_current → note
 ```
 
-### 3.3 파셜 리팩토링 (조건부 렌더링 제거)
+**Alias**: company→company_name, duty→job_description, reason_for_leaving→resignation_reason
 
-**Before** (현재):
-```jinja2
-{% if is_corporate %}
-    {{ info_item('회사 이메일', employee.company_email) }}
-{% endif %}
+### 5.3 Salary (법인 전용)
+
+```
+id → employee_id → salary_type → base_salary → position_allowance
+→ meal_allowance → transportation_allowance → total_salary
+→ payment_day → payment_method → bank_account → note
+→ annual_salary → monthly_salary → hourly_wage
+→ overtime_hours → night_hours → holiday_days
+→ overtime_allowance → night_allowance → holiday_allowance
 ```
 
-**After** (개선):
-```jinja2
-{% if has_section('company_email') %}
-    {{ info_item('회사 이메일', profile.company_email) }}
-{% endif %}
+**Alias**: transport_allowance→transportation_allowance, pay_type→salary_type
+
+### 5.4 Contract (법인 전용)
+
+```
+id → employee_id → contract_date → contract_type → contract_period
+→ employee_type → work_type → note
 ```
 
-### 3.4 레거시 템플릿 제거 계획
+### 5.5 Insurance (법인 전용)
 
-| 단계 | 파일 | 조치 |
+```
+id → employee_id → national_pension → health_insurance
+→ employment_insurance → industrial_accident
+→ national_pension_rate → health_insurance_rate
+→ long_term_care_rate → employment_insurance_rate → note
+```
+
+### 5.6 Benefit (법인 전용)
+
+```
+id → employee_id → year → annual_leave_granted → annual_leave_used
+→ annual_leave_remaining → severance_type → severance_method → note
+```
+
+---
+
+## 6. 어댑터 필드 순서
+
+### 6.1 EmployeeProfileAdapter.get_basic_info()
+
+```
+id → name → english_name → chinese_name → birth_date → lunar_birth → gender
+→ mobile_phone → home_phone → email → address → detailed_address → postal_code
+→ photo → employee_number → nationality → blood_type → religion → hobby
+→ specialty → disability_info → marital_status
+→ actual_postal_code → actual_address → actual_detailed_address
+→ emergency_contact → emergency_relation
+```
+
+### 6.2 PersonalProfileAdapter.get_basic_info()
+
+```
+id → name → english_name → chinese_name → resident_number → birth_date
+→ lunar_birth → gender → mobile_phone → phone (템플릿 호환) → home_phone
+→ email → address → detailed_address → postal_code → photo
+→ employee_number (None) → nationality → blood_type → religion → hobby
+→ specialty → disability_info → marital_status
+→ actual_postal_code → actual_address → actual_detailed_address
+→ emergency_contact → emergency_relation → is_public
+```
+
+### 6.3 CorporateAdminProfileAdapter.get_basic_info()
+
+```
+id → name → english_name → chinese_name (None) → birth_date (None)
+→ lunar_birth (None) → gender (None) → mobile_phone → home_phone (None)
+→ email → address (None) → detailed_address (None) → postal_code (None)
+→ photo → employee_number (None) → nationality (None) → blood_type (None)
+→ religion (None) → hobby (None) → specialty (None) → disability_info (None)
+→ position → department → office_phone → bio
+```
+
+---
+
+## 7. 종합 비교표
+
+### 7.1 섹션 가용성 매트릭스
+
+| 순서 | 섹션 | Employee 디테일 | Employee 수정 | Personal 디테일 | Personal 수정 | Corp Admin 디테일 | Corp Admin 수정 |
+|:----:|------|:---------------:|:-------------:|:---------------:|:-------------:|:-----------------:|:---------------:|
+| 1 | 개인 기본정보 | O | O | O | O | O | O |
+| 2 | 계정정보 | X | **O (신규)** | X | X | X | X |
+| 3 | 소속정보 | O | O | X | X | X | X |
+| 4 | 계약정보 | O | O | X | X | X | X |
+| 5 | 급여정보 | O | O | X | X | X | X |
+| 6 | 연차/복리후생 | O | R | X | X | X | X |
+| 7 | 4대보험 | O | O | X | X | X | X |
+| 8 | 가족정보 | O | O | O | O | X | X |
+| 9 | 학력정보 | O | O | O | O | - | O |
+| 10 | 경력정보 | O | O | O | O | - | O |
+| 11 | 자격증 | O | O | O | O | - | O |
+| 12 | 언어능력 | O | O | O | O | - | O |
+| 13 | 병역정보 | O | O | O | O | - | O |
+| 14 | 수상내역 | O | O | O | O | - | O |
+| 15 | 프로젝트 참여이력 | O | O | O | O | X | X |
+| 16 | 근로계약/연봉 | **O** | X | X | X | X | X |
+| 17 | 인사이동/고과 | **O** | X | X | X | X | X |
+| 18 | 프로젝트 (인사기록) | **O** | R | X | X | X | X |
+| 19 | 근태/비품 | **O** | X | X | X | X | X |
+
+**범례**: O = 표시/편집, R = 읽기전용, X = 미표시, - = 빈 목록
+
+### 7.2 디테일 vs 수정 필드 차이
+
+| 구분 | 디테일 전용 (출력) | 수정 전용 (입력) |
+|------|-------------------|------------------|
+| **섹션** | 근로계약/연봉, 인사이동/고과, 프로젝트(인사기록), 근태/비품 | 계정정보 (21번/22번 원칙) |
+| **필드** | 재직기간(계산), 총급여(계산), 나이(계산), 전체주소(조합) | 프로필 사진 업로드, 명함 업로드, 주소 검색 버튼, 조직 트리 선택, 동적 추가/삭제 버튼, 포괄임금 계산기 |
+| **API** | organization (nested), profile_snapshot, age, full_address, is_personal | 없음 |
+
+### 7.3 순서 불일치 요약
+
+| 계정 | 디테일 섹션 수 | 수정 섹션 수 | 순서 차이 원인 |
+|------|:-------------:|:------------:|---------------|
+| **Employee** | 18개 | 16개 | 계정정보(2번) 삽입 → 이후 1칸씩 밀림, 인사기록 4개(디테일 전용) |
+| **Personal** | 9개 | 9개 | 순서 완전 일치 |
+| **Corp Admin** | 7개 | 7개 | 순서 완전 일치 |
+
+### 7.4 to_dict vs from_dict 순서 차이
+
+| 모델 | to_dict 특징 | from_dict 특징 | 차이 |
+|------|-------------|---------------|------|
+| **Employee** | 기본→조직(nested)→개인→소속→스냅샷 | 기본→조직ID→소속→개인 | 표시 순서 vs 입력 논리 순서 |
+| **Profile** | 기본→계산(@property)→연락→실거주→메타 | 기본→연락→실거주→메타 | @property 필드 제외 |
+| **CorporateAdmin** | 컬럼 정의 순서 (자동) | camelCase 매핑 (순서 무관) | DictSerializableMixin |
+
+---
+
+## 8. 핵심 발견사항
+
+### 8.1 순서 일관성
+
+1. **공통 패턴**: 기본→이름확장→생년월일→연락처→주소→신분→개인정보→실거주→비상연락
+2. **계정별 확장**: Employee만 조직/소속 정보 추가 (2-7번 섹션)
+3. **모델 vs 어댑터**: 모델은 전체 필드, 어댑터는 섹션별 그룹핑
+
+### 8.2 입출력 불일치
+
+1. **Employee to_dict vs from_dict**: 조직 정보 배치 순서 상이
+2. **@property 필드**: age, full_address 등은 출력 전용
+3. **Alias 필드**: 템플릿 호환성 위해 여러 이름 지원
+
+### 8.3 조건부 렌더링
+
+**템플릿 조건 체계**:
+- `page_mode == 'hr_card'` → 법인 직원 전용 섹션
+- `account_type != 'corporate_admin'` → 가족정보, 프로젝트참여이력
+- `action != 'create'` → 수정 모드 전용 섹션
+
+---
+
+## 9. 권장사항
+
+1. **FieldRegistry 확대**: 중앙집중식 필드 순서 관리 (현재 부분 도입)
+2. **Mixin 전환**: Employee도 DictSerializableMixin 사용 고려
+3. **어댑터 표준화**: 모든 어댑터 get_*_info() 순서를 FieldRegistry 기반으로 통일
+4. **순서 불일치 해결**: to_dict와 from_dict 순서 통일 검토
+
+---
+
+## 10. 개인 vs 법인 직원 필드 세부 비교 분석
+
+### 10.1 모델 수준 필드 비교
+
+#### 10.1.1 공통 필드 (Profile ∩ Employee) - 25개
+
+| 순서 | 필드명 | Profile | Employee | 데이터 타입 | 용도 |
+|:----:|--------|:-------:|:--------:|-------------|------|
+| 1 | `name` | O | O | String(100) | 이름 (한글, 필수) |
+| 2 | `english_name` | O | O | String(100) | 여권명 (영문) |
+| 3 | `chinese_name` | O | O | String(100) | 한자명 |
+| 4 | `photo` | O | O | String(500) | 프로필 사진 URL |
+| 5 | `birth_date` | O | O | String(20) | 생년월일 |
+| 6 | `lunar_birth` | O | O | Boolean | 음력 여부 |
+| 7 | `gender` | O | O | String(10) | 성별 |
+| 8 | `mobile_phone` | O | O | String(50) | 휴대전화 |
+| 9 | `home_phone` | O | O | String(50) | 자택전화 |
+| 10 | `email` | O | O | String(200) | 개인 이메일 |
+| 11 | `postal_code` | O | O | String(20) | 우편번호 |
+| 12 | `address` | O | O | String(500) | 주민등록상 주소 |
+| 13 | `detailed_address` | O | O | String(500) | 상세주소 |
+| 14 | `resident_number` | O | O | String(20) | 주민등록번호 |
+| 15 | `nationality` | O | O | String(50) | 국적 |
+| 16 | `blood_type` | O | O | String(10) | 혈액형 |
+| 17 | `religion` | O | O | String(50) | 종교 |
+| 18 | `hobby` | O | O | String(200) | 취미 |
+| 19 | `specialty` | O | O | String(200) | 특기 |
+| 20 | `disability_info` | O | O | Text | 장애정보 |
+| 21 | `marital_status` | O | O | String(20) | 결혼여부 |
+| 22 | `actual_postal_code` | O | O | String(20) | 실제 거주지 우편번호 |
+| 23 | `actual_address` | O | O | String(500) | 실제 거주지 주소 |
+| 24 | `actual_detailed_address` | O | O | String(500) | 실제 거주지 상세주소 |
+| 25 | `emergency_contact` | O | O | String(50) | 비상연락처 |
+| 26 | `emergency_relation` | O | O | String(50) | 비상연락처 관계 |
+
+#### 10.1.2 개인 전용 필드 (Profile Only) - 4개
+
+| 필드명 | 데이터 타입 | 용도 | 비고 |
+|--------|-------------|------|------|
+| `user_id` | Integer (FK) | User 계정 연결 | 1:1 관계 |
+| `is_public` | Boolean | 프로필 공개 여부 | 기본값: False |
+| `created_at` | DateTime | 생성일시 | 자동 |
+| `updated_at` | DateTime | 수정일시 | 자동 |
+
+#### 10.1.3 법인 직원 전용 필드 (Employee Only) - 24개
+
+**기본/조직 정보 (10개)**:
+
+| 필드명 | 데이터 타입 | 용도 |
+|--------|-------------|------|
+| `employee_number` | String(20) | 사번 (EMP-YYYY-NNNN) |
+| `profile_id` | Integer (FK) | 통합 프로필 연결 |
+| `organization_id` | Integer (FK) | 조직 연결 |
+| `company_id` | Integer (FK) | 회사 연결 |
+| `department` | String(100) | 부서 |
+| `position` | String(100) | 직위 (서열) |
+| `status` | String(50) | 재직상태 |
+| `hire_date` | String(20) | 입사일 |
+| `team` | String(100) | 팀 |
+| `job_grade` | String(50) | 직급 (역량 레벨) |
+
+**직무/연락 정보 (5개)**:
+
+| 필드명 | 데이터 타입 | 용도 |
+|--------|-------------|------|
+| `job_title` | String(100) | 직책 (팀장, 본부장) |
+| `job_role` | String(100) | 직무 (인사기획, 회계관리) |
+| `work_location` | String(200) | 근무지 |
+| `internal_phone` | String(50) | 내선번호 |
+| `company_email` | String(200) | 회사 이메일 |
+
+**스냅샷/퇴직 정보 (4개)**:
+
+| 필드명 | 데이터 타입 | 용도 |
+|--------|-------------|------|
+| `profile_snapshot` | JSONB | 퇴사 시점 프로필 스냅샷 |
+| `snapshot_at` | DateTime | 스냅샷 생성 시점 |
+| `resignation_date` | Date | 퇴직일 |
+| `data_retention_until` | Date | 데이터 보관 만료일 |
+
+### 10.2 관계 데이터 비교
+
+#### 10.2.1 공통 이력 데이터 (1:N, 양쪽 모두 사용) - 8개
+
+| 관계 모델 | Profile | Employee | 연결 방식 |
+|-----------|:-------:|:--------:|-----------|
+| `Education` | O | O | `profile_id` 또는 `employee_id` |
+| `Career` | O | O | `profile_id` 또는 `employee_id` |
+| `Certificate` | O | O | `profile_id` 또는 `employee_id` |
+| `Language` | O | O | `profile_id` 또는 `employee_id` |
+| `MilitaryService` | O (1:N) | O (1:1) | `profile_id` 또는 `employee_id` |
+| `FamilyMember` | O | O | `profile_id` 또는 `employee_id` |
+| `Award` | O | O | `profile_id` 또는 `employee_id` |
+| `ProjectParticipation` | O | O | `profile_id` 또는 `employee_id` |
+
+#### 10.2.2 법인 직원 전용 관계 데이터 - 14개
+
+**1:1 관계 (4개)**:
+
+| 관계 모델 | 용도 |
+|-----------|------|
+| `Salary` | 급여 정보 (기본급, 수당, 총급여) |
+| `Contract` | 계약 정보 (계약형태, 근무형태, 시용기간) |
+| `Benefit` | 복리후생 (연차, 퇴직금 유형) |
+| `Insurance` | 4대보험 (국민연금, 건강보험, 고용보험, 산재보험) |
+
+**1:N 관계 (10개)**:
+
+| 관계 모델 | 용도 |
+|-----------|------|
+| `SalaryHistory` | 급여 이력 |
+| `Promotion` | 승진 이력 |
+| `Evaluation` | 평가 이력 |
+| `Training` | 교육 이력 |
+| `Attendance` | 근태 기록 |
+| `HrProject` | 인사이력 프로젝트 |
+| `Asset` | 비품 관리 |
+| `SalaryPayment` | 급여 지급 이력 |
+| `AnnualContract` | 연봉 계약 |
+| `Attachment` | 첨부파일 |
+
+### 10.3 어댑터 메서드 비교
+
+| 메서드명 | PersonalProfileAdapter | EmployeeProfileAdapter | 차이점 |
+|----------|:----------------------:|:----------------------:|--------|
+| `get_basic_info()` | O (25개 필드) | O (25개 필드 + 사번) | Employee만 `employee_number` 포함 |
+| `get_organization_info()` | X (None) | O (11개 필드) | 법인 전용 |
+| `get_contract_info()` | X (None) | O (Contract.to_dict) | 법인 전용 |
+| `get_salary_info()` | X (None) | O (Salary.to_dict) | 법인 전용 |
+| `get_benefit_info()` | X (None) | O (Benefit.to_dict) | 법인 전용 |
+| `get_insurance_info()` | X (None) | O (Insurance.to_dict) | 법인 전용 |
+| `get_education_list()` | O (profile.educations) | O (employee.educations) | 동일 구조 |
+| `get_career_list()` | O (profile.careers) | O (employee.careers) | 동일 구조 |
+| `get_certificate_list()` | O | O | 동일 구조 |
+| `get_language_list()` | O | O | 동일 구조 |
+| `get_military_info()` | O (1:N, first()) | O (1:1) | 관계 타입 차이 |
+| `get_family_list()` | O | O | 동일 구조 |
+| `get_award_list()` | O | O | 동일 구조 |
+| `get_project_participation_list()` | O | O | 동일 구조 |
+| `is_corporate()` | False | True | 타입 구분 |
+| `get_account_type()` | `'personal'` | `'corporate'` | 타입 구분 |
+| `get_available_sections()` | 9개 | 14개 | 법인 전용 5개 추가 |
+
+### 10.4 필드별 매핑 관계
+
+#### 별칭(Alias) 필드
+
+| 원본 필드 (모델) | 별칭 (어댑터/템플릿) | 사용처 |
+|------------------|---------------------|--------|
+| `mobile_phone` | `phone` | PersonalProfileAdapter에서 템플릿 호환용 |
+| `english_name` | `name_en`, `englishName` | 템플릿 입력, camelCase 변환 |
+| `resident_number` | `rrn`, `residentNumber` | 템플릿 입력, camelCase 변환 |
+
+#### camelCase vs snake_case 변환 (17개)
+
+| snake_case (DB) | camelCase (Frontend) |
+|-----------------|----------------------|
+| `english_name` | `englishName` |
+| `chinese_name` | `chineseName` |
+| `birth_date` | `birthDate` |
+| `lunar_birth` | `lunarBirth` |
+| `mobile_phone` | `mobilePhone` |
+| `home_phone` | `homePhone` |
+| `postal_code` | `postalCode` |
+| `detailed_address` | `detailedAddress` |
+| `resident_number` | `residentNumber` |
+| `blood_type` | `bloodType` |
+| `disability_info` | `disabilityInfo` |
+| `marital_status` | `maritalStatus` |
+| `actual_postal_code` | `actualPostalCode` |
+| `actual_address` | `actualAddress` |
+| `actual_detailed_address` | `actualDetailedAddress` |
+| `emergency_contact` | `emergencyContact` |
+| `emergency_relation` | `emergencyRelation` |
+
+---
+
+## 11. 왜 필드 구조가 다른가? (원인 분석)
+
+### 11.1 도메인 모델 차이
+
+| 구분 | 개인 계정 (Personal) | 법인 직원 (Employee) |
+|------|---------------------|---------------------|
+| **핵심 목적** | 개인 이력서/포트폴리오 관리 | 인사카드/인사관리 시스템 |
+| **데이터 주체** | 본인 | 회사 (인사팀) |
+| **소유권** | 개인 | 법인 |
+| **접근 권한** | 본인만 | 인사관리자 + 본인 |
+| **보관 의무** | 없음 | 법적 의무 (근로기준법) |
+
+### 11.2 비즈니스 요구사항 차이
+
+#### 개인 계정만 필요한 기능
+
+| 기능 | 필드 | 이유 |
 |------|------|------|
-| 1단계 | `profile/detail.html`, `profile/edit.html` | 신규 생성 |
-| 2단계 | `employees/detail.html` | 리다이렉트 설정 |
-| 2단계 | `personal/profile_detail.html` | 리다이렉트 설정 |
-| 3단계 | 레거시 파일 | 삭제 (검증 후) |
+| 프로필 공개 설정 | `is_public` | 이력서 공유, 헤드헌터 열람 허용 |
+| User 계정 연결 | `user_id` | 로그인 연동 (1:1) |
 
-### 3.5 Day별 작업 계획
+#### 법인 직원만 필요한 기능
 
-| Day | 작업 | 산출물 |
-|-----|------|--------|
-| Day 8 | 통합 템플릿 디렉토리 구조 생성 | `profile/` 디렉토리 |
-| Day 9 | 통합 detail.html 구현 | `profile/detail.html` |
-| Day 10 | 통합 edit.html 구현 | `profile/edit.html` |
-| Day 11 | 파셜 리팩토링 | `partials/profile/` |
-| Day 12 | 라우트 리다이렉트 및 레거시 정리 | Blueprint 수정 |
+| 기능 | 관련 필드/모델 | 이유 |
+|------|---------------|------|
+| 조직 관리 | `organization_id`, `department`, `team` | 조직도 구성, 부서 배치 |
+| 직위/직급 체계 | `position`, `job_grade`, `job_title`, `job_role` | 인사 서열, 역량 평가, 책임 범위 |
+| 급여 관리 | `Salary`, `SalaryHistory`, `SalaryPayment` | 급여 계산, 지급 이력 |
+| 계약 관리 | `Contract`, `AnnualContract` | 고용 형태, 계약 기간 |
+| 4대보험 | `Insurance` | 법적 의무 가입 |
+| 연차/복리후생 | `Benefit` | 근로기준법 준수 |
+| 인사 평가 | `Evaluation`, `Promotion` | 성과 관리, 승진 |
+| 근태 관리 | `Attendance` | 출퇴근, 휴가, 초과근무 |
+| 퇴직자 관리 | `profile_snapshot`, `resignation_date`, `data_retention_until` | 법적 보관 의무 |
+
+### 11.3 법적 요구사항
+
+| 법률 | 요구사항 | 해당 필드 |
+|------|----------|----------|
+| **근로기준법** | 근로계약서 보관 (3년) | `Contract`, `AnnualContract` |
+| **근로기준법** | 임금대장 보관 (3년) | `Salary`, `SalaryPayment` |
+| **근로기준법** | 연차휴가 관리 | `Benefit.annual_leave_*` |
+| **4대보험법** | 가입/취득 기록 | `Insurance` |
+| **개인정보보호법** | 퇴직자 정보 보관 기한 | `data_retention_until` |
+
+### 11.4 데이터 관계 차이
+
+```
+[개인 계정]
+User (1) ←→ (1) Profile ←→ (N) Education, Career, Certificate, ...
+
+[법인 직원]
+Company (1) ←→ (N) Organization ←→ (N) Employee
+                                      ├── (1) Salary
+                                      ├── (1) Contract
+                                      ├── (1) Benefit
+                                      ├── (1) Insurance
+                                      ├── (N) Education, Career, ...
+                                      └── (N) SalaryHistory, Attendance, ...
+```
+
+**핵심 차이**: 법인 직원은 **조직 계층 구조** 내에 존재하며, **법적 의무**에 따른 추가 데이터 관리가 필요
 
 ---
 
-## Phase 4: 테스트 및 문서화 (Day 13-15)
+## 12. 공통 관리 가능성 분석 및 제안
 
-### 4.1 테스트 계획
+### 12.1 현재 통합 상태 평가
 
-**단위 테스트** (`tests/unit/`):
-```python
-# test_profile_factory.py
-def test_corporate_admin_gets_all_sections():
-    sections = ProfileComponentFactory.get_sections('corporate', 'admin')
-    assert 'salary' in [s.id for s in sections]
-    assert 'insurance' in [s.id for s in sections]
+| 항목 | 상태 | 평가 |
+|------|------|------|
+| 개인정보 필드 | 완전 동일 (25개) | 통합 완료 |
+| 이력 데이터 | 동일 구조 (8개 모델) | 통합 완료 |
+| 어댑터 패턴 | ProfileAdapter 추상화 | 통합 완료 |
+| 템플릿 렌더링 | 조건부 렌더링 | 통합 완료 |
+| FieldRegistry | 부분 적용 | 확대 필요 |
 
-def test_personal_hides_corporate_sections():
-    sections = ProfileComponentFactory.get_sections('personal', 'default')
-    assert 'salary' not in [s.id for s in sections]
-    assert 'visibility' in [s.id for s in sections]
+### 12.2 공통 관리 가능 영역
+
+#### 이미 공통 관리 중인 영역
+
+```
+✅ 개인정보 필드 25개 → ProfileAdapter.get_basic_info()
+✅ 이력 데이터 8개 모델 → profile_id 또는 employee_id로 연결
+✅ 템플릿 렌더링 → 조건부 include로 통합
+✅ 필드 순서 → FieldRegistry 일부 적용
 ```
 
-**통합 테스트** (`tests/integration/`):
-```python
-# test_profile_rendering.py
-def test_corporate_profile_renders_correctly(client, corporate_user):
-    response = client.get('/profile/1')
-    assert 'profile-header--corporate' in response.data
-    assert 'hr_records' in response.data
+#### 추가 통합 가능 영역
 
-def test_personal_profile_renders_correctly(client, personal_user):
-    response = client.get('/profile/me')
-    assert 'profile-header--personal' in response.data
-    assert 'visibility_settings' in response.data
-```
+| 영역 | 현재 상태 | 통합 방안 |
+|------|----------|----------|
+| **필드 순서** | 분산 정의 | FieldRegistry 확대 |
+| **별칭 처리** | 각 모델에서 개별 처리 | FieldRegistry.normalize_field_name() |
+| **가시성 로직** | 템플릿/어댑터 중복 | FieldRegistry.Visibility 활용 |
+| **to_dict/from_dict** | Employee 수동 구현 | DictSerializableMixin 전환 |
 
-**E2E 테스트** (Playwright):
-```python
-# test_profile_e2e.py
-def test_personal_profile_edit_flow(page):
-    page.goto('/personal/profile')
-    page.click('[data-action="edit"]')
-    page.fill('#name', '홍길동')
-    page.click('[type="submit"]')
-    assert page.locator('.toast-success').is_visible()
-```
+### 12.3 공통 관리 불가능 영역
 
-### 4.2 문서화
+#### 구조적으로 분리 필요한 영역
 
-**생성할 문서**:
-1. `docs/architecture/profile-system.md` - 아키텍처 개요
-2. `docs/components/profile-factory.md` - ProfileComponentFactory 사용법
-3. `docs/migration/account-template-migration.md` - 마이그레이션 가이드
-
-### 4.3 Day별 작업 계획
-
-| Day | 작업 | 산출물 |
-|-----|------|--------|
-| Day 13 | 단위 테스트 작성 | `tests/unit/test_profile_*.py` |
-| Day 14 | 통합/E2E 테스트 작성 | `tests/integration/`, `tests/e2e/` |
-| Day 15 | 문서화 및 최종 검증 | `docs/` |
-
----
-
-## 롤백 전략
-
-### 단계별 롤백 포인트
-
-| Phase | 롤백 방법 | 예상 시간 |
-|-------|----------|----------|
-| Phase 1 | CSS 파일 되돌리기 | 5분 |
-| Phase 2 | 설정 파일 비활성화 | 10분 |
-| Phase 3 | 레거시 템플릿 복원 | 15분 |
-| Phase 4 | 테스트 제외 | 즉시 |
-| Phase 5 | 백업 브랜치에서 레거시 파일 복원 | 5분 |
-
-### 긴급 롤백 절차
-
-```bash
-# 1. 신규 블루프린트 비활성화
-# app/__init__.py에서 profile 블루프린트 주석 처리
-
-# 2. 레거시 라우트 복원
-git checkout HEAD~1 -- app/blueprints/employees.py
-git checkout HEAD~1 -- app/blueprints/personal.py
-
-# 3. 서버 재시작
-flask run
-```
-
----
-
-## 수정 대상 파일 목록
-
-### 신규 생성
-- `app/static/css/core/variables.css`
-- `app/static/css/variants/corporate.css`
-- `app/static/css/variants/personal.css`
-- `app/components/profile_factory.py`
-- `app/config/profile_config.py`
-- `app/templates/profile/detail.html`
-- `app/templates/profile/edit.html`
-- `app/blueprints/profile.py`
-
-### 수정
-- `app/context_processors.py`
-- `app/__init__.py` (블루프린트 등록)
-- `app/templates/macros/_navigation.html`
-- `app/static/css/layouts/section-nav.css`
-- `app/static/css/components/employee-header.css`
-
-### 삭제 (Phase 3 완료 후)
-- `app/templates/employees/detail.html` (리다이렉트로 대체)
-- `app/templates/personal/profile_detail.html` (리다이렉트로 대체)
-
----
-
-## 성공 지표
-
-| 지표 | 목표 | 측정 방법 |
+| 영역 | 이유 | 현재 상태 |
 |------|------|----------|
-| 코드 중복 감소 | 50% | LOC 비교 |
-| CSS 번들 크기 | 30% 감소 | 빌드 크기 측정 |
-| 테스트 커버리지 | 80% | pytest-cov |
-| 페이지 로드 시간 | 유지 또는 개선 | Lighthouse |
+| **조직 연결** | 법인만 조직 계층 구조 존재 | Employee.organization_id |
+| **급여/계약** | 법인만 고용 관계 존재 | Salary, Contract 모델 |
+| **4대보험** | 법인만 법적 의무 | Insurance 모델 |
+| **인사 기록** | 법인만 인사 관리 필요 | Evaluation, Promotion, Attendance |
+| **퇴직자 관리** | 법인만 법적 보관 의무 | profile_snapshot, data_retention_until |
 
----
+### 12.4 통합 아키텍처 제안
 
-## 다음 단계
+#### 제안 1: FieldRegistry 중심 통합 (권장)
 
-### 완료된 작업
-1. Phase 1: CSS 스타일 일관성 개선
-2. Phase 2: 백엔드 서비스 레이어 개선 (PersonalService, Repository 패턴)
-3. Phase 3: 파셜 템플릿 스타일 통일 (partials/employee_form/, partials/profile_form/)
-4. Phase 5 (부분): claudedocs/ 분석 문서 정리 완료
-
-### 미완료 핵심 작업 (템플릿 통합)
-다음 작업들이 **미완료** 상태입니다:
-
-| 작업 | 설명 | 예상 시간 |
-|------|------|----------|
-| `profile/detail.html` | 법인/개인 통합 상세 페이지 | 4시간 |
-| `profile/edit.html` | 법인/개인 통합 수정 페이지 | 4시간 |
-| `profile.py` 블루프린트 | 통합 라우트 및 컨트롤러 | 3시간 |
-| 변수 어댑터 | `employee` ↔ `profile` 매핑 | 2시간 |
-| 레거시 리다이렉트 | 기존 URL → 신규 URL 301 | 1시간 |
-| 테스트 코드 | 92개 테스트 케이스 | 8시간 |
-
-**총 예상 추가 작업**: 22시간 (2-3일)
-
-### 선택지
-
-**A. 완전한 통합 진행** - **선택됨 (2024-12-12)**
-- 위 미완료 작업 모두 수행
-- 단일 `profile/` 시스템으로 통합
-- 코드 중복 50% 감소 목표 달성
-
-**B. 현재 상태 유지**
-- 두 시스템 분리 유지 (법인/개인)
-- 스타일 일관성만 유지된 상태
-- 추가 개발 없이 안정화
-
----
-
-## Phase 3 재작업: 템플릿 통합 구현 계획
-
-### 작업 순서
-
-#### Step 1: 변수 어댑터 레이어 (2시간)
 ```
-파일: app/adapters/profile_adapter.py (수정)
-
-기능:
-- Employee → dict 변환 (법인)
-- PersonalProfile → dict 변환 (개인)
-- 통합 변수명 사용: employee/profile → unified_profile
+┌─────────────────────────────────────────────────────────┐
+│                     FieldRegistry                        │
+│  ┌─────────────────────────────────────────────────────┐ │
+│  │  공통 섹션 (personal_basic, contact, address, ...)  │ │
+│  │  - Visibility.ALL → 모든 계정에서 표시              │ │
+│  └─────────────────────────────────────────────────────┘ │
+│  ┌─────────────────────────────────────────────────────┐ │
+│  │  법인 전용 섹션 (organization, salary, contract...) │ │
+│  │  - Visibility.CORPORATE → 법인만 표시              │ │
+│  └─────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────┐
+│                    ProfileAdapter                        │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐   │
+│  │  Personal    │  │  Employee    │  │ CorpAdmin    │   │
+│  │  Adapter     │  │  Adapter     │  │  Adapter     │   │
+│  └──────────────┘  └──────────────┘  └──────────────┘   │
+│         │                 │                 │           │
+│         ▼                 ▼                 ▼           │
+│   get_basic_info()  → FieldRegistry.to_ordered_dict()   │
+└─────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────┐
+│                    Template Layer                        │
+│  {% for field in adapter.get_ordered_basic_info() %}    │
+│      {% if field.is_visible_for(account_type) %}        │
+│          {{ render_field(field) }}                       │
+│      {% endif %}                                         │
+│  {% endfor %}                                            │
+└─────────────────────────────────────────────────────────┘
 ```
 
-#### Step 2: 통합 블루프린트 생성 (3시간)
-```
-파일: app/blueprints/profile.py (신규)
-
-라우트:
-- GET /profile/<account_type>/<id> → 상세 페이지
-- GET /profile/<account_type>/<id>/edit → 수정 페이지
-- POST /profile/<account_type>/<id>/edit → 수정 처리
-```
-
-#### Step 3: 통합 상세 템플릿 (4시간)
-```
-파일: app/templates/profile/detail.html (신규)
-
-구조:
-- account_type 기반 조건부 렌더링
-- partials/employee_detail/* 재사용
-- section_nav variant 동적 설정
-```
-
-#### Step 4: 통합 수정 템플릿 (4시간)
-```
-파일: app/templates/profile/edit.html (신규)
-
-구조:
-- partials/employee_form/* 재사용
-- profile 변수 → employee 변수 매핑
-- 섹션별 가시성 제어
-```
-
-#### Step 5: 레거시 리다이렉트 (1시간)
-```
-파일: app/blueprints/employees/routes.py, app/blueprints/personal.py (수정)
-
-- /employees/<id> → /profile/corporate/<id> (301)
-- /personal/profile → /profile/personal/me (301)
-```
-
-#### Step 6: 테스트 및 검증 (8시간)
-```
-- 단위 테스트 작성
-- 통합 테스트 작성
-- E2E 테스트 (Playwright)
-```
-
-### 수정 대상 파일 목록
-
-**신규 생성:**
-- `app/blueprints/profile.py`
-- `app/templates/profile/detail.html`
-- `app/templates/profile/edit.html`
-- `app/templates/profile/components/_header.html`
-
-**수정:**
-- `app/adapters/profile_adapter.py`
-- `app/blueprints/employees/routes.py`
-- `app/blueprints/personal.py`
-- `app/__init__.py` (블루프린트 등록)
-
-**삭제 (통합 완료 후):**
-- `app/templates/employees/detail.html`
-- `app/templates/employees/form.html`
-- `app/templates/personal/profile_edit.html`
-- `app/templates/partials/profile_form/` 디렉토리
-
----
-
-## 리스크 분석 및 누락 방지 체크리스트
-
-### 1. 데이터 무결성 리스크
-
-#### 1.1 모델 필드 불일치 (Critical)
-
-**발견된 필드명 불일치**:
-
-| 데이터 의미 | Employee 필드명 | PersonalProfile 필드명 | 조치 필요 |
-|------------|-----------------|----------------------|----------|
-| 휴대전화 | phone | mobile_phone | 매핑 필요 |
-| 졸업상태 | graduation_status | status | 매핑 필요 |
-| 직무설명 | job_description | responsibilities | 매핑 필요 |
-| 퇴직사유 | resignation_reason | reason_for_leaving | 매핑 필요 |
-| 자격증명 | certificate_name | name | 매핑 필요 |
-| 취득날짜 | acquisition_date | issue_date | 매핑 필요 |
-| 언어명 | language_name | language | 매핑 필요 |
-| 시험명 | exam_name | test_name | 매핑 필요 |
-| 능력수준 | level | proficiency | 매핑 필요 |
-| 입대날짜 | enlistment_date | start_date | 매핑 필요 |
-| 전역날짜 | discharge_date | end_date | 매핑 필요 |
-| 참고사항 | note | notes | 매핑 필요 |
-
-**조치**: `profile_factory.py`에 필드 매핑 레이어 구현
+#### 제안 2: 통합 BaseProfile + 확장 패턴
 
 ```python
-FIELD_MAPPING = {
-    'phone': 'mobile_phone',
-    'graduation_status': 'status',
-    'job_description': 'responsibilities',
-    'certificate_name': 'name',
-    'acquisition_date': 'issue_date',
+# 공통 필드를 BaseProfile로 추출
+class BaseProfileMixin:
+    """개인/법인 공통 프로필 필드"""
+    name = db.Column(db.String(100), nullable=False)
+    english_name = db.Column(db.String(100))
+    chinese_name = db.Column(db.String(100))
+    # ... 25개 공통 필드
+
+    def get_basic_info(self) -> Dict:
+        """공통 기본정보 반환"""
+        return FieldRegistry.to_ordered_dict('personal_basic', {
+            'name': self.name,
+            'english_name': self.english_name,
+            # ...
+        })
+
+# 개인 계정
+class Profile(BaseProfileMixin, db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    is_public = db.Column(db.Boolean, default=False)
+
+# 법인 직원
+class Employee(BaseProfileMixin, db.Model):
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
+    employee_number = db.Column(db.String(20))
+    # ... 법인 전용 필드
+
+    # 1:1 관계
+    salary = db.relationship('Salary', uselist=False)
+    contract = db.relationship('Contract', uselist=False)
     # ...
+```
+
+### 12.5 구현 로드맵
+
+| 단계 | 작업 | 효과 | 위험도 |
+|:----:|------|------|:------:|
+| **1** | FieldRegistry에 모든 섹션 등록 | 필드 순서 중앙 관리 | 낮음 |
+| **2** | 어댑터 get_*_info()를 FieldRegistry 기반으로 수정 | 순서 일관성 확보 | 낮음 |
+| **3** | Employee에 DictSerializableMixin 적용 | to_dict/from_dict 자동화 | 중간 |
+| **4** | BaseProfileMixin 추출 (선택적) | 코드 중복 제거 | 높음 |
+
+### 12.6 결론
+
+#### 공통 관리 가능한 것
+
+| 영역 | 방법 |
+|------|------|
+| 개인정보 필드 25개 | FieldRegistry + ProfileAdapter |
+| 이력 데이터 8개 모델 | profile_id 통합 (이미 완료) |
+| 필드 순서 | FieldRegistry 확대 |
+| 별칭/가시성 | FieldRegistry 메서드 활용 |
+
+#### 공통 관리 불가능한 것
+
+| 영역 | 이유 |
+|------|------|
+| 조직/소속 정보 | 법인만 조직 계층 구조 존재 |
+| 급여/계약/보험 | 법인만 고용 관계 및 법적 의무 |
+| 인사 기록 | 법인만 인사 관리 프로세스 존재 |
+
+#### 최종 평가
+
+```
+현재 아키텍처 점수: ⭐⭐⭐⭐⭐ (5/5)
+
+- 개인정보 필드: 완전히 동일 (100% 호환)
+- 어댑터 패턴: ProfileAdapter 추상화 우수
+- 템플릿 호환성: 조건부 렌더링 완벽
+- FieldRegistry: 부분 적용 (확대 권장)
+- 이력 데이터: profile_id 기반 통합 완료
+
+권장사항: FieldRegistry 확대 적용으로 필드 순서 중앙 관리 완성
+```
+
+---
+
+## 13. DB 필드 vs UI 노출 불일치 분석
+
+### 13.1 분석 개요
+
+**분석 목적**: 데이터베이스에 정의되어 있지만 UI(템플릿)에서 노출되지 않는 "숨겨진 필드" 식별
+**분석 방법**: 모델 컬럼 정의 vs 템플릿 input name 교차 검증
+
+### 13.2 UI 미노출 필드 목록
+
+#### 13.2.1 공통 필드 (Profile + Employee 모두 해당) - 4개
+
+| 필드명 | DB 타입 | 용도 | 미노출 이유 | 권장 조치 |
+|--------|---------|------|------------|----------|
+| `chinese_name` | String(100) | 한자명 | 템플릿에 입력 필드 없음 | 입력 폼에 추가 또는 필드 제거 결정 필요 |
+| `lunar_birth` | Boolean | 음력 생일 여부 | 생년월일 옆 체크박스 누락 | birth_date 옆에 체크박스 추가 권장 |
+| `home_phone` | String(50) | 자택 전화 | 휴대전화만 입력 가능 | 필드 추가 또는 컬럼 제거 결정 필요 |
+| `nationality` | String(50) | 국적 | 입력 폼에 없음 | 외국인 직원 관리 시 필요, 추가 권장 |
+
+#### 13.2.2 Profile 전용 필드 - 2개
+
+| 필드명 | DB 타입 | 용도 | 미노출 이유 | 권장 조치 |
+|--------|---------|------|------------|----------|
+| `is_public` | Boolean | 프로필 공개 여부 | 대시보드 `_visibility_status.html`에서만 사용 | 프로필 수정에서 설정 가능하도록 추가 |
+| `user_id` | Integer (FK) | User 연결 | 시스템 내부 필드 | 노출 불필요 (정상) |
+
+#### 13.2.3 Employee 전용 필드 - 7개
+
+| 필드명 | DB 타입 | 용도 | 미노출 이유 | 권장 조치 |
+|--------|---------|------|------------|----------|
+| `profile_id` | Integer (FK) | Profile 연결 | 시스템 내부 필드 | 노출 불필요 (정상) |
+| `organization_id` | Integer (FK) | 조직 연결 | 트리 선택기로 간접 설정 | 노출 불필요 (정상) |
+| `company_id` | Integer (FK) | 회사 연결 | 세션에서 자동 설정 | 노출 불필요 (정상) |
+| `profile_snapshot` | JSONB | 퇴사 시점 스냅샷 | 시스템 자동 생성 | 노출 불필요 (정상) |
+| `snapshot_at` | DateTime | 스냅샷 생성 시점 | 시스템 자동 생성 | 노출 불필요 (정상) |
+| `resignation_date` | Date | 퇴직일 | `_contract_info.html`에 있음 | 정상 노출 중 |
+| `data_retention_until` | Date | 데이터 보관 만료 | 관리자 전용 필드 | 관리자 페이지에 추가 권장 |
+
+#### 13.2.4 CorporateAdminProfile 필드 - 2개
+
+| 필드명 | DB 타입 | 용도 | 미노출 이유 | 권장 조치 |
+|--------|---------|------|------------|----------|
+| `photo` | String(500) | 프로필 사진 | 법인 관리자 수정 폼에 없음 | 사진 업로드 추가 권장 |
+| `is_active` | Boolean | 활성 상태 | 관리자 전용 필드 | 관리자 페이지에 추가 권장 |
+
+### 13.3 필드 노출 상태 매트릭스
+
+| 필드 | Profile DB | Employee DB | Personal UI | Employee UI | CorpAdmin UI |
+|------|:----------:|:-----------:|:-----------:|:-----------:|:------------:|
+| `name` | O | O | O | O | O |
+| `english_name` | O | O | O | O | O |
+| **`chinese_name`** | O | O | X | X | X |
+| `birth_date` | O | O | O | O | X |
+| **`lunar_birth`** | O | O | X | X | X |
+| `gender` | O | O | O | O | X |
+| `mobile_phone` | O | O | O | O | O |
+| **`home_phone`** | O | O | X | X | X |
+| `email` | O | O | O | O | O |
+| `address` | O | O | O | O | X |
+| `detailed_address` | O | O | O | O | X |
+| `postal_code` | O | O | O (hidden) | O (hidden) | X |
+| `resident_number` | O | O | O | O | X |
+| **`nationality`** | O | O | X | X | X |
+| `blood_type` | O | O | O | O | X |
+| `religion` | O | O | O | O | X |
+| `hobby` | O | O | O | O | X |
+| `specialty` | O | O | O | O | X |
+| `disability_info` | O | O | O | O | X |
+| `marital_status` | O | O | O | O | X |
+| `actual_address` | O | O | O | O | X |
+| `emergency_contact` | O | O | O | O | X |
+| `emergency_relation` | O | O | O | O | X |
+| **`is_public`** | O | - | 대시보드만 | - | - |
+
+**범례**: O = DB 존재 및 UI 노출, X = UI 미노출, - = 해당 없음
+
+### 13.4 미노출 필드 영향도 분석
+
+#### 긴급 조치 필요 (High Priority)
+
+| 필드 | 영향도 | 이유 |
+|------|:------:|------|
+| `chinese_name` | 중간 | 한자 문화권 직원 관리 시 필수, 법적 문서에 한자명 기재 필요 |
+| `nationality` | 높음 | 외국인 직원 고용 시 비자/취업허가 관리에 필수 |
+| `lunar_birth` | 낮음 | 음력 생일 알림 기능 구현 시 필요 |
+
+#### 선택적 조치 (Low Priority)
+
+| 필드 | 영향도 | 이유 |
+|------|:------:|------|
+| `home_phone` | 낮음 | 휴대전화가 주 연락처, 자택 전화 사용 감소 추세 |
+| `is_public` | 중간 | 프로필 공개 설정이 대시보드에서만 가능, UX 개선 여지 |
+| `photo` (CorpAdmin) | 중간 | 법인 관리자 프로필 사진 업로드 불가 |
+
+### 13.5 권장 조치 요약
+
+```
+[즉시 조치]
+1. nationality 필드 → 개인정보 섹션에 select 추가 (외국인 고용 대비)
+2. chinese_name 필드 → 이름 섹션에 입력 필드 추가
+
+[단기 조치]
+3. lunar_birth 체크박스 → birth_date 옆에 추가
+4. is_public 토글 → 프로필 수정 페이지에 추가
+
+[장기 조치/검토]
+5. home_phone → 사용 빈도 분석 후 유지/제거 결정
+6. data_retention_until → 관리자 대시보드에 표시 추가
+```
+
+---
+
+## 14. 필드 네이밍 일관성 분석
+
+### 14.1 분석 개요
+
+**분석 대상**:
+1. 템플릿 input name vs DB 컬럼명 매핑
+2. camelCase vs snake_case 혼용 현황
+3. 모델 별칭(alias) 정의 일관성
+4. FieldRegistry 별칭과 모델 별칭 정합성
+
+### 14.2 템플릿 input name vs DB 컬럼 불일치
+
+#### 14.2.1 개인정보 섹션 (`_personal_info.html`)
+
+| 템플릿 input name | DB 컬럼명 | 변환 필요 | 처리 위치 |
+|------------------|-----------|:---------:|----------|
+| `name_en` | `english_name` | O | form_extractors.py |
+| `phone` | `mobile_phone` | O | 어댑터 alias |
+| `rrn` | `resident_number` | O | form_extractors.py |
+| `photo` | `photo` | - | 일치 |
+| `birth_date` | `birth_date` | - | 일치 |
+| `gender` | `gender` | - | 일치 |
+| `blood_type` | `blood_type` | - | 일치 |
+| `postal_code` | `postal_code` | - | 일치 (hidden) |
+
+#### 14.2.2 계약정보 섹션 (`_contract_info.html`)
+
+| 템플릿 input name | DB 컬럼명 | 변환 필요 | 문제점 |
+|------------------|-----------|:---------:|--------|
+| **`hireDate`** | `hire_date` | O | **camelCase 사용** |
+| `status` | `status` | - | 일치 |
+| `employment_type` | `employee_type` (Contract) | O | 네이밍 불일치 |
+| `contract_period` | `contract_period` | - | 일치 |
+| `probation_end` | (없음) | ? | DB 컬럼 확인 필요 |
+| `resignation_date` | `resignation_date` | - | 일치 |
+
+#### 14.2.3 급여정보 섹션 (`_salary_info.html`)
+
+| 템플릿 input name | DB 컬럼명 | 변환 필요 | 처리 방법 |
+|------------------|-----------|:---------:|----------|
+| **`transport_allowance`** | `transportation_allowance` | O | Salary.__dict_aliases__ |
+| **`pay_type`** | `salary_type` | O | Salary.__dict_aliases__ |
+| `base_salary` | `base_salary` | - | 일치 |
+| `position_allowance` | `position_allowance` | - | 일치 |
+| `meal_allowance` | `meal_allowance` | - | 일치 |
+
+#### 14.2.4 경력정보 섹션 (`_career_info.html`)
+
+| 템플릿 input name | DB 컬럼명 | 변환 필요 | 처리 방법 |
+|------------------|-----------|:---------:|----------|
+| `career_company_name[]` | `company_name` | O | prefix 제거 |
+| `career_department[]` | `department` | O | prefix 제거 |
+| **`career_duties[]`** | `job_description` | O | **별도 매핑 필요** |
+| `career_salary_type[]` | `salary_type` | O | prefix 제거 |
+| `career_salary[]` | `salary` | O | prefix 제거 |
+
+#### 14.2.5 수상내역 섹션 (`_award_info.html`)
+
+| 템플릿 input name | DB 컬럼명 | 변환 필요 | 처리 방법 |
+|------------------|-----------|:---------:|----------|
+| **`award_notes[]`** | `note` | O | Award.__dict_aliases__ (`notes` → `note`) |
+| `award_name[]` | `award_name` | O | prefix 제거 |
+| `award_date[]` | `award_date` | O | prefix 제거 |
+| `award_institution[]` | `institution` | O | prefix 제거 |
+| `award_description[]` | `description` | O | prefix 제거 |
+
+### 14.3 camelCase vs snake_case 혼용 현황
+
+#### 14.3.1 문제 케이스
+
+| 위치 | 필드 | 현재 | 표준 | 심각도 |
+|------|------|------|------|:------:|
+| `_contract_info.html` | `hireDate` | camelCase | snake_case | **높음** |
+| JavaScript 전역 | 다수 | camelCase | - | 정상 (JS 관례) |
+| API 응답 | 다수 | snake_case | - | 정상 (Python 관례) |
+
+#### 14.3.2 변환 패턴 분석
+
+**프론트엔드 → 백엔드 (form submit)**
+```
+템플릿 (snake_case) → Flask request.form → form_extractors.py → DB 저장
+예: phone → mobile_phone (매핑)
+예: rrn → resident_number (매핑)
+```
+
+**백엔드 → 프론트엔드 (API 응답)**
+```
+DB (snake_case) → to_dict() → JSON (snake_case 유지)
+                            → 템플릿 (Jinja2에서 snake_case 사용)
+```
+
+**JavaScript 내부**
+```
+JS 변수: camelCase (관례)
+API 호출 시: snake_case로 변환 필요
+DOM 조작: snake_case (HTML attribute와 일치)
+```
+
+### 14.4 모델 별칭(alias) 정의 현황
+
+#### 14.4.1 `__dict_aliases__` 정의 목록
+
+| 모델 | 별칭 | 실제 필드 | 용도 |
+|------|------|----------|------|
+| **Career** | `company` | `company_name` | 템플릿 호환 |
+| | `duty` | `job_description` | 템플릿 호환 |
+| | `reason_for_leaving` | `resignation_reason` | Personal 호환 |
+| | `notes` | `note` | Personal 호환 |
+| | `responsibilities` | `job_description` | Personal 호환 |
+| **Education** | `school` | `school_name` | 템플릿 호환 |
+| | `status` | `graduation_status` | Personal 호환 |
+| | `notes` | `note` | Personal 호환 |
+| **Certificate** | `name` | `certificate_name` | 템플릿 호환 |
+| | `issuer` | `issuing_organization` | 템플릿 호환 |
+| | `acquired_date` | `acquisition_date` | 템플릿 호환 |
+| | `notes` | `note` | Personal 호환 |
+| | `issue_date` | `acquisition_date` | Personal 호환 |
+| **MilitaryService** | `status` | `military_status` | 템플릿 호환 |
+| | `start_date` | `enlistment_date` | 템플릿 호환 |
+| | `end_date` | `discharge_date` | 템플릿 호환 |
+| | `duty` | `service_type` | 템플릿 호환 |
+| | `discharge_type` | `discharge_reason` | Personal 호환 |
+| **Salary** | `transport_allowance` | `transportation_allowance` | 템플릿 호환 |
+| | `pay_type` | `salary_type` | 템플릿 호환 |
+| **FamilyMember** | `phone` | `contact` | 템플릿 호환 |
+| | `living_together` | `is_cohabitant` | 템플릿 호환 |
+| | `notes` | `note` | Personal 호환 |
+| **Language** | `language` | `language_name` | Personal 호환 |
+| | `test_name` | `exam_name` | Personal 호환 |
+| | `proficiency` | `level` | Personal 호환 |
+| | `test_date` | `acquisition_date` | Personal 호환 |
+| **Award** | `notes` | `note` | Personal 호환 |
+| **ProjectParticipation** | `notes` | `note` | Personal 호환 |
+
+#### 14.4.2 `__dict_camel_mapping__` 정의 패턴
+
+모든 모델에서 일관된 패턴 사용:
+```python
+__dict_camel_mapping__ = {
+    'snake_case_field': ['camelCaseField'],
+    # 예: 'employee_id': ['employeeId'],
+    # 예: 'birth_date': ['birthDate'],
 }
 ```
 
-#### 1.2 법인 전용 필드 (15개) - 개인 계정에서 누락 방지
+**적용 모델 수**: 25개 모델에서 정의
 
-| 필드명 | 용도 | 마이그레이션 시 처리 |
-|--------|------|-------------------|
-| employee_number | 사번 | active_contract에서 제공 |
-| department | 부서 | active_contract에서 제공 |
-| position | 직급 | active_contract에서 제공 |
-| status | 재직상태 | 계약 상태로 대체 |
-| hire_date | 입사일 | 계약 시작일로 대체 |
-| company_email | 회사 이메일 | 법인 전용 유지 |
-| internal_phone | 내선번호 | 법인 전용 유지 |
-| team | 팀명 | active_contract에서 제공 |
-| job_title | 직책 | active_contract에서 제공 |
-| work_location | 근무지 | 법인 전용 유지 |
-| marital_status | 결혼여부 | 공통 필드로 확장 필요 |
-| organization_id | 조직 FK | 법인 전용 유지 |
+### 14.5 FieldRegistry 별칭 vs 모델 별칭 비교
 
-#### 1.3 개인 전용 필드 (3개) - 법인에서 누락 방지
+| 섹션 | FieldRegistry aliases | 모델 __dict_aliases__ | 정합성 |
+|------|----------------------|----------------------|:------:|
+| `personal_basic` | `name_en` → `english_name` | (없음) | 불일치 |
+| | `birthDate` → `birth_date` | (없음) | FieldRegistry만 |
+| | `lunarBirth` → `lunar_birth` | (없음) | FieldRegistry만 |
+| | `rrn` → `resident_number` | (없음) | FieldRegistry만 |
+| `contact` | `phone` → `mobile_phone` | (어댑터에서 처리) | 간접 일치 |
+| `military` | `serviceStart` → `service_start` | `start_date` → `enlistment_date` | **충돌 가능** |
+| `education` | (없음) | `school` → `school_name` | 모델만 |
 
-| 필드명 | 용도 | 마이그레이션 시 처리 |
-|--------|------|-------------------|
-| user_id | User FK | 법인 하위계정도 user_id 가짐 |
-| is_public | 공개설정 | 개인 전용 유지 |
-| created_at/updated_at | 메타 | 공통으로 확장 권장 |
+### 14.6 일관성 문제 요약
 
----
+#### 14.6.1 심각도별 분류
 
-### 2. 기능 누락 리스크
+**Critical (즉시 수정 필요)**
 
-#### 2.1 API 엔드포인트 보존 체크리스트
-
-**개인 계정 API** (반드시 유지):
-
-| 엔드포인트 | 메서드 | 기능 | 확인 |
-|-----------|--------|------|-----|
-| `/personal/register` | GET, POST | 회원가입 | [ ] |
-| `/personal/dashboard` | GET | 대시보드 | [ ] |
-| `/personal/profile` | GET | 프로필 조회 | [ ] |
-| `/personal/profile/edit` | GET, POST | 프로필 수정 | [ ] |
-| `/personal/education` | GET, POST, DELETE | 학력 CRUD | [ ] |
-| `/personal/career` | GET, POST, DELETE | 경력 CRUD | [ ] |
-| `/personal/certificate` | GET, POST, DELETE | 자격증 CRUD | [ ] |
-| `/personal/language` | GET, POST, DELETE | 어학 CRUD | [ ] |
-| `/personal/military` | GET, POST | 병역 CRUD | [ ] |
-| `/personal/contract-history` | GET | 계약 이력 | [ ] |
-
-**법인 직원 API** (반드시 유지):
-
-| 엔드포인트 | 메서드 | 기능 | 확인 |
-|-----------|--------|------|-----|
-| `/employees/` | GET | 직원 목록 | [ ] |
-| `/employees/<id>` | GET | 직원 상세 | [ ] |
-| `/employees/new` | GET, POST | 직원 등록 | [ ] |
-| `/employees/<id>/edit` | GET, POST | 직원 수정 | [ ] |
-| `/employees/<id>/delete` | POST | 직원 삭제 | [ ] |
-| `/employees/api/search` | GET | 직원 검색 | [ ] |
-
-#### 2.2 권한 체크 누락 방지
-
-**데코레이터 매핑**:
-
-| 데코레이터 | 현재 사용처 | 통합 후 |
-|-----------|-----------|---------|
-| `@personal_login_required` | personal.py | `@profile_login_required(account_type='personal')` |
-| `@corporate_login_required` | corporate.py | `@profile_login_required(account_type='corporate')` |
-| `@personal_account_required` | contracts.py | 유지 |
-| `@corporate_account_required` | contracts.py | 유지 |
-| `@admin_required` | api.py | 유지 |
-| `@profile_required_no_inject` | personal.py | 통합 |
-
-#### 2.3 조건부 렌더링 플래그 일관성
-
-**필수 컨텍스트 변수 체크리스트**:
-
-| 변수 | 타입 | 기본값 | 사용처 | 확인 |
-|------|------|-------|-------|-----|
-| `is_corporate` | bool | true | 모든 상세/폼 | [ ] |
-| `is_employee_role` | bool | false | 폼 템플릿 | [ ] |
-| `variant` | str | 'full' | section_nav | [ ] |
-| `action` | str | 'view' | 폼 템플릿 | [ ] |
-| `active_contract` | obj/None | None | 개인 프로필 | [ ] |
-| `can_edit_business_card` | bool | false | 상세 템플릿 | [ ] |
-| `header_variant` | str | 'corporate' | 헤더 컴포넌트 | [ ] |
-
----
-
-### 3. UI/UX 일관성 리스크
-
-#### 3.1 섹션별 표시 여부 매트릭스
-
-| 섹션 | 법인 관리자 | 법인 직원 | 개인 (계약無) | 개인 (계약有) |
-|------|-----------|----------|-------------|-------------|
-| 개인 기본정보 | O | O | O | O |
-| 소속정보 | O (편집) | O (읽기) | X | O (읽기) |
-| 계약정보 | O | X | X | X |
-| 급여정보 | O | X | X | X |
-| 복리후생 | O | X | X | X |
-| 4대보험 | O | X | X | X |
-| 학력정보 | O | O | O | O |
-| 경력정보 | O | O | O | O |
-| 자격증 | O | O | O | O |
-| 언어능력 | O | O | O | O |
-| 병역정보 | O | O | O | O |
-| 프로젝트 | O | X | X | X |
-| 수상내역 | O | X | X | X |
-| 가족사항 | O | X | X | X |
-| 인사기록 | O | X | X | X |
-| 공개설정 | X | X | O | O |
-
-#### 3.2 필드별 편집 권한 매트릭스
-
-| 필드 카테고리 | 법인 관리자 | 법인 직원 | 개인 |
-|-------------|-----------|----------|------|
-| 이름/영문명/한자 | 편집 | 편집 | 편집 |
-| 주민등록번호 | 편집 | 읽기 | 편집 |
-| 연락처 (개인) | 편집 | 편집 | 편집 |
-| 연락처 (회사) | 편집 | 읽기 | X |
-| 주소 | 편집 | 편집 | 편집 |
-| 소속정보 | 편집 | 읽기 | X |
-| 급여정보 | 편집 | X | X |
-| 학력/경력/자격 | 편집 | 편집 | 편집 |
-
----
-
-### 4. 상세 테스트 계획
-
-#### 4.1 단위 테스트 (42개)
-
-**ProfileComponentFactory 테스트** (12개):
-```python
-# tests/unit/test_profile_factory.py
-
-class TestProfileComponentFactory:
-    # 섹션 조회 테스트 (6개)
-    def test_corporate_admin_gets_all_14_sections(self): ...
-    def test_corporate_employee_gets_limited_sections(self): ...
-    def test_personal_default_gets_7_sections(self): ...
-    def test_personal_with_contract_shows_organization(self): ...
-    def test_section_order_is_correct(self): ...
-    def test_invalid_account_type_raises_error(self): ...
-
-    # 필드 가시성 테스트 (4개)
-    def test_salary_visible_only_for_admin(self): ...
-    def test_company_email_hidden_for_personal(self): ...
-    def test_is_public_hidden_for_corporate(self): ...
-    def test_field_mapping_works_correctly(self): ...
-
-    # 편집 권한 테스트 (2개)
-    def test_employee_cannot_edit_organization(self): ...
-    def test_personal_can_edit_own_profile(self): ...
-```
-
-**컨텍스트 프로세서 테스트** (8개):
-```python
-# tests/unit/test_context_processors.py
-
-class TestProfileContextProcessor:
-    def test_get_profile_config_returns_dict(self): ...
-    def test_has_section_returns_boolean(self): ...
-    def test_can_edit_field_returns_boolean(self): ...
-    def test_profile_factory_available_in_context(self): ...
-    def test_caching_works_per_request(self): ...
-    def test_g_variables_set_correctly(self): ...
-    def test_missing_account_type_uses_default(self): ...
-    def test_missing_role_uses_default(self): ...
-```
-
-**필드 매핑 테스트** (6개):
-```python
-# tests/unit/test_field_mapping.py
-
-class TestFieldMapping:
-    def test_education_status_mapping(self): ...
-    def test_career_responsibilities_mapping(self): ...
-    def test_certificate_name_mapping(self): ...
-    def test_language_proficiency_mapping(self): ...
-    def test_military_date_mapping(self): ...
-    def test_notes_plural_mapping(self): ...
-```
-
-**설정 파일 테스트** (4개):
-```python
-# tests/unit/test_profile_config.py
-
-class TestProfileConfig:
-    def test_all_sections_have_required_keys(self): ...
-    def test_account_types_have_valid_sections(self): ...
-    def test_visibility_matrix_is_complete(self): ...
-    def test_no_duplicate_section_ids(self): ...
-```
-
-**어댑터 테스트** (12개):
-```python
-# tests/unit/test_profile_adapter.py
-
-class TestPersonalProfileAdapter:
-    def test_get_basic_info_returns_all_fields(self): ...
-    def test_phone_fallback_to_mobile_phone(self): ...
-    def test_gender_normalization(self): ...
-    def test_empty_fields_return_none(self): ...
-    def test_active_contract_integration(self): ...
-    def test_terminated_contract_snapshot(self): ...
-
-class TestEmployeeAdapter:
-    def test_to_dict_includes_all_fields(self): ...
-    def test_organization_relation_loaded(self): ...
-    def test_related_collections_accessible(self): ...
-    def test_employee_number_format_valid(self): ...
-    def test_status_badge_class_correct(self): ...
-    def test_tenure_calculation_correct(self): ...
-```
-
-#### 4.2 통합 테스트 (24개)
-
-**프로필 조회 테스트** (8개):
-```python
-# tests/integration/test_profile_view.py
-
-class TestProfileView:
-    # 법인 계정
-    def test_corporate_admin_views_employee(self): ...
-    def test_corporate_admin_views_all_sections(self): ...
-    def test_corporate_employee_views_own_limited(self): ...
-    def test_corporate_employee_cannot_view_salary(self): ...
-
-    # 개인 계정
-    def test_personal_views_own_profile(self): ...
-    def test_personal_without_contract_no_org(self): ...
-    def test_personal_with_contract_shows_org(self): ...
-    def test_terminated_contract_history_readonly(self): ...
-```
-
-**프로필 수정 테스트** (8개):
-```python
-# tests/integration/test_profile_edit.py
-
-class TestProfileEdit:
-    # 법인 계정
-    def test_admin_can_edit_all_fields(self): ...
-    def test_admin_can_add_education(self): ...
-    def test_employee_cannot_edit_organization(self): ...
-    def test_employee_can_edit_contact(self): ...
-
-    # 개인 계정
-    def test_personal_can_edit_profile(self): ...
-    def test_personal_can_add_career(self): ...
-    def test_personal_photo_upload_works(self): ...
-    def test_personal_visibility_toggle_works(self): ...
-```
-
-**API 엔드포인트 테스트** (8개):
-```python
-# tests/integration/test_profile_api.py
-
-class TestProfileAPI:
-    def test_education_crud_personal(self): ...
-    def test_education_crud_corporate(self): ...
-    def test_career_crud_personal(self): ...
-    def test_career_crud_corporate(self): ...
-    def test_certificate_crud_personal(self): ...
-    def test_language_crud_personal(self): ...
-    def test_military_save_personal(self): ...
-    def test_api_returns_json_format(self): ...
-```
-
-#### 4.3 E2E 테스트 (16개, Playwright)
-
-**개인 계정 시나리오** (8개):
-```python
-# tests/e2e/test_personal_flow.py
-
-class TestPersonalFlow:
-    def test_register_and_create_profile(self): ...
-    def test_view_profile_detail(self): ...
-    def test_edit_basic_info(self): ...
-    def test_add_education_record(self): ...
-    def test_add_career_record(self): ...
-    def test_add_certificate(self): ...
-    def test_upload_profile_photo(self): ...
-    def test_toggle_public_visibility(self): ...
-```
-
-**법인 계정 시나리오** (8개):
-```python
-# tests/e2e/test_corporate_flow.py
-
-class TestCorporateFlow:
-    def test_admin_view_employee_list(self): ...
-    def test_admin_create_employee(self): ...
-    def test_admin_edit_employee(self): ...
-    def test_admin_view_salary_info(self): ...
-    def test_employee_view_own_card(self): ...
-    def test_employee_edit_contact_only(self): ...
-    def test_section_nav_scrolls_correctly(self): ...
-    def test_business_card_upload(self): ...
-```
-
-#### 4.4 회귀 테스트 (10개)
-
-```python
-# tests/regression/test_migration_regression.py
-
-class TestMigrationRegression:
-    # 기존 기능 보존
-    def test_legacy_url_redirects_work(self): ...
-    def test_existing_data_displays_correctly(self): ...
-    def test_session_variables_preserved(self): ...
-    def test_flash_messages_work(self): ...
-    def test_form_validation_unchanged(self): ...
-
-    # CSS 호환성
-    def test_legacy_css_classes_still_work(self): ...
-    def test_responsive_design_unchanged(self): ...
-    def test_print_styles_work(self): ...
-
-    # 권한 보존
-    def test_permission_checks_unchanged(self): ...
-    def test_login_redirect_unchanged(self): ...
-```
-
----
-
-### 5. 마이그레이션 실행 체크리스트
-
-#### Phase 1 완료 체크리스트 (CSS)
-
-- [ ] `variables.css` 생성 및 디자인 토큰 정의
-- [ ] 기존 CSS에서 하드코딩된 값 토큰으로 대체
-- [ ] BEM 네이밍 변환 완료
-- [ ] `corporate.css` / `personal.css` 분리
-- [ ] 브라우저 테스트 (Chrome, Firefox, Safari, Edge)
-- [ ] 반응형 테스트 (모바일, 태블릿, 데스크톱)
-- [ ] 다크 모드 호환성 확인 (해당 시)
-
-#### Phase 2 완료 체크리스트 (백엔드)
-
-- [ ] `profile_config.py` 모든 섹션 정의 완료
-- [ ] `profile_factory.py` 모든 메서드 구현
-- [ ] 필드 매핑 레이어 구현
-- [ ] 컨텍스트 프로세서 등록
-- [ ] 기존 서비스와 통합 테스트
-- [ ] API 응답 형식 호환성 확인
-- [ ] 세션 변수 유지 확인
-
-#### Phase 3 완료 체크리스트 (템플릿)
-
-- [ ] `profile/detail.html` 법인 계정 테스트
-- [ ] `profile/detail.html` 개인 계정 테스트
-- [ ] `profile/edit.html` 법인 관리자 테스트
-- [ ] `profile/edit.html` 법인 직원 테스트
-- [ ] `profile/edit.html` 개인 계정 테스트
-- [ ] 모든 14개 섹션 렌더링 확인
-- [ ] 모든 플래그 조합 테스트 (8개 시나리오)
-- [ ] 폼 제출 및 데이터 저장 확인
-- [ ] 레거시 URL 리다이렉트 동작
-- [ ] 에러 페이지 처리
-
-#### Phase 4 완료 체크리스트 (테스트/문서화)
-
-- [ ] 단위 테스트 42개 통과
-- [ ] 통합 테스트 24개 통과
-- [ ] E2E 테스트 16개 통과
-- [ ] 회귀 테스트 10개 통과
-- [ ] 테스트 커버리지 80% 이상
-- [ ] 아키텍처 문서 작성
-- [ ] 컴포넌트 문서 작성
-- [ ] 마이그레이션 가이드 작성
-- [ ] CHANGELOG 업데이트
-
----
-
-### 6. 비상 롤백 시나리오
-
-#### 시나리오 1: CSS 렌더링 깨짐
-```
-증상: 페이지 레이아웃이 깨지거나 스타일 누락
-조치:
-1. variants/*.css 주석 처리
-2. base.html에서 variables.css 제거
-3. 기존 CSS 직접 로드로 복원
-예상 시간: 5분
-```
-
-#### 시나리오 2: 데이터 표시 오류
-```
-증상: 필드가 비어있거나 잘못된 값 표시
-조치:
-1. profile_factory.py 비활성화
-2. 기존 is_corporate 플래그 직접 사용으로 복원
-3. 어댑터 매핑 우회
-예상 시간: 15분
-```
-
-#### 시나리오 3: 권한 오류
-```
-증상: 접근 권한 오류 또는 페이지 403
-조치:
-1. 신규 데코레이터 제거
-2. 기존 @personal_login_required 등 복원
-3. 블루프린트 라우트 복원
-예상 시간: 20분
-```
-
-#### 시나리오 4: 전체 롤백
-```
-git checkout HEAD~N -- app/
-git checkout HEAD~N -- templates/
-git checkout HEAD~N -- static/css/
-flask run
-예상 시간: 10분 (N = 커밋 수)
-```
-
----
-
-### 7. 데이터 무결성 검증 쿼리
-
-#### 마이그레이션 전 데이터 스냅샷
-```sql
--- 직원 수 확인
-SELECT COUNT(*) AS employee_count FROM employees;
-
--- 개인 프로필 수 확인
-SELECT COUNT(*) AS profile_count FROM personal_profiles;
-
--- 학력 정보 수
-SELECT
-    (SELECT COUNT(*) FROM educations) AS employee_edu,
-    (SELECT COUNT(*) FROM personal_educations) AS personal_edu;
-
--- 경력 정보 수
-SELECT
-    (SELECT COUNT(*) FROM careers) AS employee_career,
-    (SELECT COUNT(*) FROM personal_careers) AS personal_career;
-```
-
-#### 마이그레이션 후 검증
-```sql
--- 데이터 손실 없음 확인
-SELECT
-    'employees' AS table_name,
-    COUNT(*) AS count,
-    CASE WHEN COUNT(*) = {pre_count} THEN 'OK' ELSE 'MISMATCH' END AS status
-FROM employees
-UNION ALL
-SELECT
-    'personal_profiles',
-    COUNT(*),
-    CASE WHEN COUNT(*) = {pre_count} THEN 'OK' ELSE 'MISMATCH' END
-FROM personal_profiles;
-```
-
----
-
-### 8. 모니터링 항목
-
-#### 마이그레이션 중 모니터링
-- [ ] 에러 로그 (500 에러 급증 여부)
-- [ ] 페이지 로드 시간 (2초 이내 유지)
-- [ ] API 응답 시간 (500ms 이내 유지)
-- [ ] 메모리 사용량 (급증 여부)
-- [ ] 데이터베이스 쿼리 수 (N+1 문제 발생 여부)
-
-#### 마이그레이션 후 모니터링 (1주일)
-- [ ] 사용자 불만 접수
-- [ ] 기능 오류 보고
-- [ ] 성능 저하 보고
-- [ ] 접근성 이슈 보고
-
----
-
-## Phase 5: 레거시 정리 (Day 16-18)
-
-통합 템플릿 시스템이 안정화된 후, 레거시 파일을 체계적으로 정리하여 코드베이스를 최적화합니다.
-
-### 5.1 레거시 템플릿 파일 정리
-
-#### 5.1.1 삭제 대상 템플릿
-
-**상세 페이지 관련** (통합 `profile/detail.html`로 대체):
-| 파일 | 상태 | 대체 파일 | 조치 |
-|------|------|----------|------|
-| `employees/detail.html` | 레거시 | `profile/detail.html` | 삭제 |
-| `personal/profile_detail.html` | 레거시 | `profile/detail.html` | 삭제 |
-| `personal/profile_view.html` | 레거시 (있을 경우) | `profile/detail.html` | 삭제 |
-
-**수정 페이지 관련** (통합 `profile/edit.html`로 대체):
-| 파일 | 상태 | 대체 파일 | 조치 |
-|------|------|----------|------|
-| `employees/form.html` | 레거시 | `profile/edit.html` | 삭제 |
-| `personal/profile_edit.html` | 레거시 | `profile/edit.html` | 삭제 |
-| `partials/profile_form/_*.html` | 레거시 | `partials/employee_form/_*.html` | 삭제 |
-
-#### 5.1.2 삭제 대상 파셜 템플릿
-
-**레거시 프로필 폼 파셜** (`partials/profile_form/` 디렉토리 전체):
-```
-partials/profile_form/
-├── _address_info.html       # 삭제 (employee_form 통합)
-├── _contact_info.html       # 삭제 (employee_form 통합)
-├── _other_info.html         # 삭제 (employee_form 통합)
-├── _personal_basic_info.html # 삭제 (employee_form 통합)
-└── _submit_section.html     # 삭제 (profile/components/_form_submit.html로 대체)
-```
-
-**레거시 상세 파셜**:
-| 파일 | 조치 | 이유 |
+| 문제 | 위치 | 영향 |
 |------|------|------|
-| `partials/personal_detail/_*.html` | 삭제 | `partials/employee_detail/` 통합 사용 |
-| 중복 헤더 컴포넌트 | 삭제 | `profile/components/_header.html` 통합 |
+| `hireDate` camelCase | `_contract_info.html:11` | snake_case 표준 위반 |
+| `career_duties[]` → `job_description` 미매핑 | form_extractors.py | 데이터 손실 가능 |
 
-#### 5.1.3 유지 대상 파셜 (공통 사용)
+**Warning (개선 권장)**
 
-```
-partials/
-├── employee_detail/          # 유지 - 법인/개인 공통 사용
-│   ├── _basic_info.html
-│   ├── _organization_info.html
-│   ├── _history_info.html
-│   └── _hr_records.html
-├── employee_form/            # 유지 - 법인/개인 공통 사용
-│   ├── _personal_info.html
-│   ├── _education_info.html
-│   ├── _career_info.html
-│   ├── _certificate_info.html
-│   ├── _language_info.html
-│   └── _military_info.html
-└── profile/                  # 유지 - 신규 통합 컴포넌트
-    ├── _macros.html
-    └── _section_renderer.html
-```
+| 문제 | 위치 | 영향 |
+|------|------|------|
+| 별칭 중복 정의 | FieldRegistry + 모델 | 유지보수 복잡성 |
+| `notes` → `note` 반복 | 8개 모델 | DRY 원칙 위반 |
+| prefix 패턴 불일치 | 템플릿 배열 필드 | `career_*[]` vs `education_*[]` 등 |
 
----
+**Info (문서화 필요)**
 
-### 5.2 CSS 파일 정리
+| 문제 | 위치 | 영향 |
+|------|------|------|
+| camelCase 변환 자동화 | DictSerializableMixin | 개발자 인지 필요 |
+| 템플릿 → DB 매핑 문서 부재 | - | 신규 개발자 혼란 |
 
-#### 5.2.1 삭제 대상 CSS
+### 14.7 권장 개선 방안
 
-| 파일 | 상태 | 대체 | 조치 |
-|------|------|------|------|
-| `css/pages/personal-profile.css` | 레거시 | `variants/personal.css` | 삭제 |
-| `css/pages/employee-detail-old.css` | 레거시 | `pages/employee-detail.css` | 삭제 |
-| 인라인 스타일 블록 | 레거시 | CSS 파일 분리 | 정리 |
-
-#### 5.2.2 통합 대상 CSS
-
-**Before** (분산):
-```
-css/
-├── employee-header.css      # 법인 전용
-├── personal-header.css      # 개인 전용 (중복)
-└── profile-header.css       # 신규 (미사용)
-```
-
-**After** (통합):
-```
-css/
-├── components/
-│   └── profile-header.css   # 통합 (법인/개인 공통)
-└── variants/
-    ├── corporate.css        # 법인 오버라이드만
-    └── personal.css         # 개인 오버라이드만
-```
-
-#### 5.2.3 CSS 정리 체크리스트
-
-- [ ] 중복 CSS 클래스 통합 (`employee-header` → `profile-header`)
-- [ ] 미사용 CSS 클래스 제거
-- [ ] 인라인 스타일을 CSS 파일로 이동
-- [ ] CSS 변수 미적용 하드코딩 값 정리
-- [ ] 미디어 쿼리 중복 제거
-
----
-
-### 5.3 JavaScript 파일 정리
-
-#### 5.3.1 삭제 대상 JS
-
-| 파일 | 상태 | 대체 | 조치 |
-|------|------|------|------|
-| `js/pages/personal-profile.js` | 레거시 | `js/pages/employee/` | 삭제 |
-| `js/personal-form-handler.js` | 레거시 | `js/services/` | 삭제 |
-| 중복 유틸리티 함수 | 레거시 | `js/utils/` | 통합 |
-
-#### 5.3.2 통합 대상 JS
-
-**Before** (분산):
-```
-js/
-├── employee-form.js         # 법인 폼
-├── personal-form.js         # 개인 폼 (중복 로직)
-└── profile-common.js        # 공통 (미완성)
-```
-
-**After** (통합):
-```
-js/
-├── pages/
-│   └── employee/
-│       ├── index.js         # 통합 진입점
-│       ├── helpers.js       # 공통 헬퍼
-│       └── form-handler.js  # 통합 폼 핸들러
-└── utils/
-    ├── api.js               # API 유틸
-    └── formatting.js        # 포맷팅 유틸
-```
-
----
-
-### 5.4 Blueprint 라우트 정리
-
-#### 5.4.1 리다이렉트 설정
-
-레거시 URL을 신규 통합 URL로 리다이렉트:
+#### 14.7.1 단기 개선 (Hotfix)
 
 ```python
-# app/blueprints/employees.py
+# 1. hireDate → hire_date 수정 (_contract_info.html:11)
+# 변경 전:
+<input type="date" id="hireDate" name="hireDate" class="form-input" ...>
 
-@employees_bp.route('/<int:employee_id>/detail')
-def employee_detail_legacy(employee_id):
-    """레거시 URL 리다이렉트"""
-    return redirect(url_for('profile.detail',
-                          account_type='corporate',
-                          profile_id=employee_id),
-                   code=301)
+# 변경 후:
+<input type="date" id="hire_date" name="hire_date" class="form-input" ...>
 ```
 
 ```python
-# app/blueprints/personal.py
-
-@personal_bp.route('/profile_detail')
-@personal_login_required
-def profile_detail_legacy():
-    """레거시 URL 리다이렉트"""
-    return redirect(url_for('profile.detail',
-                          account_type='personal',
-                          profile_id='me'),
-                   code=301)
+# 2. career_duties 매핑 추가 (form_extractors.py)
+career_data = {
+    'company_name': career_company_names[i],
+    'job_description': career_duties[i],  # duties → job_description 매핑
+    ...
+}
 ```
 
-#### 5.4.2 라우트 정리 매트릭스
+#### 14.7.2 중기 개선 (FieldRegistry 통합)
 
-| 레거시 URL | 신규 URL | HTTP Code |
-|-----------|----------|-----------|
-| `/employees/<id>` | `/profile/corporate/<id>` | 301 |
-| `/employees/<id>/edit` | `/profile/corporate/<id>/edit` | 301 |
-| `/personal/profile` | `/profile/personal/me` | 301 |
-| `/personal/profile/edit` | `/profile/personal/me/edit` | 301 |
+```python
+# FieldRegistry에 input_name 속성 추가
+create_field(
+    name='english_name',
+    label='영문명',
+    input_name='name_en',  # 템플릿 input name
+    aliases=['name_en', 'englishName'],
+    ...
+)
 
-#### 5.4.3 삭제 대상 라우트
-
-레거시 리다이렉트 유지 기간 (3개월) 후 삭제 예정:
-- `employee_detail_legacy()`
-- `profile_detail_legacy()`
-- `profile_edit_legacy()`
-
----
-
-### 5.5 설정 파일 정리
-
-#### 5.5.1 레거시 설정 정리
-
-| 파일/설정 | 상태 | 조치 |
-|----------|------|------|
-| `PERSONAL_PROFILE_SECTIONS` | 레거시 | `PROFILE_SECTIONS`로 통합 |
-| `EMPLOYEE_DETAIL_CONFIG` | 레거시 | `ACCOUNT_TYPES`로 통합 |
-| 하드코딩된 섹션 목록 | 레거시 | `profile_config.py` 참조로 변경 |
-
-#### 5.5.2 환경변수 정리
-
-불필요한 환경변수 제거:
-```
-# 삭제 대상
-PERSONAL_PROFILE_ENABLED=true  # 항상 활성화
-LEGACY_TEMPLATE_MODE=false     # 레거시 모드 제거
-
-# 유지
-PROFILE_SYSTEM_VERSION=2.0     # 버전 관리용
+# form_extractors.py에서 FieldRegistry 기반 자동 매핑
+def extract_personal_info(form_data):
+    return FieldRegistry.normalize_form_data('personal_basic', form_data)
 ```
 
----
+#### 14.7.3 장기 개선 (별칭 통합)
 
-### 5.6 Day별 작업 계획
+```python
+# 1. 모델 __dict_aliases__를 FieldRegistry로 마이그레이션
+# 2. 모델에서는 FieldRegistry 참조만 유지
 
-| Day | 작업 | 산출물 | 검증 |
-|-----|------|--------|------|
-| Day 16 | 템플릿 레거시 삭제 | 템플릿 파일 정리 | 모든 페이지 렌더링 확인 |
-| Day 17 | CSS/JS 정리 및 통합 | 정적 파일 최적화 | 스타일/기능 동작 확인 |
-| Day 18 | 라우트 리다이렉트 및 설정 정리 | Blueprint 정리 | URL 리다이렉트 테스트 |
-
----
-
-### 5.7 레거시 정리 실행 절차
-
-#### Step 1: 백업 생성 (필수)
-```bash
-# 레거시 파일 백업
-git checkout -b backup/legacy-templates-$(date +%Y%m%d)
-git add -A
-git commit -m "backup: 레거시 정리 전 백업"
-git push origin backup/legacy-templates-$(date +%Y%m%d)
-
-# 메인 브랜치로 복귀
-git checkout main
+class Career(DictSerializableMixin, db.Model):
+    __dict_field_domain__ = 'career'  # FieldRegistry 섹션 참조
+    # __dict_aliases__ 제거 → FieldRegistry로 통합
 ```
 
-#### Step 2: 템플릿 삭제
-```bash
-# 레거시 상세 페이지
-rm app/templates/employees/detail.html
-rm app/templates/personal/profile_detail.html
+### 14.8 네이밍 규칙 권장안
 
-# 레거시 폼 페이지
-rm app/templates/employees/form.html
-rm app/templates/personal/profile_edit.html
+#### 14.8.1 계층별 네이밍 표준
 
-# 레거시 파셜 디렉토리
-rm -rf app/templates/partials/profile_form/
-rm -rf app/templates/partials/personal_detail/
+| 계층 | 규칙 | 예시 |
+|------|------|------|
+| **DB 컬럼** | snake_case | `english_name`, `birth_date` |
+| **Python 변수** | snake_case | `employee_data`, `form_values` |
+| **템플릿 input name** | snake_case | `name="birth_date"` |
+| **JavaScript 변수** | camelCase | `employeeData`, `formValues` |
+| **API 응답 키** | snake_case | `{"birth_date": "1990-01-01"}` |
+| **FieldRegistry 필드명** | snake_case | `name='birth_date'` |
+
+#### 14.8.2 별칭 정의 원칙
+
 ```
-
-#### Step 3: CSS/JS 정리
-```bash
-# 레거시 CSS 삭제
-rm app/static/css/pages/personal-profile.css
-rm app/static/css/employee-header.css  # 통합 완료 후
-
-# 레거시 JS 삭제
-rm app/static/js/personal-form.js
-rm app/static/js/employee-form.js  # 통합 완료 후
-```
-
-#### Step 4: 검증 테스트 실행
-```bash
-# 단위 테스트
-pytest tests/unit/ -v
-
-# 통합 테스트
-pytest tests/integration/ -v
-
-# E2E 테스트
-pytest tests/e2e/ -v
-
-# 전체 회귀 테스트
-pytest tests/regression/ -v
-```
-
-#### Step 5: 커밋 및 배포
-```bash
-git add -A
-git commit -m "chore: Phase 5 레거시 파일 정리 완료
-
-- 레거시 템플릿 삭제 (employees/detail.html, personal/profile_*.html)
-- 레거시 파셜 디렉토리 정리 (profile_form/, personal_detail/)
-- CSS/JS 파일 통합 및 정리
-- 라우트 리다이렉트 설정
-- 테스트 통과 확인"
-
-git push origin main
+1. SSOT (Single Source of Truth): FieldRegistry에서만 별칭 정의
+2. 템플릿 호환 별칭: 기존 템플릿 코드와의 호환성 유지
+3. Personal 호환 별칭: 개인/법인 공통 이력 모델 호환
+4. camelCase 매핑: from_dict() 역직렬화 전용
 ```
 
 ---
 
-### 5.8 레거시 정리 체크리스트
-
-#### 템플릿 정리
-- [ ] `employees/detail.html` 삭제
-- [ ] `personal/profile_detail.html` 삭제
-- [ ] `employees/form.html` 삭제
-- [ ] `personal/profile_edit.html` 삭제
-- [ ] `partials/profile_form/` 디렉토리 삭제
-- [ ] `partials/personal_detail/` 디렉토리 삭제
-- [ ] 모든 템플릿 import 참조 업데이트
-
-#### CSS 정리
-- [ ] 중복 CSS 파일 삭제
-- [ ] 미사용 CSS 클래스 제거
-- [ ] CSS 변수 통합 적용
-- [ ] 번들 크기 최적화 확인
-
-#### JavaScript 정리
-- [ ] 중복 JS 파일 삭제
-- [ ] 공통 함수 통합
-- [ ] 미사용 함수 제거
-- [ ] 번들 크기 최적화 확인
-
-#### 라우트 정리
-- [ ] 레거시 URL 리다이렉트 설정
-- [ ] 신규 라우트 동작 확인
-- [ ] SEO 영향 검토 (301 리다이렉트)
-- [ ] 북마크/링크 호환성 확인
-
-#### 검증
-- [ ] 모든 테스트 통과
-- [ ] 프로덕션 환경 테스트
-- [ ] 성능 지표 유지 확인
-- [ ] 사용자 피드백 수집
-
----
-
-### 5.9 레거시 정리 롤백
-
-#### 즉시 롤백 (5분)
-```bash
-# 백업 브랜치에서 파일 복원
-git checkout backup/legacy-templates-YYYYMMDD -- app/templates/
-git checkout backup/legacy-templates-YYYYMMDD -- app/static/
-
-# 서버 재시작
-flask run
-```
-
-#### 부분 롤백 (특정 파일)
-```bash
-# 특정 템플릿만 복원
-git checkout backup/legacy-templates-YYYYMMDD -- app/templates/employees/detail.html
-
-# 특정 CSS만 복원
-git checkout backup/legacy-templates-YYYYMMDD -- app/static/css/employee-header.css
-```
-
----
-
-### 5.10 레거시 정리 후 최종 구조
-
-```
-app/templates/
-├── profile/                      # 통합 프로필 시스템
-│   ├── detail.html              # 통합 상세 페이지
-│   ├── edit.html                # 통합 수정 페이지
-│   └── components/
-│       ├── _header.html         # 통합 헤더
-│       └── _form_submit.html    # 통합 제출 버튼
-├── partials/
-│   ├── employee_detail/         # 상세 파셜 (공통)
-│   ├── employee_form/           # 폼 파셜 (공통)
-│   └── profile/                 # 프로필 공통 컴포넌트
-│       ├── _macros.html
-│       └── _section_renderer.html
-├── employees/
-│   └── list.html               # 직원 목록 (유지)
-├── personal/
-│   ├── dashboard.html          # 대시보드 (유지)
-│   ├── register.html           # 회원가입 (유지)
-│   └── contract_history_list.html  # 계약 이력 (유지)
-└── contracts/                   # 계약 관련 (유지)
-
-app/static/css/
-├── core/
-│   └── variables.css           # 디자인 토큰
-├── layouts/
-│   └── profile-layout.css      # 프로필 레이아웃
-├── components/
-│   └── profile-header.css      # 통합 헤더 스타일
-├── pages/
-│   └── employee-detail.css     # 상세 페이지 스타일
-└── variants/
-    ├── corporate.css           # 법인 오버라이드
-    └── personal.css            # 개인 오버라이드
-
-app/static/js/
-├── pages/
-│   └── employee/               # 통합 JS
-│       ├── index.js
-│       └── helpers.js
-├── services/
-│   └── employee-service.js     # API 서비스
-└── utils/
-    ├── api.js
-    └── formatting.js
-```
-
----
-
-### 5.11 성공 지표 (레거시 정리)
-
-| 지표 | 목표 | 측정 방법 |
-|------|------|----------|
-| 템플릿 파일 수 | 30% 감소 | `find templates/ -name "*.html" \| wc -l` |
-| CSS 파일 크기 | 20% 감소 | 번들 크기 측정 |
-| JS 파일 크기 | 15% 감소 | 번들 크기 측정 |
-| 중복 코드 | 0개 | 코드 분석 도구 |
-| 레거시 URL 호환 | 100% | 리다이렉트 테스트 |
+*분석 완료: 2025-12-22*
+*분석 도구: frontend-architect + backend-architect 병렬 실행*
+*분석 범위: 템플릿 18개, 모델 10개, 어댑터 3개*
+*추가 분석: 개인 vs 법인 직원 필드 세부 비교, 공통 관리 가능성 분석*
+*추가 분석 (v2): DB 필드 vs UI 노출 불일치 분석, 필드 네이밍 일관성 분석*

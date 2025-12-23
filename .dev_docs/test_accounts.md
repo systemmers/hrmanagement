@@ -1,146 +1,118 @@
-# 멀티테넌시 테스트 계정 정보
+# 테스트 계정 정보
 
-생성일: 2025-12-03
+**최종 업데이트**: 2025-12-20
 
-## localserver port 5200
+## 계정 현황
 
-## 계정 구조
+| 계정 유형 | 수량 | 설명 |
+|----------|------|------|
+| personal | 10 | 개인 계정 |
+| corporate | 5 | 법인 관리자 계정 |
+| employee_sub | 50 | 법인 소속 직원 계정 |
+| **합계** | **65** | |
 
-```
-플랫폼
-├── 개인계정 (personal) - 독립적인 개인 사용자
-├── 법인계정 (corporate) - 기업 관리자
-│   └── 법인소속 직원계정 (employee_sub) - 법인이 생성한 하위 계정
-```
+## 공통 비밀번호
 
----
-
-## 1. 개인계정 (Personal)
-
-| No | Username | Email | Password | ID |
-|----|----------|-------|----------|-----|
-| 1 | personal_user1 | personal1@test.com | personal1234 | 7 |
-| 2 | personal_user2 | personal2@test.com | personal1234 | 8 |
-| 3 | personal_user3 | personal3@test.com | personal1234 | 9 |
-
-**특징:**
-- 독립적인 개인 계정
-- 법인과 계약 체결 가능
-- 개인 정보 직접 관리
+모든 테스트 계정의 비밀번호: `test1234`
 
 ---
 
-## 2. 법인계정 (Corporate)
+## 법인 목록
 
-### 법인 A: 테스트기업 A
-
-| 항목 | 값 |
-|------|-----|
-| Company ID | 1 |
-| 기업명 | 테스트기업 A |
-| 사업자번호 | 123-45-67890 |
-| 대표자 | 홍길동 |
-
-**법인 관리자 계정:**
-
-| Username | Email | Password | Role | ID |
-|----------|-------|----------|------|-----|
-| corp_admin_a | corp_a@test.com | corp1234 | admin | 10 |
+| ID | 법인명 | 직원수 | 관리자 이메일 |
+|----|--------|--------|--------------|
+| 1 | 테스트기업 A | 10 | admin@testcorp.co.kr |
+| 2 | 테크솔루션즈 | 10 | admin@techsol.com |
+| 3 | 글로벌코퍼레이션 | 10 | admin@globalcorp.co.kr |
+| 4 | 스마트시스템즈 | 10 | admin@smartsys.net |
+| 5 | 넥스트테크 | 10 | admin@nexttech.io |
 
 ---
 
-### 법인 B: 테스트기업 B
+## 개인계정 (personal)
 
-| 항목 | 값 |
-|------|-----|
-| Company ID | 3 |
-| 기업명 | 테스트기업 B |
-| 사업자번호 | 098-76-54321 |
-| 대표자 | 김철수 |
+개인 이력서 관리용 계정
 
-**법인 관리자 계정:**
-
-| Username | Email | Password | Role | ID |
-|----------|-------|----------|------|-----|
-| corp_admin_b | corp_b@test.com | corp1234 | admin | 11 |
-
----
-
-## 3. 법인소속 직원계정 (Employee Sub)
-
-### 법인 A 소속 (5명)
-
-| No | Username | Email | Password | Parent | ID |
-|----|----------|-------|----------|--------|-----|
-| 1 | emp_a1 | emp_a1@test.com | emp1234 | corp_admin_a | 12 |
-| 2 | emp_a2 | emp_a2@test.com | emp1234 | corp_admin_a | 13 |
-| 3 | emp_a3 | emp_a3@test.com | emp1234 | corp_admin_a | 14 |
-| 4 | emp_a4 | emp_a4@test.com | emp1234 | corp_admin_a | 15 |
-| 5 | emp_a5 | emp_a5@test.com | emp1234 | corp_admin_a | 16 |
-
-### 법인 B 소속 (3명)
-
-| No | Username | Email | Password | Parent | ID |
-|----|----------|-------|----------|--------|-----|
-| 1 | emp_b1 | emp_b1@test.com | emp1234 | corp_admin_b | 17 |
-| 2 | emp_b2 | emp_b2@test.com | emp1234 | corp_admin_b | 18 |
-| 3 | emp_b3 | emp_b3@test.com | emp1234 | corp_admin_b | 19 |
-
-**특징:**
-- 법인이 생성하고 관리하는 하위 계정
-- parent_user_id로 법인 관리자와 연결
-- company_id로 법인과 연결
+| Email | 이름 | 비밀번호 |
+|-------|------|----------|
+| junhyuk.kim@gmail.com | 김준혁 | test1234 |
+| seojun.lee@gmail.com | 이서준 | test1234 |
+| doyun.park@gmail.com | 박도윤 | test1234 |
+| siwoo.choi@gmail.com | 최시우 | test1234 |
+| yejun.jung@gmail.com | 정예준 | test1234 |
+| seoyun.kim@gmail.com | 김서윤 | test1234 |
+| jiwoo.lee@gmail.com | 이지우 | test1234 |
+| hayun.park@gmail.com | 박하윤 | test1234 |
+| sua.choi@gmail.com | 최수아 | test1234 |
+| minseo.jung@gmail.com | 정민서 | test1234 |
 
 ---
 
-## 계정 유형별 요약
+## 법인관리자 (corporate)
 
-| 계정 유형 | 설명 | 생성 수 |
-|-----------|------|---------|
-| personal | 개인 계정 | 3개 |
-| corporate | 법인 관리자 계정 | 2개 |
-| employee_sub | 법인소속 직원 계정 | 8개 (5+3) |
+법인 인사관리 시스템 관리자 계정
+
+| Email | 법인 | 역할 | 비밀번호 |
+|-------|------|------|----------|
+| admin@testcorp.co.kr | 테스트기업 A | admin | test1234 |
+| admin@techsol.com | 테크솔루션즈 | admin | test1234 |
+| admin@globalcorp.co.kr | 글로벌코퍼레이션 | admin | test1234 |
+| admin@smartsys.net | 스마트시스템즈 | admin | test1234 |
+| admin@nexttech.io | 넥스트테크 | admin | test1234 |
 
 ---
 
-## 기존 테스트 계정 (참고)
+## 직원계정 (employee_sub)
 
-| Email | Password | 계정유형 | 비고 |
-|-------|----------|---------|------|
-| testuser@example.com | test1234 | corporate | 일반 직원 |
-| company@example.com | admin1234 | corporate | 관리자 |
+법인 소속 직원 계정 (샘플)
+
+### 테스트기업 A
+
+| Email | 이름 | 비밀번호 |
+|-------|------|----------|
+| seo623@testcorp.co.kr | 서민재 | test1234 |
+| shin49@testcorp.co.kr | 신예준 | test1234 |
+| lee597@testcorp.co.kr | 이시우 | test1234 |
+| kwon413@testcorp.co.kr | 권하윤 | test1234 |
+| choi996@testcorp.co.kr | 최지아 | test1234 |
+| jung330@testcorp.co.kr | 정지현 | test1234 |
+| song653@testcorp.co.kr | 송예진 | test1234 |
+| park697@testcorp.co.kr | 박지영 | test1234 |
+
+### 테크솔루션즈
+
+| Email | 이름 | 비밀번호 |
+|-------|------|----------|
+| choi687@techsol.com | 최재현 | test1234 |
+| hong760@techsol.com | 홍재현 | test1234 |
 
 ---
 
 ## 테스트 시나리오
 
-### 1. 개인계정 로그인
-```
-Email: personal1@test.com
-Password: personal1234
-```
+### 시나리오 1: 개인 프로필 관리
+1. junhyuk.kim@gmail.com 로그인
+2. 개인 프로필 조회/수정
+3. 학력, 경력, 자격증 등 이력 관리
 
-### 2. 법인계정 로그인
-```
-Email: corp_a@test.com
-Password: corp1234
-```
+### 시나리오 2: 법인 직원 관리
+1. admin@testcorp.co.kr 로그인
+2. 직원 목록 조회
+3. 직원 상세 정보 조회/수정
+4. 계약, 급여, 조직 정보 관리
 
-### 3. 법인소속 직원계정 로그인
-```
-Email: emp_a1@test.com
-Password: emp1234
-```
+### 시나리오 3: 직원 본인 프로필
+1. seo623@testcorp.co.kr 로그인
+2. 본인 프로필 조회
+3. 수정 가능 항목 확인
 
 ---
 
-## 데이터베이스 모델 구조
+## URL 정보
 
-### User 모델 (account_type)
-- `personal`: 개인 계정
-- `corporate`: 법인 계정
-- `employee_sub`: 법인 하위 직원 계정
-
-### 관계
-- User.company_id -> Company.id (법인 연결)
-- User.parent_user_id -> User.id (하위 계정의 부모)
+| 환경 | URL |
+|------|-----|
+| 로컬 개발 | http://localhost:5200 |
+| 로그인 | http://localhost:5200/login |
+| 개인 대시보드 | http://localhost:5200/personal/dashboard |
+| 법인 대시보드 | http://localhost:5200/employees |

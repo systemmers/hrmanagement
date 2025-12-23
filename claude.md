@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **계정 체계**: 개인(personal), 법인(corporate), 직원(employee_sub) 3가지 계정 타입
 - **핵심 기능**: 직원 관리, 계약 관리, 프로필 관리, 조직 관리, AI 문서 처리
+- **규모**: 62개 모델, 45개 Repository, 23개 Service, 17개 Blueprint
 
 ## Commands
 
@@ -28,14 +29,21 @@ alembic revision --autogenerate -m "migration message"
 
 ### Layer Structure (3-Tier + Repository Pattern)
 ```
-blueprints/     → Routes (URL 라우팅, 요청 처리)
-    ├── employees/   # 모듈 분할된 CRUD (list_routes, mutation_routes, detail_routes)
-    ├── profile/     # 통합 프로필 (개인/법인 인터페이스 통합)
-    └── [domain].py  # 도메인별 라우트
+blueprints/       → Routes (URL 라우팅, 요청 처리)
+    ├── employees/    # 모듈 분할된 CRUD
+    ├── profile/      # 통합 프로필 (개인/법인)
+    ├── account/      # 계정 설정
+    ├── admin/        # 관리자 기능
+    └── [domain].py   # 도메인별 라우트
 
-services/       → Business Logic (비즈니스 로직)
-repositories/   → Data Access (BaseRepository, BaseRelationRepository 상속)
-models/         → SQLAlchemy Models (to_dict, from_dict 메서드 필수)
+services/         → Business Logic (비즈니스 로직)
+    ├── base/         # 기본 서비스 (relation_updater, history)
+    └── ai/           # AI 제공자 (gemini, local_llama, document_ai)
+
+repositories/     → Data Access (BaseRepository 상속)
+models/           → SQLAlchemy Models (to_dict, from_dict 필수)
+utils/            → 유틸리티 (decorators, helpers)
+constants/        → 상수 정의 (messages, session_keys)
 ```
 
 ### Account Type System
@@ -44,6 +52,21 @@ models/         → SQLAlchemy Models (to_dict, from_dict 메서드 필수)
 | `personal` | 개인 계정 | user_id, personal_profile_id |
 | `corporate` | 법인 관리자 | user_id, company_id, user_role |
 | `employee_sub` | 법인 직원 | user_id, employee_id, company_id |
+
+### Blueprint Modules
+| Blueprint | 경로 | 설명 |
+|-----------|------|------|
+| auth_bp | /auth/* | 로그인, 회원가입, 비밀번호 |
+| corporate_bp | /corporate/* | 법인 계정 관리 |
+| personal_bp | /personal/* | 개인 계정 관리 |
+| employees_bp | /employees/* | 직원 CRUD (list, mutation, detail) |
+| profile_bp | /profile/* | 통합 프로필 (법인/개인) |
+| account_bp | /account/* | 계정 설정 (비밀번호, 탈퇴) |
+| contracts_bp | /contracts/* | 계약 관리 |
+| admin_bp | /admin/* | 관리자 (감사, 조직, 분류) |
+| sync_bp | /sync/* | 데이터 동기화 |
+| api_bp | /api/* | REST API |
+| ai_test_bp | /ai-test/* | AI 테스트 |
 
 ### Key Decorators (`app/utils/decorators.py`)
 ```python
@@ -57,17 +80,37 @@ models/         → SQLAlchemy Models (to_dict, from_dict 메서드 필수)
 ### Frontend Structure
 ```
 static/js/
-├── components/    # 재사용 UI (data-table, salary-calculator, toast)
-├── services/      # API 통신 (employee-service, contract-service)
-├── pages/         # 페이지별 로직
-│   └── employee/  # 모듈화된 직원 폼 (validators, dynamic-sections)
-└── utils/         # 공통 유틸 (api.js, validation.js)
+├── components/        # 재사용 UI
+│   ├── data-table/    # 고급 테이블 (column, filter, pagination, selection)
+│   ├── salary/        # 급여 계산기 (calculator, allowance-manager)
+│   ├── accordion.js, toast.js, form-validator.js, tree-selector.js
+│   └── file-upload.js, section-nav.js, notification-dropdown.js
+├── pages/             # 페이지별 로직
+│   ├── employee/      # 모듈화 (validators, dynamic-sections, helpers)
+│   ├── dashboard.js, contracts.js, corporate-settings.js
+│   └── auth.js, admin.js, classification-options.js
+└── app.js             # 메인 스크립트
+
+static/css/
+├── core/              # 기본 (reset, theme, variables, responsive)
+├── layouts/           # 레이아웃 (header, sidebar, main-content)
+├── components/        # 컴포넌트 (button, card, forms, table, modal)
+└── pages/             # 페이지 특정 스타일
 ```
 
-### Template Macros (`templates/macros/`)
-- `_form_controls.html`: 폼 입력 컴포넌트
-- `_navigation.html`: 사이드바/섹션 네비게이션
-- `_alerts.html`: 알림 메시지
+### Template Structure
+```
+templates/
+├── base.html, base_public.html, base_error.html
+├── auth/, account/, corporate/, personal/
+├── employees/, contracts/, dashboard/, admin/
+├── macros/            # Jinja2 매크로
+│   ├── _form_controls.html   # 폼 입력 컴포넌트
+│   ├── _navigation.html      # 네비게이션
+│   ├── _alerts.html, _cards.html, _accordion.html
+│   └── _info_display.html, _contracts.html
+└── components/navigation/    # 사이드바
+```
 
 ## Key Patterns
 
@@ -84,6 +127,11 @@ class SomeModel(db.Model):
 
 ### Repository Pattern
 ```python
+# 기본 CRUD: BaseRepository 상속
+class EmployeeRepository(BaseRepository):
+    def __init__(self):
+        super().__init__(Employee)
+
 # 1:N 관계: BaseRelationRepository 상속
 class EducationRepository(BaseRelationRepository):
     def __init__(self):
@@ -92,6 +140,17 @@ class EducationRepository(BaseRelationRepository):
 # 1:1 관계: BaseOneToOneRepository 상속
 class SalaryRepository(BaseOneToOneRepository):
     ...
+```
+
+### Service Layer
+```python
+# services/ 에서 비즈니스 로직 처리
+# Repository를 주입받아 데이터 접근
+
+class EmployeeService:
+    def __init__(self, employee_repo, profile_repo):
+        self.employee_repo = employee_repo
+        self.profile_repo = profile_repo
 ```
 
 ### Blueprint Module Split (employees 예시)
@@ -103,7 +162,20 @@ employees/
 ├── mutation_routes.py   # 생성/수정/삭제
 ├── detail_routes.py     # 상세 조회
 ├── helpers.py           # 헬퍼 함수
-└── form_extractors.py   # 폼 데이터 추출
+├── form_extractors.py   # 폼 데이터 추출
+├── relation_updaters.py # 관계 데이터 업데이트
+└── files.py, file_handlers.py  # 파일 처리
+```
+
+## AI Services
+```
+services/ai/
+├── base.py              # 기본 AI 제공자 인터페이스
+├── gemini_provider.py   # Google Gemini API
+├── local_llama_provider.py  # Local LLaMA
+├── document_ai_provider.py  # Google Document AI
+├── vision_ocr.py        # 비전/OCR 처리
+└── prompts.py           # AI 프롬프트 템플릿
 ```
 
 ## Test Accounts
