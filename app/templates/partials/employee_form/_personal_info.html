@@ -142,9 +142,23 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="chinese_name" class="form-label">한자 이름</label>
+                    <input type="text" id="chinese_name" name="chinese_name" class="form-input"
+                           value="{{ employee.chinese_name if employee and employee.chinese_name else '' }}"
+                           placeholder="洪吉童">
+                </div>
+
+                <div class="form-group">
                     <label for="birth_date" class="form-label">생년월일</label>
-                    <input type="date" id="birth_date" name="birth_date" class="form-input"
-                           value="{{ employee.birth_date if employee and employee.birth_date else '' }}">
+                    <div class="input-with-checkbox">
+                        <input type="date" id="birth_date" name="birth_date" class="form-input"
+                               value="{{ employee.birth_date if employee and employee.birth_date else '' }}">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" id="lunar_birth" name="lunar_birth" value="true"
+                                   {% if employee and employee.lunar_birth %}checked{% endif %}>
+                            <span>음력</span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -168,10 +182,30 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="nationality" class="form-label">국적</label>
+                    <select id="nationality" name="nationality" class="form-input">
+                        <option value="">선택하세요</option>
+                        <option value="대한민국" {% if employee and employee.nationality == '대한민국' %}selected{% endif %}>대한민국</option>
+                        <option value="미국" {% if employee and employee.nationality == '미국' %}selected{% endif %}>미국</option>
+                        <option value="중국" {% if employee and employee.nationality == '중국' %}selected{% endif %}>중국</option>
+                        <option value="일본" {% if employee and employee.nationality == '일본' %}selected{% endif %}>일본</option>
+                        <option value="베트남" {% if employee and employee.nationality == '베트남' %}selected{% endif %}>베트남</option>
+                        <option value="기타" {% if employee and employee.nationality == '기타' %}selected{% endif %}>기타</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="phone" class="form-label">휴대전화 <span class="required" aria-hidden="true">*</span></label>
                     <input type="tel" id="phone" name="phone" class="form-input"
                            value="{{ employee.phone if employee and employee.phone else '' }}"
                            placeholder="010-1234-5678" required aria-required="true">
+                </div>
+
+                <div class="form-group">
+                    <label for="home_phone" class="form-label">자택전화</label>
+                    <input type="tel" id="home_phone" name="home_phone" class="form-input"
+                           value="{{ employee.home_phone if employee and employee.home_phone else '' }}"
+                           placeholder="02-1234-5678">
                 </div>
 
                 <div class="form-group">

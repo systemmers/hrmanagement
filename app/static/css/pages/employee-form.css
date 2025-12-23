@@ -136,6 +136,33 @@ select.form-input {
     white-space: nowrap;
 }
 
+/* 입력 필드 + 체크박스 조합 (생년월일 + 음력) */
+.input-with-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.input-with-checkbox .form-input {
+    flex: 1;
+}
+
+.input-with-checkbox .checkbox-inline {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    white-space: nowrap;
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-600);
+    cursor: pointer;
+}
+
+.input-with-checkbox .checkbox-inline input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
 /* 사진 업로드 섹션 */
 .photo-upload-section {
     display: flex;
