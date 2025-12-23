@@ -4,8 +4,8 @@
 직원 생성, 수정, 삭제 처리를 담당합니다.
 21번/22번 원칙: 직원 등록 시 계정 동시 생성 지원
 Phase 8: 상수 모듈 적용
+Phase 9: DRY 원칙 - file_storage 서비스 활용
 """
-import os
 from datetime import datetime
 from flask import Blueprint, request, redirect, url_for, flash, session
 
@@ -15,13 +15,13 @@ from ...utils.decorators import login_required, admin_required, manager_or_admin
 from ...utils.tenant import get_current_organization_id
 from ...services.employee_service import employee_service
 from ...services import employee_account_service
+from ...services.file_storage_service import file_storage, CATEGORY_PROFILE_PHOTO
 from .helpers import (
     verify_employee_access, extract_employee_from_form, extract_basic_fields_from_form,
     update_family_data, update_education_data, update_career_data,
     update_certificate_data, update_language_data, update_military_data,
     update_hr_project_data, update_project_participation_data, update_award_data,
-    allowed_image_file, get_file_extension, get_profile_photo_folder, get_business_card_folder,
-    generate_unique_filename, MAX_IMAGE_SIZE
+    get_business_card_folder, generate_unique_filename
 )
 
 
@@ -242,33 +242,30 @@ def register_mutation_routes(bp: Blueprint):
 # ========================================
 
 def _handle_profile_photo_upload(employee_id):
-    """프로필 사진 업로드 처리"""
+    """프로필 사진 업로드 처리 (DRY: file_storage 서비스 활용)"""
     if 'photoFile' not in request.files:
         return False
 
     file = request.files['photoFile']
-    if not file or not file.filename or not allowed_image_file(file.filename):
+
+    # 파일 검증 (중앙화된 서비스 사용)
+    is_valid, error_msg = file_storage.validate_file(file, is_image=True)
+    if not is_valid:
         return False
 
-    # 파일 크기 확인
-    file.seek(0, os.SEEK_END)
-    file_size = file.tell()
-    file.seek(0)
+    # 파일 저장 (중앙화된 서비스 사용)
+    file_size = file_storage.get_file_size(file)
+    web_path, error = file_storage.handle_photo_upload(
+        file,
+        employee_id,
+        CATEGORY_PROFILE_PHOTO
+    )
 
-    if file_size > MAX_IMAGE_SIZE:
+    if error or not web_path:
         return False
 
-    # 파일 저장
-    ext = get_file_extension(file.filename)
-    unique_filename = generate_unique_filename(employee_id, file.filename, 'profile')
-    upload_folder = get_profile_photo_folder()
-    file_path = os.path.join(upload_folder, unique_filename)
-    file.save(file_path)
-
-    # 웹 접근 경로
-    web_path = f"/static/uploads/profile_photos/{unique_filename}"
-
-    # DB 저장
+    # DB 저장 (첨부파일 기록)
+    ext = file_storage.get_file_extension(file.filename)
     attachment_data = {
         'employeeId': employee_id,
         'fileName': file.filename,
@@ -283,7 +280,7 @@ def _handle_profile_photo_upload(employee_id):
 
 
 def _handle_business_card_upload(employee_id):
-    """명함 파일 업로드 처리 (앞면/뒷면)"""
+    """명함 파일 업로드 처리 (앞면/뒷면) - DRY: file_storage 서비스 활용"""
     uploaded = False
 
     for side in ['Front', 'Back']:
@@ -292,35 +289,33 @@ def _handle_business_card_upload(employee_id):
             continue
 
         file = request.files[file_key]
-        if not file or not file.filename or not allowed_image_file(file.filename):
+
+        # 파일 검증 (중앙화된 서비스 사용)
+        is_valid, error_msg = file_storage.validate_file(file, is_image=True)
+        if not is_valid:
             continue
 
-        # 파일 크기 확인
-        file.seek(0, os.SEEK_END)
-        file_size = file.tell()
-        file.seek(0)
+        # 파일 저장 (business_card 카테고리)
+        category = f'business_card_{side.lower()}'
+        file_size = file_storage.get_file_size(file)
+        web_path, error = file_storage.handle_photo_upload(
+            file,
+            employee_id,
+            category
+        )
 
-        if file_size > MAX_IMAGE_SIZE:
+        if error or not web_path:
             continue
 
-        # 파일 저장
-        ext = get_file_extension(file.filename)
-        unique_filename = generate_unique_filename(employee_id, file.filename, f'business_card_{side.lower()}')
-        upload_folder = get_business_card_folder()
-        file_path = os.path.join(upload_folder, unique_filename)
-        file.save(file_path)
-
-        # 웹 접근 경로
-        web_path = f"/static/uploads/business_cards/{unique_filename}"
-
-        # DB 저장
+        # DB 저장 (첨부파일 기록)
+        ext = file_storage.get_file_extension(file.filename)
         attachment_data = {
             'employeeId': employee_id,
             'fileName': file.filename,
             'filePath': web_path,
             'fileType': ext,
             'fileSize': file_size,
-            'category': f'business_card_{side.lower()}',
+            'category': category,
             'uploadDate': datetime.now().strftime('%Y-%m-%d')
         }
         employee_service.create_attachment(attachment_data)

@@ -31,6 +31,7 @@ CATEGORY_PROFILE_PHOTO = 'profile_photo'
 CATEGORY_BUSINESS_CARD_FRONT = 'business_card_front'
 CATEGORY_BUSINESS_CARD_BACK = 'business_card_back'
 CATEGORY_COMPANY_DOCUMENT = 'documents'
+CATEGORY_ADMIN_PHOTO = 'admin_photos'
 
 # 법인 서류 허용 확장자
 ALLOWED_DOCUMENT_EXTENSIONS = {'pdf', 'doc', 'docx', 'xls', 'xlsx', 'hwp', 'jpg', 'jpeg', 'png'}
@@ -332,6 +333,95 @@ class FileStorageService:
         folder_path = self.get_personal_path(user_id, category)
         file_path = os.path.join(folder_path, filename)
         return self.delete_file(file_path)
+
+    # ========================================
+    # 법인 관리자 사진 관리
+    # ========================================
+
+    def get_admin_photos_path(self) -> str:
+        """법인 관리자 프로필 사진 경로 생성
+
+        Returns:
+            절대 경로
+        """
+        base = self._get_base_path()
+        path = os.path.join(base, CATEGORY_ADMIN_PHOTO)
+        os.makedirs(path, exist_ok=True)
+        return path
+
+    def get_admin_photos_web_path(self, filename: str) -> str:
+        """법인 관리자 프로필 사진 웹 접근 경로"""
+        return f"/static/uploads/{CATEGORY_ADMIN_PHOTO}/{filename}"
+
+    # ========================================
+    # 범용 사진 업로드 처리 (DRY)
+    # ========================================
+
+    def handle_photo_upload(self, file, entity_id: int, category: str,
+                            fallback_value: Optional[str] = None) -> Tuple[Optional[str], Optional[str]]:
+        """범용 사진 업로드 처리
+
+        request.files에서 받은 파일을 검증하고 저장합니다.
+        DRY 원칙에 따라 여러 라우트에서 공통으로 사용합니다.
+
+        Args:
+            file: 업로드된 파일 객체 (request.files.get('photoFile'))
+            entity_id: 엔티티 ID (직원 ID, 관리자 프로필 ID 등)
+            category: 저장 카테고리 ('profile_photo', 'admin_photos' 등)
+            fallback_value: 파일이 없을 때 반환할 기본값
+
+        Returns:
+            (웹 경로 또는 fallback_value, 에러 메시지 또는 None)
+
+        Examples:
+            # 법인 관리자 프로필 사진
+            web_path, error = file_storage.handle_photo_upload(
+                request.files.get('photoFile'),
+                admin_profile_id,
+                CATEGORY_ADMIN_PHOTO,
+                request.form.get('photo', '')
+            )
+
+            # 직원 프로필 사진
+            web_path, error = file_storage.handle_photo_upload(
+                request.files.get('photoFile'),
+                employee_id,
+                CATEGORY_PROFILE_PHOTO
+            )
+        """
+        # 파일이 없으면 fallback 값 반환
+        if not file or file.filename == '':
+            return fallback_value, None
+
+        # 이미지 파일 검증
+        is_valid, error_msg = self.validate_file(file, is_image=True)
+        if not is_valid:
+            return None, error_msg
+
+        # 카테고리별 경로 결정
+        if category == CATEGORY_ADMIN_PHOTO:
+            folder_path = self.get_admin_photos_path()
+            filename = self.generate_filename(file.filename, 'admin', entity_id)
+            web_path = self.get_admin_photos_web_path(filename)
+        elif category == CATEGORY_PROFILE_PHOTO:
+            # 프로필 사진은 별도 폴더 구조 사용 (기존 호환성)
+            base = self._get_base_path()
+            folder_path = os.path.join(base, 'profile_photos')
+            os.makedirs(folder_path, exist_ok=True)
+            filename = self.generate_filename(file.filename, 'profile', entity_id)
+            web_path = f"/static/uploads/profile_photos/{filename}"
+        else:
+            # 기타 카테고리
+            base = self._get_base_path()
+            folder_path = os.path.join(base, category)
+            os.makedirs(folder_path, exist_ok=True)
+            filename = self.generate_filename(file.filename, category, entity_id)
+            web_path = f"/static/uploads/{category}/{filename}"
+
+        # 파일 저장
+        self.save_file(file, folder_path, filename)
+
+        return web_path, None
 
     # ========================================
     # 법인 서류 파일 관리
