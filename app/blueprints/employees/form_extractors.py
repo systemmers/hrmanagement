@@ -6,6 +6,11 @@
 from ...models import Employee
 
 
+def _parse_boolean(value):
+    """폼 데이터 boolean 변환 헬퍼 (DRY 원칙)"""
+    return value in ('true', 'True', '1', True)
+
+
 def extract_employee_from_form(form_data, employee_id=0):
     """폼 데이터에서 Employee 객체 생성 (SSOT 헬퍼 함수)"""
     # organization_id 처리
@@ -39,7 +44,7 @@ def extract_employee_from_form(form_data, employee_id=0):
         english_name=form_data.get('english_name') or form_data.get('name_en') or None,
         chinese_name=form_data.get('chinese_name') or None,
         birth_date=form_data.get('birth_date') or None,
-        lunar_birth=form_data.get('lunar_birth') in ('true', 'True', '1', True),
+        lunar_birth=_parse_boolean(form_data.get('lunar_birth')),
         gender=form_data.get('gender') or None,
         address=form_data.get('address') or None,
         detailed_address=form_data.get('detailed_address') or None,
@@ -63,7 +68,7 @@ def extract_basic_fields_from_form(form_data):
         'english_name': form_data.get('english_name') or form_data.get('name_en') or None,
         'chinese_name': form_data.get('chinese_name') or None,
         'birth_date': form_data.get('birth_date') or None,
-        'lunar_birth': form_data.get('lunar_birth') in ('true', 'True', '1', True),
+        'lunar_birth': _parse_boolean(form_data.get('lunar_birth')),
         'gender': form_data.get('gender') or None,
         'phone': form_data.get('phone', ''),
         'email': form_data.get('email', ''),

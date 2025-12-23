@@ -3,12 +3,19 @@ RelationDataConfigs
 
 관계형 데이터 업데이트 설정을 정의합니다.
 Phase 4.2: SOLID 원칙 적용 - 설정과 로직 분리
+Phase 8: FieldRegistry 통합 - 필드 순서 자동 연동
 
 각 관계 타입별 설정을 정의하여 코드 중복을 제거합니다.
 """
-from typing import Dict, Any
+from typing import Dict, Any, List
 from dataclasses import dataclass, field
 from .relation_updater import RelationDataConfig
+from app.constants.field_registry import FieldRegistry
+
+
+def _get_field_order(section_id: str) -> List[str]:
+    """FieldRegistry에서 필드 순서 조회"""
+    return FieldRegistry.get_ordered_names(section_id)
 
 
 def get_relation_config(relation_type: str, repositories: Dict[str, Any]) -> RelationDataConfig:
@@ -40,7 +47,8 @@ def get_relation_config(relation_type: str, repositories: Dict[str, Any]) -> Rel
                 'major': 'major',
                 'degree': 'degree',
                 'graduation_status': 'graduation_status',
-            }
+            },
+            field_order=_get_field_order('education'),
         ),
 
         'career': RelationDataConfig(
@@ -55,7 +63,8 @@ def get_relation_config(relation_type: str, repositories: Dict[str, Any]) -> Rel
                 'department': 'department',
                 'position': 'position',
                 'duties': 'job_description',
-            }
+            },
+            field_order=_get_field_order('career'),
         ),
 
         'certificate': RelationDataConfig(
@@ -69,7 +78,8 @@ def get_relation_config(relation_type: str, repositories: Dict[str, Any]) -> Rel
                 'issuer': 'issuing_organization',
                 'number': 'certificate_number',
                 'date': 'acquisition_date',
-            }
+            },
+            field_order=_get_field_order('certificate'),
         ),
 
         'language': RelationDataConfig(
@@ -83,7 +93,8 @@ def get_relation_config(relation_type: str, repositories: Dict[str, Any]) -> Rel
                 'test_name': 'test_name',
                 'score': 'score',
                 'test_date': 'test_date',
-            }
+            },
+            field_order=_get_field_order('language'),
         ),
 
         'family': RelationDataConfig(
@@ -99,7 +110,8 @@ def get_relation_config(relation_type: str, repositories: Dict[str, Any]) -> Rel
                 'phone': 'contact',
                 'cohabiting': 'is_cohabitant',
             },
-            converters={'is_cohabitant': bool}
+            converters={'is_cohabitant': bool},
+            field_order=_get_field_order('family'),
         ),
 
         'award': RelationDataConfig(
@@ -112,7 +124,8 @@ def get_relation_config(relation_type: str, repositories: Dict[str, Any]) -> Rel
                 'name': 'award_name',
                 'issuer': 'issuer',
                 'note': 'note',
-            }
+            },
+            field_order=_get_field_order('award'),
         ),
 
         'project_participation': RelationDataConfig(
@@ -127,7 +140,8 @@ def get_relation_config(relation_type: str, repositories: Dict[str, Any]) -> Rel
                 'duties': 'role',
                 'role': 'role',
                 'client': 'client',
-            }
+            },
+            field_order=_get_field_order('project_participation'),
         ),
     }
 

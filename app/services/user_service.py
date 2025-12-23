@@ -93,16 +93,27 @@ class UserService:
         """
         return self.user_repo.deactivate(user_id)
 
-    def get_by_id(self, user_id: int) -> Optional[Any]:
-        """사용자 ID로 조회
+    def get_by_id(self, user_id: int) -> Optional[Dict]:
+        """사용자 ID로 조회 (Dict 반환)
 
         Args:
             user_id: 사용자 ID
 
         Returns:
-            User 객체 또는 None
+            User Dict 또는 None
         """
         return self.user_repo.get_by_id(user_id)
+
+    def get_model_by_id(self, user_id: int) -> Optional[Any]:
+        """사용자 ID로 모델 객체 조회
+
+        Args:
+            user_id: 사용자 ID
+
+        Returns:
+            User 모델 객체 또는 None
+        """
+        return self.user_repo.get_model_by_id(user_id)
 
 
 # 싱글톤 인스턴스

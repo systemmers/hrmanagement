@@ -13,7 +13,11 @@ from app.database import db
 
 @dataclass
 class RelationDataConfig:
-    """관계형 데이터 업데이트 설정"""
+    """
+    관계형 데이터 업데이트 설정
+
+    Phase 8: FieldRegistry 통합 - field_order 지원
+    """
     model_class: Type
     repository: Any
     form_prefix: str
@@ -21,6 +25,7 @@ class RelationDataConfig:
     field_mapping: Dict[str, str]
     converters: Dict[str, Callable] = field(default_factory=dict)
     owner_field: str = 'employee_id'  # 'employee_id' or 'profile_id'
+    field_order: List[str] = field(default_factory=list)  # FieldRegistry 순서
 
 
 class RelationDataUpdater:

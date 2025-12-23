@@ -1,15 +1,49 @@
 /**
  * Employee Form Templates
  * Phase 7: 프론트엔드 리팩토링 - employee-form.js 분할
+ * Phase 8: FieldRegistry 통합 - 하드코딩 → 중앙 관리 전환
  *
  * 동적 필드 추가를 위한 HTML 템플릿 함수 모음
+ *
+ * 마이그레이션 전략:
+ * - FieldRegistry 로드됨: TemplateGenerator로 동적 생성
+ * - FieldRegistry 미로드: 기존 하드코딩 함수 사용 (fallback)
  */
+
+import { TemplateGenerator } from '../../core/template-generator.js';
+
+/**
+ * FieldRegistry 기반 템플릿 생성 (우선)
+ * @param {string} sectionId - 섹션 ID
+ * @param {number} index - 항목 인덱스
+ * @returns {string|null} HTML 템플릿 또는 null (fallback 필요)
+ */
+function getRegistryTemplate(sectionId, index = 0) {
+    const FieldRegistry = window.FieldRegistry;
+    if (!FieldRegistry || !FieldRegistry.isLoaded()) {
+        return null; // fallback 필요
+    }
+
+    const section = FieldRegistry.getSection(sectionId);
+    if (!section) {
+        console.warn(`[templates] Section not found in registry: ${sectionId}`);
+        return null;
+    }
+
+    return TemplateGenerator.generateDynamicTemplate(section, { index });
+}
 
 /**
  * 학력 템플릿
+ * @param {number} index - 항목 인덱스 (FieldRegistry 사용 시)
  * @returns {string} HTML 템플릿
  */
-export function getEducationTemplate() {
+export function getEducationTemplate(index = 0) {
+    // FieldRegistry 우선 시도
+    const registryTemplate = getRegistryTemplate('education', index);
+    if (registryTemplate) return registryTemplate;
+
+    // Fallback: 하드코딩된 템플릿
     return `
         <div class="dynamic-item" data-index="0">
             <div class="form-grid">
@@ -64,9 +98,15 @@ export function getEducationTemplate() {
 
 /**
  * 경력 템플릿
+ * @param {number} index - 항목 인덱스 (FieldRegistry 사용 시)
  * @returns {string} HTML 템플릿
  */
-export function getCareerTemplate() {
+export function getCareerTemplate(index = 0) {
+    // FieldRegistry 우선 시도
+    const registryTemplate = getRegistryTemplate('career', index);
+    if (registryTemplate) return registryTemplate;
+
+    // Fallback: 하드코딩된 템플릿
     return `
         <div class="dynamic-item" data-index="0">
             <div class="form-grid">
@@ -138,9 +178,15 @@ export function getCareerTemplate() {
 
 /**
  * 자격증 템플릿
+ * @param {number} index - 항목 인덱스 (FieldRegistry 사용 시)
  * @returns {string} HTML 템플릿
  */
-export function getCertificateTemplate() {
+export function getCertificateTemplate(index = 0) {
+    // FieldRegistry 우선 시도
+    const registryTemplate = getRegistryTemplate('certificate', index);
+    if (registryTemplate) return registryTemplate;
+
+    // Fallback: 하드코딩된 템플릿
     return `
         <div class="dynamic-item" data-index="0">
             <div class="form-grid">
@@ -178,9 +224,15 @@ export function getCertificateTemplate() {
 
 /**
  * 가족 템플릿
+ * @param {number} index - 항목 인덱스 (FieldRegistry 사용 시)
  * @returns {string} HTML 템플릿
  */
-export function getFamilyTemplate() {
+export function getFamilyTemplate(index = 0) {
+    // FieldRegistry 우선 시도
+    const registryTemplate = getRegistryTemplate('family', index);
+    if (registryTemplate) return registryTemplate;
+
+    // Fallback: 하드코딩된 템플릿
     return `
         <div class="dynamic-item" data-index="0">
             <div class="form-grid">
@@ -230,9 +282,15 @@ export function getFamilyTemplate() {
 
 /**
  * 언어능력 템플릿
+ * @param {number} index - 항목 인덱스 (FieldRegistry 사용 시)
  * @returns {string} HTML 템플릿
  */
-export function getLanguageTemplate() {
+export function getLanguageTemplate(index = 0) {
+    // FieldRegistry 우선 시도
+    const registryTemplate = getRegistryTemplate('language', index);
+    if (registryTemplate) return registryTemplate;
+
+    // Fallback: 하드코딩된 템플릿
     return `
         <div class="dynamic-item" data-index="0">
             <div class="form-grid">
@@ -284,9 +342,15 @@ export function getLanguageTemplate() {
 
 /**
  * 프로젝트 템플릿
+ * @param {number} index - 항목 인덱스 (FieldRegistry 사용 시)
  * @returns {string} HTML 템플릿
  */
-export function getProjectTemplate() {
+export function getProjectTemplate(index = 0) {
+    // FieldRegistry 우선 시도
+    const registryTemplate = getRegistryTemplate('project', index);
+    if (registryTemplate) return registryTemplate;
+
+    // Fallback: 하드코딩된 템플릿
     return `
         <div class="dynamic-item" data-index="0">
             <div class="form-grid">
@@ -320,9 +384,15 @@ export function getProjectTemplate() {
 
 /**
  * 수상내역 템플릿
+ * @param {number} index - 항목 인덱스 (FieldRegistry 사용 시)
  * @returns {string} HTML 템플릿
  */
-export function getAwardTemplate() {
+export function getAwardTemplate(index = 0) {
+    // FieldRegistry 우선 시도
+    const registryTemplate = getRegistryTemplate('award', index);
+    if (registryTemplate) return registryTemplate;
+
+    // Fallback: 하드코딩된 템플릿
     return `
         <div class="dynamic-item" data-index="0">
             <div class="form-grid">
@@ -356,9 +426,15 @@ export function getAwardTemplate() {
 
 /**
  * 프로젝트 참여이력 템플릿
+ * @param {number} index - 항목 인덱스 (FieldRegistry 사용 시)
  * @returns {string} HTML 템플릿
  */
-export function getProjectParticipationTemplate() {
+export function getProjectParticipationTemplate(index = 0) {
+    // FieldRegistry 우선 시도
+    const registryTemplate = getRegistryTemplate('project_participation', index);
+    if (registryTemplate) return registryTemplate;
+
+    // Fallback: 하드코딩된 템플릿
     return `
         <div class="dynamic-item" data-index="0">
             <div class="form-grid">

@@ -5,8 +5,10 @@ DictSerializableMixin: to_dict/from_dict 자동화
 - 코드 중복 제거 (~3,500 LOC 감소 목표)
 - 선언적 alias/computed 필드 정의
 - camelCase/snake_case 자동 변환
+- FieldRegistry 통합 필드 순서 관리
 """
-from typing import Dict, List, Any, Optional, Callable, Type
+from collections import OrderedDict
+from typing import Dict, List, Any, Optional, Callable, Type, Union
 
 
 class DictSerializableMixin:
@@ -19,6 +21,9 @@ class DictSerializableMixin:
     사용법:
         class Education(DictSerializableMixin, db.Model):
             __tablename__ = 'educations'
+
+            # FieldRegistry 도메인 (섹션 ID)
+            __dict_field_domain__ = 'education'  # 필드 순서 자동 적용
 
             # Alias 정의: to_dict()에서 추가 키로 포함
             __dict_aliases__ = {
@@ -48,8 +53,13 @@ class DictSerializableMixin:
     __dict_computed__: Dict[str, Callable] = {}
     __dict_camel_mapping__: Dict[str, List[str]] = {}
     __dict_json_fields__: List[str] = []  # JSON 파싱이 필요한 필드
+    __dict_field_domain__: str = ''  # FieldRegistry 섹션 ID (설정 시 필드 순서 자동 적용)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(
+        self,
+        ordered: bool = True,
+        account_type: Optional[str] = None
+    ) -> Union[Dict[str, Any], OrderedDict]:
         """
         모델을 딕셔너리로 변환
 
@@ -58,9 +68,14 @@ class DictSerializableMixin:
         - __dict_aliases__ 추가 키 생성
         - __dict_computed__ 계산 필드 추가
         - datetime/date 객체 자동 ISO 포맷 변환
+        - FieldRegistry 기반 필드 순서 적용 (ordered=True, __dict_field_domain__ 설정 시)
+
+        Args:
+            ordered: 필드 순서 정렬 여부 (기본 True)
+            account_type: 계정 타입 (가시성 필터링용)
 
         Returns:
-            모델 데이터 딕셔너리
+            모델 데이터 딕셔너리 (ordered=True일 경우 OrderedDict)
         """
         result = {}
 
@@ -99,6 +114,15 @@ class DictSerializableMixin:
                 result[computed_name] = compute_fn(self)
             except Exception:
                 result[computed_name] = None
+
+        # 4. FieldRegistry 기반 필드 순서 적용
+        if ordered and self.__dict_field_domain__:
+            from app.constants.field_registry import FieldRegistry
+            result = FieldRegistry.to_ordered_dict(
+                self.__dict_field_domain__,
+                result,
+                account_type
+            )
 
         return result
 

@@ -5,6 +5,14 @@ Constants Module
 """
 from .session_keys import SessionKeys, AccountType, UserRole
 from .messages import FlashMessages, ErrorMessages
+from .field_registry import (
+    FieldRegistry,
+    FieldDefinition,
+    SectionDefinition,
+    FieldType,
+    Visibility,
+)
+from .field_options import FieldOptions
 
 __all__ = [
     'SessionKeys',
@@ -12,4 +20,12 @@ __all__ = [
     'UserRole',
     'FlashMessages',
     'ErrorMessages',
+    # Field Registry
+    'FieldRegistry',
+    'FieldDefinition',
+    'SectionDefinition',
+    'FieldType',
+    'Visibility',
+    # Field Options (SSOT)
+    'FieldOptions',
 ]

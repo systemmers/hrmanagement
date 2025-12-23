@@ -8,11 +8,14 @@ Profile Adapter - 법인/개인 계정 데이터 모델 통합 어댑터
 - create_profile_adapter(): 팩토리 함수
 
 Phase 1.2: 매직 스트링 상수화 적용
+Phase 8: FieldRegistry 통합 - 필드 순서 중앙 관리
 """
 from abc import ABC, abstractmethod
+from collections import OrderedDict
 from typing import Dict, Any, List, Optional, Union
 
 from app.constants.session_keys import AccountType
+from app.constants.field_registry import FieldRegistry
 
 
 class ProfileAdapter(ABC):
@@ -117,6 +120,67 @@ class ProfileAdapter(ABC):
             해당 섹션이 표시 가능한지 여부
         """
         return section_name in self.get_available_sections()
+
+    def _apply_field_order(
+        self,
+        data: Dict[str, Any],
+        section_id: str
+    ) -> OrderedDict:
+        """
+        FieldRegistry를 사용하여 필드 순서 적용
+
+        Phase 8: 필드 순서 중앙 관리 통합
+
+        Args:
+            data: 정렬할 데이터 딕셔너리
+            section_id: FieldRegistry 섹션 ID
+
+        Returns:
+            정렬된 OrderedDict
+        """
+        return FieldRegistry.to_ordered_dict(
+            section_id,
+            data,
+            self.get_account_type()
+        )
+
+    def get_ordered_basic_info(self) -> OrderedDict:
+        """
+        FieldRegistry 순서가 적용된 기본 정보 반환
+
+        Phase 8: 필드 순서 중앙 관리 통합
+        기존 get_basic_info()를 FieldRegistry 순서로 정렬하여 반환합니다.
+
+        Returns:
+            정렬된 기본 정보 OrderedDict
+        """
+        raw_data = self.get_basic_info()
+        # personal_basic 섹션 순서 적용
+        return self._apply_field_order(raw_data, 'personal_basic')
+
+    def get_ordered_contact_info(self) -> OrderedDict:
+        """
+        FieldRegistry 순서가 적용된 연락처 정보 반환
+
+        Returns:
+            정렬된 연락처 정보 OrderedDict
+        """
+        basic = self.get_basic_info()
+        contact_keys = ['mobile_phone', 'home_phone', 'email', 'emergency_contact', 'emergency_relation']
+        contact_data = {k: basic.get(k) for k in contact_keys if k in basic}
+        return self._apply_field_order(contact_data, 'contact')
+
+    def get_ordered_organization_info(self) -> Optional[OrderedDict]:
+        """
+        FieldRegistry 순서가 적용된 소속 정보 반환
+
+        Returns:
+            정렬된 소속 정보 OrderedDict 또는 None
+        """
+        org_info = self.get_organization_info()
+        if org_info:
+            return self._apply_field_order(org_info, 'organization')
+        return None
 
     def get_section_visibility(self) -> Dict[str, bool]:
         """
