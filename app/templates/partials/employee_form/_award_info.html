@@ -1,5 +1,6 @@
 {#
     직원 폼 - 수상내역 섹션 (동적 폼)
+    Phase 9: FieldRegistry 필드명 동기화
     employee: 직원 객체 (수정 모드일 때)
     award_list: 수상내역 목록 (개인 프로필용)
 #}
@@ -34,18 +35,13 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">수여기관</label>
-                                <input type="text" name="award_institution[]" class="form-input"
-                                       value="{{ award.institution }}" placeholder="수여기관">
-                            </div>
-                            <div class="form-group form-group-full">
-                                <label class="form-label">수상내용</label>
-                                <textarea name="award_description[]" class="form-input" rows="2"
-                                          placeholder="수상 내용">{{ award.description or '' }}</textarea>
+                                <input type="text" name="award_issuer[]" class="form-input"
+                                       value="{{ award.issuer or award.institution or '' }}" placeholder="수여기관">
                             </div>
                             <div class="form-group form-group-full">
                                 <label class="form-label">비고</label>
-                                <input type="text" name="award_notes[]" class="form-input"
-                                       value="{{ award.notes or '' }}" placeholder="비고">
+                                <textarea name="award_note[]" class="form-input" rows="2"
+                                          placeholder="수상 내용 및 비고">{{ award.note or award.description or '' }}</textarea>
                             </div>
                         </div>
                         <button type="button" class="btn-remove" title="삭제">
@@ -66,16 +62,12 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">수여기관</label>
-                            <input type="text" name="award_institution[]" class="form-input" placeholder="수여기관">
-                        </div>
-                        <div class="form-group form-group-full">
-                            <label class="form-label">수상내용</label>
-                            <textarea name="award_description[]" class="form-input" rows="2"
-                                      placeholder="수상 내용"></textarea>
+                            <input type="text" name="award_issuer[]" class="form-input" placeholder="수여기관">
                         </div>
                         <div class="form-group form-group-full">
                             <label class="form-label">비고</label>
-                            <input type="text" name="award_notes[]" class="form-input" placeholder="비고">
+                            <textarea name="award_note[]" class="form-input" rows="2"
+                                      placeholder="수상 내용 및 비고"></textarea>
                         </div>
                     </div>
                     <button type="button" class="btn-remove" title="삭제">

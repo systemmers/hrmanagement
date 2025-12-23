@@ -1,5 +1,6 @@
 {#
     직원 폼 - 자격증 섹션 (동적 폼)
+    Phase 9: FieldRegistry 필드명 동기화
     employee: 직원 객체 (수정 모드일 때)
 #}
 <section class="form-section" id="certificate-info">
@@ -26,7 +27,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">발급기관</label>
-                                <input type="text" name="certificate_issuer[]" class="form-input"
+                                <input type="text" name="certificate_issuing_organization[]" class="form-input"
                                        value="{{ cert.issuing_organization if cert.issuing_organization else '' }}" placeholder="한국산업인력공단">
                             </div>
                             <div class="form-group">
@@ -36,7 +37,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">취득일</label>
-                                <input type="date" name="certificate_date[]" class="form-input"
+                                <input type="date" name="certificate_acquisition_date[]" class="form-input"
                                        value="{{ cert.acquisition_date if cert.acquisition_date else '' }}">
                             </div>
                             <div class="form-group">
@@ -64,7 +65,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">발급기관</label>
-                            <input type="text" name="certificate_issuer[]" class="form-input" placeholder="한국산업인력공단">
+                            <input type="text" name="certificate_issuing_organization[]" class="form-input" placeholder="한국산업인력공단">
                         </div>
                         <div class="form-group">
                             <label class="form-label">등급/점수</label>
@@ -72,7 +73,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">취득일</label>
-                            <input type="date" name="certificate_date[]" class="form-input">
+                            <input type="date" name="certificate_acquisition_date[]" class="form-input">
                         </div>
                         <div class="form-group">
                             <label class="form-label">자격번호</label>

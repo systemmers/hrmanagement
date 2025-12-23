@@ -4,10 +4,12 @@ PersonCorporateContract SQLAlchemy Model
 개인-법인 간 계약 관계를 관리하는 모델입니다.
 계약 요청, 승인/거절, 데이터 공유 설정 등을 처리합니다.
 Phase 8: DictSerializableMixin 적용 (DataSharingSettings, SyncLog)
+SSOT: FieldOptions.CONTRACT_TYPE 참조
 """
 from datetime import datetime
 from app.database import db
 from app.models.mixins import DictSerializableMixin
+from app.constants.field_options import FieldOptions
 
 
 class PersonCorporateContract(db.Model):
@@ -86,19 +88,14 @@ class PersonCorporateContract(db.Model):
     STATUS_TERMINATED = 'terminated'
     STATUS_EXPIRED = 'expired'
 
-    # 계약 유형 상수
+    # 계약 유형 상수 (하위 호환용)
     TYPE_EMPLOYMENT = 'employment'
     TYPE_CONTRACT = 'contract'
     TYPE_FREELANCE = 'freelance'
     TYPE_INTERN = 'intern'
 
-    # 계약 유형 레이블
-    TYPE_LABELS = {
-        'employment': '정규직',
-        'contract': '계약직',
-        'freelance': '프리랜서',
-        'intern': '인턴'
-    }
+    # 계약 유형 레이블 - SSOT: FieldOptions.CONTRACT_TYPE 참조
+    # TYPE_LABELS = FieldOptions.get_labels_dict(FieldOptions.CONTRACT_TYPE)
 
     # 관계 설정
     person_user = db.relationship(
@@ -134,7 +131,9 @@ class PersonCorporateContract(db.Model):
             'company_id': self.company_id,
             'status': self.status,
             'contract_type': self.contract_type,
-            'contract_type_label': self.TYPE_LABELS.get(self.contract_type, self.contract_type),
+            'contract_type_label': FieldOptions.get_label_with_legacy(
+                FieldOptions.CONTRACT_TYPE, self.contract_type
+            ),
             'contract_start_date': self.contract_start_date.isoformat() if self.contract_start_date else None,
             'contract_end_date': self.contract_end_date.isoformat() if self.contract_end_date else None,
             'position': self.position,

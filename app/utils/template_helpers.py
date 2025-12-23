@@ -2,8 +2,12 @@
 템플릿 유틸리티 모듈
 
 Jinja2 템플릿에서 사용하는 컨텍스트 프로세서와 필터를 정의합니다.
+SSOT 원칙: field_options.py를 단일 진실 공급원으로 사용합니다.
+
+이 모듈은 Flask 등록만 담당하고, 모든 레이블 변환 로직은 FieldOptions에 위임합니다.
 """
 from datetime import datetime, date
+from app.constants.field_options import FieldOptions
 
 
 def register_template_utils(app):
@@ -27,13 +31,8 @@ def register_template_utils(app):
             return status_classes.get(status, 'badge-secondary')
 
         def get_status_text(status):
-            """상태 텍스트"""
-            status_texts = {
-                'active': '정상',
-                'warning': '대기',
-                'expired': '만료'
-            }
-            return status_texts.get(status, status)
+            """상태 텍스트 (SSOT: FieldOptions.EMPLOYEE_STATUS)"""
+            return FieldOptions.get_label_with_legacy(FieldOptions.EMPLOYEE_STATUS, status)
 
         def calculate_tenure(hire_date):
             """근속연수 계산 (입사일 기준)"""
@@ -95,101 +94,88 @@ def register_template_utils(app):
             except (ValueError, TypeError):
                 return str(amount)
 
-        def get_degree_label(degree):
-            """학위 레이블 변환"""
-            labels = {
-                'bachelor': '학사',
-                'master': '석사',
-                'doctor': '박사',
-                'associate': '전문학사',
-                'high_school': '고졸'
-            }
-            return labels.get(degree, degree or '정보 없음')
-
-        def get_level_label(level):
-            """언어 수준 레이블 변환"""
-            labels = {
-                'advanced': '상급',
-                'intermediate': '중급',
-                'beginner': '초급',
-                'native': '원어민'
-            }
-            return labels.get(level, level or '정보 없음')
-
-        def get_relation_label(relation):
-            """가족 관계 레이블 변환"""
-            labels = {
-                'spouse': '배우자',
-                'child': '자녀',
-                'parent': '부모',
-                'sibling': '형제자매',
-                'grandparent': '조부모',
-                'other': '기타'
-            }
-            return labels.get(relation, relation or '정보 없음')
-
-        def get_military_status_label(status):
-            """병역 상태 레이블 변환"""
-            labels = {
-                'completed': '군필',
-                'exempted': '면제',
-                'serving': '복무중',
-                'not_applicable': '해당없음'
-            }
-            return labels.get(status, status or '정보 없음')
-
-        def get_branch_label(branch):
-            """군 구분 레이블 변환"""
-            labels = {
-                'army': '육군',
-                'navy': '해군',
-                'airforce': '공군',
-                'marine': '해병대',
-                'auxiliary': '보충역'
-            }
-            return labels.get(branch, branch or '정보 없음')
+        # ========================================
+        # 레이블 변환 함수 (SSOT: FieldOptions 위임)
+        # ========================================
 
         def get_gender_label(gender):
             """성별 레이블 변환"""
-            labels = {
-                'male': '남성',
-                'female': '여성'
-            }
-            return labels.get(gender, gender or '정보 없음')
-
-        def get_employment_type_label(emp_type):
-            """고용형태 레이블 변환"""
-            labels = {
-                'regular': '정규직',
-                'contract': '계약직',
-                'parttime': '파트타임',
-                'intern': '인턴'
-            }
-            return labels.get(emp_type, emp_type or '정보 없음')
+            return FieldOptions.get_label_with_legacy(FieldOptions.GENDER, gender)
 
         def get_marital_status_label(status):
             """결혼여부 레이블 변환"""
-            labels = {
-                'single': '미혼',
-                'married': '기혼',
-                'divorced': '이혼',
-                'widowed': '사별'
-            }
-            return labels.get(status, status or '정보 없음')
+            return FieldOptions.get_label_with_legacy(FieldOptions.MARITAL_STATUS, status)
+
+        def get_nationality_label(nationality):
+            """국적 레이블 변환"""
+            return FieldOptions.get_label_with_legacy(FieldOptions.NATIONALITY, nationality)
+
+        def get_blood_type_label(blood_type):
+            """혈액형 레이블 변환"""
+            return FieldOptions.get_label_with_legacy(FieldOptions.BLOOD_TYPE, blood_type)
+
+        def get_employment_type_label(emp_type):
+            """고용형태 레이블 변환"""
+            return FieldOptions.get_label_with_legacy(FieldOptions.EMPLOYMENT_TYPE, emp_type)
+
+        def get_degree_label(degree):
+            """학위 레이블 변환"""
+            return FieldOptions.get_label_with_legacy(FieldOptions.DEGREE, degree)
+
+        def get_graduation_status_label(status):
+            """졸업상태 레이블 변환"""
+            return FieldOptions.get_label_with_legacy(FieldOptions.GRADUATION_STATUS, status)
+
+        def get_salary_type_label(salary_type):
+            """급여유형 레이블 변환"""
+            return FieldOptions.get_label_with_legacy(FieldOptions.SALARY_TYPE, salary_type)
+
+        def get_relation_label(relation):
+            """가족 관계 레이블 변환"""
+            return FieldOptions.get_label_with_legacy(FieldOptions.FAMILY_RELATION, relation)
+
+        def get_cohabit_label(cohabit):
+            """동거여부 레이블 변환"""
+            return FieldOptions.get_label_with_legacy(FieldOptions.COHABIT, cohabit)
+
+        def get_language_label(language):
+            """언어 레이블 변환"""
+            return FieldOptions.get_label_with_legacy(FieldOptions.LANGUAGE, language)
+
+        def get_level_label(level):
+            """언어 수준 레이블 변환"""
+            return FieldOptions.get_label_with_legacy(FieldOptions.LANGUAGE_LEVEL, level)
+
+        def get_military_status_label(status):
+            """병역 상태 레이블 변환"""
+            return FieldOptions.get_label_with_legacy(FieldOptions.MILITARY_STATUS, status)
+
+        def get_branch_label(branch):
+            """군 구분 레이블 변환"""
+            return FieldOptions.get_label_with_legacy(FieldOptions.MILITARY_BRANCH, branch)
 
         return {
+            # 포맷팅 함수
             'format_phone': format_phone,
+            'format_date': format_date,
+            'format_currency': format_currency,
+            # 상태 함수
             'get_status_badge_class': get_status_badge_class,
             'get_status_text': get_status_text,
             'calculate_tenure': calculate_tenure,
-            'format_date': format_date,
-            'format_currency': format_currency,
+            # 레이블 변환 함수 (SSOT: FieldOptions 위임)
+            'get_gender_label': get_gender_label,
+            'get_marital_status_label': get_marital_status_label,
+            'get_nationality_label': get_nationality_label,
+            'get_blood_type_label': get_blood_type_label,
+            'get_employment_type_label': get_employment_type_label,
             'get_degree_label': get_degree_label,
-            'get_level_label': get_level_label,
+            'get_graduation_status_label': get_graduation_status_label,
+            'get_salary_type_label': get_salary_type_label,
             'get_relation_label': get_relation_label,
+            'get_cohabit_label': get_cohabit_label,
+            'get_language_label': get_language_label,
+            'get_level_label': get_level_label,
             'get_military_status_label': get_military_status_label,
             'get_branch_label': get_branch_label,
-            'get_gender_label': get_gender_label,
-            'get_employment_type_label': get_employment_type_label,
-            'get_marital_status_label': get_marital_status_label
         }

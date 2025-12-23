@@ -74,10 +74,11 @@ def _get_family_updater():
     from ...models import FamilyMember
 
     def parse_living_together(value):
-        """living_together 값을 boolean으로 변환"""
+        """living_together 값을 boolean으로 변환 (SSOT + 레거시 호환)"""
         if value is None or value == '':
             return False
-        return value == 'true' or value is True
+        # SSOT 값: '동거'/'별거', 레거시 값: 'true'/'false'
+        return value in ('동거', 'true', True)
 
     return RelatedDataUpdater(
         model_class=FamilyMember,
@@ -90,7 +91,9 @@ def _get_family_updater():
             'birth_date': 'birth_date',
             'occupation': 'occupation',
             'phone': 'contact',
-            'living_together': 'is_cohabitant',
+            # FieldRegistry 정규 필드명 + 레거시 별칭
+            'is_cohabitant': 'is_cohabitant',
+            'living_together': 'is_cohabitant',  # 레거시 별칭
         },
         converters={'is_cohabitant': parse_living_together}
     )
@@ -161,7 +164,7 @@ def _get_career_updater():
 
 
 def _get_certificate_updater():
-    """자격증정보 Updater 생성"""
+    """자격증정보 Updater 생성 (Phase 9: FieldRegistry 필드명 동기화)"""
     from ...models import Certificate
     return RelatedDataUpdater(
         model_class=Certificate,
@@ -171,24 +174,29 @@ def _get_certificate_updater():
         field_mapping={
             'name': 'certificate_name',
             'grade': 'grade',
-            'issuer': 'issuing_organization',
+            # FieldRegistry 정규 필드명 + 레거시 별칭
+            'issuing_organization': 'issuing_organization',
+            'issuer': 'issuing_organization',  # 레거시 별칭
             'number': 'certificate_number',
-            'date': 'acquisition_date',
+            'acquisition_date': 'acquisition_date',
+            'date': 'acquisition_date',  # 레거시 별칭
             'expiry_date': 'expiry_date',
         }
     )
 
 
 def _get_language_updater():
-    """언어능력정보 Updater 생성"""
+    """언어능력정보 Updater 생성 (Phase 9: FieldRegistry 필드명 동기화)"""
     from ...models import Language
     return RelatedDataUpdater(
         model_class=Language,
         repository=language_repo,
         form_prefix='language_',
-        required_field='name',
+        required_field='language',  # FieldRegistry 정규 필드명
         field_mapping={
-            'name': 'language_name',
+            # FieldRegistry 정규 필드명 + 레거시 별칭
+            'language': 'language_name',
+            'name': 'language_name',  # 레거시 별칭
             'level': 'level',
             'test_name': 'exam_name',
             'score': 'score',

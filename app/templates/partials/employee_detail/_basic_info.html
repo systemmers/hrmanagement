@@ -11,18 +11,28 @@
         {{ card_header('개인 기본정보', 'fas fa-user') }}
         <div class="card-body">
             <div class="info-grid">
+                {# FieldRegistry personal_basic 섹션 순서 적용 #}
                 {{ info_item('성명 (한글)', employee.name) }}
                 {{ info_item('여권명 (영문)', employee.english_name) }}
-                {{ info_item('주민등록번호', employee.resident_number) }}
-                {{ info_item('생년월일', employee.birth_date) }}
+                {{ info_item('한자명', employee.chinese_name) }}
+                <div class="info-item">
+                    <div class="info-label">생년월일</div>
+                    <div class="info-value{% if not employee.birth_date %} empty{% endif %}">
+                        {{ employee.birth_date or '정보 없음' }}{% if employee.lunar_birth %} <span class="badge badge-info">음력</span>{% endif %}
+                    </div>
+                </div>
                 {{ info_item('성별', get_gender_label(employee.gender)) }}
+                {{ info_item('국적', get_nationality_label(employee.nationality)) }}
+                {{ info_item('주민등록번호', employee.resident_number) }}
                 <div class="info-item">
                     <div class="info-label">결혼여부</div>
                     <div class="info-value{% if not employee.marital_status %} empty{% endif %}">
                         {{ get_marital_status_label(employee.marital_status) or '정보 없음' }}
                     </div>
                 </div>
+                {# FieldRegistry contact 섹션 순서 적용 #}
                 {{ info_item('휴대전화', format_phone(employee.phone)) }}
+                {{ info_item('자택전화', format_phone(employee.home_phone) if format_phone is defined and employee.home_phone else employee.home_phone) }}
                 {{ info_item('개인 이메일', employee.email, highlight=true) }}
                 <div class="info-item">
                     <div class="info-label">비상연락처</div>
@@ -30,7 +40,7 @@
                         {{ employee.emergency_contact or '정보 없음' }}{% if employee.emergency_relation %} ({{ employee.emergency_relation }}){% endif %}
                     </div>
                 </div>
-                {# 신규 필드: 혈액형, 종교, 취미, 특기, 장애정보 #}
+                {# FieldRegistry personal_extended 섹션 #}
                 {{ info_item('혈액형', employee.blood_type) }}
                 {{ info_item('종교', employee.religion) }}
                 {{ info_item('취미', employee.hobby) }}

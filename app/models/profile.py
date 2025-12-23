@@ -3,8 +3,12 @@ Profile SQLAlchemy 모델
 
 통합 프로필 모델 - 개인/직원 공통 프로필 정보 관리
 Phase 4: 통합 프로필 아키텍처
+Phase 9: FieldRegistry 기반 to_dict() 정렬
 """
+from collections import OrderedDict
 from datetime import datetime
+from typing import Optional
+
 from app.database import db
 
 
@@ -179,8 +183,8 @@ class Profile(db.Model):
         """개인 계정 소유 프로필인지 확인"""
         return self.user_id is not None
 
-    def to_dict(self):
-        """딕셔너리 변환"""
+    def _collect_raw_data(self) -> dict:
+        """원시 필드 데이터 수집 (내부용)"""
         return {
             'id': self.id,
             'user_id': self.user_id,
@@ -220,6 +224,43 @@ class Profile(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }
+
+    def to_dict(self, ordered: bool = False, account_type: Optional[str] = None) -> dict:
+        """딕셔너리 변환 (Phase 9: FieldRegistry 기반 정렬 지원)
+
+        Args:
+            ordered: True면 FieldRegistry 순서 적용, False면 기존 방식
+            account_type: 가시성 필터링용 계정 타입
+
+        Returns:
+            프로필 정보 딕셔너리
+        """
+        raw = self._collect_raw_data()
+
+        # 기존 방식 (하위 호환성)
+        if not ordered:
+            return raw
+
+        # Phase 9: FieldRegistry 기반 정렬
+        from app.constants.field_registry import FieldRegistry
+
+        result = OrderedDict()
+        result['id'] = raw.pop('id')
+        result['user_id'] = raw.pop('user_id')
+
+        # 섹션별 정렬 적용 (profile 도메인)
+        section_ids = ['personal_basic', 'contact', 'address', 'actual_address', 'personal_extended']
+        for section_id in section_ids:
+            section_data = FieldRegistry.to_ordered_dict(section_id, raw, account_type)
+            for key, value in section_data.items():
+                if key in raw:
+                    result[key] = raw.pop(key)
+
+        # 나머지 필드 추가 (정의되지 않은 필드들)
+        for key, value in raw.items():
+            result[key] = value
+
+        return dict(result)
 
     def to_snapshot(self):
         """퇴사 시 스냅샷용 딕셔너리 (민감정보 포함)"""

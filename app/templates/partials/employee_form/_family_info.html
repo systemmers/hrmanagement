@@ -1,5 +1,6 @@
 {#
     직원 폼 - 가족사항 섹션 (동적 폼)
+    Phase 9: FieldRegistry 필드명 동기화
     employee: 직원 객체 (수정 모드일 때)
 #}
 <section class="form-section" id="family-info">
@@ -50,10 +51,10 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">동거여부</label>
-                                <select name="family_living_together[]" class="form-input">
+                                <select name="family_is_cohabitant[]" class="form-input">
                                     <option value="">선택하세요</option>
                                     {% for opt in COHABIT_OPTIONS %}
-                                    <option value="{{ opt.value }}" {% if (opt.value == '동거' and (member.is_cohabitant == True or member.living_together == True)) or (opt.value == '별거' and (member.is_cohabitant == False or member.living_together == False)) %}selected{% endif %}>{{ opt.label }}</option>
+                                    <option value="{{ opt.value }}" {% if member.is_cohabitant == opt.value %}selected{% endif %}>{{ opt.label }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -93,7 +94,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">동거여부</label>
-                            <select name="family_living_together[]" class="form-input">
+                            <select name="family_is_cohabitant[]" class="form-input">
                                 <option value="">선택하세요</option>
                                 {% for opt in COHABIT_OPTIONS %}
                                 <option value="{{ opt.value }}">{{ opt.label }}</option>

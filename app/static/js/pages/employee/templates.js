@@ -142,10 +142,10 @@ export function getCareerTemplate(index = 0) {
                     <label class="form-label">급여유형</label>
                     <select name="career_salary_type[]" class="form-input">
                         <option value="">선택</option>
-                        <option value="annual">연봉제</option>
-                        <option value="monthly">월급제</option>
-                        <option value="hourly">시급제</option>
-                        <option value="pay_step">호봉제</option>
+                        <option value="연봉제">연봉제</option>
+                        <option value="월급제">월급제</option>
+                        <option value="시급제">시급제</option>
+                        <option value="호봉제">호봉제</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -196,7 +196,7 @@ export function getCertificateTemplate(index = 0) {
                 </div>
                 <div class="form-group">
                     <label class="form-label">발급기관</label>
-                    <input type="text" name="certificate_issuer[]" class="form-input" placeholder="한국산업인력공단">
+                    <input type="text" name="certificate_issuing_organization[]" class="form-input" placeholder="한국산업인력공단">
                 </div>
                 <div class="form-group">
                     <label class="form-label">등급/점수</label>
@@ -204,7 +204,7 @@ export function getCertificateTemplate(index = 0) {
                 </div>
                 <div class="form-group">
                     <label class="form-label">취득일</label>
-                    <input type="date" name="certificate_date[]" class="form-input">
+                    <input type="date" name="certificate_acquisition_date[]" class="form-input">
                 </div>
                 <div class="form-group">
                     <label class="form-label">자격번호</label>
@@ -266,7 +266,7 @@ export function getFamilyTemplate(index = 0) {
                 </div>
                 <div class="form-group">
                     <label class="form-label">동거여부</label>
-                    <select name="family_living_together[]" class="form-input">
+                    <select name="family_is_cohabitant[]" class="form-input">
                         <option value="">선택하세요</option>
                         <option value="동거">동거</option>
                         <option value="별거">별거</option>
@@ -296,7 +296,7 @@ export function getLanguageTemplate(index = 0) {
             <div class="form-grid">
                 <div class="form-group">
                     <label class="form-label">언어</label>
-                    <select name="language_name[]" class="form-input">
+                    <select name="language_language[]" class="form-input">
                         <option value="">선택하세요</option>
                         <option value="영어">영어</option>
                         <option value="일본어">일본어</option>
@@ -406,15 +406,11 @@ export function getAwardTemplate(index = 0) {
                 </div>
                 <div class="form-group">
                     <label class="form-label">수여기관</label>
-                    <input type="text" name="award_institution[]" class="form-input" placeholder="수여기관">
-                </div>
-                <div class="form-group form-group-full">
-                    <label class="form-label">수상내용</label>
-                    <textarea name="award_description[]" class="form-input" rows="2" placeholder="수상 내용"></textarea>
+                    <input type="text" name="award_issuer[]" class="form-input" placeholder="수여기관">
                 </div>
                 <div class="form-group form-group-full">
                     <label class="form-label">비고</label>
-                    <input type="text" name="award_notes[]" class="form-input" placeholder="비고">
+                    <textarea name="award_note[]" class="form-input" rows="2" placeholder="수상 내용 및 비고"></textarea>
                 </div>
             </div>
             <button type="button" class="btn-remove" title="삭제">

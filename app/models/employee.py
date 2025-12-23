@@ -3,9 +3,14 @@ Employee SQLAlchemy 모델
 
 직원 기본 정보 및 확장 정보를 포함합니다.
 Phase 4: 통합 프로필 연결 및 스냅샷 기능 추가
+Phase 9: FieldRegistry 기반 to_dict() 정렬
 """
+from collections import OrderedDict
 from datetime import datetime
+from typing import Optional
+
 from sqlalchemy.dialects.postgresql import JSONB
+
 from app.database import db
 
 
@@ -123,8 +128,8 @@ class Employee(db.Model):
         """템플릿 호환성: employment_type -> contract.employee_type"""
         return self.contract.employee_type if self.contract else None
 
-    def to_dict(self):
-        """딕셔너리 반환 (snake_case 통일)"""
+    def _collect_raw_data(self) -> dict:
+        """원시 필드 데이터 수집 (내부용)"""
         return {
             'id': self.id,
             'name': self.name,
@@ -136,7 +141,6 @@ class Employee(db.Model):
             'phone': self.phone,
             'email': self.email,
             'organization_id': self.organization_id,
-            'organization': self.organization.to_dict() if self.organization else None,
             'english_name': self.english_name,
             'chinese_name': self.chinese_name,
             'birth_date': self.birth_date,
@@ -165,9 +169,9 @@ class Employee(db.Model):
             # 소속 정보 추가 필드
             'team': self.team,
             # 직급 체계
-            'job_grade': self.job_grade,  # 직급
-            'job_title': self.job_title,  # 직책
-            'job_role': self.job_role,  # 직무
+            'job_grade': self.job_grade,
+            'job_title': self.job_title,
+            'job_role': self.job_role,
             'work_location': self.work_location,
             'internal_phone': self.internal_phone,
             'company_email': self.company_email,
@@ -179,6 +183,47 @@ class Employee(db.Model):
             'resignation_date': self.resignation_date.isoformat() if self.resignation_date else None,
             'data_retention_until': self.data_retention_until.isoformat() if self.data_retention_until else None,
         }
+
+    def to_dict(self, ordered: bool = False, account_type: Optional[str] = None) -> dict:
+        """딕셔너리 반환 (Phase 9: FieldRegistry 기반 정렬 지원)
+
+        Args:
+            ordered: True면 FieldRegistry 순서 적용, False면 기존 방식
+            account_type: 가시성 필터링용 계정 타입
+
+        Returns:
+            직원 정보 딕셔너리
+        """
+        raw = self._collect_raw_data()
+
+        # 기존 방식 (하위 호환성)
+        if not ordered:
+            raw['organization'] = self.organization.to_dict() if self.organization else None
+            return raw
+
+        # Phase 9: FieldRegistry 기반 정렬
+        from app.constants.field_registry import FieldRegistry
+
+        result = OrderedDict()
+        result['id'] = raw.pop('id')
+
+        # 섹션별 정렬 적용
+        section_ids = ['personal_basic', 'contact', 'address', 'actual_address',
+                       'personal_extended', 'organization', 'contract']
+        for section_id in section_ids:
+            section_data = FieldRegistry.to_ordered_dict(section_id, raw, account_type)
+            for key, value in section_data.items():
+                if key in raw:
+                    result[key] = raw.pop(key)
+
+        # 조직 정보 추가
+        result['organization'] = self.organization.to_dict() if self.organization else None
+
+        # 나머지 필드 추가 (정의되지 않은 필드들)
+        for key, value in raw.items():
+            result[key] = value
+
+        return dict(result)
 
     @classmethod
     def from_dict(cls, data):
