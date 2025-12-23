@@ -28,11 +28,9 @@
                                 <label class="form-label">학위</label>
                                 <select name="education_degree[]" class="form-input">
                                     <option value="">선택하세요</option>
-                                    <option value="고졸" {% if edu.degree == '고졸' %}selected{% endif %}>고등학교 졸업</option>
-                                    <option value="전문학사" {% if edu.degree == '전문학사' %}selected{% endif %}>전문학사</option>
-                                    <option value="학사" {% if edu.degree == '학사' %}selected{% endif %}>학사</option>
-                                    <option value="석사" {% if edu.degree == '석사' %}selected{% endif %}>석사</option>
-                                    <option value="박사" {% if edu.degree == '박사' %}selected{% endif %}>박사</option>
+                                    {% for opt in DEGREE_OPTIONS %}
+                                    <option value="{{ opt.value }}" {% if edu.degree == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                             <div class="form-group">
@@ -54,10 +52,9 @@
                                 <label class="form-label">졸업유무</label>
                                 <select name="education_graduation_status[]" class="form-input">
                                     <option value="">선택하세요</option>
-                                    <option value="졸업" {% if edu.graduation_status == '졸업' or edu.status == '졸업' %}selected{% endif %}>졸업</option>
-                                    <option value="재학" {% if edu.graduation_status == '재학' or edu.status == '재학' %}selected{% endif %}>재학</option>
-                                    <option value="휴학" {% if edu.graduation_status == '휴학' or edu.status == '휴학' %}selected{% endif %}>휴학</option>
-                                    <option value="중퇴" {% if edu.graduation_status == '중퇴' or edu.status == '중퇴' %}selected{% endif %}>중퇴</option>
+                                    {% for opt in GRADUATION_STATUS_OPTIONS %}
+                                    <option value="{{ opt.value }}" {% if edu.graduation_status == opt.value or edu.status == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                             <div class="form-group">
@@ -82,11 +79,9 @@
                             <label class="form-label">학위</label>
                             <select name="education_degree[]" class="form-input">
                                 <option value="">선택하세요</option>
-                                <option value="고졸">고등학교 졸업</option>
-                                <option value="전문학사">전문학사</option>
-                                <option value="학사">학사</option>
-                                <option value="석사">석사</option>
-                                <option value="박사">박사</option>
+                                {% for opt in DEGREE_OPTIONS %}
+                                <option value="{{ opt.value }}">{{ opt.label }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="form-group">
@@ -105,10 +100,9 @@
                             <label class="form-label">졸업유무</label>
                             <select name="education_graduation_status[]" class="form-input">
                                 <option value="">선택하세요</option>
-                                <option value="졸업">졸업</option>
-                                <option value="재학">재학</option>
-                                <option value="휴학">휴학</option>
-                                <option value="중퇴">중퇴</option>
+                                {% for opt in GRADUATION_STATUS_OPTIONS %}
+                                <option value="{{ opt.value }}">{{ opt.label }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="form-group">

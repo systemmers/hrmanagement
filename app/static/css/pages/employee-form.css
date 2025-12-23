@@ -66,17 +66,10 @@
     grid-column: 1 / -1;
 }
 
-/* 폼 그룹 */
+/* 폼 그룹, 레이블, 입력 필드는 components/forms.css에서 정의 */
+/* 직원 폼 페이지 특화 오버라이드 */
 .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-}
-
-.form-label {
-    font-size: var(--text-sm);
-    font-weight: 500;
-    color: var(--color-gray-700);
+    gap: var(--space-1); /* 폼 페이지는 더 밀집된 레이아웃 */
 }
 
 .form-label .required {
@@ -84,30 +77,13 @@
     margin-left: var(--space-1);
 }
 
-.form-input {
-    width: 100%;
-    padding: var(--space-3);
-    border: 1px solid var(--color-gray-300);
-    border-radius: var(--radius-md);
-    font-size: var(--text-base);
-    color: var(--color-gray-900);
-    background-color: var(--color-pure-white);
-    transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
-}
-
 .form-input:focus {
-    outline: none;
     border-color: var(--color-blue-600);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); /* --color-blue-600 focus ring */
 }
 
 .form-input::placeholder {
     color: var(--color-gray-400);
-}
-
-.form-input:disabled {
-    background-color: var(--color-gray-100);
-    cursor: not-allowed;
 }
 
 select.form-input {
@@ -120,98 +96,22 @@ select.form-input {
     margin-top: var(--space-1);
 }
 
-/* 입력 필드 + 버튼 조합 */
-.input-with-button {
-    display: flex;
-    gap: var(--space-2);
-}
+/* 입력 필드 조합 패턴은 components/forms.css로 이동 */
+/* .input-with-button, .input-with-checkbox → components/forms.css */
 
-.input-with-button .form-input {
-    flex: 1;
-    cursor: pointer;
-}
-
-.input-with-button .btn {
-    flex-shrink: 0;
-    white-space: nowrap;
-}
-
-/* 입력 필드 + 체크박스 조합 (생년월일 + 음력) */
-.input-with-checkbox {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-}
-
-.input-with-checkbox .form-input {
-    flex: 1;
-}
-
-.input-with-checkbox .checkbox-inline {
-    display: flex;
-    align-items: center;
-    gap: var(--space-1);
-    white-space: nowrap;
-    font-size: var(--font-size-sm);
-    color: var(--color-gray-600);
-    cursor: pointer;
-}
-
-.input-with-checkbox .checkbox-inline input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-}
-
-/* 사진 업로드 섹션 */
-.photo-upload-section {
-    display: flex;
-    gap: var(--space-6);
-    margin-bottom: var(--space-6);
-    padding-bottom: var(--space-6);
-    border-bottom: 1px solid var(--color-gray-200);
-}
-
+/* 사진 업로드 섹션은 components/forms.css에서 정의 */
+/* 직원 폼 페이지 특화 오버라이드 */
 .photo-preview {
-    width: 150px;
+    width: 150px; /* 직원 폼은 더 큰 사진 미리보기 사용 */
     height: 150px;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    border: 2px solid var(--color-gray-200);
-    background-color: var(--color-gray-100);
-    flex-shrink: 0;
-}
-
-.photo-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.photo-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-gray-400);
-    gap: var(--space-2);
-}
-
-.photo-placeholder i {
-    font-size: var(--text-3xl);
 }
 
 .photo-placeholder span {
-    font-size: var(--text-sm);
+    font-size: var(--text-sm); /* 직원 폼에서 더 큰 텍스트 */
 }
 
 .photo-upload-controls {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    justify-content: center; /* 직원 폼에서 중앙 정렬 */
 }
 
 /* 동적 리스트 (학력, 경력, 자격증, 가족) */

@@ -23,12 +23,9 @@
                                 <label class="form-label">관계</label>
                                 <select name="family_relation[]" class="form-input">
                                     <option value="">선택하세요</option>
-                                    <option value="배우자" {% if member.relation == '배우자' %}selected{% endif %}>배우자</option>
-                                    <option value="자녀" {% if member.relation == '자녀' %}selected{% endif %}>자녀</option>
-                                    <option value="부" {% if member.relation == '부' %}selected{% endif %}>부</option>
-                                    <option value="모" {% if member.relation == '모' %}selected{% endif %}>모</option>
-                                    <option value="형제" {% if member.relation == '형제' %}selected{% endif %}>형제</option>
-                                    <option value="자매" {% if member.relation == '자매' %}selected{% endif %}>자매</option>
+                                    {% for opt in FAMILY_RELATION_OPTIONS %}
+                                    <option value="{{ opt.value }}" {% if member.relation == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                             <div class="form-group">
@@ -55,8 +52,9 @@
                                 <label class="form-label">동거여부</label>
                                 <select name="family_living_together[]" class="form-input">
                                     <option value="">선택하세요</option>
-                                    <option value="동거" {% if member.is_cohabitant == True or member.living_together == True %}selected{% endif %}>동거</option>
-                                    <option value="별거" {% if member.is_cohabitant == False or member.living_together == False %}selected{% endif %}>별거</option>
+                                    {% for opt in COHABIT_OPTIONS %}
+                                    <option value="{{ opt.value }}" {% if (opt.value == '동거' and (member.is_cohabitant == True or member.living_together == True)) or (opt.value == '별거' and (member.is_cohabitant == False or member.living_together == False)) %}selected{% endif %}>{{ opt.label }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
@@ -72,12 +70,9 @@
                             <label class="form-label">관계</label>
                             <select name="family_relation[]" class="form-input">
                                 <option value="">선택하세요</option>
-                                <option value="배우자">배우자</option>
-                                <option value="자녀">자녀</option>
-                                <option value="부">부</option>
-                                <option value="모">모</option>
-                                <option value="형제">형제</option>
-                                <option value="자매">자매</option>
+                                {% for opt in FAMILY_RELATION_OPTIONS %}
+                                <option value="{{ opt.value }}">{{ opt.label }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="form-group">
@@ -100,8 +95,9 @@
                             <label class="form-label">동거여부</label>
                             <select name="family_living_together[]" class="form-input">
                                 <option value="">선택하세요</option>
-                                <option value="동거">동거</option>
-                                <option value="별거">별거</option>
+                                {% for opt in COHABIT_OPTIONS %}
+                                <option value="{{ opt.value }}">{{ opt.label }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>

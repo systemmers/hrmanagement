@@ -13,14 +13,9 @@
         <label for="military_status" class="form-label">병역사항</label>
         <select id="military_status" name="military_status" class="form-input">
             <option value="">선택하세요</option>
-            <option value="군필" {% if mil.service_type == '군필' or mil.status == '군필' or (employee and employee.military_status == '군필') %}selected{% endif %}>군필</option>
-            <option value="만기전역" {% if mil.service_type == '만기전역' or mil.status == '만기전역' or (employee and employee.military_status == '만기전역') %}selected{% endif %}>만기전역</option>
-            <option value="의가사전역" {% if mil.service_type == '의가사전역' or mil.status == '의가사전역' or (employee and employee.military_status == '의가사전역') %}selected{% endif %}>의가사전역</option>
-            <option value="병역면제" {% if mil.service_type == '병역면제' or mil.status == '병역면제' or (employee and employee.military_status == '병역면제') %}selected{% endif %}>병역면제</option>
-            <option value="면제" {% if mil.service_type == '면제' or mil.status == '면제' or (employee and employee.military_status == '면제') %}selected{% endif %}>면제</option>
-            <option value="복무중" {% if mil.service_type == '복무중' or mil.status == '복무중' or (employee and employee.military_status == '복무중') %}selected{% endif %}>복무중</option>
-            <option value="미필" {% if mil.service_type == '미필' or mil.status == '미필' or (employee and employee.military_status == '미필') %}selected{% endif %}>미필</option>
-            <option value="해당없음" {% if mil.service_type == '해당없음' or mil.status == '해당없음' or (employee and employee.military_status == '해당없음') %}selected{% endif %}>해당없음</option>
+            {% for opt in MILITARY_STATUS_OPTIONS %}
+            <option value="{{ opt.value }}" {% if mil.service_type == opt.value or mil.status == opt.value or (employee and employee.military_status == opt.value) %}selected{% endif %}>{{ opt.label }}</option>
+            {% endfor %}
         </select>
     </div>
 
@@ -28,12 +23,9 @@
         <label for="military_branch" class="form-label">군별</label>
         <select id="military_branch" name="military_branch" class="form-input">
             <option value="">선택하세요</option>
-            <option value="육군" {% if mil.branch == '육군' or (employee and employee.military_branch == '육군') %}selected{% endif %}>육군</option>
-            <option value="해군" {% if mil.branch == '해군' or (employee and employee.military_branch == '해군') %}selected{% endif %}>해군</option>
-            <option value="공군" {% if mil.branch == '공군' or (employee and employee.military_branch == '공군') %}selected{% endif %}>공군</option>
-            <option value="해병대" {% if mil.branch == '해병대' or (employee and employee.military_branch == '해병대') %}selected{% endif %}>해병대</option>
-            <option value="의무경찰" {% if mil.branch == '의무경찰' or (employee and employee.military_branch == '의무경찰') %}selected{% endif %}>의무경찰</option>
-            <option value="사회복무요원" {% if mil.branch == '사회복무요원' or (employee and employee.military_branch == '사회복무요원') %}selected{% endif %}>사회복무요원</option>
+            {% for opt in MILITARY_BRANCH_OPTIONS %}
+            <option value="{{ opt.value }}" {% if mil.branch == opt.value or (employee and employee.military_branch == opt.value) %}selected{% endif %}>{{ opt.label }}</option>
+            {% endfor %}
         </select>
     </div>
 

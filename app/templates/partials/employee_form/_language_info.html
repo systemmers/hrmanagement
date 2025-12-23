@@ -16,8 +16,8 @@
                     <label class="form-label">언어</label>
                     <select name="language_name[]" class="form-input">
                         <option value="">선택하세요</option>
-                        {% for l in ['영어', '일본어', '중국어', '스페인어', '프랑스어', '독일어', '러시아어', '베트남어', '태국어', '기타'] %}
-                        <option value="{{ l }}" {% if lang.language == l %}selected{% endif %}>{{ l }}</option>
+                        {% for opt in LANGUAGE_OPTIONS %}
+                        <option value="{{ opt.value }}" {% if lang.language == opt.value %}selected{% endif %}>{{ opt.label }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -25,10 +25,9 @@
                     <label class="form-label">수준</label>
                     <select name="language_level[]" class="form-input">
                         <option value="">선택하세요</option>
-                        <option value="원어민" {% if lang.level == '원어민' or lang.proficiency == '원어민' %}selected{% endif %}>원어민</option>
-                        <option value="고급" {% if lang.level == '고급' or lang.proficiency == '고급' %}selected{% endif %}>상</option>
-                        <option value="중급" {% if lang.level == '중급' or lang.proficiency == '중급' %}selected{% endif %}>중</option>
-                        <option value="초급" {% if lang.level == '초급' or lang.proficiency == '초급' %}selected{% endif %}>하</option>
+                        {% for opt in LANGUAGE_LEVEL_OPTIONS %}
+                        <option value="{{ opt.value }}" {% if lang.level == opt.value or lang.proficiency == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
@@ -59,8 +58,8 @@
                 <label class="form-label">언어</label>
                 <select name="language_name[]" class="form-input">
                     <option value="">선택하세요</option>
-                    {% for l in ['영어', '일본어', '중국어', '스페인어', '프랑스어', '독일어', '러시아어', '베트남어', '태국어', '기타'] %}
-                    <option value="{{ l }}">{{ l }}</option>
+                    {% for opt in LANGUAGE_OPTIONS %}
+                    <option value="{{ opt.value }}">{{ opt.label }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -68,10 +67,9 @@
                 <label class="form-label">수준</label>
                 <select name="language_level[]" class="form-input">
                     <option value="">선택하세요</option>
-                    <option value="원어민">원어민</option>
-                    <option value="고급">상</option>
-                    <option value="중급">중</option>
-                    <option value="초급">하</option>
+                    {% for opt in LANGUAGE_LEVEL_OPTIONS %}
+                    <option value="{{ opt.value }}">{{ opt.label }}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class="form-group">
