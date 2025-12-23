@@ -165,8 +165,9 @@
                     <label for="gender" class="form-label">성별</label>
                     <select id="gender" name="gender" class="form-input">
                         <option value="">선택하세요</option>
-                        <option value="남" {% if employee and employee.gender == '남' %}selected{% endif %}>남성</option>
-                        <option value="여" {% if employee and employee.gender == '여' %}selected{% endif %}>여성</option>
+                        {% for opt in GENDER_OPTIONS %}
+                        <option value="{{ opt.value }}" {% if employee and employee.gender == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
@@ -174,10 +175,9 @@
                     <label for="marital_status" class="form-label">결혼여부</label>
                     <select id="marital_status" name="marital_status" class="form-input">
                         <option value="">선택하세요</option>
-                        <option value="미혼" {% if employee and (employee.marital_status == '미혼' or employee.marital_status == 'single') %}selected{% endif %}>미혼</option>
-                        <option value="기혼" {% if employee and (employee.marital_status == '기혼' or employee.marital_status == 'married') %}selected{% endif %}>기혼</option>
-                        <option value="이혼" {% if employee and (employee.marital_status == '이혼' or employee.marital_status == 'divorced') %}selected{% endif %}>이혼</option>
-                        <option value="사별" {% if employee and (employee.marital_status == '사별' or employee.marital_status == 'widowed') %}selected{% endif %}>사별</option>
+                        {% for opt in MARITAL_STATUS_OPTIONS %}
+                        <option value="{{ opt.value }}" {% if employee and employee.marital_status == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
@@ -185,12 +185,9 @@
                     <label for="nationality" class="form-label">국적</label>
                     <select id="nationality" name="nationality" class="form-input">
                         <option value="">선택하세요</option>
-                        <option value="대한민국" {% if employee and employee.nationality == '대한민국' %}selected{% endif %}>대한민국</option>
-                        <option value="미국" {% if employee and employee.nationality == '미국' %}selected{% endif %}>미국</option>
-                        <option value="중국" {% if employee and employee.nationality == '중국' %}selected{% endif %}>중국</option>
-                        <option value="일본" {% if employee and employee.nationality == '일본' %}selected{% endif %}>일본</option>
-                        <option value="베트남" {% if employee and employee.nationality == '베트남' %}selected{% endif %}>베트남</option>
-                        <option value="기타" {% if employee and employee.nationality == '기타' %}selected{% endif %}>기타</option>
+                        {% for opt in NATIONALITY_OPTIONS %}
+                        <option value="{{ opt.value }}" {% if employee and employee.nationality == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
@@ -262,10 +259,9 @@
                     <label for="blood_type" class="form-label">혈액형</label>
                     <select id="blood_type" name="blood_type" class="form-input">
                         <option value="">선택하세요</option>
-                        <option value="A" {% if employee and employee.blood_type == 'A' %}selected{% endif %}>A형</option>
-                        <option value="B" {% if employee and employee.blood_type == 'B' %}selected{% endif %}>B형</option>
-                        <option value="O" {% if employee and employee.blood_type == 'O' %}selected{% endif %}>O형</option>
-                        <option value="AB" {% if employee and employee.blood_type == 'AB' %}selected{% endif %}>AB형</option>
+                        {% for opt in BLOOD_TYPE_OPTIONS %}
+                        <option value="{{ opt.value }}" {% if employee and employee.blood_type == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
@@ -326,6 +322,24 @@
                        value="{{ employee.postal_code if employee and employee.postal_code else '' }}">
                 <input type="hidden" id="actual_postal_code" name="actual_postal_code"
                        value="{{ employee.actual_postal_code if employee and employee.actual_postal_code else '' }}">
+
+                {# 개인 계정 전용: 프로필 공개 설정 #}
+                {% if account_type == 'personal' %}
+                <div class="form-group form-group-full mt-4">
+                    <h5 class="form-subsection-title">프로필 공개 설정</h5>
+                    <small class="form-help mb-3">프로필을 공개하면 채용 담당자가 내 정보를 확인할 수 있습니다</small>
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="is_public" name="is_public" value="true"
+                               {% if employee and employee.is_public %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">프로필 공개 (구직 활동)</span>
+                    </label>
+                    <small class="form-help">공개 시 이름, 학력, 경력, 자격증, 어학 정보가 노출됩니다</small>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

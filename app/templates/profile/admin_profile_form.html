@@ -27,13 +27,45 @@
         {% endif %}
     {% endwith %}
 
-    <form method="POST" class="admin-profile-form__form">
+    <form method="POST" class="admin-profile-form__form" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <!-- 기본 정보 섹션 -->
         <div class="admin-profile-form__section">
             <h3 class="admin-profile-form__section-title">
                 <i class="fas fa-user"></i> 기본 정보
             </h3>
+
+            <!-- 프로필 사진 업로드 -->
+            <div class="admin-profile-form__photo-section">
+                <div class="admin-profile-form__photo-preview" id="photoPreview">
+                    {% if form_data.get('photo') %}
+                    <img src="{{ form_data.get('photo') }}" alt="프로필 사진" id="previewImage">
+                    {% else %}
+                    <div class="admin-profile-form__photo-placeholder" id="photoPlaceholder">
+                        <i class="fas fa-user"></i>
+                        <span>사진 미등록</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="admin-profile-form__photo-controls">
+                    <label class="admin-profile-form__label">프로필 사진</label>
+                    <input type="file" id="photoFile" name="photoFile"
+                           accept="image/jpeg,image/png,image/gif,image/webp"
+                           class="admin-profile-form__input-file" style="display: none;">
+                    <input type="hidden" id="photo" name="photo" value="{{ form_data.get('photo', '') }}">
+                    <div class="admin-profile-form__photo-buttons">
+                        <button type="button" class="admin-profile-form__btn admin-profile-form__btn--secondary admin-profile-form__btn--sm" id="selectPhotoBtn">
+                            <i class="fas fa-camera"></i> 사진 선택
+                        </button>
+                        {% if form_data.get('photo') and not form_data.get('photo').startswith('http') %}
+                        <button type="button" class="admin-profile-form__btn admin-profile-form__btn--danger admin-profile-form__btn--sm" id="deletePhotoBtn">
+                            <i class="fas fa-trash"></i> 삭제
+                        </button>
+                        {% endif %}
+                    </div>
+                    <small class="admin-profile-form__help">JPG, PNG, GIF, WebP (최대 5MB)</small>
+                </div>
+            </div>
 
             <div class="admin-profile-form__row">
                 <div class="admin-profile-form__group">
@@ -167,4 +199,50 @@
 {% block extra_js %}
 <!-- JS: utils/formatting.js - 전화번호 자동 포맷팅 (DOMContentLoaded 시 자동 초기화) -->
 <script src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 사진 선택 버튼
+    const selectPhotoBtn = document.getElementById('selectPhotoBtn');
+    const photoFileInput = document.getElementById('photoFile');
+    const photoHiddenInput = document.getElementById('photo');
+    const photoPreview = document.getElementById('photoPreview');
+    const deletePhotoBtn = document.getElementById('deletePhotoBtn');
+
+    if (selectPhotoBtn && photoFileInput) {
+        selectPhotoBtn.addEventListener('click', function() {
+            photoFileInput.click();
+        });
+
+        photoFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // 파일 크기 체크 (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('파일 크기는 5MB 이하여야 합니다.');
+                    return;
+                }
+
+                // 미리보기 표시
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoPreview.innerHTML = '<img src="' + e.target.result + '" alt="프로필 사진" id="previewImage">';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // 사진 삭제 버튼
+    if (deletePhotoBtn) {
+        deletePhotoBtn.addEventListener('click', function() {
+            if (confirm('프로필 사진을 삭제하시겠습니까?')) {
+                photoPreview.innerHTML = '<div class="admin-profile-form__photo-placeholder" id="photoPlaceholder"><i class="fas fa-user"></i><span>사진 미등록</span></div>';
+                photoHiddenInput.value = '';
+                photoFileInput.value = '';
+                deletePhotoBtn.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

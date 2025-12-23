@@ -106,7 +106,27 @@
                 {% if employee.resignation_date %}
                 {{ info_item('퇴사일', employee.resignation_date) }}
                 {% endif %}
+                {% if employee.data_retention_until %}
+                {{ info_item('데이터 보관 만료일', employee.data_retention_until) }}
+                {% endif %}
             </div>
+
+            {# 퇴직자 스냅샷 정보 표시 #}
+            {% if employee.status in ('resigned', 'terminated') and employee.snapshot_at %}
+            <div class="mt-4 p-3 bg-gray-50 border-radius-md">
+                <h5 class="info-subsection-title">
+                    <i class="fas fa-archive text-warning"></i> 퇴직자 데이터 보관 정보
+                </h5>
+                <div class="info-grid mt-3">
+                    {{ info_item('스냅샷 생성일', employee.snapshot_at.strftime('%Y-%m-%d %H:%M') if employee.snapshot_at else none) }}
+                    {{ info_item('데이터 보관 만료일', employee.data_retention_until) }}
+                </div>
+                <small class="text-muted mt-2 d-block">
+                    <i class="fas fa-info-circle"></i>
+                    퇴직자 데이터는 보관 만료일까지 유지되며, 이후 개인정보 보호 정책에 따라 처리됩니다.
+                </small>
+            </div>
+            {% endif %}
         </div>
     </div>
 </section>

@@ -5,7 +5,8 @@ Profile Routes - 통합 프로필 라우트
 Phase 8: 상수 모듈 적용
 Phase 2: Service 계층 표준화
 """
-from flask import render_template, g, jsonify, request, flash, redirect, url_for, session
+import os
+from flask import render_template, g, jsonify, request, flash, redirect, url_for, session, current_app
 
 from app.blueprints.profile import profile_bp
 from app.constants.session_keys import SessionKeys, AccountType
@@ -16,6 +17,7 @@ from app.blueprints.profile.decorators import (
 )
 from app.services.attachment_service import attachment_service
 from app.services.corporate_admin_profile_service import corporate_admin_profile_service
+from app.services.file_storage_service import file_storage
 from app.models.user import User
 
 
@@ -307,6 +309,46 @@ def awards():
 # 법인 관리자 프로필 라우트
 # ========================================
 
+def _handle_admin_photo_upload(profile_id):
+    """법인 관리자 프로필 사진 업로드 처리
+
+    Args:
+        profile_id: 프로필 ID (파일명 생성용)
+
+    Returns:
+        str or None: 저장된 사진 URL 경로 또는 None
+    """
+    photo_file = request.files.get('photoFile')
+    if not photo_file or photo_file.filename == '':
+        # 파일이 없으면 기존 photo 값 사용
+        return request.form.get('photo', '').strip() or None
+
+    # 이미지 파일 검증
+    if not file_storage.allowed_image_file(photo_file.filename):
+        flash('허용되지 않은 이미지 형식입니다. (JPG, PNG, GIF, WebP만 가능)', 'error')
+        return None
+
+    # 파일 크기 검증 (5MB)
+    photo_file.seek(0, 2)
+    file_size = photo_file.tell()
+    photo_file.seek(0)
+    if file_size > 5 * 1024 * 1024:
+        flash('파일 크기는 5MB 이하여야 합니다.', 'error')
+        return None
+
+    # 업로드 폴더 생성
+    upload_folder = os.path.join(current_app.root_path, 'static', 'uploads', 'admin_photos')
+    os.makedirs(upload_folder, exist_ok=True)
+
+    # 고유 파일명 생성 및 저장
+    filename = file_storage.generate_filename(photo_file.filename, 'admin', profile_id)
+    file_path = os.path.join(upload_folder, filename)
+    photo_file.save(file_path)
+
+    # URL 경로 반환
+    return url_for('static', filename=f'uploads/admin_photos/{filename}')
+
+
 @profile_bp.route('/admin/create', methods=['GET', 'POST'])
 def admin_profile_create():
     """법인 관리자 프로필 생성"""
@@ -330,6 +372,9 @@ def admin_profile_create():
         return redirect(url_for('auth.login'))
 
     if request.method == 'POST':
+        # 사진 업로드 처리 (user_id를 임시 ID로 사용)
+        photo_url = _handle_admin_photo_upload(user_id)
+
         data = {
             'name': request.form.get('name', '').strip(),
             'english_name': request.form.get('english_name', '').strip() or None,
@@ -339,6 +384,7 @@ def admin_profile_create():
             'office_phone': request.form.get('office_phone', '').strip() or None,
             'email': request.form.get('email', '').strip() or None,
             'bio': request.form.get('bio', '').strip() or None,
+            'photo': photo_url,
         }
 
         # 필수 필드 검증
@@ -380,6 +426,9 @@ def admin_profile_edit():
     admin_profile = g.admin_profile
 
     if request.method == 'POST':
+        # 사진 업로드 처리
+        photo_url = _handle_admin_photo_upload(admin_profile.id)
+
         data = {
             'name': request.form.get('name', '').strip(),
             'english_name': request.form.get('english_name', '').strip() or None,
@@ -389,6 +438,7 @@ def admin_profile_edit():
             'office_phone': request.form.get('office_phone', '').strip() or None,
             'email': request.form.get('email', '').strip() or None,
             'bio': request.form.get('bio', '').strip() or None,
+            'photo': photo_url,
         }
 
         # 필수 필드 검증

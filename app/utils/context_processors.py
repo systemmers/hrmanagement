@@ -3,10 +3,13 @@
 
 모든 템플릿에서 사용 가능한 전역 변수와 함수를 제공합니다.
 Phase 8: 상수 모듈 적용
+Phase 8.1: FieldRegistry 통합 - 템플릿 헬퍼 추가
 """
 from flask import session, g
 
 from ..constants.session_keys import SessionKeys, UserRole
+from ..constants.field_registry import FieldRegistry
+from ..constants.field_options import FieldOptions
 from ..extensions import user_repo
 
 
@@ -152,3 +155,113 @@ def register_context_processors(app):
             get_section_icon=get_section_icon,
             get_section_title=get_section_title
         )
+
+    @app.context_processor
+    def inject_field_registry_helpers():
+        """
+        FieldRegistry 관련 헬퍼 함수를 템플릿에 주입
+
+        Phase 8.1: FieldRegistry 통합
+        _field_renderer.html 매크로에서 사용
+        """
+
+        def get_section(section_id):
+            """섹션 ID로 SectionDefinition 조회"""
+            section = FieldRegistry.get_section(section_id)
+            if section:
+                return section.to_dict()
+            return None
+
+        def get_sections_by_domain(domain):
+            """도메인에 속한 모든 섹션 조회"""
+            sections = FieldRegistry.get_sections_by_domain(domain)
+            return [s.to_dict() for s in sections]
+
+        def get_field_options(field):
+            """
+            필드의 옵션 목록 반환
+
+            옵션 우선순위:
+            1. 직접 정의된 options
+            2. ClassificationOption 참조 (options_category)
+            3. 빈 리스트
+            """
+            # 직접 정의된 옵션이 있으면 사용
+            if field.get('options'):
+                return field['options']
+
+            # ClassificationOption 참조
+            options_category = field.get('optionsCategory')
+            if options_category:
+                try:
+                    from ..services.classification_service import classification_service
+                    options = classification_service.get_options_for_category(options_category)
+                    if options:
+                        return [{'value': o.get('value', o), 'label': o.get('label', o)} for o in options]
+                except Exception:
+                    pass
+
+            return []
+
+        def is_field_visible(field, account_type):
+            """필드가 특정 계정 타입에서 표시되는지 확인"""
+            visibility = field.get('visibility', 'all')
+
+            if visibility == 'all':
+                return True
+            if visibility == 'personal':
+                return account_type == 'personal'
+            if visibility == 'corporate':
+                return account_type in ('corporate', 'employee_sub')
+            if visibility == 'employee_sub':
+                return account_type == 'employee_sub'
+            if visibility == 'personal_and_employee':
+                return account_type in ('personal', 'employee_sub')
+            if visibility == 'corporate_only':
+                return account_type == 'corporate'
+
+            return True
+
+        def is_section_visible(section, account_type):
+            """섹션이 특정 계정 타입에서 표시되는지 확인"""
+            visibility = section.get('visibility', 'all')
+
+            if visibility == 'all':
+                return True
+            if visibility == 'personal':
+                return account_type == 'personal'
+            if visibility == 'corporate':
+                return account_type in ('corporate', 'employee_sub')
+            if visibility == 'employee_sub':
+                return account_type == 'employee_sub'
+            if visibility == 'personal_and_employee':
+                return account_type in ('personal', 'employee_sub')
+            if visibility == 'corporate_only':
+                return account_type == 'corporate'
+
+            return True
+
+        def get_ordered_field_names(section_id, account_type=None):
+            """섹션의 정렬된 필드명 목록 반환"""
+            return FieldRegistry.get_ordered_names(section_id, account_type)
+
+        return dict(
+            get_section=get_section,
+            get_sections_by_domain=get_sections_by_domain,
+            get_field_options=get_field_options,
+            is_field_visible=is_field_visible,
+            is_section_visible=is_section_visible,
+            get_ordered_field_names=get_ordered_field_names
+        )
+
+    @app.context_processor
+    def inject_field_option_constants():
+        """
+        FieldOptions 상수를 템플릿에 주입 (SSOT 원칙)
+
+        템플릿에서 사용 예:
+        {% for opt in GENDER_OPTIONS %}
+            <option value="{{ opt.value }}" ...>{{ opt.label }}</option>
+        {% endfor %}
+        """
+        return FieldOptions.get_all()
