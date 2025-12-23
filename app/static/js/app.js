@@ -109,17 +109,55 @@ window.HRApp = {
 
 /**
  * 기존 코드 호환성을 위한 전역 함수 (deprecated)
- * 향후 HRApp 네임스페이스 사용 권장
+ * 2025-03 이후 제거 예정, HRApp 네임스페이스 사용 권장
+ *
+ * 마이그레이션 가이드:
+ * - window.showToast() → HRApp.toast.show()
+ * - window.applyFilters() → HRApp.filter.apply()
+ * - window.resetFilters() → HRApp.filter.reset()
+ * - window.removeFilter() → HRApp.filter.remove()
+ * - window.toggleFilterBar() → HRApp.filter.toggle()
+ * - window.searchEmployees() → HRApp.employee.search()
+ * - window.applySorting() → HRApp.ui.applySorting()
+ * - window.handleLogout() → HRApp.ui.handleLogout()
+ * - window.toggleEmployeeView() → HRApp.ui.toggleView()
  */
-window.showToast = showToast;
-window.applyFilters = applyFilters;
-window.resetFilters = resetFilters;
-window.removeFilter = removeFilter;
-window.toggleFilterBar = toggleFilterBar;
-window.searchEmployees = searchEmployees;
-window.applySorting = applySorting;
-window.handleLogout = handleLogout;
-window.toggleEmployeeView = toggleEmployeeView;
+window.showToast = (...args) => {
+    console.warn('DEPRECATED: window.showToast() → HRApp.toast.show()');
+    return showToast(...args);
+};
+window.applyFilters = (...args) => {
+    console.warn('DEPRECATED: window.applyFilters() → HRApp.filter.apply()');
+    return applyFilters(...args);
+};
+window.resetFilters = (...args) => {
+    console.warn('DEPRECATED: window.resetFilters() → HRApp.filter.reset()');
+    return resetFilters(...args);
+};
+window.removeFilter = (...args) => {
+    console.warn('DEPRECATED: window.removeFilter() → HRApp.filter.remove()');
+    return removeFilter(...args);
+};
+window.toggleFilterBar = (...args) => {
+    console.warn('DEPRECATED: window.toggleFilterBar() → HRApp.filter.toggle()');
+    return toggleFilterBar(...args);
+};
+window.searchEmployees = (...args) => {
+    console.warn('DEPRECATED: window.searchEmployees() → HRApp.employee.search()');
+    return searchEmployees(...args);
+};
+window.applySorting = (...args) => {
+    console.warn('DEPRECATED: window.applySorting() → HRApp.ui.applySorting()');
+    return applySorting(...args);
+};
+window.handleLogout = (...args) => {
+    console.warn('DEPRECATED: window.handleLogout() → HRApp.ui.handleLogout()');
+    return handleLogout(...args);
+};
+window.toggleEmployeeView = (...args) => {
+    console.warn('DEPRECATED: window.toggleEmployeeView() → HRApp.ui.toggleView()');
+    return toggleEmployeeView(...args);
+};
 
 // 페이지 초기화
 document.addEventListener('DOMContentLoaded', () => {

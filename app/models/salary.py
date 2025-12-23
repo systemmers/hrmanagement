@@ -40,6 +40,7 @@ class Salary(DictSerializableMixin, db.Model):
         'overtime_allowance': ['overtimeAllowance'],
         'night_allowance': ['nightAllowance'],
         'holiday_allowance': ['holidayAllowance'],
+        'bonus_rate': ['bonusRate'],
     }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -69,6 +70,7 @@ class Salary(DictSerializableMixin, db.Model):
     overtime_allowance = db.Column(db.Integer, default=0)      # 연장근로수당
     night_allowance = db.Column(db.Integer, default=0)         # 야간근로수당
     holiday_allowance = db.Column(db.Integer, default=0)       # 휴일근로수당
+    bonus_rate = db.Column(db.Integer, default=0)              # 상여금률 (%)
 
     # 템플릿 호환성 프로퍼티 (transport_allowance -> transportation_allowance)
     @property

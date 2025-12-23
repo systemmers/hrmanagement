@@ -30,6 +30,7 @@ class Employee(db.Model):
     snapshot_at = db.Column(db.DateTime, nullable=True)  # 스냅샷 생성 시점
     resignation_date = db.Column(db.Date, nullable=True)  # 퇴직일
     data_retention_until = db.Column(db.Date, nullable=True)  # 데이터 보관 만료일
+    probation_end = db.Column(db.Date, nullable=True)  # 수습종료일
     name = db.Column(db.String(100), nullable=False)
     photo = db.Column(db.String(500), nullable=True)
     department = db.Column(db.String(100), nullable=True)
@@ -182,6 +183,7 @@ class Employee(db.Model):
             'snapshot_at': self.snapshot_at.isoformat() if self.snapshot_at else None,
             'resignation_date': self.resignation_date.isoformat() if self.resignation_date else None,
             'data_retention_until': self.data_retention_until.isoformat() if self.data_retention_until else None,
+            'probation_end': self.probation_end.isoformat() if self.probation_end else None,
         }
 
     def to_dict(self, ordered: bool = False, account_type: Optional[str] = None) -> dict:
@@ -276,6 +278,8 @@ class Employee(db.Model):
             # 비상연락처
             emergency_contact=data.get('emergency_contact') or data.get('emergencyContact'),
             emergency_relation=data.get('emergency_relation') or data.get('emergencyRelation'),
+            # 수습종료일
+            probation_end=data.get('probation_end') or data.get('probationEnd'),
         )
 
     def __repr__(self):

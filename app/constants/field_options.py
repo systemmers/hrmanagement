@@ -65,6 +65,22 @@ class FieldOptions:
         Option('expired', '만료'),
     ]
 
+    # 주간 근무시간 옵션
+    WORKING_HOURS = [
+        Option('40', '주 40시간'),
+        Option('35', '주 35시간'),
+        Option('30', '주 30시간'),
+        Option('20', '주 20시간'),
+        Option('15', '주 15시간'),
+    ]
+
+    # 휴게시간 옵션
+    BREAK_TIME = [
+        Option('60', '60분'),
+        Option('30', '30분'),
+        Option('0', '없음'),
+    ]
+
     # 고용 형태 옵션
     EMPLOYMENT_TYPE = [
         Option('regular', '정규직'),
@@ -291,6 +307,8 @@ class FieldOptions:
             'EMPLOYEE_STATUS_OPTIONS': cls.EMPLOYEE_STATUS,
             'EMPLOYMENT_TYPE_OPTIONS': cls.EMPLOYMENT_TYPE,
             'CONTRACT_TYPE_OPTIONS': cls.CONTRACT_TYPE,
+            'WORKING_HOURS_OPTIONS': cls.WORKING_HOURS,
+            'BREAK_TIME_OPTIONS': cls.BREAK_TIME,
             # 학력정보
             'DEGREE_OPTIONS': cls.DEGREE,
             'GRADUATION_STATUS_OPTIONS': cls.GRADUATION_STATUS,

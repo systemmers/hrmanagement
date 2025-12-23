@@ -8,7 +8,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **계정 체계**: 개인(personal), 법인(corporate), 직원(employee_sub) 3가지 계정 타입
 - **핵심 기능**: 직원 관리, 계약 관리, 프로필 관리, 조직 관리, AI 문서 처리
-- **규모**: 62개 모델, 45개 Repository, 23개 Service, 17개 Blueprint
 
 ## Commands
 
@@ -30,20 +29,15 @@ alembic revision --autogenerate -m "migration message"
 ### Layer Structure (3-Tier + Repository Pattern)
 ```
 blueprints/       → Routes (URL 라우팅, 요청 처리)
-    ├── employees/    # 모듈 분할된 CRUD
-    ├── profile/      # 통합 프로필 (개인/법인)
-    ├── account/      # 계정 설정
-    ├── admin/        # 관리자 기능
-    └── [domain].py   # 도메인별 라우트
-
 services/         → Business Logic (비즈니스 로직)
-    ├── base/         # 기본 서비스 (relation_updater, history)
-    └── ai/           # AI 제공자 (gemini, local_llama, document_ai)
-
+    ├── base/         # relation_updater, history
+    └── ai/           # gemini, local_llama, document_ai
 repositories/     → Data Access (BaseRepository 상속)
 models/           → SQLAlchemy Models (to_dict, from_dict 필수)
-utils/            → 유틸리티 (decorators, helpers)
-constants/        → 상수 정의 (messages, session_keys)
+constants/        → 상수 정의
+    ├── field_options.py     # SSOT: 폼 선택 옵션 + 레거시 매핑
+    └── field_registry/      # SSOT: 필드 순서/메타데이터
+utils/            → decorators, helpers
 ```
 
 ### Account Type System
@@ -52,21 +46,6 @@ constants/        → 상수 정의 (messages, session_keys)
 | `personal` | 개인 계정 | user_id, personal_profile_id |
 | `corporate` | 법인 관리자 | user_id, company_id, user_role |
 | `employee_sub` | 법인 직원 | user_id, employee_id, company_id |
-
-### Blueprint Modules
-| Blueprint | 경로 | 설명 |
-|-----------|------|------|
-| auth_bp | /auth/* | 로그인, 회원가입, 비밀번호 |
-| corporate_bp | /corporate/* | 법인 계정 관리 |
-| personal_bp | /personal/* | 개인 계정 관리 |
-| employees_bp | /employees/* | 직원 CRUD (list, mutation, detail) |
-| profile_bp | /profile/* | 통합 프로필 (법인/개인) |
-| account_bp | /account/* | 계정 설정 (비밀번호, 탈퇴) |
-| contracts_bp | /contracts/* | 계약 관리 |
-| admin_bp | /admin/* | 관리자 (감사, 조직, 분류) |
-| sync_bp | /sync/* | 데이터 동기화 |
-| api_bp | /api/* | REST API |
-| ai_test_bp | /ai-test/* | AI 테스트 |
 
 ### Key Decorators (`app/utils/decorators.py`)
 ```python
@@ -77,47 +56,44 @@ constants/        → 상수 정의 (messages, session_keys)
 @api_login_required          # API용 (JSON 응답)
 ```
 
-### Frontend Structure
-```
-static/js/
-├── components/        # 재사용 UI
-│   ├── data-table/    # 고급 테이블 (column, filter, pagination, selection)
-│   ├── salary/        # 급여 계산기 (calculator, allowance-manager)
-│   ├── accordion.js, toast.js, form-validator.js, tree-selector.js
-│   └── file-upload.js, section-nav.js, notification-dropdown.js
-├── pages/             # 페이지별 로직
-│   ├── employee/      # 모듈화 (validators, dynamic-sections, helpers)
-│   ├── dashboard.js, contracts.js, corporate-settings.js
-│   └── auth.js, admin.js, classification-options.js
-└── app.js             # 메인 스크립트
-
-static/css/
-├── core/              # 기본 (reset, theme, variables, responsive)
-├── layouts/           # 레이아웃 (header, sidebar, main-content)
-├── components/        # 컴포넌트 (button, card, forms, table, modal)
-└── pages/             # 페이지 특정 스타일
-```
-
-### Template Structure
-```
-templates/
-├── base.html, base_public.html, base_error.html
-├── auth/, account/, corporate/, personal/
-├── employees/, contracts/, dashboard/, admin/
-├── macros/            # Jinja2 매크로
-│   ├── _form_controls.html   # 폼 입력 컴포넌트
-│   ├── _navigation.html      # 네비게이션
-│   ├── _alerts.html, _cards.html, _accordion.html
-│   └── _info_display.html, _contracts.html
-└── components/navigation/    # 사이드바
-```
-
 ## Key Patterns
+
+### SSOT System (Single Source of Truth)
+
+**FieldOptions** (`app/constants/field_options.py`)
+- 폼 선택 옵션 중앙 관리 (Option namedtuple: value, label)
+- 레거시 매핑 (`LEGACY_MAP`): 영문코드 → DB 저장값(한글) 변환
+- 레이블 조회: `get_label()`, `get_label_with_legacy()`
+
+```python
+from app.constants.field_options import FieldOptions
+
+# 옵션 조회
+FieldOptions.GENDER  # [Option('남', '남성'), Option('여', '여성')]
+
+# 레이블 변환 (레거시 코드 자동 처리)
+FieldOptions.get_label_with_legacy(FieldOptions.GENDER, 'male')  # '남성'
+```
+
+**FieldRegistry** (`app/constants/field_registry/`)
+- 필드 순서/메타데이터 중앙 관리
+- 섹션별 필드 정의, 계정타입별 가시성
+- 필드명 정규화 (별칭 → 정규 필드명)
+
+```python
+from app.constants.field_registry import FieldRegistry
+
+# 정렬된 필드명 목록
+FieldRegistry.get_ordered_names('personal_basic', account_type='personal')
+
+# 필드명 정규화
+FieldRegistry.normalize_field_name('personal_basic', 'name_en')  # -> 'english_name'
+```
 
 ### Model Convention
 ```python
 class SomeModel(db.Model):
-    def to_dict(self):      # 직렬화 (camelCase 반환)
+    def to_dict(self):      # 직렬화 (camelCase 반환, 레이블 변환 포함)
         return {...}
 
     @staticmethod
@@ -125,10 +101,10 @@ class SomeModel(db.Model):
         return SomeModel(...)
 ```
 
-### Repository Pattern
+### Repository Pattern (Generic Type)
 ```python
-# 기본 CRUD: BaseRepository 상속
-class EmployeeRepository(BaseRepository):
+# 기본 CRUD: BaseRepository[ModelType] 상속 (IDE 자동완성 지원)
+class EmployeeRepository(BaseRepository[Employee]):
     def __init__(self):
         super().__init__(Employee)
 
@@ -136,21 +112,22 @@ class EmployeeRepository(BaseRepository):
 class EducationRepository(BaseRelationRepository):
     def __init__(self):
         super().__init__(Education)
-
-# 1:1 관계: BaseOneToOneRepository 상속
-class SalaryRepository(BaseOneToOneRepository):
-    ...
 ```
 
-### Service Layer
+### RelationDataUpdater (관계형 데이터 공통 로직)
 ```python
-# services/ 에서 비즈니스 로직 처리
-# Repository를 주입받아 데이터 접근
+from app.services.base.relation_updater import RelationDataUpdater, RelationDataConfig
 
-class EmployeeService:
-    def __init__(self, employee_repo, profile_repo):
-        self.employee_repo = employee_repo
-        self.profile_repo = profile_repo
+config = RelationDataConfig(
+    model_class=Education,
+    repository=education_repo,
+    form_prefix='education_',
+    required_field='school_name',
+    field_mapping={'school_type': 'school_type', ...}
+)
+
+updater = RelationDataUpdater()
+updater.update(employee_id, form_data, config)
 ```
 
 ### Blueprint Module Split (employees 예시)
@@ -161,45 +138,35 @@ employees/
 ├── list_routes.py       # 목록 조회
 ├── mutation_routes.py   # 생성/수정/삭제
 ├── detail_routes.py     # 상세 조회
-├── helpers.py           # 헬퍼 함수
-├── form_extractors.py   # 폼 데이터 추출
-├── relation_updaters.py # 관계 데이터 업데이트
-└── files.py, file_handlers.py  # 파일 처리
+├── form_extractors.py   # 폼 데이터 추출 (FieldRegistry 기반)
+├── relation_updaters.py # 관계 데이터 업데이트 (RelationDataConfig)
+└── helpers.py           # 헬퍼 함수
 ```
 
-## AI Services
+## Frontend Structure
 ```
-services/ai/
-├── base.py              # 기본 AI 제공자 인터페이스
-├── gemini_provider.py   # Google Gemini API
-├── local_llama_provider.py  # Local LLaMA
-├── document_ai_provider.py  # Google Document AI
-├── vision_ocr.py        # 비전/OCR 처리
-└── prompts.py           # AI 프롬프트 템플릿
+static/js/
+├── core/              # field-registry.js, template-generator.js
+├── components/        # data-table/, salary/, accordion.js, toast.js
+└── pages/employee/    # validators.js, dynamic-sections.js, templates.js
+
+static/css/
+├── core/              # reset, theme, variables, responsive
+├── layouts/           # header, sidebar, main-content
+└── components/        # button, card, forms, table, modal
 ```
 
 ## Test Accounts
 
 > 모든 테스트 계정의 비밀번호는 `test1234` 입니다.
 
-### 법인계정 (corporate)
-| 법인 | Username | Email | Company ID |
-|------|----------|-------|------------|
-| 테스트기업 A | admin_testa | admin@testcorp.co.kr | 1 |
-| 글로벌기업 | admin_global | admin@globalcorp.co.kr | 2 |
-
-### 개인계정 (personal)
-| Username | Email |
-|----------|-------|
-| personal_junhyuk.kim | junhyuk.kim@gmail.com |
-| personal_seojun.lee | seojun.lee@gmail.com |
-| personal_doyun.park | doyun.park@gmail.com |
-
-### 법인소속 직원계정 (employee_sub)
-| 소속 | Username 패턴 | Email 패턴 |
-|------|---------------|------------|
-| 테스트기업 A | emp_0001 ~ emp_0010 | *@testcorp.co.kr |
-| 글로벌기업 | emp_0021 ~ emp_0035 | *@globalcorp.co.kr |
+| 타입 | Username | Email | 비고 |
+|------|----------|-------|------|
+| 법인 | admin_testa | admin@testcorp.co.kr | Company ID: 1 |
+| 법인 | admin_global | admin@globalcorp.co.kr | Company ID: 2 |
+| 개인 | personal_junhyuk.kim | junhyuk.kim@gmail.com | - |
+| 직원 | emp_0001 ~ emp_0010 | *@testcorp.co.kr | 테스트기업 A |
+| 직원 | emp_0021 ~ emp_0035 | *@globalcorp.co.kr | 글로벌기업 |
 
 ## Rules
 

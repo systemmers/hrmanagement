@@ -2,8 +2,13 @@
  * Advanced Data Table Component
  * Phase 7: 프론트엔드 리팩토링 - 모듈 분할 후 re-export
  *
+ * @deprecated 2025-03 이후 제거 예정
  * 이 파일은 하위 호환성을 위해 유지됩니다.
  * 새 코드에서는 './data-table/index.js'에서 직접 import하세요.
+ *
+ * 마이그레이션:
+ * - 변경 전: import { DataTableAdvanced } from './data-table-advanced.js';
+ * - 변경 후: import { DataTableAdvanced } from './data-table/index.js';
  *
  * 기능:
  * - 소팅, 검색, 행선택, 컬럼 토글, 컬럼 재정렬
@@ -20,6 +25,8 @@
  *   storageKey: 'myTable'
  * });
  */
+
+console.warn('DEPRECATED: data-table-advanced.js → data-table/index.js (2025-03 이후 제거 예정)');
 
 // 분할된 모듈에서 re-export
 export {
