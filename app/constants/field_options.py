@@ -61,6 +61,8 @@ class FieldOptions:
     # 재직 상태 옵션
     EMPLOYEE_STATUS = [
         Option('active', '정상'),
+        Option('pending_info', '정보입력대기'),
+        Option('pending_contract', '계약대기'),
         Option('warning', '대기'),
         Option('expired', '만료'),
     ]

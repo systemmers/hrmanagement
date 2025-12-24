@@ -7,9 +7,9 @@ Phase 8: 상수 모듈 적용
 Phase 9: DRY 원칙 - file_storage 서비스 활용
 """
 from datetime import datetime
-from flask import Blueprint, request, redirect, url_for, flash, session
+from flask import Blueprint, request, redirect, url_for, flash, session, render_template
 
-from ...constants.session_keys import SessionKeys, UserRole
+from ...constants.session_keys import SessionKeys, UserRole, AccountType
 from ...utils.employee_number import generate_employee_number
 from ...utils.decorators import login_required, admin_required, manager_or_admin_required
 from ...utils.tenant import get_current_organization_id
@@ -23,6 +23,7 @@ from .helpers import (
     update_hr_project_data, update_project_participation_data, update_award_data,
     get_business_card_folder, generate_unique_filename
 )
+from ...extensions import organization_repo
 
 
 def register_mutation_routes(bp: Blueprint):
@@ -105,6 +106,72 @@ def register_mutation_routes(bp: Blueprint):
             return redirect(url_for('employees.employee_new'))
 
     # ========================================
+    # 계정 발급 (Account Provisioning)
+    # ========================================
+
+    @bp.route('/employees/provision', methods=['GET', 'POST'])
+    @manager_or_admin_required
+    def employee_account_provision():
+        """계정 발급: 계정만 발급, 직원이 로그인 후 정보 입력
+
+        기존 create_account_only() 서비스 메서드 활용
+        Employee(status='pending_info') + User(account_type='employee_sub') 생성
+        """
+        company_id = session.get(SessionKeys.COMPANY_ID)
+        admin_user_id = session.get(SessionKeys.USER_ID)
+
+        if request.method == 'GET':
+            # 조직 목록 조회 (선택 옵션용)
+            org_id = get_current_organization_id()
+            organizations = []
+            if org_id:
+                organizations = organization_repo.get_flat_list(root_organization_id=org_id)
+
+            return render_template(
+                'employees/account_provision.html',
+                organizations=organizations
+            )
+
+        # POST: 계정 발급 처리
+        try:
+            account_data = {
+                'username': request.form.get('username', '').strip(),
+                'email': request.form.get('email', '').strip(),
+                'password': request.form.get('password', '').strip() or None,
+                'role': request.form.get('role', 'employee')
+            }
+
+            minimal_employee_data = {
+                'name': request.form.get('name', '').strip()
+            }
+
+            # 선택적 조직 ID
+            org_id = request.form.get('organization_id')
+            if org_id:
+                minimal_employee_data['organization_id'] = int(org_id)
+
+            success, result, error = employee_account_service.create_account_only(
+                account_data=account_data,
+                minimal_employee_data=minimal_employee_data,
+                company_id=company_id,
+                admin_user_id=admin_user_id
+            )
+
+            if success:
+                flash_msg = f'계정이 발급되었습니다. (사용자명: {result["username"]})'
+                if result.get('status') == 'pending_info':
+                    flash_msg += ' 직원이 로그인하여 정보를 입력해야 합니다.'
+                flash(flash_msg, 'success')
+                return redirect(url_for('employees.employee_list'))
+            else:
+                flash(f'계정 발급 실패: {error}', 'error')
+                return redirect(url_for('employees.employee_account_provision'))
+
+        except Exception as e:
+            flash(f'계정 발급 중 오류가 발생했습니다: {str(e)}', 'error')
+            return redirect(url_for('employees.employee_account_provision'))
+
+    # ========================================
     # 직원 수정
     # ========================================
 
@@ -129,9 +196,13 @@ def register_mutation_routes(bp: Blueprint):
 
         try:
             employee = extract_employee_from_form(request.form, employee_id=employee_id)
-            updated_employee = employee_service.update_employee_direct(employee_id, employee)
+            # Employee 객체를 Dict로 변환하여 전달 (BaseRepository.update는 Dict 기대)
+            employee_data = employee.to_dict() if hasattr(employee, 'to_dict') else vars(employee)
+            updated_employee = employee_service.update_employee_direct(employee_id, employee_data)
             if updated_employee:
-                flash(f'{updated_employee.name} 직원 정보가 수정되었습니다.', 'success')
+                # update_employee_direct는 Dict 반환
+                employee_name = updated_employee.get('name', '') if isinstance(updated_employee, dict) else updated_employee.name
+                flash(f'{employee_name} 직원 정보가 수정되었습니다.', 'success')
                 return redirect(url_for('employees.employee_detail', employee_id=employee_id))
             else:
                 flash('직원을 찾을 수 없습니다.', 'error')
@@ -159,11 +230,23 @@ def register_mutation_routes(bp: Blueprint):
                 return redirect(url_for('main.index'))
 
         try:
+            # 기존 직원 정보 조회 (상태 확인용)
+            existing_employee = employee_service.get_employee_by_id(employee_id)
+            original_status = existing_employee.get('status') if existing_employee else None
+
             basic_fields = extract_basic_fields_from_form(request.form)
             updated_employee = employee_service.update_employee_partial(employee_id, basic_fields)
             update_family_data(employee_id, request.form)
 
             if updated_employee:
+                # employee_sub 계정이 프로필 완성한 경우 상태 전환
+                account_type = session.get(SessionKeys.ACCOUNT_TYPE)
+                if account_type == AccountType.EMPLOYEE_SUB and original_status == 'pending_info':
+                    # pending_info → pending_contract 상태 전환
+                    employee_service.update_employee_partial(employee_id, {'status': 'pending_contract'})
+                    flash('프로필이 완성되었습니다. 계약 요청을 기다리고 있습니다.', 'success')
+                    return redirect(url_for('mypage.company_info'))
+
                 flash('기본정보가 수정되었습니다.', 'success')
                 return redirect(url_for('employees.employee_detail', employee_id=employee_id))
             else:

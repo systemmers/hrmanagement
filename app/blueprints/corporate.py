@@ -140,76 +140,12 @@ def users():
 @corporate_bp.route('/users/add', methods=['GET', 'POST'])
 @corporate_admin_required
 def add_user():
-    """법인 하위 사용자 추가"""
-    company_id = session.get(SessionKeys.COMPANY_ID)
-    if not company_id:
-        flash('법인 정보를 찾을 수 없습니다.', 'error')
-        return redirect(url_for('main.index'))
+    """법인 하위 사용자 추가 (deprecated)
 
-    company = company_repository.get_model_by_id(company_id)
-    if not company:
-        flash('법인 정보를 찾을 수 없습니다.', 'error')
-        return redirect(url_for('main.index'))
-
-    # 직원 추가 가능 여부 확인
-    if not company.can_add_employee():
-        flash(f'현재 플랜에서는 최대 {company.max_employees}명까지 등록 가능합니다.', 'error')
-        return redirect(url_for('corporate.users'))
-
-    if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        email = request.form.get('email', '').strip()
-        password = request.form.get('password', '')
-        role = request.form.get('role', User.ROLE_EMPLOYEE)
-
-        # 입력 검증
-        errors = []
-        if not username:
-            errors.append('아이디를 입력해주세요.')
-        if not email:
-            errors.append('이메일을 입력해주세요.')
-        if not password:
-            errors.append('비밀번호를 입력해주세요.')
-        if len(password) < 8:
-            errors.append('비밀번호는 최소 8자 이상이어야 합니다.')
-        if user_repo.get_by_username(username):
-            errors.append('이미 사용 중인 아이디입니다.')
-        if user_repo.get_by_email(email):
-            errors.append('이미 사용 중인 이메일입니다.')
-        if role not in User.VALID_ROLES:
-            errors.append('유효하지 않은 역할입니다.')
-
-        if errors:
-            for error in errors:
-                flash(error, 'error')
-            return render_template('corporate/add_user.html',
-                                   company=company,
-                                   username=username,
-                                   email=email,
-                                   role=role)
-
-        try:
-            new_user = User(
-                username=username,
-                email=email,
-                role=role,
-                account_type=User.ACCOUNT_EMPLOYEE_SUB,
-                company_id=company_id,
-                parent_user_id=session.get(SessionKeys.USER_ID),
-                is_active=True
-            )
-            new_user.set_password(password)
-            db.session.add(new_user)
-            db.session.commit()
-
-            flash(f'사용자 {username}이(가) 추가되었습니다.', 'success')
-            return redirect(url_for('corporate.users'))
-
-        except Exception as e:
-            db.session.rollback()
-            flash(f'사용자 추가 중 오류가 발생했습니다: {str(e)}', 'error')
-
-    return render_template('corporate/add_user.html', company=company)
+    계정 발급 기능으로 통합됨. 하위 호환성을 위해 리다이렉트 처리.
+    """
+    flash('계정 발급 기능이 "직원관리 > 계정 발급"으로 통합되었습니다.', 'info')
+    return redirect(url_for('employees.employee_account_provision'))
 
 
 # API 엔드포인트

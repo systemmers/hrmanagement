@@ -23,10 +23,11 @@ def unified_profile_required(f):
     """
     통합 프로필 인증 데코레이터
 
-    세션에서 employee_id, user_id, account_type을 확인하여 적절한 어댑터를 생성합니다.
-    - 법인 직원: session['employee_id'] -> EmployeeProfileAdapter
-    - 법인 관리자: session['account_type'] == 'corporate' & no employee_id -> CorporateAdminProfileAdapter
-    - 일반 개인: session['user_id'] -> PersonalProfileAdapter
+    세션에서 account_type을 우선 확인하여 적절한 어댑터를 생성합니다.
+    - 개인 계정: session['account_type'] == 'personal' -> PersonalProfileAdapter
+      (개인 계정은 계약 승인 시 employee_id가 설정될 수 있지만 Profile 모델 사용)
+    - 법인 직원: session['account_type'] == 'employee_sub' -> EmployeeProfileAdapter
+    - 법인 관리자: session['account_type'] == 'corporate' -> CorporateAdminProfileAdapter
 
     생성된 어댑터는 g.profile에 저장됩니다.
     추가로 g.is_corporate (법인 소속 여부), g.is_admin (관리자 여부) 플래그가 설정됩니다.
@@ -49,8 +50,24 @@ def unified_profile_required(f):
             else:
                 return redirect(url_for('personal.profile'))
 
-        # 법인 직원 어댑터 생성 (employee_id가 있는 경우)
-        if employee_id:
+        # 개인 계정 어댑터 생성 (account_type이 personal인 경우 - 우선 처리)
+        # 개인 계정은 계약 승인 시 employee_id가 설정될 수 있지만,
+        # 프로필 조회는 항상 Profile 모델(PersonalProfileAdapter)을 사용해야 함
+        if account_type == AccountType.PERSONAL:
+            # 통합 Profile 모델 조회
+            profile = Profile.query.filter_by(user_id=user_id).first()
+            if not profile:
+                # 프로필이 없으면 프로필 수정 페이지로 리다이렉트
+                flash('프로필을 먼저 생성해주세요.', 'info')
+                return redirect(url_for('personal.profile_edit'))
+
+            g.profile = PersonalProfileAdapter(profile)
+            g.is_corporate = False
+            g.is_admin = False
+            g.personal_profile = profile
+
+        # 법인 직원 어댑터 생성 (employee_sub 계정)
+        elif employee_id and account_type == AccountType.EMPLOYEE_SUB:
             employee = Employee.query.get(employee_id)
             if not employee:
                 flash('직원 정보를 찾을 수 없습니다.', 'error')
@@ -62,7 +79,7 @@ def unified_profile_required(f):
             g.is_admin = False
             g.employee = employee
 
-        # 법인 관리자 계정 (employee_id 없이 account_type이 corporate인 경우)
+        # 법인 관리자 계정 (account_type이 corporate인 경우)
         elif account_type == AccountType.CORPORATE:
             # 법인 관리자 프로필 기능 플래그 확인
             if not current_app.config.get('ENABLE_CORPORATE_ADMIN_PROFILE', False):
@@ -81,19 +98,10 @@ def unified_profile_required(f):
             g.is_admin = True
             g.admin_profile = admin_profile
 
-        # 개인 계정 어댑터 생성 (Phase 4.1: 통합 Profile 모델 전용)
+        # 그 외 (예외 케이스 - 정상적으로는 도달하지 않음)
         else:
-            # 통합 Profile 모델 조회
-            profile = Profile.query.filter_by(user_id=user_id).first()
-            if not profile:
-                # 프로필이 없으면 프로필 수정 페이지로 리다이렉트
-                flash('프로필을 먼저 생성해주세요.', 'info')
-                return redirect(url_for('personal.profile_edit'))
-
-            g.profile = PersonalProfileAdapter(profile)
-            g.is_corporate = False
-            g.is_admin = False
-            g.personal_profile = profile
+            flash('계정 유형을 확인할 수 없습니다.', 'error')
+            return redirect(url_for('auth.login'))
 
         return f(*args, **kwargs)
     return decorated_function

@@ -373,6 +373,10 @@
             <button type="button" class="btn btn-sm btn-danger" data-action="terminate-contract" data-contract-id="{{ contract.id }}" title="계약 종료">
                 <i class="fas fa-ban"></i>
             </button>
+            {% elif contract.status == 'terminated' and contract.employee_id %}
+            <a href="{{ url_for('employees.employee_detail', employee_id=contract.employee_id) }}" class="btn btn-sm btn-info" title="인사카드 보기">
+                <i class="fas fa-id-card"></i>
+            </a>
             {% endif %}
         </div>
     </td>

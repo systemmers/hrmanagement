@@ -356,7 +356,6 @@ def get_resource_types():
         {'value': 'contract', 'label': '계약'},
         {'value': 'personal_profile', 'label': '개인 프로필'},
         {'value': 'sync', 'label': '동기화'},
-        {'value': 'snapshot', 'label': '스냅샷'},
         {'value': 'termination', 'label': '퇴사 처리'},
         {'value': 'user', 'label': '사용자'},
         {'value': 'company', 'label': '법인'},

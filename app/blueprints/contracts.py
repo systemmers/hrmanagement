@@ -140,21 +140,32 @@ def company_pending():
 @login_required
 @corporate_account_required
 def request_contract():
-    """계약 요청 (법인 -> 개인)"""
+    """계약 요청 (법인 -> 개인/직원)
+
+    통합 계약 요청 페이지:
+    - 개인계정 (personal) 중 계약 미체결
+    - 직원계정 (employee_sub) 중 pending_contract 상태
+    """
     company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
         flash('법인 정보가 없습니다.', 'error')
         return redirect(url_for('main.index'))
 
     if request.method == 'POST':
-        person_email = request.form.get('person_email')
+        # 선택된 대상의 user_id로 계약 요청
+        target_user_id = request.form.get('target_user_id', type=int)
         contract_type = request.form.get('contract_type', 'employment')
         position = request.form.get('position')
         department = request.form.get('department')
         notes = request.form.get('notes')
 
-        success, contract, error = contract_service.create_contract_request(
-            person_email=person_email,
+        if not target_user_id:
+            flash('계약 대상을 선택해주세요.', 'error')
+            return redirect(url_for('contracts.request_contract'))
+
+        # user_id로 계약 요청 생성
+        success, contract, error = contract_service.create_employee_contract_request(
+            employee_user_id=target_user_id,
             company_id=company_id,
             contract_type=contract_type,
             position=position,
@@ -169,7 +180,14 @@ def request_contract():
             flash(error, 'error')
             return redirect(url_for('contracts.request_contract'))
 
-    return render_template('contracts/request_contract.html')
+    # GET: 계약 요청 가능한 대상 목록 조회
+    eligible_targets = contract_service.get_contract_eligible_targets(company_id)
+
+    return render_template(
+        'contracts/request_contract.html',
+        personal_accounts=eligible_targets['personal_accounts'],
+        employee_accounts=eligible_targets['employee_accounts']
+    )
 
 
 # ===== API 엔드포인트 =====

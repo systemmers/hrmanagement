@@ -119,11 +119,18 @@ class EmployeeAccountService:
             if validation_error:
                 return False, None, validation_error
 
-            # 2. 최소 Employee 생성
-            # Note: Employee는 organization_id를 사용, company_id는 User에만 사용
+            # 2. Company의 root_organization_id 조회
+            from app.models.company import Company
+            company = Company.query.get(company_id)
+            if not company:
+                return False, None, "법인 정보를 찾을 수 없습니다."
+
+            # 3. 최소 Employee 생성 (company_id + organization_id 포함)
             employee = Employee(
                 name=minimal_employee_data.get('name', ''),
                 email=account_data.get('email', ''),
+                company_id=company_id,  # 법인 소속 설정
+                organization_id=company.root_organization_id,  # 조직 트리 연결
                 status='pending_info'  # 정보 입력 대기 상태
             )
             db.session.add(employee)
@@ -342,6 +349,14 @@ class EmployeeAccountService:
         Returns:
             생성된 Employee 객체
         """
+        # organization_id가 없으면 company의 root_organization_id 사용
+        organization_id = employee_data.get('organization_id')
+        if not organization_id:
+            from app.models.company import Company
+            company = Company.query.get(company_id)
+            if company and company.root_organization_id:
+                organization_id = company.root_organization_id
+
         employee = Employee(
             name=employee_data.get('name', ''),
             photo=employee_data.get('photo') or '/static/images/face/face_01_m.png',
@@ -351,7 +366,7 @@ class EmployeeAccountService:
             hire_date=employee_data.get('hire_date', ''),
             phone=employee_data.get('phone', ''),
             email=employee_data.get('email', ''),
-            organization_id=employee_data.get('organization_id'),
+            organization_id=organization_id,
             employee_number=employee_data.get('employee_number'),
             team=employee_data.get('team'),
             job_title=employee_data.get('job_title'),

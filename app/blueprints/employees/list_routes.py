@@ -5,6 +5,7 @@
 
 21번 원칙 확장: 직원 계약 상태 표시 및 계약 요청 기능
 Phase 8: 상수 모듈 적용
+개선: Employee.employee_number → Contract.employee_number 기반 조회
 """
 from flask import Blueprint, render_template, request, jsonify, session
 
@@ -14,6 +15,8 @@ from ...utils.tenant import get_current_organization_id
 from ...services.employee_service import employee_service
 from ...services.contract_service import contract_service
 from ...extensions import user_repo
+from ...models.person_contract import PersonCorporateContract
+from ...models.user import User
 
 
 def register_list_routes(bp: Blueprint):
@@ -83,15 +86,31 @@ def register_list_routes(bp: Blueprint):
         for emp in employees:
             emp_dict = emp if isinstance(emp, dict) else emp.to_dict()
 
-            # 직원의 연결된 User 계정 조회
-            user = user_repo.get_by_employee_id(emp_dict.get('id'))
+            # 개선: Employee.employee_number → Contract.employee_number 기반 조회
+            # 개인 계정이 여러 회사와 계약 시 각 회사별 Employee가 생성되므로
+            # User.employee_id 역방향 조회는 최신 Employee만 찾음
+            employee_number = emp_dict.get('employee_number')
+            user = None
             contract_status = 'no_account'
 
-            if user and company_id:
-                # contract_service를 통한 계약 상태 조회
-                contract_status = contract_service.get_employee_contract_status(
-                    user.id, company_id
-                ) or 'none'
+            if employee_number and company_id:
+                # Contract.employee_number로 해당 회사의 계약 조회
+                contract = PersonCorporateContract.query.filter_by(
+                    employee_number=employee_number,
+                    company_id=company_id
+                ).first()
+
+                if contract:
+                    contract_status = contract.status
+                    user = User.query.get(contract.person_user_id)
+
+            # fallback: Contract가 없는 경우 기존 방식 (User.employee_id 역방향 조회)
+            if not user and company_id:
+                user = user_repo.get_by_employee_id(emp_dict.get('id'))
+                if user:
+                    contract_status = contract_service.get_employee_contract_status(
+                        user.id, company_id
+                    ) or 'none'
 
             # 계약 approved인 직원만 목록에 추가
             if contract_status == 'approved':

@@ -170,12 +170,16 @@ static/css/
 
 ## Rules
 
+### git
+- 뉴브랜치 요청시 "hrm-projekt-yymmddnn" 형식으로 생성
+
+
 ### Communication
 - 한국어로 커뮤니케이션
 - 이모지 사용 금지
 
 ### Code Standards
-- 파일당 500~800 라인 이내 유지
+- 파일당 최대 500~800 라인 이내 유지
 - DRY 원칙 준수, 코드 중복 금지
 - snake_case (Python), camelCase (JavaScript) 일관성
 - 하드코딩 금지 (상수화 또는 환경변수 사용)

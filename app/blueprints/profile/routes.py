@@ -514,3 +514,48 @@ def api_admin_company_get():
         'success': True,
         'data': adapter.get_organization_info()
     })
+
+
+# ========================================
+# 프로필 완성 라우트 (계정 발급 후)
+# ========================================
+
+@profile_bp.route('/complete', methods=['GET'])
+@unified_profile_required
+def complete_profile():
+    """프로필 완성 페이지
+
+    계정 발급(create_account_only) 후 pending_info 상태인 직원이
+    로그인하면 이 페이지로 리다이렉션되어 정보를 완성합니다.
+
+    SSOT 원칙: 기존 profile/edit.html 템플릿 재활용
+    """
+    adapter = g.profile
+
+    # pending_info 상태가 아니면 일반 프로필 페이지로
+    if hasattr(adapter, 'get_status'):
+        status = adapter.get_status()
+        if status != 'pending_info':
+            return redirect(url_for('profile.view'))
+
+    # 기존 어댑터 패턴 활용 (DIP 원칙)
+    context = adapter.to_template_context(variable_name='employee')
+    context['sections'] = adapter.get_available_sections()
+    context['action'] = 'update'
+
+    # 프로필 완성 모드 표시
+    context['page_mode'] = 'profile_completion'
+    context['is_completion_mode'] = True
+
+    # 안내 메시지
+    context['completion_message'] = '프로필 정보를 완성해주세요. 기본정보, 학력, 경력 등을 입력할 수 있습니다.'
+
+    # 첨부파일 목록 조회
+    profile_id = adapter.get_profile_id()
+    if profile_id:
+        context['attachment_list'] = attachment_service.get_by_employee_id(profile_id)
+    else:
+        context['attachment_list'] = []
+    context['is_readonly'] = False
+
+    return render_template('profile/edit.html', **context)

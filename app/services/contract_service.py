@@ -15,9 +15,10 @@ from typing import Dict, Optional, List, Any, Tuple
 from flask import session
 
 from ..constants.session_keys import AccountType
-from ..extensions import person_contract_repo, user_repo
+from ..extensions import person_contract_repo, user_repo, employee_repo
 from ..database import db
 from ..models.user import User
+from ..models.employee import Employee
 
 
 class ContractService:
@@ -68,6 +69,78 @@ class ContractService:
             contract_type=contract_type,
             search_term=search_term
         )
+
+    def get_contract_eligible_targets(self, company_id: int) -> Dict[str, List[Dict]]:
+        """계약 요청 가능한 대상 목록 조회
+
+        Returns:
+            {
+                'personal_accounts': [개인계정 목록],
+                'employee_accounts': [직원계정 목록 (pending_contract 상태)]
+            }
+        """
+        result = {
+            'personal_accounts': [],
+            'employee_accounts': []
+        }
+
+        # 1. 개인계정 중 해당 법인과 계약 미체결 (또는 거절/종료된 계약만 있는 경우)
+        # 기존 계약이 없거나, active/pending 상태가 아닌 계정만 포함
+        personal_users = User.query.filter(
+            User.account_type == AccountType.PERSONAL,
+            User.is_active == True
+        ).all()
+
+        for user in personal_users:
+            # 해당 법인과의 계약 상태 확인
+            existing_contract = self.contract_repo.get_contract_between(
+                person_user_id=user.id,
+                company_id=company_id
+            )
+            # 계약이 없거나, rejected/terminated 상태인 경우만 포함
+            if not existing_contract or existing_contract.get('status') in ['rejected', 'terminated']:
+                result['personal_accounts'].append({
+                    'user_id': user.id,
+                    'name': user.username,
+                    'email': user.email,
+                    'account_type': 'personal'
+                })
+
+        # 2. 직원계정 중 계약 미체결 상태 (pending_info 또는 pending_contract)
+        pending_employees = Employee.query.filter(
+            Employee.company_id == company_id,
+            Employee.status.in_(['pending_info', 'pending_contract'])
+        ).all()
+
+        for emp in pending_employees:
+            # 직원의 user 계정 정보 조회
+            emp_user = User.query.filter(
+                User.employee_id == emp.id
+            ).first()
+
+            if emp_user:
+                # 해당 법인과의 계약 상태 확인
+                existing_contract = self.contract_repo.get_contract_between(
+                    person_user_id=emp_user.id,
+                    company_id=company_id
+                )
+                # 계약이 없거나, rejected/terminated 상태인 경우만 포함
+                if not existing_contract or existing_contract.get('status') in ['rejected', 'terminated']:
+                    # 상태별 레이블 설정
+                    status_label = '프로필 미완성' if emp.status == 'pending_info' else '계약 대기'
+                    result['employee_accounts'].append({
+                        'user_id': emp_user.id,
+                        'employee_id': emp.id,
+                        'name': emp.name,
+                        'email': emp_user.email,
+                        'department': emp.department,
+                        'position': emp.position,
+                        'account_type': 'employee_sub',
+                        'status': emp.status,
+                        'status_label': status_label
+                    })
+
+        return result
 
     # ========================================
     # 계약 상세 조회

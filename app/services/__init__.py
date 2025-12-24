@@ -27,7 +27,6 @@ from .file_storage_service import (
     CATEGORY_ATTACHMENT, CATEGORY_PROFILE_PHOTO,
     CATEGORY_BUSINESS_CARD_FRONT, CATEGORY_BUSINESS_CARD_BACK
 )
-from .resignation_service import ResignationService, DataRetentionService
 
 __all__ = [
     'AIService',
@@ -63,6 +62,4 @@ __all__ = [
     'CATEGORY_PROFILE_PHOTO',
     'CATEGORY_BUSINESS_CARD_FRONT',
     'CATEGORY_BUSINESS_CARD_BACK',
-    'ResignationService',
-    'DataRetentionService',
 ]

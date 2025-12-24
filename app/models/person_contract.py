@@ -155,6 +155,16 @@ class PersonCorporateContract(db.Model):
             if self.person_user:
                 data['person_name'] = self.person_user.username
                 data['person_email'] = self.person_user.email
+                # employee_id: User.employee_id 우선, 없으면 employee_number로 조회
+                employee_id = self.person_user.employee_id
+                if not employee_id and self.employee_number:
+                    from app.models.employee import Employee
+                    emp = Employee.query.filter_by(
+                        employee_number=self.employee_number
+                    ).first()
+                    if emp:
+                        employee_id = emp.id
+                data['employee_id'] = employee_id
             if self.company:
                 data['company_name'] = self.company.name
 

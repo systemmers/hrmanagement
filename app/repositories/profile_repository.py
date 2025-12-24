@@ -142,15 +142,3 @@ class ProfileRepository(BaseRepository[Profile]):
         profile.user_id = user_id
         db.session.commit()
         return profile
-
-    def to_snapshot_data(self, profile: Profile) -> Dict:
-        """
-        스냅샷용 데이터 생성 (이력 정보 포함)
-
-        Args:
-            profile: Profile 모델
-
-        Returns:
-            스냅샷 딕셔너리
-        """
-        return profile.to_snapshot()

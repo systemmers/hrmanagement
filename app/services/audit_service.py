@@ -31,7 +31,7 @@ class AuditService:
     # 로깅 대상 리소스 타입
     TRACKED_RESOURCES = [
         'employee', 'contract', 'personal_profile',
-        'sync', 'snapshot', 'termination',
+        'sync', 'termination',
         'user', 'company', 'organization'
     ]
 

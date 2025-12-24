@@ -9,6 +9,7 @@ from app.database import db
 from app.models.person_contract import PersonCorporateContract, DataSharingSettings, SyncLog
 from app.models.user import User
 from app.models.employee import Employee
+from app.models.personal_profile import PersonalProfile
 from .base_repository import BaseRepository
 
 
@@ -130,19 +131,51 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
         """계약 승인
 
         21번 원칙: 계약 승인 시 Employee.status = 'active' 연동
+
+        개인 계정(personal):
+        - 항상 새 Employee 생성 (회사별 분리, full_sync=True)
+        - 전체 프로필 데이터 동기화
+
+        직원 계정(employee_sub):
+        - 기존 Employee의 status만 active로 변경
+        - organization_id를 계약 회사에 맞게 업데이트
         """
+        from app.models.company import Company
+
         contract = self.get_model_by_id(contract_id)
         if not contract:
             raise ValueError("계약을 찾을 수 없습니다.")
 
         contract.approve(approved_by_user_id)
 
-        # Employee.status 연동: 계약 승인 시 active로 변경
         user = User.query.get(contract.person_user_id)
-        if user and user.employee_id:
-            employee = db.session.get(Employee, user.employee_id)
-            if employee:
-                employee.status = 'active'
+        company = Company.query.get(contract.company_id)
+
+        if user:
+            if user.account_type == 'personal':
+                # 개인 계정: 항상 새 Employee 생성 (회사별 분리)
+                profile = PersonalProfile.query.filter_by(user_id=user.id).first()
+                if profile:
+                    from app.services.sync_service import sync_service
+                    # force_create=True: 기존 Employee 무시, 새로 생성
+                    # full_sync=True: 전체 프로필 데이터 동기화
+                    employee = sync_service._find_or_create_employee(
+                        contract, profile,
+                        full_sync=True,
+                        force_create=True
+                    )
+                    if employee:
+                        user.employee_id = employee.id
+                        employee.status = 'active'
+            else:
+                # 직원 계정(employee_sub): 기존 Employee 상태 업데이트
+                if user.employee_id:
+                    employee = db.session.get(Employee, user.employee_id)
+                    if employee:
+                        employee.status = 'active'
+                        # organization_id를 계약 회사에 맞게 업데이트
+                        if company and company.root_organization_id:
+                            employee.organization_id = company.root_organization_id
 
         db.session.commit()
 
@@ -162,23 +195,23 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
     def terminate_contract(self, contract_id: int, terminated_by_user_id: int = None, reason: str = None) -> Dict:
         """계약 종료
 
-        21번 원칙: 계약 종료 시 Employee.status = 'inactive' 연동
+        21번 원칙: 계약 종료 시 Employee.status = 'terminated' 연동
+        스냅샷 저장: termination_service를 통해 전체 인사기록 스냅샷 저장
         """
+        from app.services.termination_service import termination_service
+
+        # termination_service를 통해 종료 처리 (스냅샷 포함)
+        termination_service.set_current_user(terminated_by_user_id)
+        result = termination_service.terminate_contract(
+            contract_id=contract_id,
+            reason=reason,
+            terminate_by_user_id=terminated_by_user_id
+        )
+
+        if not result.get('success'):
+            raise ValueError(result.get('error', '계약 종료 실패'))
+
         contract = self.get_model_by_id(contract_id)
-        if not contract:
-            raise ValueError("계약을 찾을 수 없습니다.")
-
-        contract.terminate(terminated_by_user_id, reason)
-
-        # Employee.status 연동: 계약 종료 시 inactive로 변경
-        user = User.query.get(contract.person_user_id)
-        if user and user.employee_id:
-            employee = db.session.get(Employee, user.employee_id)
-            if employee:
-                employee.status = 'inactive'
-
-        db.session.commit()
-
         return contract.to_dict(include_relations=True)
 
     # ===== 데이터 공유 설정 =====

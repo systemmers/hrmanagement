@@ -22,7 +22,6 @@ from app.models.person_contract import (
 # 서브 서비스 임포트
 from app.services.sync_basic_service import SyncBasicService
 from app.services.sync_relation_service import SyncRelationService
-from app.services.sync_snapshot_service import SyncSnapshotService
 
 
 class SyncService:
@@ -66,6 +65,14 @@ class SyncService:
         'specialty': 'specialty',
         'disability_info': 'disability_info',
         'resident_number': 'resident_number',
+        'marital_status': 'marital_status',
+        # 실제 거주 주소
+        'actual_postal_code': 'actual_postal_code',
+        'actual_address': 'actual_address',
+        'actual_detailed_address': 'actual_detailed_address',
+        # 비상연락처
+        'emergency_contact': 'emergency_contact',
+        'emergency_relation': 'emergency_relation',
     }
 
     # 데이터 공유 설정과 필드 그룹 매핑
@@ -78,14 +85,12 @@ class SyncService:
         self._current_user_id = None
         self._basic_service = SyncBasicService()
         self._relation_service = SyncRelationService()
-        self._snapshot_service = SyncSnapshotService()
 
     def set_current_user(self, user_id: int):
         """현재 작업 사용자 설정 (로그 기록용)"""
         self._current_user_id = user_id
         self._basic_service.set_current_user(user_id)
         self._relation_service.set_current_user(user_id)
-        self._snapshot_service.set_current_user(user_id)
 
     # ===== 필드 조회 메서드 =====
 
@@ -251,41 +256,6 @@ class SyncService:
             'logs': result['log_ids'],
         }
 
-    # ===== 1회성 제공 메서드 =====
-
-    def get_snapshot(
-        self,
-        contract_id: int,
-        include_relations: bool = True
-    ) -> Dict[str, Any]:
-        """계약 기준 개인 프로필 스냅샷 생성 (1회성 제공용)"""
-        syncable = self.get_syncable_fields(contract_id)
-        return self._snapshot_service.get_snapshot(
-            contract_id, syncable, include_relations
-        )
-
-    def apply_snapshot_to_employee(
-        self,
-        contract_id: int,
-        snapshot_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """스냅샷 데이터를 직원 정보에 적용 (1회성 제공)"""
-        contract = PersonCorporateContract.query.get(contract_id)
-        if not contract:
-            return {'success': False, 'error': '계약을 찾을 수 없습니다.'}
-
-        profile = PersonalProfile.query.filter_by(
-            user_id=contract.person_user_id
-        ).first()
-
-        employee = self._find_or_create_employee(contract, profile)
-        if not employee:
-            return {'success': False, 'error': '직원 데이터를 생성/조회할 수 없습니다.'}
-
-        return self._snapshot_service.apply_snapshot_to_employee(
-            contract_id, snapshot_data, employee, self._get_employee_field
-        )
-
     # ===== 실시간 동기화 지원 =====
 
     def should_auto_sync(self, contract_id: int) -> bool:
@@ -345,39 +315,47 @@ class SyncService:
     def _find_or_create_employee(
         self,
         contract: PersonCorporateContract,
-        profile: PersonalProfile
+        profile: PersonalProfile,
+        full_sync: bool = False,
+        force_create: bool = False
     ) -> Optional[Employee]:
-        """계약에 연결된 직원 찾기 또는 생성"""
-        if contract.employee_number:
-            employee = Employee.query.filter_by(
-                employee_number=contract.employee_number
-            ).first()
-            if employee:
-                return employee
+        """계약에 연결된 직원 찾기 또는 생성
 
+        Args:
+            contract: 계약 정보
+            profile: 개인 프로필
+            full_sync: True면 전체 프로필 데이터 동기화 (SSOT: FIELD_MAPPING 사용)
+            force_create: True면 기존 Employee 무시하고 항상 새로 생성 (회사별 분리용)
+
+        Returns:
+            Employee 객체
+        """
         from app.models.company import Company
         company = Company.query.get(contract.company_id)
 
-        if company:
-            employee = Employee.query.filter_by(
-                name=profile.name,
-                organization_id=company.organization_id
-            ).first()
+        # force_create가 아닌 경우에만 기존 Employee 탐색
+        if not force_create:
+            if contract.employee_number:
+                employee = Employee.query.filter_by(
+                    employee_number=contract.employee_number
+                ).first()
+                if employee:
+                    return employee
 
-            if employee:
-                if not contract.employee_number and employee.employee_number:
-                    contract.employee_number = employee.employee_number
-                return employee
+            if company:
+                employee = Employee.query.filter_by(
+                    name=profile.name,
+                    organization_id=company.root_organization_id
+                ).first()
 
-        employee = Employee(
-            name=profile.name,
-            email=profile.email,
-            phone=profile.mobile_phone,
-            organization_id=company.organization_id if company else None,
-            department=contract.department,
-            position=contract.position,
-            status='active',
-            hire_date=datetime.utcnow().strftime('%Y-%m-%d'),
+                if employee:
+                    if not contract.employee_number and employee.employee_number:
+                        contract.employee_number = employee.employee_number
+                    return employee
+
+        # 새 Employee 생성
+        employee = self._create_employee_from_profile(
+            profile, contract, company, full_sync
         )
         db.session.add(employee)
         db.session.flush()
@@ -386,6 +364,50 @@ class SyncService:
         contract.employee_number = employee.employee_number
 
         return employee
+
+    def _create_employee_from_profile(
+        self,
+        profile: PersonalProfile,
+        contract: PersonCorporateContract,
+        company,
+        full_sync: bool = False
+    ) -> Employee:
+        """PersonalProfile에서 Employee 생성 (SSOT: FIELD_MAPPING 활용)
+
+        Args:
+            profile: 개인 프로필
+            contract: 계약 정보 (department, position)
+            company: 회사 정보 (root_organization_id)
+            full_sync: 전체 필드 동기화 여부
+
+        Returns:
+            새 Employee 객체
+        """
+        # 기본 필수 필드
+        employee_data = {
+            'name': profile.name,
+            'email': profile.email,
+            'phone': profile.mobile_phone,
+            'organization_id': company.root_organization_id if company else None,
+            'department': contract.department,
+            'position': contract.position,
+            'status': 'active',
+            'hire_date': datetime.utcnow().strftime('%Y-%m-%d'),
+        }
+
+        if full_sync:
+            # SSOT: FIELD_MAPPING 활용하여 전체 필드 복사
+            all_mappings = {
+                **self.BASIC_FIELD_MAPPING,
+                **self.CONTACT_FIELD_MAPPING,
+                **self.EXTRA_FIELD_MAPPING,
+            }
+            for profile_field, employee_field in all_mappings.items():
+                value = getattr(profile, profile_field, None)
+                if value is not None:
+                    employee_data[employee_field] = value
+
+        return Employee(**employee_data)
 
     def _find_employee_by_contract(
         self,

@@ -5,12 +5,13 @@
 Phase 4: 데이터 동기화 및 퇴사 처리
 """
 from typing import Dict, List, Optional, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import json
 
 from app.database import db
 from app.models.employee import Employee
 from app.models.user import User
+from app.models.personal_profile import PersonalProfile
 from app.models.person_contract import (
     PersonCorporateContract,
     DataSharingSettings,
@@ -126,16 +127,33 @@ class TerminationService:
             settings.is_realtime_sync = False
             revoked['data_sync'] = True
 
-        # 2. 직원 계정 접근 권한 해제 (employee_number 연결 해제)
+        # 2. 직원 계정 접근 권한 해제
+        # employee_number 또는 User.employee_id로 Employee 조회
+        employee = None
         if contract.employee_number:
             employee = Employee.query.filter_by(
                 employee_number=contract.employee_number
             ).first()
 
-            if employee:
-                # 직원 상태를 퇴사로 변경
-                employee.status = 'terminated'
-                revoked['employee_access'] = True
+        user = User.query.get(contract.person_user_id)
+
+        if not employee and user:
+            if user.employee_id:
+                employee = db.session.get(Employee, user.employee_id)
+            else:
+                # Employee가 없는 경우 (personal 계정) - Employee 생성 후 terminated 설정
+                profile = PersonalProfile.query.filter_by(user_id=user.id).first()
+                if profile:
+                    from app.services.sync_service import sync_service
+                    employee = sync_service._find_or_create_employee(contract, profile)
+                    if employee:
+                        user.employee_id = employee.id
+
+        if employee:
+            # 직원 상태를 퇴사로 변경
+            employee.status = 'terminated'
+            employee.resignation_date = date.today()
+            revoked['employee_access'] = True
 
         # 3. 개인 사용자의 해당 법인 접근 권한 로그
         revoked['api_access'] = True
@@ -211,9 +229,6 @@ class TerminationService:
         if contract.status != PersonCorporateContract.STATUS_TERMINATED:
             return {'success': False, 'error': '종료된 계약만 아카이브할 수 있습니다.'}
 
-        # 아카이브 데이터 생성 (통계용)
-        archive_data = self._create_archive_snapshot(contract)
-
         # 직원 데이터 익명화
         if contract.employee_number:
             employee = Employee.query.filter_by(
@@ -236,7 +251,7 @@ class TerminationService:
             entity_type='contract',
             field_name=None,
             old_value=None,
-            new_value=json.dumps(archive_data),
+            new_value=None,
             direction='system',
             user_id=self._current_user_id
         )
@@ -246,30 +261,8 @@ class TerminationService:
         return {
             'success': True,
             'contract_id': contract_id,
-            'archive_data': archive_data,
             'archived_at': datetime.utcnow().isoformat(),
         }
-
-    def _create_archive_snapshot(self, contract: PersonCorporateContract) -> Dict:
-        """아카이브용 통계 스냅샷 생성"""
-        return {
-            'contract_id': contract.id,
-            'contract_type': contract.contract_type,
-            'company_id': contract.company_id,
-            'department': contract.department,
-            'position': contract.position,
-            'contract_start_date': contract.contract_start_date.isoformat() if contract.contract_start_date else None,
-            'contract_end_date': contract.contract_end_date.isoformat() if contract.contract_end_date else None,
-            'terminated_at': contract.terminated_at.isoformat() if contract.terminated_at else None,
-            'duration_days': self._calculate_duration(contract),
-        }
-
-    def _calculate_duration(self, contract: PersonCorporateContract) -> Optional[int]:
-        """계약 기간 계산"""
-        if contract.approved_at and contract.terminated_at:
-            delta = contract.terminated_at - contract.approved_at
-            return delta.days
-        return None
 
     def _anonymize_employee(self, employee: Employee):
         """

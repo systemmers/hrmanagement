@@ -1,0 +1,62 @@
+{#
+    승인 대기 중 안내 페이지
+
+    employee_sub 계정의 직원 상태가 pending_approval인 경우 표시
+    계약 승인을 기다리고 있음을 안내
+#}
+{% extends "base.html" %}
+{% from 'macros/_alerts.html' import info_box %}
+
+{% block title %}승인 대기 중{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/corporate-add-user.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">내 회사 정보</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="plan-limit-info">
+            <div class="plan-limit-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="plan-limit-content">
+                <strong>승인 대기 중</strong>
+                <p>현재 계약 승인을 기다리고 있습니다. HR 담당자의 승인이 완료되면 회사 인사카드를 확인할 수 있습니다.</p>
+            </div>
+        </div>
+
+        {% if employee %}
+        <div class="info-grid" style="margin-top: var(--space-6);">
+            <div class="info-item">
+                <span class="info-label">이름</span>
+                <span class="info-value">{{ employee.name }}</span>
+            </div>
+            {% if employee.department %}
+            <div class="info-item">
+                <span class="info-label">부서</span>
+                <span class="info-value">{{ employee.department }}</span>
+            </div>
+            {% endif %}
+            {% if employee.position %}
+            <div class="info-item">
+                <span class="info-label">직위</span>
+                <span class="info-value">{{ employee.position }}</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="form-actions" style="margin-top: var(--space-6);">
+            <a href="{{ url_for('profile.view') }}" class="btn btn-primary">
+                <i class="fas fa-user"></i>
+                <span>내 프로필 보기</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

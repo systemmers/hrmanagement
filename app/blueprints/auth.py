@@ -9,6 +9,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from ..constants.session_keys import SessionKeys
 from ..constants.messages import FlashMessages
 from ..services.user_service import user_service
+from ..models import Employee
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -42,6 +43,17 @@ def login():
             session[SessionKeys.COMPANY_ID] = user.company_id
 
             flash(FlashMessages.WELCOME_TEMPLATE.format(user.username), 'success')
+
+            # 계정 발급 후 직원 상태별 분기 (pending_info, pending_contract)
+            if user.employee_id and user.account_type == 'employee_sub':
+                employee = Employee.query.get(user.employee_id)
+                if employee:
+                    if employee.status == 'pending_info':
+                        flash('프로필 정보를 완성해주세요.', 'info')
+                        return redirect(url_for('profile.complete_profile'))
+                    elif employee.status == 'pending_contract':
+                        flash('계약 요청을 기다리고 있습니다.', 'info')
+                        return redirect(url_for('mypage.company_info'))
 
             # next 파라미터가 있으면 해당 페이지로, 없으면 대시보드로
             next_page = request.args.get('next')

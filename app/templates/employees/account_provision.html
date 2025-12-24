@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}직원 계정 발급{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/corporate-add-user.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-row">
+        <h1 class="page-title">직원 계정 발급</h1>
+        <div class="page-actions">
+            <a href="{{ url_for('employees.employee_list') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                <span>직원 목록으로</span>
+            </a>
+        </div>
+    </div>
+    <p class="page-description">계정만 발급하고, 직원이 로그인 후 나머지 정보를 입력합니다.</p>
+</div>
+
+<div class="form-container">
+    <form method="POST" id="accountProvisionForm" class="employee-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <!-- 직원 기본 정보 섹션 -->
+        <div class="form-section">
+            <h2 class="form-section-title">
+                <i class="fas fa-user"></i>
+                직원 기본 정보
+            </h2>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        이름 <span class="required">*</span>
+                    </label>
+                    <input type="text" name="name" id="name" class="form-input"
+                           placeholder="직원 이름" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        소속 조직
+                    </label>
+                    <select name="organization_id" id="organization_id" class="form-input">
+                        <option value="">미지정 (직원이 입력)</option>
+                        {% for org in organizations %}
+                        <option value="{{ org.id }}">{{ org.path or org.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-help mt-1">미선택 시 직원이 로그인 후 입력</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 계정 정보 섹션 -->
+        <div class="form-section">
+            <h2 class="form-section-title">
+                <i class="fas fa-id-card"></i>
+                계정 정보
+            </h2>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        사용자명 <span class="required">*</span>
+                    </label>
+                    <input type="text" name="username" id="username" class="form-input"
+                           placeholder="영문, 숫자 조합 (4자 이상)"
+                           pattern="[a-zA-Z0-9_]+" minlength="4" required>
+                    <small class="form-help mt-1">영문, 숫자만 사용 가능 (4자 이상)</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        이메일 <span class="required">*</span>
+                    </label>
+                    <input type="email" name="email" id="email" class="form-input"
+                           placeholder="user@example.com" required>
+                    <small class="form-help mt-1">로그인 및 알림에 사용</small>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        초기 비밀번호
+                    </label>
+                    <div class="input-with-button">
+                        <input type="text" name="password" id="password" class="form-input"
+                               placeholder="미입력 시 자동 생성">
+                        <button type="button" id="generatePasswordBtn" class="btn btn-outline">
+                            <i class="fas fa-random"></i>
+                            <span>자동 생성</span>
+                        </button>
+                    </div>
+                    <small class="form-help mt-1">미입력 시 안전한 비밀번호가 자동 생성됩니다</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        권한
+                    </label>
+                    <select name="role" id="role" class="form-input">
+                        <option value="employee" selected>일반 직원</option>
+                        <option value="manager">매니저</option>
+                    </select>
+                    <small class="form-help mt-1">
+                        <strong>일반 직원:</strong> 본인 정보 조회/수정 |
+                        <strong>매니저:</strong> 직원 관리 권한
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 안내 메시지 섹션 -->
+        <div class="form-section">
+            <div class="plan-limit-info">
+                <div class="plan-limit-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="plan-limit-content">
+                    <strong>계정 발급 후 프로세스</strong>
+                    <p>
+                        1. 직원에게 계정 정보(사용자명, 비밀번호) 전달<br>
+                        2. 직원이 로그인하면 프로필 완성 페이지로 이동<br>
+                        3. 직원이 개인정보, 학력, 경력 등 입력 완료
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('employees.employee_list') }}" class="btn btn-secondary">취소</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-id-card"></i>
+                <span>계정 발급</span>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/pages/employee/account-provision.js') }}"></script>
+{% endblock %}

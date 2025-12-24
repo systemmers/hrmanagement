@@ -83,7 +83,13 @@
       "Bash(git -C \"D:/projects/hrmanagement\" diff --name-only HEAD)",
       "Bash(git -C \"D:/projects/hrmanagement\" log --oneline -10)",
       "mcp__context7__resolve-library-id",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "WebSearch",
+      "Bash(xargs:*)",
+      "Bash(git -C \"D:/projects/hrmanagement\" diff --name-only)",
+      "Bash(git -C \"D:/projects/hrmanagement\" log --oneline -5)",
+      "Bash(git -C \"D:/projects/hrmanagement\" status --short)",
+      "Bash(source D:/projects/hrmanagement/.env)"
     ],
     "deny": [],
     "ask": []

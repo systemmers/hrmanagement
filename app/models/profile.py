@@ -262,14 +262,6 @@ class Profile(db.Model):
 
         return dict(result)
 
-    def to_snapshot(self):
-        """퇴사 시 스냅샷용 딕셔너리 (민감정보 포함)"""
-        data = self.to_dict()
-        # 스냅샷 메타데이터 추가
-        data['snapshot_version'] = '1.0'
-        data['snapshot_at'] = datetime.utcnow().isoformat()
-        return data
-
     @classmethod
     def from_dict(cls, data):
         """딕셔너리에서 모델 생성"""
