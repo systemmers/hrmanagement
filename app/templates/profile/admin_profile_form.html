@@ -20,7 +20,7 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert--{{ category }}" style="margin-bottom: var(--spacing-4);">
+                <div class="alert alert--{{ category }} mb-4">
                     {{ message }}
                 </div>
             {% endfor %}
@@ -199,50 +199,6 @@
 {% block extra_js %}
 <!-- JS: utils/formatting.js - 전화번호 자동 포맷팅 (DOMContentLoaded 시 자동 초기화) -->
 <script src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 사진 선택 버튼
-    const selectPhotoBtn = document.getElementById('selectPhotoBtn');
-    const photoFileInput = document.getElementById('photoFile');
-    const photoHiddenInput = document.getElementById('photo');
-    const photoPreview = document.getElementById('photoPreview');
-    const deletePhotoBtn = document.getElementById('deletePhotoBtn');
-
-    if (selectPhotoBtn && photoFileInput) {
-        selectPhotoBtn.addEventListener('click', function() {
-            photoFileInput.click();
-        });
-
-        photoFileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                // 파일 크기 체크 (5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('파일 크기는 5MB 이하여야 합니다.');
-                    return;
-                }
-
-                // 미리보기 표시
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    photoPreview.innerHTML = '<img src="' + e.target.result + '" alt="프로필 사진" id="previewImage">';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-
-    // 사진 삭제 버튼
-    if (deletePhotoBtn) {
-        deletePhotoBtn.addEventListener('click', function() {
-            if (confirm('프로필 사진을 삭제하시겠습니까?')) {
-                photoPreview.innerHTML = '<div class="admin-profile-form__photo-placeholder" id="photoPlaceholder"><i class="fas fa-user"></i><span>사진 미등록</span></div>';
-                photoHiddenInput.value = '';
-                photoFileInput.value = '';
-                deletePhotoBtn.style.display = 'none';
-            }
-        });
-    }
-});
-</script>
+<!-- JS: pages/profile/admin-form.js - 프로필 사진 업로드/삭제 -->
+<script src="{{ url_for('static', filename='js/pages/profile/admin-form.js') }}"></script>
 {% endblock %}

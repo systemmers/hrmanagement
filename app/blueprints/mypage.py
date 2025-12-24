@@ -7,10 +7,11 @@ Phase 8: 상수 모듈 적용
 """
 from flask import Blueprint, render_template, session, redirect, url_for, flash
 
-from ..constants.session_keys import SessionKeys
+from ..constants.session_keys import SessionKeys, AccountType
 from ..utils.decorators import login_required
 from ..services.employee_service import employee_service
 from ..services.system_setting_service import system_setting_service
+from ..services import contract_service
 
 mypage_bp = Blueprint('mypage', __name__, url_prefix='/my')
 
@@ -20,22 +21,45 @@ mypage_bp = Blueprint('mypage', __name__, url_prefix='/my')
 def company_info():
     """회사 인사카드
 
-    직원의 회사 관련 전체 인사정보를 표시합니다:
-    - 소속정보, 계약정보, 급여정보, 복리후생, 4대보험
-    - 인사기록: 근로계약/연봉, 인사이동/고과, 근태/비품
+    계정 유형 및 계약/직원 상태별 분기 처리:
+    - personal: 회사 목록으로 리다이렉트
+    - employee_sub (승인된 계약 있음): 인사카드 표시
+    - employee_sub (계약 미승인): 계약 대기 안내
+    - employee_sub (pending_info): 프로필 완성 리다이렉트
+    - employee_id 없음: HR 문의 안내
     """
+    account_type = session.get(SessionKeys.ACCOUNT_TYPE)
     employee_id = session.get(SessionKeys.EMPLOYEE_ID)
 
-    # employee_id가 없는 경우 (계정과 직원이 연결되지 않음)
-    if not employee_id:
-        flash('계정에 연결된 직원 정보가 없습니다.', 'warning')
-        return redirect(url_for('main.index'))
+    # 1. personal 계정은 회사 목록으로 리다이렉트
+    if account_type == AccountType.PERSONAL:
+        return redirect(url_for('personal.company_card_list'))
 
-    # 직원 정보 조회
+    # 2. employee_id 없음 체크
+    if not employee_id:
+        return render_template('mypage/no_employee_info.html')
+
+    # 3. 직원 정보 조회
     employee = employee_service.get_employee_by_id(employee_id)
     if not employee:
         flash('직원 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
+
+    # 4. 계약 기반 접근 제어 (status와 무관하게 승인된 계약 필수)
+    user_id = session.get(SessionKeys.USER_ID)
+    company_id = session.get(SessionKeys.COMPANY_ID)
+
+    if user_id and company_id:
+        contract_status = contract_service.get_employee_contract_status(user_id, company_id)
+        if contract_status != 'approved':
+            return render_template('mypage/pending_contract.html', employee=employee)
+
+    # 5. 프로필 미완성 체크 (pending_info → 프로필 완성 페이지로)
+    employee_status = employee.get('status')
+    if employee_status == 'pending_info':
+        return redirect(url_for('profile.complete_profile'))
+
+    # 6. 정상 상태: 인사카드 표시
 
     # 회사 정보 조회 (SystemSetting에서)
     company_data = system_setting_service.get_company_data()

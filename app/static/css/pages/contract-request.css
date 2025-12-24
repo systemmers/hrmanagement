@@ -163,6 +163,119 @@
     padding-top: var(--space-4);
 }
 
+/* ========================================
+   Tab Navigation Override
+   tabs.css 기본 스타일 오버라이드
+   ======================================== */
+
+.contract-form .tabs-nav {
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.contract-form .tab-btn.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+    font-weight: 600;
+}
+
+/* Tab Badge (탭 내부 카운트 배지) */
+.contract-form .tab-btn .badge {
+    margin-left: var(--space-2);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: var(--text-xs);
+    background: var(--color-gray-100);
+}
+
+.contract-form .tab-btn.active .badge {
+    background: var(--color-primary);
+    color: var(--color-pure-white);
+}
+
+/* ========================================
+   Target Selection List
+   계약 대상 선택 목록 스타일
+   ======================================== */
+
+.target-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+}
+
+.target-item {
+    display: flex;
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-gray-200);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.target-item:last-child {
+    border-bottom: none;
+}
+
+.target-item:hover {
+    background: var(--color-gray-50);
+}
+
+.target-item.selected {
+    background: var(--color-primary-50);
+    border-left: 3px solid var(--color-primary);
+}
+
+.target-item input[type="radio"] {
+    margin-right: var(--space-3);
+}
+
+.target-info {
+    flex: 1;
+}
+
+.target-name {
+    font-weight: 500;
+    color: var(--color-gray-900);
+}
+
+.target-email {
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+}
+
+.target-meta {
+    font-size: var(--text-xs);
+    color: var(--color-gray-400);
+}
+
+.target-actions {
+    margin-left: var(--space-2);
+}
+
+/* ========================================
+   Empty State Override
+   리스트 내부용 empty-state 오버라이드
+   ======================================== */
+
+.target-list .empty-state {
+    padding: var(--space-6);
+    border: none;
+    background: transparent;
+}
+
+.target-list .empty-state i {
+    font-size: 2rem;
+    margin-bottom: var(--space-3);
+    opacity: 0.5;
+}
+
+/* ========================================
+   Responsive
+   반응형 스타일
+   ======================================== */
+
 @media (max-width: 768px) {
     .contract-form .form-row.two-col {
         grid-template-columns: 1fr;
@@ -178,5 +291,15 @@
 
     .contract-form .form-actions .btn {
         width: 100%;
+    }
+
+    .target-item {
+        flex-wrap: wrap;
+    }
+
+    .target-actions {
+        width: 100%;
+        margin-top: var(--space-2);
+        margin-left: 0;
     }
 }
