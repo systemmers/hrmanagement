@@ -463,7 +463,7 @@ def create_employees(companies, count=20, dry_run=False):
                 name=name,
                 department=department,
                 position=position,
-                status='재직',
+                status='active',
                 hire_date=hire_date,
                 phone=generate_phone(),
                 email=generate_email(name, 'company.co.kr'),

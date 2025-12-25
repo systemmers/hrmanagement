@@ -120,7 +120,7 @@ def test_employee(session):
         name='테스트직원',
         department='개발팀',
         position='사원',
-        status='재직'
+        status='active'
     )
     session.add(employee)
     session.commit()

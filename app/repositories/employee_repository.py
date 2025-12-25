@@ -266,9 +266,9 @@ class EmployeeRepository(BaseRepository[Employee]):
         """
         query = self._build_query(organization_id)
         total = query.count()
-        active = self._build_query(organization_id).filter_by(status='재직').count()
-        on_leave = self._build_query(organization_id).filter_by(status='휴직').count()
-        resigned = self._build_query(organization_id).filter_by(status='퇴사').count()
+        active = self._build_query(organization_id).filter_by(status='active').count()
+        on_leave = self._build_query(organization_id).filter_by(status='on_leave').count()
+        resigned = self._build_query(organization_id).filter_by(status='resigned').count()
 
         return {
             'total': total,

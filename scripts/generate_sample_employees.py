@@ -238,7 +238,7 @@ def generate_employee(gender: str, index: int) -> Employee:
         photo=photo,
         department=department,
         position=position,
-        status='재직',
+        status='active',
         hire_date=hire_date,
         phone=random_phone(),
         email=f"{name.lower().replace(' ', '')}@example.com",
