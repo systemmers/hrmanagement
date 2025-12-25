@@ -380,124 +380,178 @@ class PersonalService:
     # 회사 인사카드 (Phase 2)
     # ========================================
 
-    def get_approved_contracts(self, user_id: int) -> List[Dict]:
-        """승인된 계약 목록 조회
+    def get_viewable_contracts(self, user_id: int, include_terminated: bool = True) -> List[Dict]:
+        """열람 가능한 계약 목록 조회
 
-        개인 계정이 계약한 법인들의 목록을 반환합니다.
+        승인된 계약과 종료된 계약(3년 보관 기간 내)을 모두 반환합니다.
+
+        Args:
+            user_id: 사용자 ID
+            include_terminated: 종료된 계약 포함 여부 (기본 True)
+
+        Returns:
+            계약 목록 (활성/종료 구분 포함)
         """
+        from datetime import datetime, timedelta
         from app.models.person_contract import PersonCorporateContract
         from app.models.company import Company
 
-        contracts = PersonCorporateContract.query.filter_by(
-            person_user_id=user_id,
-            status='approved'
+        # 조회 대상 상태
+        viewable_statuses = ['approved']
+        if include_terminated:
+            viewable_statuses.append('terminated')
+
+        contracts = PersonCorporateContract.query.filter(
+            PersonCorporateContract.person_user_id == user_id,
+            PersonCorporateContract.status.in_(viewable_statuses)
         ).all()
 
         result = []
+        retention_days = 365 * 3  # 3년 보관
+
         for contract in contracts:
             company = Company.query.get(contract.company_id)
-            if company:
-                result.append({
-                    'id': contract.id,
-                    'company_id': contract.company_id,
-                    'company_name': company.name,
-                    'company_logo': getattr(company, 'logo_url', None),
-                    'position': contract.position,
-                    'department': contract.department,
-                    'contract_start_date': contract.contract_start_date,
-                    'contract_end_date': contract.contract_end_date,
-                    'approved_at': contract.approved_at,
-                })
+            if not company:
+                continue
+
+            # 종료된 계약의 보관 기간 확인
+            is_within_retention = True
+            if contract.status == 'terminated' and contract.terminated_at:
+                retention_end = contract.terminated_at + timedelta(days=retention_days)
+                is_within_retention = datetime.utcnow() < retention_end
+
+            if not is_within_retention:
+                continue
+
+            result.append({
+                'id': contract.id,
+                'company_id': contract.company_id,
+                'company_name': company.name,
+                'company_logo': getattr(company, 'logo_url', None),
+                'position': contract.position,
+                'department': contract.department,
+                'contract_start_date': contract.contract_start_date,
+                'contract_end_date': contract.contract_end_date,
+                'approved_at': contract.approved_at,
+                # 종료 상태 정보
+                'status': contract.status,
+                'is_active': contract.status == 'approved',
+                'terminated_at': contract.terminated_at,
+                'termination_reason': contract.termination_reason,
+            })
+
+        # 활성 계약 우선, 그 다음 종료일 역순 정렬
+        result.sort(key=lambda x: (
+            0 if x['is_active'] else 1,
+            x.get('terminated_at') or datetime.min
+        ), reverse=False)
 
         return result
+
+    def get_approved_contracts(self, user_id: int) -> List[Dict]:
+        """승인된 계약 목록 조회 (하위 호환용)
+
+        활성 계약만 반환합니다. 종료된 계약도 필요하면 get_viewable_contracts() 사용.
+        """
+        contracts = self.get_viewable_contracts(user_id, include_terminated=False)
+        return [c for c in contracts if c['is_active']]
 
     def get_company_card_data(self, user_id: int, contract_id: int) -> Optional[Dict]:
         """회사 인사카드 데이터 조회
 
         특정 계약에 대한 회사 인사카드 정보를 반환합니다.
-        employee 데이터, 이력 정보를 포함하여 공유 파셜 템플릿과 호환됩니다.
+        법인의 Employee 데이터를 조회하여 법인과 동일한 정보를 제공합니다.
+        종료된 계약도 3년 보관 기간 내에는 열람 가능합니다.
         """
+        from datetime import datetime, timedelta
         from app.models.person_contract import PersonCorporateContract
         from app.models.company import Company
+        from app.models.employee import Employee
 
-        # 계약 정보 조회 및 권한 확인
-        contract = PersonCorporateContract.query.filter_by(
-            id=contract_id,
-            person_user_id=user_id,
-            status='approved'
+        # 계약 정보 조회 및 권한 확인 (approved + terminated)
+        contract = PersonCorporateContract.query.filter(
+            PersonCorporateContract.id == contract_id,
+            PersonCorporateContract.person_user_id == user_id,
+            PersonCorporateContract.status.in_(['approved', 'terminated'])
         ).first()
 
         if not contract:
             return None
+
+        # 종료된 계약의 보관 기간 확인 (3년)
+        is_terminated = contract.status == 'terminated'
+        if is_terminated and contract.terminated_at:
+            retention_end = contract.terminated_at + timedelta(days=365 * 3)
+            if datetime.utcnow() >= retention_end:
+                return None  # 보관 기간 만료
 
         # 회사 정보 조회
         company = Company.query.get(contract.company_id)
         if not company:
             return None
 
-        # 통합 Profile 모델 조회
-        profile = self.profile_repo.get_by_user_id(user_id)
-        user = User.query.get(user_id)
+        # Employee 조회 (법인 DB)
+        employee = None
+        if contract.employee_number:
+            employee = Employee.query.filter_by(
+                employee_number=contract.employee_number
+            ).first()
 
-        # 승인된 계약 수 조회
-        contract_count = PersonCorporateContract.query.filter_by(
-            person_user_id=user_id,
-            status='approved'
-        ).count()
+        # Employee가 없으면 User.employee_id로 시도
+        if not employee:
+            user = User.query.get(user_id)
+            if user and user.employee_id:
+                employee = db.session.get(Employee, user.employee_id)
 
-        # employee 데이터 구성 (공유 파셜 템플릿 호환 - _basic_info.html 필드 포함)
+        # Employee 데이터 구성 (법인 DB 기반)
         employee_data = None
-        if profile:
+        if employee:
             employee_data = {
-                'id': user.id if user else user_id,
-                # 개인 기본정보 필드
-                'name': profile.name,
-                'english_name': profile.english_name,
-                'chinese_name': profile.chinese_name,
-                'photo': profile.photo or '/static/images/face/face_01_m.png',
-                'email': profile.email,
-                'phone': profile.mobile_phone,
-                'home_phone': profile.home_phone,
-                'address': profile.address,
-                'detailed_address': profile.detailed_address,
-                'postal_code': profile.postal_code,
-                'actual_address': profile.actual_address,
-                'actual_detailed_address': profile.actual_detailed_address,
-                'birth_date': profile.birth_date,
-                'lunar_birth': profile.lunar_birth,
-                'gender': profile.gender,
-                'marital_status': profile.marital_status,
-                'resident_number': profile.resident_number,
-                'nationality': profile.nationality,
-                'emergency_contact': profile.emergency_contact,
-                'emergency_relation': profile.emergency_relation,
-                'blood_type': profile.blood_type,
-                'religion': profile.religion,
-                'hobby': profile.hobby,
-                'specialty': profile.specialty,
-                'disability_info': profile.disability_info,
-                # 소속정보 (계약 기반)
-                'department': contract.department,
-                'team': contract.department,
-                'position': contract.position,
-                'job_title': getattr(contract, 'job_title', None),
-                'employee_number': contract.employee_number or f'EMP-{user_id:03d}',
-                'employment_type': getattr(contract, 'employment_type', contract.contract_type),
-                'work_location': getattr(contract, 'work_location', '본사'),
-                'internal_phone': getattr(contract, 'internal_phone', None),
-                'company_email': getattr(contract, 'company_email', None),
-                'hire_date': contract.contract_start_date,
-                'status': 'active',
-                # 계약 관련 추가 필드
-                'contract_period': getattr(contract, 'contract_period', '무기한'),
-                'probation_end': getattr(contract, 'probation_end', None),
-                'resignation_date': getattr(contract, 'resignation_date', None),
-                # 통계
-                'contract_count': contract_count,
-                'created_at': user.created_at.strftime('%Y-%m-%d') if user and user.created_at else '-',
+                'id': employee.id,
+                'name': employee.name,
+                'english_name': employee.english_name,
+                'chinese_name': employee.chinese_name,
+                'photo': employee.photo or '/static/images/face/face_01_m.png',
+                'email': employee.email,
+                'phone': employee.mobile_phone or employee.phone,
+                'home_phone': employee.home_phone,
+                'address': employee.address,
+                'detailed_address': employee.detailed_address,
+                'postal_code': employee.postal_code,
+                'actual_address': employee.actual_address,
+                'actual_detailed_address': employee.actual_detailed_address,
+                'birth_date': employee.birth_date,
+                'lunar_birth': employee.lunar_birth,
+                'gender': employee.gender,
+                'marital_status': employee.marital_status,
+                'resident_number': employee.resident_number,
+                'nationality': employee.nationality,
+                'emergency_contact': employee.emergency_contact,
+                'emergency_relation': employee.emergency_relation,
+                'blood_type': employee.blood_type,
+                'religion': employee.religion,
+                'hobby': employee.hobby,
+                'specialty': employee.specialty,
+                'disability_info': employee.disability_info,
+                # 소속정보 (Employee 기반)
+                'department': employee.department or contract.department,
+                'team': employee.team or contract.department,
+                'position': employee.position or contract.position,
+                'job_title': employee.job_title,
+                'job_grade': employee.job_grade,
+                'job_role': employee.job_role,
+                'employee_number': employee.employee_number,
+                'employment_type': employee.employment_type,
+                'work_location': employee.work_location,
+                'internal_phone': employee.internal_phone,
+                'company_email': employee.company_email,
+                'hire_date': employee.hire_date,
+                'status': employee.status,
+                'probation_end': employee.probation_end,
+                'resignation_date': employee.resignation_date,
             }
 
-        # 이력 정보 조회 (통합 Profile 모델 사용)
+        # 이력 정보 조회 (Employee 기반 - 법인 DB)
         education_list = []
         career_list = []
         certificate_list = []
@@ -505,16 +559,29 @@ class PersonalService:
         military = None
         award_list = []
         family_list = []
+        salary_history_list = []
+        salary_payment_list = []
+        promotion_list = []
+        evaluation_list = []
+        training_list = []
+        attendance_summary = None
+        asset_list = []
 
-        if profile:
-            education_list = [e.to_dict() for e in profile.educations.all()]
-            career_list = [c.to_dict() for c in profile.careers.all()]
-            certificate_list = [c.to_dict() for c in profile.certificates.all()]
-            language_list = [lang.to_dict() for lang in profile.languages.all()]
-            military_records = profile.military_services.first()
-            military = military_records.to_dict() if military_records else None
-            award_list = [a.to_dict() for a in profile.awards.all()]
-            family_list = [f.to_dict() for f in profile.family_members.all()]
+        if employee:
+            education_list = [e.to_dict() for e in employee.educations.all()]
+            career_list = [c.to_dict() for c in employee.careers.all()]
+            certificate_list = [c.to_dict() for c in employee.certificates.all()]
+            language_list = [lang.to_dict() for lang in employee.languages.all()]
+            military = employee.military_service.to_dict() if employee.military_service else None
+            award_list = [a.to_dict() for a in employee.awards.all()]
+            family_list = [f.to_dict() for f in employee.family_members.all()]
+            # 법인 전용 정보 (인사기록)
+            salary_history_list = [s.to_dict() for s in employee.salary_histories.all()]
+            salary_payment_list = [s.to_dict() for s in employee.salary_payments.all()]
+            promotion_list = [p.to_dict() for p in employee.promotions.all()]
+            evaluation_list = [e.to_dict() for e in employee.evaluations.all()]
+            training_list = [t.to_dict() for t in employee.trainings.all()]
+            asset_list = [a.to_dict() for a in employee.assets.all()]
 
         # 인사카드 데이터 구성
         return {
@@ -528,7 +595,6 @@ class PersonalService:
                 'contract_start_date': contract.contract_start_date,
                 'contract_end_date': contract.contract_end_date,
                 'approved_at': contract.approved_at,
-                # 계약정보 추가 필드
                 'contract_date': contract.contract_start_date,
                 'contract_period': getattr(contract, 'contract_period', '무기한'),
                 'employee_type': getattr(contract, 'employee_type', None),
@@ -546,7 +612,11 @@ class PersonalService:
                 'start_date': contract.contract_start_date,
                 'end_date': contract.contract_end_date,
             },
-            # 이력 정보 (공유 파셜용 - _history_info.html)
+            # 종료 상태 정보
+            'is_terminated': is_terminated,
+            'terminated_at': contract.terminated_at.isoformat() if contract.terminated_at else None,
+            'termination_reason': contract.termination_reason,
+            # 이력 정보 (법인 DB 기반)
             'education_list': education_list,
             'career_list': career_list,
             'certificate_list': certificate_list,
@@ -554,15 +624,14 @@ class PersonalService:
             'military': military,
             'award_list': award_list,
             'family_list': family_list,
-            # 인사기록 정보 (공유 파셜용 - _hr_records.html)
-            # 현재 개인 계정에서는 해당 데이터가 없으므로 빈 값으로 반환
-            'salary_history_list': [],
-            'salary_payment_list': [],
-            'promotion_list': [],
-            'evaluation_list': [],
-            'training_list': [],
-            'attendance_summary': None,
-            'asset_list': [],
+            # 인사기록 정보 (법인 DB 기반)
+            'salary_history_list': salary_history_list,
+            'salary_payment_list': salary_payment_list,
+            'promotion_list': promotion_list,
+            'evaluation_list': evaluation_list,
+            'training_list': training_list,
+            'attendance_summary': attendance_summary,
+            'asset_list': asset_list,
         }
 
 

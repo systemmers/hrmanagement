@@ -134,7 +134,8 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
 
         개인 계정(personal):
         - 항상 새 Employee 생성 (회사별 분리, full_sync=True)
-        - 전체 프로필 데이터 동기화
+        - 전체 프로필 데이터 동기화 (기본 필드 + 관계형 데이터)
+        - DataSharingSettings 자동 생성 (전체 공유 기본값)
 
         직원 계정(employee_sub):
         - 기존 Employee의 status만 active로 변경
@@ -167,6 +168,32 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
                     if employee:
                         user.employee_id = employee.id
                         employee.status = 'active'
+
+                        # DataSharingSettings 생성 (전체 공유 기본값)
+                        settings = DataSharingSettings.query.filter_by(
+                            contract_id=contract_id
+                        ).first()
+                        if not settings:
+                            settings = DataSharingSettings(
+                                contract_id=contract_id,
+                                share_basic_info=True,
+                                share_contact=True,
+                                share_education=True,
+                                share_career=True,
+                                share_certificates=True,
+                                share_languages=True,
+                                share_military=True,
+                                is_realtime_sync=False,
+                            )
+                            db.session.add(settings)
+                            db.session.flush()
+
+                        # 관계형 데이터 동기화 실행
+                        sync_service.set_current_user(approved_by_user_id)
+                        sync_service.sync_personal_to_employee(
+                            contract_id=contract_id,
+                            sync_type='initial'
+                        )
             else:
                 # 직원 계정(employee_sub): 기존 Employee 상태 업데이트
                 if user.employee_id:

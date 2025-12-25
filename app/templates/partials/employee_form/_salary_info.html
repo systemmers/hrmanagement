@@ -2,18 +2,25 @@
     직원 폼 - 급여정보 섹션
     employee: 직원 객체 (수정 모드일 때)
     salary: 급여 정보 객체
+    has_person_contract: 승인된 개인계약 존재 여부 (계약 후 수정 불가용)
 #}
+{# 계약 후 수정 불가 플래그: 승인된 개인계약이 있을 때 #}
+{% set is_contract_readonly = has_person_contract %}
+
 <section class="form-section" id="salary-info">
     <div class="card">
         <div class="card-header">
             <h2 class="card-title">
                 <i class="fas fa-won-sign"></i>
                 급여정보
+                {% if is_contract_readonly %}<small class="text-muted">(계약 확정)</small>{% endif %}
             </h2>
+            {% if not is_contract_readonly %}
             <button type="button" class="btn btn-outline-primary btn-sm" id="openSalaryCalculatorBtn">
                 <i class="fas fa-calculator"></i>
                 포괄임금 계산기
             </button>
+            {% endif %}
         </div>
         <div class="card-body">
             <!-- 포괄임금제 요약 (계산기 사용 시 표시) -->
@@ -41,43 +48,49 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="base_salary" class="form-label">기본급</label>
-                    <input type="number" id="base_salary" name="base_salary" class="form-input"
+                    <input type="number" id="base_salary" name="base_salary" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ salary.base_salary if salary and salary.base_salary else '' }}"
-                           placeholder="3000000">
-                    <small class="form-help">월 기본급 (원)</small>
+                           placeholder="3000000"
+                           {% if is_contract_readonly %}readonly disabled{% endif %}>
+                    {% if not is_contract_readonly %}<small class="form-help">월 기본급 (원)</small>{% endif %}
                 </div>
 
                 <div class="form-group">
                     <label for="position_allowance" class="form-label">직책수당</label>
-                    <input type="number" id="position_allowance" name="position_allowance" class="form-input"
+                    <input type="number" id="position_allowance" name="position_allowance" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ salary.position_allowance if salary and salary.position_allowance else '' }}"
-                           placeholder="200000">
+                           placeholder="200000"
+                           {% if is_contract_readonly %}readonly disabled{% endif %}>
                 </div>
 
                 <div class="form-group">
                     <label for="meal_allowance" class="form-label">식대</label>
-                    <input type="number" id="meal_allowance" name="meal_allowance" class="form-input"
+                    <input type="number" id="meal_allowance" name="meal_allowance" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ salary.meal_allowance if salary and salary.meal_allowance else '' }}"
-                           placeholder="100000">
+                           placeholder="100000"
+                           {% if is_contract_readonly %}readonly disabled{% endif %}>
                 </div>
 
                 <div class="form-group">
                     <label for="transport_allowance" class="form-label">교통비</label>
-                    <input type="number" id="transport_allowance" name="transport_allowance" class="form-input"
+                    <input type="number" id="transport_allowance" name="transport_allowance" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ salary.transport_allowance if salary and salary.transport_allowance else '' }}"
-                           placeholder="100000">
+                           placeholder="100000"
+                           {% if is_contract_readonly %}readonly disabled{% endif %}>
                 </div>
 
                 <div class="form-group">
                     <label for="bonus_rate" class="form-label">상여금률 (%)</label>
-                    <input type="number" id="bonus_rate" name="bonus_rate" class="form-input"
+                    <input type="number" id="bonus_rate" name="bonus_rate" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ salary.bonus_rate if salary and salary.bonus_rate else '' }}"
-                           placeholder="200" step="1" min="0" max="1000">
+                           placeholder="200" step="1" min="0" max="1000"
+                           {% if is_contract_readonly %}readonly disabled{% endif %}>
                 </div>
 
                 <div class="form-group">
                     <label for="pay_type" class="form-label">급여 지급방식</label>
-                    <select id="pay_type" name="pay_type" class="form-input">
+                    <select id="pay_type" name="pay_type" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                            {% if is_contract_readonly %}disabled{% endif %}>
                         <option value="">선택하세요</option>
                         <option value="monthly" {% if salary and salary.pay_type == 'monthly' %}selected{% endif %}>월급</option>
                         <option value="hourly" {% if salary and salary.pay_type == 'hourly' %}selected{% endif %}>시급</option>
@@ -88,7 +101,8 @@
 
                 <div class="form-group">
                     <label for="bank_name" class="form-label">은행</label>
-                    <select id="bank_name" name="bank_name" class="form-input">
+                    <select id="bank_name" name="bank_name" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                            {% if is_contract_readonly %}disabled{% endif %}>
                         <option value="">선택하세요</option>
                         {% for bank in ['국민은행', '신한은행', '우리은행', '하나은행', 'NH농협', '기업은행', 'SC제일은행', '케이뱅크', '카카오뱅크', '토스뱅크'] %}
                         <option value="{{ bank }}" {% if salary and salary.bank_name == bank %}selected{% endif %}>{{ bank }}</option>
@@ -98,9 +112,10 @@
 
                 <div class="form-group">
                     <label for="account_number" class="form-label">계좌번호</label>
-                    <input type="text" id="account_number" name="account_number" class="form-input"
+                    <input type="text" id="account_number" name="account_number" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ salary.account_number if salary and salary.account_number else '' }}"
-                           placeholder="123-456-789012">
+                           placeholder="123-456-789012"
+                           {% if is_contract_readonly %}readonly disabled{% endif %}>
                 </div>
             </div>
 

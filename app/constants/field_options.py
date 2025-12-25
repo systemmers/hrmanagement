@@ -99,6 +99,15 @@ class FieldOptions:
         Option('intern', '인턴'),
     ]
 
+    # 계약 상태 옵션 (PersonCorporateContract.status용)
+    CONTRACT_STATUS = [
+        Option('requested', '계약진행중'),
+        Option('approved', '계약완료'),
+        Option('rejected', '거절됨'),
+        Option('terminated', '종료됨'),
+        Option('expired', '만료됨'),
+    ]
+
     # ========================================
     # 학력정보 옵션
     # ========================================
@@ -309,6 +318,7 @@ class FieldOptions:
             'EMPLOYEE_STATUS_OPTIONS': cls.EMPLOYEE_STATUS,
             'EMPLOYMENT_TYPE_OPTIONS': cls.EMPLOYMENT_TYPE,
             'CONTRACT_TYPE_OPTIONS': cls.CONTRACT_TYPE,
+            'CONTRACT_STATUS_OPTIONS': cls.CONTRACT_STATUS,
             'WORKING_HOURS_OPTIONS': cls.WORKING_HOURS,
             'BREAK_TIME_OPTIONS': cls.BREAK_TIME,
             # 학력정보

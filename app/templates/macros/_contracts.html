@@ -14,9 +14,9 @@
 {# 계약 상태 배지 #}
 {% macro contract_status_badge(status) %}
 {% if status == 'approved' %}
-<span class="badge badge-success">활성</span>
+<span class="badge badge-success">계약완료</span>
 {% elif status == 'requested' %}
-<span class="badge badge-warning">대기 중</span>
+<span class="badge badge-warning">계약진행중</span>
 {% elif status == 'rejected' %}
 <span class="badge badge-danger">거절됨</span>
 {% elif status == 'terminated' %}
@@ -31,8 +31,8 @@
 {# 상태 배지 (테이블용) #}
 {% macro status_badge(status) %}
 <span class="status-badge status-{{ status }}">
-{% if status == 'approved' %}활성
-{% elif status == 'requested' %}대기 중
+{% if status == 'approved' %}계약완료
+{% elif status == 'requested' %}계약진행중
 {% elif status == 'rejected' %}거절됨
 {% elif status == 'terminated' %}종료됨
 {% elif status == 'expired' %}만료됨
@@ -59,7 +59,7 @@
         </div>
         <div class="stat-content">
             <span class="stat-value">{{ stats.active or 0 }}</span>
-            <span class="stat-label">활성 계약</span>
+            <span class="stat-label">계약완료</span>
         </div>
     </div>
     <div class="stat-card">
@@ -68,7 +68,7 @@
         </div>
         <div class="stat-content">
             <span class="stat-value">{{ stats.pending or 0 }}</span>
-            <span class="stat-label">대기 중</span>
+            <span class="stat-label">계약진행중</span>
         </div>
     </div>
 </div>
@@ -92,7 +92,7 @@
         </div>
         <div class="stat-content">
             <span class="stat-value">{{ stats.active or 0 }}</span>
-            <span class="stat-label">활성 계약</span>
+            <span class="stat-label">계약완료</span>
         </div>
     </div>
     <div class="stat-card">
@@ -101,7 +101,7 @@
         </div>
         <div class="stat-content">
             <span class="stat-value">{{ stats.pending or 0 }}</span>
-            <span class="stat-label">대기 중</span>
+            <span class="stat-label">계약진행중</span>
         </div>
     </div>
     <div class="stat-card">
@@ -332,8 +332,8 @@
     <div class="filter-group">
         <select id="statusFilter" class="filter-select">
             <option value="">전체 상태</option>
-            <option value="approved">활성</option>
-            <option value="requested">대기 중</option>
+            <option value="approved">계약완료</option>
+            <option value="requested">계약진행중</option>
             <option value="rejected">거절됨</option>
             <option value="terminated">종료됨</option>
         </select>

@@ -9,6 +9,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, session
 from ...constants.session_keys import SessionKeys, UserRole, AccountType
 from ...utils.decorators import login_required, manager_or_admin_required
 from ...services.employee_service import employee_service
+from ...models.person_contract import PersonCorporateContract
 from .helpers import verify_employee_access
 
 
@@ -84,6 +85,33 @@ def register_detail_routes(bp: Blueprint):
         business_card_back = employee_service.get_attachment_by_category(employee_id, 'business_card_back')
         classification_options = employee_service.get_all_classification_options()
 
+        from ...extensions import user_repo
+
+        # 개인계약 존재 여부 확인 (개인정보 수정 제한용)
+        # 개인계약을 먼저 조회하여 linked_user 결정에 활용
+        company_id = session.get(SessionKeys.COMPANY_ID)
+        has_person_contract = False
+        person_contract = None
+
+        if company_id:
+            # 1차: employee_number로 approved 계약 조회
+            if employee.employee_number:
+                person_contract = PersonCorporateContract.query.filter_by(
+                    employee_number=employee.employee_number,
+                    company_id=company_id,
+                    status=PersonCorporateContract.STATUS_APPROVED
+                ).first()
+
+            has_person_contract = person_contract is not None
+
+        # 연결된 계정 조회 (계정정보 섹션용)
+        # 개인계약이 있으면 person_user_id로 조회 (다중 법인 계약 지원)
+        # 없으면 User.employee_id로 직접 조회 (법인 직접 생성 계정)
+        if person_contract:
+            linked_user = user_repo.get_model_by_id(person_contract.person_user_id)
+        else:
+            linked_user = user_repo.get_by_employee_id(employee_id)
+
         return render_template('profile/edit.html',
                                employee=employee,
                                action='update',
@@ -98,7 +126,10 @@ def register_detail_routes(bp: Blueprint):
                                hr_project_list=list(employee.hr_projects),
                                project_participation_list=list(employee.project_participations),
                                salary=employee.salary,
-                               insurance=employee.insurance)
+                               insurance=employee.insurance,
+                               has_person_contract=has_person_contract,
+                               person_contract=person_contract,
+                               user=linked_user)
 
     # ========================================
     # 레거시 리다이렉트 라우트
@@ -156,11 +187,33 @@ def _render_employee_full_view(employee_id, employee):
     business_card_front = employee_service.get_attachment_by_category(employee_id, 'business_card_front')
     business_card_back = employee_service.get_attachment_by_category(employee_id, 'business_card_back')
 
+    from ...extensions import user_repo
+
     # 명함 편집 권한 체크
     can_edit_business_card = (
         session.get(SessionKeys.USER_ROLE) == UserRole.ADMIN or
         (session.get(SessionKeys.USER_ROLE) == UserRole.EMPLOYEE and session.get(SessionKeys.EMPLOYEE_ID) == employee_id)
     )
+
+    # 개인계약 조회 (동기화 버튼용 + 계정정보 섹션용)
+    # 개인계약을 먼저 조회하여 linked_user 결정에 활용
+    company_id = session.get(SessionKeys.COMPANY_ID)
+    person_contract = None
+    emp_number = employee.get('employee_number') if isinstance(employee, dict) else getattr(employee, 'employee_number', None)
+    if company_id and emp_number:
+        person_contract = PersonCorporateContract.query.filter_by(
+            employee_number=emp_number,
+            company_id=company_id,
+            status=PersonCorporateContract.STATUS_APPROVED
+        ).first()
+
+    # 연결된 계정 조회 (계정정보 섹션용)
+    # 개인계약이 있으면 person_user_id로 조회 (다중 법인 계약 지원)
+    # 없으면 User.employee_id로 직접 조회 (법인 직접 생성 계정)
+    if person_contract:
+        linked_user = user_repo.get_model_by_id(person_contract.person_user_id)
+    else:
+        linked_user = user_repo.get_by_employee_id(employee_id)
 
     return render_template('profile/detail.html',
                            employee=employee,
@@ -190,4 +243,6 @@ def _render_employee_full_view(employee_id, employee):
                            attachment_list=attachment_list,
                            business_card_front=business_card_front,
                            business_card_back=business_card_back,
-                           can_edit_business_card=can_edit_business_card)
+                           can_edit_business_card=can_edit_business_card,
+                           person_contract=person_contract,
+                           user=linked_user)

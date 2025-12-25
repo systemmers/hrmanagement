@@ -455,7 +455,18 @@ class EmployeeService:
         org_id = form_data.get('organization_id')
         organization_id = int(org_id) if org_id and str(org_id).strip() else None
 
+        # 수정 시 기존 employee의 company_id, organization_id 보존 (중요: 손실 방지)
+        company_id = None
+        if employee_id:
+            existing = db.session.get(Employee, employee_id)
+            if existing:
+                company_id = existing.company_id
+                # organization_id가 폼에 없으면 기존 값 보존
+                if not organization_id:
+                    organization_id = existing.organization_id
+
         return Employee(
+            company_id=company_id,
             id=employee_id,
             name=form_data.get('name', ''),
             photo=form_data.get('photo') or '/static/images/face/face_01_m.png',

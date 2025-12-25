@@ -94,10 +94,11 @@ def register_list_routes(bp: Blueprint):
             contract_status = 'no_account'
 
             if employee_number and company_id:
-                # Contract.employee_number로 해당 회사의 계약 조회
+                # Contract.employee_number로 해당 회사의 계약 조회 (approved만)
                 contract = PersonCorporateContract.query.filter_by(
                     employee_number=employee_number,
-                    company_id=company_id
+                    company_id=company_id,
+                    status=PersonCorporateContract.STATUS_APPROVED
                 ).first()
 
                 if contract:

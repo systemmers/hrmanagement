@@ -1,19 +1,27 @@
 {#
     직원 폼 - 계약정보 섹션
     employee: 직원 객체 (수정 모드일 때)
+    has_person_contract: 승인된 개인계약 존재 여부 (계약 후 수정 불가용)
+    주의: status 필드는 관리자가 변경 가능해야 하므로 readonly 제외
 #}
+{# 계약 후 수정 불가 플래그: 승인된 개인계약이 있을 때 #}
+{% set is_contract_readonly = has_person_contract %}
+
 {% from 'macros/_cards.html' import form_section_card %}
 
-{% call form_section_card('계약정보', 'fas fa-file-contract', 'contract-info') %}
+{% call form_section_card('계약정보' ~ (' (계약 확정)' if is_contract_readonly else ''), 'fas fa-file-contract', 'contract-info') %}
 <div class="form-grid">
     <div class="form-group">
-        <label for="hire_date" class="form-label">입사일 <span class="required">*</span></label>
-        <input type="date" id="hire_date" name="hire_date" class="form-input"
-               value="{{ employee.hire_date if employee else '' }}" required>
+        <label for="hire_date" class="form-label">입사일 {% if not is_contract_readonly %}<span class="required">*</span>{% endif %}</label>
+        <input type="date" id="hire_date" name="hire_date" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+               value="{{ employee.hire_date if employee else '' }}"
+               {% if not is_contract_readonly %}required{% endif %}
+               {% if is_contract_readonly %}readonly disabled{% endif %}>
     </div>
 
     <div class="form-group">
         <label for="status" class="form-label">재직 상태 <span class="required">*</span></label>
+        {# status 필드는 관리자가 변경 가능해야 하므로 readonly 제외 #}
         <select id="status" name="status" class="form-input" required>
             {% for opt in EMPLOYEE_STATUS_OPTIONS %}
             <option value="{{ opt.value }}" {% if employee and employee.status == opt.value %}selected{% endif %}>{{ opt.label }}</option>
@@ -23,7 +31,8 @@
 
     <div class="form-group">
         <label for="employment_type" class="form-label">고용형태</label>
-        <select id="employment_type" name="employment_type" class="form-input">
+        <select id="employment_type" name="employment_type" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                {% if is_contract_readonly %}disabled{% endif %}>
             <option value="">선택하세요</option>
             {% for opt in EMPLOYMENT_TYPE_OPTIONS %}
             <option value="{{ opt.value }}" {% if employee and employee.employment_type == opt.value %}selected{% endif %}>{{ opt.label }}</option>
@@ -33,21 +42,24 @@
 
     <div class="form-group">
         <label for="contract_period" class="form-label">계약기간</label>
-        <input type="text" id="contract_period" name="contract_period" class="form-input"
+        <input type="text" id="contract_period" name="contract_period" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
                value="{{ employee.contract_period if employee and employee.contract_period else '' }}"
-               placeholder="2024.01.01 ~ 2024.12.31">
+               placeholder="2024.01.01 ~ 2024.12.31"
+               {% if is_contract_readonly %}readonly disabled{% endif %}>
     </div>
 
     <div class="form-group">
         <label for="probation_end" class="form-label">수습종료일</label>
-        <input type="date" id="probation_end" name="probation_end" class="form-input"
-               value="{{ employee.probation_end if employee and employee.probation_end else '' }}">
+        <input type="date" id="probation_end" name="probation_end" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+               value="{{ employee.probation_end if employee and employee.probation_end else '' }}"
+               {% if is_contract_readonly %}readonly disabled{% endif %}>
     </div>
 
     <div class="form-group">
         <label for="resignation_date" class="form-label">퇴사일</label>
-        <input type="date" id="resignation_date" name="resignation_date" class="form-input"
-               value="{{ employee.resignation_date if employee and employee.resignation_date else '' }}">
+        <input type="date" id="resignation_date" name="resignation_date" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+               value="{{ employee.resignation_date if employee and employee.resignation_date else '' }}"
+               {% if is_contract_readonly %}readonly disabled{% endif %}>
     </div>
 </div>
 {% endcall %}

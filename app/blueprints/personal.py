@@ -538,14 +538,21 @@ def company_card_list():
     """계약된 회사 인사카드 목록
 
     개인 계정이 계약한 법인들의 인사카드 목록을 표시합니다.
+    종료된 계약도 3년 보관 기간 내에는 열람 가능합니다.
     """
     user_id = session.get(SessionKeys.USER_ID)
 
-    # 승인된 계약 목록 조회
-    contracts = personal_service.get_approved_contracts(user_id)
+    # 열람 가능한 모든 계약 조회 (활성 + 종료)
+    contracts = personal_service.get_viewable_contracts(user_id, include_terminated=True)
+
+    # 활성/종료 계약 분리 (템플릿에서 그룹화 표시용)
+    active_contracts = [c for c in contracts if c.get('is_active')]
+    terminated_contracts = [c for c in contracts if not c.get('is_active')]
 
     return render_template('personal/company_card_list.html',
-                           contracts=contracts)
+                           contracts=contracts,
+                           active_contracts=active_contracts,
+                           terminated_contracts=terminated_contracts)
 
 
 @personal_bp.route('/company-cards/<int:contract_id>')
@@ -555,6 +562,7 @@ def company_card_detail(contract_id):
 
     개인 계정의 특정 법인 계약에 대한 인사카드 상세 정보를 표시합니다.
     공유 파셜 템플릿을 사용하여 법인 직원 인사카드와 동일한 구조로 표시합니다.
+    종료된 계약도 3년 보관 기간 내에는 읽기 전용으로 열람 가능합니다.
     """
     user_id = session.get(SessionKeys.USER_ID)
 
@@ -564,6 +572,9 @@ def company_card_detail(contract_id):
     if not card_data:
         flash('인사카드 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('personal.company_card_list'))
+
+    # 종료된 계약 여부
+    is_terminated = card_data.get('is_terminated', False)
 
     return render_template('personal/company_card_detail.html',
                            # 기본 정보
@@ -583,7 +594,7 @@ def company_card_detail(contract_id):
                            military=card_data.get('military'),
                            award_list=card_data.get('award_list', []),
                            family_list=card_data.get('family_list', []),
-                           # 인사기록 정보 - 개인 계정은 데이터 없음 (섹션 숨김 처리용)
+                           # 인사기록 정보 (법인 DB 기반)
                            salary_history_list=card_data.get('salary_history_list', []),
                            salary_payment_list=card_data.get('salary_payment_list', []),
                            promotion_list=card_data.get('promotion_list', []),
@@ -592,9 +603,13 @@ def company_card_detail(contract_id):
                            attendance_summary=card_data.get('attendance_summary'),
                            asset_list=card_data.get('asset_list', []),
                            # 첨부파일 (인사카드에서는 조회 전용)
-                           # 개인 계정 첨부파일은 추후 구현 예정
                            attachment_list=[],
                            is_readonly=True,
+                           # 종료 상태 정보
+                           is_terminated=is_terminated,
+                           terminated_at=card_data.get('terminated_at'),
+                           termination_reason=card_data.get('termination_reason'),
+                           show_termination_notice=is_terminated,
                            # 페이지 모드 및 계정 타입
                            page_mode='hr_card',
                            account_type=AccountType.PERSONAL,

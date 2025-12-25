@@ -13,6 +13,7 @@ import json
 from app.database import db
 from app.models.employee import Employee
 from app.models.personal_profile import PersonalProfile
+from app.models.profile import Profile
 from app.models.person_contract import (
     PersonCorporateContract,
     DataSharingSettings,
@@ -117,6 +118,7 @@ class SyncService:
             'certificates': False,
             'languages': False,
             'military': False,
+            'family': False,
         }
 
         if not settings:
@@ -142,6 +144,10 @@ class SyncService:
 
         if settings.share_military:
             result['military'] = True
+
+        # family: share_contact가 True면 가족정보도 동기화 (비상연락처/부양가족)
+        if settings.share_contact:
+            result['family'] = True
 
         return result
 
@@ -179,29 +185,37 @@ class SyncService:
         if contract.status != PersonCorporateContract.STATUS_APPROVED:
             return {'success': False, 'error': '승인된 계약만 동기화할 수 있습니다.'}
 
-        profile = PersonalProfile.query.filter_by(
+        personal_profile = PersonalProfile.query.filter_by(
             user_id=contract.person_user_id
         ).first()
-        if not profile:
+        if not personal_profile:
             return {'success': False, 'error': '개인 프로필을 찾을 수 없습니다.'}
 
-        employee = self._find_or_create_employee(contract, profile)
+        # 관계 데이터용 Profile 조회 (educations, careers 등)
+        profile = Profile.query.filter_by(
+            user_id=contract.person_user_id
+        ).first()
+
+        employee = self._find_or_create_employee(contract, personal_profile)
         if not employee:
             return {'success': False, 'error': '직원 데이터를 생성/조회할 수 없습니다.'}
 
         syncable = self.get_syncable_fields(contract_id)
         target_fields = fields if fields else syncable['basic'] + syncable['contact']
 
-        # 기본 필드 동기화
+        # 기본 필드 동기화 (PersonalProfile에서)
         basic_result = self._basic_service.sync_personal_to_employee(
-            contract_id, profile, employee, target_fields,
+            contract_id, personal_profile, employee, target_fields,
             self._get_employee_field, sync_type
         )
 
-        # 관계 데이터 동기화
-        relation_result = self._relation_service.sync_relations(
-            contract_id, profile, employee, syncable, sync_type
-        )
+        # 관계 데이터 동기화 (Profile에서, Profile이 있는 경우에만)
+        if profile:
+            relation_result = self._relation_service.sync_relations(
+                contract_id, profile, employee, syncable, sync_type
+            )
+        else:
+            relation_result = {'synced_relations': [], 'changes': [], 'log_ids': []}
 
         db.session.commit()
 
@@ -388,6 +402,7 @@ class SyncService:
             'name': profile.name,
             'email': profile.email,
             'phone': profile.mobile_phone,
+            'company_id': contract.company_id,  # 명시적 설정 (손실 방지)
             'organization_id': company.root_organization_id if company else None,
             'department': contract.department,
             'position': contract.position,

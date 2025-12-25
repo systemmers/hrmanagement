@@ -15,8 +15,14 @@
 
 <div class="content-card">
     {% if contracts %}
+
+    {% if active_contracts %}
+    <h3 class="section-subtitle">
+        <i class="fas fa-check-circle" style="color: var(--color-success);"></i>
+        현재 계약
+    </h3>
     <div class="company-card-grid">
-        {% for contract in contracts %}
+        {% for contract in active_contracts %}
         <a href="{{ url_for('personal.company_card_detail', contract_id=contract.id) }}" class="company-card-item">
             <div class="company-card-logo">
                 {% if contract.company_logo %}
@@ -54,10 +60,69 @@
         </a>
         {% endfor %}
     </div>
+    {% endif %}
+
+    {% if terminated_contracts %}
+    <h3 class="section-subtitle" style="margin-top: 32px;">
+        <i class="fas fa-archive" style="color: var(--color-warning);"></i>
+        종료된 계약
+        <span class="section-subtitle-info">(보관용 - 읽기 전용)</span>
+    </h3>
+    <div class="company-card-grid terminated-section">
+        {% for contract in terminated_contracts %}
+        <a href="{{ url_for('personal.company_card_detail', contract_id=contract.id) }}" class="company-card-item terminated">
+            <div class="contract-status-badge terminated">
+                <i class="fas fa-archive"></i>
+                종료됨
+            </div>
+            <div class="company-card-logo">
+                {% if contract.company_logo %}
+                <img src="{{ contract.company_logo }}" alt="{{ contract.company_name }}">
+                {% else %}
+                <i class="fas fa-building"></i>
+                {% endif %}
+            </div>
+            <div class="company-card-info">
+                <h3 class="company-card-name">{{ contract.company_name }}</h3>
+                <div class="company-card-meta">
+                    {% if contract.department %}
+                    <span class="meta-item">
+                        <i class="fas fa-sitemap"></i>
+                        {{ contract.department }}
+                    </span>
+                    {% endif %}
+                    {% if contract.position %}
+                    <span class="meta-item">
+                        <i class="fas fa-user-tie"></i>
+                        {{ contract.position }}
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="company-card-date">
+                    <i class="fas fa-calendar-check"></i>
+                    {{ contract.contract_start_date.strftime('%Y.%m.%d') if contract.contract_start_date else '계약일 미정' }}
+                    ~
+                    {{ contract.contract_end_date.strftime('%Y.%m.%d') if contract.contract_end_date else '진행중' }}
+                </div>
+                {% if contract.terminated_at %}
+                <div class="company-card-terminated-date">
+                    <i class="fas fa-calendar-times"></i>
+                    {{ contract.terminated_at.strftime('%Y.%m.%d') }} 종료
+                </div>
+                {% endif %}
+            </div>
+            <div class="company-card-arrow">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     {% else %}
     <div class="empty-state">
         <i class="fas fa-building"></i>
-        <h3>계약된 회사가 없습니다</h3>
+        <h3>계약 이력이 없습니다</h3>
         <p>법인과의 계약이 승인되면 여기에 인사카드가 표시됩니다.</p>
         <a href="{{ url_for('contracts.pending_contracts') }}" class="btn btn-primary">
             <i class="fas fa-clock"></i>
@@ -66,4 +131,58 @@
     </div>
     {% endif %}
 </div>
+
+<style>
+.section-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+.section-subtitle-info {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--color-text-muted);
+}
+
+.company-card-item.terminated {
+    position: relative;
+    opacity: 0.85;
+    border-left: 4px solid var(--color-warning);
+}
+
+.contract-status-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.contract-status-badge.terminated {
+    background-color: #fef3cd;
+    color: #856404;
+}
+
+.company-card-terminated-date {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--color-warning-dark, #856404);
+}
+
+.terminated-section {
+    opacity: 0.95;
+}
+</style>
 {% endblock %}

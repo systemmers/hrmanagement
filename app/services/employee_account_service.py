@@ -358,6 +358,7 @@ class EmployeeAccountService:
                 organization_id = company.root_organization_id
 
         employee = Employee(
+            company_id=company_id,  # 명시적 설정 (손실 방지)
             name=employee_data.get('name', ''),
             photo=employee_data.get('photo') or '/static/images/face/face_01_m.png',
             department=employee_data.get('department', ''),

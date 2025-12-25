@@ -35,8 +35,8 @@
                 계약 정보
             </h2>
             <span class="status-badge status-{{ contract.status }}">
-                {% if contract.status == 'approved' %}활성
-                {% elif contract.status == 'requested' %}대기 중
+                {% if contract.status == 'approved' %}계약완료
+                {% elif contract.status == 'requested' %}계약진행중
                 {% elif contract.status == 'rejected' %}거절됨
                 {% elif contract.status == 'terminated' %}종료됨
                 {% elif contract.status == 'expired' %}만료됨

@@ -49,9 +49,9 @@
                         {% if emp.contract_status == 'none' %}
                         <span class="badge badge-secondary">계약 없음</span>
                         {% elif emp.contract_status == 'requested' %}
-                        <span class="badge badge-warning">요청됨</span>
+                        <span class="badge badge-warning">계약진행중</span>
                         {% elif emp.contract_status == 'pending' %}
-                        <span class="badge badge-warning">대기중</span>
+                        <span class="badge badge-warning">계약진행중</span>
                         {% else %}
                         <span class="badge badge-secondary">{{ emp.contract_status }}</span>
                         {% endif %}
@@ -64,7 +64,7 @@
                             <i class="fas fa-file-contract"></i> 계약 요청
                         </button>
                         {% elif emp.contract_status == 'requested' %}
-                        <span class="text-muted">요청 대기중</span>
+                        <span class="text-muted">계약진행중</span>
                         {% else %}
                         <span class="text-muted">-</span>
                         {% endif %}

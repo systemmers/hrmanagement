@@ -124,6 +124,69 @@ def sync_employee_to_personal(contract_id):
         return jsonify(result), 400
 
 
+@sync_bp.route('/full-sync/<int:contract_id>', methods=['POST'])
+@login_required
+@corporate_account_required
+@contract_access_required
+def full_sync_from_corporate(contract_id):
+    """
+    법인 관리자용 전체 동기화
+
+    기존 계약에 대해 DataSharingSettings를 전체 True로 설정하고
+    모든 데이터를 동기화합니다.
+
+    Response:
+    {
+        "success": true,
+        "synced_fields": [...],
+        "changes": [...],
+        "relations": [...]
+    }
+    """
+    from app.models.person_contract import DataSharingSettings
+    from app.database import db
+
+    user_id = session.get(SessionKeys.USER_ID)
+    sync_service.set_current_user(user_id)
+
+    # 계약 확인
+    contract = PersonCorporateContract.query.get(contract_id)
+    if not contract:
+        return jsonify({'success': False, 'error': '계약을 찾을 수 없습니다.'}), 404
+
+    if contract.status != PersonCorporateContract.STATUS_APPROVED:
+        return jsonify({'success': False, 'error': '승인된 계약만 동기화할 수 있습니다.'}), 400
+
+    # DataSharingSettings 생성 또는 업데이트 (전체 공유)
+    settings = DataSharingSettings.query.filter_by(contract_id=contract_id).first()
+    if not settings:
+        settings = DataSharingSettings(contract_id=contract_id)
+        db.session.add(settings)
+
+    # 모든 공유 설정을 True로
+    settings.share_basic_info = True
+    settings.share_contact = True
+    settings.share_education = True
+    settings.share_career = True
+    settings.share_certificates = True
+    settings.share_languages = True
+    settings.share_military = True
+    db.session.flush()
+
+    # 전체 동기화 실행
+    result = sync_service.sync_personal_to_employee(
+        contract_id=contract_id,
+        sync_type=SyncLog.SYNC_TYPE_MANUAL
+    )
+
+    if result.get('success'):
+        db.session.commit()
+        return jsonify(result)
+    else:
+        db.session.rollback()
+        return jsonify(result), 400
+
+
 @sync_bp.route('/all-contracts', methods=['POST'])
 @login_required
 @personal_account_required

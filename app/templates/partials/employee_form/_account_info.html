@@ -112,8 +112,8 @@
     </div>
 </section>
 
-{% elif action == 'update' and user %}
-{# 수정 모드: 연결된 계정 정보 표시 (읽기 전용) #}
+{% elif (action == 'update' or action == 'view') and user %}
+{# 수정/상세 모드: 연결된 계정 정보 표시 (읽기 전용) #}
 <section class="form-section" id="account-info" aria-labelledby="account-info-title">
     <div class="card">
         <div class="card-header">

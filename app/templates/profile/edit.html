@@ -86,6 +86,14 @@
         </div>
         {% endif %}
 
+        {# 개인계약 연동 안내 (법인 관리자용) #}
+        {% if has_person_contract %}
+        <div class="alert alert-warning alert-info-box">
+            <i class="fas fa-link"></i>
+            <span>이 직원은 개인 계정과 연동되어 있습니다. 개인 기본정보, 학력, 경력 등은 개인 계정에서 관리되며, 동기화를 통해 업데이트됩니다.</span>
+        </div>
+        {% endif %}
+
         {# 계정 타입별 폼 액션 설정 #}
         {% if is_corporate and account_type != 'corporate_admin' %}
             {% if is_create_mode %}
@@ -107,7 +115,8 @@
             {% include 'partials/employee_form/_personal_info.html' %}
 
             {# 인사카드 전용: 계정정보 (21번/22번 원칙 - 직원 등록 시 계정 동시 생성) #}
-            {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
+            {# 법인 계정만 표시 (개인 계정은 계정정보 섹션 불필요) #}
+            {% if page_mode == 'hr_card' and is_corporate and account_type != 'corporate_admin' %}
                 {% include 'partials/employee_form/_account_info.html' %}
             {% endif %}
 

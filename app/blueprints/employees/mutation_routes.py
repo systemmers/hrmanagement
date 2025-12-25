@@ -10,6 +10,7 @@ from datetime import datetime
 from flask import Blueprint, request, redirect, url_for, flash, session, render_template
 
 from ...constants.session_keys import SessionKeys, UserRole, AccountType
+from ...models.person_contract import PersonCorporateContract
 from ...utils.employee_number import generate_employee_number
 from ...utils.decorators import login_required, admin_required, manager_or_admin_required
 from ...utils.tenant import get_current_organization_id
@@ -24,6 +25,133 @@ from .helpers import (
     get_business_card_folder, generate_unique_filename
 )
 from ...extensions import organization_repo
+
+
+# ========================================
+# 개인정보 보호 상수 및 헬퍼
+# ========================================
+
+# 개인 계정에서만 수정 가능한 필드 목록 (법인에서 수정 불가)
+PERSONAL_PROTECTED_FIELDS = [
+    'name', 'english_name', 'name_en', 'birth_date', 'gender',
+    'nationality', 'resident_number', 'rrn', 'mobile_phone', 'home_phone',
+    'address', 'detailed_address', 'postal_code',
+    'blood_type', 'religion', 'hobby', 'specialty',
+    'marital_status', 'emergency_contact_name', 'emergency_contact_phone',
+    'emergency_contact_relation',
+]
+
+# 계약 후 수정 불가 필드 목록 (승인된 개인계약 존재 시 수정 불가)
+# 주의: status 필드는 관리자가 변경 가능해야 하므로 제외
+CONTRACT_PROTECTED_FIELDS = [
+    # 소속정보
+    'organization_id', 'department', 'team', 'position', 'job_grade',
+    'job_title', 'job_role', 'work_location', 'internal_phone', 'company_email',
+    # 계약정보 (status 제외)
+    'hire_date', 'employment_type', 'contract_period', 'probation_end',
+    # 급여정보
+    'base_salary', 'position_allowance', 'meal_allowance', 'transport_allowance',
+    'bonus_rate', 'pay_type', 'bank_name', 'account_number',
+    'annual_salary', 'hourly_wage', 'overtime_hours', 'overtime_allowance',
+    'night_hours', 'night_allowance', 'holiday_days', 'holiday_allowance',
+    # 4대보험
+    'national_pension_number', 'national_pension_date',
+    'health_insurance_number', 'health_insurance_date',
+    'employment_insurance_number', 'employment_insurance_date',
+    'industrial_insurance_number', 'industrial_insurance_date',
+    'pension_exempt', 'health_exempt', 'employment_exempt',
+]
+
+
+def _has_person_contract(employee_id: int, company_id: int) -> bool:
+    """직원이 개인 계정과 연동된 계약이 있는지 확인
+
+    Args:
+        employee_id: 직원 ID
+        company_id: 회사 ID
+
+    Returns:
+        개인 계약 존재 여부
+    """
+    if not employee_id or not company_id:
+        return False
+
+    employee = employee_service.get_employee_by_id(employee_id)
+    if not employee:
+        return False
+
+    employee_number = employee.get('employee_number') if isinstance(employee, dict) else employee.employee_number
+    if not employee_number:
+        return False
+
+    contract = PersonCorporateContract.query.filter_by(
+        employee_number=employee_number,
+        company_id=company_id,
+        status=PersonCorporateContract.STATUS_APPROVED
+    ).first()
+
+    return contract is not None
+
+
+def _filter_personal_fields(form_data: dict, employee_id: int) -> dict:
+    """법인 계정에서 개인 정보 필드 필터링 (보안 강화)
+
+    개인 계약이 있는 직원의 경우, 법인 계정에서 개인 정보 필드를 수정하지 못하도록 필터링
+
+    Args:
+        form_data: 폼에서 추출한 데이터
+        employee_id: 직원 ID
+
+    Returns:
+        필터링된 데이터
+    """
+    account_type = session.get(SessionKeys.ACCOUNT_TYPE)
+    company_id = session.get(SessionKeys.COMPANY_ID)
+
+    # 법인 계정이 아니면 필터링 불필요
+    if account_type != AccountType.CORPORATE:
+        return form_data
+
+    # 개인 계약 존재 여부 확인
+    if not _has_person_contract(employee_id, company_id):
+        return form_data
+
+    # 개인 정보 필드 제거
+    filtered_data = form_data.copy()
+    for field in PERSONAL_PROTECTED_FIELDS:
+        filtered_data.pop(field, None)
+
+    return filtered_data
+
+
+def _filter_contract_fields(form_data: dict, employee_id: int) -> dict:
+    """계약 후 보호 필드 필터링 (승인된 개인계약 없으면 수정 가능)
+
+    승인된 개인계약이 있는 직원의 경우, 계약 관련 필드를 수정하지 못하도록 필터링
+    조건 통일: 템플릿의 has_person_contract와 동일한 조건 사용
+
+    Args:
+        form_data: 폼에서 추출한 데이터
+        employee_id: 직원 ID
+
+    Returns:
+        필터링된 데이터
+    """
+    if not employee_id:
+        return form_data
+
+    company_id = session.get(SessionKeys.COMPANY_ID)
+
+    # 승인된 개인계약 존재 여부 확인 (템플릿과 동일한 조건)
+    if not _has_person_contract(employee_id, company_id):
+        return form_data  # 계약 없으면 수정 가능
+
+    # 승인된 개인계약이 있으면 계약 관련 필드 제거
+    filtered_data = form_data.copy()
+    for field in CONTRACT_PROTECTED_FIELDS:
+        filtered_data.pop(field, None)
+
+    return filtered_data
 
 
 def register_mutation_routes(bp: Blueprint):
@@ -83,6 +211,10 @@ def register_mutation_routes(bp: Blueprint):
                 # organization_id 자동 설정
                 if org_id and not employee.organization_id:
                     employee.organization_id = org_id
+
+                # company_id 명시적 설정 (손실 방지)
+                if company_id and not employee.company_id:
+                    employee.company_id = company_id
 
                 # Employee 객체를 Dict로 변환하여 service에 전달
                 employee_data = employee.to_dict() if hasattr(employee, 'to_dict') else vars(employee)
@@ -198,6 +330,13 @@ def register_mutation_routes(bp: Blueprint):
             employee = extract_employee_from_form(request.form, employee_id=employee_id)
             # Employee 객체를 Dict로 변환하여 전달 (BaseRepository.update는 Dict 기대)
             employee_data = employee.to_dict() if hasattr(employee, 'to_dict') else vars(employee)
+
+            # 개인 계약 연동 직원의 개인 정보 필드 필터링 (보안 강화)
+            employee_data = _filter_personal_fields(employee_data, employee_id)
+
+            # 계약 후 보호 필드 필터링 (계약 확정 시 수정 불가)
+            employee_data = _filter_contract_fields(employee_data, employee_id)
+
             updated_employee = employee_service.update_employee_direct(employee_id, employee_data)
             if updated_employee:
                 # update_employee_direct는 Dict 반환
@@ -235,8 +374,20 @@ def register_mutation_routes(bp: Blueprint):
             original_status = existing_employee.get('status') if existing_employee else None
 
             basic_fields = extract_basic_fields_from_form(request.form)
+
+            # 개인 계약 연동 직원의 개인 정보 필드 필터링 (보안 강화)
+            basic_fields = _filter_personal_fields(basic_fields, employee_id)
+
+            # 계약 후 보호 필드 필터링 (계약 확정 시 수정 불가)
+            basic_fields = _filter_contract_fields(basic_fields, employee_id)
+
             updated_employee = employee_service.update_employee_partial(employee_id, basic_fields)
-            update_family_data(employee_id, request.form)
+
+            # 개인 계약 연동 직원의 가족 정보 수정 차단 (법인에서는 동기화만 가능)
+            company_id = session.get(SessionKeys.COMPANY_ID)
+            account_type = session.get(SessionKeys.ACCOUNT_TYPE)
+            if not (account_type == AccountType.CORPORATE and _has_person_contract(employee_id, company_id)):
+                update_family_data(employee_id, request.form)
 
             if updated_employee:
                 # employee_sub 계정이 프로필 완성한 경우 상태 전환
@@ -275,6 +426,13 @@ def register_mutation_routes(bp: Blueprint):
                 return redirect(url_for('main.index'))
 
         try:
+            # 개인 계약 연동 직원의 이력정보 수정 차단 (법인에서는 동기화만 가능)
+            company_id = session.get(SessionKeys.COMPANY_ID)
+            account_type = session.get(SessionKeys.ACCOUNT_TYPE)
+            if account_type == AccountType.CORPORATE and _has_person_contract(employee_id, company_id):
+                flash('개인 계정 연동 직원의 이력 정보는 동기화를 통해서만 업데이트됩니다.', 'warning')
+                return redirect(url_for('employees.employee_detail', employee_id=employee_id))
+
             update_education_data(employee_id, request.form)
             update_career_data(employee_id, request.form)
             update_certificate_data(employee_id, request.form)

@@ -36,9 +36,39 @@
 
     {# 메인 콘텐츠 #}
     <div class="detail-main-content">
+        {# 종료된 계약 안내 배너 #}
+        {% if show_termination_notice %}
+        <div class="termination-notice-banner">
+            <div class="notice-icon">
+                <i class="fas fa-archive"></i>
+            </div>
+            <div class="notice-content">
+                <h4>종료된 계약의 인사카드입니다</h4>
+                <p>
+                    {{ terminated_at[:10] if terminated_at else '알 수 없음' }} 종료
+                    {% if termination_reason %}
+                    | 사유: {{ termination_reason }}
+                    {% endif %}
+                </p>
+                <p class="notice-info">
+                    <i class="fas fa-info-circle"></i>
+                    이 정보는 법적 보관 의무에 따라 3년간 보관됩니다. 읽기 전용으로만 열람 가능합니다.
+                </p>
+            </div>
+        </div>
+        {% endif %}
+
         {# 페이지 헤더 #}
         <div class="detail-page-header">
-            <h1 class="detail-page-title">{{ company.name }} 인사카드</h1>
+            <h1 class="detail-page-title">
+                {{ company.name }} 인사카드
+                {% if is_terminated %}
+                <span class="status-badge terminated">
+                    <i class="fas fa-archive"></i>
+                    종료됨
+                </span>
+                {% endif %}
+            </h1>
             <div class="detail-page-actions">
                 <a href="{{ url_for('personal.company_card_list') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
@@ -80,4 +110,72 @@
 {% block extra_js %}
 <script type="module" src="{{ url_for('static', filename='js/pages/employee-detail.js') }}"></script>
 <script src="{{ url_for('static', filename='js/components/business-card.js') }}"></script>
+
+<style>
+/* 종료 안내 배너 */
+.termination-notice-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    background-color: #fef3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+}
+
+.termination-notice-banner .notice-icon {
+    font-size: 28px;
+    color: #856404;
+    flex-shrink: 0;
+}
+
+.termination-notice-banner .notice-content {
+    flex: 1;
+}
+
+.termination-notice-banner .notice-content h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #856404;
+}
+
+.termination-notice-banner .notice-content p {
+    margin: 0;
+    font-size: 14px;
+    color: #664d03;
+}
+
+.termination-notice-banner .notice-info {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: 13px;
+    color: #856404;
+}
+
+.termination-notice-banner .notice-info i {
+    margin-right: 4px;
+}
+
+/* 헤더 상태 배지 */
+.status-badge.terminated {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    margin-left: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    background-color: #fef3cd;
+    color: #856404;
+    border-radius: 20px;
+    vertical-align: middle;
+}
+
+.status-badge.terminated i {
+    font-size: 12px;
+}
+</style>
 {% endblock %}
