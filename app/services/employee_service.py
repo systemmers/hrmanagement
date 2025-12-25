@@ -9,6 +9,7 @@ Employee Service
 PersonalService와 동일한 아키텍처 패턴을 적용합니다.
 Phase 2: Service 계층 표준화 - 조회 메서드 추가
 Phase 4.2: SOLID 원칙 적용 - RelationDataUpdater 통합
+Phase 24: Option A 레이어 분리 - Service는 Dict 반환 표준화
 """
 from typing import Any, Dict, List, Optional, Tuple
 from flask import request
@@ -86,11 +87,16 @@ class EmployeeService:
     # 직원 CRUD
     # ========================================
 
-    def get_employee(self, employee_id: int) -> Optional[Employee]:
-        """직원 조회 (접근 권한 확인 포함)"""
+    def get_employee(self, employee_id: int) -> Optional[Dict]:
+        """직원 조회 (접근 권한 확인 포함, Dict 반환)"""
         if not self.verify_access(employee_id):
             return None
-        return self.employee_repo.get_by_id(employee_id)
+        model = self.employee_repo.find_by_id(employee_id)
+        return model.to_dict() if model else None
+
+    def _get_employee_model(self, employee_id: int) -> Optional[Employee]:
+        """내부용: Model이 필요한 경우 (수정/삭제 작업용)"""
+        return self.employee_repo.find_by_id(employee_id)
 
     def get_employees_by_org(self, org_id: int = None) -> List[Employee]:
         """조직별 직원 목록 조회"""
@@ -100,12 +106,16 @@ class EmployeeService:
         return self.employee_repo.get_by_company_id(org_id)
 
     def get_employee_by_id(self, employee_id: int) -> Optional[Dict]:
-        """직원 ID로 조회 (Dict 반환)"""
-        return self.employee_repo.get_by_id(employee_id)
+        """직원 ID로 조회 (Dict 반환)
+
+        Phase 24: find_by_id() + to_dict() 패턴 적용
+        """
+        model = self.employee_repo.find_by_id(employee_id)
+        return model.to_dict() if model else None
 
     def get_employee_model_by_id(self, employee_id: int) -> Optional[Employee]:
-        """직원 ID로 모델 조회"""
-        return self.employee_repo.get_model_by_id(employee_id)
+        """직원 ID로 모델 조회 (템플릿 렌더링용)"""
+        return self.employee_repo.find_by_id(employee_id)
 
     def filter_employees(self, **kwargs) -> List[Dict]:
         """직원 필터링 조회"""
@@ -337,7 +347,7 @@ class EmployeeService:
             if not self.verify_access(employee_id):
                 return False, "접근 권한이 없습니다."
 
-            employee = self.employee_repo.get_by_id(employee_id)
+            employee = self._get_employee_model(employee_id)
             if not employee:
                 return False, "직원을 찾을 수 없습니다."
 
@@ -364,7 +374,7 @@ class EmployeeService:
             if not self.verify_access(employee_id):
                 return False, "접근 권한이 없습니다."
 
-            employee = self.employee_repo.get_by_id(employee_id)
+            employee = self._get_employee_model(employee_id)
             if not employee:
                 return False, "직원을 찾을 수 없습니다."
 
@@ -382,7 +392,7 @@ class EmployeeService:
     def update_basic_info(self, employee_id: int, form_data: Dict) -> Tuple[bool, Optional[str]]:
         """기본 정보만 수정 (연락처, 주소 등)"""
         try:
-            employee = self.employee_repo.get_by_id(employee_id)
+            employee = self._get_employee_model(employee_id)
             if not employee:
                 return False, "직원을 찾을 수 없습니다."
 

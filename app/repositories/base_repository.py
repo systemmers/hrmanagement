@@ -4,6 +4,7 @@ Base Repository 클래스
 SQLAlchemy 기반 공통 CRUD 기능을 제공합니다.
 Phase 6: 백엔드 리팩토링 - 중복 로직 통합
 Phase 8: 제네릭 타입 적용 - IDE 자동완성 및 타입 안전성 강화
+Phase 24: Option A 레이어 분리 - find_by_id() 표준화 (Model 반환)
 """
 from typing import List, Optional, Dict, Any, Type, TypeVar, Generic
 from app.database import db
@@ -47,6 +48,21 @@ class BaseRepository(Generic[ModelType]):
 
     def get_model_by_id(self, record_id: Any) -> Optional[ModelType]:
         """ID로 모델 객체 조회"""
+        return self.model_class.query.get(record_id)
+
+    def find_by_id(self, record_id: Any) -> Optional[ModelType]:
+        """
+        ID로 모델 객체 조회 (신규 표준 메서드)
+
+        Phase 24 Option A: Repository는 Model만 반환
+        Service에서 to_dict() 호출하여 Dict 변환
+
+        Args:
+            record_id: 조회할 레코드 ID
+
+        Returns:
+            모델 객체 또는 None
+        """
         return self.model_class.query.get(record_id)
 
     def create(self, data: Dict) -> Dict:
@@ -135,6 +151,21 @@ class BaseRelationRepository(BaseRepository[ModelType]):
 
     def get_models_by_employee_id(self, employee_id: int) -> List[ModelType]:
         """특정 직원의 모든 레코드를 모델 객체로 조회"""
+        return self.model_class.query.filter_by(employee_id=employee_id).all()
+
+    def find_by_employee_id(self, employee_id: int) -> List[ModelType]:
+        """
+        특정 직원의 모든 레코드 조회 (신규 표준 메서드)
+
+        Phase 24 Option A: Repository는 Model만 반환
+        Service에서 to_dict() 호출하여 Dict 변환
+
+        Args:
+            employee_id: 직원 ID
+
+        Returns:
+            모델 객체 리스트
+        """
         return self.model_class.query.filter_by(employee_id=employee_id).all()
 
     def delete_by_employee_id(self, employee_id: int) -> int:
@@ -258,6 +289,21 @@ class BaseOneToOneRepository(BaseRepository[ModelType]):
 
     def get_model_by_employee_id(self, employee_id: int) -> Optional[ModelType]:
         """특정 직원의 레코드 조회 (1:1) - 모델 객체 반환"""
+        return self.model_class.query.filter_by(employee_id=employee_id).first()
+
+    def find_by_employee_id(self, employee_id: int) -> Optional[ModelType]:
+        """
+        특정 직원의 레코드 조회 (신규 표준 메서드, 1:1 관계)
+
+        Phase 24 Option A: Repository는 Model만 반환
+        Service에서 to_dict() 호출하여 Dict 변환
+
+        Args:
+            employee_id: 직원 ID
+
+        Returns:
+            모델 객체 또는 None
+        """
         return self.model_class.query.filter_by(employee_id=employee_id).first()
 
     def save_for_employee(self, employee_id: int, data: Dict) -> Dict:

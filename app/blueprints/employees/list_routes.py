@@ -6,6 +6,7 @@
 21번 원칙 확장: 직원 계약 상태 표시 및 계약 요청 기능
 Phase 8: 상수 모듈 적용
 Phase 9: 통합 계약 필터 서비스 적용 (N+1 쿼리 제거)
+Phase 24: Option A - isinstance 체크 제거 (Service가 Dict 보장)
 """
 from flask import Blueprint, render_template, request, jsonify, session
 
@@ -87,8 +88,9 @@ def register_list_routes(bp: Blueprint):
             employees_with_contract = []
         else:
             # 벌크 조회: 모든 employee_number에 대해 한번에 계약 조회
+            # Phase 24: filter_employees()가 항상 Dict 리스트 반환하므로 isinstance 불필요
             employee_numbers = [
-                (emp if isinstance(emp, dict) else emp.to_dict()).get('employee_number')
+                emp.get('employee_number')
                 for emp in employees
             ]
             contract_map = contract_filter_service.get_contracts_by_employee_numbers(
@@ -100,23 +102,23 @@ def register_list_routes(bp: Blueprint):
 
             employees_with_contract = []
             for emp in employees:
-                emp_dict = emp if isinstance(emp, dict) else emp.to_dict()
-                employee_number = emp_dict.get('employee_number')
+                # Phase 24: emp는 항상 Dict (isinstance 체크 제거)
+                employee_number = emp.get('employee_number')
 
                 # 퇴사 직원 제외 (resignation_date가 있으면 퇴사 처리된 직원)
-                if emp_dict.get('resignation_date'):
+                if emp.get('resignation_date'):
                     continue
 
                 # 벌크 조회 결과에서 계약 확인
                 contract = contract_map.get(employee_number)
                 if contract:
-                    emp_dict['user_id'] = contract.person_user_id
-                    emp_dict['user_email'] = (
+                    emp['user_id'] = contract.person_user_id
+                    emp['user_email'] = (
                         contract.person_user.email
                         if contract.person_user else None
                     )
-                    emp_dict['contract_status'] = contract.status
-                    employees_with_contract.append(emp_dict)
+                    emp['contract_status'] = contract.status
+                    employees_with_contract.append(emp)
 
         classification_options = employee_service.get_classification_options()
         return render_template('employees/list.html',

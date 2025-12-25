@@ -10,6 +10,8 @@ Contract Service
 21번 원칙 확장:
 - personal 계정: 기존 개인-법인 계약
 - employee_sub 계정: 직원-법인 계약 (동일한 프로세스)
+
+Phase 24: Option A 레이어 분리 - Service는 Dict 반환 표준화
 """
 from typing import Dict, Optional, List, Any, Tuple
 from flask import session
@@ -147,12 +149,16 @@ class ContractService:
     # ========================================
 
     def get_contract_by_id(self, contract_id: int) -> Optional[Dict]:
-        """계약 상세 조회"""
-        return self.contract_repo.get_by_id(contract_id)
+        """계약 상세 조회 (Dict 반환)
+
+        Phase 24: find_by_id() + to_dict() 패턴 적용
+        """
+        model = self.contract_repo.find_by_id(contract_id)
+        return model.to_dict() if model else None
 
     def get_contract_model_by_id(self, contract_id: int):
         """계약 모델 조회 (ORM 객체)"""
-        return self.contract_repo.get_model_by_id(contract_id)
+        return self.contract_repo.find_by_id(contract_id)
 
     def get_sharing_settings(self, contract_id: int) -> Dict:
         """데이터 공유 설정 조회"""

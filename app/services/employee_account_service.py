@@ -8,6 +8,7 @@ Employee Account Service
 
 Phase 1 (Part A): 직원 등록 + 계정 생성
 Phase 2 (Part B): 계약 프로세스 확장 (별도 구현)
+Phase 24: Option A 레이어 분리 - find_by_id() 표준 사용
 """
 import secrets
 import string
@@ -181,8 +182,8 @@ class EmployeeAccountService:
             Tuple[성공여부, 에러메시지]
         """
         try:
-            # Employee 조회
-            employee = self.employee_repo.get_by_id(employee_id)
+            # Employee 조회 (Model 필요 - 상태 변경용)
+            employee = self.employee_repo.find_by_id(employee_id)
             if not employee:
                 return False, "직원을 찾을 수 없습니다."
 
@@ -216,7 +217,7 @@ class EmployeeAccountService:
             Tuple[성공여부, 에러메시지]
         """
         try:
-            employee = self.employee_repo.get_by_id(employee_id)
+            employee = self.employee_repo.find_by_id(employee_id)
             if not employee:
                 return False, "직원을 찾을 수 없습니다."
 

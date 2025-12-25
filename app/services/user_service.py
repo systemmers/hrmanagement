@@ -3,6 +3,7 @@
 
 사용자 인증 및 계정 관리 비즈니스 로직을 제공합니다.
 Phase 2: Service 계층 표준화
+Phase 24: Option A 레이어 분리 - Service는 Dict 반환 표준화
 """
 from typing import Dict, Optional, Any
 
@@ -96,13 +97,16 @@ class UserService:
     def get_by_id(self, user_id: int) -> Optional[Dict]:
         """사용자 ID로 조회 (Dict 반환)
 
+        Phase 24: find_by_id() + to_dict() 패턴 적용
+
         Args:
             user_id: 사용자 ID
 
         Returns:
             User Dict 또는 None
         """
-        return self.user_repo.get_by_id(user_id)
+        model = self.user_repo.find_by_id(user_id)
+        return model.to_dict() if model else None
 
     def get_model_by_id(self, user_id: int) -> Optional[Any]:
         """사용자 ID로 모델 객체 조회
@@ -113,7 +117,7 @@ class UserService:
         Returns:
             User 모델 객체 또는 None
         """
-        return self.user_repo.get_model_by_id(user_id)
+        return self.user_repo.find_by_id(user_id)
 
 
 # 싱글톤 인스턴스

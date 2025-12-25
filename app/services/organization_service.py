@@ -3,6 +3,7 @@
 
 조직 구조 CRUD 및 트리 관리 비즈니스 로직을 제공합니다.
 Phase 2: Service 계층 표준화
+Phase 24: Option A 레이어 분리 - Service는 Dict 반환 표준화
 """
 from typing import Dict, List, Optional, Any
 
@@ -57,7 +58,9 @@ class OrganizationService:
         return self.organization_repo.get_organization_statistics(root_organization_id=root_organization_id)
 
     def get_by_id(self, org_id: int) -> Optional[Dict]:
-        """조직 ID로 조회
+        """조직 ID로 조회 (Dict 반환)
+
+        Phase 24: find_by_id() + to_dict() 패턴 적용
 
         Args:
             org_id: 조직 ID
@@ -65,7 +68,8 @@ class OrganizationService:
         Returns:
             조직 Dict 또는 None
         """
-        return self.organization_repo.get_by_id(org_id)
+        model = self.organization_repo.find_by_id(org_id)
+        return model.to_dict() if model else None
 
     def get_children(self, org_id: int, root_organization_id: int = None) -> List[Dict]:
         """하위 조직 조회
