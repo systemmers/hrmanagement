@@ -20,6 +20,7 @@ from .corporate_admin_profile_service import CorporateAdminProfileService, corpo
 from .employee_service import EmployeeService, employee_service
 from .employee_account_service import EmployeeAccountService, employee_account_service
 from .contract_service import ContractService, contract_service
+from .contract_filter_service import ContractFilterService, contract_filter_service
 from .file_storage_service import (
     FileStorageService, file_storage,
     ALLOWED_EXTENSIONS, ALLOWED_IMAGE_EXTENSIONS,
@@ -52,6 +53,8 @@ __all__ = [
     'employee_account_service',
     'ContractService',
     'contract_service',
+    'ContractFilterService',
+    'contract_filter_service',
     'FileStorageService',
     'file_storage',
     'ALLOWED_EXTENSIONS',

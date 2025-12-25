@@ -5,7 +5,7 @@
 
 21번 원칙 확장: 직원 계약 상태 표시 및 계약 요청 기능
 Phase 8: 상수 모듈 적용
-개선: Employee.employee_number → Contract.employee_number 기반 조회
+Phase 9: 통합 계약 필터 서비스 적용 (N+1 쿼리 제거)
 """
 from flask import Blueprint, render_template, request, jsonify, session
 
@@ -14,8 +14,8 @@ from ...utils.decorators import manager_or_admin_required
 from ...utils.tenant import get_current_organization_id
 from ...services.employee_service import employee_service
 from ...services.contract_service import contract_service
+from ...services.contract_filter_service import contract_filter_service
 from ...extensions import user_repo
-from ...models.person_contract import PersonCorporateContract
 from ...models.user import User
 
 
@@ -80,49 +80,43 @@ def register_list_routes(bp: Blueprint):
             )
 
         # 21번 원칙: 계약 approved인 직원만 표시
+        # Phase 9: 벌크 조회로 N+1 쿼리 제거
         company_id = session.get(SessionKeys.COMPANY_ID)
-        employees_with_contract = []
 
-        for emp in employees:
-            emp_dict = emp if isinstance(emp, dict) else emp.to_dict()
+        if not company_id:
+            employees_with_contract = []
+        else:
+            # 벌크 조회: 모든 employee_number에 대해 한번에 계약 조회
+            employee_numbers = [
+                (emp if isinstance(emp, dict) else emp.to_dict()).get('employee_number')
+                for emp in employees
+            ]
+            contract_map = contract_filter_service.get_contracts_by_employee_numbers(
+                employee_numbers=employee_numbers,
+                company_id=company_id,
+                statuses=['approved'],
+                exclude_resigned=True
+            )
 
-            # 개선: Employee.employee_number → Contract.employee_number 기반 조회
-            # 개인 계정이 여러 회사와 계약 시 각 회사별 Employee가 생성되므로
-            # User.employee_id 역방향 조회는 최신 Employee만 찾음
-            employee_number = emp_dict.get('employee_number')
-            user = None
-            contract_status = 'no_account'
+            employees_with_contract = []
+            for emp in employees:
+                emp_dict = emp if isinstance(emp, dict) else emp.to_dict()
+                employee_number = emp_dict.get('employee_number')
 
-            if employee_number and company_id:
-                # Contract.employee_number로 해당 회사의 계약 조회 (approved만)
-                contract = PersonCorporateContract.query.filter_by(
-                    employee_number=employee_number,
-                    company_id=company_id,
-                    status=PersonCorporateContract.STATUS_APPROVED
-                ).first()
+                # 퇴사 직원 제외 (resignation_date가 있으면 퇴사 처리된 직원)
+                if emp_dict.get('resignation_date'):
+                    continue
 
+                # 벌크 조회 결과에서 계약 확인
+                contract = contract_map.get(employee_number)
                 if contract:
-                    contract_status = contract.status
-                    user = User.query.get(contract.person_user_id)
-
-            # fallback: Contract가 없는 경우 기존 방식 (User.employee_id 역방향 조회)
-            if not user and company_id:
-                user = user_repo.get_by_employee_id(emp_dict.get('id'))
-                if user:
-                    contract_status = contract_service.get_employee_contract_status(
-                        user.id, company_id
-                    ) or 'none'
-
-            # 퇴사 직원 제외 (resignation_date가 있으면 퇴사 처리된 직원)
-            if emp_dict.get('resignation_date'):
-                continue
-
-            # 계약 approved인 직원만 목록에 추가
-            if contract_status == 'approved':
-                emp_dict['user_id'] = user.id if user else None
-                emp_dict['user_email'] = user.email if user else None
-                emp_dict['contract_status'] = contract_status
-                employees_with_contract.append(emp_dict)
+                    emp_dict['user_id'] = contract.person_user_id
+                    emp_dict['user_email'] = (
+                        contract.person_user.email
+                        if contract.person_user else None
+                    )
+                    emp_dict['contract_status'] = contract.status
+                    employees_with_contract.append(emp_dict)
 
         classification_options = employee_service.get_classification_options()
         return render_template('employees/list.html',
