@@ -7,7 +7,6 @@ Phase 2: Service 계층 표준화
 from typing import List, Optional, Dict, Any
 
 from ..extensions import classification_repo
-from ..models.classification_option import ClassificationOption
 
 
 class ClassificationService:
@@ -24,7 +23,8 @@ class ClassificationService:
         Returns:
             분류 옵션 목록
         """
-        return classification_repo.get_all()
+        models = classification_repo.find_all()
+        return [m.to_dict() for m in models]
 
     def get_by_category(self, category: str) -> List[Dict[str, Any]]:
         """
@@ -38,7 +38,7 @@ class ClassificationService:
         """
         return classification_repo.get_by_category(category)
 
-    def get_by_id(self, option_id: int) -> Optional[ClassificationOption]:
+    def get_by_id(self, option_id: int) -> Optional[Dict]:
         """
         ID로 분류 옵션 조회
 
@@ -46,9 +46,10 @@ class ClassificationService:
             option_id: 분류 옵션 ID
 
         Returns:
-            분류 옵션 또는 None
+            분류 옵션 Dict 또는 None
         """
-        return classification_repo.get_by_id(option_id)
+        model = classification_repo.find_by_id(option_id)
+        return model.to_dict() if model else None
 
     # ========================================
     # 부서 관리

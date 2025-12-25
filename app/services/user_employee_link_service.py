@@ -40,7 +40,7 @@ class UserEmployeeLinkService:
         """
         contract = self._contract_repo.get_contract_for_employee(employee_id)
         if contract and contract.person_user_id:
-            return self._user_repo.get_model_by_id(contract.person_user_id)
+            return self._user_repo.find_by_id(contract.person_user_id)
         return None
 
     def get_linked_user_dict(self, employee_id: int) -> Optional[Dict]:
@@ -154,7 +154,7 @@ class UserEmployeeLinkService:
         contracts = self._contract_repo.get_active_contracts_by_person(user_id)
         if contracts:
             # 첫 번째 활성 계약 반환 (employee_sub는 보통 1개만 있음)
-            return self._contract_repo.get_model_by_id(contracts[0].get('id'))
+            return self._contract_repo.find_by_id(contracts[0].get('id'))
         return None
 
     def get_users_with_contract_status_bulk(

@@ -26,7 +26,8 @@ class AttachmentService:
         Returns:
             첨부파일 목록
         """
-        return attachment_repo.get_by_employee_id(employee_id)
+        models = attachment_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_by_category(self, employee_id: int, category: str) -> List[Dict]:
         """

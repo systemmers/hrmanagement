@@ -185,55 +185,68 @@ class EmployeeService:
 
     def get_education_list(self, employee_id: int) -> List[Dict]:
         """학력 목록 조회"""
-        return self.education_repo.get_by_employee_id(employee_id)
+        models = self.education_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_career_list(self, employee_id: int) -> List[Dict]:
         """경력 목록 조회"""
-        return self.career_repo.get_by_employee_id(employee_id)
+        models = self.career_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_certificate_list(self, employee_id: int) -> List[Dict]:
         """자격증 목록 조회"""
-        return self.certificate_repo.get_by_employee_id(employee_id)
+        models = self.certificate_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_family_list(self, employee_id: int) -> List[Dict]:
         """가족 목록 조회"""
-        return self.family_repo.get_by_employee_id(employee_id)
+        models = self.family_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_language_list(self, employee_id: int) -> List[Dict]:
         """어학 목록 조회"""
-        return self.language_repo.get_by_employee_id(employee_id)
+        models = self.language_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_military_info(self, employee_id: int) -> Optional[Dict]:
         """병역 정보 조회"""
-        return self.military_repo.get_by_employee_id(employee_id)
+        model = self.military_repo.find_by_employee_id(employee_id)
+        return model.to_dict() if model else None
 
     def get_salary_info(self, employee_id: int) -> Optional[Dict]:
         """급여 정보 조회"""
-        return self.salary_repo.get_by_employee_id(employee_id)
+        model = self.salary_repo.find_by_employee_id(employee_id)
+        return model.to_dict() if model else None
 
     def get_benefit_info(self, employee_id: int) -> Optional[Dict]:
         """복리후생 정보 조회"""
-        return self.benefit_repo.get_by_employee_id(employee_id)
+        model = self.benefit_repo.find_by_employee_id(employee_id)
+        return model.to_dict() if model else None
 
     def get_contract_info(self, employee_id: int) -> Optional[Dict]:
         """계약 정보 조회"""
-        return self.contract_repo.get_by_employee_id(employee_id)
+        model = self.contract_repo.find_by_employee_id(employee_id)
+        return model.to_dict() if model else None
 
     def get_salary_history_list(self, employee_id: int) -> List[Dict]:
         """급여 이력 조회"""
-        return self.salary_history_repo.get_by_employee_id(employee_id)
+        models = self.salary_history_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_promotion_list(self, employee_id: int) -> List[Dict]:
         """승진 이력 조회"""
-        return self.promotion_repo.get_by_employee_id(employee_id)
+        models = self.promotion_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_evaluation_list(self, employee_id: int) -> List[Dict]:
         """평가 이력 조회"""
-        return self.evaluation_repo.get_by_employee_id(employee_id)
+        models = self.evaluation_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_training_list(self, employee_id: int) -> List[Dict]:
         """교육 이력 조회"""
-        return self.training_repo.get_by_employee_id(employee_id)
+        models = self.training_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_attendance_summary(self, employee_id: int, year: int) -> Optional[Dict]:
         """근태 요약 조회"""
@@ -241,31 +254,38 @@ class EmployeeService:
 
     def get_insurance_info(self, employee_id: int) -> Optional[Dict]:
         """보험 정보 조회"""
-        return self.insurance_repo.get_by_employee_id(employee_id)
+        model = self.insurance_repo.find_by_employee_id(employee_id)
+        return model.to_dict() if model else None
 
     def get_hr_project_list(self, employee_id: int) -> List[Dict]:
         """인사 프로젝트 목록 조회"""
-        return self.hr_project_repo.get_by_employee_id(employee_id)
+        models = self.hr_project_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_project_participation_list(self, employee_id: int) -> List[Dict]:
         """프로젝트 참여 목록 조회"""
-        return self.project_participation_repo.get_by_employee_id(employee_id)
+        models = self.project_participation_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_award_list(self, employee_id: int) -> List[Dict]:
         """수상 목록 조회"""
-        return self.award_repo.get_by_employee_id(employee_id)
+        models = self.award_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_asset_list(self, employee_id: int) -> List[Dict]:
         """자산 목록 조회"""
-        return self.asset_repo.get_by_employee_id(employee_id)
+        models = self.asset_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_salary_payment_list(self, employee_id: int) -> List[Dict]:
         """급여 지급 목록 조회"""
-        return self.salary_payment_repo.get_by_employee_id(employee_id)
+        models = self.salary_payment_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_attachment_list(self, employee_id: int) -> List[Dict]:
         """첨부파일 목록 조회"""
-        return self.attachment_repo.get_by_employee_id(employee_id)
+        models = self.attachment_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
 
     def get_attachment_by_category(self, employee_id: int, category: str) -> Optional[Dict]:
         """카테고리별 첨부파일 조회"""
@@ -273,7 +293,8 @@ class EmployeeService:
 
     def get_classification_options(self) -> List[Dict]:
         """분류 옵션 조회"""
-        return self.classification_repo.get_all()
+        models = self.classification_repo.find_all()
+        return [m.to_dict() for m in models]
 
     def get_all_classification_options(self) -> Dict:
         """전체 분류 옵션 조회 (카테고리별)"""
@@ -289,7 +310,8 @@ class EmployeeService:
 
     def get_attachment_by_id(self, attachment_id: int) -> Optional[Dict]:
         """첨부파일 ID로 조회"""
-        return self.attachment_repo.get_by_id(attachment_id)
+        model = self.attachment_repo.find_by_id(attachment_id)
+        return model.to_dict() if model else None
 
     def delete_attachment(self, attachment_id: int) -> bool:
         """첨부파일 삭제"""

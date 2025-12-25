@@ -46,9 +46,10 @@ class BaseHistoryService:
             이력 데이터 딕셔너리 리스트
         """
         if owner_field == 'profile_id':
-            return repository.get_by_profile_id(owner_id)
+            models = repository.find_by_profile_id(owner_id)
         else:
-            return repository.get_by_employee_id(owner_id)
+            models = repository.find_by_employee_id(owner_id)
+        return [m.to_dict() for m in models]
 
     def add_item(self, repository, owner_id: int, data: Dict,
                  owner_field: str = 'profile_id') -> Dict:
@@ -181,9 +182,9 @@ class BaseHistoryService:
             레코드의 딕셔너리 또는 None
         """
         if owner_field == 'profile_id':
-            record = repository.get_by_profile_id(owner_id)
+            record = repository.find_by_profile_id(owner_id)
         else:
-            record = repository.get_by_employee_id(owner_id)
+            record = repository.find_by_employee_id(owner_id)
         return record.to_dict() if record and hasattr(record, 'to_dict') else record
 
 
