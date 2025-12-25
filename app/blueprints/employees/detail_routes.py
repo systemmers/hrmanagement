@@ -109,9 +109,9 @@ def register_detail_routes(bp: Blueprint):
         # 개인계약이 있으면 person_user_id로 조회 (다중 법인 계약 지원)
         # 없으면 User.employee_id로 직접 조회 (법인 직접 생성 계정)
         if person_contract:
-            linked_user = user_repo.get_model_by_id(person_contract.person_user_id)
+            linked_user = user_repo.find_by_id(person_contract.person_user_id)
         else:
-            linked_user = user_repo.get_by_employee_id(employee_id)
+            linked_user = user_repo.find_by_employee_id(employee_id)
 
         return render_template('profile/edit.html',
                                employee=employee,
@@ -212,9 +212,9 @@ def _render_employee_full_view(employee_id, employee):
     # 개인계약이 있으면 person_user_id로 조회 (다중 법인 계약 지원)
     # 없으면 User.employee_id로 직접 조회 (법인 직접 생성 계정)
     if person_contract:
-        linked_user = user_repo.get_model_by_id(person_contract.person_user_id)
+        linked_user = user_repo.find_by_id(person_contract.person_user_id)
     else:
-        linked_user = user_repo.get_by_employee_id(employee_id)
+        linked_user = user_repo.find_by_employee_id(employee_id)
 
     return render_template('profile/detail.html',
                            employee=employee,

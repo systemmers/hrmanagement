@@ -87,8 +87,11 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
         ).order_by(PersonCorporateContract.created_at.desc()).all()
         return [c.to_dict(include_relations=True) for c in contracts]
 
-    def get_model_by_id(self, contract_id: int) -> Optional[PersonCorporateContract]:
-        """ID로 모델 조회 (모델 반환)"""
+    def find_by_id(self, contract_id: int) -> Optional[PersonCorporateContract]:
+        """ID로 모델 조회 (모델 반환)
+
+        Phase 24: 신규 표준 메서드 (BaseRepository.find_by_id() override)
+        """
         return PersonCorporateContract.query.get(contract_id)
 
     # ===== 생성 메서드 =====
@@ -150,7 +153,7 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
         """
         from app.models.company import Company
 
-        contract = self.get_model_by_id(contract_id)
+        contract = self.find_by_id(contract_id)
         if not contract:
             raise ValueError("계약을 찾을 수 없습니다.")
 
@@ -234,7 +237,7 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
 
     def reject_contract(self, contract_id: int, rejected_by_user_id: int = None, reason: str = None) -> Dict:
         """계약 거절"""
-        contract = self.get_model_by_id(contract_id)
+        contract = self.find_by_id(contract_id)
         if not contract:
             raise ValueError("계약을 찾을 수 없습니다.")
 
@@ -262,21 +265,21 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
         if not result.get('success'):
             raise ValueError(result.get('error', '계약 종료 실패'))
 
-        contract = self.get_model_by_id(contract_id)
+        contract = self.find_by_id(contract_id)
         return contract.to_dict(include_relations=True)
 
     # ===== 데이터 공유 설정 =====
 
     def get_sharing_settings(self, contract_id: int) -> Optional[Dict]:
         """데이터 공유 설정 조회"""
-        contract = self.get_model_by_id(contract_id)
+        contract = self.find_by_id(contract_id)
         if not contract or not contract.data_sharing_settings:
             return None
         return contract.data_sharing_settings.to_dict()
 
     def update_sharing_settings(self, contract_id: int, settings: Dict) -> Dict:
         """데이터 공유 설정 업데이트"""
-        contract = self.get_model_by_id(contract_id)
+        contract = self.find_by_id(contract_id)
         if not contract:
             raise ValueError("계약을 찾을 수 없습니다.")
 

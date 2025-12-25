@@ -83,7 +83,7 @@ def settings():
         flash('법인 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
 
-    company = company_repository.get_model_by_id(company_id)
+    company = company_repository.find_by_id(company_id)
     if not company:
         flash('법인 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
@@ -128,7 +128,7 @@ def users():
         flash('법인 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
 
-    company = company_repository.get_model_by_id(company_id)
+    company = company_repository.find_by_id(company_id)
     if not company:
         flash('법인 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))

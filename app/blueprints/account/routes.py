@@ -18,7 +18,7 @@ from ...services.employee_service import employee_service
 def settings():
     """계정 설정 메인 페이지"""
     user_id = session.get(SessionKeys.USER_ID)
-    user = user_service.get_model_by_id(user_id)
+    user = user_service.find_by_id(user_id)
 
     if not user:
         flash('사용자 정보를 찾을 수 없습니다.', 'error')
@@ -79,7 +79,7 @@ def password():
 def privacy():
     """개인정보 공개 설정"""
     user_id = session.get(SessionKeys.USER_ID)
-    user = user_service.get_model_by_id(user_id)
+    user = user_service.find_by_id(user_id)
 
     if not user:
         flash('사용자 정보를 찾을 수 없습니다.', 'error')
@@ -115,7 +115,7 @@ def privacy():
 def delete():
     """계정 탈퇴"""
     user_id = session.get(SessionKeys.USER_ID)
-    user = user_service.get_model_by_id(user_id)
+    user = user_service.find_by_id(user_id)
 
     if not user:
         flash('사용자 정보를 찾을 수 없습니다.', 'error')

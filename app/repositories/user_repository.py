@@ -23,9 +23,21 @@ class UserRepository(BaseRepository[User]):
         """이메일로 조회 (모델 객체 반환)"""
         return User.query.filter_by(email=email).first()
 
-    def get_by_employee_id(self, employee_id: int) -> Optional[User]:
-        """직원 ID로 조회 (모델 객체 반환)"""
+    def find_by_employee_id(self, employee_id: int) -> Optional[User]:
+        """직원 ID로 조회 (모델 객체 반환)
+
+        Phase 24: 신규 표준 메서드 (Model 반환)
+        """
         return User.query.filter_by(employee_id=employee_id).first()
+
+    def get_by_employee_id(self, employee_id: int) -> Optional[User]:
+        """@deprecated: Use find_by_employee_id() instead"""
+        import warnings
+        warnings.warn(
+            "get_by_employee_id() is deprecated. Use find_by_employee_id() instead.",
+            DeprecationWarning, stacklevel=2
+        )
+        return self.find_by_employee_id(employee_id)
 
     def authenticate(self, username: str, password: str) -> Optional[User]:
         """사용자 인증 (로그인)"""
