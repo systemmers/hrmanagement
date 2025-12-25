@@ -19,6 +19,7 @@ from app.models import (
 )
 from app.repositories.user_repository import UserRepository
 from app.repositories.profile_repository import ProfileRepository
+from app.services.profile_relation_service import profile_relation_service
 
 
 class PersonalService:
@@ -153,228 +154,113 @@ class PersonalService:
             return False, str(e)
 
     # ========================================
-    # 학력 (Education) CRUD
+    # 학력 (Education) CRUD - profile_relation_service 위임
     # ========================================
 
     def get_educations(self, profile_id: int) -> List[Dict]:
         """학력 목록 조회"""
-        profile = Profile.query.get(profile_id)
-        if not profile:
-            return []
-        return [e.to_dict() for e in profile.educations.all()]
+        return profile_relation_service.get_educations(profile_id, 'profile')
 
     def add_education(self, profile_id: int, data: Dict) -> Dict:
         """학력 추가"""
-        education = Education(
-            profile_id=profile_id,
-            school_name=data.get('school_name'),
-            degree=data.get('degree'),
-            major=data.get('major'),
-            graduation_date=data.get('graduation_date'),
-            gpa=data.get('gpa'),
-            graduation_status=data.get('status') or data.get('graduation_status'),
-            note=data.get('notes') or data.get('note')
-        )
-        db.session.add(education)
-        db.session.commit()
-        return education.to_dict()
+        return profile_relation_service.add_education(profile_id, data, 'profile')
 
     def delete_education(self, education_id: int, profile_id: int) -> bool:
         """학력 삭제 (소유권 확인)"""
-        education = Education.query.filter_by(
-            id=education_id, profile_id=profile_id
-        ).first()
-        if not education:
-            return False
-        db.session.delete(education)
-        db.session.commit()
-        return True
+        return profile_relation_service.delete_education(education_id, profile_id, 'profile')
 
     def delete_all_educations(self, profile_id: int) -> int:
         """프로필의 모든 학력 삭제"""
-        count = Education.query.filter_by(profile_id=profile_id).delete()
-        db.session.commit()
-        return count
+        return profile_relation_service.delete_all_educations(profile_id, 'profile')
 
     # ========================================
-    # 경력 (Career) CRUD
+    # 경력 (Career) CRUD - profile_relation_service 위임
     # ========================================
 
     def get_careers(self, profile_id: int) -> List[Dict]:
         """경력 목록 조회"""
-        profile = Profile.query.get(profile_id)
-        if not profile:
-            return []
-        return [c.to_dict() for c in profile.careers.all()]
+        return profile_relation_service.get_careers(profile_id, 'profile')
 
     def add_career(self, profile_id: int, data: Dict) -> Dict:
         """경력 추가"""
-        career = Career(
-            profile_id=profile_id,
-            company_name=data.get('company_name'),
-            department=data.get('department'),
-            position=data.get('position'),
-            job_grade=data.get('job_grade'),
-            job_title=data.get('job_title'),
-            job_role=data.get('job_role'),
-            responsibilities=data.get('responsibilities'),
-            salary_type=data.get('salary_type'),
-            salary=data.get('salary'),
-            monthly_salary=data.get('monthly_salary'),
-            pay_step=data.get('pay_step'),
-            start_date=data.get('start_date'),
-            end_date=data.get('end_date')
-        )
-        db.session.add(career)
-        db.session.commit()
-        return career.to_dict()
+        return profile_relation_service.add_career(profile_id, data, 'profile')
 
     def delete_career(self, career_id: int, profile_id: int) -> bool:
         """경력 삭제 (소유권 확인)"""
-        career = Career.query.filter_by(
-            id=career_id, profile_id=profile_id
-        ).first()
-        if not career:
-            return False
-        db.session.delete(career)
-        db.session.commit()
-        return True
+        return profile_relation_service.delete_career(career_id, profile_id, 'profile')
 
     def delete_all_careers(self, profile_id: int) -> int:
         """프로필의 모든 경력 삭제"""
-        count = Career.query.filter_by(profile_id=profile_id).delete()
-        db.session.commit()
-        return count
+        return profile_relation_service.delete_all_careers(profile_id, 'profile')
 
     # ========================================
-    # 자격증 (Certificate) CRUD
+    # 자격증 (Certificate) CRUD - profile_relation_service 위임
     # ========================================
 
     def get_certificates(self, profile_id: int) -> List[Dict]:
         """자격증 목록 조회"""
-        profile = Profile.query.get(profile_id)
-        if not profile:
-            return []
-        return [c.to_dict() for c in profile.certificates.all()]
+        return profile_relation_service.get_certificates(profile_id, 'profile')
 
     def add_certificate(self, profile_id: int, data: Dict) -> Dict:
         """자격증 추가"""
-        certificate = Certificate(
-            profile_id=profile_id,
-            certificate_name=data.get('name') or data.get('certificate_name'),
-            issuing_organization=data.get('issuing_organization'),
-            acquisition_date=data.get('issue_date') or data.get('acquisition_date'),
-            expiry_date=data.get('expiry_date'),
-            certificate_number=data.get('certificate_number'),
-            grade=data.get('grade')
-        )
-        db.session.add(certificate)
-        db.session.commit()
-        return certificate.to_dict()
+        return profile_relation_service.add_certificate(profile_id, data, 'profile')
 
     def delete_certificate(self, certificate_id: int, profile_id: int) -> bool:
         """자격증 삭제 (소유권 확인)"""
-        certificate = Certificate.query.filter_by(
-            id=certificate_id, profile_id=profile_id
-        ).first()
-        if not certificate:
-            return False
-        db.session.delete(certificate)
-        db.session.commit()
-        return True
+        return profile_relation_service.delete_certificate(certificate_id, profile_id, 'profile')
 
     def delete_all_certificates(self, profile_id: int) -> int:
         """프로필의 모든 자격증 삭제"""
-        count = Certificate.query.filter_by(profile_id=profile_id).delete()
-        db.session.commit()
-        return count
+        return profile_relation_service.delete_all_certificates(profile_id, 'profile')
 
     # ========================================
-    # 어학 (Language) CRUD
+    # 어학 (Language) CRUD - profile_relation_service 위임
     # ========================================
 
     def get_languages(self, profile_id: int) -> List[Dict]:
         """어학 목록 조회"""
-        profile = Profile.query.get(profile_id)
-        if not profile:
-            return []
-        return [lang.to_dict() for lang in profile.languages.all()]
+        return profile_relation_service.get_languages(profile_id, 'profile')
 
     def add_language(self, profile_id: int, data: Dict) -> Dict:
         """어학 추가"""
-        language = Language(
-            profile_id=profile_id,
-            language_name=data.get('language') or data.get('language_name'),
-            level=data.get('proficiency') or data.get('level'),
-            test_name=data.get('test_name'),
-            score=data.get('score'),
-            test_date=data.get('test_date')
-        )
-        db.session.add(language)
-        db.session.commit()
-        return language.to_dict()
+        return profile_relation_service.add_language(profile_id, data, 'profile')
 
     def delete_language(self, language_id: int, profile_id: int) -> bool:
         """어학 삭제 (소유권 확인)"""
-        language = Language.query.filter_by(
-            id=language_id, profile_id=profile_id
-        ).first()
-        if not language:
-            return False
-        db.session.delete(language)
-        db.session.commit()
-        return True
+        return profile_relation_service.delete_language(language_id, profile_id, 'profile')
 
     def delete_all_languages(self, profile_id: int) -> int:
         """프로필의 모든 어학 삭제"""
-        count = Language.query.filter_by(profile_id=profile_id).delete()
-        db.session.commit()
-        return count
+        return profile_relation_service.delete_all_languages(profile_id, 'profile')
 
     # ========================================
     # 병역 (MilitaryService) CRUD - 1:1 관계
+    # Phase 9: ProfileRelationService 위임
     # ========================================
 
     def get_military(self, profile_id: int) -> Optional[Dict]:
         """병역 정보 조회"""
-        profile = Profile.query.get(profile_id)
-        if not profile:
-            return None
-        military = profile.military_services.first()
-        return military.to_dict() if military else None
+        return profile_relation_service.get_military(profile_id, 'profile')
+
+    def get_military_list(self, profile_id: int) -> List[Dict]:
+        """병역 목록 조회 (1:N 지원)"""
+        return profile_relation_service.get_military_list(profile_id, 'profile')
 
     def save_military(self, profile_id: int, data: Dict) -> Dict:
         """병역 정보 저장/수정 (1:1)"""
-        # 기존 데이터 조회
-        military = MilitaryService.query.filter_by(profile_id=profile_id).first()
+        return profile_relation_service.update_or_create_military(profile_id, data, 'profile')
 
-        if military:
-            # 수정
-            military.military_status = data.get('service_type') or data.get('military_status')
-            military.branch = data.get('branch')
-            military.rank = data.get('rank')
-            military.start_date = data.get('start_date')
-            military.end_date = data.get('end_date')
-            military.service_type = data.get('specialty') or data.get('service_type')
-            military.duty = data.get('duty')
-            military.exemption_reason = data.get('notes') or data.get('exemption_reason')
-        else:
-            # 신규 생성
-            military = MilitaryService(
-                profile_id=profile_id,
-                military_status=data.get('service_type') or data.get('military_status'),
-                branch=data.get('branch'),
-                rank=data.get('rank'),
-                start_date=data.get('start_date'),
-                end_date=data.get('end_date'),
-                service_type=data.get('specialty') or data.get('service_type'),
-                duty=data.get('duty'),
-                exemption_reason=data.get('notes') or data.get('exemption_reason')
-            )
-            db.session.add(military)
+    def add_military(self, profile_id: int, data: Dict) -> Dict:
+        """병역 추가"""
+        return profile_relation_service.add_military(profile_id, data, 'profile')
 
-        db.session.commit()
-        return military.to_dict()
+    def delete_military(self, military_id: int, profile_id: int) -> bool:
+        """병역 삭제 (소유권 확인)"""
+        return profile_relation_service.delete_military(military_id, profile_id, 'profile')
+
+    def delete_all_military(self, profile_id: int) -> int:
+        """프로필의 모든 병역 정보 삭제"""
+        return profile_relation_service.delete_all_military(profile_id, 'profile')
 
     # ========================================
     # 회사 인사카드 (Phase 2)
