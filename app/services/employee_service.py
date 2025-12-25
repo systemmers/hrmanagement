@@ -14,7 +14,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from flask import request
 
 from app.database import db
-from app.models import Employee, MilitaryService
+from app.models import Employee
 from app.utils.tenant import get_current_organization_id
 from app.extensions import (
     employee_repo, family_repo, education_repo, career_repo,

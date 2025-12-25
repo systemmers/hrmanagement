@@ -18,7 +18,6 @@ from app.blueprints.profile.decorators import (
 from app.services.attachment_service import attachment_service
 from app.services.corporate_admin_profile_service import corporate_admin_profile_service
 from app.services.file_storage_service import file_storage, CATEGORY_ADMIN_PHOTO
-from app.models.user import User
 
 
 @profile_bp.route('/')

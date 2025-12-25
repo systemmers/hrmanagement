@@ -94,9 +94,6 @@ class PersonCorporateContract(db.Model):
     TYPE_FREELANCE = 'freelance'
     TYPE_INTERN = 'intern'
 
-    # 계약 유형 레이블 - SSOT: FieldOptions.CONTRACT_TYPE 참조
-    # TYPE_LABELS = FieldOptions.get_labels_dict(FieldOptions.CONTRACT_TYPE)
-
     # 관계 설정
     person_user = db.relationship(
         'User',
