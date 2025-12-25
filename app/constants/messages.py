@@ -52,3 +52,15 @@ class ErrorMessages:
     # 리소스
     NOT_FOUND = '리소스를 찾을 수 없습니다.'
     CONTRACT_NOT_FOUND = '계약을 찾을 수 없습니다.'
+    EMPLOYEE_NOT_FOUND = '직원 정보를 찾을 수 없습니다.'
+
+    # 파일 관련
+    FILE_NOT_FOUND = '파일을 찾을 수 없습니다.'
+    FILE_TOO_LARGE = '파일 크기는 {size}MB를 초과할 수 없습니다.'
+    INVALID_EXTENSION = '허용되지 않는 파일 형식입니다.'
+    UPLOAD_FAILED = '파일 업로드에 실패했습니다.'
+
+    # 일반
+    SERVER_ERROR = '서버 오류가 발생했습니다.'
+    INVALID_ACCOUNT_TYPE = '잘못된 계정 유형입니다.'
+    INVALID_REQUEST = '잘못된 요청입니다.'
