@@ -14,6 +14,7 @@ from ...models.person_contract import PersonCorporateContract
 from ...utils.employee_number import generate_employee_number
 from ...utils.decorators import login_required, admin_required, manager_or_admin_required
 from ...utils.tenant import get_current_organization_id
+from ...utils.object_helpers import safe_get
 from ...services.employee_service import employee_service
 from ...services import employee_account_service
 from ...services.file_storage_service import file_storage, CATEGORY_PROFILE_PHOTO
@@ -80,7 +81,7 @@ def _has_person_contract(employee_id: int, company_id: int) -> bool:
     if not employee:
         return False
 
-    employee_number = employee.get('employee_number') if isinstance(employee, dict) else employee.employee_number
+    employee_number = safe_get(employee, 'employee_number')
     if not employee_number:
         return False
 
@@ -340,7 +341,7 @@ def register_mutation_routes(bp: Blueprint):
             updated_employee = employee_service.update_employee_direct(employee_id, employee_data)
             if updated_employee:
                 # update_employee_direct는 Dict 반환
-                employee_name = updated_employee.get('name', '') if isinstance(updated_employee, dict) else updated_employee.name
+                employee_name = safe_get(updated_employee, 'name', '')
                 flash(f'{employee_name} 직원 정보가 수정되었습니다.', 'success')
                 return redirect(url_for('employees.employee_detail', employee_id=employee_id))
             else:
@@ -465,7 +466,7 @@ def register_mutation_routes(bp: Blueprint):
             employee = employee_service.get_employee_by_id(employee_id)
             if employee:
                 if employee_service.delete_employee_direct(employee_id):
-                    employee_name = employee.get('name') if isinstance(employee, dict) else employee.name
+                    employee_name = safe_get(employee, 'name')
                     flash(f'{employee_name} 직원이 삭제되었습니다.', 'success')
                 else:
                     flash('직원 삭제에 실패했습니다.', 'error')

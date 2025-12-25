@@ -10,6 +10,7 @@ from flask import Blueprint, request, jsonify, current_app, session
 
 from ...constants.session_keys import SessionKeys, UserRole
 from ...utils.decorators import login_required, manager_or_admin_required
+from ...utils.object_helpers import safe_get
 from ...services.employee_service import employee_service
 from .helpers import (
     allowed_file, allowed_image_file, get_file_extension,
@@ -113,7 +114,7 @@ def register_file_routes(bp: Blueprint):
                 return jsonify({'success': False, 'error': '첨부파일을 찾을 수 없습니다.'}), 404
 
             # 파일 경로 추출
-            file_path = attachment.get('file_path') if isinstance(attachment, dict) else attachment.file_path
+            file_path = safe_get(attachment, 'file_path')
 
             # 실제 파일 삭제
             delete_file_if_exists(file_path)
@@ -171,7 +172,7 @@ def register_file_routes(bp: Blueprint):
             # 기존 프로필 사진 삭제
             old_photo = employee_service.get_attachment_by_category(employee_id, category)
             if old_photo:
-                old_path = old_photo.get('file_path') if isinstance(old_photo, dict) else old_photo.file_path
+                old_path = safe_get(old_photo, 'file_path')
                 delete_file_if_exists(old_path)
                 employee_service.delete_attachment_by_category(employee_id, category)
 
@@ -216,7 +217,7 @@ def register_file_routes(bp: Blueprint):
             if photo:
                 return jsonify({
                     'success': True,
-                    'file_path': photo.get('file_path') if isinstance(photo, dict) else photo.file_path,
+                    'file_path': safe_get(photo, 'file_path'),
                     'attachment': photo
                 })
             else:
@@ -242,7 +243,7 @@ def register_file_routes(bp: Blueprint):
             # 기존 프로필 사진 삭제
             old_photo = employee_service.get_attachment_by_category(employee_id, category)
             if old_photo:
-                old_path = old_photo.get('file_path') if isinstance(old_photo, dict) else old_photo.file_path
+                old_path = safe_get(old_photo, 'file_path')
                 delete_file_if_exists(old_path)
                 employee_service.delete_attachment_by_category(employee_id, category)
                 return jsonify({'success': True, 'message': '프로필 사진이 삭제되었습니다.'})
@@ -301,7 +302,7 @@ def register_file_routes(bp: Blueprint):
             # 기존 명함 이미지 삭제
             old_card = employee_service.get_attachment_by_category(employee_id, category)
             if old_card:
-                old_path = old_card.get('file_path') if isinstance(old_card, dict) else old_card.file_path
+                old_path = safe_get(old_card, 'file_path')
                 delete_file_if_exists(old_path)
                 employee_service.delete_attachment_by_category(employee_id, category)
 
@@ -358,7 +359,7 @@ def register_file_routes(bp: Blueprint):
             # 기존 명함 이미지 삭제
             old_card = employee_service.get_attachment_by_category(employee_id, category)
             if old_card:
-                old_path = old_card.get('file_path') if isinstance(old_card, dict) else old_card.file_path
+                old_path = safe_get(old_card, 'file_path')
                 delete_file_if_exists(old_path)
                 employee_service.delete_attachment_by_category(employee_id, category)
                 return jsonify({'success': True, 'message': f'명함 {side} 이미지가 삭제되었습니다.'})

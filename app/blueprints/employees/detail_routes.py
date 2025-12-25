@@ -8,6 +8,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, session
 
 from ...constants.session_keys import SessionKeys, UserRole, AccountType
 from ...utils.decorators import login_required, manager_or_admin_required
+from ...utils.object_helpers import safe_get
 from ...services.employee_service import employee_service
 from ...models.person_contract import PersonCorporateContract
 from .helpers import verify_employee_access
@@ -199,7 +200,7 @@ def _render_employee_full_view(employee_id, employee):
     # 개인계약을 먼저 조회하여 linked_user 결정에 활용
     company_id = session.get(SessionKeys.COMPANY_ID)
     person_contract = None
-    emp_number = employee.get('employee_number') if isinstance(employee, dict) else getattr(employee, 'employee_number', None)
+    emp_number = safe_get(employee, 'employee_number')
     if company_id and emp_number:
         person_contract = PersonCorporateContract.query.filter_by(
             employee_number=emp_number,
