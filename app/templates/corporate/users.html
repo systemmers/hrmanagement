@@ -34,6 +34,7 @@
                 <th>이메일</th>
                 <th>역할</th>
                 <th>상태</th>
+                <th>계약상태</th>
                 <th>생성일</th>
                 <th>작업</th>
             </tr>
@@ -65,7 +66,20 @@
                     <span class="badge badge-danger">비활성</span>
                     {% endif %}
                 </td>
-                <td>{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else '-' }}</td>
+                <td>
+                    {% if user.contract_status == 'approved' %}
+                    <span class="badge badge-success">승인됨</span>
+                    {% elif user.contract_status == 'requested' %}
+                    <span class="badge badge-warning">대기중</span>
+                    {% elif user.contract_status == 'rejected' %}
+                    <span class="badge badge-danger">거절됨</span>
+                    {% elif user.contract_status == 'terminated' %}
+                    <span class="badge badge-secondary">종료</span>
+                    {% else %}
+                    <span class="badge badge-light">계약없음</span>
+                    {% endif %}
+                </td>
+                <td>{{ user.created_at[:10] if user.created_at else '-' }}</td>
                 <td>
                     <div class="table-actions">
                         <button class="btn-icon" title="수정" data-action="edit-user" data-user-id="{{ user.id }}">

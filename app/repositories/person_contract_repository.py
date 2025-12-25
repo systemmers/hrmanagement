@@ -384,3 +384,183 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
 
         contracts = query.order_by(PersonCorporateContract.created_at.desc()).all()
         return [c.to_dict(include_relations=True) for c in contracts]
+
+    # ===== 벌크 조회 메서드 (N+1 방지) =====
+
+    def get_contracts_by_user_ids_bulk(
+        self,
+        user_ids: List[int],
+        company_id: int
+    ) -> Dict[int, PersonCorporateContract]:
+        """N+1 방지: user_id 목록으로 계약 벌크 조회
+
+        Args:
+            user_ids: User ID 목록
+            company_id: 회사 ID
+
+        Returns:
+            Dict[user_id, PersonCorporateContract]
+        """
+        if not user_ids or not company_id:
+            return {}
+
+        contracts = PersonCorporateContract.query.filter(
+            PersonCorporateContract.person_user_id.in_(user_ids),
+            PersonCorporateContract.company_id == company_id
+        ).all()
+
+        return {c.person_user_id: c for c in contracts}
+
+    def get_approved_by_employee_numbers_bulk(
+        self,
+        employee_numbers: List[str],
+        company_id: int
+    ) -> Dict[str, PersonCorporateContract]:
+        """N+1 방지: employee_number 목록으로 approved 계약 벌크 조회
+
+        Args:
+            employee_numbers: 직원번호 목록
+            company_id: 회사 ID
+
+        Returns:
+            Dict[employee_number, PersonCorporateContract]
+        """
+        if not employee_numbers or not company_id:
+            return {}
+
+        # None 값 필터링
+        valid_numbers = [n for n in employee_numbers if n]
+        if not valid_numbers:
+            return {}
+
+        from sqlalchemy.orm import joinedload
+
+        contracts = PersonCorporateContract.query.options(
+            joinedload(PersonCorporateContract.person_user)
+        ).filter(
+            PersonCorporateContract.employee_number.in_(valid_numbers),
+            PersonCorporateContract.company_id == company_id,
+            PersonCorporateContract.status == PersonCorporateContract.STATUS_APPROVED
+        ).all()
+
+        return {c.employee_number: c for c in contracts if c.employee_number}
+
+    def get_contract_for_employee(self, employee_id: int) -> Optional[PersonCorporateContract]:
+        """직원의 활성 계약 조회
+
+        employee_id를 가진 User의 계약 또는 employee_number 매칭으로 조회
+
+        Args:
+            employee_id: Employee.id
+
+        Returns:
+            PersonCorporateContract 또는 None
+        """
+        # 1. User.employee_id로 User 찾기
+        user = User.query.filter_by(employee_id=employee_id).first()
+        if user:
+            contract = PersonCorporateContract.query.filter_by(
+                person_user_id=user.id,
+                status=PersonCorporateContract.STATUS_APPROVED
+            ).first()
+            if contract:
+                return contract
+
+        # 2. Employee.employee_number로 계약 찾기
+        employee = Employee.query.get(employee_id)
+        if employee and employee.employee_number and employee.company_id:
+            contract = PersonCorporateContract.query.filter_by(
+                employee_number=employee.employee_number,
+                company_id=employee.company_id,
+                status=PersonCorporateContract.STATUS_APPROVED
+            ).first()
+            if contract:
+                return contract
+
+        return None
+
+    def get_by_employee_ids_bulk(
+        self,
+        employee_ids: List[int]
+    ) -> Dict[int, PersonCorporateContract]:
+        """N+1 방지: employee_id 목록으로 계약 벌크 조회
+
+        User.employee_id를 통해 계약 조회
+
+        Args:
+            employee_ids: Employee ID 목록
+
+        Returns:
+            Dict[employee_id, PersonCorporateContract]
+        """
+        if not employee_ids:
+            return {}
+
+        from sqlalchemy.orm import joinedload
+
+        # employee_id를 가진 User 목록 조회
+        users = User.query.filter(User.employee_id.in_(employee_ids)).all()
+        user_emp_map = {u.employee_id: u.id for u in users if u.employee_id}
+
+        if not user_emp_map:
+            return {}
+
+        # User의 계약 조회
+        contracts = PersonCorporateContract.query.options(
+            joinedload(PersonCorporateContract.person_user)
+        ).filter(
+            PersonCorporateContract.person_user_id.in_(user_emp_map.values()),
+            PersonCorporateContract.status == PersonCorporateContract.STATUS_APPROVED
+        ).all()
+
+        # user_id -> contract 매핑
+        user_contract_map = {c.person_user_id: c for c in contracts}
+
+        # employee_id -> contract 변환
+        result = {}
+        for emp_id, user_id in user_emp_map.items():
+            if user_id in user_contract_map:
+                result[emp_id] = user_contract_map[user_id]
+
+        return result
+
+    def get_active_contract_by_person_and_company(
+        self,
+        user_id: int,
+        company_id: int
+    ) -> Optional[PersonCorporateContract]:
+        """특정 User와 회사 간의 활성 계약 조회
+
+        Args:
+            user_id: User.id
+            company_id: Company.id
+
+        Returns:
+            PersonCorporateContract 또는 None
+        """
+        return PersonCorporateContract.query.filter_by(
+            person_user_id=user_id,
+            company_id=company_id,
+            status=PersonCorporateContract.STATUS_APPROVED
+        ).first()
+
+    def get_approved_contracts_with_users(
+        self,
+        company_id: int
+    ) -> List[PersonCorporateContract]:
+        """회사의 승인된 계약 목록 조회 (User 포함)
+
+        Args:
+            company_id: 회사 ID
+
+        Returns:
+            PersonCorporateContract 목록 (person_user 로드됨)
+        """
+        from sqlalchemy.orm import joinedload
+
+        return PersonCorporateContract.query.options(
+            joinedload(PersonCorporateContract.person_user)
+        ).filter_by(
+            company_id=company_id,
+            status=PersonCorporateContract.STATUS_APPROVED
+        ).all()

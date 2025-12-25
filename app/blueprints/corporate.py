@@ -21,6 +21,7 @@ from app.utils.corporate_helpers import (
     validate_registration,
     create_company_entities
 )
+from app.services.user_employee_link_service import user_employee_link_service
 
 corporate_bp = Blueprint('corporate', __name__, url_prefix='/corporate')
 
@@ -118,6 +119,9 @@ def users():
 
     21번 원칙: 법인 계정(employee_sub)만 표시
     personal 계정은 외부 사용자이므로 제외
+
+    BUG-1 수정: 계약 상태 표시 추가
+    - N+1 방지: 벌크 조회 사용
     """
     company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
@@ -130,9 +134,30 @@ def users():
         return redirect(url_for('main.index'))
 
     # 법인 계정(employee_sub)만 표시
-    users = user_repo.get_by_company_and_account_type(
+    raw_users = user_repo.get_by_company_and_account_type(
         company_id, User.ACCOUNT_EMPLOYEE_SUB
     )
+
+    # 계약 상태 벌크 조회 (N+1 방지)
+    user_ids = [u.id for u in raw_users]
+    contract_map = user_employee_link_service.get_users_with_contract_status_bulk(
+        user_ids, company_id
+    )
+
+    # users를 dict로 변환하고 contract_status 추가
+    users = []
+    for user in raw_users:
+        user_dict = user.to_dict() if hasattr(user, 'to_dict') else {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'role': user.role,
+            'is_active': user.is_active,
+            'created_at': user.created_at,
+        }
+        contract_info = contract_map.get(user.id, {})
+        user_dict['contract_status'] = contract_info.get('status', 'none')
+        users.append(user_dict)
 
     return render_template('corporate/users.html', company=company, users=users)
 
