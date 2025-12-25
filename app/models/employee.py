@@ -4,10 +4,13 @@ Employee SQLAlchemy 모델
 직원 기본 정보 및 확장 정보를 포함합니다.
 Phase 4: 통합 프로필 연결
 Phase 9: FieldRegistry 기반 to_dict() 정렬
+Phase 23: resigned 상태 자동 처리 (resignation_date, PCC.status)
 """
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional
+
+from sqlalchemy import event
 
 from app.database import db
 
@@ -278,3 +281,51 @@ class Employee(db.Model):
 
     def __repr__(self):
         return f'<Employee {self.id}: {self.name}>'
+
+
+# ===== SQLAlchemy Event Listeners (Phase 23) =====
+
+@event.listens_for(Employee.status, 'set')
+def on_employee_status_change(target, value, oldvalue, initiator):
+    """Employee.status 변경 시 자동 처리
+
+    Phase 23 데이터 정합성 규칙:
+    1. resigned 전환 시 resignation_date 자동 설정 (없을 경우)
+    2. resigned 전환 시 연결된 PCC.status → terminated 전환
+    """
+    # 같은 값이면 무시
+    if value == oldvalue:
+        return
+
+    # resigned 상태로 전환될 때
+    if value == 'resigned':
+        # 1. resignation_date 자동 설정
+        if not target.resignation_date:
+            target.resignation_date = date.today()
+
+        # 2. 연결된 PCC.status → terminated 전환
+        # 주의: 순환 import 방지를 위해 함수 내에서 import
+        _update_pcc_status_to_terminated(target)
+
+
+def _update_pcc_status_to_terminated(employee: Employee):
+    """Employee의 연결된 PCC를 terminated로 전환
+
+    Args:
+        employee: 퇴사 처리된 Employee 객체
+    """
+    if not employee.employee_number:
+        return
+
+    # 순환 import 방지
+    from app.models.person_contract import PersonCorporateContract
+
+    # employee_number로 approved 상태인 PCC 조회
+    contracts = PersonCorporateContract.query.filter_by(
+        employee_number=employee.employee_number,
+        status=PersonCorporateContract.STATUS_APPROVED
+    ).all()
+
+    for contract in contracts:
+        contract.status = PersonCorporateContract.STATUS_TERMINATED
+        contract.terminated_at = datetime.utcnow()

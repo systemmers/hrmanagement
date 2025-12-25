@@ -131,15 +131,22 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
         """계약 승인
 
         21번 원칙: 계약 승인 시 Employee.status = 'active' 연동
+        23번 원칙: 계약 승인 시 PCC.employee_number 동기화
 
         개인 계정(personal):
         - 항상 새 Employee 생성 (회사별 분리, full_sync=True)
         - 전체 프로필 데이터 동기화 (기본 필드 + 관계형 데이터)
         - DataSharingSettings 자동 생성 (전체 공유 기본값)
+        - employee_number 자동 동기화
 
         직원 계정(employee_sub):
         - 기존 Employee의 status만 active로 변경
         - organization_id를 계약 회사에 맞게 업데이트
+        - employee_number 자동 동기화
+
+        사전 검증:
+        - employee_sub: User.employee_id 필수
+        - employee_sub: Employee.status != 'resigned' (퇴사자 재계약 불가)
         """
         from app.models.company import Company
 
@@ -147,10 +154,19 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
         if not contract:
             raise ValueError("계약을 찾을 수 없습니다.")
 
-        contract.approve(approved_by_user_id)
-
         user = User.query.get(contract.person_user_id)
         company = Company.query.get(contract.company_id)
+
+        # 사전 검증 (employee_sub)
+        if user and user.account_type == 'employee_sub':
+            if not user.employee_id:
+                raise ValueError("Employee 연결이 필요합니다. (User.employee_id NULL)")
+
+            existing_employee = db.session.get(Employee, user.employee_id)
+            if existing_employee and existing_employee.status == 'resigned':
+                raise ValueError("퇴사한 직원은 재계약할 수 없습니다.")
+
+        contract.approve(approved_by_user_id)
 
         if user:
             if user.account_type == 'personal':
@@ -194,6 +210,10 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
                             contract_id=contract_id,
                             sync_type='initial'
                         )
+
+                        # 23번 원칙: employee_number 동기화
+                        if employee.employee_number:
+                            contract.employee_number = employee.employee_number
             else:
                 # 직원 계정(employee_sub): 기존 Employee 상태 업데이트
                 if user.employee_id:
@@ -203,6 +223,10 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
                         # organization_id를 계약 회사에 맞게 업데이트
                         if company and company.root_organization_id:
                             employee.organization_id = company.root_organization_id
+
+                        # 23번 원칙: employee_number 동기화
+                        if employee.employee_number:
+                            contract.employee_number = employee.employee_number
 
         db.session.commit()
 

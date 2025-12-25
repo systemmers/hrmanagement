@@ -52,8 +52,7 @@ class ContractFilterService:
             statuses.append('terminated')
 
         query = PersonCorporateContract.query.options(
-            joinedload(PersonCorporateContract.person_user),
-            joinedload(PersonCorporateContract.employee)
+            joinedload(PersonCorporateContract.person_user)
         ).filter(
             PersonCorporateContract.status.in_(statuses)
         )
@@ -129,8 +128,7 @@ class ContractFilterService:
             statuses = self.DEFAULT_STATUSES.copy()
 
         contracts = PersonCorporateContract.query.options(
-            joinedload(PersonCorporateContract.person_user),
-            joinedload(PersonCorporateContract.employee)
+            joinedload(PersonCorporateContract.person_user)
         ).filter(
             PersonCorporateContract.employee_number.in_(valid_numbers),
             PersonCorporateContract.company_id == company_id,
@@ -225,8 +223,15 @@ class ContractFilterService:
         Returns:
             퇴사 여부 (resignation_date가 있으면 True)
         """
-        if contract.employee:
-            return contract.employee.resignation_date is not None
+        # PersonCorporateContract에는 employee 관계가 없으므로
+        # employee_number로 Employee를 조회하여 확인
+        if contract.employee_number:
+            from ..models.employee import Employee
+            employee = Employee.query.filter_by(
+                employee_number=contract.employee_number
+            ).first()
+            if employee:
+                return employee.resignation_date is not None
         return False
 
     def is_contract_active(
