@@ -4,8 +4,10 @@ Base Repository 클래스
 SQLAlchemy 기반 공통 CRUD 기능을 제공합니다.
 Phase 6: 백엔드 리팩토링 - 중복 로직 통합
 Phase 8: 제네릭 타입 적용 - IDE 자동완성 및 타입 안전성 강화
-Phase 24: Option A 레이어 분리 - find_by_id() 표준화 (Model 반환)
+Phase 24: Option A 레이어 분리 - find_by_id(), find_all() 표준화 (Model 반환)
+         Deprecated 경고 추가 (get_by_id, get_all)
 """
+import warnings
 from typing import List, Optional, Dict, Any, Type, TypeVar, Generic
 from app.database import db
 
@@ -33,22 +35,67 @@ class BaseRepository(Generic[ModelType]):
         self.model_class = model_class
 
     def get_all(self) -> List[Dict]:
-        """모든 레코드 조회"""
-        records = self.model_class.query.all()
-        return [record.to_dict() for record in records]
+        """모든 레코드 조회 (Dict 반환)
 
-    def get_all_models(self) -> List[ModelType]:
-        """모든 레코드를 모델 객체로 조회"""
+        @deprecated: Use find_all() + to_dict() instead
+        Phase 24 Option A: Service에서 Dict 변환 책임
+        """
+        warnings.warn(
+            "get_all() is deprecated. Use find_all() instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return [record.to_dict() for record in self.find_all()]
+
+    def find_all(self) -> List[ModelType]:
+        """
+        모든 레코드 조회 (신규 표준 메서드)
+
+        Phase 24 Option A: Repository는 Model만 반환
+        Service에서 to_dict() 호출하여 Dict 변환
+
+        Returns:
+            모델 객체 리스트
+        """
         return self.model_class.query.all()
 
+    def get_all_models(self) -> List[ModelType]:
+        """모든 레코드를 모델 객체로 조회
+
+        @deprecated: Use find_all() instead
+        """
+        warnings.warn(
+            "get_all_models() is deprecated. Use find_all() instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return self.find_all()
+
     def get_by_id(self, record_id: Any) -> Optional[Dict]:
-        """ID로 레코드 조회 (Dict 반환)"""
-        record = self.model_class.query.get(record_id)
-        return record.to_dict() if record else None
+        """ID로 레코드 조회 (Dict 반환)
+
+        @deprecated: Use find_by_id() + to_dict() instead
+        Phase 24 Option A: Service에서 Dict 변환 책임
+        """
+        warnings.warn(
+            "get_by_id() is deprecated. Use find_by_id() instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        model = self.find_by_id(record_id)
+        return model.to_dict() if model else None
 
     def get_model_by_id(self, record_id: Any) -> Optional[ModelType]:
-        """ID로 모델 객체 조회"""
-        return self.model_class.query.get(record_id)
+        """ID로 모델 객체 조회
+
+        @deprecated: Use find_by_id() instead
+        """
+        warnings.warn(
+            "get_model_by_id() is deprecated. Use find_by_id() instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return self.find_by_id(record_id)
 
     def find_by_id(self, record_id: Any) -> Optional[ModelType]:
         """
@@ -145,13 +192,28 @@ class BaseRelationRepository(BaseRepository[ModelType]):
     """
 
     def get_by_employee_id(self, employee_id: int) -> List[Dict]:
-        """특정 직원의 모든 레코드 조회"""
-        records = self.model_class.query.filter_by(employee_id=employee_id).all()
-        return [record.to_dict() for record in records]
+        """특정 직원의 모든 레코드 조회 (Dict 반환)
+
+        @deprecated: Use find_by_employee_id() + to_dict() instead
+        """
+        warnings.warn(
+            "get_by_employee_id() is deprecated. Use find_by_employee_id() instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return [record.to_dict() for record in self.find_by_employee_id(employee_id)]
 
     def get_models_by_employee_id(self, employee_id: int) -> List[ModelType]:
-        """특정 직원의 모든 레코드를 모델 객체로 조회"""
-        return self.model_class.query.filter_by(employee_id=employee_id).all()
+        """특정 직원의 모든 레코드를 모델 객체로 조회
+
+        @deprecated: Use find_by_employee_id() instead
+        """
+        warnings.warn(
+            "get_models_by_employee_id() is deprecated. Use find_by_employee_id() instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return self.find_by_employee_id(employee_id)
 
     def find_by_employee_id(self, employee_id: int) -> List[ModelType]:
         """
@@ -193,13 +255,43 @@ class BaseProfileRelationRepository(BaseRepository[ModelType]):
     """
 
     def get_by_profile_id(self, profile_id: int) -> List[Dict]:
-        """특정 프로필의 모든 레코드 조회"""
-        records = self.model_class.query.filter_by(profile_id=profile_id).all()
-        return [record.to_dict() for record in records]
+        """특정 프로필의 모든 레코드 조회 (Dict 반환)
+
+        @deprecated: Use find_by_profile_id() + to_dict() instead
+        """
+        warnings.warn(
+            "get_by_profile_id() is deprecated. Use find_by_profile_id() instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return [record.to_dict() for record in self.find_by_profile_id(profile_id)]
+
+    def find_by_profile_id(self, profile_id: int) -> List[ModelType]:
+        """
+        특정 프로필의 모든 레코드 조회 (신규 표준 메서드)
+
+        Phase 24 Option A: Repository는 Model만 반환
+        Service에서 to_dict() 호출하여 Dict 변환
+
+        Args:
+            profile_id: 프로필 ID
+
+        Returns:
+            모델 객체 리스트
+        """
+        return self.model_class.query.filter_by(profile_id=profile_id).all()
 
     def get_models_by_profile_id(self, profile_id: int) -> List[ModelType]:
-        """특정 프로필의 모든 레코드를 모델 객체로 조회"""
-        return self.model_class.query.filter_by(profile_id=profile_id).all()
+        """특정 프로필의 모든 레코드를 모델 객체로 조회
+
+        @deprecated: Use find_by_profile_id() instead
+        """
+        warnings.warn(
+            "get_models_by_profile_id() is deprecated. Use find_by_profile_id() instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return self.find_by_profile_id(profile_id)
 
     def create_for_profile(self, profile_id: int, data: Dict) -> ModelType:
         """특정 프로필에 레코드 추가 (from_dict 없이 직접 생성)"""
@@ -239,12 +331,35 @@ class BaseProfileOneToOneRepository(BaseRepository[ModelType]):
     """
 
     def get_by_profile_id(self, profile_id: int) -> Optional[ModelType]:
-        """특정 프로필의 레코드 조회 (1:1)"""
+        """특정 프로필의 레코드 조회 (1:1)
+
+        @deprecated: Use find_by_profile_id() instead
+        """
+        warnings.warn(
+            "get_by_profile_id() is deprecated. Use find_by_profile_id() instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return self.find_by_profile_id(profile_id)
+
+    def find_by_profile_id(self, profile_id: int) -> Optional[ModelType]:
+        """
+        특정 프로필의 레코드 조회 (신규 표준 메서드, 1:1 관계)
+
+        Phase 24 Option A: Repository는 Model만 반환
+        Service에서 to_dict() 호출하여 Dict 변환
+
+        Args:
+            profile_id: 프로필 ID
+
+        Returns:
+            모델 객체 또는 None
+        """
         return self.model_class.query.filter_by(profile_id=profile_id).first()
 
     def save_for_profile(self, profile_id: int, data: Dict) -> ModelType:
         """특정 프로필의 레코드 저장 (upsert)"""
-        record = self.get_by_profile_id(profile_id)
+        record = self.find_by_profile_id(profile_id)
 
         if record:
             # 기존 레코드 업데이트
@@ -262,7 +377,7 @@ class BaseProfileOneToOneRepository(BaseRepository[ModelType]):
 
     def delete_by_profile_id(self, profile_id: int) -> bool:
         """특정 프로필의 레코드 삭제"""
-        record = self.get_by_profile_id(profile_id)
+        record = self.find_by_profile_id(profile_id)
         if record:
             db.session.delete(record)
             db.session.commit()
@@ -283,13 +398,29 @@ class BaseOneToOneRepository(BaseRepository[ModelType]):
     """
 
     def get_by_employee_id(self, employee_id: int) -> Optional[Dict]:
-        """특정 직원의 레코드 조회 (1:1) - Dict 반환"""
-        record = self.model_class.query.filter_by(employee_id=employee_id).first()
+        """특정 직원의 레코드 조회 (1:1) - Dict 반환
+
+        @deprecated: Use find_by_employee_id() + to_dict() instead
+        """
+        warnings.warn(
+            "get_by_employee_id() is deprecated. Use find_by_employee_id() instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        record = self.find_by_employee_id(employee_id)
         return record.to_dict() if record else None
 
     def get_model_by_employee_id(self, employee_id: int) -> Optional[ModelType]:
-        """특정 직원의 레코드 조회 (1:1) - 모델 객체 반환"""
-        return self.model_class.query.filter_by(employee_id=employee_id).first()
+        """특정 직원의 레코드 조회 (1:1) - 모델 객체 반환
+
+        @deprecated: Use find_by_employee_id() instead
+        """
+        warnings.warn(
+            "get_model_by_employee_id() is deprecated. Use find_by_employee_id() instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        return self.find_by_employee_id(employee_id)
 
     def find_by_employee_id(self, employee_id: int) -> Optional[ModelType]:
         """
