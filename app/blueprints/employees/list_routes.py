@@ -113,6 +113,10 @@ def register_list_routes(bp: Blueprint):
                         user.id, company_id
                     ) or 'none'
 
+            # 퇴사 직원 제외 (resignation_date가 있으면 퇴사 처리된 직원)
+            if emp_dict.get('resignation_date'):
+                continue
+
             # 계약 approved인 직원만 목록에 추가
             if contract_status == 'approved':
                 emp_dict['user_id'] = user.id if user else None

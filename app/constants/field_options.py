@@ -65,6 +65,7 @@ class FieldOptions:
         Option('pending_contract', '계약대기'),
         Option('warning', '대기'),
         Option('expired', '만료'),
+        Option('resigned', '퇴사'),
     ]
 
     # 주간 근무시간 옵션
@@ -295,6 +296,10 @@ class FieldOptions:
         'exempted': '면제',
         'serving': '복무중',
         'not_applicable': '해당없음',
+
+        # 재직상태 레거시 (한글 → 영문 표준값)
+        '재직': 'active',
+        '퇴사': 'resigned',
 
         # 군별
         'army': '육군',
