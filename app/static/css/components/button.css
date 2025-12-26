@@ -40,7 +40,11 @@
 .btn-sm {
     padding: var(--space-1-5) var(--space-3);
     font-size: var(--text-xs);
-    flex: 1;
+}
+
+.btn-lg {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-base);
 }
 
 .btn-icon {
@@ -57,7 +61,7 @@
 }
 
 .btn-danger {
-    background-color: var(--color-error);
+    background-color: var(--color-error-500);
     color: var(--color-pure-white);
 }
 
@@ -67,7 +71,7 @@
 }
 
 .btn-success {
-    background-color: var(--color-success);
+    background-color: var(--color-success-500);
     color: var(--color-pure-white);
 }
 

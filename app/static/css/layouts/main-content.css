@@ -181,11 +181,7 @@
             margin-top: var(--space-3);
         }
 
-        .btn-sm {
-            padding: var(--space-1-5) var(--space-3);
-            font-size: var(--text-xs);
-            flex: 1;
-        }
+        /* 버튼 크기는 components/button.css에서 정의 */
 
         /* 대시보드 추가 정보 섹션 */
         .dashboard-info-section {

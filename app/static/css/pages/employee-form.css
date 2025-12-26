@@ -184,16 +184,7 @@ select.form-input {
     gap: var(--space-3);
 }
 
-/* 버튼 사이즈 */
-.btn-lg {
-    padding: var(--space-3) var(--space-6);
-    font-size: var(--text-base);
-}
-
-.btn-sm {
-    padding: var(--space-1) var(--space-3);
-    font-size: var(--text-sm);
-}
+/* 버튼 크기는 components/button.css에서 정의 */
 
 /* 모바일 메뉴 토글 */
 .mobile-section-nav-toggle {
