@@ -25,6 +25,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/card.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/table.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/employee-detail.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/company-card-detail.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -110,72 +111,4 @@
 {% block extra_js %}
 <script type="module" src="{{ url_for('static', filename='js/pages/employee-detail.js') }}"></script>
 <script src="{{ url_for('static', filename='js/components/business-card.js') }}"></script>
-
-<style>
-/* 종료 안내 배너 */
-.termination-notice-banner {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 16px 20px;
-    margin-bottom: 24px;
-    background-color: #fef3cd;
-    border: 1px solid #ffc107;
-    border-radius: 8px;
-}
-
-.termination-notice-banner .notice-icon {
-    font-size: 28px;
-    color: #856404;
-    flex-shrink: 0;
-}
-
-.termination-notice-banner .notice-content {
-    flex: 1;
-}
-
-.termination-notice-banner .notice-content h4 {
-    margin: 0 0 8px 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: #856404;
-}
-
-.termination-notice-banner .notice-content p {
-    margin: 0;
-    font-size: 14px;
-    color: #664d03;
-}
-
-.termination-notice-banner .notice-info {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    font-size: 13px;
-    color: #856404;
-}
-
-.termination-notice-banner .notice-info i {
-    margin-right: 4px;
-}
-
-/* 헤더 상태 배지 */
-.status-badge.terminated {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    margin-left: 12px;
-    font-size: 13px;
-    font-weight: 600;
-    background-color: #fef3cd;
-    color: #856404;
-    border-radius: 20px;
-    vertical-align: middle;
-}
-
-.status-badge.terminated i {
-    font-size: 12px;
-}
-</style>
 {% endblock %}

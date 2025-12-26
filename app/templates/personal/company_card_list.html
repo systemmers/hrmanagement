@@ -2,6 +2,10 @@
 
 {% block title %}회사 인사카드 - 인사카드 관리 시스템{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/company-card-list.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="page-header">
     <div class="page-title-section">
@@ -18,7 +22,7 @@
 
     {% if active_contracts %}
     <h3 class="section-subtitle">
-        <i class="fas fa-check-circle" style="color: var(--color-success);"></i>
+        <i class="fas fa-check-circle icon-success"></i>
         현재 계약
     </h3>
     <div class="company-card-grid">
@@ -63,8 +67,8 @@
     {% endif %}
 
     {% if terminated_contracts %}
-    <h3 class="section-subtitle" style="margin-top: 32px;">
-        <i class="fas fa-archive" style="color: var(--color-warning);"></i>
+    <h3 class="section-subtitle section-subtitle--terminated">
+        <i class="fas fa-archive icon-warning"></i>
         종료된 계약
         <span class="section-subtitle-info">(보관용 - 읽기 전용)</span>
     </h3>
@@ -131,58 +135,4 @@
     </div>
     {% endif %}
 </div>
-
-<style>
-.section-subtitle {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 16px 0;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--color-border);
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--color-text-secondary);
-}
-
-.section-subtitle-info {
-    font-size: 13px;
-    font-weight: 400;
-    color: var(--color-text-muted);
-}
-
-.company-card-item.terminated {
-    position: relative;
-    opacity: 0.85;
-    border-left: 4px solid var(--color-warning);
-}
-
-.contract-status-badge {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.contract-status-badge.terminated {
-    background-color: #fef3cd;
-    color: #856404;
-}
-
-.company-card-terminated-date {
-    margin-top: 8px;
-    font-size: 12px;
-    color: var(--color-warning-dark, #856404);
-}
-
-.terminated-section {
-    opacity: 0.95;
-}
-</style>
 {% endblock %}
