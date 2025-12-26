@@ -40,7 +40,7 @@
 /* Card Title Icon - Personal (Green) */
 .dashboard-card.personal-theme .card-title i,
 .personal-dashboard .card-title i {
-    color: #10b981;
+    color: var(--color-success-500);
 }
 
 /* Dashboard Card Body - cards.css 오버라이드 */
@@ -70,7 +70,7 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success-500) 0%, var(--color-success-600) 100%);
     color: white;
     display: flex;
     align-items: center;

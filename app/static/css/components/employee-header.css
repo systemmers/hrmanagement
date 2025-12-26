@@ -4,7 +4,7 @@
    ======================================== */
 
 .employee-header {
-    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    background: linear-gradient(135deg, var(--color-blue-600) 0%, var(--color-blue-800) 100%);
     border-radius: var(--radius-xl);
     padding: var(--space-8);
     margin-bottom: var(--space-6);
@@ -140,7 +140,7 @@
 
 .employee-header--personal {
     /* 그린 그래디언트 테마 */
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    background: linear-gradient(135deg, var(--color-success-600) 0%, var(--color-success-700) 100%);
 }
 
 .employee-header--personal .employee-header-content {

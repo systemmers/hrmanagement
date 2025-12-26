@@ -43,7 +43,7 @@
     width: 48px;
     height: 48px;
     border-radius: var(--radius-md);
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success-500) 0%, var(--color-success-600) 100%);
     color: white;
     display: flex;
     align-items: center;
@@ -55,7 +55,7 @@
 /* Corporate Avatar - Blue gradient */
 .company-avatar.corporate,
 .person-avatar.corporate {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    background: linear-gradient(135deg, var(--color-blue-500) 0%, var(--color-blue-600) 100%);
 }
 
 /* Company/Person Details */

@@ -5,14 +5,14 @@
 
 /* 버튼 추가 스타일 */
 .btn-danger {
-    background-color: #ef4444;
+    background-color: var(--color-error-500);
     color: var(--color-pure-white);
-    border: 1px solid #ef4444;
+    border: 1px solid var(--color-error-500);
 }
 
 .btn-danger:hover {
-    background-color: #dc2626;
-    border-color: #dc2626;
+    background-color: var(--color-error-600);
+    border-color: var(--color-error-600);
     box-shadow: var(--shadow-md);
 }
 
