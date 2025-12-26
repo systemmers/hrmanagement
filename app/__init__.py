@@ -60,6 +60,10 @@ def create_app(config_name=None):
     # 에러 핸들러
     register_error_handlers(app)
 
+    # CLI 명령어 등록
+    from .cli import register_cli_commands
+    register_cli_commands(app)
+
     return app
 
 

@@ -101,6 +101,33 @@ def _check_role(*roles) -> Optional[Tuple]:
     return None
 
 
+def _check_superadmin() -> Optional[Tuple]:
+    """
+    슈퍼관리자 여부 확인 (웹 페이지용)
+
+    Returns:
+        None: 슈퍼관리자
+        Tuple: (abort_response,) 권한 없을시 403
+    """
+    if not session.get(SessionKeys.IS_SUPERADMIN):
+        flash(FlashMessages.SUPERADMIN_REQUIRED, 'error')
+        return (abort(403),)
+    return None
+
+
+def _check_api_superadmin() -> Optional[Tuple]:
+    """
+    슈퍼관리자 여부 확인 (API용)
+
+    Returns:
+        None: 슈퍼관리자
+        Tuple: (json_response, status_code) 권한 없을시 JSON 응답
+    """
+    if not session.get(SessionKeys.IS_SUPERADMIN):
+        return (jsonify({'success': False, 'error': ErrorMessages.SUPERADMIN_REQUIRED}), 403)
+    return None
+
+
 # ============================================================
 # 기본 데코레이터
 # ============================================================
@@ -459,5 +486,50 @@ def api_admin_or_manager_required(f):
     def decorated_function(*args, **kwargs):
         if session.get(SessionKeys.USER_ROLE) not in UserRole.admin_roles():
             return jsonify({'success': False, 'error': ErrorMessages.ADMIN_PERMISSION_REQUIRED}), 403
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+# ============================================================
+# 플랫폼 관리자 데코레이터
+# ============================================================
+
+def superadmin_required(f):
+    """
+    플랫폼 마스터 관리자 전용 데코레이터
+
+    is_superadmin=True인 사용자만 접근 가능합니다.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        login_check = _check_login()
+        if login_check:
+            return login_check[0]
+
+        superadmin_check = _check_superadmin()
+        if superadmin_check:
+            return superadmin_check[0]
+
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def api_superadmin_required(f):
+    """
+    API용 플랫폼 마스터 관리자 전용 데코레이터
+
+    is_superadmin=True인 사용자만 접근 가능합니다.
+    JSON 응답을 반환하는 API 엔드포인트용입니다.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        api_check = _check_api_login()
+        if api_check:
+            return api_check
+
+        superadmin_check = _check_api_superadmin()
+        if superadmin_check:
+            return superadmin_check
+
         return f(*args, **kwargs)
     return decorated_function

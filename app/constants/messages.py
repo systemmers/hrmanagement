@@ -32,6 +32,7 @@ class FlashMessages:
     PERSONAL_ONLY_ACCESS = '개인 계정으로만 접근할 수 있습니다.'
     CORPORATE_ONLY_ACCESS = '법인 계정으로만 접근할 수 있습니다.'
     PERSONAL_OR_EMPLOYEE_ONLY = '개인 또는 직원 계정으로만 접근할 수 있습니다.'
+    SUPERADMIN_REQUIRED = '플랫폼 관리자 권한이 필요합니다.'
 
     # 로그아웃
     LOGGED_OUT_TEMPLATE = '{}님이 로그아웃되었습니다.'
@@ -48,6 +49,7 @@ class ErrorMessages:
     # 계정 타입
     PERSONAL_ONLY = '개인 계정으로만 접근할 수 있습니다.'
     CORPORATE_ONLY = '법인 계정으로만 접근할 수 있습니다.'
+    SUPERADMIN_REQUIRED = '플랫폼 관리자 권한이 필요합니다.'
 
     # 리소스
     NOT_FOUND = '리소스를 찾을 수 없습니다.'

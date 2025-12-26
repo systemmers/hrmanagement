@@ -41,8 +41,14 @@ def login():
             # Phase 1: 계정 유형 및 법인 정보 추가
             session[SessionKeys.ACCOUNT_TYPE] = user.account_type
             session[SessionKeys.COMPANY_ID] = user.company_id
+            # Platform Admin: 슈퍼관리자 여부
+            session[SessionKeys.IS_SUPERADMIN] = user.is_superadmin
 
             flash(FlashMessages.WELCOME_TEMPLATE.format(user.username), 'success')
+
+            # 슈퍼관리자인 경우 플랫폼 대시보드로
+            if user.is_superadmin:
+                return redirect(url_for('platform.dashboard'))
 
             # 계정 발급 후 직원 상태별 분기 (pending_info, pending_contract)
             if user.employee_id and user.account_type == 'employee_sub':

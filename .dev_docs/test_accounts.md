@@ -1,19 +1,39 @@
 # 테스트 계정 정보
 
-**최종 업데이트**: 2024-12-24
+**최종 업데이트**: 2025-12-26
 
 ## 계정 현황
 
 | 계정 유형 | 수량 | 설명 |
 |----------|------|------|
+| platform | 1 | 플랫폼 마스터 관리자 (Superadmin) |
 | corporate | 5 | 법인 관리자 계정 |
 | employee_sub | 52 | 법인 소속 직원 계정 |
 | personal | 10 | 개인 계정 |
-| **합계** | **67** | |
+| **합계** | **68** | |
 
 ## 공통 비밀번호
 
 모든 테스트 계정의 비밀번호: `test1234`
+
+---
+
+## 플랫폼 관리자 (platform)
+
+플랫폼 전체를 관리하는 Superadmin 계정
+
+| ID | Username | Email | Password | is_superadmin |
+|----|----------|-------|----------|---------------|
+| - | superadmin | admin@platform.hrm | test1234 | True |
+
+> **생성 방법**: `flask create-superadmin` CLI 명령어 사용
+>
+> ```bash
+> flask create-superadmin
+> # Username: superadmin
+> # Email: admin@platform.hrm
+> # Password: test1234
+> ```
 
 ---
 
@@ -145,6 +165,14 @@
 
 ## 자주 사용하는 테스트 계정
 
+### 플랫폼 관리자 테스트 (Superadmin)
+```
+Username: superadmin
+Email: admin@platform.hrm
+Password: test1234
+URL: http://localhost:5200/platform/
+```
+
 ### 법인 관리자 테스트
 ```
 Username: admin_testa
@@ -179,6 +207,7 @@ Password: test1234
 
 | 유형 | 접근 가능 메뉴 |
 |------|---------------|
+| `platform` | 플랫폼 대시보드, 법인 관리, 사용자 관리, 시스템 설정 |
 | `corporate` | 대시보드, 직원 관리, 계약 관리, 법인 관리, AI 테스트 |
 | `employee_sub` | 내 회사 정보 (인사카드), 프로필, 계약 승인 |
 | `personal` | 회사 목록, 계약 관리, 프로필 |
@@ -216,6 +245,7 @@ Password: test1234
 |------|-----|
 | 로컬 개발 | http://localhost:5200 |
 | 로그인 | http://localhost:5200/auth/login |
+| 플랫폼 대시보드 | http://localhost:5200/platform/ |
 | 개인 대시보드 | http://localhost:5200/personal/dashboard |
 | 법인 대시보드 | http://localhost:5200/ |
 | 직원 인사카드 | http://localhost:5200/my/company |

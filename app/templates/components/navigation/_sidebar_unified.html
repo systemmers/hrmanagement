@@ -2,13 +2,46 @@
     통합 사이드바 템플릿
     - account_type과 role 기반 동적 메뉴 생성
     - 개인(personal), 법인 직원(employee), 법인 관리자(corporate) 통합
+    - 플랫폼 관리자(superadmin) 전용 메뉴 포함
     Phase 3: 템플릿 통합 작업
 #}
 
 {# ========================================
+   플랫폼 관리자 (Superadmin) 메뉴
+   ======================================== #}
+{% if session.get('is_superadmin') %}
+
+<!-- 플랫폼 관리 섹션 -->
+<div class="nav-section platform-admin-section">
+    <h2 class="nav-section-title">
+        <i class="fas fa-crown"></i> 플랫폼 관리
+    </h2>
+    <a href="{{ url_for('platform.dashboard') }}"
+       class="nav-item {% if request.endpoint == 'platform.dashboard' %}active{% endif %}">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>대시보드</span>
+    </a>
+    <a href="{{ url_for('platform.companies_list') }}"
+       class="nav-item {% if request.endpoint and request.endpoint.startswith('platform.compan') %}active{% endif %}">
+        <i class="fas fa-building"></i>
+        <span>법인 관리</span>
+    </a>
+    <a href="{{ url_for('platform.users_list') }}"
+       class="nav-item {% if request.endpoint and request.endpoint.startswith('platform.user') %}active{% endif %}">
+        <i class="fas fa-users"></i>
+        <span>사용자 관리</span>
+    </a>
+    <a href="{{ url_for('platform.settings_list') }}"
+       class="nav-item {% if request.endpoint == 'platform.settings_list' %}active{% endif %}">
+        <i class="fas fa-cog"></i>
+        <span>시스템 설정</span>
+    </a>
+</div>
+
+{# ========================================
    개인 계정 (Personal) 메뉴
    ======================================== #}
-{% if current_user and current_user.account_type == 'personal' %}
+{% elif current_user and current_user.account_type == 'personal' %}
 
 <!-- 내 정보 섹션 -->
 <div class="nav-section">

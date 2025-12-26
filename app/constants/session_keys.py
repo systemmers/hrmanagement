@@ -15,6 +15,7 @@ class SessionKeys:
     PERSONAL_PROFILE_ID = 'personal_profile_id'
     ORG_ID = 'org_id'
     USERNAME = 'username'
+    IS_SUPERADMIN = 'is_superadmin'
 
 
 class AccountType:
@@ -23,11 +24,12 @@ class AccountType:
     CORPORATE = 'corporate'
     EMPLOYEE_SUB = 'employee_sub'
     CORPORATE_ADMIN = 'corporate_admin'  # 법인 관리자 (employee_id 없는 corporate)
+    PLATFORM = 'platform'  # 플랫폼 마스터 관리자
 
     @classmethod
     def all_types(cls):
         """모든 계정 타입 리스트"""
-        return [cls.PERSONAL, cls.CORPORATE, cls.EMPLOYEE_SUB]
+        return [cls.PERSONAL, cls.CORPORATE, cls.EMPLOYEE_SUB, cls.PLATFORM]
 
     @classmethod
     def personal_types(cls):

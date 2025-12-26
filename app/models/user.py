@@ -20,6 +20,7 @@ class User(db.Model):
     role = db.Column(db.String(20), default='employee', nullable=False)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=True)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
+    is_superadmin = db.Column(db.Boolean, default=False, nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime, nullable=True)
 
@@ -71,13 +72,15 @@ class User(db.Model):
     ACCOUNT_PERSONAL = 'personal'
     ACCOUNT_CORPORATE = 'corporate'
     ACCOUNT_EMPLOYEE_SUB = 'employee_sub'
+    ACCOUNT_PLATFORM = 'platform'  # 플랫폼 마스터 관리자
 
-    VALID_ACCOUNT_TYPES = [ACCOUNT_PERSONAL, ACCOUNT_CORPORATE, ACCOUNT_EMPLOYEE_SUB]
+    VALID_ACCOUNT_TYPES = [ACCOUNT_PERSONAL, ACCOUNT_CORPORATE, ACCOUNT_EMPLOYEE_SUB, ACCOUNT_PLATFORM]
 
     ACCOUNT_TYPE_LABELS = {
         ACCOUNT_PERSONAL: '개인',
         ACCOUNT_CORPORATE: '법인',
         ACCOUNT_EMPLOYEE_SUB: '법인직원',
+        ACCOUNT_PLATFORM: '플랫폼관리자',
     }
 
     def set_password(self, password):
@@ -135,6 +138,10 @@ class User(db.Model):
         """법인 하위 직원 계정 여부"""
         return self.account_type == self.ACCOUNT_EMPLOYEE_SUB
 
+    def is_platform_admin(self):
+        """플랫폼 마스터 관리자 여부"""
+        return self.is_superadmin
+
     def get_account_type_label(self):
         """계정 유형 한글 라벨"""
         return self.ACCOUNT_TYPE_LABELS.get(self.account_type, self.account_type)
@@ -162,6 +169,7 @@ class User(db.Model):
             'role': self.role,
             'employee_id': self.employee_id,
             'is_active': self.is_active,
+            'is_superadmin': self.is_superadmin,
             'account_type': self.account_type,
             'account_type_label': self.get_account_type_label(),
             'company_id': self.company_id,
@@ -180,6 +188,7 @@ class User(db.Model):
             role=data.get('role', cls.ROLE_EMPLOYEE),
             employee_id=data.get('employee_id'),
             is_active=data.get('is_active', True),
+            is_superadmin=data.get('is_superadmin', False),
             account_type=data.get('account_type', cls.ACCOUNT_CORPORATE),
             company_id=data.get('company_id'),
             parent_user_id=data.get('parent_user_id'),
