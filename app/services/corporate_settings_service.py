@@ -197,8 +197,22 @@ class CorporateSettingsService:
         return self.document_repo.get_expiring_documents(company_id, days)
 
     def get_document_by_id(self, document_id: int, company_id: int) -> Optional[Dict]:
-        """법인 서류 ID로 조회"""
-        return self.document_repo.get_by_id(document_id, company_id)
+        """법인 서류 ID로 조회
+
+        Args:
+            document_id: 서류 ID
+            company_id: 법인 ID (권한 검증용)
+
+        Returns:
+            서류 정보 Dict 또는 None
+        """
+        model = self.document_repo.find_by_id(document_id)
+        if not model:
+            return None
+        # 권한 검증: 해당 법인의 서류인지 확인
+        if model.company_id != company_id:
+            return None
+        return model.to_dict()
 
 
 # 싱글톤 인스턴스

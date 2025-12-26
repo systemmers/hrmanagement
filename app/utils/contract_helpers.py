@@ -158,7 +158,7 @@ def contract_party_required(f):
     def decorated_function(contract_id, *args, **kwargs):
         from ..extensions import person_contract_repo
 
-        contract = person_contract_repo.get_model_by_id(contract_id)
+        contract = person_contract_repo.find_by_id(contract_id)
         if not contract:
             return jsonify({'success': False, 'message': '계약을 찾을 수 없습니다.'}), 404
 
@@ -186,7 +186,7 @@ def approve_reject_permission_required(f):
     def decorated_function(contract_id, *args, **kwargs):
         from ..extensions import person_contract_repo
 
-        contract = person_contract_repo.get_model_by_id(contract_id)
+        contract = person_contract_repo.find_by_id(contract_id)
         if not contract:
             return jsonify({'success': False, 'message': '계약을 찾을 수 없습니다.'}), 404
 

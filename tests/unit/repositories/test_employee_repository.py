@@ -33,8 +33,8 @@ class TestEmployeeRepository:
         assert result['id'] is not None
 
     @pytest.mark.unit
-    def test_get_by_id(self, session):
-        """ID로 직원 조회 테스트"""
+    def test_find_by_id(self, session):
+        """ID로 직원 조회 테스트 (Model 반환)"""
         # 직원 생성
         employee = Employee(
             name='홍길동',
@@ -45,32 +45,34 @@ class TestEmployeeRepository:
         session.add(employee)
         session.commit()
 
-        # 조회
-        result = self.repo.get_by_id(employee.id)
+        # 조회 (Model 반환)
+        result = self.repo.find_by_id(employee.id)
 
         assert result is not None
-        assert result['name'] == '홍길동'
-        assert result['department'] == '인사팀'
+        assert isinstance(result, Employee)
+        assert result.name == '홍길동'
+        assert result.department == '인사팀'
 
     @pytest.mark.unit
-    def test_get_by_id_not_found(self):
+    def test_find_by_id_not_found(self):
         """존재하지 않는 직원 조회"""
-        result = self.repo.get_by_id(9999)
+        result = self.repo.find_by_id(9999)
         assert result is None
 
     @pytest.mark.unit
-    def test_get_all(self, session):
-        """전체 직원 조회 테스트"""
+    def test_find_all(self, session):
+        """전체 직원 조회 테스트 (Model 반환)"""
         # 직원 2명 생성
         emp1 = Employee(name='직원1', department='개발팀', status='active')
         emp2 = Employee(name='직원2', department='인사팀', status='active')
         session.add_all([emp1, emp2])
         session.commit()
 
-        result = self.repo.get_all()
+        result = self.repo.find_all()
 
         assert len(result) >= 2
-        names = [e['name'] for e in result]
+        assert all(isinstance(e, Employee) for e in result)
+        names = [e.name for e in result]
         assert '직원1' in names
         assert '직원2' in names
 
@@ -117,7 +119,7 @@ class TestEmployeeRepository:
         assert result is True
 
         # 삭제 확인
-        assert self.repo.get_by_id(emp_id) is None
+        assert self.repo.find_by_id(emp_id) is None
 
     @pytest.mark.unit
     def test_delete_not_found(self):

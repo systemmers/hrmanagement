@@ -73,7 +73,8 @@ class EmployeeRepository(BaseRepository[Employee]):
         company = Company.query.get(company_id)
         if not company or not company.root_organization_id:
             return []
-        return self.get_all(organization_id=company.root_organization_id)
+        models = self.find_all(organization_id=company.root_organization_id)
+        return [m.to_dict() for m in models]
 
     def verify_ownership(self, employee_id: int, root_organization_id: int) -> bool:
         """직원이 해당 조직 계층에 속하는지 확인
@@ -99,15 +100,17 @@ class EmployeeRepository(BaseRepository[Employee]):
     # CRUD 메서드
     # ========================================
 
-    def get_all(self, organization_id: int = None) -> List[Dict]:
-        """모든 직원 조회
+    def find_all(self, organization_id: int = None) -> List[Employee]:
+        """모든 직원 조회 (Model 반환 - 신규 표준)
 
         Args:
             organization_id: 조직 ID (None이면 전체 조회)
+
+        Returns:
+            Employee 모델 객체 리스트
         """
         query = self._build_query(organization_id)
-        employees = query.order_by(Employee.id).all()
-        return [emp.to_dict() for emp in employees]
+        return query.order_by(Employee.id).all()
 
     def get_by_id(self, employee_id: str) -> Optional[Dict]:
         """ID로 직원 조회 (dict 반환)"""
@@ -180,7 +183,8 @@ class EmployeeRepository(BaseRepository[Employee]):
             organization_id: 조직 ID (None이면 전체 검색)
         """
         if not query:
-            return self.get_all(organization_id=organization_id)
+            models = self.find_all(organization_id=organization_id)
+            return [m.to_dict() for m in models]
 
         search_term = f'%{query}%'
         base_query = self._build_query(organization_id)

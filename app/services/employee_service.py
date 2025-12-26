@@ -123,7 +123,8 @@ class EmployeeService:
 
     def get_all_employees(self, organization_id: int = None) -> List[Dict]:
         """전체 직원 조회"""
-        return self.employee_repo.get_all(organization_id=organization_id)
+        models = self.employee_repo.find_all(organization_id=organization_id)
+        return [m.to_dict() for m in models]
 
     def verify_ownership(self, employee_id: int, org_id: int) -> bool:
         """직원 소유권 확인"""
