@@ -12,10 +12,10 @@
     position: relative;
     background: transparent;
     border: none;
-    padding: 8px;
+    padding: var(--space-2);
     cursor: pointer;
     color: var(--color-gray-600);
-    font-size: 18px;
+    font-size: var(--text-lg);
     transition: color var(--transition-fast);
 }
 
@@ -66,7 +66,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
+    padding: var(--space-4) var(--space-5);
     border-bottom: 1px solid var(--color-gray-200);
 }
 
@@ -87,8 +87,8 @@
 /* 알림 아이템 */
 .notification-item {
     display: flex;
-    gap: 12px;
-    padding: 14px 20px;
+    gap: var(--space-3);
+    padding: var(--space-3-5) var(--space-5);
     border-bottom: 1px solid var(--color-gray-200);
     cursor: pointer;
     transition: background var(--transition-fast);
@@ -127,11 +127,12 @@
     font-size: 14px;
 }
 
-.notification-icon.contract { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-.notification-icon.sync { background: rgba(6, 182, 212, 0.1); color: #06b6d4; }
-.notification-icon.termination { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
-.notification-icon.system { background: rgba(107, 114, 128, 0.1); color: #6b7280; }
-.notification-icon.warning { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+/* 알림 아이콘 색상 - rgba()는 RGB 변수 필요, 현재 직접 색상값 유지 */
+.notification-icon.contract { background: rgba(59, 130, 246, 0.1); color: var(--color-blue-500); }
+.notification-icon.sync { background: rgba(6, 182, 212, 0.1); color: #06b6d4; } /* cyan-500 */
+.notification-icon.termination { background: rgba(239, 68, 68, 0.1); color: var(--color-error-500); }
+.notification-icon.system { background: rgba(107, 114, 128, 0.1); color: var(--color-gray-500); }
+.notification-icon.warning { background: rgba(234, 179, 8, 0.1); color: var(--color-warning-500); }
 
 /* 알림 내용 */
 .notification-content {
@@ -143,7 +144,7 @@
     font-size: var(--text-sm);
     font-weight: 500;
     color: var(--color-gray-900);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -160,9 +161,9 @@
 }
 
 .notification-time {
-    font-size: 10px;
+    font-size: var(--text-xs);
     color: var(--color-gray-400);
-    margin-top: 4px;
+    margin-top: var(--space-1);
 }
 
 /* 빈 상태 */
@@ -171,19 +172,19 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
+    padding: var(--space-10) var(--space-5);
     color: var(--color-gray-500);
 }
 
 .notification-empty i {
-    font-size: 32px;
-    margin-bottom: 12px;
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-3);
     opacity: 0.5;
 }
 
 /* 알림 푸터 */
 .notification-footer {
-    padding: 12px 20px;
+    padding: var(--space-3) var(--space-5);
     border-top: 1px solid var(--color-gray-200);
     text-align: center;
 }

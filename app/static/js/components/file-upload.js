@@ -7,6 +7,12 @@
  */
 
 import { showToast } from './toast.js';
+import {
+    MAX_FILE_SIZE,
+    ALLOWED_FILE_EXTENSIONS,
+    FILE_UPLOAD_MESSAGES,
+    isAllowedExtension
+} from '../constants/file-upload-constants.js';
 
 export class FileUpload {
     /**
@@ -91,17 +97,15 @@ export class FileUpload {
 
     async handleFiles(files) {
         for (const file of files) {
-            // 파일 크기 검사 (10MB)
-            if (file.size > 10 * 1024 * 1024) {
-                showToast(`${file.name}: 파일 크기가 10MB를 초과합니다.`, 'error');
+            // 파일 크기 검사
+            if (file.size > MAX_FILE_SIZE) {
+                showToast(`${file.name}: ${FILE_UPLOAD_MESSAGES.SIZE_EXCEEDED}`, 'error');
                 continue;
             }
 
             // 파일 확장자 검사
-            const ext = file.name.split('.').pop().toLowerCase();
-            const allowedExts = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'doc', 'docx', 'xls', 'xlsx'];
-            if (!allowedExts.includes(ext)) {
-                showToast(`${file.name}: 허용되지 않는 파일 형식입니다.`, 'error');
+            if (!isAllowedExtension(file.name, ALLOWED_FILE_EXTENSIONS)) {
+                showToast(`${file.name}: ${FILE_UPLOAD_MESSAGES.INVALID_TYPE}`, 'error');
                 continue;
             }
 

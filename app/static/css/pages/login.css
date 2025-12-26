@@ -9,7 +9,7 @@
     align-items: center;
     justify-content: center;
     background: var(--gradient-accent);
-    padding: 20px;
+    padding: var(--space-5);
 }
 
 .login-container {
@@ -17,47 +17,47 @@
     max-width: 420px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--space-5);
 }
 
 /* 로그인 카드 */
 .login-card {
     background: var(--color-pure-white);
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    padding: 40px;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); /* elevated card shadow */
+    padding: var(--space-10);
 }
 
 /* 헤더 영역 */
 .login-header {
     text-align: center;
-    margin-bottom: 32px;
+    margin-bottom: var(--space-8);
 }
 
 .login-logo {
     width: 80px;
     height: 80px;
     background: var(--gradient-accent);
-    border-radius: 20px;
+    border-radius: var(--radius-2xl);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: var(--text-3xl);
     font-weight: 700;
-    color: white;
-    margin: 0 auto 16px;
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4); /* --color-accent-start shadow */
+    color: var(--color-pure-white);
+    margin: 0 auto var(--space-4);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4); /* --color-accent-start with opacity */
 }
 
 .login-title {
-    font-size: 24px;
+    font-size: var(--text-2xl);
     font-weight: 700;
     color: var(--color-gray-900);
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .login-subtitle {
-    font-size: 14px;
+    font-size: var(--text-sm);
     color: var(--color-gray-500);
 }
 
@@ -65,11 +65,11 @@
 .login-card .alert {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 14px;
+    gap: var(--space-2-5);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-5);
+    font-size: var(--text-sm);
 }
 
 .login-card .alert-success {
@@ -85,37 +85,37 @@
 }
 
 .login-card .alert i {
-    font-size: 16px;
+    font-size: var(--text-base);
 }
 
 /* 폼 그룹 */
 .login-form .form-group {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .login-form .form-label {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 14px;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
     font-weight: 500;
     color: var(--color-gray-700);
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .login-form .form-label i {
     color: var(--color-gray-400);
-    font-size: 14px;
+    font-size: var(--text-sm);
 }
 
 .login-form .form-input {
     width: 100%;
-    padding: 12px 16px;
+    padding: var(--space-3) var(--space-4);
     border: 2px solid var(--color-gray-200);
-    border-radius: 10px;
-    font-size: 15px;
+    border-radius: var(--radius-lg);
+    font-size: var(--text-base);
     color: var(--color-gray-900);
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
     background: var(--color-gray-50);
 }
 
@@ -136,23 +136,23 @@
 }
 
 .password-input-wrapper .form-input {
-    padding-right: 48px;
+    padding-right: var(--space-12);
 }
 
 .password-toggle {
     position: absolute;
-    right: 12px;
+    right: var(--space-3);
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
     color: var(--color-gray-400);
     cursor: pointer;
-    padding: 4px;
+    padding: var(--space-1);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.2s;
+    transition: color var(--transition-fast);
 }
 
 .password-toggle:hover {
@@ -161,14 +161,14 @@
 
 /* 체크박스 옵션 */
 .form-options {
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 .checkbox-label {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 14px;
+    gap: var(--space-2-5);
+    font-size: var(--text-sm);
     color: var(--color-gray-600);
     cursor: pointer;
 }
@@ -181,9 +181,9 @@
     width: 18px;
     height: 18px;
     border: 2px solid var(--color-gray-300);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     position: relative;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
@@ -198,7 +198,7 @@
     top: 2px;
     width: 5px;
     height: 9px;
-    border: solid white;
+    border: solid var(--color-pure-white);
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
 }
@@ -206,19 +206,19 @@
 /* 로그인 버튼 */
 .btn-login {
     width: 100%;
-    padding: 14px 24px;
+    padding: var(--space-3-5) var(--space-6);
     background: var(--gradient-accent);
     border: none;
-    border-radius: 10px;
-    font-size: 16px;
+    border-radius: var(--radius-lg);
+    font-size: var(--text-base);
     font-weight: 600;
-    color: white;
+    color: var(--color-pure-white);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    transition: all 0.3s;
+    gap: var(--space-2-5);
+    transition: all var(--transition-normal);
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); /* --color-accent-start shadow */
 }
 
@@ -234,19 +234,19 @@
 /* 도움말 */
 .login-help {
     text-align: center;
-    margin-top: 24px;
-    padding-top: 24px;
+    margin-top: var(--space-6);
+    padding-top: var(--space-6);
     border-top: 1px solid var(--color-gray-200);
 }
 
 .login-help p {
-    font-size: 13px;
+    font-size: var(--text-xs);
     color: var(--color-gray-500);
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .login-help a {
-    font-size: 14px;
+    font-size: var(--text-sm);
     color: var(--color-accent-start);
     text-decoration: none;
     font-weight: 500;
@@ -262,23 +262,23 @@
 }
 
 .login-footer p {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.7);
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.7); /* white with opacity for gradient background */
 }
 
 /* 반응형 */
 @media (max-width: 480px) {
     .login-card {
-        padding: 30px 24px;
+        padding: var(--space-7) var(--space-6);
     }
 
     .login-logo {
         width: 64px;
         height: 64px;
-        font-size: 24px;
+        font-size: var(--text-2xl);
     }
 
     .login-title {
-        font-size: 20px;
+        font-size: var(--text-xl);
     }
 }

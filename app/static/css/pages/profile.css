@@ -257,29 +257,7 @@
     font-size: var(--text-sm);
 }
 
-/* .info-grid, .info-group, .info-group--full은 components/info-grid.css에서 정의 */
-
-.info-label {
-    font-size: var(--text-sm);
-    color: var(--color-gray-600);
-    font-weight: 500;
-}
-
-.info-value {
-    font-size: var(--text-base);
-    color: var(--color-gray-900);
-    font-weight: 400;
-}
-
-.info-value--highlight {
-    color: var(--profile-primary);
-    font-weight: 600;
-}
-
-.info-value--empty {
-    color: var(--color-gray-400);
-    font-style: italic;
-}
+/* .info-grid, .info-group, .info-group--full, .info-label, .info-value는 components/info-grid.css에서 정의 */
 
 /* ----------------------------------------
    타임라인 (교육/경력 이력)

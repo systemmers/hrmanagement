@@ -10,6 +10,7 @@
  */
 
 import { post, get } from '../utils/api.js';
+import { showToast } from '../components/toast.js';
 
 const API_BASE = '/contracts/api';
 
@@ -31,16 +32,16 @@ export async function approveContract(contractId, options = {}) {
         const result = await post(`${API_BASE}/${contractId}/approve`);
 
         if (result.success) {
-            alert(options.successMessage || '계약이 승인되었습니다.');
+            showToast(options.successMessage || '계약이 승인되었습니다.', 'success');
             if (options.reload !== false) location.reload();
             return true;
         } else {
-            alert(result.message || '오류가 발생했습니다.');
+            showToast(result.message || '오류가 발생했습니다.', 'error');
             return false;
         }
     } catch (error) {
         console.error('계약 승인 오류:', error);
-        alert(error.message || '요청 처리 중 오류가 발생했습니다.');
+        showToast(error.message || '요청 처리 중 오류가 발생했습니다.', 'error');
         return false;
     }
 }
@@ -62,16 +63,16 @@ export async function rejectContract(contractId, options = {}) {
         const result = await post(`${API_BASE}/${contractId}/reject`, { reason });
 
         if (result.success) {
-            alert(options.successMessage || '계약 요청이 거절되었습니다.');
+            showToast(options.successMessage || '계약 요청이 거절되었습니다.', 'success');
             if (options.reload !== false) location.reload();
             return true;
         } else {
-            alert(result.message || '오류가 발생했습니다.');
+            showToast(result.message || '오류가 발생했습니다.', 'error');
             return false;
         }
     } catch (error) {
         console.error('계약 거절 오류:', error);
-        alert(error.message || '요청 처리 중 오류가 발생했습니다.');
+        showToast(error.message || '요청 처리 중 오류가 발생했습니다.', 'error');
         return false;
     }
 }
@@ -97,16 +98,16 @@ export async function terminateContract(contractId, options = {}) {
         const result = await post(`${API_BASE}/${contractId}/terminate`, { reason });
 
         if (result.success) {
-            alert(options.successMessage || '계약이 종료되었습니다.');
+            showToast(options.successMessage || '계약이 종료되었습니다.', 'success');
             if (options.reload !== false) location.reload();
             return true;
         } else {
-            alert(result.message || '오류가 발생했습니다.');
+            showToast(result.message || '오류가 발생했습니다.', 'error');
             return false;
         }
     } catch (error) {
         console.error('계약 종료 오류:', error);
-        alert(error.message || '요청 처리 중 오류가 발생했습니다.');
+        showToast(error.message || '요청 처리 중 오류가 발생했습니다.', 'error');
         return false;
     }
 }

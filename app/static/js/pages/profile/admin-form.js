@@ -5,7 +5,13 @@
  * 기능:
  * - 프로필 사진 업로드 및 미리보기
  * - 사진 삭제
+ *
+ * TODO: ES 모듈 전환 시 constants/file-upload-constants.js import 필요
  */
+
+// 파일 업로드 상수 (SSOT: constants/file-upload-constants.js와 동일 값)
+const MAX_FILE_SIZE_MB = 10;
+const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 document.addEventListener('DOMContentLoaded', function() {
     initAdminProfileForm();
@@ -35,9 +41,9 @@ function initPhotoUpload() {
         photoFileInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
-                // 파일 크기 체크 (5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('파일 크기는 5MB 이하여야 합니다.');
+                // 파일 크기 체크
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`파일 크기는 ${MAX_FILE_SIZE_MB}MB 이하여야 합니다.`);
                     return;
                 }
 

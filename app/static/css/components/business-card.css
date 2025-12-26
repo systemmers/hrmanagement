@@ -138,14 +138,14 @@
 }
 
 .btn-delete-card {
-    background: rgba(239, 68, 68, 0.2);
-    color: #fca5a5;
-    border: 1px solid rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.2); /* --color-error-500 with opacity */
+    color: var(--color-error-300, #fca5a5);
+    border: 1px solid rgba(239, 68, 68, 0.4); /* --color-error-500 with opacity */
 }
 
 .btn-delete-card:hover {
-    background: rgba(239, 68, 68, 0.3);
-    border-color: rgba(239, 68, 68, 0.6);
+    background: rgba(239, 68, 68, 0.3); /* --color-error-500 with opacity */
+    border-color: rgba(239, 68, 68, 0.6); /* --color-error-500 with opacity */
 }
 
 /* ========================================
@@ -243,12 +243,12 @@
 
 .upload-dropzone:hover {
     border-color: var(--color-primary);
-    background: rgba(37, 99, 235, 0.05);
+    background: rgba(37, 99, 235, 0.05); /* --color-blue-600 with opacity */
 }
 
 .upload-dropzone.dragover {
     border-color: var(--color-primary);
-    background: rgba(37, 99, 235, 0.1);
+    background: rgba(37, 99, 235, 0.1); /* --color-blue-600 with opacity */
 }
 
 .upload-dropzone.has-file {

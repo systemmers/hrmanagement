@@ -55,21 +55,21 @@
 }
 
 /* Icon Color Variants - Contracts */
-.stat-icon.total { background: #dbeafe; color: #2563eb; }
-.stat-icon.active { background: #dcfce7; color: #16a34a; }
-.stat-icon.pending { background: #fef3c7; color: #d97706; }
-.stat-icon.terminated { background: #f3f4f6; color: #6b7280; }
+.stat-icon.total { background: var(--color-blue-100); color: var(--color-blue-600); }
+.stat-icon.active { background: var(--color-success-100); color: var(--color-success-600); }
+.stat-icon.pending { background: var(--color-warning-100); color: var(--color-warning-600); }
+.stat-icon.terminated { background: var(--color-gray-100); color: var(--color-gray-500); }
 
 /* Icon Color Variants - Personal/Corporate */
-.stat-icon.education { background: #dbeafe; color: #2563eb; }
-.stat-icon.career { background: #dcfce7; color: #16a34a; }
-.stat-icon.certificate { background: #fef3c7; color: #d97706; }
-.stat-icon.language { background: #fce7f3; color: #db2777; }
-.stat-icon.employees { background: #dbeafe; color: #2563eb; }
-.stat-icon.limit { background: #dcfce7; color: #16a34a; }
-.stat-icon.plan { background: #fef3c7; color: #d97706; }
-.stat-icon.status.verified { background: #dcfce7; color: #16a34a; }
-.stat-icon.status.pending { background: #fef3c7; color: #d97706; }
+.stat-icon.education { background: var(--color-blue-100); color: var(--color-blue-600); }
+.stat-icon.career { background: var(--color-success-100); color: var(--color-success-600); }
+.stat-icon.certificate { background: var(--color-warning-100); color: var(--color-warning-600); }
+.stat-icon.language { background: #fce7f3; color: #db2777; } /* TODO: Add --color-pink to variables.css */
+.stat-icon.employees { background: var(--color-blue-100); color: var(--color-blue-600); }
+.stat-icon.limit { background: var(--color-success-100); color: var(--color-success-600); }
+.stat-icon.plan { background: var(--color-warning-100); color: var(--color-warning-600); }
+.stat-icon.status.verified { background: var(--color-success-100); color: var(--color-success-600); }
+.stat-icon.status.pending { background: var(--color-warning-100); color: var(--color-warning-600); }
 
 /* Stat Content */
 .stat-content,

@@ -5,6 +5,12 @@
  * 공통 헬퍼 함수 모음
  */
 
+import {
+    MAX_FILE_SIZE,
+    MAX_FILE_SIZE_MB,
+    FILE_UPLOAD_MESSAGES
+} from '../../constants/file-upload-constants.js';
+
 /**
  * 폼에서 직원 ID 추출
  * 프로필 수정 페이지(profileEditForm)와 직원 수정 페이지(employeeForm) 모두 지원
@@ -51,10 +57,8 @@ export function showToast(message, type = 'info') {
  */
 export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
-/**
- * 최대 파일 크기 (5MB)
- */
-export const MAX_FILE_SIZE = 5 * 1024 * 1024;
+// MAX_FILE_SIZE는 constants/file-upload-constants.js에서 import하여 re-export
+export { MAX_FILE_SIZE };
 
 /**
  * 이미지 파일 유효성 검사
@@ -72,7 +76,7 @@ export function validateImageFile(file) {
     if (file.size > MAX_FILE_SIZE) {
         return {
             valid: false,
-            error: '파일 크기가 5MB를 초과합니다.'
+            error: FILE_UPLOAD_MESSAGES.SIZE_EXCEEDED
         };
     }
 

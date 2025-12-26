@@ -7,8 +7,8 @@
 /* 통계 카드 레이아웃 */
 .stats-row {
     display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
     flex-wrap: wrap;
 }
 
@@ -16,7 +16,7 @@
 .org-container {
     display: grid;
     grid-template-columns: 1fr 400px;
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 @media (max-width: 1024px) {
@@ -29,13 +29,13 @@
 .org-tree-panel,
 .org-detail-panel {
     background: var(--color-pure-white);
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
 }
 
 .panel-header {
-    padding: 16px 20px;
+    padding: var(--space-4) var(--space-5);
     border-bottom: 1px solid var(--color-gray-100);
     display: flex;
     align-items: center;
@@ -43,23 +43,23 @@
 }
 
 .panel-header h3 {
-    font-size: 16px;
+    font-size: var(--text-base);
     font-weight: 600;
     color: var(--color-gray-900);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .panel-actions {
     display: flex;
-    gap: 4px;
+    gap: var(--space-1);
 }
 
 .btn-icon {
     width: 32px;
     height: 32px;
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     border: none;
     background: transparent;
     color: var(--color-gray-500);
@@ -67,7 +67,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .btn-icon:hover {
@@ -76,14 +76,14 @@
 }
 
 .panel-body {
-    padding: 16px;
+    padding: var(--space-4);
     max-height: calc(100vh - 400px);
     overflow-y: auto;
 }
 
 /* 트리 구조 */
 .org-tree {
-    font-size: 14px;
+    font-size: var(--text-sm);
 }
 
 .tree-node {
@@ -93,11 +93,11 @@
 .tree-node-content {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border-radius: 6px;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all var(--transition-fast);
 }
 
 .tree-node-content:hover {
@@ -117,11 +117,11 @@
     justify-content: center;
     color: var(--color-gray-400);
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform var(--transition-fast);
 }
 
 .tree-toggle i {
-    font-size: 10px;
+    font-size: var(--text-xs);
 }
 
 .tree-toggle-placeholder {
@@ -160,17 +160,17 @@
 }
 
 .tree-code {
-    font-size: 11px;
-    padding: 2px 6px;
+    font-size: var(--text-xs);
+    padding: var(--space-0-5) var(--space-1-5);
     background: var(--color-gray-100);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     color: var(--color-gray-500);
 }
 
 .tree-children {
-    margin-left: 28px;
+    margin-left: var(--space-7);
     border-left: 1px dashed var(--color-gray-200);
-    padding-left: 4px;
+    padding-left: var(--space-1);
 }
 
 .tree-children.collapsed {
@@ -181,43 +181,43 @@
 .empty-tree,
 .empty-detail {
     text-align: center;
-    padding: 48px 24px;
+    padding: var(--space-12) var(--space-6);
     color: var(--color-gray-400);
 }
 
 .empty-tree i,
 .empty-detail i {
-    font-size: 48px;
-    margin-bottom: 16px;
+    font-size: var(--text-5xl);
+    margin-bottom: var(--space-4);
 }
 
 .empty-tree p,
 .empty-detail p {
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 /* 조직 상세 정보 */
 .org-detail {
-    padding: 8px;
+    padding: var(--space-2);
 }
 
 .detail-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
 }
 
 .detail-header h4 {
-    font-size: 20px;
+    font-size: var(--text-xl);
     font-weight: 600;
     color: var(--color-gray-900);
 }
 
 .org-type-badge {
-    padding: 4px 10px;
-    border-radius: 16px;
-    font-size: 12px;
+    padding: var(--space-1) var(--space-2-5);
+    border-radius: var(--radius-2xl);
+    font-size: var(--text-xs);
     font-weight: 500;
 }
 
@@ -247,12 +247,12 @@
 }
 
 .detail-info {
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 .info-row {
     display: flex;
-    padding: 12px 0;
+    padding: var(--space-3) 0;
     border-bottom: 1px solid var(--color-gray-100);
 }
 
@@ -263,19 +263,19 @@
 .info-label {
     width: 100px;
     flex-shrink: 0;
-    font-size: 13px;
+    font-size: var(--text-xs);
     color: var(--color-gray-500);
 }
 
 .info-value {
     flex: 1;
-    font-size: 14px;
+    font-size: var(--text-sm);
     color: var(--color-gray-800);
 }
 
 .detail-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
     flex-wrap: wrap;
 }
 
@@ -300,8 +300,8 @@
 .checkbox-label {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 14px;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
     color: var(--color-gray-700);
     cursor: pointer;
 }
