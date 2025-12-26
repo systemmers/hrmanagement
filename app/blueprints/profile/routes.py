@@ -15,6 +15,7 @@ from app.blueprints.profile.decorators import (
     corporate_only,
     corporate_admin_only
 )
+from app.extensions import user_repo
 from app.services.attachment_service import attachment_service
 from app.services.corporate_admin_profile_service import corporate_admin_profile_service
 from app.services.file_storage_service import file_storage, CATEGORY_ADMIN_PHOTO
@@ -325,7 +326,7 @@ def admin_profile_create():
         return redirect(url_for('profile.view'))
 
     # 사용자 정보 조회
-    user = User.query.get(user_id)
+    user = user_repo.find_by_id(user_id)
     if not user:
         flash('사용자 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('auth.login'))
