@@ -22,7 +22,7 @@
 
 /* 모달 컨텐츠 */
 .tree-selector-content {
-    background: var(--white);
+    background: var(--color-pure-white);
     border-radius: 16px;
     width: 100%;
     max-width: 500px;
@@ -36,7 +36,7 @@
 /* 헤더 */
 .tree-selector-header {
     padding: 16px 20px;
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid var(--color-gray-100);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -46,7 +46,7 @@
 .tree-selector-header h3 {
     font-size: 18px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--color-gray-900);
     margin: 0;
 }
 
@@ -57,7 +57,7 @@
     border: none;
     background: transparent;
     font-size: 24px;
-    color: var(--gray-400);
+    color: var(--color-gray-400);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -66,31 +66,31 @@
 }
 
 .tree-selector-close:hover {
-    background: var(--gray-100);
-    color: var(--gray-600);
+    background: var(--color-gray-100);
+    color: var(--color-gray-600);
 }
 
 /* 검색 */
 .tree-selector-search {
     padding: 12px 20px;
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid var(--color-gray-100);
     flex-shrink: 0;
 }
 
 .tree-selector-search-input {
     width: 100%;
     padding: 10px 14px;
-    border: 1px solid var(--gray-200);
+    border: 1px solid var(--color-gray-200);
     border-radius: 8px;
     font-size: 14px;
-    color: var(--gray-900);
+    color: var(--color-gray-900);
     transition: all 0.2s;
 }
 
 .tree-selector-search-input:focus {
     outline: none;
-    border-color: var(--primary-500);
-    box-shadow: 0 0 0 3px var(--primary-100);
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-primary-100);
 }
 
 /* 트리 영역 */
@@ -133,12 +133,12 @@
 }
 
 .tree-item-content:hover {
-    background: var(--gray-50);
+    background: var(--color-gray-50);
 }
 
 .tree-item-content.selected {
-    background: var(--primary-50);
-    color: var(--primary-700);
+    background: var(--color-primary-50);
+    color: var(--color-primary-700);
 }
 
 /* 토글 버튼 */
@@ -148,7 +148,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--gray-400);
+    color: var(--color-gray-400);
     transition: transform 0.2s;
 }
 
@@ -172,51 +172,51 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--gray-500);
+    color: var(--color-gray-500);
 }
 
 .tree-item[data-type="company"] > .tree-item-content .tree-icon {
-    color: var(--primary-600);
+    color: var(--color-primary-600);
 }
 
 .tree-item[data-type="division"] > .tree-item-content .tree-icon {
-    color: var(--blue-600);
+    color: var(--color-blue-600);
 }
 
 .tree-item[data-type="department"] > .tree-item-content .tree-icon {
-    color: var(--green-600);
+    color: var(--color-success-600);
 }
 
 .tree-item[data-type="team"] > .tree-item-content .tree-icon {
-    color: var(--orange-600);
+    color: var(--color-warning-600);
 }
 
 /* 라벨 */
 .tree-label {
     flex: 1;
     font-weight: 500;
-    color: var(--gray-800);
+    color: var(--color-gray-800);
 }
 
 .tree-code {
     font-size: 11px;
     padding: 2px 6px;
-    background: var(--gray-100);
+    background: var(--color-gray-100);
     border-radius: 4px;
-    color: var(--gray-500);
+    color: var(--color-gray-500);
 }
 
 /* 빈 상태 */
 .tree-empty {
     text-align: center;
     padding: 32px;
-    color: var(--gray-400);
+    color: var(--color-gray-400);
 }
 
 /* 푸터 */
 .tree-selector-footer {
     padding: 16px 20px;
-    border-top: 1px solid var(--gray-100);
+    border-top: 1px solid var(--color-gray-100);
     display: flex;
     justify-content: flex-end;
     gap: 8px;
@@ -234,7 +234,7 @@
 }
 
 .org-selector-input:hover {
-    border-color: var(--primary-400);
+    border-color: var(--color-primary-400);
 }
 
 /* 반응형 */

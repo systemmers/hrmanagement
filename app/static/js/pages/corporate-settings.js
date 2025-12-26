@@ -24,7 +24,7 @@ function showLoadingError(loadingEl) {
         <div class="category-empty">
             <i class="fas fa-exclamation-circle"></i>
             <p>데이터를 불러오는데 실패했습니다</p>
-            <button class="btn btn-small btn-secondary" onclick="location.reload()">다시 시도</button>
+            <button class="btn btn-sm btn-secondary" onclick="location.reload()">다시 시도</button>
         </div>
     `;
 }

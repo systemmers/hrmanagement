@@ -223,17 +223,17 @@
             </div>
         </div>
         <div class="employee-actions">
-            <a href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}" class="btn btn-secondary btn-small">
+            <a href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}" class="btn btn-secondary btn-sm">
                 <i class="fas fa-eye"></i>
                 <span>보기</span>
             </a>
-            <a href="{{ url_for('employees.employee_edit', employee_id=employee.id) }}" class="btn btn-secondary btn-small">
+            <a href="{{ url_for('employees.employee_edit', employee_id=employee.id) }}" class="btn btn-secondary btn-sm">
                 <i class="fas fa-edit"></i>
                 <span>수정</span>
             </a>
             {# 21번 원칙: 계약 요청 버튼 (계정 있고 계약 없는 경우만) #}
             {% if employee.contract_status == 'none' %}
-            <button class="btn btn-primary btn-small btn-contract-request"
+            <button class="btn btn-primary btn-sm btn-contract-request"
                     data-user-id="{{ employee.user_id }}"
                     data-employee-name="{{ employee.name }}">
                 <i class="fas fa-file-signature"></i>

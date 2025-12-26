@@ -110,7 +110,7 @@
 }
 
 /* 버튼 flex: 1 오버라이드 */
-.accordion-section .add-item-form .btn-small {
+.accordion-section .add-item-form .btn-sm {
     flex: none;
 }
 
