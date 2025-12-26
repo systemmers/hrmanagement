@@ -93,7 +93,18 @@
       "mcp__playwright__browser_network_requests",
       "Bash(DATABASE_URL=\"postgresql://hrm_user:hrm_secure_password_2024@localhost:6543/hrmanagement_db\" python:*)",
       "Bash(DATABASE_URL=\"postgresql://hrm_user:hrm_secure_password_2024@localhost:6543/hrmanagement_db\" python -c:*)",
-      "Skill(sc:workflow)"
+      "Skill(sc:workflow)",
+      "Bash(alembic downgrade:*)",
+      "Skill(sc:cleanup)",
+      "Bash(git -C D:/projects/hrmanagement add app/services/employee_service.py app/services/attachment_service.py app/services/base/history_service.py app/services/classification_service.py app/services/user_employee_link_service.py)",
+      "Bash(git -C D:/projects/hrmanagement commit -m \"$\\(cat <<''EOF''\nrefactor\\(services\\): Phase 5.1 - Service 계층 find_* 메서드 마이그레이션\n\nPhase 24 Option A 레이어 분리 작업의 일환으로 Service 계층에서\ndeprecated된 Repository 메서드 호출을 신규 표준 메서드로 변경\n\n변경 내용:\n- employee_service.py: get_by_employee_id\\(\\) 21회 → find_by_employee_id\\(\\)\n  - get_all\\(\\) 1회 → find_all\\(\\)\n  - get_by_id\\(\\) 1회 → find_by_id\\(\\)\n- attachment_service.py: get_by_employee_id\\(\\) 1회 → find_by_employee_id\\(\\)\n- history_service.py: get_by_profile_id/employee_id\\(\\) 4회 → find_by_*\\(\\)\n- classification_service.py: get_all\\(\\) 1회, get_by_id\\(\\) 1회 → find_*\\(\\)\n- user_employee_link_service.py: get_model_by_id\\(\\) 2회 → find_by_id\\(\\)\n\n마이그레이션 패턴:\n- Repository: Model 반환 \\(find_*\\)\n- Service: Dict 반환 \\(model.to_dict\\(\\)\\)\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(DATABASE_URL=\"postgresql://hrm_user:hrm_secure_password_2024@localhost:6543/hrmanagement_db\" python run.py:*)",
+      "Bash(DATABASE_URL=\"postgresql://hrm_user:hrm_secure_password_2024@localhost:6543/hrmanagement_db\" python -m pytest:*)",
+      "Bash(git -C D:/projects/hrmanagement status --short)",
+      "Bash(git -C D:/projects/hrmanagement add app/static/css/pages/company-card-list.css app/static/css/pages/company-card-detail.css app/static/js/pages/profile-sync.js app/templates/personal/company_card_detail.html app/templates/personal/company_card_list.html app/templates/personal/register.html app/templates/profile/detail.html)",
+      "Bash(git -C D:/projects/hrmanagement commit -m \"$\\(cat <<''EOF''\ncleanup\\(frontend\\): 인라인 코드 외부 파일로 추출\n\nCLAUDE.md 규칙 \"인라인 스타일/스크립트 금지\" 준수를 위한 클린업\n\n변경 내용:\n- profile/detail.html: 42줄 임베디드 스크립트 → profile-sync.js\n- company_card_detail.html: 67줄 임베디드 CSS → company-card-detail.css  \n- company_card_list.html: 53줄 임베디드 CSS + 인라인 스타일 3건 → 외부 CSS\n- register.html: 불필요한 인라인 스타일 제거 \\(CSS 클래스와 중복\\)\n\n신규 파일:\n- app/static/js/pages/profile-sync.js\n- app/static/css/pages/company-card-detail.css\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git -C \"D:/projects/hrmanagement\" log --oneline -3)",
+      "Bash(git -C \"D:/projects/hrmanagement\" diff --stat)"
     ],
     "deny": [],
     "ask": []

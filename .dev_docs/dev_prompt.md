@@ -10,7 +10,7 @@
 
 
 /sc:explain "오류의 근본원인이 무엇인가?" --simple --beginer --metaphor
-
+/sc:workflow --patterns-dev --task --checklist --todolist --test-check --preview 
 
 ---
 
@@ -187,7 +187,5 @@ js, py 백엔드 프론트엔드
 시나리오
 
 개인정보
-
-
 
 

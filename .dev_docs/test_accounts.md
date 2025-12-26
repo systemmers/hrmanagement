@@ -34,7 +34,7 @@
 법인 인사관리 시스템 관리자 계정
 
 | ID | Username | Email | Password | Company ID |
-|----|----------|-------|----------|------------|
+|----|----------|-------|----------|--------
 | 1 | admin_testa | admin@testcorp.co.kr | test1234 | 1 |
 | 2 | admin_techsol | admin@techsol.com | test1234 | 2 |
 | 3 | admin_global | admin@globalcorp.co.kr | test1234 | 3 |
