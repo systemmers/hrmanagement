@@ -16,6 +16,7 @@ from flask import request
 
 from app.database import db
 from app.models import Employee
+from app.models.military_service import MilitaryService
 from app.utils.tenant import get_current_organization_id
 from app.extensions import (
     employee_repo, family_repo, education_repo, career_repo,
