@@ -8,7 +8,7 @@
     padding: var(--space-4);
     border-radius: var(--radius-md);
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: var(--space-3);
 }
 
@@ -55,12 +55,33 @@
     border: 1px solid var(--color-info-100);
 }
 
-/* 플래시 메시지 (인라인 방식) */
-.flash-messages {
-    margin-bottom: var(--space-6);
+/* 알림 닫기 버튼 */
+.alert-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    padding: var(--space-1);
     display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+    transition: opacity var(--transition-fast);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.alert-close:hover {
+    opacity: 1;
+}
+
+.alert-close i {
+    font-size: var(--text-sm);
+}
+
+/* 플래시 메시지 - JS가 Toast로 변환 후 제거 (깜빡임 방지) */
+.flash-messages {
+    display: none;
 }
 
 .flash-message {

@@ -14,6 +14,7 @@ import { FormValidator } from './components/form-validator.js';
 import { Filter, applyFilters, resetFilters, removeFilter, toggleFilterBar } from './components/filter.js';
 import { searchEmployees } from './services/employee-service.js';
 import { SalaryCalculator, SalaryCalculatorModal } from './components/salary-calculator.js';
+import { initAvatarFallback } from './components/avatar-fallback.js';
 
 /**
  * 정렬 적용 함수
@@ -161,6 +162,20 @@ window.toggleEmployeeView = (...args) => {
 
 // 페이지 초기화
 document.addEventListener('DOMContentLoaded', () => {
+    // 아바타 폴백 초기화 (이미지 로드 실패 처리)
+    initAvatarFallback();
+
+    // Flash 메시지 닫기 버튼 처리
+    document.addEventListener('click', (e) => {
+        const closeBtn = e.target.closest('[data-action="close-alert"]');
+        if (closeBtn) {
+            const alert = closeBtn.closest('.alert');
+            if (alert) {
+                alert.remove();
+            }
+        }
+    });
+
     // 헤더 검색 폼 제출 방지 (엔터 키 처리)
     const searchForm = document.querySelector('.header-search form');
     if (searchForm) {
@@ -199,6 +214,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 급여 계산기 초기화
     initializeSalaryCalculator();
+
+    // Flash 메시지를 Toast로 변환 (레이아웃 시프트 방지)
+    document.querySelectorAll('.flash-messages .alert').forEach(alert => {
+        const messageSpan = alert.querySelector('span');
+        const message = messageSpan ? messageSpan.textContent : '';
+
+        let type = 'info';
+        if (alert.classList.contains('alert-success')) type = 'success';
+        else if (alert.classList.contains('alert-error')) type = 'error';
+        else if (alert.classList.contains('alert-warning')) type = 'warning';
+
+        if (message) {
+            showToast(message, type);
+        }
+        alert.remove();
+    });
+
+    // 빈 Flash 컨테이너 정리
+    const flashContainer = document.querySelector('.flash-messages');
+    if (flashContainer && flashContainer.children.length === 0) {
+        flashContainer.remove();
+    }
 });
 
 /**
