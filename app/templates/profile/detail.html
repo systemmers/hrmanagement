@@ -105,8 +105,7 @@
 
         {# 인사카드 전용: 계정정보 (법인 계정만, 개인 계정 제외) #}
         {% if page_mode == 'hr_card' and is_corporate and account_type != 'corporate_admin' %}
-            {% set action = 'view' %}
-            {% include 'partials/employee_form/_account_info.html' %}
+            {% include 'partials/employee_detail/_account_info.html' %}
         {% endif %}
 
         {# 섹션 12-14: 인사기록 (인사카드 페이지 전용) #}

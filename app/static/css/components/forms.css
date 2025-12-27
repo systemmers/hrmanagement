@@ -74,6 +74,26 @@
     box-shadow: var(--shadow-sm);
 }
 
+/* 폼 입력 필드 비활성화 상태 */
+.form-input:disabled,
+.form-input.readonly-field {
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-500);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* select 요소 비활성화 상태 */
+select.form-input:disabled {
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-500);
+    cursor: not-allowed;
+    opacity: 0.7;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
 /* 폼 액션 버튼 영역 */
 .form-actions {
     display: flex;

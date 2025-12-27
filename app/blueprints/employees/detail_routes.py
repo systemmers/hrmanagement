@@ -95,12 +95,17 @@ def register_detail_routes(bp: Blueprint):
         person_contract = None
 
         if company_id:
-            # 1차: employee_number로 approved 계약 조회
+            # 1차: employee_number로 계약 조회 (approved/terminated/expired 모두 포함)
+            # 계약 이력이 있는 직원은 영구적으로 필드 잠금 유지
             if employee.employee_number:
-                person_contract = PersonCorporateContract.query.filter_by(
-                    employee_number=employee.employee_number,
-                    company_id=company_id,
-                    status=PersonCorporateContract.STATUS_APPROVED
+                person_contract = PersonCorporateContract.query.filter(
+                    PersonCorporateContract.employee_number == employee.employee_number,
+                    PersonCorporateContract.company_id == company_id,
+                    PersonCorporateContract.status.in_([
+                        PersonCorporateContract.STATUS_APPROVED,
+                        PersonCorporateContract.STATUS_TERMINATED,
+                        PersonCorporateContract.STATUS_EXPIRED
+                    ])
                 ).first()
 
             has_person_contract = person_contract is not None
