@@ -16,7 +16,7 @@ from ...utils.tenant import get_current_organization_id
 from ...services.employee_service import employee_service
 from ...services.contract_service import contract_service
 from ...services.contract_filter_service import contract_filter_service
-from ...extensions import user_repo
+from ...services.user_service import user_service
 from ...models.user import User
 
 
@@ -137,7 +137,7 @@ def register_list_routes(bp: Blueprint):
 
         # employee_sub 계정 중 계약 없거나 pending인 경우
         pending_employees = []
-        users = user_repo.get_employee_sub_users_with_employee(company_id)
+        users = user_service.get_employee_sub_users_with_employee(company_id)
 
         for user in users:
             # 해당 법인과의 계약 상태 확인

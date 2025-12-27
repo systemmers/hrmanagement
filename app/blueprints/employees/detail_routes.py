@@ -10,7 +10,7 @@ from ...constants.session_keys import SessionKeys, UserRole, AccountType
 from ...utils.decorators import login_required, manager_or_admin_required
 from ...utils.object_helpers import safe_get
 from ...services.employee_service import employee_service
-from ...models.person_contract import PersonCorporateContract
+from ...services.contract_service import contract_service
 from .helpers import verify_employee_access
 
 
@@ -55,7 +55,15 @@ def register_detail_routes(bp: Blueprint):
                                is_corporate=True,
                                account_type=AccountType.CORPORATE,
                                page_mode='hr_card',
-                               classification_options=classification_options)
+                               classification_options=classification_options,
+                               # 템플릿 fallback 제거를 위해 빈 리스트 명시적 전달
+                               education_list=[],
+                               career_list=[],
+                               certificate_list=[],
+                               family_list=[],
+                               language_list=[],
+                               award_list=[],
+                               military=None)
 
     @bp.route('/employees/<int:employee_id>/edit', methods=['GET'])
     @login_required
@@ -86,7 +94,7 @@ def register_detail_routes(bp: Blueprint):
         business_card_back = employee_service.get_attachment_by_category(employee_id, 'business_card_back')
         classification_options = employee_service.get_all_classification_options()
 
-        from ...extensions import user_repo
+        from ...services.user_service import user_service
 
         # 개인계약 존재 여부 확인 (개인정보 수정 제한용)
         # 개인계약을 먼저 조회하여 linked_user 결정에 활용
@@ -98,15 +106,9 @@ def register_detail_routes(bp: Blueprint):
             # 1차: employee_number로 계약 조회 (approved/terminated/expired 모두 포함)
             # 계약 이력이 있는 직원은 영구적으로 필드 잠금 유지
             if employee.employee_number:
-                person_contract = PersonCorporateContract.query.filter(
-                    PersonCorporateContract.employee_number == employee.employee_number,
-                    PersonCorporateContract.company_id == company_id,
-                    PersonCorporateContract.status.in_([
-                        PersonCorporateContract.STATUS_APPROVED,
-                        PersonCorporateContract.STATUS_TERMINATED,
-                        PersonCorporateContract.STATUS_EXPIRED
-                    ])
-                ).first()
+                person_contract = contract_service.find_contract_with_history(
+                    employee.employee_number, company_id
+                )
 
             has_person_contract = person_contract is not None
 
@@ -114,9 +116,9 @@ def register_detail_routes(bp: Blueprint):
         # 개인계약이 있으면 person_user_id로 조회 (다중 법인 계약 지원)
         # 없으면 User.employee_id로 직접 조회 (법인 직접 생성 계정)
         if person_contract:
-            linked_user = user_repo.find_by_id(person_contract.person_user_id)
+            linked_user = user_service.get_model_by_id(person_contract.person_user_id)
         else:
-            linked_user = user_repo.find_by_employee_id(employee_id)
+            linked_user = user_service.find_by_employee_id(employee_id)
 
         return render_template('profile/edit.html',
                                employee=employee,
@@ -128,11 +130,17 @@ def register_detail_routes(bp: Blueprint):
                                business_card_front=business_card_front,
                                business_card_back=business_card_back,
                                classification_options=classification_options,
+                               education_list=list(employee.educations),
+                               career_list=list(employee.careers),
+                               certificate_list=list(employee.certificates),
+                               family_list=list(employee.family_members),
                                language_list=list(employee.languages),
                                hr_project_list=list(employee.hr_projects),
                                project_participation_list=list(employee.project_participations),
+                               award_list=list(employee.awards),
                                salary=employee.salary,
                                insurance=employee.insurance,
+                               military=employee.military_service,
                                has_person_contract=has_person_contract,
                                person_contract=person_contract,
                                user=linked_user)
@@ -193,7 +201,7 @@ def _render_employee_full_view(employee_id, employee):
     business_card_front = employee_service.get_attachment_by_category(employee_id, 'business_card_front')
     business_card_back = employee_service.get_attachment_by_category(employee_id, 'business_card_back')
 
-    from ...extensions import user_repo
+    from ...services.user_service import user_service
 
     # 명함 편집 권한 체크
     can_edit_business_card = (
@@ -207,19 +215,17 @@ def _render_employee_full_view(employee_id, employee):
     person_contract = None
     emp_number = safe_get(employee, 'employee_number')
     if company_id and emp_number:
-        person_contract = PersonCorporateContract.query.filter_by(
-            employee_number=emp_number,
-            company_id=company_id,
-            status=PersonCorporateContract.STATUS_APPROVED
-        ).first()
+        person_contract = contract_service.find_approved_contract(
+            emp_number, company_id
+        )
 
     # 연결된 계정 조회 (계정정보 섹션용)
     # 개인계약이 있으면 person_user_id로 조회 (다중 법인 계약 지원)
     # 없으면 User.employee_id로 직접 조회 (법인 직접 생성 계정)
     if person_contract:
-        linked_user = user_repo.find_by_id(person_contract.person_user_id)
+        linked_user = user_service.get_model_by_id(person_contract.person_user_id)
     else:
-        linked_user = user_repo.find_by_employee_id(employee_id)
+        linked_user = user_service.find_by_employee_id(employee_id)
 
     return render_template('profile/detail.html',
                            employee=employee,

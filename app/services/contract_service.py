@@ -164,9 +164,92 @@ class ContractService:
         """데이터 공유 설정 조회"""
         return self.contract_repo.get_sharing_settings(contract_id)
 
+    def get_sharing_settings_model(self, contract_id: int) -> Optional[Any]:
+        """데이터 공유 설정 모델 조회
+
+        Phase 24: Blueprint Model.query 제거 - Service 경유
+
+        Args:
+            contract_id: 계약 ID
+
+        Returns:
+            DataSharingSettings 모델 또는 None
+        """
+        from ..models.person_contract import DataSharingSettings
+        return DataSharingSettings.query.filter_by(contract_id=contract_id).first()
+
+    def get_sync_logs_filtered(
+        self, contract_id: int, sync_type: str = None, limit: int = 50
+    ) -> List[Dict]:
+        """동기화 로그 조회 (필터링 지원)
+
+        Phase 24: Blueprint Model.query 제거 - Service 경유
+
+        Args:
+            contract_id: 계약 ID
+            sync_type: 동기화 유형 필터 (선택)
+            limit: 최대 조회 수
+
+        Returns:
+            로그 목록 (Dict)
+        """
+        from ..models.person_contract import SyncLog
+        query = SyncLog.query.filter_by(contract_id=contract_id)
+        if sync_type:
+            query = query.filter_by(sync_type=sync_type)
+        logs = query.order_by(SyncLog.executed_at.desc()).limit(limit).all()
+        return [log.to_dict() for log in logs]
+
     def get_sync_logs(self, contract_id: int, limit: int = 50) -> List[Dict]:
         """동기화 로그 조회"""
         return self.contract_repo.get_sync_logs(contract_id, limit)
+
+    def find_contract_with_history(
+        self, employee_number: str, company_id: int
+    ) -> Optional[Any]:
+        """계약 이력 조회 (approved/terminated/expired)
+
+        Phase 24: Blueprint Model.query 제거 - Service 경유
+
+        Args:
+            employee_number: 직원번호
+            company_id: 회사 ID
+
+        Returns:
+            계약 모델 또는 None
+        """
+        from ..models.person_contract import PersonCorporateContract
+
+        if not employee_number or not company_id:
+            return None
+
+        return PersonCorporateContract.query.filter(
+            PersonCorporateContract.employee_number == employee_number,
+            PersonCorporateContract.company_id == company_id,
+            PersonCorporateContract.status.in_([
+                PersonCorporateContract.STATUS_APPROVED,
+                PersonCorporateContract.STATUS_TERMINATED,
+                PersonCorporateContract.STATUS_EXPIRED
+            ])
+        ).first()
+
+    def find_approved_contract(
+        self, employee_number: str, company_id: int
+    ) -> Optional[Any]:
+        """승인된 계약 조회
+
+        Phase 24: Blueprint Model.query 제거 - Service 경유
+
+        Args:
+            employee_number: 직원번호
+            company_id: 회사 ID
+
+        Returns:
+            계약 모델 또는 None
+        """
+        return self.contract_repo.find_approved_contract_by_employee_number(
+            employee_number, company_id
+        )
 
     # ========================================
     # 계약 생성/수정

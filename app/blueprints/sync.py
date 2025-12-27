@@ -4,13 +4,16 @@
 개인-법인 데이터 동기화 API를 제공합니다.
 Phase 4: 데이터 동기화 및 퇴사 처리
 Phase 8: 상수 모듈 적용
+Phase 24: 트랜잭션 SSOT 적용
 """
 from flask import Blueprint, request, jsonify, session
 
 from app.constants.session_keys import SessionKeys, AccountType
 from app.services.sync_service import sync_service
+from app.services.contract_service import contract_service
+from app.utils.transaction import atomic_transaction
 from app.services.termination_service import termination_service
-from app.models.person_contract import PersonCorporateContract, SyncLog
+from app.models.person_contract import DataSharingSettings
 from app.utils.decorators import (
     api_login_required as login_required,
     api_personal_account_required as personal_account_required,
@@ -143,48 +146,51 @@ def full_sync_from_corporate(contract_id):
         "relations": [...]
     }
     """
-    from app.models.person_contract import DataSharingSettings
     from app.database import db
+    from app.models.person_contract import PersonCorporateContract
 
     user_id = session.get(SessionKeys.USER_ID)
     sync_service.set_current_user(user_id)
 
     # 계약 확인
-    contract = PersonCorporateContract.query.get(contract_id)
+    contract = contract_service.get_contract_model_by_id(contract_id)
     if not contract:
         return jsonify({'success': False, 'error': '계약을 찾을 수 없습니다.'}), 404
 
     if contract.status != PersonCorporateContract.STATUS_APPROVED:
         return jsonify({'success': False, 'error': '승인된 계약만 동기화할 수 있습니다.'}), 400
 
-    # DataSharingSettings 생성 또는 업데이트 (전체 공유)
-    settings = DataSharingSettings.query.filter_by(contract_id=contract_id).first()
-    if not settings:
-        settings = DataSharingSettings(contract_id=contract_id)
-        db.session.add(settings)
+    try:
+        with atomic_transaction():
+            # DataSharingSettings 생성 또는 업데이트 (전체 공유)
+            settings = contract_service.get_sharing_settings_model(contract_id)
+            if not settings:
+                settings = DataSharingSettings(contract_id=contract_id)
+                db.session.add(settings)
 
-    # 모든 공유 설정을 True로
-    settings.share_basic_info = True
-    settings.share_contact = True
-    settings.share_education = True
-    settings.share_career = True
-    settings.share_certificates = True
-    settings.share_languages = True
-    settings.share_military = True
-    db.session.flush()
+            # 모든 공유 설정을 True로
+            settings.share_basic_info = True
+            settings.share_contact = True
+            settings.share_education = True
+            settings.share_career = True
+            settings.share_certificates = True
+            settings.share_languages = True
+            settings.share_military = True
+            db.session.flush()
 
-    # 전체 동기화 실행
-    result = sync_service.sync_personal_to_employee(
-        contract_id=contract_id,
-        sync_type=SyncLog.SYNC_TYPE_MANUAL
-    )
+            # 전체 동기화 실행
+            result = sync_service.sync_personal_to_employee(
+                contract_id=contract_id,
+                sync_type=SyncLog.SYNC_TYPE_MANUAL
+            )
 
-    if result.get('success'):
-        db.session.commit()
+            if not result.get('success'):
+                raise Exception(result.get('error', '동기화 실패'))
+
         return jsonify(result)
-    else:
-        db.session.rollback()
-        return jsonify(result), 400
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
 
 
 @sync_bp.route('/all-contracts', methods=['POST'])
@@ -256,19 +262,18 @@ def toggle_realtime_sync(contract_id):
         "realtime_sync": true/false
     }
     """
-    from app.models.person_contract import DataSharingSettings
     from app.database import db
 
     data = request.get_json() or {}
     enabled = data.get('enabled', False)
 
-    settings = DataSharingSettings.query.filter_by(contract_id=contract_id).first()
-    if not settings:
-        settings = DataSharingSettings(contract_id=contract_id)
-        db.session.add(settings)
+    with atomic_transaction():
+        settings = contract_service.get_sharing_settings_model(contract_id)
+        if not settings:
+            settings = DataSharingSettings(contract_id=contract_id)
+            db.session.add(settings)
 
-    settings.is_realtime_sync = enabled
-    db.session.commit()
+        settings.is_realtime_sync = enabled
 
     return jsonify({
         'success': True,
@@ -400,16 +405,13 @@ def get_sync_logs(contract_id):
     limit = request.args.get('limit', 50, type=int)
     sync_type = request.args.get('sync_type')
 
-    query = SyncLog.query.filter_by(contract_id=contract_id)
-
-    if sync_type:
-        query = query.filter_by(sync_type=sync_type)
-
-    logs = query.order_by(SyncLog.executed_at.desc()).limit(limit).all()
+    logs = contract_service.get_sync_logs_filtered(
+        contract_id, sync_type=sync_type, limit=limit
+    )
 
     return jsonify({
         'success': True,
-        'logs': [log.to_dict() for log in logs]
+        'logs': logs
     })
 
 

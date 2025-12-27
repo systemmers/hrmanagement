@@ -10,8 +10,8 @@ from flask import render_template, request, jsonify, flash, redirect, url_for, s
 from . import admin_bp
 from ...constants.session_keys import SessionKeys
 from ...services.organization_service import organization_service
+from ...services.company_service import company_service
 from ...utils.decorators import admin_required, login_required
-from ...models.company import Company
 
 
 def get_current_root_organization_id():
@@ -23,7 +23,7 @@ def get_current_root_organization_id():
     company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
         return None
-    company = Company.query.get(company_id)
+    company = company_service.get_by_id(company_id)
     return company.root_organization_id if company else None
 
 

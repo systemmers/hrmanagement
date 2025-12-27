@@ -5,12 +5,12 @@
 21번/22번 원칙: 직원 등록 시 계정 동시 생성 지원
 Phase 8: 상수 모듈 적용
 Phase 9: DRY 원칙 - file_storage 서비스 활용
+Phase 24: 레이어 분리 - Service 경유
 """
 from datetime import datetime
 from flask import Blueprint, request, redirect, url_for, flash, session, render_template
 
 from ...constants.session_keys import SessionKeys, UserRole, AccountType
-from ...models.person_contract import PersonCorporateContract
 from ...utils.employee_number import generate_employee_number
 from ...utils.decorators import login_required, admin_required, manager_or_admin_required
 from ...utils.tenant import get_current_organization_id
@@ -18,6 +18,7 @@ from ...utils.object_helpers import safe_get
 from ...services.employee_service import employee_service
 from ...services import employee_account_service
 from ...services.file_storage_service import file_storage, CATEGORY_PROFILE_PHOTO
+from ...services.user_employee_link_service import user_employee_link_service
 from .helpers import (
     verify_employee_access, extract_employee_from_form, extract_basic_fields_from_form,
     update_family_data, update_education_data, update_career_data,
@@ -25,7 +26,7 @@ from .helpers import (
     update_hr_project_data, update_project_participation_data, update_award_data,
     get_business_card_folder, generate_unique_filename
 )
-from ...extensions import organization_repo
+from ...services.organization_service import organization_service
 
 
 # ========================================
@@ -77,21 +78,9 @@ def _has_person_contract(employee_id: int, company_id: int) -> bool:
     if not employee_id or not company_id:
         return False
 
-    employee = employee_service.get_employee_by_id(employee_id)
-    if not employee:
-        return False
-
-    employee_number = safe_get(employee, 'employee_number')
-    if not employee_number:
-        return False
-
-    contract = PersonCorporateContract.query.filter_by(
-        employee_number=employee_number,
-        company_id=company_id,
-        status=PersonCorporateContract.STATUS_APPROVED
-    ).first()
-
-    return contract is not None
+    return user_employee_link_service.has_approved_personal_contract(
+        employee_id, company_id
+    )
 
 
 def _filter_personal_fields(form_data: dict, employee_id: int) -> dict:
@@ -167,72 +156,41 @@ def register_mutation_routes(bp: Blueprint):
     def employee_create():
         """직원 등록 처리 (멀티테넌시 적용)
 
-        21번/22번 원칙: 계정 생성 토글에 따라 직원+계정 동시 생성
+        21번/22번 원칙: 직원 등록 시 계정 필수 생성
         """
         try:
-            # 계정 생성 여부 확인
-            create_account = request.form.get('create_account') == 'true'
             org_id = get_current_organization_id()
             company_id = session.get(SessionKeys.COMPANY_ID)
             admin_user_id = session.get(SessionKeys.USER_ID)
 
-            if create_account and company_id:
-                # === 계정과 함께 직원 생성 (21번/22번 원칙) ===
-                employee_data = _extract_employee_data_for_service(request.form, org_id)
-                account_data = _extract_account_data(request.form)
+            # 회사 정보 필수 확인
+            if not company_id:
+                flash('회사 정보가 없습니다.', 'error')
+                return redirect(url_for('employees.employee_new'))
 
-                success, result, error = employee_account_service.create_employee_with_account(
-                    employee_data=employee_data,
-                    account_data=account_data,
-                    company_id=company_id,
-                    admin_user_id=admin_user_id
-                )
+            # === 계정과 함께 직원 생성 (계정 생성 필수) ===
+            employee_data = _extract_employee_data_for_service(request.form, org_id)
+            account_data = _extract_account_data(request.form)
 
-                if not success:
-                    flash(f'직원 등록 실패: {error}', 'error')
-                    return redirect(url_for('employees.employee_new'))
+            success, result, error = employee_account_service.create_employee_with_account(
+                employee_data=employee_data,
+                account_data=account_data,
+                company_id=company_id,
+                admin_user_id=admin_user_id
+            )
 
-                employee_id = result['employee_id']
+            if not success:
+                flash(f'직원 등록 실패: {error}', 'error')
+                return redirect(url_for('employees.employee_new'))
 
-                # 프로필 사진/명함 처리
-                _handle_profile_photo_upload(employee_id)
-                _handle_business_card_upload(employee_id)
+            employee_id = result['employee_id']
 
-                flash(f'직원 및 계정이 등록되었습니다. {result["message"]}', 'success')
-                return redirect(url_for('employees.employee_edit', employee_id=employee_id))
+            # 프로필 사진/명함 처리
+            _handle_profile_photo_upload(employee_id)
+            _handle_business_card_upload(employee_id)
 
-            else:
-                # === 기존 로직: 직원만 생성 (계정 없이) ===
-                employee = extract_employee_from_form(request.form, employee_id=0)
-
-                # 사번 자동 생성
-                if not employee.employee_number:
-                    employee.employee_number = generate_employee_number()
-
-                # organization_id 자동 설정
-                if org_id and not employee.organization_id:
-                    employee.organization_id = org_id
-
-                # company_id 명시적 설정 (손실 방지)
-                if company_id and not employee.company_id:
-                    employee.company_id = company_id
-
-                # Employee 객체를 Dict로 변환하여 service에 전달
-                employee_data = employee.to_dict() if hasattr(employee, 'to_dict') else vars(employee)
-                created_employee = employee_service.create_employee_direct(employee_data)
-                employee_id = created_employee['id']
-
-                # 프로필 사진 파일 처리
-                photo_uploaded = _handle_profile_photo_upload(employee_id)
-
-                # 명함 파일 처리 (앞면/뒷면)
-                business_card_uploaded = _handle_business_card_upload(employee_id)
-
-                if photo_uploaded or business_card_uploaded:
-                    flash(f'{created_employee["name"]} 직원이 등록되었습니다.', 'success')
-                else:
-                    flash(f'{created_employee["name"]} 직원이 등록되었습니다. 사진과 명함을 추가해주세요.', 'success')
-                return redirect(url_for('employees.employee_edit', employee_id=employee_id))
+            flash(f'직원 및 계정이 등록되었습니다. {result["message"]}', 'success')
+            return redirect(url_for('employees.employee_edit', employee_id=employee_id))
 
         except Exception as e:
             flash(f'직원 등록 중 오류가 발생했습니다: {str(e)}', 'error')
@@ -258,7 +216,7 @@ def register_mutation_routes(bp: Blueprint):
             org_id = get_current_organization_id()
             organizations = []
             if org_id:
-                organizations = organization_repo.get_flat_list(root_organization_id=org_id)
+                organizations = organization_service.get_flat_list(root_organization_id=org_id)
 
             return render_template(
                 'employees/account_provision.html',

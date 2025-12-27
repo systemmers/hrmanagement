@@ -15,10 +15,51 @@ from app.blueprints.profile.decorators import (
     corporate_only,
     corporate_admin_only
 )
-from app.extensions import user_repo
+from app.services.user_service import user_service
 from app.services.attachment_service import attachment_service
 from app.services.corporate_admin_profile_service import corporate_admin_profile_service
+from app.services.employee_service import employee_service
 from app.services.file_storage_service import file_storage, CATEGORY_ADMIN_PHOTO
+
+
+@profile_bp.route('/dashboard')
+@unified_profile_required
+def dashboard():
+    """
+    통합 대시보드
+
+    법인 직원과 개인 계정의 대시보드 표시
+    개인 계정은 기존 personal.dashboard로 리다이렉트
+    법인 직원은 직원용 대시보드 표시
+    """
+    account_type = session.get(SessionKeys.ACCOUNT_TYPE)
+
+    # 개인 계정: 기존 대시보드로 리다이렉트
+    if account_type == AccountType.PERSONAL:
+        return redirect(url_for('personal.dashboard'))
+
+    # 법인 관리자: 법인 대시보드로 리다이렉트
+    if account_type == AccountType.CORPORATE and session.get('user_role') in ['admin', 'manager']:
+        return redirect(url_for('corporate.dashboard'))
+
+    # 법인 직원 대시보드
+    employee_id = session.get(SessionKeys.EMPLOYEE_ID)
+    if not employee_id:
+        flash('직원 정보를 찾을 수 없습니다.', 'error')
+        return redirect(url_for('main.index'))
+
+    dashboard_data = employee_service.get_dashboard_data(employee_id)
+    if not dashboard_data:
+        flash('대시보드 데이터를 불러올 수 없습니다.', 'error')
+        return redirect(url_for('profile.view'))
+
+    return render_template(
+        'dashboard/base_dashboard.html',
+        account_type='employee_sub',
+        employee=dashboard_data['employee'],
+        stats=dashboard_data['stats'],
+        work_info=dashboard_data['work_info']
+    )
 
 
 @profile_bp.route('/')
@@ -326,7 +367,7 @@ def admin_profile_create():
         return redirect(url_for('profile.view'))
 
     # 사용자 정보 조회
-    user = user_repo.find_by_id(user_id)
+    user = user_service.get_model_by_id(user_id)
     if not user:
         flash('사용자 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('auth.login'))

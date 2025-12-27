@@ -119,6 +119,50 @@ class UserService:
         """
         return self.user_repo.find_by_id(user_id)
 
+    def get_by_company_and_account_type(
+        self,
+        company_id: int,
+        account_type: str
+    ) -> list:
+        """회사 ID와 계정 유형으로 사용자 목록 조회
+
+        Phase 24: Blueprint → Repository 직접 호출 제거
+
+        Args:
+            company_id: 회사 ID
+            account_type: 계정 유형 (employee_sub, corporate 등)
+
+        Returns:
+            User 모델 객체 리스트
+        """
+        return self.user_repo.get_by_company_and_account_type(company_id, account_type)
+
+    def get_employee_sub_users_with_employee(self, company_id: int) -> list:
+        """회사 소속 employee_sub 계정 목록 조회 (Employee 정보 포함)
+
+        Phase 24: Blueprint → Repository 직접 호출 제거
+
+        Args:
+            company_id: 회사 ID
+
+        Returns:
+            User 모델 객체 리스트 (employee 관계 로드됨)
+        """
+        return self.user_repo.get_employee_sub_users_with_employee(company_id)
+
+    def find_by_employee_id(self, employee_id: int) -> Optional[Any]:
+        """Employee ID로 연결된 User 조회
+
+        Phase 24: Blueprint → Repository 직접 호출 제거
+
+        Args:
+            employee_id: Employee.id
+
+        Returns:
+            User 모델 객체 또는 None
+        """
+        return self.user_repo.find_by_employee_id(employee_id)
+
 
 # 싱글톤 인스턴스
 user_service = UserService()

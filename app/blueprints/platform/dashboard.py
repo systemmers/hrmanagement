@@ -2,34 +2,27 @@
 Platform Dashboard
 
 플랫폼 대시보드 라우트
+Phase 24: Model.query 제거 - PlatformService 경유
 """
 from flask import render_template
 
 from . import platform_bp
 from ...utils.decorators import superadmin_required
-from ...models import User, Company
-from ...models.person_contract import PersonCorporateContract
+from ...services.platform_service import platform_service
 
 
 @platform_bp.route('/')
 @superadmin_required
 def dashboard():
     """플랫폼 대시보드"""
-    # 통계 데이터
-    stats = {
-        'total_users': User.query.count(),
-        'total_companies': Company.query.count(),
-        'active_companies': Company.query.filter_by(is_active=True).count(),
-        'total_contracts': PersonCorporateContract.query.count(),
-        'active_contracts': PersonCorporateContract.query.filter_by(status='active').count(),
-        'superadmins': User.query.filter_by(is_superadmin=True).count(),
-    }
+    # 통계 데이터 (Service 경유)
+    stats = platform_service.get_dashboard_stats()
 
-    # 최근 가입 사용자
-    recent_users = User.query.order_by(User.created_at.desc()).limit(5).all()
+    # 최근 가입 사용자 (Service 경유)
+    recent_users = platform_service.get_recent_users(limit=5)
 
-    # 최근 등록 법인
-    recent_companies = Company.query.order_by(Company.created_at.desc()).limit(5).all()
+    # 최근 등록 법인 (Service 경유)
+    recent_companies = platform_service.get_recent_companies(limit=5)
 
     return render_template(
         'platform/dashboard.html',

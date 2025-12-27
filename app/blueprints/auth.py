@@ -9,7 +9,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from ..constants.session_keys import SessionKeys
 from ..constants.messages import FlashMessages
 from ..services.user_service import user_service
-from ..models import Employee
+from ..services.employee_service import employee_service
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -52,7 +52,7 @@ def login():
 
             # 계정 발급 후 직원 상태별 분기 (pending_info, pending_contract)
             if user.employee_id and user.account_type == 'employee_sub':
-                employee = Employee.query.get(user.employee_id)
+                employee = employee_service.get_employee_model_by_id(user.employee_id)
                 if employee:
                     if employee.status == 'pending_info':
                         flash('프로필 정보를 완성해주세요.', 'info')
