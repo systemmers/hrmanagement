@@ -1,7 +1,6 @@
 """
 AI 테스트 Blueprint
 - 문서 분석 프로토타입 테스트 페이지
-- Provider 비교 테스트
 - AI 설정 확인
 """
 from flask import Blueprint, render_template, request, jsonify, current_app
@@ -59,59 +58,6 @@ def analyze():
             'provider': provider,
             'document_type': document_type
         }), 500
-
-
-@ai_test_bp.route('/compare')
-@login_required
-def compare():
-    """Provider 비교 테스트 페이지"""
-    sample_files = get_sample_files()
-    providers = get_available_providers()
-    return render_template('ai_test/compare.html',
-                          sample_files=sample_files,
-                          providers=providers)
-
-
-@ai_test_bp.route('/compare/run', methods=['POST'])
-@login_required
-def run_compare():
-    """여러 Provider로 동시 분석 비교"""
-    file = request.files.get('file')
-    sample_file = request.form.get('sample_file')
-
-    # 파일 경로 결정
-    if file and file.filename:
-        file_path = save_uploaded_file(file)
-    elif sample_file:
-        file_path = get_sample_file_path(sample_file)
-        if not file_path or not os.path.exists(file_path):
-            return jsonify({'error': f'샘플 파일을 찾을 수 없습니다: {sample_file}'}), 400
-    else:
-        return jsonify({'error': '파일을 선택해주세요'}), 400
-
-    results = {}
-
-    try:
-        from ..services.ai_service import AIService
-        available_providers = AIService.get_available_providers()
-
-        for provider_name in available_providers:
-            try:
-                result = AIService.analyze(file_path, provider_name)
-                results[provider_name] = {
-                    'success': True,
-                    'data': result.to_dict()
-                }
-            except Exception as e:
-                results[provider_name] = {
-                    'success': False,
-                    'error': str(e)
-                }
-    except ImportError:
-        # AI Service가 아직 구현되지 않은 경우
-        results['error'] = 'AI Service가 아직 구현되지 않았습니다.'
-
-    return jsonify(results)
 
 
 @ai_test_bp.route('/settings')
