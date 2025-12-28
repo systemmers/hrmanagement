@@ -10,7 +10,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-opacity-50);
     z-index: 1100;
     align-items: center;
     justify-content: center;
@@ -23,13 +23,13 @@
 /* 모달 컨텐츠 */
 .tree-selector-content {
     background: var(--color-pure-white);
-    border-radius: 16px;
+    border-radius: var(--radius-2xl);
     width: 100%;
     max-width: 500px;
     max-height: 80vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px var(--color-black-opacity-30);
     overflow: hidden;
 }
 

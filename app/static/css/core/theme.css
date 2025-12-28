@@ -35,50 +35,50 @@
 
 /* Personal 계정 테마 (녹색 계열) */
 [data-account-type="personal"] {
-    --theme-primary: #059669;
-    --theme-primary-light: #D1FAE5;
-    --theme-primary-dark: #047857;
+    --theme-primary: var(--color-personal-500);
+    --theme-primary-light: var(--color-personal-50);
+    --theme-primary-dark: var(--color-personal-700);
 
-    --theme-sidebar-active-bg: #059669;
+    --theme-sidebar-active-bg: var(--color-personal-500);
     --theme-sidebar-active-text: var(--color-pure-white);
-    --theme-sidebar-hover-bg: #ECFDF5;
+    --theme-sidebar-hover-bg: var(--color-personal-bg-hover);
 
-    --theme-header-accent: #059669;
+    --theme-header-accent: var(--color-personal-500);
 
-    --theme-avatar-bg: #059669;
+    --theme-avatar-bg: var(--color-personal-500);
     --theme-avatar-text: var(--color-pure-white);
 
-    --theme-btn-primary-bg: #059669;
-    --theme-btn-primary-hover: #047857;
+    --theme-btn-primary-bg: var(--color-personal-500);
+    --theme-btn-primary-hover: var(--color-personal-700);
 
-    --theme-gradient: linear-gradient(135deg, #059669 0%, #047857 100%);
+    --theme-gradient: linear-gradient(135deg, var(--color-personal-500) 0%, var(--color-personal-700) 100%);
 
-    --theme-stats-icon-bg: #D1FAE5;
-    --theme-stats-icon-color: #059669;
+    --theme-stats-icon-bg: var(--color-personal-50);
+    --theme-stats-icon-color: var(--color-personal-500);
 }
 
 /* Employee Sub 계정 테마 (보라색 계열) */
 [data-account-type="employee_sub"] {
-    --theme-primary: #7C3AED;
-    --theme-primary-light: #EDE9FE;
-    --theme-primary-dark: #6D28D9;
+    --theme-primary: var(--color-employee-500);
+    --theme-primary-light: var(--color-employee-50);
+    --theme-primary-dark: var(--color-employee-700);
 
-    --theme-sidebar-active-bg: #7C3AED;
+    --theme-sidebar-active-bg: var(--color-employee-500);
     --theme-sidebar-active-text: var(--color-pure-white);
-    --theme-sidebar-hover-bg: #F5F3FF;
+    --theme-sidebar-hover-bg: var(--color-employee-bg-hover);
 
-    --theme-header-accent: #7C3AED;
+    --theme-header-accent: var(--color-employee-500);
 
-    --theme-avatar-bg: #7C3AED;
+    --theme-avatar-bg: var(--color-employee-500);
     --theme-avatar-text: var(--color-pure-white);
 
-    --theme-btn-primary-bg: #7C3AED;
-    --theme-btn-primary-hover: #6D28D9;
+    --theme-btn-primary-bg: var(--color-employee-500);
+    --theme-btn-primary-hover: var(--color-employee-700);
 
-    --theme-gradient: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+    --theme-gradient: linear-gradient(135deg, var(--color-employee-500) 0%, var(--color-employee-700) 100%);
 
-    --theme-stats-icon-bg: #EDE9FE;
-    --theme-stats-icon-color: #7C3AED;
+    --theme-stats-icon-bg: var(--color-employee-50);
+    --theme-stats-icon-color: var(--color-employee-500);
 }
 
 /* Corporate 계정 테마 (파란색 계열 - 명시적) */

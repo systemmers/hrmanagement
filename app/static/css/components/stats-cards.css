@@ -64,7 +64,7 @@
 .stat-icon.education { background: var(--color-blue-100); color: var(--color-blue-600); }
 .stat-icon.career { background: var(--color-success-100); color: var(--color-success-600); }
 .stat-icon.certificate { background: var(--color-warning-100); color: var(--color-warning-600); }
-.stat-icon.language { background: #fce7f3; color: #db2777; } /* TODO: Add --color-pink to variables.css */
+.stat-icon.language { background: var(--color-pink-50); color: var(--color-pink-600); }
 .stat-icon.employees { background: var(--color-blue-100); color: var(--color-blue-600); }
 .stat-icon.limit { background: var(--color-success-100); color: var(--color-success-600); }
 .stat-icon.plan { background: var(--color-warning-100); color: var(--color-warning-600); }

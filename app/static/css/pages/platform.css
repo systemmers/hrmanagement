@@ -15,10 +15,10 @@
    Platform Theme Variables
    ======================================== */
 .platform-page {
-    --platform-primary: #7C3AED;
-    --platform-primary-light: #EDE9FE;
-    --platform-primary-dark: #6D28D9;
-    --platform-gradient: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);
+    --platform-primary: var(--color-platform-500);
+    --platform-primary-light: var(--color-platform-50);
+    --platform-primary-dark: var(--color-platform-700);
+    --platform-gradient: linear-gradient(135deg, var(--color-platform-500) 0%, var(--color-platform-900) 100%);
 }
 
 /* ========================================
@@ -143,51 +143,8 @@
     margin-top: var(--space-1);
 }
 
-/* ========================================
-   Content Card
-   ======================================== */
-.content-card {
-    background: var(--color-pure-white);
-    border: 1px solid var(--color-gray-200);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    margin-bottom: var(--space-6);
-}
-
-.card-header {
-    padding: var(--space-4) var(--space-5);
-    border-bottom: 1px solid var(--color-gray-200);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--color-gray-50);
-}
-
-.card-header h3 {
-    font-size: var(--text-base);
-    font-weight: 600;
-    color: var(--color-gray-900);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-}
-
-.card-header h3 i {
-    color: var(--color-gray-500);
-}
-
-.card-body {
-    padding: var(--space-5);
-}
-
-.card-footer {
-    padding: var(--space-4) var(--space-5);
-    border-top: 1px solid var(--color-gray-200);
-    background: var(--color-gray-50);
-    display: flex;
-    gap: var(--space-3);
-}
+/* .content-card, .card-header, .card-body, .card-footer 스타일은
+   utilities.css 및 card.css에서 SSOT로 정의됨 */
 
 /* ========================================
    Data Table
@@ -373,8 +330,8 @@
 }
 
 .type-badge.platform {
-    background: #FEF3C7;
-    color: #92400E;
+    background: var(--color-warning-100);
+    color: var(--color-warning-800);
 }
 
 .role-badge {
@@ -402,7 +359,7 @@
    Superadmin Icon
    ======================================== */
 .superadmin-icon {
-    color: #F59E0B;
+    color: var(--color-warning-500);
     margin-left: var(--space-1);
 }
 

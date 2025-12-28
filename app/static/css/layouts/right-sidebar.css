@@ -75,16 +75,16 @@
     border-radius: var(--radius-md);
 }
 
-.file-icon.pdf { color: #ef4444; }
-.file-icon.doc { color: #2563eb; }
-.file-icon.xls { color: #10b981; }
-.file-icon.img { color: #f59e0b; }
+.file-icon.pdf { color: var(--color-error-500); }
+.file-icon.doc { color: var(--color-blue-600); }
+.file-icon.xls { color: var(--color-success-500); }
+.file-icon.img { color: var(--color-warning-500); }
 
 /* 파일 타입별 아이콘 색상 (FontAwesome 아이콘용) */
-.file-icon .fa-file-pdf { color: #dc3545; }
-.file-icon .fa-file-image { color: #28a745; }
-.file-icon .fa-file-word { color: #0d6efd; }
-.file-icon .fa-file-excel { color: #198754; }
+.file-icon .fa-file-pdf { color: var(--color-error-600); }
+.file-icon .fa-file-image { color: var(--color-success-600); }
+.file-icon .fa-file-word { color: var(--color-blue-600); }
+.file-icon .fa-file-excel { color: var(--color-success-700); }
 .file-icon .fa-file { color: var(--color-gray-500); }
 
 .file-info {
@@ -111,8 +111,8 @@
 }
 
 .file-category {
-    background: rgba(37, 99, 235, 0.1);
-    color: #2563eb;
+    background: var(--color-blue-opacity-10);
+    color: var(--color-blue-600);
     padding: 2px 6px;
     border-radius: var(--radius-sm);
     font-weight: 500;
@@ -160,8 +160,8 @@
 }
 
 .btn-icon:hover {
-    background: rgba(37, 99, 235, 0.1);
-    color: #2563eb;
+    background: var(--color-blue-opacity-10);
+    color: var(--color-blue-600);
 }
 
 .btn-icon.btn-delete-attachment {
@@ -171,8 +171,8 @@
 }
 
 .btn-icon.btn-delete-attachment:hover {
-    background: rgba(220, 38, 38, 0.1);
-    color: #dc2626;
+    background: var(--color-error-opacity-10);
+    color: var(--color-error-600);
 }
 
 /* 파일 업로드 영역 */
@@ -187,14 +187,14 @@
 }
 
 .file-upload-area:hover {
-    border-color: #2563eb;
-    background: rgba(37, 99, 235, 0.02);
+    border-color: var(--color-blue-600);
+    background: var(--color-blue-opacity-05);
 }
 
 .file-upload-area.dragover,
 .file-upload-area.drag-over {
-    border-color: #2563eb;
-    background: rgba(37, 99, 235, 0.05);
+    border-color: var(--color-blue-600);
+    background: var(--color-blue-opacity-05);
 }
 
 /* 업로드 중 카드 */
@@ -203,11 +203,11 @@
 }
 
 .file-card.uploading .file-icon {
-    color: #2563eb;
+    color: var(--color-blue-600);
 }
 
 .file-status {
-    color: #2563eb;
+    color: var(--color-blue-600);
     font-weight: 500;
 }
 
@@ -270,7 +270,7 @@
     align-items: center;
     gap: var(--space-1);
     padding: var(--space-2) var(--space-3);
-    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-500) 100%);
     color: var(--color-pure-white);
     border: none;
     border-radius: var(--radius-md);
@@ -281,9 +281,9 @@
 }
 
 .btn-ai-analyze:hover {
-    background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+    background: linear-gradient(135deg, var(--color-employee-500) 0%, var(--color-primary-600) 100%);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-ai-analyze:disabled {

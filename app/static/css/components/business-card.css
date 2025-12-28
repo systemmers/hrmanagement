@@ -50,8 +50,8 @@
     -webkit-backface-visibility: hidden;
     border-radius: var(--radius-md);
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px var(--color-black-opacity-25);
+    border: 2px solid var(--color-white-opacity-20);
 }
 
 .business-card .card-face img {
@@ -78,10 +78,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.6);
+    background: var(--color-white-opacity-10);
+    color: var(--color-white-opacity-60);
     border-radius: var(--radius-md);
-    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border: 2px dashed var(--color-white-opacity-30);
     gap: var(--space-1);
 }
 
@@ -127,25 +127,25 @@
 }
 
 .btn-upload-card {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--color-white-opacity-15);
     color: var(--color-pure-white);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--color-white-opacity-30);
 }
 
 .btn-upload-card:hover {
-    background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(255, 255, 255, 0.5);
+    background: var(--color-white-opacity-25);
+    border-color: var(--color-white-opacity-50);
 }
 
 .btn-delete-card {
-    background: rgba(239, 68, 68, 0.2); /* --color-error-500 with opacity */
-    color: var(--color-error-300, #fca5a5);
-    border: 1px solid rgba(239, 68, 68, 0.4); /* --color-error-500 with opacity */
+    background: var(--color-error-opacity-20);
+    color: var(--color-error-100);
+    border: 1px solid var(--color-error-opacity-40);
 }
 
 .btn-delete-card:hover {
-    background: rgba(239, 68, 68, 0.3); /* --color-error-500 with opacity */
-    border-color: rgba(239, 68, 68, 0.6); /* --color-error-500 with opacity */
+    background: var(--color-error-opacity-30);
+    border-color: var(--color-error-opacity-60);
 }
 
 /* ========================================
@@ -157,7 +157,7 @@
     position: fixed;
     inset: 0;
     z-index: 1000;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--color-black-opacity-60);
     backdrop-filter: blur(4px);
     align-items: center;
     justify-content: center;
@@ -243,12 +243,12 @@
 
 .upload-dropzone:hover {
     border-color: var(--color-primary);
-    background: rgba(37, 99, 235, 0.05); /* --color-blue-600 with opacity */
+    background: var(--color-blue-opacity-05);
 }
 
 .upload-dropzone.dragover {
     border-color: var(--color-primary);
-    background: rgba(37, 99, 235, 0.1); /* --color-blue-600 with opacity */
+    background: var(--color-blue-opacity-10);
 }
 
 .upload-dropzone.has-file {

@@ -1,40 +1,9 @@
 /**
  * Miscellaneous Component Styles
- * 기타 공통 스타일 (버튼 추가, 빈 상태, 링크 버튼 등)
+ * 기타 공통 스타일 (빈 상태, 링크 버튼 등)
+ *
+ * Note: btn-icon, btn-danger는 button.css에서 SSOT로 관리
  */
-
-/* 버튼 추가 스타일 */
-.btn-danger {
-    background-color: var(--color-error-500);
-    color: var(--color-pure-white);
-    border: 1px solid var(--color-error-500);
-}
-
-.btn-danger:hover {
-    background-color: var(--color-error-600);
-    border-color: var(--color-error-600);
-    box-shadow: var(--shadow-md);
-}
-
-/* 아이콘 버튼 */
-.btn-icon {
-    width: 32px;
-    height: 32px;
-    border: none;
-    background-color: transparent;
-    color: var(--color-gray-600);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-icon:hover {
-    background-color: var(--color-gray-100);
-    color: var(--color-gray-900);
-}
 
 /* .empty-state는 components/empty-state.css에서 정의 */
 

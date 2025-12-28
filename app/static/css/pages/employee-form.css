@@ -99,20 +99,10 @@ select.form-input {
 /* 입력 필드 조합 패턴은 components/forms.css로 이동 */
 /* .input-with-button, .input-with-checkbox → components/forms.css */
 
-/* 사진 업로드 섹션은 components/forms.css에서 정의 */
-/* 직원 폼 페이지 특화 오버라이드 */
-.photo-preview {
-    width: 150px; /* 직원 폼은 더 큰 사진 미리보기 사용 */
-    height: 150px;
-}
-
-.photo-placeholder span {
-    font-size: var(--text-sm); /* 직원 폼에서 더 큰 텍스트 */
-}
-
-.photo-upload-controls {
-    justify-content: center; /* 직원 폼에서 중앙 정렬 */
-}
+/* 사진 업로드 섹션
+   → 중앙화됨: components/image-upload.css
+   사용 클래스: .image-upload-section, .image-preview.image-preview--lg, .image-placeholder
+   기존 .photo-preview 오버라이드 제거됨 */
 
 /* 동적 리스트 (학력, 경력, 자격증, 가족) */
 .dynamic-list {
@@ -281,7 +271,7 @@ select.form-input {
         grid-template-columns: 1fr;
     }
 
-    .photo-upload-section {
+    .image-upload-section {
         flex-direction: column;
         align-items: center;
     }

@@ -20,7 +20,4 @@
     font-weight: 600;
 }
 
-/* Icon Button Danger State */
-.btn-icon-danger:hover {
-    color: var(--color-error-500);
-}
+/* Note: btn-icon-danger는 button.css에서 SSOT로 관리 */

@@ -117,10 +117,12 @@ table .badge {
     background-color: var(--color-gray-25);
 }
 
-/* 테이블 액션 버튼 */
-.table-actions {
+/* 테이블 액션 버튼 컨테이너 (SSOT) */
+.table-actions,
+.action-buttons {
     display: flex;
     gap: var(--space-2);
+    align-items: center;
 }
 
 /* 반응형 테이블 */

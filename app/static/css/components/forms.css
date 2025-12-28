@@ -8,7 +8,7 @@
     max-width: 800px;
 }
 
-.employee-form {
+.app-form {
     background-color: var(--color-pure-white);
     border: 1px solid var(--color-gray-200);
     border-radius: var(--radius-lg);
@@ -25,12 +25,19 @@
 }
 
 .form-section-title {
-    font-size: var(--text-xl);
+    font-size: var(--text-lg);
     font-weight: 600;
     color: var(--color-gray-900);
     margin-bottom: var(--space-6);
     padding-bottom: var(--space-3);
-    border-bottom: 2px solid var(--color-gray-200);
+    border-bottom: 1px solid var(--color-gray-200);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.form-section-title i {
+    color: var(--color-primary-600);
 }
 
 /* 폼 레이아웃 */
@@ -106,51 +113,11 @@ select.form-input:disabled {
 
 /* ========================================
    프로필 사진 업로드 섹션
+   → 중앙화됨: components/image-upload.css
+   레거시 클래스 호환성을 위한 최소한의 정의만 유지
    ======================================== */
 
-.photo-upload-section {
-    display: flex;
-    gap: var(--space-6);
-    margin-bottom: var(--space-6);
-    padding-bottom: var(--space-6);
-    border-bottom: 1px solid var(--color-gray-200);
-}
-
-.photo-preview {
-    width: 120px;
-    height: 120px;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    background-color: var(--color-gray-100);
-    border: 2px solid var(--color-gray-200);
-    flex-shrink: 0;
-}
-
-.photo-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.photo-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-gray-400);
-    gap: var(--space-2);
-}
-
-.photo-placeholder i {
-    font-size: var(--text-3xl);
-}
-
-.photo-placeholder span {
-    font-size: var(--text-xs);
-}
-
+/* 레거시 호환: photo-upload-controls (폼 내 사진 컨트롤 영역) */
 .photo-upload-controls {
     flex: 1;
     display: flex;
@@ -343,6 +310,13 @@ select.form-input:disabled {
     border-color: var(--color-error-500) !important;
 }
 
+/* 폼 힌트/도움말 텍스트 */
+.form-hint {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+    margin-top: var(--space-1);
+}
+
 /* ========================================
    Form Section Variants
    ======================================== */
@@ -524,12 +498,7 @@ select.form-input:disabled {
         align-items: flex-start;
     }
 
-    .photo-upload-section {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
+    /* 사진 업로드 반응형은 image-upload.css에서 정의 */
     .photo-upload-controls {
         align-items: center;
     }

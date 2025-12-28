@@ -8,13 +8,7 @@
     max-width: 1000px;
 }
 
-/* 상세 카드 */
-.detail-card {
-    background-color: var(--color-pure-white);
-    border: 1px solid var(--color-gray-200);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-}
+/* .detail-card 스타일은 contract-detail.css에서 SSOT로 정의됨 */
 
 /* 상세 헤더 */
 .detail-header {
