@@ -2,12 +2,14 @@
 노출 설정 API
 
 필드 노출 설정 CRUD API를 제공합니다.
+Phase 2.4: API 응답 표준화 (2025-12-29)
 """
-from flask import jsonify, request
+from flask import request
 
 from app.blueprints.corporate_settings import corporate_settings_api_bp
 from app.blueprints.corporate_settings.helpers import get_company_id
 from app.services.corporate_settings_service import corporate_settings_service
+from app.utils.api_helpers import api_success, api_forbidden
 from app.utils.decorators import corporate_admin_required
 
 
@@ -17,10 +19,10 @@ def get_visibility_settings():
     """노출 설정 조회"""
     company_id = get_company_id()
     if not company_id:
-        return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
+        return api_forbidden('법인 정보를 찾을 수 없습니다.')
 
     settings = corporate_settings_service.get_visibility_settings(company_id)
-    return jsonify(settings)
+    return api_success(settings)
 
 
 @corporate_settings_api_bp.route('/visibility', methods=['PUT'])
@@ -29,12 +31,12 @@ def update_visibility_settings():
     """노출 설정 저장"""
     company_id = get_company_id()
     if not company_id:
-        return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
+        return api_forbidden('법인 정보를 찾을 수 없습니다.')
 
     data = request.get_json()
     result = corporate_settings_service.update_visibility_settings(company_id, data)
 
-    return jsonify(result)
+    return api_success(result)
 
 
 @corporate_settings_api_bp.route('/visibility/reset', methods=['POST'])
@@ -43,7 +45,7 @@ def reset_visibility_settings():
     """노출 설정 기본값 초기화"""
     company_id = get_company_id()
     if not company_id:
-        return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 403
+        return api_forbidden('법인 정보를 찾을 수 없습니다.')
 
     result = corporate_settings_service.reset_visibility_settings(company_id)
-    return jsonify(result)
+    return api_success(result)

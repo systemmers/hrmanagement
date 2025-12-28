@@ -4,11 +4,13 @@ REST API Blueprint
 FieldRegistry API를 제공합니다.
 Phase 2: Service 계층 표준화
 Phase 6: FieldRegistry API 추가
+Phase 2.4: API 응답 표준화 (2025-12-29)
 """
-from flask import Blueprint, jsonify, request, session
+from flask import Blueprint, request, session
 
 from ..constants.field_registry import FieldRegistry
 from ..constants.session_keys import SessionKeys
+from ..utils.api_helpers import api_success, api_error, api_not_found, api_forbidden
 from ..utils.decorators import login_required
 
 api_bp = Blueprint('api', __name__)
@@ -52,7 +54,7 @@ def get_all_field_sections():
             FieldRegistry.get_js_config(section.id, account_type)
         )
 
-    return jsonify({
+    return api_success({
         'sections': result_sections,
         'accountType': account_type,
         'domain': domain,
@@ -78,13 +80,13 @@ def get_field_section(section_id):
 
     section = FieldRegistry.get_section(section_id)
     if not section:
-        return jsonify({'error': f'Section not found: {section_id}'}), 404
+        return api_not_found(f'섹션 {section_id}')
 
     # 계정 타입별 가시성 체크
     if account_type and not section.is_visible_for(account_type):
-        return jsonify({'error': 'Section not accessible for this account type'}), 403
+        return api_forbidden('해당 계정 타입에서 접근할 수 없는 섹션입니다.')
 
-    return jsonify({
+    return api_success({
         'section': FieldRegistry.get_js_config(section_id, account_type),
         'accountType': account_type,
     })
@@ -99,6 +101,6 @@ def get_all_domains():
     Returns:
         {"domains": ["profile", "employee", ...]}
     """
-    return jsonify({
+    return api_success({
         'domains': FieldRegistry.get_all_domains()
     })
