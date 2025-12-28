@@ -62,7 +62,8 @@ from .file_handlers import (
 
 # 관계형 데이터 업데이트 함수
 from .relation_updaters import (
-    RelatedDataUpdater,
+    EmployeeRelationUpdater,
+    employee_relation_updater,
     update_family_data,
     update_education_data,
     update_career_data,
@@ -73,6 +74,9 @@ from .relation_updaters import (
     update_project_participation_data,
     update_award_data,
 )
+
+# 하위 호환성 alias (Phase 27.1: RelatedDataUpdater -> EmployeeRelationUpdater)
+RelatedDataUpdater = EmployeeRelationUpdater
 
 # __all__ 정의
 __all__ = [
@@ -95,7 +99,9 @@ __all__ = [
     'generate_unique_filename',
     'delete_file_if_exists',
     # 관계형 데이터 업데이트
-    'RelatedDataUpdater',
+    'EmployeeRelationUpdater',
+    'employee_relation_updater',
+    'RelatedDataUpdater',  # 하위 호환성 alias
     'update_family_data',
     'update_education_data',
     'update_career_data',

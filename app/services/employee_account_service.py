@@ -17,6 +17,7 @@ from typing import Dict, Optional, Tuple, List
 from app.database import db
 from app.models import Employee, User
 from app.extensions import employee_repo, user_repo
+from app.utils.transaction import atomic_transaction
 from app.utils.tenant import get_current_organization_id
 
 
@@ -64,20 +65,19 @@ class EmployeeAccountService:
             if validation_error:
                 return False, None, validation_error
 
-            # 2. Employee 생성
-            employee = self._create_employee(employee_data, company_id)
-            db.session.flush()  # employee.id 확보
+            with atomic_transaction():
+                # 2. Employee 생성
+                employee = self._create_employee(employee_data, company_id)
+                db.session.flush()  # employee.id 확보
 
-            # 3. User 생성 (account_type='employee_sub')
-            user = self._create_user(
-                account_data=account_data,
-                employee_id=employee.id,
-                company_id=company_id,
-                parent_user_id=admin_user_id
-            )
-            db.session.flush()
-
-            db.session.commit()
+                # 3. User 생성 (account_type='employee_sub')
+                user = self._create_user(
+                    account_data=account_data,
+                    employee_id=employee.id,
+                    company_id=company_id,
+                    parent_user_id=admin_user_id
+                )
+                db.session.flush()
 
             return True, {
                 'employee_id': employee.id,
@@ -88,7 +88,6 @@ class EmployeeAccountService:
             }, None
 
         except Exception as e:
-            db.session.rollback()
             return False, None, f"생성 실패: {str(e)}"
 
     def create_account_only(
@@ -126,27 +125,26 @@ class EmployeeAccountService:
             if not company:
                 return False, None, "법인 정보를 찾을 수 없습니다."
 
-            # 3. 최소 Employee 생성 (company_id + organization_id 포함)
-            employee = Employee(
-                name=minimal_employee_data.get('name', ''),
-                email=account_data.get('email', ''),
-                company_id=company_id,  # 법인 소속 설정
-                organization_id=company.root_organization_id,  # 조직 트리 연결
-                status='pending_info'  # 정보 입력 대기 상태
-            )
-            db.session.add(employee)
-            db.session.flush()
+            with atomic_transaction():
+                # 3. 최소 Employee 생성 (company_id + organization_id 포함)
+                employee = Employee(
+                    name=minimal_employee_data.get('name', ''),
+                    email=account_data.get('email', ''),
+                    company_id=company_id,  # 법인 소속 설정
+                    organization_id=company.root_organization_id,  # 조직 트리 연결
+                    status='pending_info'  # 정보 입력 대기 상태
+                )
+                db.session.add(employee)
+                db.session.flush()
 
-            # 3. User 생성
-            user = self._create_user(
-                account_data=account_data,
-                employee_id=employee.id,
-                company_id=company_id,
-                parent_user_id=admin_user_id
-            )
-            db.session.flush()
-
-            db.session.commit()
+                # 4. User 생성
+                user = self._create_user(
+                    account_data=account_data,
+                    employee_id=employee.id,
+                    company_id=company_id,
+                    parent_user_id=admin_user_id
+                )
+                db.session.flush()
 
             return True, {
                 'employee_id': employee.id,
@@ -158,7 +156,6 @@ class EmployeeAccountService:
             }, None
 
         except Exception as e:
-            db.session.rollback()
             return False, None, f"생성 실패: {str(e)}"
 
     # ========================================
@@ -187,19 +184,18 @@ class EmployeeAccountService:
             if not employee:
                 return False, "직원을 찾을 수 없습니다."
 
-            # User 조회 (employee_id로)
-            user = User.query.filter_by(employee_id=employee_id).first()
-            if user:
-                user.is_active = False
+            with atomic_transaction():
+                # User 조회 (employee_id로)
+                user = User.query.filter_by(employee_id=employee_id).first()
+                if user:
+                    user.is_active = False
 
-            # Employee 상태 변경
-            employee.status = 'inactive'
+                # Employee 상태 변경
+                employee.status = 'inactive'
 
-            db.session.commit()
             return True, None
 
         except Exception as e:
-            db.session.rollback()
             return False, str(e)
 
     def reactivate_employee_account(
@@ -221,17 +217,16 @@ class EmployeeAccountService:
             if not employee:
                 return False, "직원을 찾을 수 없습니다."
 
-            user = User.query.filter_by(employee_id=employee_id).first()
-            if user:
-                user.is_active = True
+            with atomic_transaction():
+                user = User.query.filter_by(employee_id=employee_id).first()
+                if user:
+                    user.is_active = True
 
-            employee.status = 'active'
+                employee.status = 'active'
 
-            db.session.commit()
             return True, None
 
         except Exception as e:
-            db.session.rollback()
             return False, str(e)
 
     # ========================================

@@ -591,3 +591,23 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
             company_id=company_id,
             status=PersonCorporateContract.STATUS_APPROVED
         ).all()
+
+    def find_approved_contract_by_employee_number(
+        self,
+        employee_number: str,
+        company_id: int
+    ) -> Optional[PersonCorporateContract]:
+        """직원번호와 회사ID로 승인된 계약 조회
+
+        Args:
+            employee_number: 직원번호
+            company_id: 회사 ID
+
+        Returns:
+            PersonCorporateContract 또는 None
+        """
+        return PersonCorporateContract.query.filter_by(
+            employee_number=employee_number,
+            company_id=company_id,
+            status=PersonCorporateContract.STATUS_APPROVED
+        ).first()

@@ -16,6 +16,7 @@ from flask import request
 
 from app.database import db
 from app.models import Employee
+from app.utils.transaction import atomic_transaction
 from app.models.military_service import MilitaryService
 from app.utils.tenant import get_current_organization_id
 from app.extensions import (
@@ -346,19 +347,19 @@ class EmployeeService:
             if not org_id:
                 return False, None, "조직 정보를 찾을 수 없습니다."
 
-            employee = self._extract_employee_from_form(form_data)
-            employee.company_id = org_id
+            with atomic_transaction():
+                employee = self._extract_employee_from_form(form_data)
+                employee.company_id = org_id
 
-            self.employee_repo.create(employee)
-            db.session.flush()
+                self.employee_repo.create(employee, commit=False)
+                db.session.flush()
 
-            # 관계형 데이터 업데이트
-            self._update_all_related_data(employee.id, form_data)
+                # 관계형 데이터 업데이트
+                self._update_all_related_data(employee.id, form_data)
 
             return True, employee, None
 
         except Exception as e:
-            db.session.rollback()
             return False, None, str(e)
 
     def update_employee(self, employee_id: int, form_data: Dict) -> Tuple[bool, Optional[str]]:
@@ -375,17 +376,17 @@ class EmployeeService:
             if not employee:
                 return False, "직원을 찾을 수 없습니다."
 
-            # 기본 필드 업데이트
-            updated_employee = self._extract_employee_from_form(form_data, employee_id)
-            self.employee_repo.update(employee, updated_employee)
+            with atomic_transaction():
+                # 기본 필드 업데이트
+                updated_employee = self._extract_employee_from_form(form_data, employee_id)
+                self.employee_repo.update(employee, updated_employee, commit=False)
 
-            # 관계형 데이터 업데이트
-            self._update_all_related_data(employee_id, form_data)
+                # 관계형 데이터 업데이트
+                self._update_all_related_data(employee_id, form_data)
 
             return True, None
 
         except Exception as e:
-            db.session.rollback()
             return False, str(e)
 
     def delete_employee(self, employee_id: int) -> Tuple[bool, Optional[str]]:
@@ -402,11 +403,12 @@ class EmployeeService:
             if not employee:
                 return False, "직원을 찾을 수 없습니다."
 
-            self.employee_repo.delete(employee)
+            with atomic_transaction():
+                self.employee_repo.delete(employee, commit=False)
+
             return True, None
 
         except Exception as e:
-            db.session.rollback()
             return False, str(e)
 
     # ========================================
@@ -420,16 +422,15 @@ class EmployeeService:
             if not employee:
                 return False, "직원을 찾을 수 없습니다."
 
-            basic_fields = self._extract_basic_fields(form_data)
-            for key, value in basic_fields.items():
-                if hasattr(employee, key):
-                    setattr(employee, key, value)
+            with atomic_transaction():
+                basic_fields = self._extract_basic_fields(form_data)
+                for key, value in basic_fields.items():
+                    if hasattr(employee, key):
+                        setattr(employee, key, value)
 
-            db.session.commit()
             return True, None
 
         except Exception as e:
-            db.session.rollback()
             return False, str(e)
 
     # ========================================
@@ -461,11 +462,10 @@ class EmployeeService:
     def update_military(self, employee_id: int, form_data: Dict) -> Tuple[bool, Optional[str]]:
         """병역 정보 수정 (특수 처리: 1:1 관계)"""
         try:
-            self._update_military_data(employee_id, form_data)
-            db.session.commit()
+            with atomic_transaction():
+                self._update_military_data(employee_id, form_data)
             return True, None
         except Exception as e:
-            db.session.rollback()
             return False, str(e)
 
     def update_family(self, employee_id: int, form_data: Dict) -> Tuple[bool, Optional[str]]:
@@ -592,7 +592,62 @@ class EmployeeService:
             self.military_repo.create(military)
 
     # ========================================
-    # 대시보드/검색용 메서드 (main.py용)
+    # 대시보드용 메서드
+    # ========================================
+
+    def get_dashboard_data(self, employee_id: int) -> Optional[Dict]:
+        """직원 대시보드 데이터 조회
+
+        Args:
+            employee_id: 직원 ID
+
+        Returns:
+            대시보드용 데이터 Dict 또는 None
+        """
+        from datetime import date
+
+        employee = self.employee_repo.find_by_id(employee_id)
+        if not employee:
+            return None
+
+        # 이력 통계 (lazy relationship은 list()로 변환 후 len() 사용)
+        stats = {
+            'education_count': len(list(employee.educations)) if employee.educations else 0,
+            'career_count': len(list(employee.careers)) if employee.careers else 0,
+            'certificate_count': len(list(employee.certificates)) if employee.certificates else 0,
+            'language_count': len(list(employee.languages)) if employee.languages else 0,
+        }
+
+        # 근속년수 계산
+        years_of_service = 0
+        if employee.hire_date:
+            try:
+                hire_date = employee.hire_date
+                if isinstance(hire_date, str):
+                    from datetime import datetime
+                    hire_date = datetime.strptime(hire_date, '%Y-%m-%d').date()
+                today = date.today()
+                years_of_service = (today - hire_date).days // 365
+            except (ValueError, TypeError):
+                years_of_service = 0
+
+        # 근무 정보
+        work_info = {
+            'hire_date': employee.hire_date,
+            'years_of_service': years_of_service,
+            'status': employee.status,
+            'department': employee.department,
+            'position': employee.position,
+        }
+
+        return {
+            'employee': employee,
+            'stats': stats,
+            'work_info': work_info,
+        }
+
+    # ========================================
+    # 통계/검색용 메서드 (main.py용)
     # ========================================
 
     def get_statistics(self, organization_id: int = None) -> Dict:

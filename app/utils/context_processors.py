@@ -190,17 +190,6 @@ def register_context_processors(app):
             if field.get('options'):
                 return field['options']
 
-            # ClassificationOption 참조
-            options_category = field.get('optionsCategory')
-            if options_category:
-                try:
-                    from ..services.classification_service import classification_service
-                    options = classification_service.get_options_for_category(options_category)
-                    if options:
-                        return [{'value': o.get('value', o), 'label': o.get('label', o)} for o in options]
-                except Exception:
-                    pass
-
             return []
 
         def is_field_visible(field, account_type):

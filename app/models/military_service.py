@@ -26,9 +26,7 @@ class MilitaryService(DictSerializableMixin, db.Model):
         'notes': 'note',                       # Personal 호환 alias
     }
 
-    __dict_computed__ = {
-        'specialty': lambda self: None,        # 템플릿: military.specialty
-    }
+    # specialty 컬럼 추가됨 (2025-12-27) - computed 불필요
 
     __dict_camel_mapping__ = {
         'employee_id': ['employeeId'],
@@ -56,6 +54,7 @@ class MilitaryService(DictSerializableMixin, db.Model):
     discharge_date = db.Column(db.String(20), nullable=True)
     discharge_reason = db.Column(db.String(200), nullable=True)
     exemption_reason = db.Column(db.String(500), nullable=True)
+    specialty = db.Column(db.String(100), nullable=True)  # 병과 (보병, 통신 등)
     note = db.Column(db.Text, nullable=True)
 
     def __repr__(self):

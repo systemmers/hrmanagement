@@ -14,6 +14,7 @@ from typing import Dict, Optional, Tuple, List
 from app.database import db
 from app.models.user import User
 from app.models.profile import Profile
+from app.utils.transaction import atomic_transaction
 from app.models import (
     Education, Career, Certificate, Language, MilitaryService
 )
@@ -68,32 +69,31 @@ class PersonalService:
             Tuple[성공여부, User객체, 에러메시지]
         """
         try:
-            # 사용자 계정 생성
-            user = User(
-                username=username,
-                email=email,
-                role=User.ROLE_EMPLOYEE,
-                account_type=User.ACCOUNT_PERSONAL,
-                is_active=True
-            )
-            user.set_password(password)
-            db.session.add(user)
-            db.session.flush()
+            with atomic_transaction():
+                # 사용자 계정 생성
+                user = User(
+                    username=username,
+                    email=email,
+                    role=User.ROLE_EMPLOYEE,
+                    account_type=User.ACCOUNT_PERSONAL,
+                    is_active=True
+                )
+                user.set_password(password)
+                db.session.add(user)
+                db.session.flush()
 
-            # 통합 Profile 생성
-            profile = Profile(
-                user_id=user.id,
-                name=name,
-                email=email,
-                mobile_phone=mobile_phone
-            )
-            db.session.add(profile)
-            db.session.commit()
+                # 통합 Profile 생성
+                profile = Profile(
+                    user_id=user.id,
+                    name=name,
+                    email=email,
+                    mobile_phone=mobile_phone
+                )
+                db.session.add(profile)
 
             return True, user, None
 
         except Exception as e:
-            db.session.rollback()
             return False, None, str(e)
 
     # ========================================
@@ -147,10 +147,10 @@ class PersonalService:
             return False, '프로필을 찾을 수 없습니다.'
 
         try:
-            self.profile_repo.update_by_user_id(user_id, data)
+            with atomic_transaction():
+                self.profile_repo.update_by_user_id(user_id, data, commit=False)
             return True, None
         except Exception as e:
-            db.session.rollback()
             return False, str(e)
 
     # ========================================

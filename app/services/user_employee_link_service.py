@@ -131,6 +131,36 @@ class UserEmployeeLinkService:
         contract = self._contract_repo.get_contract_for_employee(employee_id)
         return contract is not None and contract.person_user_id is not None
 
+    def has_approved_personal_contract(
+        self,
+        employee_id: int,
+        company_id: int
+    ) -> bool:
+        """직원에게 승인된 개인 계약이 있는지 확인
+
+        Args:
+            employee_id: Employee ID
+            company_id: Company ID
+
+        Returns:
+            승인된 개인 계약 존재 여부
+        """
+        from app.services.employee_service import employee_service
+
+        employee = employee_service.get_employee_by_id(employee_id)
+        if not employee:
+            return False
+
+        # employee_number가 없으면 계약이 없는 것
+        employee_number = employee.get('employee_number') if isinstance(employee, dict) else employee.employee_number
+        if not employee_number:
+            return False
+
+        contract = self._contract_repo.find_approved_contract_by_employee_number(
+            employee_number, company_id
+        )
+        return contract is not None
+
     def get_contract_for_employee(self, employee_id: int):
         """직원의 활성 계약 조회
 

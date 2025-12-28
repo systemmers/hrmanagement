@@ -12,6 +12,7 @@ from app.models.company import Company
 from app.models.user import User
 from app.models.organization import Organization
 from app.repositories.company_repository import company_repository
+from app.utils.transaction import atomic_transaction
 
 
 @dataclass
@@ -135,51 +136,50 @@ def create_company_entities(data: RegistrationData) -> Optional[str]:
         Optional[str]: 에러 메시지 (성공 시 None)
     """
     try:
-        # 루트 조직 생성
-        root_org = Organization(
-            name=data.company_name,
-            org_type=Organization.TYPE_COMPANY,
-            is_active=True,
-            description=f'{data.company_name} 루트 조직'
-        )
-        db.session.add(root_org)
-        db.session.flush()
+        with atomic_transaction():
+            # 루트 조직 생성
+            root_org = Organization(
+                name=data.company_name,
+                org_type=Organization.TYPE_COMPANY,
+                is_active=True,
+                description=f'{data.company_name} 루트 조직'
+            )
+            db.session.add(root_org)
+            db.session.flush()
 
-        # 법인 생성
-        company = Company(
-            name=data.company_name,
-            business_number=data.business_number.replace('-', ''),
-            representative=data.representative,
-            business_type=data.business_type,
-            business_category=data.business_category,
-            phone=data.phone,
-            email=data.email,
-            address=data.address,
-            address_detail=data.address_detail,
-            postal_code=data.postal_code,
-            root_organization_id=root_org.id,
-            is_active=True,
-            plan_type=Company.PLAN_FREE,
-            max_employees=Company.PLAN_MAX_EMPLOYEES[Company.PLAN_FREE]
-        )
-        db.session.add(company)
-        db.session.flush()
+            # 법인 생성
+            company = Company(
+                name=data.company_name,
+                business_number=data.business_number.replace('-', ''),
+                representative=data.representative,
+                business_type=data.business_type,
+                business_category=data.business_category,
+                phone=data.phone,
+                email=data.email,
+                address=data.address,
+                address_detail=data.address_detail,
+                postal_code=data.postal_code,
+                root_organization_id=root_org.id,
+                is_active=True,
+                plan_type=Company.PLAN_FREE,
+                max_employees=Company.PLAN_MAX_EMPLOYEES[Company.PLAN_FREE]
+            )
+            db.session.add(company)
+            db.session.flush()
 
-        # 관리자 계정 생성
-        admin_user = User(
-            username=data.admin_username,
-            email=data.admin_email,
-            role=User.ROLE_ADMIN,
-            account_type=User.ACCOUNT_CORPORATE,
-            company_id=company.id,
-            is_active=True
-        )
-        admin_user.set_password(data.admin_password)
-        db.session.add(admin_user)
+            # 관리자 계정 생성
+            admin_user = User(
+                username=data.admin_username,
+                email=data.admin_email,
+                role=User.ROLE_ADMIN,
+                account_type=User.ACCOUNT_CORPORATE,
+                company_id=company.id,
+                is_active=True
+            )
+            admin_user.set_password(data.admin_password)
+            db.session.add(admin_user)
 
-        db.session.commit()
         return None
 
     except Exception as e:
-        db.session.rollback()
         return f'회원가입 중 오류가 발생했습니다: {str(e)}'

@@ -11,6 +11,7 @@ from ...constants.session_keys import SessionKeys
 from ...utils.decorators import login_required
 from ...services.user_service import user_service
 from ...services.employee_service import employee_service
+from ...services.personal_service import personal_service
 
 
 @account_bp.route('/settings')
@@ -80,10 +81,16 @@ def privacy():
     """개인정보 공개 설정"""
     user_id = session.get(SessionKeys.USER_ID)
     user = user_service.get_model_by_id(user_id)
+    account_type = session.get(SessionKeys.ACCOUNT_TYPE)
 
     if not user:
         flash('사용자 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
+
+    # 개인계정인 경우 프로필 조회
+    profile = None
+    if account_type == 'personal':
+        _, profile = personal_service.get_user_with_profile(user_id)
 
     if request.method == 'POST':
         # 공개 설정 저장
@@ -94,6 +101,11 @@ def privacy():
             'show_birth_date': request.form.get('show_birth_date') == 'on',
             'show_profile_photo': request.form.get('show_profile_photo') == 'on',
         }
+
+        # 개인계정: 프로필 공개 설정 (구직 활동)
+        if account_type == 'personal' and profile:
+            is_public = request.form.get('is_public') == 'on'
+            personal_service.update_profile(user_id, {'is_public': is_public})
 
         # 사용자 privacy_settings 업데이트
         if user_service.update_privacy_settings(user_id, privacy_settings):
@@ -107,7 +119,9 @@ def privacy():
 
     return render_template('account/privacy.html',
                            user=user,
-                           privacy_settings=privacy_settings)
+                           privacy_settings=privacy_settings,
+                           profile=profile,
+                           account_type=account_type)
 
 
 @account_bp.route('/delete', methods=['GET', 'POST'])

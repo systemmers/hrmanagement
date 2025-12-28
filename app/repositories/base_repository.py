@@ -6,6 +6,7 @@ Phase 6: 백엔드 리팩토링 - 중복 로직 통합
 Phase 8: 제네릭 타입 적용 - IDE 자동완성 및 타입 안전성 강화
 Phase 24: Option A 레이어 분리 - find_by_id(), find_all() 표준화 (Model 반환)
 Phase 26: 레거시 메서드 완전 제거 (get_by_id, get_all 등)
+Phase 27: 트랜잭션 안전성 - commit 파라미터 추가 (단일 트랜잭션 지원)
 """
 from typing import List, Optional, Dict, Any, Type, TypeVar, Generic
 from app.database import db
@@ -59,43 +60,74 @@ class BaseRepository(Generic[ModelType]):
         """
         return self.model_class.query.get(record_id)
 
-    def create(self, data: Dict) -> Dict:
-        """새 레코드 생성 (Dict에서)"""
+    def create(self, data: Dict, commit: bool = True) -> Dict:
+        """새 레코드 생성 (Dict에서)
+
+        Args:
+            data: 생성할 데이터 딕셔너리
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         record = self.model_class.from_dict(data)
         db.session.add(record)
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return record.to_dict()
 
-    def create_model(self, model: ModelType) -> ModelType:
-        """모델 객체 직접 저장"""
+    def create_model(self, model: ModelType, commit: bool = True) -> ModelType:
+        """모델 객체 직접 저장
+
+        Args:
+            model: 저장할 모델 인스턴스
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         db.session.add(model)
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return model
 
-    def update(self, record_id: Any, data: Dict) -> Optional[Dict]:
-        """레코드 수정"""
+    def update(self, record_id: Any, data: Dict, commit: bool = True) -> Optional[Dict]:
+        """레코드 수정
+
+        Args:
+            record_id: 수정할 레코드 ID
+            data: 수정할 데이터 딕셔너리
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         record = self.model_class.query.get(record_id)
         if not record:
             return None
 
         self._update_record_fields(record, data)
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return record.to_dict()
 
-    def delete(self, record_id: Any) -> bool:
-        """레코드 삭제"""
+    def delete(self, record_id: Any, commit: bool = True) -> bool:
+        """레코드 삭제
+
+        Args:
+            record_id: 삭제할 레코드 ID
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         record = self.model_class.query.get(record_id)
         if not record:
             return False
 
         db.session.delete(record)
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return True
 
-    def delete_model(self, model: ModelType) -> bool:
-        """모델 객체 직접 삭제"""
+    def delete_model(self, model: ModelType, commit: bool = True) -> bool:
+        """모델 객체 직접 삭제
+
+        Args:
+            model: 삭제할 모델 인스턴스
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         db.session.delete(model)
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return True
 
     def _update_record_fields(self, record: ModelType, data: Dict) -> None:
@@ -153,16 +185,28 @@ class BaseRelationRepository(BaseRepository[ModelType]):
         """
         return self.model_class.query.filter_by(employee_id=employee_id).all()
 
-    def delete_by_employee_id(self, employee_id: int) -> int:
-        """특정 직원의 모든 레코드 삭제"""
+    def delete_by_employee_id(self, employee_id: int, commit: bool = True) -> int:
+        """특정 직원의 모든 레코드 삭제
+
+        Args:
+            employee_id: 직원 ID
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         count = self.model_class.query.filter_by(employee_id=employee_id).delete()
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return count
 
-    def create_for_employee(self, employee_id: int, data: Dict) -> Dict:
-        """특정 직원에게 레코드 추가"""
+    def create_for_employee(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """특정 직원에게 레코드 추가
+
+        Args:
+            employee_id: 직원 ID
+            data: 생성할 데이터 딕셔너리
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         data['employeeId'] = employee_id
-        return self.create(data)
+        return self.create(data, commit=commit)
 
 
 class BaseProfileRelationRepository(BaseRepository[ModelType]):
@@ -192,28 +236,48 @@ class BaseProfileRelationRepository(BaseRepository[ModelType]):
         """
         return self.model_class.query.filter_by(profile_id=profile_id).all()
 
-    def create_for_profile(self, profile_id: int, data: Dict) -> ModelType:
-        """특정 프로필에 레코드 추가 (from_dict 없이 직접 생성)"""
+    def create_for_profile(self, profile_id: int, data: Dict, commit: bool = True) -> ModelType:
+        """특정 프로필에 레코드 추가 (from_dict 없이 직접 생성)
+
+        Args:
+            profile_id: 프로필 ID
+            data: 생성할 데이터 딕셔너리
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         record = self.model_class(profile_id=profile_id, **data)
         db.session.add(record)
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return record
 
-    def delete_by_id_and_profile(self, record_id: int, profile_id: int) -> bool:
-        """레코드 삭제 (소유권 확인)"""
+    def delete_by_id_and_profile(self, record_id: int, profile_id: int, commit: bool = True) -> bool:
+        """레코드 삭제 (소유권 확인)
+
+        Args:
+            record_id: 레코드 ID
+            profile_id: 프로필 ID
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         record = self.model_class.query.filter_by(
             id=record_id, profile_id=profile_id
         ).first()
         if not record:
             return False
         db.session.delete(record)
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return True
 
-    def delete_all_by_profile(self, profile_id: int) -> int:
-        """프로필의 모든 레코드 삭제"""
+    def delete_all_by_profile(self, profile_id: int, commit: bool = True) -> int:
+        """프로필의 모든 레코드 삭제
+
+        Args:
+            profile_id: 프로필 ID
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         count = self.model_class.query.filter_by(profile_id=profile_id).delete()
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return count
 
 
@@ -244,8 +308,14 @@ class BaseProfileOneToOneRepository(BaseRepository[ModelType]):
         """
         return self.model_class.query.filter_by(profile_id=profile_id).first()
 
-    def save_for_profile(self, profile_id: int, data: Dict) -> ModelType:
-        """특정 프로필의 레코드 저장 (upsert)"""
+    def save_for_profile(self, profile_id: int, data: Dict, commit: bool = True) -> ModelType:
+        """특정 프로필의 레코드 저장 (upsert)
+
+        Args:
+            profile_id: 프로필 ID
+            data: 저장할 데이터 딕셔너리
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         record = self.find_by_profile_id(profile_id)
 
         if record:
@@ -253,21 +323,29 @@ class BaseProfileOneToOneRepository(BaseRepository[ModelType]):
             for key, value in data.items():
                 if hasattr(record, key):
                     setattr(record, key, value)
-            db.session.commit()
+            if commit:
+                db.session.commit()
             return record
         else:
             # 새 레코드 생성
             record = self.model_class(profile_id=profile_id, **data)
             db.session.add(record)
-            db.session.commit()
+            if commit:
+                db.session.commit()
             return record
 
-    def delete_by_profile_id(self, profile_id: int) -> bool:
-        """특정 프로필의 레코드 삭제"""
+    def delete_by_profile_id(self, profile_id: int, commit: bool = True) -> bool:
+        """특정 프로필의 레코드 삭제
+
+        Args:
+            profile_id: 프로필 ID
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         record = self.find_by_profile_id(profile_id)
         if record:
             db.session.delete(record)
-            db.session.commit()
+            if commit:
+                db.session.commit()
             return True
         return False
 
@@ -299,25 +377,38 @@ class BaseOneToOneRepository(BaseRepository[ModelType]):
         """
         return self.model_class.query.filter_by(employee_id=employee_id).first()
 
-    def save_for_employee(self, employee_id: int, data: Dict) -> Dict:
-        """특정 직원의 레코드 저장 (upsert)"""
+    def save_for_employee(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """특정 직원의 레코드 저장 (upsert)
+
+        Args:
+            employee_id: 직원 ID
+            data: 저장할 데이터 딕셔너리
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         record = self.model_class.query.filter_by(employee_id=employee_id).first()
 
         if record:
             # 기존 레코드 업데이트 (_update_record_fields 재사용)
             self._update_record_fields(record, data)
-            db.session.commit()
+            if commit:
+                db.session.commit()
             return record.to_dict()
         else:
             # 새 레코드 생성
             data['employeeId'] = employee_id
-            return self.create(data)
+            return self.create(data, commit=commit)
 
-    def delete_by_employee_id(self, employee_id: int) -> bool:
-        """특정 직원의 레코드 삭제"""
+    def delete_by_employee_id(self, employee_id: int, commit: bool = True) -> bool:
+        """특정 직원의 레코드 삭제
+
+        Args:
+            employee_id: 직원 ID
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         record = self.model_class.query.filter_by(employee_id=employee_id).first()
         if record:
             db.session.delete(record)
-            db.session.commit()
+            if commit:
+                db.session.commit()
             return True
         return False
