@@ -490,6 +490,29 @@ def api_admin_or_manager_required(f):
     return decorated_function
 
 
+def company_id_required(f):
+    """
+    법인 ID 필수 데코레이터
+
+    세션에서 company_id를 검증하고 함수에 주입합니다.
+    corporate_settings_api 등에서 반복되는 company_id 검증 로직을 추출한 데코레이터입니다.
+
+    사용 예:
+        @corporate_admin_required
+        @company_id_required
+        def get_settings(company_id):
+            # company_id가 자동으로 주입됨
+            return corporate_settings_service.get_settings(company_id)
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        company_id = session.get(SessionKeys.COMPANY_ID)
+        if not company_id:
+            return jsonify({'success': False, 'error': '법인 정보를 찾을 수 없습니다.'}), 403
+        return f(*args, company_id=company_id, **kwargs)
+    return decorated_function
+
+
 # ============================================================
 # 플랫폼 관리자 데코레이터
 # ============================================================

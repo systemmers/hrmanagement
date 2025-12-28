@@ -1,19 +1,16 @@
 """
-동기화 API Blueprint
+동기화 실행 라우트
 
-개인-법인 데이터 동기화 API를 제공합니다.
-Phase 4: 데이터 동기화 및 퇴사 처리
-Phase 8: 상수 모듈 적용
-Phase 24: 트랜잭션 SSOT 적용
+개인-법인 데이터 동기화 API 라우트를 정의합니다.
 """
-from flask import Blueprint, request, session
+from flask import request, session
 
-from app.constants.session_keys import SessionKeys, AccountType
+from app.blueprints.sync import sync_bp
+from app.constants.session_keys import SessionKeys
 from app.services.sync_service import sync_service
 from app.services.contract_service import contract_service
 from app.utils.transaction import atomic_transaction
-from app.services.termination_service import termination_service
-from app.models.person_contract import DataSharingSettings
+from app.models.person_contract import DataSharingSettings, SyncLog
 from app.utils.decorators import (
     api_login_required as login_required,
     api_personal_account_required as personal_account_required,
@@ -22,10 +19,6 @@ from app.utils.decorators import (
 )
 from app.utils.api_helpers import api_success, api_error, api_not_found
 
-sync_bp = Blueprint('sync', __name__, url_prefix='/api/sync')
-
-
-# ===== 동기화 API =====
 
 @sync_bp.route('/fields/<int:contract_id>', methods=['GET'])
 @login_required
@@ -218,196 +211,6 @@ def sync_all_contracts():
 
     return api_success(result)
 
-
-# ===== 계약 목록 API =====
-
-@sync_bp.route('/contracts', methods=['GET'])
-@login_required
-@personal_account_required
-def get_my_contracts():
-    """
-    내 활성 계약 목록 조회 (동기화 대상)
-
-    Response:
-    {
-        "success": true,
-        "contracts": [...]
-    }
-    """
-    user_id = session.get(SessionKeys.USER_ID)
-    contracts = sync_service.get_contracts_for_user(user_id)
-    return api_success({'contracts': contracts})
-
-
-# ===== 동기화 설정 API =====
-
-@sync_bp.route('/settings/<int:contract_id>/realtime', methods=['PUT'])
-@login_required
-@personal_account_required
-@contract_access_required
-def toggle_realtime_sync(contract_id):
-    """
-    실시간 동기화 설정 변경 (개인만 가능)
-
-    Request Body:
-    {
-        "enabled": true/false
-    }
-
-    Response:
-    {
-        "success": true,
-        "realtime_sync": true/false
-    }
-    """
-    from app.database import db
-
-    data = request.get_json() or {}
-    enabled = data.get('enabled', False)
-
-    with atomic_transaction():
-        settings = contract_service.get_sharing_settings_model(contract_id)
-        if not settings:
-            settings = DataSharingSettings(contract_id=contract_id)
-            db.session.add(settings)
-
-        settings.is_realtime_sync = enabled
-
-    return api_success({'realtime_sync': settings.is_realtime_sync})
-
-
-# ===== 퇴사/종료 처리 API =====
-
-@sync_bp.route('/terminate/<int:contract_id>', methods=['POST'])
-@login_required
-@contract_access_required
-def terminate_contract(contract_id):
-    """
-    계약 종료 처리
-
-    Request Body:
-    {
-        "reason": "퇴사 사유 (선택)"
-    }
-
-    Response:
-    {
-        "success": true,
-        "contract_id": 1,
-        "terminated_at": "...",
-        "revoked_permissions": {...},
-        "archive_scheduled": {...}
-    }
-    """
-    user_id = session.get(SessionKeys.USER_ID)
-    termination_service.set_current_user(user_id)
-
-    data = request.get_json() or {}
-    reason = data.get('reason')
-
-    result = termination_service.terminate_contract(
-        contract_id=contract_id,
-        reason=reason,
-        terminate_by_user_id=user_id
-    )
-
-    if result.get('success'):
-        return api_success(result)
-    else:
-        return api_error(result.get('error', '계약 종료 실패'))
-
-
-@sync_bp.route('/retention/<int:contract_id>', methods=['GET'])
-@login_required
-@contract_access_required
-def get_retention_status(contract_id):
-    """
-    데이터 보관 상태 조회
-
-    Response:
-    {
-        "success": true,
-        "status": "pending/archived/deleted",
-        "terminated_at": "...",
-        "retention_end": "...",
-        "days_remaining": 1095
-    }
-    """
-    result = termination_service.get_retention_status(contract_id)
-
-    if result.get('success'):
-        return api_success(result)
-    else:
-        return api_error(result.get('error', '보관 상태 조회 실패'))
-
-
-@sync_bp.route('/termination-history', methods=['GET'])
-@login_required
-def get_termination_history():
-    """
-    종료된 계약 이력 조회
-
-    Query Params:
-    - limit: 조회 제한 (기본 50)
-
-    Response:
-    {
-        "success": true,
-        "contracts": [...]
-    }
-    """
-    account_type = session.get(SessionKeys.ACCOUNT_TYPE)
-    user_id = session.get(SessionKeys.USER_ID)
-    company_id = session.get(SessionKeys.COMPANY_ID)
-
-    limit = request.args.get('limit', 50, type=int)
-
-    if account_type == AccountType.PERSONAL:
-        history = termination_service.get_termination_history(
-            person_user_id=user_id,
-            limit=limit
-        )
-    elif account_type == AccountType.CORPORATE:
-        history = termination_service.get_termination_history(
-            company_id=company_id,
-            limit=limit
-        )
-    else:
-        return api_error('잘못된 계정 유형입니다.')
-
-    return api_success({'contracts': history})
-
-
-# ===== 동기화 로그 API =====
-
-@sync_bp.route('/logs/<int:contract_id>', methods=['GET'])
-@login_required
-@contract_access_required
-def get_sync_logs(contract_id):
-    """
-    동기화 로그 조회
-
-    Query Params:
-    - limit: 조회 제한 (기본 50)
-    - sync_type: 동기화 유형 필터 (auto, manual, initial)
-
-    Response:
-    {
-        "success": true,
-        "logs": [...]
-    }
-    """
-    limit = request.args.get('limit', 50, type=int)
-    sync_type = request.args.get('sync_type')
-
-    logs = contract_service.get_sync_logs_filtered(
-        contract_id, sync_type=sync_type, limit=limit
-    )
-
-    return api_success({'logs': logs})
-
-
-# ===== 필드 매핑 정보 API =====
 
 @sync_bp.route('/field-mappings', methods=['GET'])
 @login_required

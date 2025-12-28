@@ -220,9 +220,15 @@ employees/
 ├── list_routes.py       # 목록 조회
 ├── mutation_routes.py   # 생성/수정/삭제
 ├── detail_routes.py     # 상세 조회
+├── files.py             # 파일 업로드 API (8개 라우트)
 ├── form_extractors.py   # 폼 데이터 추출 (FieldRegistry 기반)
 ├── relation_updaters.py # 관계 데이터 업데이트 (RelationDataConfig)
 └── helpers.py           # 헬퍼 함수
+
+admin/
+├── __init__.py          # Blueprint 정의
+├── organization.py      # 조직 관리
+└── audit.py             # 감사 대시보드 (1개 UI 라우트)
 ```
 
 ## Frontend Structure
