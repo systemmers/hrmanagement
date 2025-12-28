@@ -31,7 +31,7 @@
         </div>
 
         {% if employee %}
-        <div class="info-grid" style="margin-top: var(--space-6);">
+        <div class="info-grid mt-6">
             <div class="info-item">
                 <span class="info-label">이름</span>
                 <span class="info-value">{{ employee.name }}</span>
@@ -51,7 +51,7 @@
         </div>
         {% endif %}
 
-        <div class="form-actions" style="margin-top: var(--space-6);">
+        <div class="form-actions mt-6">
             <a href="{{ url_for('contracts.pending_contracts') }}" class="btn btn-primary">
                 <i class="fas fa-file-contract"></i>
                 <span>대기 중인 계약 확인</span>

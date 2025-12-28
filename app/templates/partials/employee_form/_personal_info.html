@@ -16,25 +16,25 @@
         </div>
         <div class="card-body">
             {# 프로필 사진 영역 #}
-            <div class="photo-upload-section">
-                <div class="photo-preview" id="photoPreview">
+            <div class="image-upload-section">
+                <div class="image-preview image-preview--lg" id="photoPreview">
                     {% if employee and employee.photo %}
                     <img src="{{ employee.photo }}" alt="프로필 사진" id="previewImage">
                     {% else %}
-                    <div class="photo-placeholder" id="photoPlaceholder">
+                    <div class="image-placeholder" id="photoPlaceholder">
                         <i class="fas fa-user"></i>
                         <span>사진 미등록</span>
                     </div>
                     {% endif %}
                 </div>
-                <div class="photo-upload-controls">
+                <div class="image-upload-controls">
                     {% if action == 'update' and employee %}
                     {# 수정 모드: 파일 업로드 #}
                     <label class="form-label">프로필 사진</label>
                     <div class="photo-file-upload" id="photoFileUpload">
                         <input type="file" id="photoFile" name="photoFile"
                                accept="image/jpeg,image/png,image/gif,image/webp"
-                               class="form-input-file" style="display: none;"
+                               class="form-input-file hidden"
                                {% if is_personal_readonly %}disabled{% endif %}>
                         <input type="hidden" id="photo" name="photo" value="{{ employee.photo if employee and employee.photo else '' }}">
                         {% if not is_personal_readonly %}
@@ -59,11 +59,14 @@
                     <div class="photo-file-upload" id="photoFileUpload">
                         <input type="file" id="photoFile" name="photoFile"
                                accept="image/jpeg,image/png,image/gif,image/webp"
-                               class="form-input-file" style="display: none;">
+                               class="form-input-file hidden">
                         <input type="hidden" id="photo" name="photo" value="{{ url_for('static', filename='images/face/face_01_m.png') }}">
                         <div class="photo-upload-buttons">
                             <button type="button" class="btn btn-secondary btn-sm" id="selectPhotoBtn">
                                 <i class="fas fa-camera"></i> 사진 선택
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm hidden" id="deletePhotoBtn">
+                                <i class="fas fa-trash"></i> 삭제
                             </button>
                         </div>
                         <small class="form-help">JPG, PNG, GIF, WebP (최대 5MB) - 등록 시 함께 저장됩니다</small>
@@ -92,12 +95,16 @@
                         <div class="card-actions">
                             <input type="file" id="businessCardFrontFile" name="businessCardFrontFile"
                                    accept="image/jpeg,image/png,image/gif,image/webp"
-                                   class="form-input-file" style="display: none;">
-                            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('businessCardFrontFile').click()">
+                                   class="form-input-file hidden">
+                            <button type="button" class="btn btn-secondary btn-sm" id="selectBusinessCardFrontBtn">
                                 <i class="fas fa-upload"></i> 앞면 선택
                             </button>
                             {% if action == 'update' and business_card_front %}
                             <button type="button" class="btn btn-outline-danger btn-sm delete-card-btn" data-side="front">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            {% else %}
+                            <button type="button" class="btn btn-outline-danger btn-sm delete-card-btn hidden" data-side="front">
                                 <i class="fas fa-trash"></i>
                             </button>
                             {% endif %}
@@ -118,12 +125,16 @@
                         <div class="card-actions">
                             <input type="file" id="businessCardBackFile" name="businessCardBackFile"
                                    accept="image/jpeg,image/png,image/gif,image/webp"
-                                   class="form-input-file" style="display: none;">
-                            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('businessCardBackFile').click()">
+                                   class="form-input-file hidden">
+                            <button type="button" class="btn btn-secondary btn-sm" id="selectBusinessCardBackBtn">
                                 <i class="fas fa-upload"></i> 뒷면 선택
                             </button>
                             {% if action == 'update' and business_card_back %}
                             <button type="button" class="btn btn-outline-danger btn-sm delete-card-btn" data-side="back">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            {% else %}
+                            <button type="button" class="btn btn-outline-danger btn-sm delete-card-btn hidden" data-side="back">
                                 <i class="fas fa-trash"></i>
                             </button>
                             {% endif %}
@@ -358,23 +369,6 @@
                 <input type="hidden" id="actual_postal_code" name="actual_postal_code"
                        value="{{ employee.actual_postal_code if employee and employee.actual_postal_code else '' }}">
 
-                {# 개인 계정 전용: 프로필 공개 설정 #}
-                {% if account_type == 'personal' %}
-                <div class="form-group form-group-full mt-4">
-                    <h5 class="form-subsection-title">프로필 공개 설정</h5>
-                    <small class="form-help mb-3">프로필을 공개하면 채용 담당자가 내 정보를 확인할 수 있습니다</small>
-                </div>
-
-                <div class="form-group form-group-full">
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="is_public" name="is_public" value="true"
-                               {% if employee and employee.is_public %}checked{% endif %}>
-                        <span class="toggle-slider"></span>
-                        <span class="toggle-label">프로필 공개 (구직 활동)</span>
-                    </label>
-                    <small class="form-help">공개 시 이름, 학력, 경력, 자격증, 어학 정보가 노출됩니다</small>
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>

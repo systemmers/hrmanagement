@@ -185,12 +185,68 @@ export function initBusinessCardPreviewForCreate() {
             const reader = new FileReader();
             reader.onload = (event) => {
                 preview.innerHTML = `<img src="${event.target.result}" alt="명함 ${sideLabel} 미리보기">`;
+
+                // 삭제 버튼 표시
+                const item = document.querySelector(`.business-card-item[data-side="${side}"]`);
+                if (item) {
+                    const deleteBtn = item.querySelector('.delete-card-btn');
+                    if (deleteBtn) {
+                        deleteBtn.classList.remove('hidden');
+                    }
+                }
             };
             reader.readAsDataURL(file);
         }
 
         showToast(`명함 ${sideLabel}이 선택되었습니다. 등록 시 함께 저장됩니다.`, 'info');
     };
+
+    // 삭제 버튼 클릭 시 초기화 (신규 등록 모드)
+    const handleDeletePreview = (side) => {
+        const previewId = side === 'front' ? 'businessCardFrontPreview' : 'businessCardBackPreview';
+        const fileInputId = side === 'front' ? 'businessCardFrontFile' : 'businessCardBackFile';
+        const sideLabel = side === 'front' ? '앞면' : '뒷면';
+
+        const preview = document.getElementById(previewId);
+        const fileInput = document.getElementById(fileInputId);
+
+        // 파일 입력 초기화
+        if (fileInput) {
+            fileInput.value = '';
+        }
+
+        // 미리보기를 기본 상태로 복원
+        if (preview) {
+            preview.innerHTML = `
+                <div class="card-placeholder">
+                    <i class="fas fa-id-card"></i>
+                    <span>${sideLabel}</span>
+                </div>
+            `;
+        }
+
+        // 삭제 버튼 숨기기
+        const item = document.querySelector(`.business-card-item[data-side="${side}"]`);
+        if (item) {
+            const deleteBtn = item.querySelector('.delete-card-btn');
+            if (deleteBtn) {
+                deleteBtn.classList.add('hidden');
+            }
+        }
+
+        showToast(`명함 ${sideLabel} 선택이 취소되었습니다.`, 'info');
+    };
+
+    // 선택 버튼 클릭 이벤트
+    const selectFrontBtn = document.getElementById('selectBusinessCardFrontBtn');
+    const selectBackBtn = document.getElementById('selectBusinessCardBackBtn');
+
+    if (selectFrontBtn && frontFileInput) {
+        selectFrontBtn.addEventListener('click', () => frontFileInput.click());
+    }
+    if (selectBackBtn && backFileInput) {
+        selectBackBtn.addEventListener('click', () => backFileInput.click());
+    }
 
     // 앞면 미리보기
     if (frontFileInput) {
@@ -201,6 +257,13 @@ export function initBusinessCardPreviewForCreate() {
     if (backFileInput) {
         backFileInput.addEventListener('change', (e) => handleFilePreview(e, 'back'));
     }
+
+    // 신규 등록 모드 삭제 버튼 이벤트
+    document.querySelectorAll('.delete-card-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            handleDeletePreview(btn.dataset.side);
+        });
+    });
 }
 
 /**
@@ -217,6 +280,17 @@ export function initBusinessCardUpload() {
         // 신규 등록 모드면 미리보기 전용 초기화 실행
         initBusinessCardPreviewForCreate();
         return;
+    }
+
+    // 선택 버튼 클릭 이벤트
+    const selectFrontBtn = document.getElementById('selectBusinessCardFrontBtn');
+    const selectBackBtn = document.getElementById('selectBusinessCardBackBtn');
+
+    if (selectFrontBtn && frontFileInput) {
+        selectFrontBtn.addEventListener('click', () => frontFileInput.click());
+    }
+    if (selectBackBtn && backFileInput) {
+        selectBackBtn.addEventListener('click', () => backFileInput.click());
     }
 
     // 앞면 업로드

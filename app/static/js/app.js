@@ -348,7 +348,7 @@ function applySalaryCalculationToForm(result) {
     // 요약 섹션 표시 및 업데이트
     const summarySection = document.getElementById('comprehensiveSalarySummary');
     if (summarySection) {
-        summarySection.style.display = 'block';
+        summarySection.classList.remove('hidden');
 
         const summaryAnnual = document.getElementById('summaryAnnualSalary');
         if (summaryAnnual) {
@@ -369,6 +369,6 @@ function applySalaryCalculationToForm(result) {
     // 상세 필드 섹션 표시
     const detailsSection = document.getElementById('comprehensiveSalaryDetails');
     if (detailsSection) {
-        detailsSection.style.display = 'block';
+        detailsSection.classList.remove('hidden');
     }
 }
