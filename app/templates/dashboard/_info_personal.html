@@ -1,10 +1,7 @@
+{% from 'macros/_avatar.html' import avatar_image %}
 <div class="profile-summary">
     <div class="profile-avatar">
-        {% if profile.photo %}
-        <img src="{{ profile.photo }}" alt="{{ profile.name }}">
-        {% else %}
-        <div class="avatar-placeholder">{{ profile.name[:1] }}</div>
-        {% endif %}
+        {{ avatar_image(profile.photo, profile.name, size='md', fallback='initial', theme='personal') }}
     </div>
     <div class="profile-info">
         <h3 class="profile-name">{{ profile.name }}</h3>

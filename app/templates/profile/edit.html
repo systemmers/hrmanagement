@@ -107,7 +107,7 @@
             {% set form_action = url_for('personal.profile_edit') %}
         {% endif %}
 
-        <form method="POST" action="{{ form_action }}" class="employee-form" id="profileEditForm" enctype="multipart/form-data"
+        <form method="POST" action="{{ form_action }}" class="app-form" id="profileEditForm" enctype="multipart/form-data"
               {% if profile_data and profile_data.id %}data-employee-id="{{ profile_data.id }}"{% endif %}>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
@@ -173,10 +173,8 @@
                 {% include 'partials/employee_form/_project_participation_info.html' %}
             {% endif %}
 
-            {# 인사카드 전용: 프로젝트 (수정 모드에서만 표시 - 등록 후 인사이력에서 발생) #}
-            {% if page_mode == 'hr_card' and account_type != 'corporate_admin' and not is_create_mode %}
-                {% include 'partials/employee_form/_project_info.html' %}
-            {% endif %}
+            {# 인사카드 전용: 프로젝트는 상세 페이지에서만 표시 (인사관리 영역) #}
+            {# 수정 페이지에서는 노출하지 않음 - 2024-12 정책 변경 #}
 
             {# 폼 제출 버튼 #}
             <section class="form-section form-submit-section">

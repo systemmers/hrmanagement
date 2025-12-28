@@ -65,14 +65,15 @@
                     </td>
                     <td>{{ company.created_at.strftime('%Y-%m-%d') if company.created_at else '-' }}</td>
                     <td>
-                        <div class="action-buttons">
+                        <div class="table-actions">
                             <a href="{{ url_for('platform.company_detail', company_id=company.id) }}"
-                               class="btn btn-sm btn-secondary">
+                               class="btn-icon" title="상세보기">
                                 <i class="fas fa-eye"></i>
                             </a>
                             <button type="button"
-                                    class="btn btn-sm {{ 'btn-warning' if company.is_active else 'btn-success' }}"
-                                    onclick="toggleCompanyActive({{ company.id }})">
+                                    class="btn-icon {{ 'btn-icon-warning' if company.is_active else 'btn-icon-success' }}"
+                                    onclick="toggleCompanyActive({{ company.id }})"
+                                    title="{{ '비활성화' if company.is_active else '활성화' }}">
                                 <i class="fas {{ 'fa-ban' if company.is_active else 'fa-check' }}"></i>
                             </button>
                         </div>

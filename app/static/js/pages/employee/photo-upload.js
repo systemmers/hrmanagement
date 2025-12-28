@@ -29,7 +29,7 @@ export function initPhotoPreview() {
             };
             img.onerror = () => {
                 photoPreview.innerHTML = `
-                    <div class="photo-placeholder">
+                    <div class="image-placeholder">
                         <i class="fas fa-exclamation-triangle"></i>
                         <span>이미지 로드 실패</span>
                     </div>
@@ -38,7 +38,7 @@ export function initPhotoPreview() {
             img.src = url;
         } else {
             photoPreview.innerHTML = `
-                <div class="photo-placeholder">
+                <div class="image-placeholder">
                     <i class="fas fa-user"></i>
                     <span>사진 미등록</span>
                 </div>
@@ -90,7 +90,7 @@ async function handleDeletePhoto(employeeId, deleteBtn) {
             const photoHiddenInput = document.getElementById('photo');
 
             photoPreview.innerHTML = `
-                <div class="photo-placeholder" id="photoPlaceholder">
+                <div class="image-placeholder" id="photoPlaceholder">
                     <i class="fas fa-user"></i>
                     <span>사진 미등록</span>
                 </div>
@@ -117,14 +117,19 @@ async function handleDeletePhoto(employeeId, deleteBtn) {
  */
 export function initPhotoPreviewForCreate() {
     const selectPhotoBtn = document.getElementById('selectPhotoBtn');
+    const deletePhotoBtn = document.getElementById('deletePhotoBtn');
     const photoFileInput = document.getElementById('photoFile');
     const photoPreview = document.getElementById('photoPreview');
+    const photoHiddenInput = document.getElementById('photo');
 
     if (!selectPhotoBtn || !photoFileInput) return;
 
     // 직원 ID가 있으면 수정 모드이므로 여기서 처리하지 않음
     const employeeId = getEmployeeIdFromForm();
     if (employeeId) return;
+
+    // 기본 이미지 경로 저장
+    const defaultPhotoPath = photoHiddenInput ? photoHiddenInput.value : '';
 
     // 사진 선택 버튼 클릭
     selectPhotoBtn.addEventListener('click', () => {
@@ -148,11 +153,41 @@ export function initPhotoPreviewForCreate() {
         const reader = new FileReader();
         reader.onload = (event) => {
             photoPreview.innerHTML = `<img src="${event.target.result}" alt="프로필 사진 미리보기" id="previewImage">`;
+            // 삭제 버튼 표시
+            if (deletePhotoBtn) {
+                deletePhotoBtn.classList.remove('hidden');
+            }
         };
         reader.readAsDataURL(file);
 
         showToast('사진이 선택되었습니다. 등록 시 함께 저장됩니다.', 'info');
     });
+
+    // 삭제 버튼 클릭 시 초기화 (신규 등록 모드)
+    if (deletePhotoBtn) {
+        deletePhotoBtn.addEventListener('click', () => {
+            // 파일 입력 초기화
+            photoFileInput.value = '';
+
+            // 미리보기를 기본 이미지로 복원
+            photoPreview.innerHTML = `
+                <div class="image-placeholder" id="photoPlaceholder">
+                    <i class="fas fa-user"></i>
+                    <span>사진 미등록</span>
+                </div>
+            `;
+
+            // hidden input 초기화
+            if (photoHiddenInput) {
+                photoHiddenInput.value = defaultPhotoPath;
+            }
+
+            // 삭제 버튼 숨기기
+            deletePhotoBtn.classList.add('hidden');
+
+            showToast('사진 선택이 취소되었습니다.', 'info');
+        });
+    }
 }
 
 /**

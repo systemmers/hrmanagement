@@ -22,8 +22,10 @@
         </div>
         <div class="card-body">
             <div class="dynamic-list" id="familyList">
-                {% if employee and employee.family_members %}
-                    {% for member in employee.family_members %}
+                {# SSOT: Blueprint에서 family_list 전달 필수 (N+1 쿼리 방지) #}
+                {% set family_members = family_list | default([]) %}
+                {% if family_members and family_members|length > 0 %}
+                    {% for member in family_members %}
                     <div class="dynamic-item" data-index="{{ loop.index0 }}">
                         <div class="form-grid">
                             <div class="form-group">

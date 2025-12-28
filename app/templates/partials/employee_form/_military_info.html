@@ -6,8 +6,8 @@
 {# 개인정보 읽기 전용 플래그: 법인 계정 + 개인계약 연동 시 #}
 {% set is_personal_readonly = is_corporate and has_person_contract %}
 
-{# military 변수 설정: employee.military_service 또는 별도 military 변수 사용 #}
-{% set mil = employee.military_service if employee and employee.military_service else (military if military else {}) %}
+{# SSOT: Blueprint에서 military 전달 필수 (N+1 쿼리 방지) #}
+{% set mil = military | default({}) %}
 
 <section class="form-section" id="military-info">
     <div class="card">

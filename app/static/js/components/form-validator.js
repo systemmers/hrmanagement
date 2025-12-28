@@ -5,7 +5,7 @@
 import { showToast } from './toast.js';
 
 export class FormValidator {
-    constructor(formSelector = 'form.employee-form') {
+    constructor(formSelector = 'form.app-form') {
         this.forms = document.querySelectorAll(formSelector);
         this.init();
     }

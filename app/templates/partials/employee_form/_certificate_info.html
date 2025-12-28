@@ -22,8 +22,10 @@
         </div>
         <div class="card-body">
             <div class="dynamic-list" id="certificateList">
-                {% if employee and employee.certificates %}
-                    {% for cert in employee.certificates %}
+                {# SSOT: Blueprint에서 certificate_list 전달 필수 (N+1 쿼리 방지) #}
+                {% set certificates = certificate_list | default([]) %}
+                {% if certificates and certificates|length > 0 %}
+                    {% for cert in certificates %}
                     <div class="dynamic-item" data-index="{{ loop.index0 }}">
                         <div class="form-grid">
                             <div class="form-group">

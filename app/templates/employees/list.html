@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from 'macros/_avatar.html' import avatar_image %}
 
 {% block title %}직원 목록 - 인사카드 관리 시스템{% endblock %}
 
@@ -135,7 +136,7 @@
                 <td>{{ employee.id }}</td>
                 <td>
                     <div class="d-flex items-center gap-2">
-                        <img src="{{ employee.photo }}" alt="{{ employee.name }}" class="avatar-sm">
+                        {{ avatar_image(employee.photo, employee.name, size='xs') }}
                         <span>{{ employee.name }}</span>
                     </div>
                 </td>
@@ -192,7 +193,7 @@
     {% for employee in employees %}
     <div class="employee-card" data-href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}">
         <div class="employee-status {{ employee.status }}"></div>
-        <img src="{{ employee.photo }}" alt="{{ employee.name }}" class="employee-photo">
+        {{ avatar_image(employee.photo, employee.name, size='lg', extra_class='employee-photo') }}
         <h3 class="employee-name">{{ employee.name }}</h3>
         <p class="employee-position">{{ employee.department }} · {{ employee.position }}</p>
         <div class="employee-meta">

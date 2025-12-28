@@ -365,16 +365,16 @@
     <td>{{ status_badge(contract.status) }}</td>
     <td>{{ contract.approved_at[:10] if contract.approved_at else '-' }}</td>
     <td>
-        <div class="action-buttons">
-            <a href="{{ url_for('contracts.contract_detail', contract_id=contract.id) }}" class="btn btn-sm btn-secondary" title="상세보기">
+        <div class="table-actions">
+            <a href="{{ url_for('contracts.contract_detail', contract_id=contract.id) }}" class="btn-icon" title="상세보기">
                 <i class="fas fa-eye"></i>
             </a>
             {% if contract.status == 'approved' %}
-            <button type="button" class="btn btn-sm btn-danger" data-action="terminate-contract" data-contract-id="{{ contract.id }}" title="계약 종료">
+            <button type="button" class="btn-icon btn-icon-danger" data-action="terminate-contract" data-contract-id="{{ contract.id }}" title="계약 종료">
                 <i class="fas fa-ban"></i>
             </button>
             {% elif contract.status == 'terminated' and contract.employee_id %}
-            <a href="{{ url_for('employees.employee_detail', employee_id=contract.employee_id) }}" class="btn btn-sm btn-info" title="인사카드 보기">
+            <a href="{{ url_for('employees.employee_detail', employee_id=contract.employee_id) }}" class="btn-icon btn-icon-info" title="인사카드 보기">
                 <i class="fas fa-id-card"></i>
             </a>
             {% endif %}

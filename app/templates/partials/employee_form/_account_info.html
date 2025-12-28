@@ -20,20 +20,14 @@
                 <i class="fas fa-user-circle" aria-hidden="true"></i>
                 계정정보
             </h2>
-            <div class="card-header-actions">
-                <label class="toggle-switch">
-                    <input type="checkbox" id="createAccountToggle" name="create_account" value="true" checked>
-                    <span class="toggle-slider"></span>
-                    <span class="toggle-label">계정 생성</span>
-                </label>
-            </div>
         </div>
         <div class="card-body" id="accountInfoBody">
-            {# 계정 생성 ON 상태 #}
+            {# 계정 생성 필수 - 토글 제거, hidden input으로 항상 true #}
+            <input type="hidden" name="create_account" value="true">
             <div id="accountFormFields">
                 <div class="alert alert-info mb-3">
                     <i class="fas fa-info-circle"></i>
-                    직원 등록 시 계정을 함께 생성합니다. 계약은 직원 등록 후 별도로 요청해야 합니다.
+                    직원 등록 시 시스템 로그인 계정이 함께 생성됩니다.
                 </div>
 
                 <div class="form-grid">
@@ -97,15 +91,6 @@
                             역할에 따라 시스템 접근 권한이 달라집니다
                         </small>
                     </div>
-                </div>
-            </div>
-
-            {# 계정 생성 OFF 상태 #}
-            <div id="accountDisabledMessage" style="display: none;">
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    계정을 생성하지 않으면 직원이 시스템에 로그인할 수 없습니다.
-                    나중에 직원 목록에서 계정을 생성할 수 있습니다.
                 </div>
             </div>
         </div>

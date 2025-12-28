@@ -16,11 +16,9 @@ import { showToast } from './helpers.js';
  * 계정 섹션 초기화
  */
 export function initAccountSection() {
-    const accountToggle = document.getElementById('createAccountToggle');
-    if (!accountToggle) return;
-
-    // 토글 이벤트
-    initToggleEvent(accountToggle);
+    // 계정 폼 필드가 없으면 리턴
+    const accountFormFields = document.getElementById('accountFormFields');
+    if (!accountFormFields) return;
 
     // 이메일 동기화 버튼
     initEmailSync();
@@ -34,45 +32,33 @@ export function initAccountSection() {
     // 이메일 유효성 검사
     initEmailValidation();
 
-    // 초기 상태 설정
-    updateAccountFieldsState(accountToggle.checked);
-}
-
-/**
- * 토글 이벤트 초기화
- */
-function initToggleEvent(toggleElement) {
-    toggleElement.addEventListener('change', function() {
-        updateAccountFieldsState(this.checked);
-    });
+    // 계정 생성 필수화: 필드 항상 활성화
+    updateAccountFieldsState(true);
 }
 
 /**
  * 계정 필드 상태 업데이트
+ * 계정 생성 필수화: 항상 활성화 상태 유지
  */
 function updateAccountFieldsState(isEnabled) {
     const formFields = document.getElementById('accountFormFields');
-    const disabledMessage = document.getElementById('accountDisabledMessage');
     const accountUsername = document.getElementById('account_username');
     const accountEmail = document.getElementById('account_email');
     const accountPassword = document.getElementById('account_password');
 
     if (formFields) {
-        formFields.style.display = isEnabled ? 'block' : 'none';
-    }
-    if (disabledMessage) {
-        disabledMessage.style.display = isEnabled ? 'none' : 'block';
+        formFields.style.display = 'block';
     }
 
-    // 필수 필드 설정
+    // 필수 필드 설정 (항상 필수)
     if (accountUsername) {
-        accountUsername.required = isEnabled;
+        accountUsername.required = true;
     }
     if (accountEmail) {
-        accountEmail.required = isEnabled;
+        accountEmail.required = true;
     }
     if (accountPassword) {
-        accountPassword.required = isEnabled;
+        accountPassword.required = true;
     }
 }
 
@@ -257,10 +243,12 @@ function setValidationState(iconElement, state, message) {
 
 /**
  * 폼 제출 전 계정 필드 검증
+ * 계정 생성 필수화: 항상 검증 수행
  */
 export function validateAccountFields() {
-    const toggle = document.getElementById('createAccountToggle');
-    if (!toggle || !toggle.checked) {
+    // 계정 폼 필드가 없으면 검증 통과 (수정 모드)
+    const accountFormFields = document.getElementById('accountFormFields');
+    if (!accountFormFields) {
         return { valid: true, errors: [] };
     }
 

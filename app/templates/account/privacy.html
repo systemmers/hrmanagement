@@ -22,6 +22,32 @@
 <div class="content-card max-w-600">
     <form method="POST" aria-label="개인정보 공개 설정 폼">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        {# 개인계정 전용: 프로필 공개 설정 (구직 활동) #}
+        {% if account_type == 'personal' %}
+        <div class="privacy-section mb-4">
+            <h4 class="privacy-section-title">
+                <i class="fas fa-globe"></i>
+                프로필 공개 설정
+            </h4>
+            <p class="privacy-section-desc">프로필을 공개하면 채용 담당자가 내 정보를 확인할 수 있습니다.</p>
+
+            <div class="privacy-options">
+                <label class="privacy-option">
+                    <input type="checkbox" name="is_public"
+                           {% if profile and profile.is_public %}checked{% endif %}>
+                    <span class="privacy-option-content">
+                        <span class="privacy-option-title">
+                            <i class="fas fa-briefcase"></i>
+                            구직 활동 프로필 공개
+                        </span>
+                        <span class="privacy-option-desc">공개 시 이름, 학력, 경력, 자격증 정보가 채용 담당자에게 노출됩니다</span>
+                    </span>
+                </label>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="privacy-section">
             <h4 class="privacy-section-title">
                 <i class="fas fa-address-card"></i>

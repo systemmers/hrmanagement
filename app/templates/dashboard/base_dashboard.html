@@ -3,6 +3,8 @@
 {% block title %}
   {% if account_type == 'corporate' %}
     법인 대시보드 - {{ company.name }}
+  {% elif account_type == 'employee_sub' %}
+    직원 대시보드 - 인사카드 관리 시스템
   {% else %}
     개인 대시보드 - 인사카드 관리 시스템
   {% endif %}
@@ -12,7 +14,13 @@
 <div class="page-header">
     <div class="page-title-row">
         <h1 class="page-title">
-            {% if account_type == 'corporate' %}법인 대시보드{% else %}개인 대시보드{% endif %}
+            {% if account_type == 'corporate' %}
+                법인 대시보드
+            {% elif account_type == 'employee_sub' %}
+                내 대시보드
+            {% else %}
+                개인 대시보드
+            {% endif %}
         </h1>
         <div class="page-actions">
             {% if account_type == 'corporate' %}
@@ -22,6 +30,15 @@
                     <span>설정</span>
                 </a>
                 {% endif %}
+            {% elif account_type == 'employee_sub' %}
+                <a href="{{ url_for('profile.view') }}" class="btn btn-secondary">
+                    <i class="fas fa-user"></i>
+                    <span>프로필 보기</span>
+                </a>
+                <a href="{{ url_for('profile.edit') }}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i>
+                    <span>정보 수정</span>
+                </a>
             {% else %}
                 <a href="{{ url_for('personal.profile') }}" class="btn btn-secondary">
                     <i class="fas fa-user"></i>
@@ -37,6 +54,8 @@
     <p class="page-description">
         {% if account_type == 'corporate' %}
             {{ company.name }} 관리 현황
+        {% elif account_type == 'employee_sub' %}
+            {{ employee.name }}님, 환영합니다!
         {% else %}
             {{ profile.name }}님, 환영합니다!
         {% endif %}
@@ -55,11 +74,28 @@
         <div class="card-body">
             {% if account_type == 'corporate' %}
                 {% include 'dashboard/_info_corporate.html' %}
+            {% elif account_type == 'employee_sub' %}
+                {% include 'dashboard/_info_employee.html' %}
             {% else %}
                 {% include 'dashboard/_info_personal.html' %}
             {% endif %}
         </div>
     </div>
+
+    <!-- 직원 전용: 근무 현황 카드 -->
+    {% if account_type == 'employee_sub' %}
+    <div class="dashboard-card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-building"></i>
+                근무 현황
+            </h2>
+        </div>
+        <div class="card-body">
+            {% include 'dashboard/_work_status_employee.html' %}
+        </div>
+    </div>
+    {% endif %}
 
     <!-- 현황/통계 카드 -->
     <div class="dashboard-card">
@@ -73,6 +109,8 @@
             <div class="stats-grid">
                 {% if account_type == 'corporate' %}
                     {% include 'dashboard/_stats_corporate.html' %}
+                {% elif account_type == 'employee_sub' %}
+                    {% include 'dashboard/_stats_employee.html' %}
                 {% else %}
                     {% include 'dashboard/_stats_personal.html' %}
                 {% endif %}
@@ -92,6 +130,8 @@
             <div class="quick-links">
                 {% if account_type == 'corporate' %}
                     {% include 'dashboard/_quick_links_corporate.html' %}
+                {% elif account_type == 'employee_sub' %}
+                    {% include 'dashboard/_quick_links_employee.html' %}
                 {% else %}
                     {% include 'dashboard/_quick_links_personal.html' %}
                 {% endif %}

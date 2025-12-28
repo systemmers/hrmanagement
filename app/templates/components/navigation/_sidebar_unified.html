@@ -106,8 +106,13 @@
 <!-- 내 정보 섹션 (통합) -->
 <div class="nav-section">
     <h2 class="nav-section-title">내 정보</h2>
+    <a href="{{ url_for('profile.dashboard') }}"
+       class="nav-item {% if request.endpoint == 'profile.dashboard' %}active{% endif %}">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>대시보드</span>
+    </a>
     <a href="{{ url_for('profile.view') }}"
-       class="nav-item {% if request.endpoint and request.endpoint.startswith('profile.') %}active{% endif %}">
+       class="nav-item {% if request.endpoint == 'profile.view' or request.endpoint == 'profile.edit' %}active{% endif %}">
         <i class="fas fa-user"></i>
         <span>프로필</span>
     </a>
@@ -230,10 +235,6 @@
         <i class="fas fa-sitemap"></i>
         <span>조직 관리</span>
     </a>
-    <a href="{{ url_for('classification.classification_options_page') }}" class="nav-item {% if request.endpoint == 'classification.classification_options_page' %}active{% endif %}">
-        <i class="fas fa-cog"></i>
-        <span>분류 옵션 관리</span>
-    </a>
 </div>
 {% endif %}
 
@@ -242,21 +243,13 @@
     <h2 class="nav-section-title">
         <i class="fas fa-flask"></i> AI 테스트
     </h2>
-    <a href="{{ url_for('ai_test.index') }}" class="nav-item {% if request.endpoint and request.endpoint.startswith('ai_test.') and request.endpoint != 'ai_test.compare' and request.endpoint != 'ai_test.settings' %}active{% endif %}">
+    <a href="{{ url_for('ai_test.index') }}" class="nav-item {% if request.endpoint and request.endpoint.startswith('ai_test.') and request.endpoint != 'ai_test.settings' %}active{% endif %}">
         <i class="fas fa-robot"></i>
         <span>문서 분석 테스트</span>
-    </a>
-    <a href="{{ url_for('ai_test.compare') }}" class="nav-item {% if request.endpoint == 'ai_test.compare' %}active{% endif %}">
-        <i class="fas fa-balance-scale"></i>
-        <span>Provider 비교</span>
     </a>
     <a href="{{ url_for('ai_test.settings') }}" class="nav-item {% if request.endpoint == 'ai_test.settings' %}active{% endif %}">
         <i class="fas fa-sliders-h"></i>
         <span>AI 설정</span>
-    </a>
-    <a href="{{ url_for('mypage.company_info') }}" class="nav-item {% if request.endpoint == 'mypage.company_info' %}active{% endif %}">
-        <i class="fas fa-id-card"></i>
-        <span>회사 인사카드</span>
     </a>
     <a href="{{ url_for('main.data_table_demo') }}" class="nav-item {% if request.endpoint == 'main.data_table_demo' %}active{% endif %}">
         <i class="fas fa-table"></i>

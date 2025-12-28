@@ -21,8 +21,10 @@
         </div>
         <div class="card-body">
             <div class="dynamic-list" id="educationList">
-                {% if employee and employee.educations %}
-                    {% for edu in employee.educations %}
+                {# SSOT: Blueprint에서 education_list 전달 필수 (N+1 쿼리 방지) #}
+                {% set educations = education_list | default([]) %}
+                {% if educations and educations|length > 0 %}
+                    {% for edu in educations %}
                     <div class="dynamic-item" data-index="{{ loop.index0 }}">
                         <div class="form-grid">
                             <div class="form-group">
