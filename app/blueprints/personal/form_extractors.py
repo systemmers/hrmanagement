@@ -2,53 +2,10 @@
 폼 데이터 추출 함수 (Personal Blueprint)
 
 FieldRegistry 기반 필드명 정규화를 적용합니다. (SSOT 원칙)
-employees/form_extractors.py 패턴을 재사용합니다. (DRY 원칙)
+공통 헬퍼 모듈을 사용합니다. (DRY 원칙)
+Phase 25: 공통 헬퍼 모듈로 이동 (2025-12-29)
 """
-from typing import Any, Optional
-
-from ...constants.field_registry import FieldRegistry
-
-
-def _parse_boolean(value) -> bool:
-    """폼 데이터 boolean 변환 헬퍼 (DRY 원칙)"""
-    return value in ('true', 'True', '1', True)
-
-
-def normalize_form_field(
-    form_data: dict,
-    section_id: str,
-    field_name: str,
-    default: Any = None
-) -> Optional[Any]:
-    """FieldRegistry 기반 폼 필드값 추출 (SSOT 원칙)
-
-    정규 필드명과 별칭을 모두 검색하여 값을 반환합니다.
-
-    Args:
-        form_data: request.form 데이터
-        section_id: FieldRegistry 섹션 ID
-        field_name: 정규 필드명
-        default: 기본값 (기본: None)
-
-    Returns:
-        필드값 또는 default
-    """
-    # 정규 필드명으로 먼저 시도
-    value = form_data.get(field_name)
-    if value:
-        return value
-
-    # FieldRegistry에서 별칭 조회
-    section = FieldRegistry.get_section(section_id)
-    if section:
-        field = section.get_field(field_name)
-        if field and field.aliases:
-            for alias in field.aliases:
-                value = form_data.get(alias)
-                if value:
-                    return value
-
-    return default
+from ...utils.form_helpers import parse_boolean as _parse_boolean, normalize_form_field
 
 
 def extract_profile_data(form_data, existing_profile=None):
