@@ -331,41 +331,33 @@ class SyncService:
         contract: PersonCorporateContract,
         profile: PersonalProfile,
         full_sync: bool = False,
-        force_create: bool = False
+        force_create: bool = False  # deprecated: 항상 새로 생성
     ) -> Optional[Employee]:
-        """계약에 연결된 직원 찾기 또는 생성
+        """계약 승인 시 새 직원 레코드 생성
+
+        재입사 정책:
+        - 재입사는 새로운 Employee 레코드로 생성
+        - 동일 사번 재사용 불가 (새 사번 발급)
+        - 퇴사 처리된 Employee는 재사용 불가
+        - 이유: 4대보험 등 종료로 데이터 연속성 없음
 
         Args:
             contract: 계약 정보
             profile: 개인 프로필
-            full_sync: True면 전체 프로필 데이터 동기화 (SSOT: FIELD_MAPPING 사용)
-            force_create: True면 기존 Employee 무시하고 항상 새로 생성 (회사별 분리용)
+            full_sync: True면 전체 프로필 데이터 동기화
+            force_create: deprecated (항상 새로 생성)
 
         Returns:
-            Employee 객체
+            새 Employee 객체
         """
         from app.models.company import Company
+        from app.utils.employee_number import generate_employee_number
+
         company = Company.query.get(contract.company_id)
 
-        # force_create가 아닌 경우에만 기존 Employee 탐색
-        if not force_create:
-            if contract.employee_number:
-                employee = Employee.query.filter_by(
-                    employee_number=contract.employee_number
-                ).first()
-                if employee:
-                    return employee
-
-            if company:
-                employee = Employee.query.filter_by(
-                    name=profile.name,
-                    organization_id=company.root_organization_id
-                ).first()
-
-                if employee:
-                    if not contract.employee_number and employee.employee_number:
-                        contract.employee_number = employee.employee_number
-                    return employee
+        # [재입사 정책] 기존 Employee 탐색 로직 제거
+        # 비즈니스 규칙: 퇴사 후 재입사는 새 Employee 레코드로 생성
+        # 이유: 4대보험 등 종료로 데이터 연속성 없음
 
         # 새 Employee 생성
         employee = self._create_employee_from_profile(
@@ -374,7 +366,8 @@ class SyncService:
         db.session.add(employee)
         db.session.flush()
 
-        employee.employee_number = f"EMP-{datetime.utcnow().year}-{employee.id:04d}"
+        # 새로운 사번 생성 (시퀀스 기반 - SSOT: employee_number.py)
+        employee.employee_number = generate_employee_number()
         contract.employee_number = employee.employee_number
 
         return employee
