@@ -7,6 +7,7 @@ Corporate Admin Profile Service
 """
 from typing import Dict, Optional, Tuple
 from app.database import db
+from app.utils.transaction import atomic_transaction
 from app.models.user import User
 from app.models.corporate_admin_profile import CorporateAdminProfile
 from app.repositories.corporate_admin_profile_repository import CorporateAdminProfileRepository
@@ -84,22 +85,23 @@ class CorporateAdminProfileService:
             return False, None, '이미 프로필이 존재합니다.'
 
         try:
-            profile = self.profile_repo.create_profile(
-                user_id=user_id,
-                company_id=company_id,
-                name=data.get('name', ''),
-                english_name=data.get('english_name'),
-                position=data.get('position'),
-                mobile_phone=data.get('mobile_phone'),
-                office_phone=data.get('office_phone'),
-                email=data.get('email'),
-                photo=data.get('photo'),
-                department=data.get('department'),
-                bio=data.get('bio')
-            )
+            with atomic_transaction():
+                profile = self.profile_repo.create_profile(
+                    user_id=user_id,
+                    company_id=company_id,
+                    name=data.get('name', ''),
+                    english_name=data.get('english_name'),
+                    position=data.get('position'),
+                    mobile_phone=data.get('mobile_phone'),
+                    office_phone=data.get('office_phone'),
+                    email=data.get('email'),
+                    photo=data.get('photo'),
+                    department=data.get('department'),
+                    bio=data.get('bio'),
+                    commit=False
+                )
             return True, profile, None
         except Exception as e:
-            db.session.rollback()
             return False, None, str(e)
 
     def update_profile(self, user_id: int, data: Dict) -> Tuple[bool, Optional[str]]:
@@ -109,10 +111,10 @@ class CorporateAdminProfileService:
             return False, '프로필을 찾을 수 없습니다.'
 
         try:
-            self.profile_repo.update_profile(profile, data)
+            with atomic_transaction():
+                self.profile_repo.update_profile(profile, data, commit=False)
             return True, None
         except Exception as e:
-            db.session.rollback()
             return False, str(e)
 
     # ========================================
@@ -126,10 +128,10 @@ class CorporateAdminProfileService:
             return False, '프로필을 찾을 수 없습니다.'
 
         try:
-            self.profile_repo.deactivate(profile)
+            with atomic_transaction():
+                self.profile_repo.deactivate(profile, commit=False)
             return True, None
         except Exception as e:
-            db.session.rollback()
             return False, str(e)
 
     def activate_profile(self, user_id: int) -> Tuple[bool, Optional[str]]:
@@ -139,10 +141,10 @@ class CorporateAdminProfileService:
             return False, '프로필을 찾을 수 없습니다.'
 
         try:
-            self.profile_repo.activate(profile)
+            with atomic_transaction():
+                self.profile_repo.activate(profile, commit=False)
             return True, None
         except Exception as e:
-            db.session.rollback()
             return False, str(e)
 
     # ========================================

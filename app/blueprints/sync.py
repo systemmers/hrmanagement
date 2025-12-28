@@ -6,7 +6,7 @@ Phase 4: 데이터 동기화 및 퇴사 처리
 Phase 8: 상수 모듈 적용
 Phase 24: 트랜잭션 SSOT 적용
 """
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, session
 
 from app.constants.session_keys import SessionKeys, AccountType
 from app.services.sync_service import sync_service
@@ -20,6 +20,7 @@ from app.utils.decorators import (
     api_corporate_account_required as corporate_account_required,
     contract_access_required
 )
+from app.utils.api_helpers import api_success, api_error, api_not_found
 
 sync_bp = Blueprint('sync', __name__, url_prefix='/api/sync')
 
@@ -45,7 +46,7 @@ def get_syncable_fields(contract_id):
     }
     """
     fields = sync_service.get_syncable_fields(contract_id)
-    return jsonify({'success': True, 'fields': fields})
+    return api_success({'fields': fields})
 
 
 @sync_bp.route('/personal-to-employee/<int:contract_id>', methods=['POST'])
@@ -82,9 +83,9 @@ def sync_personal_to_employee(contract_id):
     )
 
     if result.get('success'):
-        return jsonify(result)
+        return api_success(result)
     else:
-        return jsonify(result), 400
+        return api_error(result.get('error', '동기화 실패'))
 
 
 @sync_bp.route('/employee-to-personal/<int:contract_id>', methods=['POST'])
@@ -110,10 +111,7 @@ def sync_employee_to_personal(contract_id):
     fields = data.get('fields')
 
     if not fields:
-        return jsonify({
-            'success': False,
-            'error': '동기화할 필드를 지정해야 합니다.'
-        }), 400
+        return api_error('동기화할 필드를 지정해야 합니다.')
 
     result = sync_service.sync_employee_to_personal(
         contract_id=contract_id,
@@ -122,9 +120,9 @@ def sync_employee_to_personal(contract_id):
     )
 
     if result.get('success'):
-        return jsonify(result)
+        return api_success(result)
     else:
-        return jsonify(result), 400
+        return api_error(result.get('error', '동기화 실패'))
 
 
 @sync_bp.route('/full-sync/<int:contract_id>', methods=['POST'])
@@ -155,10 +153,10 @@ def full_sync_from_corporate(contract_id):
     # 계약 확인
     contract = contract_service.get_contract_model_by_id(contract_id)
     if not contract:
-        return jsonify({'success': False, 'error': '계약을 찾을 수 없습니다.'}), 404
+        return api_not_found('계약')
 
     if contract.status != PersonCorporateContract.STATUS_APPROVED:
-        return jsonify({'success': False, 'error': '승인된 계약만 동기화할 수 있습니다.'}), 400
+        return api_error('승인된 계약만 동기화할 수 있습니다.')
 
     try:
         with atomic_transaction():
@@ -187,10 +185,10 @@ def full_sync_from_corporate(contract_id):
             if not result.get('success'):
                 raise Exception(result.get('error', '동기화 실패'))
 
-        return jsonify(result)
+        return api_success(result)
 
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
+        return api_error(str(e))
 
 
 @sync_bp.route('/all-contracts', methods=['POST'])
@@ -218,7 +216,7 @@ def sync_all_contracts():
         sync_type=SyncLog.SYNC_TYPE_MANUAL
     )
 
-    return jsonify(result)
+    return api_success(result)
 
 
 # ===== 계약 목록 API =====
@@ -238,7 +236,7 @@ def get_my_contracts():
     """
     user_id = session.get(SessionKeys.USER_ID)
     contracts = sync_service.get_contracts_for_user(user_id)
-    return jsonify({'success': True, 'contracts': contracts})
+    return api_success({'contracts': contracts})
 
 
 # ===== 동기화 설정 API =====
@@ -275,10 +273,7 @@ def toggle_realtime_sync(contract_id):
 
         settings.is_realtime_sync = enabled
 
-    return jsonify({
-        'success': True,
-        'realtime_sync': settings.is_realtime_sync
-    })
+    return api_success({'realtime_sync': settings.is_realtime_sync})
 
 
 # ===== 퇴사/종료 처리 API =====
@@ -317,9 +312,9 @@ def terminate_contract(contract_id):
     )
 
     if result.get('success'):
-        return jsonify(result)
+        return api_success(result)
     else:
-        return jsonify(result), 400
+        return api_error(result.get('error', '계약 종료 실패'))
 
 
 @sync_bp.route('/retention/<int:contract_id>', methods=['GET'])
@@ -341,9 +336,9 @@ def get_retention_status(contract_id):
     result = termination_service.get_retention_status(contract_id)
 
     if result.get('success'):
-        return jsonify(result)
+        return api_success(result)
     else:
-        return jsonify(result), 400
+        return api_error(result.get('error', '보관 상태 조회 실패'))
 
 
 @sync_bp.route('/termination-history', methods=['GET'])
@@ -378,9 +373,9 @@ def get_termination_history():
             limit=limit
         )
     else:
-        return jsonify({'success': False, 'error': '잘못된 계정 유형입니다.'}), 400
+        return api_error('잘못된 계정 유형입니다.')
 
-    return jsonify({'success': True, 'contracts': history})
+    return api_success({'contracts': history})
 
 
 # ===== 동기화 로그 API =====
@@ -409,10 +404,7 @@ def get_sync_logs(contract_id):
         contract_id, sync_type=sync_type, limit=limit
     )
 
-    return jsonify({
-        'success': True,
-        'logs': logs
-    })
+    return api_success({'logs': logs})
 
 
 # ===== 필드 매핑 정보 API =====
@@ -434,4 +426,4 @@ def get_field_mappings():
     }
     """
     mappings = sync_service.get_all_field_mappings()
-    return jsonify({'success': True, 'mappings': mappings})
+    return api_success({'mappings': mappings})

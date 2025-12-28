@@ -2,11 +2,14 @@
 AI 테스트 Blueprint
 - 문서 분석 프로토타입 테스트 페이지
 - AI 설정 확인
+
+Phase 27.2: API 응답 표준화 (api_helpers 사용)
 """
-from flask import Blueprint, render_template, request, jsonify, current_app
+from flask import Blueprint, render_template, request, current_app
 import os
 
 from ..utils.decorators import login_required, admin_required
+from ..utils.api_helpers import api_success, api_error, api_server_error
 
 ai_test_bp = Blueprint('ai_test', __name__, url_prefix='/ai-test')
 
@@ -39,9 +42,9 @@ def analyze():
         # 샘플 파일 사용
         file_path = get_sample_file_path(sample_file)
         if not file_path or not os.path.exists(file_path):
-            return jsonify({'error': f'샘플 파일을 찾을 수 없습니다: {sample_file}'}), 400
+            return api_error(f'샘플 파일을 찾을 수 없습니다: {sample_file}')
     else:
-        return jsonify({'error': '파일을 선택해주세요'}), 400
+        return api_error('파일을 선택해주세요')
 
     try:
         # AI 분석 실행
@@ -51,13 +54,9 @@ def analyze():
             provider_name=provider,
             document_type=document_type
         )
-        return jsonify(result.to_dict())
+        return api_success(result.to_dict())
     except Exception as e:
-        return jsonify({
-            'error': str(e),
-            'provider': provider,
-            'document_type': document_type
-        }), 500
+        return api_server_error(str(e))
 
 
 @ai_test_bp.route('/settings')

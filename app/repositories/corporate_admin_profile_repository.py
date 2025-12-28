@@ -35,8 +35,20 @@ class CorporateAdminProfileRepository(BaseRepository[CorporateAdminProfile]):
             is_active=True
         ).all()
 
-    def create_profile(self, user_id: int, company_id: int, name: str, **kwargs) -> CorporateAdminProfile:
-        """새 프로필 생성"""
+    def create_profile(self, user_id: int, company_id: int, name: str,
+                       commit: bool = True, **kwargs) -> CorporateAdminProfile:
+        """새 프로필 생성
+
+        Args:
+            user_id: 사용자 ID
+            company_id: 회사 ID
+            name: 이름
+            commit: True면 즉시 커밋, False면 caller가 커밋 책임
+            **kwargs: 추가 필드 (english_name, position 등)
+
+        Returns:
+            생성된 CorporateAdminProfile 객체
+        """
         profile = CorporateAdminProfile(
             user_id=user_id,
             company_id=company_id,
@@ -52,11 +64,22 @@ class CorporateAdminProfileRepository(BaseRepository[CorporateAdminProfile]):
             is_active=kwargs.get('is_active', True)
         )
         db.session.add(profile)
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return profile
 
-    def update_profile(self, profile: CorporateAdminProfile, data: Dict) -> CorporateAdminProfile:
-        """프로필 정보 수정"""
+    def update_profile(self, profile: CorporateAdminProfile, data: Dict,
+                       commit: bool = True) -> CorporateAdminProfile:
+        """프로필 정보 수정
+
+        Args:
+            profile: 수정할 프로필 객체
+            data: 수정할 필드 딕셔너리
+            commit: True면 즉시 커밋, False면 caller가 커밋 책임
+
+        Returns:
+            수정된 CorporateAdminProfile 객체
+        """
         allowed_fields = [
             'name', 'english_name', 'position', 'mobile_phone',
             'office_phone', 'email', 'photo', 'department', 'bio', 'is_active'
@@ -64,21 +87,42 @@ class CorporateAdminProfileRepository(BaseRepository[CorporateAdminProfile]):
         for field in allowed_fields:
             if field in data:
                 setattr(profile, field, data[field])
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return profile
 
     def exists_for_user(self, user_id: int) -> bool:
         """사용자에 대한 프로필 존재 여부 확인"""
         return CorporateAdminProfile.query.filter_by(user_id=user_id).first() is not None
 
-    def deactivate(self, profile: CorporateAdminProfile) -> CorporateAdminProfile:
-        """프로필 비활성화"""
+    def deactivate(self, profile: CorporateAdminProfile,
+                   commit: bool = True) -> CorporateAdminProfile:
+        """프로필 비활성화
+
+        Args:
+            profile: 비활성화할 프로필 객체
+            commit: True면 즉시 커밋, False면 caller가 커밋 책임
+
+        Returns:
+            수정된 CorporateAdminProfile 객체
+        """
         profile.is_active = False
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return profile
 
-    def activate(self, profile: CorporateAdminProfile) -> CorporateAdminProfile:
-        """프로필 활성화"""
+    def activate(self, profile: CorporateAdminProfile,
+                 commit: bool = True) -> CorporateAdminProfile:
+        """프로필 활성화
+
+        Args:
+            profile: 활성화할 프로필 객체
+            commit: True면 즉시 커밋, False면 caller가 커밋 책임
+
+        Returns:
+            수정된 CorporateAdminProfile 객체
+        """
         profile.is_active = True
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return profile

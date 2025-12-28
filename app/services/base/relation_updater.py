@@ -9,6 +9,7 @@ Phase 4.2: SOLID 원칙 적용 - SRP, DRY 개선
 from dataclasses import dataclass, field
 from typing import Dict, List, Any, Optional, Callable, Type
 from app.database import db
+from app.utils.transaction import atomic_transaction
 
 
 @dataclass
@@ -107,6 +108,8 @@ class RelationDataUpdater:
         """
         관계형 데이터 업데이트 (트랜잭션 포함)
 
+        atomic_transaction() SSOT 사용으로 트랜잭션 안전성 보장
+
         Args:
             owner_id: 직원 ID 또는 프로필 ID
             form_data: 폼 데이터
@@ -116,11 +119,10 @@ class RelationDataUpdater:
             Tuple[성공여부, 에러메시지]
         """
         try:
-            self.update(owner_id, form_data, config)
-            db.session.commit()
+            with atomic_transaction():
+                self.update(owner_id, form_data, config)
             return True, None
         except Exception as e:
-            db.session.rollback()
             return False, str(e)
 
 

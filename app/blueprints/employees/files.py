@@ -3,14 +3,18 @@
 
 첨부파일, 프로필 사진, 명함 이미지 업로드/다운로드 기능을 제공합니다.
 Phase 8: 상수 모듈 적용
+Phase 27.2: API 응답 표준화 (api_helpers 사용)
 """
 import os
 from datetime import datetime
-from flask import Blueprint, request, jsonify, current_app, session
+from flask import Blueprint, request, current_app, session
 
 from ...constants.session_keys import SessionKeys, UserRole
 from ...utils.decorators import login_required, manager_or_admin_required
 from ...utils.object_helpers import safe_get
+from ...utils.api_helpers import (
+    api_success, api_error, api_not_found, api_forbidden, api_server_error
+)
 from ...services.employee_service import employee_service
 from .helpers import (
     allowed_file, allowed_image_file, get_file_extension,
@@ -36,9 +40,9 @@ def register_file_routes(bp: Blueprint):
         """직원 첨부파일 목록 조회 API"""
         try:
             attachments = employee_service.get_attachment_list(employee_id)
-            return jsonify({'success': True, 'attachments': attachments})
+            return api_success({'attachments': attachments})
         except Exception as e:
-            return jsonify({'success': False, 'error': str(e)}), 500
+            return api_server_error(str(e))
 
     @bp.route('/api/employees/<int:employee_id>/attachments', methods=['POST'])
     @manager_or_admin_required
@@ -48,18 +52,18 @@ def register_file_routes(bp: Blueprint):
             # 직원 존재 확인
             employee = employee_service.get_employee_by_id(employee_id)
             if not employee:
-                return jsonify({'success': False, 'error': '직원을 찾을 수 없습니다.'}), 404
+                return api_not_found('직원')
 
             # 파일 검증
             if 'file' not in request.files:
-                return jsonify({'success': False, 'error': '파일이 없습니다.'}), 400
+                return api_error('파일이 없습니다.')
 
             file = request.files['file']
             if file.filename == '':
-                return jsonify({'success': False, 'error': '파일이 선택되지 않았습니다.'}), 400
+                return api_error('파일이 선택되지 않았습니다.')
 
             if not allowed_file(file.filename):
-                return jsonify({'success': False, 'error': '허용되지 않는 파일 형식입니다.'}), 400
+                return api_error('허용되지 않는 파일 형식입니다.')
 
             # 파일 크기 확인
             file.seek(0, os.SEEK_END)
@@ -67,7 +71,7 @@ def register_file_routes(bp: Blueprint):
             file.seek(0)
 
             if file_size > MAX_FILE_SIZE:
-                return jsonify({'success': False, 'error': '파일 크기가 10MB를 초과합니다.'}), 400
+                return api_error('파일 크기가 10MB를 초과합니다.')
 
             # 파일 저장
             ext = get_file_extension(file.filename)
@@ -95,13 +99,12 @@ def register_file_routes(bp: Blueprint):
             }
             created = employee_service.create_attachment(attachment_data)
 
-            return jsonify({
-                'success': True,
+            return api_success({
                 'attachment': created.to_dict() if hasattr(created, 'to_dict') else created
             })
 
         except Exception as e:
-            return jsonify({'success': False, 'error': str(e)}), 500
+            return api_server_error(str(e))
 
     @bp.route('/api/attachments/<int:attachment_id>', methods=['DELETE'])
     @manager_or_admin_required
@@ -111,7 +114,7 @@ def register_file_routes(bp: Blueprint):
             # 첨부파일 조회
             attachment = employee_service.get_attachment_by_id(attachment_id)
             if not attachment:
-                return jsonify({'success': False, 'error': '첨부파일을 찾을 수 없습니다.'}), 404
+                return api_not_found('첨부파일')
 
             # 파일 경로 추출
             file_path = safe_get(attachment, 'file_path')
@@ -122,10 +125,10 @@ def register_file_routes(bp: Blueprint):
             # DB에서 삭제
             employee_service.delete_attachment(attachment_id)
 
-            return jsonify({'success': True})
+            return api_success(message='첨부파일이 삭제되었습니다.')
 
         except Exception as e:
-            return jsonify({'success': False, 'error': str(e)}), 500
+            return api_server_error(str(e))
 
     # ========================================
     # 프로필 사진 API
@@ -141,23 +144,23 @@ def register_file_routes(bp: Blueprint):
             is_admin_or_manager = user_role in [UserRole.ADMIN, UserRole.MANAGER]
             is_self = session.get(SessionKeys.EMPLOYEE_ID) == employee_id
             if not is_admin_or_manager and not is_self:
-                return jsonify({'success': False, 'error': '권한이 없습니다.'}), 403
+                return api_forbidden()
 
             # 직원 존재 확인
             employee = employee_service.get_employee_by_id(employee_id)
             if not employee:
-                return jsonify({'success': False, 'error': '직원을 찾을 수 없습니다.'}), 404
+                return api_not_found('직원')
 
             # 파일 검증
             if 'file' not in request.files:
-                return jsonify({'success': False, 'error': '파일이 없습니다.'}), 400
+                return api_error('파일이 없습니다.')
 
             file = request.files['file']
             if file.filename == '':
-                return jsonify({'success': False, 'error': '파일이 선택되지 않았습니다.'}), 400
+                return api_error('파일이 선택되지 않았습니다.')
 
             if not allowed_image_file(file.filename):
-                return jsonify({'success': False, 'error': '이미지 파일만 업로드 가능합니다. (jpg, png, gif, webp)'}), 400
+                return api_error('이미지 파일만 업로드 가능합니다. (jpg, png, gif, webp)')
 
             # 파일 크기 확인
             file.seek(0, os.SEEK_END)
@@ -165,7 +168,7 @@ def register_file_routes(bp: Blueprint):
             file.seek(0)
 
             if file_size > MAX_IMAGE_SIZE:
-                return jsonify({'success': False, 'error': '파일 크기가 5MB를 초과합니다.'}), 400
+                return api_error('파일 크기가 5MB를 초과합니다.')
 
             category = 'profile_photo'
 
@@ -199,14 +202,13 @@ def register_file_routes(bp: Blueprint):
             }
             created = employee_service.create_attachment(attachment_data)
 
-            return jsonify({
-                'success': True,
+            return api_success({
                 'file_path': web_path,
                 'attachment': created.to_dict() if hasattr(created, 'to_dict') else created
             })
 
         except Exception as e:
-            return jsonify({'success': False, 'error': str(e)}), 500
+            return api_server_error(str(e))
 
     @bp.route('/api/employees/<int:employee_id>/profile-photo', methods=['GET'])
     @login_required
@@ -214,17 +216,13 @@ def register_file_routes(bp: Blueprint):
         """프로필 사진 조회 API"""
         try:
             photo = employee_service.get_attachment_by_category(employee_id, 'profile_photo')
-            if photo:
-                return jsonify({
-                    'success': True,
-                    'file_path': safe_get(photo, 'file_path'),
-                    'attachment': photo
-                })
-            else:
-                return jsonify({'success': True, 'file_path': None, 'attachment': None})
+            return api_success({
+                'file_path': safe_get(photo, 'file_path') if photo else None,
+                'attachment': photo
+            })
 
         except Exception as e:
-            return jsonify({'success': False, 'error': str(e)}), 500
+            return api_server_error(str(e))
 
     @bp.route('/api/employees/<int:employee_id>/profile-photo', methods=['DELETE'])
     @login_required
@@ -236,7 +234,7 @@ def register_file_routes(bp: Blueprint):
             is_admin_or_manager = user_role in [UserRole.ADMIN, UserRole.MANAGER]
             is_self = session.get(SessionKeys.EMPLOYEE_ID) == employee_id
             if not is_admin_or_manager and not is_self:
-                return jsonify({'success': False, 'error': '권한이 없습니다.'}), 403
+                return api_forbidden()
 
             category = 'profile_photo'
 
@@ -246,12 +244,12 @@ def register_file_routes(bp: Blueprint):
                 old_path = safe_get(old_photo, 'file_path')
                 delete_file_if_exists(old_path)
                 employee_service.delete_attachment_by_category(employee_id, category)
-                return jsonify({'success': True, 'message': '프로필 사진이 삭제되었습니다.'})
+                return api_success(message='프로필 사진이 삭제되었습니다.')
             else:
-                return jsonify({'success': False, 'error': '삭제할 프로필 사진이 없습니다.'}), 404
+                return api_not_found('프로필 사진')
 
         except Exception as e:
-            return jsonify({'success': False, 'error': str(e)}), 500
+            return api_server_error(str(e))
 
     # ========================================
     # 명함 이미지 API
@@ -266,30 +264,30 @@ def register_file_routes(bp: Blueprint):
             is_admin = session.get(SessionKeys.USER_ROLE) == UserRole.ADMIN
             is_self = session.get(SessionKeys.EMPLOYEE_ID) == employee_id
             if not is_admin and not is_self:
-                return jsonify({'success': False, 'error': '권한이 없습니다.'}), 403
+                return api_forbidden()
 
             # 직원 존재 확인
             employee = employee_service.get_employee_by_id(employee_id)
             if not employee:
-                return jsonify({'success': False, 'error': '직원을 찾을 수 없습니다.'}), 404
+                return api_not_found('직원')
 
             # side 파라미터 검증
             side = request.form.get('side')
             if side not in ['front', 'back']:
-                return jsonify({'success': False, 'error': 'side 파라미터는 front 또는 back이어야 합니다.'}), 400
+                return api_error('side 파라미터는 front 또는 back이어야 합니다.')
 
             category = f'business_card_{side}'
 
             # 파일 검증
             if 'file' not in request.files:
-                return jsonify({'success': False, 'error': '파일이 없습니다.'}), 400
+                return api_error('파일이 없습니다.')
 
             file = request.files['file']
             if file.filename == '':
-                return jsonify({'success': False, 'error': '파일이 선택되지 않았습니다.'}), 400
+                return api_error('파일이 선택되지 않았습니다.')
 
             if not allowed_image_file(file.filename):
-                return jsonify({'success': False, 'error': '이미지 파일만 업로드 가능합니다. (jpg, png, gif, webp)'}), 400
+                return api_error('이미지 파일만 업로드 가능합니다. (jpg, png, gif, webp)')
 
             # 파일 크기 확인
             file.seek(0, os.SEEK_END)
@@ -297,7 +295,7 @@ def register_file_routes(bp: Blueprint):
             file.seek(0)
 
             if file_size > MAX_IMAGE_SIZE:
-                return jsonify({'success': False, 'error': '파일 크기가 5MB를 초과합니다.'}), 400
+                return api_error('파일 크기가 5MB를 초과합니다.')
 
             # 기존 명함 이미지 삭제
             old_card = employee_service.get_attachment_by_category(employee_id, category)
@@ -329,15 +327,14 @@ def register_file_routes(bp: Blueprint):
             }
             created = employee_service.create_attachment(attachment_data)
 
-            return jsonify({
-                'success': True,
+            return api_success({
                 'side': side,
                 'file_path': web_path,
                 'attachment': created.to_dict() if hasattr(created, 'to_dict') else created
             })
 
         except Exception as e:
-            return jsonify({'success': False, 'error': str(e)}), 500
+            return api_server_error(str(e))
 
     @bp.route('/api/employees/<int:employee_id>/business-card/<side>', methods=['DELETE'])
     @login_required
@@ -348,11 +345,11 @@ def register_file_routes(bp: Blueprint):
             is_admin = session.get(SessionKeys.USER_ROLE) == UserRole.ADMIN
             is_self = session.get(SessionKeys.EMPLOYEE_ID) == employee_id
             if not is_admin and not is_self:
-                return jsonify({'success': False, 'error': '권한이 없습니다.'}), 403
+                return api_forbidden()
 
             # side 파라미터 검증
             if side not in ['front', 'back']:
-                return jsonify({'success': False, 'error': 'side 파라미터는 front 또는 back이어야 합니다.'}), 400
+                return api_error('side 파라미터는 front 또는 back이어야 합니다.')
 
             category = f'business_card_{side}'
 
@@ -362,9 +359,9 @@ def register_file_routes(bp: Blueprint):
                 old_path = safe_get(old_card, 'file_path')
                 delete_file_if_exists(old_path)
                 employee_service.delete_attachment_by_category(employee_id, category)
-                return jsonify({'success': True, 'message': f'명함 {side} 이미지가 삭제되었습니다.'})
+                return api_success(message=f'명함 {side} 이미지가 삭제되었습니다.')
             else:
-                return jsonify({'success': False, 'error': '삭제할 명함 이미지가 없습니다.'}), 404
+                return api_not_found('명함 이미지')
 
         except Exception as e:
-            return jsonify({'success': False, 'error': str(e)}), 500
+            return api_server_error(str(e))

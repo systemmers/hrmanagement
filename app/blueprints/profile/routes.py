@@ -6,7 +6,7 @@ Phase 8: 상수 모듈 적용
 Phase 2: Service 계층 표준화
 Phase 9: DRY 원칙 - photo 업로드 중앙화
 """
-from flask import render_template, g, jsonify, request, flash, redirect, url_for, session
+from flask import render_template, g, request, flash, redirect, url_for, session
 
 from app.blueprints.profile import profile_bp
 from app.constants.session_keys import SessionKeys, AccountType
@@ -20,6 +20,7 @@ from app.services.attachment_service import attachment_service
 from app.services.corporate_admin_profile_service import corporate_admin_profile_service
 from app.services.employee_service import employee_service
 from app.services.file_storage_service import file_storage, CATEGORY_ADMIN_PHOTO
+from app.utils.api_helpers import api_success, api_error, api_not_found, api_forbidden, api_server_error
 
 
 @profile_bp.route('/dashboard')
@@ -172,10 +173,7 @@ def get_section(section_name):
 
     # 접근 권한 확인
     if section_name not in adapter.get_available_sections():
-        return jsonify({
-            'success': False,
-            'error': '접근 권한이 없는 섹션입니다.'
-        }), 403
+        return api_forbidden('접근 권한이 없는 섹션입니다.')
 
     # 섹션별 데이터 매핑
     section_methods = {
@@ -194,22 +192,13 @@ def get_section(section_name):
 
     method = section_methods.get(section_name)
     if not method:
-        return jsonify({
-            'success': False,
-            'error': '알 수 없는 섹션입니다.'
-        }), 404
+        return api_not_found('섹션')
 
     try:
         data = method()
-        return jsonify({
-            'success': True,
-            'data': data
-        })
+        return api_success({'data': data})
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': f'데이터 조회 중 오류가 발생했습니다: {str(e)}'
-        }), 500
+        return api_server_error(f'데이터 조회 중 오류가 발생했습니다: {str(e)}')
 
 
 @profile_bp.route('/corporate/salary-history')
@@ -218,10 +207,7 @@ def salary_history():
     """급여 이력 조회 (법인 전용)"""
     adapter = g.profile
 
-    return jsonify({
-        'success': True,
-        'data': adapter.get_salary_history_list()
-    })
+    return api_success({'data': adapter.get_salary_history_list()})
 
 
 @profile_bp.route('/corporate/promotions')
@@ -230,10 +216,7 @@ def promotions():
     """승진 이력 조회 (법인 전용)"""
     adapter = g.profile
 
-    return jsonify({
-        'success': True,
-        'data': adapter.get_promotion_list()
-    })
+    return api_success({'data': adapter.get_promotion_list()})
 
 
 @profile_bp.route('/corporate/evaluations')
@@ -242,10 +225,7 @@ def evaluations():
     """평가 기록 조회 (법인 전용)"""
     adapter = g.profile
 
-    return jsonify({
-        'success': True,
-        'data': adapter.get_evaluation_list()
-    })
+    return api_success({'data': adapter.get_evaluation_list()})
 
 
 @profile_bp.route('/corporate/trainings')
@@ -254,10 +234,7 @@ def trainings():
     """교육 이력 조회 (법인 전용)"""
     adapter = g.profile
 
-    return jsonify({
-        'success': True,
-        'data': adapter.get_training_list()
-    })
+    return api_success({'data': adapter.get_training_list()})
 
 
 @profile_bp.route('/corporate/attendances')
@@ -266,10 +243,7 @@ def attendances():
     """근태 기록 조회 (법인 전용)"""
     adapter = g.profile
 
-    return jsonify({
-        'success': True,
-        'data': adapter.get_attendance_list()
-    })
+    return api_success({'data': adapter.get_attendance_list()})
 
 
 @profile_bp.route('/corporate/assets')
@@ -278,10 +252,7 @@ def assets():
     """비품 목록 조회 (법인 전용)"""
     adapter = g.profile
 
-    return jsonify({
-        'success': True,
-        'data': adapter.get_asset_list()
-    })
+    return api_success({'data': adapter.get_asset_list()})
 
 
 @profile_bp.route('/corporate/family')
@@ -290,10 +261,7 @@ def family():
     """가족 정보 조회 (법인 전용)"""
     adapter = g.profile
 
-    return jsonify({
-        'success': True,
-        'data': adapter.get_family_list()
-    })
+    return api_success({'data': adapter.get_family_list()})
 
 
 @profile_bp.route('/hr-projects')
@@ -304,15 +272,9 @@ def hr_projects():
 
     # 법인 직원만 인사이력 프로젝트 정보 있음
     if not g.is_corporate:
-        return jsonify({
-            'success': True,
-            'data': []
-        })
+        return api_success({'data': []})
 
-    return jsonify({
-        'success': True,
-        'data': adapter.get_hr_project_list()
-    })
+    return api_success({'data': adapter.get_hr_project_list()})
 
 
 @profile_bp.route('/project-participations')
@@ -321,10 +283,7 @@ def project_participations():
     """프로젝트 참여이력 목록 조회"""
     adapter = g.profile
 
-    return jsonify({
-        'success': True,
-        'data': adapter.get_project_participation_list()
-    })
+    return api_success({'data': adapter.get_project_participation_list()})
 
 
 @profile_bp.route('/awards')
@@ -335,15 +294,9 @@ def awards():
 
     # 법인 직원만 수상 정보 있음
     if not g.is_corporate:
-        return jsonify({
-            'success': True,
-            'data': []
-        })
+        return api_success({'data': []})
 
-    return jsonify({
-        'success': True,
-        'data': adapter.get_award_list()
-    })
+    return api_success({'data': adapter.get_award_list()})
 
 
 # ========================================
@@ -498,10 +451,7 @@ def api_admin_profile_get():
     """법인 관리자 프로필 조회 API"""
     adapter = g.profile
 
-    return jsonify({
-        'success': True,
-        'data': adapter.get_basic_info()
-    })
+    return api_success({'data': adapter.get_basic_info()})
 
 
 @profile_bp.route('/api/admin/profile', methods=['PUT'])
@@ -512,17 +462,11 @@ def api_admin_profile_update():
     data = request.get_json()
 
     if not data:
-        return jsonify({
-            'success': False,
-            'error': '요청 데이터가 없습니다.'
-        }), 400
+        return api_error('요청 데이터가 없습니다.')
 
     # 필수 필드 검증
     if 'name' in data and not data['name'].strip():
-        return jsonify({
-            'success': False,
-            'error': '이름은 필수 입력 항목입니다.'
-        }), 400
+        return api_error('이름은 필수 입력 항목입니다.')
 
     # 프로필 수정
     success, error = corporate_admin_profile_service.update_profile(
@@ -533,16 +477,12 @@ def api_admin_profile_update():
     if success:
         # 업데이트된 프로필 반환
         adapter = corporate_admin_profile_service.get_adapter(user_id)
-        return jsonify({
-            'success': True,
+        return api_success({
             'data': adapter.get_basic_info() if adapter else None,
             'message': '프로필이 수정되었습니다.'
         })
     else:
-        return jsonify({
-            'success': False,
-            'error': error
-        }), 500
+        return api_server_error(error)
 
 
 @profile_bp.route('/api/admin/company', methods=['GET'])
@@ -551,10 +491,7 @@ def api_admin_company_get():
     """법인 관리자 소속 회사 정보 조회 API"""
     adapter = g.profile
 
-    return jsonify({
-        'success': True,
-        'data': adapter.get_organization_info()
-    })
+    return api_success({'data': adapter.get_organization_info()})
 
 
 # ========================================
