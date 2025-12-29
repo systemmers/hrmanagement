@@ -4,9 +4,10 @@
 대시보드 및 검색 기능을 제공합니다.
 Phase 2: Service 계층 표준화
 """
-from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
+from flask import Blueprint, render_template, request, session, redirect, url_for
 
 from ..constants.session_keys import SessionKeys, AccountType, UserRole
+from ..utils.api_helpers import api_success
 from ..services.employee_service import employee_service
 from ..utils.decorators import login_required
 from ..utils.tenant import get_current_organization_id
@@ -103,7 +104,7 @@ def search():
 
     # AJAX 요청인 경우 JSON 반환
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return jsonify({
+        return api_success({
             'employees': [emp.to_dict() for emp in employees],
             'stats': stats
         })

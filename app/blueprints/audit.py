@@ -7,7 +7,7 @@ Phase 7: 데코레이터 통합 리팩토링
 Phase 8: 상수 모듈 적용
 """
 from datetime import datetime, timedelta
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, session
 
 from app.constants.session_keys import SessionKeys, AccountType
 from app.services.audit_service import audit_service, AuditLog
@@ -16,6 +16,7 @@ from app.utils.decorators import (
     api_admin_or_manager_required as admin_required,
     api_corporate_account_required as corporate_account_required
 )
+from app.utils.api_helpers import api_success
 
 audit_bp = Blueprint('audit', __name__, url_prefix='/api/audit')
 
@@ -100,8 +101,7 @@ def get_logs():
         total_query = total_query.filter_by(resource_type=resource_type)
     total = total_query.count()
 
-    return jsonify({
-        'success': True,
+    return api_success({
         'logs': logs,
         'total': total,
         'limit': limit,
@@ -137,8 +137,7 @@ def get_resource_logs(resource_type, resource_id):
         resource_id=resource_id
     )
 
-    return jsonify({
-        'success': True,
+    return api_success({
         'logs': logs,
         'access_summary': summary
     })
@@ -166,8 +165,7 @@ def get_user_logs(user_id):
 
     logs = audit_service.get_user_activity(user_id=user_id, days=days)
 
-    return jsonify({
-        'success': True,
+    return api_success({
         'logs': logs,
         'user_id': user_id,
         'period_days': days
@@ -202,8 +200,7 @@ def get_my_logs():
         limit=limit
     )
 
-    return jsonify({
-        'success': True,
+    return api_success({
         'logs': logs,
         'period_days': days
     })
@@ -261,8 +258,7 @@ def get_statistics():
         end_date=end_date
     )
 
-    return jsonify({
-        'success': True,
+    return api_success({
         'stats': stats,
         'period': {
             'start_date': start_date.isoformat() if start_date else None,
@@ -302,8 +298,7 @@ def get_company_statistics():
         days=days
     )
 
-    return jsonify({
-        'success': True,
+    return api_success({
         'stats': stats,
         'audit_trail': audit_trail[:100],  # 최근 100개만
         'period_days': days
@@ -336,7 +331,7 @@ def get_action_types():
         {'value': AuditLog.ACTION_ACCESS_DENIED, 'label': '접근 거부'},
     ]
 
-    return jsonify({'success': True, 'actions': actions})
+    return api_success({'actions': actions})
 
 
 @audit_bp.route('/resource-types', methods=['GET'])
@@ -362,7 +357,7 @@ def get_resource_types():
         {'value': 'organization', 'label': '조직'},
     ]
 
-    return jsonify({'success': True, 'resource_types': resource_types})
+    return api_success({'resource_types': resource_types})
 
 
 # ===== 접근 요약 =====
@@ -389,8 +384,7 @@ def get_employee_access_summary(employee_id):
         days=days
     )
 
-    return jsonify({
-        'success': True,
+    return api_success({
         'employee_id': employee_id,
         'summary': summary
     })
@@ -418,8 +412,7 @@ def get_contract_access_summary(contract_id):
         days=days
     )
 
-    return jsonify({
-        'success': True,
+    return api_success({
         'contract_id': contract_id,
         'summary': summary
     })

@@ -7,9 +7,10 @@ Phase 6: 백엔드 리팩토링 - register() 헬퍼 분할
 Phase 8: 상수 모듈 적용
 Phase 24: 트랜잭션 SSOT 적용 + CompanyService 경유 레이어 분리
 """
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 
 from app.constants.session_keys import SessionKeys, AccountType
+from app.utils.api_helpers import api_success, api_error, api_forbidden, api_not_found
 from app.models.user import User
 from app.utils.decorators import corporate_login_required, corporate_admin_required
 from app.utils.corporate_helpers import (
@@ -166,10 +167,10 @@ def check_business_number():
     """사업자등록번호 중복 확인 API"""
     business_number = request.args.get('business_number', '')
     if not business_number:
-        return jsonify({'error': '사업자등록번호를 입력해주세요.'}), 400
+        return api_error('사업자등록번호를 입력해주세요.')
 
     exists = company_service.exists_by_business_number(business_number)
-    return jsonify({'exists': exists, 'available': not exists})
+    return api_success({'exists': exists, 'available': not exists})
 
 
 @corporate_bp.route('/api/company/<int:company_id>')
@@ -178,10 +179,10 @@ def get_company(company_id):
     """법인 정보 조회 API"""
     # 자신의 법인 정보만 조회 가능
     if session.get(SessionKeys.COMPANY_ID) != company_id:
-        return jsonify({'error': '접근 권한이 없습니다.'}), 403
+        return api_forbidden('접근 권한이 없습니다.')
 
     company = company_service.get_with_stats(company_id)
     if not company:
-        return jsonify({'error': '법인 정보를 찾을 수 없습니다.'}), 404
+        return api_not_found('법인 정보')
 
-    return jsonify(company)
+    return api_success(company)

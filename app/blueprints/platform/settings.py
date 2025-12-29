@@ -4,11 +4,12 @@ Platform Settings Management
 시스템 설정 관리 라우트
 Phase 24: PlatformService 경유로 레이어 분리 준수
 """
-from flask import render_template, request, jsonify
+from flask import render_template, request
 
 from . import platform_bp
 from ...utils.decorators import superadmin_required, api_superadmin_required
 from ...services.platform_service import platform_service
+from ...utils.api_helpers import api_success, api_error, api_not_found
 
 
 @platform_bp.route('/settings')
@@ -29,19 +30,16 @@ def update_setting(key):
     """시스템 설정 수정"""
     data = request.get_json()
     if 'value' not in data:
-        return jsonify({
-            'success': False,
-            'error': 'value 필드가 필요합니다.'
-        }), 400
+        return api_error('value 필드가 필요합니다.')
 
     success, error, setting_info = platform_service.update_setting(key, data['value'])
 
     if not success:
-        status_code = 404 if '찾을 수 없습니다' in (error or '') else 400
-        return jsonify({'success': False, 'error': error}), status_code
+        if '찾을 수 없습니다' in (error or ''):
+            return api_not_found('설정')
+        return api_error(error)
 
-    return jsonify({
-        'success': True,
+    return api_success({
         'message': f'설정 "{key}"이(가) 수정되었습니다.',
         'setting': setting_info
     })
@@ -54,10 +52,7 @@ def create_setting():
     data = request.get_json()
 
     if not data.get('key') or 'value' not in data:
-        return jsonify({
-            'success': False,
-            'error': 'key와 value 필드가 필요합니다.'
-        }), 400
+        return api_error('key와 value 필드가 필요합니다.')
 
     success, error, setting_info = platform_service.create_setting(
         key=data['key'],
@@ -66,10 +61,9 @@ def create_setting():
     )
 
     if not success:
-        return jsonify({'success': False, 'error': error}), 400
+        return api_error(error)
 
-    return jsonify({
-        'success': True,
+    return api_success({
         'message': f'설정 "{data["key"]}"이(가) 생성되었습니다.',
         'setting': setting_info
-    }), 201
+    }, status_code=201)

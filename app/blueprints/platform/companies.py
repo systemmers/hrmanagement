@@ -4,11 +4,12 @@ Platform Companies Management
 법인 관리 라우트
 Phase 24: PlatformService 경유로 레이어 분리 준수
 """
-from flask import render_template, request, jsonify, abort
+from flask import render_template, request, abort
 
 from . import platform_bp
 from ...utils.decorators import superadmin_required, api_superadmin_required
 from ...services.platform_service import platform_service
+from ...utils.api_helpers import api_success, api_error
 
 
 @platform_bp.route('/companies')
@@ -59,10 +60,9 @@ def toggle_company_active(company_id):
     success, error, is_active = platform_service.toggle_company_active(company_id)
 
     if not success:
-        return jsonify({'success': False, 'error': error}), 400
+        return api_error(error)
 
-    return jsonify({
-        'success': True,
+    return api_success({
         'is_active': is_active,
         'message': f'법인이 {"활성화" if is_active else "비활성화"}되었습니다.'
     })

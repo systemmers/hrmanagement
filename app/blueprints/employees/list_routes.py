@@ -8,9 +8,10 @@ Phase 8: 상수 모듈 적용
 Phase 9: 통합 계약 필터 서비스 적용 (N+1 쿼리 제거)
 Phase 24: Option A - isinstance 체크 제거 (Service가 Dict 보장)
 """
-from flask import Blueprint, render_template, request, jsonify, session
+from flask import Blueprint, render_template, request, session
 
 from ...constants.session_keys import SessionKeys, AccountType
+from ...utils.api_helpers import api_success, api_server_error
 from ...utils.decorators import manager_or_admin_required
 from ...utils.tenant import get_current_organization_id
 from ...services.employee_service import employee_service
@@ -183,13 +184,9 @@ def register_list_routes(bp: Blueprint):
                     'status': emp_dict.get('status', '')
                 })
 
-            return jsonify({
-                'success': True,
+            return api_success({
                 'employees': employee_list,
                 'total': len(employee_list)
             })
         except Exception as e:
-            return jsonify({
-                'success': False,
-                'error': str(e)
-            }), 500
+            return api_server_error(str(e))

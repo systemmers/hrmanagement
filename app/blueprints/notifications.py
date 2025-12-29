@@ -7,12 +7,13 @@ Phase 5: 알림 시스템
 - 알림 설정 관리
 Phase 8: 상수 모듈 적용
 """
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, session
 from functools import wraps
 
 from app.constants.session_keys import SessionKeys
 from app.services.notification_service import notification_service
 from app.models.notification import Notification
+from app.utils.api_helpers import api_success, api_error, api_not_found
 
 notifications_bp = Blueprint('notifications', __name__, url_prefix='/api/notifications')
 
@@ -24,7 +25,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get(SessionKeys.USER_ID):
-            return jsonify({'success': False, 'error': '로그인이 필요합니다.'}), 401
+            return api_error('로그인이 필요합니다.', status_code=401)
         return f(*args, **kwargs)
     return decorated_function
 
@@ -68,8 +69,7 @@ def get_notifications():
 
     unread_count = notification_service.get_unread_count(user_id)
 
-    return jsonify({
-        'success': True,
+    return api_success({
         'notifications': notifications,
         'unread_count': unread_count,
         'limit': limit,
@@ -92,10 +92,7 @@ def get_unread_count():
     user_id = session.get(SessionKeys.USER_ID)
     count = notification_service.get_unread_count(user_id)
 
-    return jsonify({
-        'success': True,
-        'count': count
-    })
+    return api_success({'count': count})
 
 
 @notifications_bp.route('/<int:notification_id>', methods=['GET'])
@@ -118,12 +115,9 @@ def get_notification(notification_id):
     )
 
     if not notification:
-        return jsonify({'success': False, 'error': '알림을 찾을 수 없습니다.'}), 404
+        return api_not_found('알림')
 
-    return jsonify({
-        'success': True,
-        'notification': notification
-    })
+    return api_success({'notification': notification})
 
 
 # ===== 알림 상태 관리 API =====
@@ -147,9 +141,9 @@ def mark_as_read(notification_id):
     )
 
     if not result:
-        return jsonify({'success': False, 'error': '알림을 찾을 수 없습니다.'}), 404
+        return api_not_found('알림')
 
-    return jsonify({'success': True})
+    return api_success()
 
 
 @notifications_bp.route('/read-all', methods=['POST'])
@@ -178,10 +172,7 @@ def mark_all_as_read():
         notification_type=notification_type
     )
 
-    return jsonify({
-        'success': True,
-        'count': count
-    })
+    return api_success({'count': count})
 
 
 @notifications_bp.route('/<int:notification_id>', methods=['DELETE'])
@@ -203,9 +194,9 @@ def delete_notification(notification_id):
     )
 
     if not result:
-        return jsonify({'success': False, 'error': '알림을 찾을 수 없습니다.'}), 404
+        return api_not_found('알림')
 
-    return jsonify({'success': True})
+    return api_success()
 
 
 # ===== 알림 통계 API =====
@@ -238,10 +229,7 @@ def get_stats():
         days=days
     )
 
-    return jsonify({
-        'success': True,
-        'stats': stats
-    })
+    return api_success({'stats': stats})
 
 
 # ===== 알림 설정 API =====
@@ -261,10 +249,7 @@ def get_preferences():
     user_id = session.get(SessionKeys.USER_ID)
     preferences = notification_service.get_preferences(user_id)
 
-    return jsonify({
-        'success': True,
-        'preferences': preferences
-    })
+    return api_success({'preferences': preferences})
 
 
 @notifications_bp.route('/preferences', methods=['PUT'])
@@ -293,17 +278,14 @@ def update_preferences():
     data = request.get_json()
 
     if not data:
-        return jsonify({'success': False, 'error': '설정 데이터가 필요합니다.'}), 400
+        return api_error('설정 데이터가 필요합니다.')
 
     preferences = notification_service.update_preferences(
         user_id=user_id,
         settings=data
     )
 
-    return jsonify({
-        'success': True,
-        'preferences': preferences
-    })
+    return api_success({'preferences': preferences})
 
 
 # ===== 알림 유형 정보 =====
@@ -325,7 +307,4 @@ def get_notification_types():
         for value, label in Notification.NOTIFICATION_TYPES
     ]
 
-    return jsonify({
-        'success': True,
-        'types': types
-    })
+    return api_success({'types': types})

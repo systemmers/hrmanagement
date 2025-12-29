@@ -5,13 +5,14 @@
 멀티테넌시: 현재 로그인한 회사의 조직만 접근 가능합니다.
 Phase 2: Service 계층 표준화
 """
-from flask import render_template, request, jsonify, flash, redirect, url_for, session
+from flask import render_template, request, flash, redirect, url_for, session
 
 from . import admin_bp
 from ...constants.session_keys import SessionKeys
 from ...services.organization_service import organization_service
 from ...services.company_service import company_service
 from ...utils.decorators import admin_required, login_required
+from ...utils.api_helpers import api_success, api_error, api_not_found, api_server_error
 
 
 def get_current_root_organization_id():
@@ -57,7 +58,7 @@ def api_get_organizations():
     else:
         data = organization_service.get_tree(root_organization_id=root_org_id)
 
-    return jsonify({'success': True, 'data': data})
+    return api_success({'data': data})
 
 
 @admin_bp.route('/api/organizations/<int:org_id>', methods=['GET'])
@@ -68,13 +69,13 @@ def api_get_organization(org_id):
 
     # 멀티테넌시 검증
     if root_org_id and not organization_service.verify_ownership(org_id, root_org_id):
-        return jsonify({'success': False, 'error': '조직을 찾을 수 없습니다.'}), 404
+        return api_not_found('조직')
 
     org = organization_service.get_by_id(org_id)
     if not org:
-        return jsonify({'success': False, 'error': '조직을 찾을 수 없습니다.'}), 404
+        return api_not_found('조직')
 
-    return jsonify({'success': True, 'data': org})
+    return api_success({'data': org})
 
 
 @admin_bp.route('/api/organizations', methods=['POST'])
@@ -93,7 +94,7 @@ def api_create_organization():
 
     # 필수 값 검증
     if not name:
-        return jsonify({'success': False, 'error': '조직명은 필수입니다.'}), 400
+        return api_error('조직명은 필수입니다.')
 
     # parent_id가 없는 경우 현재 회사의 root_organization_id를 기본값으로 설정
     if not parent_id and root_org_id:
@@ -101,7 +102,7 @@ def api_create_organization():
 
     # 코드 중복 검사 (테넌트 범위 내)
     if code and organization_service.code_exists(code, root_organization_id=root_org_id):
-        return jsonify({'success': False, 'error': '이미 사용 중인 조직 코드입니다.'}), 400
+        return api_error('이미 사용 중인 조직 코드입니다.')
 
     try:
         org = organization_service.create_organization(
@@ -113,12 +114,12 @@ def api_create_organization():
             description=description,
             root_organization_id=root_org_id
         )
-        return jsonify({'success': True, 'data': org.to_dict()}), 201
+        return api_success({'data': org.to_dict()}, status_code=201)
 
     except ValueError as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
+        return api_error(str(e))
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return api_server_error(str(e))
 
 
 @admin_bp.route('/api/organizations/<int:org_id>', methods=['PUT'])
@@ -130,24 +131,24 @@ def api_update_organization(org_id):
 
     # 멀티테넌시 검증
     if root_org_id and not organization_service.verify_ownership(org_id, root_org_id):
-        return jsonify({'success': False, 'error': '조직을 찾을 수 없습니다.'}), 404
+        return api_not_found('조직')
 
     # 코드 중복 검사 (자기 자신 제외, 테넌트 범위 내)
     code = data.get('code', '').strip() or None
     if code and organization_service.code_exists(code, exclude_id=org_id, root_organization_id=root_org_id):
-        return jsonify({'success': False, 'error': '이미 사용 중인 조직 코드입니다.'}), 400
+        return api_error('이미 사용 중인 조직 코드입니다.')
 
     try:
         org = organization_service.update_organization(org_id, data, root_organization_id=root_org_id)
         if not org:
-            return jsonify({'success': False, 'error': '조직을 찾을 수 없습니다.'}), 404
+            return api_not_found('조직')
 
-        return jsonify({'success': True, 'data': org.to_dict()})
+        return api_success({'data': org.to_dict()})
 
     except ValueError as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
+        return api_error(str(e))
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return api_server_error(str(e))
 
 
 @admin_bp.route('/api/organizations/<int:org_id>', methods=['DELETE'])
@@ -159,12 +160,12 @@ def api_delete_organization(org_id):
 
     try:
         if organization_service.deactivate(org_id, cascade=cascade, root_organization_id=root_org_id):
-            return jsonify({'success': True, 'message': '조직이 비활성화되었습니다.'})
+            return api_success(message='조직이 비활성화되었습니다.')
         else:
-            return jsonify({'success': False, 'error': '조직을 찾을 수 없습니다.'}), 404
+            return api_not_found('조직')
 
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return api_server_error(str(e))
 
 
 @admin_bp.route('/api/organizations/<int:org_id>/move', methods=['POST'])
@@ -177,12 +178,12 @@ def api_move_organization(org_id):
 
     try:
         if organization_service.move_organization(org_id, new_parent_id, root_organization_id=root_org_id):
-            return jsonify({'success': True, 'message': '조직이 이동되었습니다.'})
+            return api_success(message='조직이 이동되었습니다.')
         else:
-            return jsonify({'success': False, 'error': '조직 이동에 실패했습니다.'}), 400
+            return api_error('조직 이동에 실패했습니다.')
 
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return api_server_error(str(e))
 
 
 @admin_bp.route('/api/organizations/<int:org_id>/children', methods=['GET'])
@@ -191,7 +192,7 @@ def api_get_children(org_id):
     """하위 조직 목록 API (멀티테넌시 적용)"""
     root_org_id = get_current_root_organization_id()
     children = organization_service.get_children(org_id, root_organization_id=root_org_id)
-    return jsonify({'success': True, 'data': children})
+    return api_success({'data': children})
 
 
 @admin_bp.route('/api/organizations/search', methods=['GET'])
@@ -201,7 +202,7 @@ def api_search_organizations():
     root_org_id = get_current_root_organization_id()
     query = request.args.get('q', '').strip()
     if not query:
-        return jsonify({'success': True, 'data': []})
+        return api_success({'data': []})
 
     results = organization_service.search(query, root_organization_id=root_org_id)
-    return jsonify({'success': True, 'data': results})
+    return api_success({'data': results})

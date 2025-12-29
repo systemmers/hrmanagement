@@ -4,12 +4,13 @@ Platform Users Management
 사용자 관리 라우트
 Phase 24: PlatformService 경유로 레이어 분리 준수
 """
-from flask import render_template, request, jsonify, session, abort
+from flask import render_template, request, session, abort
 
 from . import platform_bp
 from ...utils.decorators import superadmin_required, api_superadmin_required
 from ...services.platform_service import platform_service
 from ...constants import SessionKeys
+from ...utils.api_helpers import api_success, api_error
 
 
 @platform_bp.route('/users')
@@ -62,10 +63,9 @@ def toggle_user_active(user_id):
     )
 
     if not success:
-        return jsonify({'success': False, 'error': error}), 400
+        return api_error(error)
 
-    return jsonify({
-        'success': True,
+    return api_success({
         'is_active': is_active,
         'message': f'사용자가 {"활성화" if is_active else "비활성화"}되었습니다.'
     })
@@ -78,16 +78,13 @@ def grant_superadmin(user_id):
     success, error = platform_service.grant_superadmin(user_id)
 
     if not success:
-        return jsonify({'success': False, 'error': error}), 400
+        return api_error(error)
 
     # 성공 메시지를 위해 사용자 정보 조회
     user = platform_service.get_user_by_id(user_id)
     username = user.username if user else f'ID:{user_id}'
 
-    return jsonify({
-        'success': True,
-        'message': f'{username}에게 슈퍼관리자 권한이 부여되었습니다.'
-    })
+    return api_success(message=f'{username}에게 슈퍼관리자 권한이 부여되었습니다.')
 
 
 @platform_bp.route('/api/users/<int:user_id>/revoke-superadmin', methods=['POST'])
@@ -103,9 +100,6 @@ def revoke_superadmin(user_id):
     success, error = platform_service.revoke_superadmin(user_id, current_user_id)
 
     if not success:
-        return jsonify({'success': False, 'error': error}), 400
+        return api_error(error)
 
-    return jsonify({
-        'success': True,
-        'message': f'{username}의 슈퍼관리자 권한이 해제되었습니다.'
-    })
+    return api_success(message=f'{username}의 슈퍼관리자 권한이 해제되었습니다.')
