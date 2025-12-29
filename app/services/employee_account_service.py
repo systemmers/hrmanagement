@@ -18,6 +18,7 @@ from app.database import db
 from app.models import Employee, User
 from app.utils.transaction import atomic_transaction
 from app.utils.tenant import get_current_organization_id
+from app.constants.status import EmployeeStatus
 
 
 class EmployeeAccountService:

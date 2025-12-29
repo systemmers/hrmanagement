@@ -15,6 +15,16 @@ from .field_registry import (
 from .field_options import FieldOptions
 from .system_config import FileConfig, PaginationConfig, SessionConfig
 from .status import ContractStatus, EmployeeStatus, AccountStatus
+from .sync_fields import (
+    SyncFieldMapping,
+    SYNC_MAPPINGS,
+    BASIC_FIELD_MAPPING,
+    CONTACT_FIELD_MAPPING,
+    EXTRA_FIELD_MAPPING,
+    RELATION_FIELD_MAPPING,
+    SHARING_FIELD_GROUPS,
+    SYNCABLE_RELATION_TYPES,
+)
 
 __all__ = [
     'SessionKeys',
@@ -38,4 +48,13 @@ __all__ = [
     'ContractStatus',
     'EmployeeStatus',
     'AccountStatus',
+    # Sync Field Mappings (SSOT)
+    'SyncFieldMapping',
+    'SYNC_MAPPINGS',
+    'BASIC_FIELD_MAPPING',
+    'CONTACT_FIELD_MAPPING',
+    'EXTRA_FIELD_MAPPING',
+    'RELATION_FIELD_MAPPING',
+    'SHARING_FIELD_GROUPS',
+    'SYNCABLE_RELATION_TYPES',
 ]

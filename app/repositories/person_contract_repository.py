@@ -1,8 +1,14 @@
 """
 PersonCorporateContract Repository
 
-개인-법인 계약 관리의 CRUD 및 비즈니스 로직을 처리합니다.
+개인-법인 계약 관리의 CRUD 및 기본 조회를 처리합니다.
+
+Phase 1 Refactoring:
+- 비즈니스 로직은 ContractService로 이동 완료
+- approve_contract, reject_contract, terminate_contract는 Deprecated
+- 새 코드는 ContractService를 사용해야 함
 """
+import warnings
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 from app.database import db
@@ -129,145 +135,69 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
 
         return contract.to_dict(include_relations=True)
 
-    # ===== 승인/거절/종료 메서드 =====
+    # ===== 승인/거절/종료 메서드 (DEPRECATED) =====
+    # Phase 1 Refactoring: 비즈니스 로직은 ContractService로 이동
+    # 하위 호환성을 위해 Deprecation Wrapper 제공
 
     def approve_contract(self, contract_id: int, approved_by_user_id: int = None) -> Dict:
-        """계약 승인
+        """[DEPRECATED] 계약 승인
 
-        21번 원칙: 계약 승인 시 Employee.status = 'active' 연동
-        23번 원칙: 계약 승인 시 PCC.employee_number 동기화
+        이 메서드는 deprecated되었습니다. ContractService.approve_contract()를 사용하세요.
 
-        개인 계정(personal):
-        - 항상 새 Employee 생성 (회사별 분리, full_sync=True)
-        - 전체 프로필 데이터 동기화 (기본 필드 + 관계형 데이터)
-        - DataSharingSettings 자동 생성 (전체 공유 기본값)
-        - employee_number 자동 동기화
-
-        직원 계정(employee_sub):
-        - 기존 Employee의 status만 active로 변경
-        - organization_id를 계약 회사에 맞게 업데이트
-        - employee_number 자동 동기화
-
-        사전 검증:
-        - employee_sub: User.employee_id 필수
-        - employee_sub: Employee.status != 'resigned' (퇴사자 재계약 불가)
+        Phase 1 Refactoring: 비즈니스 로직은 ContractService로 이동
+        하위 호환성을 위해 Service로 위임합니다.
         """
-        from app.models.company import Company
-
-        contract = self.find_by_id(contract_id)
-        if not contract:
-            raise ValueError("계약을 찾을 수 없습니다.")
-
-        user = User.query.get(contract.person_user_id)
-        company = Company.query.get(contract.company_id)
-
-        # 사전 검증 (employee_sub)
-        if user and user.account_type == 'employee_sub':
-            if not user.employee_id:
-                raise ValueError("Employee 연결이 필요합니다. (User.employee_id NULL)")
-
-            existing_employee = db.session.get(Employee, user.employee_id)
-            if existing_employee and existing_employee.status == EmployeeStatus.RESIGNED:
-                raise ValueError("퇴사한 직원은 재계약할 수 없습니다.")
-
-        contract.approve(approved_by_user_id)
-
-        if user:
-            if user.account_type == 'personal':
-                # 개인 계정: 항상 새 Employee 생성 (회사별 분리)
-                profile = PersonalProfile.query.filter_by(user_id=user.id).first()
-                if profile:
-                    from app.services.sync_service import sync_service
-                    # force_create=True: 기존 Employee 무시, 새로 생성
-                    # full_sync=True: 전체 프로필 데이터 동기화
-                    employee = sync_service._find_or_create_employee(
-                        contract, profile,
-                        full_sync=True,
-                        force_create=True
-                    )
-                    if employee:
-                        user.employee_id = employee.id
-                        employee.status = EmployeeStatus.ACTIVE
-
-                        # DataSharingSettings 생성 (전체 공유 기본값)
-                        settings = DataSharingSettings.query.filter_by(
-                            contract_id=contract_id
-                        ).first()
-                        if not settings:
-                            settings = DataSharingSettings(
-                                contract_id=contract_id,
-                                share_basic_info=True,
-                                share_contact=True,
-                                share_education=True,
-                                share_career=True,
-                                share_certificates=True,
-                                share_languages=True,
-                                share_military=True,
-                                is_realtime_sync=False,
-                            )
-                            db.session.add(settings)
-                            db.session.flush()
-
-                        # 관계형 데이터 동기화 실행
-                        sync_service.set_current_user(approved_by_user_id)
-                        sync_service.sync_personal_to_employee(
-                            contract_id=contract_id,
-                            sync_type='initial'
-                        )
-
-                        # 23번 원칙: employee_number 동기화
-                        if employee.employee_number:
-                            contract.employee_number = employee.employee_number
-            else:
-                # 직원 계정(employee_sub): 기존 Employee 상태 업데이트
-                if user.employee_id:
-                    employee = db.session.get(Employee, user.employee_id)
-                    if employee:
-                        employee.status = EmployeeStatus.ACTIVE
-                        # organization_id를 계약 회사에 맞게 업데이트
-                        if company and company.root_organization_id:
-                            employee.organization_id = company.root_organization_id
-
-                        # 23번 원칙: employee_number 동기화
-                        if employee.employee_number:
-                            contract.employee_number = employee.employee_number
-
-        db.session.commit()
-
-        return contract.to_dict(include_relations=True)
+        warnings.warn(
+            "PersonContractRepository.approve_contract()는 deprecated되었습니다. "
+            "ContractService.approve_contract()를 사용하세요.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        from app.services.contract_service import contract_service
+        success, result, error = contract_service.approve_contract(contract_id, approved_by_user_id)
+        if not success:
+            raise ValueError(error)
+        return result
 
     def reject_contract(self, contract_id: int, rejected_by_user_id: int = None, reason: str = None) -> Dict:
-        """계약 거절"""
-        contract = self.find_by_id(contract_id)
-        if not contract:
-            raise ValueError("계약을 찾을 수 없습니다.")
+        """[DEPRECATED] 계약 거절
 
-        contract.reject(rejected_by_user_id, reason)
-        db.session.commit()
+        이 메서드는 deprecated되었습니다. ContractService.reject_contract()를 사용하세요.
 
-        return contract.to_dict(include_relations=True)
+        Phase 1 Refactoring: 비즈니스 로직은 ContractService로 이동
+        하위 호환성을 위해 Service로 위임합니다.
+        """
+        warnings.warn(
+            "PersonContractRepository.reject_contract()는 deprecated되었습니다. "
+            "ContractService.reject_contract()를 사용하세요.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        from app.services.contract_service import contract_service
+        success, result, error = contract_service.reject_contract(contract_id, rejected_by_user_id, reason)
+        if not success:
+            raise ValueError(error)
+        return result
 
     def terminate_contract(self, contract_id: int, terminated_by_user_id: int = None, reason: str = None) -> Dict:
-        """계약 종료
+        """[DEPRECATED] 계약 종료
 
-        21번 원칙: 계약 종료 시 Employee.status = 'terminated' 연동
-        스냅샷 저장: termination_service를 통해 전체 인사기록 스냅샷 저장
+        이 메서드는 deprecated되었습니다. ContractService.terminate_contract()를 사용하세요.
+
+        Phase 1 Refactoring: 비즈니스 로직은 ContractService로 이동
+        하위 호환성을 위해 Service로 위임합니다.
         """
-        from app.services.termination_service import termination_service
-
-        # termination_service를 통해 종료 처리 (스냅샷 포함)
-        termination_service.set_current_user(terminated_by_user_id)
-        result = termination_service.terminate_contract(
-            contract_id=contract_id,
-            reason=reason,
-            terminate_by_user_id=terminated_by_user_id
+        warnings.warn(
+            "PersonContractRepository.terminate_contract()는 deprecated되었습니다. "
+            "ContractService.terminate_contract()를 사용하세요.",
+            DeprecationWarning,
+            stacklevel=2
         )
-
-        if not result.get('success'):
-            raise ValueError(result.get('error', '계약 종료 실패'))
-
-        contract = self.find_by_id(contract_id)
-        return contract.to_dict(include_relations=True)
+        from app.services.contract_service import contract_service
+        success, result, error = contract_service.terminate_contract(contract_id, terminated_by_user_id, reason)
+        if not success:
+            raise ValueError(error)
+        return result
 
     # ===== 데이터 공유 설정 =====
 

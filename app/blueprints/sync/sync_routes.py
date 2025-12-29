@@ -10,7 +10,7 @@ from app.constants.session_keys import SessionKeys
 from app.services.sync_service import sync_service
 from app.services.contract_service import contract_service
 from app.utils.transaction import atomic_transaction
-from app.models.person_contract import DataSharingSettings, SyncLog
+from app.models.person_contract import SyncLog
 from app.utils.decorators import (
     api_login_required as login_required,
     api_personal_account_required as personal_account_required,
@@ -137,7 +137,6 @@ def full_sync_from_corporate(contract_id):
         "relations": [...]
     }
     """
-    from app.database import db
     from app.models.person_contract import PersonCorporateContract
 
     user_id = session.get(SessionKeys.USER_ID)
@@ -154,20 +153,18 @@ def full_sync_from_corporate(contract_id):
     try:
         with atomic_transaction():
             # DataSharingSettings 생성 또는 업데이트 (전체 공유)
-            settings = contract_service.get_sharing_settings_model(contract_id)
-            if not settings:
-                settings = DataSharingSettings(contract_id=contract_id)
-                db.session.add(settings)
-
-            # 모든 공유 설정을 True로
-            settings.share_basic_info = True
-            settings.share_contact = True
-            settings.share_education = True
-            settings.share_career = True
-            settings.share_certificates = True
-            settings.share_languages = True
-            settings.share_military = True
-            db.session.flush()
+            # Phase 2: db.session 직접 사용 제거 - Service 메서드 사용
+            contract_service.update_or_create_sharing_settings(
+                contract_id,
+                commit=False,
+                share_basic_info=True,
+                share_contact=True,
+                share_education=True,
+                share_career=True,
+                share_certificates=True,
+                share_languages=True,
+                share_military=True
+            )
 
             # 전체 동기화 실행
             result = sync_service.sync_personal_to_employee(

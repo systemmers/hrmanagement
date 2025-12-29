@@ -164,7 +164,7 @@ def request_contract():
             return redirect(url_for('contracts.request_contract'))
 
         # user_id로 계약 요청 생성
-        success, contract, error = contract_service.create_employee_contract_request(
+        result = contract_service.create_employee_contract_request(
             employee_user_id=target_user_id,
             company_id=company_id,
             contract_type=contract_type,
@@ -173,11 +173,11 @@ def request_contract():
             notes=notes
         )
 
-        if success:
+        if result:
             flash('계약 요청이 전송되었습니다.', 'success')
             return redirect(url_for('contracts.company_contracts'))
         else:
-            flash(error, 'error')
+            flash(result.message, 'error')
             return redirect(url_for('contracts.request_contract'))
 
     # GET: 계약 요청 가능한 대상 목록 조회
@@ -199,10 +199,10 @@ def api_approve_contract(contract, contract_id):
     """계약 승인 API"""
     user_id = session.get(SessionKeys.USER_ID)
 
-    success, result, error = contract_service.approve_contract(contract_id, user_id)
-    if success:
-        return api_success(result)
-    return api_error(error)
+    result = contract_service.approve_contract(contract_id, user_id)
+    if result:
+        return api_success(result.data)
+    return api_error(result.message)
 
 
 @contracts_bp.route('/api/<int:contract_id>/reject', methods=['POST'])
@@ -214,10 +214,10 @@ def api_reject_contract(contract, contract_id):
     data = request.get_json() or {}
     reason = data.get('reason')
 
-    success, result, error = contract_service.reject_contract(contract_id, user_id, reason)
-    if success:
-        return api_success(result)
-    return api_error(error)
+    result = contract_service.reject_contract(contract_id, user_id, reason)
+    if result:
+        return api_success(result.data)
+    return api_error(result.message)
 
 
 @contracts_bp.route('/api/<int:contract_id>/terminate', methods=['POST'])
@@ -229,10 +229,10 @@ def api_terminate_contract(contract, contract_id):
     data = request.get_json() or {}
     reason = data.get('reason')
 
-    success, result, error = contract_service.terminate_contract(contract_id, user_id, reason)
-    if success:
-        return api_success(result)
-    return api_error(error)
+    result = contract_service.terminate_contract(contract_id, user_id, reason)
+    if result:
+        return api_success(result.data)
+    return api_error(result.message)
 
 
 @contracts_bp.route('/api/<int:contract_id>/sharing-settings', methods=['GET', 'PUT'])
@@ -256,10 +256,10 @@ def api_sharing_settings(contract_id):
     # PUT: 설정 업데이트
     data = request.get_json() or {}
 
-    success, result, error = contract_service.update_sharing_settings(contract_id, data)
-    if success:
-        return api_success(result)
-    return api_error(error)
+    result = contract_service.update_sharing_settings(contract_id, data)
+    if result:
+        return api_success(result.data)
+    return api_error(result.message)
 
 
 @contracts_bp.route('/api/<int:contract_id>/sync-logs')
@@ -339,7 +339,7 @@ def api_request_employee_contract(user_id):
     department = data.get('department')
     notes = data.get('notes')
 
-    success, contract, error = contract_service.create_employee_contract_request(
+    result = contract_service.create_employee_contract_request(
         employee_user_id=user_id,
         company_id=company_id,
         contract_type=contract_type,
@@ -348,6 +348,6 @@ def api_request_employee_contract(user_id):
         notes=notes
     )
 
-    if success:
-        return api_success(contract, message='계약 요청이 전송되었습니다.')
-    return api_error(error)
+    if result:
+        return api_success(result.data, message='계약 요청이 전송되었습니다.')
+    return api_error(result.message)

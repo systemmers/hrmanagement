@@ -10,7 +10,6 @@ from app.constants.session_keys import SessionKeys
 from app.services.sync_service import sync_service
 from app.services.contract_service import contract_service
 from app.utils.transaction import atomic_transaction
-from app.models.person_contract import DataSharingSettings
 from app.utils.decorators import (
     api_login_required as login_required,
     api_personal_account_required as personal_account_required,
@@ -56,18 +55,13 @@ def toggle_realtime_sync(contract_id):
         "realtime_sync": true/false
     }
     """
-    from app.database import db
-
     data = request.get_json() or {}
     enabled = data.get('enabled', False)
 
     with atomic_transaction():
-        settings = contract_service.get_sharing_settings_model(contract_id)
-        if not settings:
-            settings = DataSharingSettings(contract_id=contract_id)
-            db.session.add(settings)
-
-        settings.is_realtime_sync = enabled
+        settings = contract_service.update_or_create_sharing_settings(
+            contract_id, commit=False, is_realtime_sync=enabled
+        )
 
     return api_success({'realtime_sync': settings.is_realtime_sync})
 

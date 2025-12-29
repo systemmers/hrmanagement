@@ -88,12 +88,12 @@ def settings():
         return redirect(url_for('main.index'))
 
     if request.method == 'POST':
-        success, error = company_service.update_company_info(company_id, request.form)
-        if success:
+        result = company_service.update_company_info(company_id, request.form)
+        if result:
             flash('법인 정보가 수정되었습니다.', 'success')
             return redirect(url_for('corporate.settings'))
         else:
-            flash(f'수정 중 오류가 발생했습니다: {error}', 'error')
+            flash(f'수정 중 오류가 발생했습니다: {result.message}', 'error')
 
     return render_template('corporate/settings.html', company=company)
 

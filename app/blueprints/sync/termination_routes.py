@@ -146,16 +146,15 @@ def request_termination(contract_id):
     data = request.get_json() or {}
     reason = data.get('reason')
 
-    success, result, error = contract_service.request_termination(
+    result = contract_service.request_termination(
         contract_id=contract_id,
         requester_user_id=user_id,
         reason=reason
     )
 
-    if success:
-        return api_success(result)
-    else:
-        return api_error(error)
+    if result:
+        return api_success(result.data)
+    return api_error(result.message)
 
 
 @sync_bp.route('/contracts/<int:contract_id>/approve-termination', methods=['POST'])
@@ -176,15 +175,14 @@ def approve_termination(contract_id):
     """
     user_id = session.get(SessionKeys.USER_ID)
 
-    success, result, error = contract_service.approve_termination(
+    result = contract_service.approve_termination(
         contract_id=contract_id,
         approver_user_id=user_id
     )
 
-    if success:
-        return api_success(result)
-    else:
-        return api_error(error)
+    if result:
+        return api_success(result.data)
+    return api_error(result.message)
 
 
 @sync_bp.route('/contracts/<int:contract_id>/reject-termination', methods=['POST'])
@@ -212,16 +210,15 @@ def reject_termination(contract_id):
     data = request.get_json() or {}
     reason = data.get('reason')
 
-    success, result, error = contract_service.reject_termination(
+    result = contract_service.reject_termination(
         contract_id=contract_id,
         rejector_user_id=user_id,
         reason=reason
     )
 
-    if success:
-        return api_success(result)
-    else:
-        return api_error(error)
+    if result:
+        return api_success(result.data)
+    return api_error(result.message)
 
 
 @sync_bp.route('/termination-pending', methods=['GET'])

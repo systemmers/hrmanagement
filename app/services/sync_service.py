@@ -24,6 +24,9 @@ from app.models.person_contract import (
 from app.services.sync_basic_service import SyncBasicService
 from app.services.sync_relation_service import SyncRelationService
 
+# 필드 매핑 SSOT (Phase 4: 중앙화)
+from app.constants.sync_fields import SYNC_MAPPINGS
+
 
 class SyncService:
     """
@@ -34,53 +37,9 @@ class SyncService:
     - 법인 -> 개인 동기화 (선택적, 법인 정보 수정 시)
     - 1회성 데이터 제공 (스냅샷)
     - 동기화 로그 기록
+
+    필드 매핑은 constants/sync_fields.py에서 중앙 관리합니다.
     """
-
-    # 동기화 가능한 기본 필드 매핑 (PersonalProfile -> Employee)
-    BASIC_FIELD_MAPPING = {
-        'name': 'name',
-        'english_name': 'english_name',
-        'chinese_name': 'chinese_name',
-        'photo': 'photo',
-        'birth_date': 'birth_date',
-        'lunar_birth': 'lunar_birth',
-        'gender': 'gender',
-    }
-
-    # 연락처 필드 매핑
-    CONTACT_FIELD_MAPPING = {
-        'mobile_phone': 'mobile_phone',
-        'home_phone': 'home_phone',
-        'email': 'email',
-        'postal_code': 'postal_code',
-        'address': 'address',
-        'detailed_address': 'detailed_address',
-    }
-
-    # 추가 개인정보 필드 매핑
-    EXTRA_FIELD_MAPPING = {
-        'nationality': 'nationality',
-        'blood_type': 'blood_type',
-        'religion': 'religion',
-        'hobby': 'hobby',
-        'specialty': 'specialty',
-        'disability_info': 'disability_info',
-        'resident_number': 'resident_number',
-        'marital_status': 'marital_status',
-        # 실제 거주 주소
-        'actual_postal_code': 'actual_postal_code',
-        'actual_address': 'actual_address',
-        'actual_detailed_address': 'actual_detailed_address',
-        # 비상연락처
-        'emergency_contact': 'emergency_contact',
-        'emergency_relation': 'emergency_relation',
-    }
-
-    # 데이터 공유 설정과 필드 그룹 매핑
-    SHARING_FIELD_GROUPS = {
-        'share_basic_info': BASIC_FIELD_MAPPING,
-        'share_contact': CONTACT_FIELD_MAPPING,
-    }
 
     def __init__(self):
         self._current_user_id = None
@@ -125,10 +84,10 @@ class SyncService:
             return result
 
         if settings.share_basic_info:
-            result['basic'] = list(self.BASIC_FIELD_MAPPING.keys())
+            result['basic'] = SYNC_MAPPINGS.get_basic_field_names()
 
         if settings.share_contact:
-            result['contact'] = list(self.CONTACT_FIELD_MAPPING.keys())
+            result['contact'] = SYNC_MAPPINGS.get_contact_field_names()
 
         if settings.share_education:
             result['education'] = True
@@ -154,9 +113,9 @@ class SyncService:
     def get_all_field_mappings(self) -> Dict[str, Dict[str, str]]:
         """모든 필드 매핑 정보 반환"""
         return {
-            'basic': self.BASIC_FIELD_MAPPING,
-            'contact': self.CONTACT_FIELD_MAPPING,
-            'extra': self.EXTRA_FIELD_MAPPING,
+            'basic': SYNC_MAPPINGS.basic,
+            'contact': SYNC_MAPPINGS.contact,
+            'extra': SYNC_MAPPINGS.extra,
         }
 
     # ===== 동기화 메서드 =====
@@ -319,12 +278,7 @@ class SyncService:
 
     def _get_employee_field(self, profile_field: str) -> Optional[str]:
         """프로필 필드에 대응하는 Employee 필드명 반환"""
-        all_mappings = {
-            **self.BASIC_FIELD_MAPPING,
-            **self.CONTACT_FIELD_MAPPING,
-            **self.EXTRA_FIELD_MAPPING,
-        }
-        return all_mappings.get(profile_field)
+        return SYNC_MAPPINGS.map_field(profile_field)
 
     def _find_or_create_employee(
         self,
@@ -404,12 +358,8 @@ class SyncService:
         }
 
         if full_sync:
-            # SSOT: FIELD_MAPPING 활용하여 전체 필드 복사
-            all_mappings = {
-                **self.BASIC_FIELD_MAPPING,
-                **self.CONTACT_FIELD_MAPPING,
-                **self.EXTRA_FIELD_MAPPING,
-            }
+            # SSOT: SYNC_MAPPINGS 활용하여 전체 필드 복사
+            all_mappings = SYNC_MAPPINGS.get_all_basic_fields()
             for profile_field, employee_field in all_mappings.items():
                 value = getattr(profile, profile_field, None)
                 if value is not None:

@@ -59,14 +59,16 @@ class TestEmployeeServiceAccessControl:
 
     def test_verify_access_returns_false_without_org_id(self, mock_repos):
         """조직 ID 없을 때 접근 거부"""
-        with patch.object(mock_repos, 'get_current_org_id', return_value=None):
+        # Core 서비스의 get_current_org_id를 패치 (Facade는 Core에 위임)
+        with patch.object(mock_repos.core, 'get_current_org_id', return_value=None):
             result = mock_repos.verify_access(1)
             assert result is False
 
     def test_verify_access_returns_true_with_ownership(self, mock_repos):
         """소유권 있을 때 접근 허용"""
         mock_repos.employee_repo.verify_ownership.return_value = True
-        with patch.object(mock_repos, 'get_current_org_id', return_value=1):
+        # Core 서비스의 get_current_org_id를 패치 (Facade는 Core에 위임)
+        with patch.object(mock_repos.core, 'get_current_org_id', return_value=1):
             result = mock_repos.verify_access(100)
             mock_repos.employee_repo.verify_ownership.assert_called_once_with(100, 1)
             assert result is True
@@ -77,7 +79,8 @@ class TestEmployeeServiceRead:
 
     def test_get_employee_returns_none_without_access(self, mock_repos):
         """접근 권한 없을 때 None 반환"""
-        with patch.object(mock_repos, 'verify_access', return_value=False):
+        # Core 서비스의 verify_access를 패치 (Facade는 Core에 위임)
+        with patch.object(mock_repos.core, 'verify_access', return_value=False):
             result = mock_repos.get_employee(1)
             assert result is None
 
@@ -87,7 +90,8 @@ class TestEmployeeServiceRead:
         mock_employee.to_dict.return_value = {'id': 1, 'name': '테스트'}
         mock_repos.employee_repo.find_by_id.return_value = mock_employee
 
-        with patch.object(mock_repos, 'verify_access', return_value=True):
+        # Core 서비스의 verify_access를 패치 (Facade는 Core에 위임)
+        with patch.object(mock_repos.core, 'verify_access', return_value=True):
             result = mock_repos.get_employee(1)
             assert result == {'id': 1, 'name': '테스트'}
 

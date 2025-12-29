@@ -10,7 +10,7 @@ Phase 4.1: PersonalProfile → Profile 마이그레이션 완료
 - ProfileRepository 사용
 - 통합 이력 테이블 직접 접근
 """
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, Optional, List, Tuple
 from app.database import db
 from app.models.user import User
 from app.models.profile import Profile
@@ -21,6 +21,8 @@ from app.models import (
 from app.repositories.user_repository import UserRepository
 from app.repositories.profile_repository import ProfileRepository
 from app.services.profile_relation_service import profile_relation_service
+from app.services.base import ServiceResult
+from app.constants.status import ContractStatus
 
 
 class PersonalService:
@@ -62,11 +64,11 @@ class PersonalService:
         return errors
 
     def register(self, username: str, email: str, password: str,
-                 name: str, mobile_phone: str = None) -> Tuple[bool, Optional[User], Optional[str]]:
+                 name: str, mobile_phone: str = None) -> ServiceResult[User]:
         """개인 회원가입 처리 (통합 Profile 모델 사용)
 
         Returns:
-            Tuple[성공여부, User객체, 에러메시지]
+            ServiceResult[User]
         """
         try:
             with atomic_transaction():
@@ -91,10 +93,10 @@ class PersonalService:
                 )
                 db.session.add(profile)
 
-            return True, user, None
+            return ServiceResult.ok(data=user)
 
         except Exception as e:
-            return False, None, str(e)
+            return ServiceResult.fail(str(e))
 
     # ========================================
     # 프로필 조회/수정
@@ -140,18 +142,18 @@ class PersonalService:
         """프로필이 없으면 생성, 있으면 반환"""
         return self.profile_repo.get_or_create_for_user(user_id, default_name)
 
-    def update_profile(self, user_id: int, data: Dict) -> Tuple[bool, Optional[str]]:
+    def update_profile(self, user_id: int, data: Dict) -> ServiceResult[Dict]:
         """프로필 정보 수정"""
         profile = self.profile_repo.get_by_user_id(user_id)
         if not profile:
-            return False, '프로필을 찾을 수 없습니다.'
+            return ServiceResult.not_found('프로필')
 
         try:
             with atomic_transaction():
                 self.profile_repo.update_by_user_id(user_id, data, commit=False)
-            return True, None
+            return ServiceResult.ok(data=profile.to_dict())
         except Exception as e:
-            return False, str(e)
+            return ServiceResult.fail(str(e))
 
     # ========================================
     # 학력 (Education) CRUD - profile_relation_service 위임

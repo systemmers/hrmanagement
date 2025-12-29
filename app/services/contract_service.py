@@ -14,7 +14,7 @@ Contract Service
 Phase 24: Option A 레이어 분리 - Service는 Dict 반환 표준화
 Phase 1 Refactoring: Repository 비즈니스 로직을 Service로 이동
 """
-from typing import Dict, Optional, List, Any, Tuple
+from typing import Dict, Optional, List, Any
 from flask import session
 
 from ..constants.session_keys import AccountType
@@ -25,6 +25,7 @@ from ..models.personal_profile import PersonalProfile
 from ..models.person_contract import PersonCorporateContract, DataSharingSettings
 from ..constants.status import ContractStatus, EmployeeStatus
 from ..utils.transaction import atomic_transaction
+from .base import ServiceResult
 
 
 class ContractService:
@@ -308,7 +309,7 @@ class ContractService:
         position: str = None,
         department: str = None,
         notes: str = None
-    ) -> Tuple[bool, Optional[Dict], Optional[str]]:
+    ) -> ServiceResult[Dict]:
         """계약 요청 생성 (법인 -> 개인/직원)
 
         21번 원칙: personal, employee_sub 계정 모두 지원
@@ -323,7 +324,7 @@ class ContractService:
         ).first()
 
         if not person_user:
-            return False, None, '해당 이메일의 계정을 찾을 수 없습니다.'
+            return ServiceResult.fail('해당 이메일의 계정을 찾을 수 없습니다.')
 
         try:
             contract = self.contract_repo.create_contract_request(
@@ -335,9 +336,9 @@ class ContractService:
                 department=department,
                 notes=notes
             )
-            return True, contract, None
+            return ServiceResult.ok(data=contract)
         except ValueError as e:
-            return False, None, str(e)
+            return ServiceResult.fail(str(e))
 
     def create_employee_contract_request(
         self,
@@ -347,7 +348,7 @@ class ContractService:
         position: str = None,
         department: str = None,
         notes: str = None
-    ) -> Tuple[bool, Optional[Dict], Optional[str]]:
+    ) -> ServiceResult[Dict]:
         """직원/개인 계정에 대한 계약 요청 (21번 원칙)
 
         직원 등록 후 계약 요청 시 사용
@@ -364,7 +365,7 @@ class ContractService:
         ).first()
 
         if not employee_user:
-            return False, None, '해당 계정을 찾을 수 없습니다.'
+            return ServiceResult.fail('해당 계정을 찾을 수 없습니다.')
 
         # 이미 해당 법인과 계약이 있는지 확인
         existing = self.contract_repo.get_contract_between(
@@ -372,7 +373,7 @@ class ContractService:
             company_id=company_id
         )
         if existing:
-            return False, None, '이미 계약이 존재하거나 대기 중입니다.'
+            return ServiceResult.fail('이미 계약이 존재하거나 대기 중입니다.')
 
         try:
             contract = self.contract_repo.create_contract_request(
@@ -384,9 +385,9 @@ class ContractService:
                 department=department,
                 notes=notes
             )
-            return True, contract, None
+            return ServiceResult.ok(data=contract)
         except ValueError as e:
-            return False, None, str(e)
+            return ServiceResult.fail(str(e))
 
     def get_employee_contract_status(
         self,
@@ -406,7 +407,7 @@ class ContractService:
             return 'none'
         return contract.get('status', 'none')
 
-    def update_sharing_settings(self, contract_id: int, settings: Dict) -> Tuple[bool, Optional[Dict], Optional[str]]:
+    def update_sharing_settings(self, contract_id: int, settings: Dict) -> ServiceResult[Dict]:
         """데이터 공유 설정 업데이트
 
         Returns:
@@ -414,15 +415,15 @@ class ContractService:
         """
         try:
             result = self.contract_repo.update_sharing_settings(contract_id, settings)
-            return True, result, None
+            return ServiceResult.ok(data=result)
         except ValueError as e:
-            return False, None, str(e)
+            return ServiceResult.fail(str(e))
 
     # ========================================
     # 계약 상태 변경
     # ========================================
 
-    def approve_contract(self, contract_id: int, user_id: int) -> Tuple[bool, Optional[Dict], Optional[str]]:
+    def approve_contract(self, contract_id: int, user_id: int) -> ServiceResult[Dict]:
         """계약 승인
 
         Phase 1 Refactoring: Repository에서 비즈니스 로직 이동
@@ -449,7 +450,7 @@ class ContractService:
 
         contract = self.contract_repo.find_by_id(contract_id)
         if not contract:
-            return False, None, "계약을 찾을 수 없습니다."
+            return ServiceResult.fail("계약을 찾을 수 없습니다.")
 
         user = User.query.get(contract.person_user_id)
         company = Company.query.get(contract.company_id)
@@ -457,11 +458,11 @@ class ContractService:
         # 사전 검증 (employee_sub)
         if user and user.account_type == 'employee_sub':
             if not user.employee_id:
-                return False, None, "Employee 연결이 필요합니다. (User.employee_id NULL)"
+                return ServiceResult.fail("Employee 연결이 필요합니다. (User.employee_id NULL)")
 
             existing_employee = db.session.get(Employee, user.employee_id)
             if existing_employee and existing_employee.status == EmployeeStatus.RESIGNED:
-                return False, None, "퇴사한 직원은 재계약할 수 없습니다."
+                return ServiceResult.fail("퇴사한 직원은 재계약할 수 없습니다.")
 
         try:
             with atomic_transaction():
@@ -510,9 +511,9 @@ class ContractService:
                                 if employee.employee_number:
                                     contract.employee_number = employee.employee_number
 
-            return True, contract.to_dict(include_relations=True), None
+            return ServiceResult.ok(data=contract.to_dict(include_relations=True))
         except Exception as e:
-            return False, None, f"계약 승인 실패: {str(e)}"
+            return ServiceResult.fail(f"계약 승인 실패: {str(e)}")
 
     def _create_default_sharing_settings(self, contract_id: int) -> DataSharingSettings:
         """기본 데이터 공유 설정 생성 (내부용)
@@ -542,7 +543,7 @@ class ContractService:
             db.session.flush()
         return settings
 
-    def reject_contract(self, contract_id: int, user_id: int, reason: str = None) -> Tuple[bool, Optional[Dict], Optional[str]]:
+    def reject_contract(self, contract_id: int, user_id: int, reason: str = None) -> ServiceResult[Dict]:
         """계약 거절
 
         Phase 1 Refactoring: Repository에서 비즈니스 로직 이동
@@ -552,17 +553,17 @@ class ContractService:
         """
         contract = self.contract_repo.find_by_id(contract_id)
         if not contract:
-            return False, None, "계약을 찾을 수 없습니다."
+            return ServiceResult.fail("계약을 찾을 수 없습니다.")
 
         try:
             with atomic_transaction():
                 contract.reject(user_id, reason)
 
-            return True, contract.to_dict(include_relations=True), None
+            return ServiceResult.ok(data=contract.to_dict(include_relations=True))
         except Exception as e:
-            return False, None, f"계약 거절 실패: {str(e)}"
+            return ServiceResult.fail(f"계약 거절 실패: {str(e)}")
 
-    def terminate_contract(self, contract_id: int, user_id: int, reason: str = None) -> Tuple[bool, Optional[Dict], Optional[str]]:
+    def terminate_contract(self, contract_id: int, user_id: int, reason: str = None) -> ServiceResult[Dict]:
         """계약 종료
 
         Phase 1 Refactoring: Repository에서 비즈니스 로직 이동
@@ -577,7 +578,7 @@ class ContractService:
 
         contract = self.contract_repo.find_by_id(contract_id)
         if not contract:
-            return False, None, "계약을 찾을 수 없습니다."
+            return ServiceResult.fail("계약을 찾을 수 없습니다.")
 
         try:
             # termination_service를 통해 종료 처리 (스냅샷 포함)
@@ -593,9 +594,9 @@ class ContractService:
 
             # 갱신된 계약 정보 조회
             contract = self.contract_repo.find_by_id(contract_id)
-            return True, contract.to_dict(include_relations=True), None
+            return ServiceResult.ok(data=contract.to_dict(include_relations=True))
         except Exception as e:
-            return False, None, f"계약 종료 실패: {str(e)}"
+            return ServiceResult.fail(f"계약 종료 실패: {str(e)}")
 
     # ========================================
     # 양측 동의 계약 종료 (Phase 5.3)
@@ -606,7 +607,7 @@ class ContractService:
         contract_id: int,
         requester_user_id: int,
         reason: str = None
-    ) -> Tuple[bool, Optional[Dict], Optional[str]]:
+    ) -> ServiceResult[Dict]:
         """계약 종료 요청 (양측 동의 프로세스 시작)
 
         개인 또는 법인 어느 쪽이든 종료 요청 가능.
@@ -624,23 +625,23 @@ class ContractService:
         """
         contract = self.contract_repo.find_by_id(contract_id)
         if not contract:
-            return False, None, "계약을 찾을 수 없습니다."
+            return ServiceResult.fail("계약을 찾을 수 없습니다.")
 
         # 상태 검증
         if not ContractStatus.can_request_termination(contract.status):
-            return False, None, f"현재 상태({contract.status})에서는 종료 요청을 할 수 없습니다."
+            return ServiceResult.fail(f"현재 상태({contract.status})에서는 종료 요청을 할 수 없습니다.")
 
         # 요청자 권한 검증 (계약 당사자인지 확인)
         user = User.query.get(requester_user_id)
         if not user:
-            return False, None, "사용자를 찾을 수 없습니다."
+            return ServiceResult.fail("사용자를 찾을 수 없습니다.")
 
         # 개인 측 또는 법인 측인지 확인
         is_person_side = (contract.person_user_id == requester_user_id)
         is_company_side = (user.company_id == contract.company_id and user.account_type == 'corporate')
 
         if not is_person_side and not is_company_side:
-            return False, None, "계약 당사자만 종료 요청을 할 수 있습니다."
+            return ServiceResult.fail("계약 당사자만 종료 요청을 할 수 있습니다.")
 
         try:
             with atomic_transaction():
@@ -649,15 +650,15 @@ class ContractService:
                 contract.termination_requested_at = db.func.now()
                 contract.termination_reason = reason
 
-            return True, contract.to_dict(include_relations=True), None
+            return ServiceResult.ok(data=contract.to_dict(include_relations=True))
         except Exception as e:
-            return False, None, f"종료 요청 실패: {str(e)}"
+            return ServiceResult.fail(f"종료 요청 실패: {str(e)}")
 
     def approve_termination(
         self,
         contract_id: int,
         approver_user_id: int
-    ) -> Tuple[bool, Optional[Dict], Optional[str]]:
+    ) -> ServiceResult[Dict]:
         """계약 종료 승인 (상대방이 승인)
 
         종료 요청의 상대방만 승인 가능.
@@ -676,16 +677,16 @@ class ContractService:
 
         contract = self.contract_repo.find_by_id(contract_id)
         if not contract:
-            return False, None, "계약을 찾을 수 없습니다."
+            return ServiceResult.fail("계약을 찾을 수 없습니다.")
 
         # 상태 검증
         if not ContractStatus.is_termination_requested(contract.status):
-            return False, None, f"종료 요청 상태가 아닙니다. (현재: {contract.status})"
+            return ServiceResult.fail(f"종료 요청 상태가 아닙니다. (현재: {contract.status})")
 
         # 승인자 권한 검증 (종료 요청자의 상대방인지 확인)
         user = User.query.get(approver_user_id)
         if not user:
-            return False, None, "사용자를 찾을 수 없습니다."
+            return ServiceResult.fail("사용자를 찾을 수 없습니다.")
 
         # 요청자가 개인이면 법인만 승인 가능, 요청자가 법인이면 개인만 승인 가능
         requester_is_person = (contract.termination_requested_by == contract.person_user_id)
@@ -694,12 +695,12 @@ class ContractService:
             # 요청자가 개인 -> 법인만 승인 가능
             is_company_side = (user.company_id == contract.company_id and user.account_type == 'corporate')
             if not is_company_side:
-                return False, None, "법인 관리자만 종료를 승인할 수 있습니다."
+                return ServiceResult.fail("법인 관리자만 종료를 승인할 수 있습니다.")
         else:
             # 요청자가 법인 -> 개인만 승인 가능
             is_person_side = (contract.person_user_id == approver_user_id)
             if not is_person_side:
-                return False, None, "개인 계정 소유자만 종료를 승인할 수 있습니다."
+                return ServiceResult.fail("개인 계정 소유자만 종료를 승인할 수 있습니다.")
 
         try:
             # termination_service를 통해 최종 종료 처리 (스냅샷 포함)
@@ -715,16 +716,16 @@ class ContractService:
 
             # 갱신된 계약 정보 조회
             contract = self.contract_repo.find_by_id(contract_id)
-            return True, contract.to_dict(include_relations=True), None
+            return ServiceResult.ok(data=contract.to_dict(include_relations=True))
         except Exception as e:
-            return False, None, f"종료 승인 실패: {str(e)}"
+            return ServiceResult.fail(f"종료 승인 실패: {str(e)}")
 
     def reject_termination(
         self,
         contract_id: int,
         rejector_user_id: int,
         reason: str = None
-    ) -> Tuple[bool, Optional[Dict], Optional[str]]:
+    ) -> ServiceResult[Dict]:
         """계약 종료 거절 (상대방이 거절)
 
         종료 요청의 상대방만 거절 가능.
@@ -742,16 +743,16 @@ class ContractService:
         """
         contract = self.contract_repo.find_by_id(contract_id)
         if not contract:
-            return False, None, "계약을 찾을 수 없습니다."
+            return ServiceResult.fail("계약을 찾을 수 없습니다.")
 
         # 상태 검증
         if not ContractStatus.is_termination_requested(contract.status):
-            return False, None, f"종료 요청 상태가 아닙니다. (현재: {contract.status})"
+            return ServiceResult.fail(f"종료 요청 상태가 아닙니다. (현재: {contract.status})")
 
         # 거절자 권한 검증 (종료 요청자의 상대방인지 확인)
         user = User.query.get(rejector_user_id)
         if not user:
-            return False, None, "사용자를 찾을 수 없습니다."
+            return ServiceResult.fail("사용자를 찾을 수 없습니다.")
 
         # 요청자가 개인이면 법인만 거절 가능, 요청자가 법인이면 개인만 거절 가능
         requester_is_person = (contract.termination_requested_by == contract.person_user_id)
@@ -760,12 +761,12 @@ class ContractService:
             # 요청자가 개인 -> 법인만 거절 가능
             is_company_side = (user.company_id == contract.company_id and user.account_type == 'corporate')
             if not is_company_side:
-                return False, None, "법인 관리자만 종료를 거절할 수 있습니다."
+                return ServiceResult.fail("법인 관리자만 종료를 거절할 수 있습니다.")
         else:
             # 요청자가 법인 -> 개인만 거절 가능
             is_person_side = (contract.person_user_id == rejector_user_id)
             if not is_person_side:
-                return False, None, "개인 계정 소유자만 종료를 거절할 수 있습니다."
+                return ServiceResult.fail("개인 계정 소유자만 종료를 거절할 수 있습니다.")
 
         try:
             with atomic_transaction():
@@ -778,9 +779,9 @@ class ContractService:
                 contract.termination_requested_at = None
                 contract.termination_reason = None
 
-            return True, contract.to_dict(include_relations=True), None
+            return ServiceResult.ok(data=contract.to_dict(include_relations=True))
         except Exception as e:
-            return False, None, f"종료 거절 실패: {str(e)}"
+            return ServiceResult.fail(f"종료 거절 실패: {str(e)}")
 
     def get_termination_pending_contracts(
         self,

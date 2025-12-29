@@ -8,12 +8,13 @@ CLAUDE.md 레이어 분리 규칙 준수:
 - Blueprint에서 Repository 직접 호출 금지
 - 모든 Repository 호출은 Service 경유
 """
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional
 
 from app.database import db
 from app.models.company import Company
 from app.repositories.company_repository import company_repository
 from app.utils.transaction import atomic_transaction
+from app.services.base import ServiceResult
 
 
 class CompanyService:
@@ -67,7 +68,7 @@ class CompanyService:
         self,
         company_id: int,
         form_data: Dict
-    ) -> Tuple[bool, Optional[str]]:
+    ) -> ServiceResult[Dict]:
         """법인 정보 수정
 
         Args:
@@ -75,11 +76,11 @@ class CompanyService:
             form_data: 폼 데이터
 
         Returns:
-            Tuple[성공여부, 에러메시지]
+            ServiceResult[Dict]
         """
         company = self.get_by_id(company_id)
         if not company:
-            return False, '법인 정보를 찾을 수 없습니다.'
+            return ServiceResult.not_found('법인')
 
         try:
             with atomic_transaction():
@@ -93,9 +94,9 @@ class CompanyService:
                 company.address = form_data.get('address', '').strip() or None
                 company.address_detail = form_data.get('address_detail', '').strip() or None
                 company.postal_code = form_data.get('postal_code', '').strip() or None
-            return True, None
+            return ServiceResult.ok(data=company.to_dict())
         except Exception as e:
-            return False, str(e)
+            return ServiceResult.fail(str(e))
 
 
 # 싱글톤 인스턴스

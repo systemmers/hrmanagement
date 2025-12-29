@@ -135,7 +135,7 @@ def register_routes(bp):
                                        mobile_phone=mobile_phone)
 
             # 회원가입 처리
-            success, user, error_msg = personal_service.register(
+            result = personal_service.register(
                 username=username,
                 email=email,
                 password=password,
@@ -143,11 +143,11 @@ def register_routes(bp):
                 mobile_phone=mobile_phone
             )
 
-            if success:
+            if result:
                 flash('회원가입이 완료되었습니다. 로그인해주세요.', 'success')
                 return redirect(url_for('auth.login'))
             else:
-                flash(f'회원가입 중 오류가 발생했습니다: {error_msg}', 'error')
+                flash(f'회원가입 중 오류가 발생했습니다: {result.message}', 'error')
                 return render_template('personal/register.html',
                                        username=username,
                                        email=email,
@@ -225,10 +225,10 @@ def register_routes(bp):
         profile_data = extract_profile_data(request.form, profile_obj)
         profile_data['photo'] = photo_path  # 사진 경로 추가
 
-        success, error_msg = personal_service.update_profile(user_id, profile_data)
+        result = personal_service.update_profile(user_id, profile_data)
 
-        if not success:
-            flash(f'프로필 수정 중 오류가 발생했습니다: {error_msg}', 'error')
+        if not result:
+            flash(f'프로필 수정 중 오류가 발생했습니다: {result.message}', 'error')
             return redirect(url_for('profile.edit'))
 
         # ========================================

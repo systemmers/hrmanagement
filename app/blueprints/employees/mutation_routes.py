@@ -11,6 +11,7 @@ from datetime import datetime
 from flask import Blueprint, request, redirect, url_for, flash, session, render_template
 
 from ...constants.session_keys import SessionKeys, UserRole, AccountType
+from ...constants.status import EmployeeStatus
 from ...utils.employee_number import generate_employee_number
 from ...utils.decorators import login_required, admin_required, manager_or_admin_required
 from ...utils.tenant import get_current_organization_id
@@ -253,7 +254,7 @@ def register_mutation_routes(bp: Blueprint):
                 if result.get('status') == EmployeeStatus.PENDING_INFO:
                     flash_msg += ' 직원이 로그인하여 정보를 입력해야 합니다.'
                 flash(flash_msg, 'success')
-                return redirect(url_for('employees.employee_list'))
+                return redirect(url_for('corporate.users'))  # 계정관리 페이지로 이동
             else:
                 flash(f'계정 발급 실패: {error}', 'error')
                 return redirect(url_for('employees.employee_account_provision'))
