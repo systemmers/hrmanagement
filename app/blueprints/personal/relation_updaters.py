@@ -8,6 +8,7 @@ Phase 27.1: 개발 원칙 준수 리팩토링
 - SSOT: transaction.py의 atomic_transaction() 단일 진실 공급원
 - employees/relation_updaters.py 패턴과 일관성 유지
 """
+from app.types import FormData, OwnerType
 from ...utils.transaction import atomic_transaction
 from ...services.profile_relation_service import profile_relation_service
 from .form_extractors import (
@@ -27,15 +28,15 @@ class ProfileRelationUpdater:
     - DRY 원칙 준수
     """
 
-    def __init__(self, owner_type: str = 'profile'):
+    def __init__(self, owner_type: OwnerType = 'profile') -> None:
         """
         Args:
             owner_type: 'profile' (개인계정) 또는 'employee' (법인직원)
         """
-        self.owner_type = owner_type
+        self.owner_type: OwnerType = owner_type
         self.service = profile_relation_service
 
-    def update_educations(self, owner_id: int, form_data) -> bool:
+    def update_educations(self, owner_id: int, form_data: FormData) -> bool:
         """학력 정보 일괄 업데이트 (트랜잭션 안전)"""
         with atomic_transaction():
             items = extract_education_list(form_data)
@@ -45,7 +46,7 @@ class ProfileRelationUpdater:
                     self.service.add_education(owner_id, item, self.owner_type, commit=False)
         return True
 
-    def update_careers(self, owner_id: int, form_data) -> bool:
+    def update_careers(self, owner_id: int, form_data: FormData) -> bool:
         """경력 정보 일괄 업데이트 (트랜잭션 안전)"""
         with atomic_transaction():
             items = extract_career_list(form_data)
@@ -55,7 +56,7 @@ class ProfileRelationUpdater:
                     self.service.add_career(owner_id, item, self.owner_type, commit=False)
         return True
 
-    def update_certificates(self, owner_id: int, form_data) -> bool:
+    def update_certificates(self, owner_id: int, form_data: FormData) -> bool:
         """자격증 정보 일괄 업데이트 (트랜잭션 안전)"""
         with atomic_transaction():
             items = extract_certificate_list(form_data)
@@ -65,7 +66,7 @@ class ProfileRelationUpdater:
                     self.service.add_certificate(owner_id, item, self.owner_type, commit=False)
         return True
 
-    def update_languages(self, owner_id: int, form_data) -> bool:
+    def update_languages(self, owner_id: int, form_data: FormData) -> bool:
         """언어능력 정보 일괄 업데이트 (트랜잭션 안전)"""
         with atomic_transaction():
             items = extract_language_list(form_data)
@@ -75,7 +76,7 @@ class ProfileRelationUpdater:
                     self.service.add_language(owner_id, item, self.owner_type, commit=False)
         return True
 
-    def update_military(self, owner_id: int, form_data) -> bool:
+    def update_military(self, owner_id: int, form_data: FormData) -> bool:
         """병역 정보 업데이트 (1:1 관계, 트랜잭션 안전)"""
         with atomic_transaction():
             data = extract_military_data(form_data)

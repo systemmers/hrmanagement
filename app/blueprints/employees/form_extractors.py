@@ -8,11 +8,13 @@ Phase 25: 공통 헬퍼 모듈로 이동 (2025-12-29)
 """
 from typing import Any, Dict, List, Optional
 
+from app.types import FormData, FieldMapping
+from app.constants.status import EmployeeStatus
 from ...models import Employee
 from ...utils.form_helpers import parse_boolean as _parse_boolean, normalize_form_field
 
 
-def extract_employee_from_form(form_data, employee_id=0):
+def extract_employee_from_form(form_data: FormData, employee_id: int = 0) -> Employee:
     """폼 데이터에서 Employee 객체 생성 (Phase 9: FieldRegistry 기반)"""
     # organization_id 처리
     org_id = form_data.get('organization_id')
@@ -68,7 +70,7 @@ def extract_employee_from_form(form_data, employee_id=0):
     )
 
 
-def extract_basic_fields_from_form(form_data):
+def extract_basic_fields_from_form(form_data: FormData) -> Dict[str, Any]:
     """폼 데이터에서 기본정보 필드만 추출 (Phase 9: FieldRegistry 기반)"""
     # 섹션 ID 상수
     BASIC = 'personal_basic'
@@ -105,9 +107,9 @@ def extract_basic_fields_from_form(form_data):
 # ========================================
 
 def extract_relation_list(
-    form_data,
+    form_data: FormData,
     prefix: str,
-    field_mapping: Dict[str, str]
+    field_mapping: FieldMapping
 ) -> List[Dict[str, Any]]:
     """동적 관계형 데이터 리스트 추출 (범용, DRY 원칙)
 
@@ -143,7 +145,7 @@ def extract_relation_list(
     return result
 
 
-def extract_family_list(form_data) -> List[Dict[str, Any]]:
+def extract_family_list(form_data: FormData) -> List[Dict[str, Any]]:
     """가족정보 리스트 추출"""
     items = extract_relation_list(form_data, 'family_', {
         'relation': 'relation',
@@ -167,7 +169,7 @@ def extract_family_list(form_data) -> List[Dict[str, Any]]:
     return items
 
 
-def extract_education_list(form_data) -> List[Dict[str, Any]]:
+def extract_education_list(form_data: FormData) -> List[Dict[str, Any]]:
     """학력정보 리스트 추출"""
     return extract_relation_list(form_data, 'education_', {
         'school_type': 'school_type',
@@ -181,7 +183,7 @@ def extract_education_list(form_data) -> List[Dict[str, Any]]:
     })
 
 
-def extract_career_list(form_data) -> List[Dict[str, Any]]:
+def extract_career_list(form_data: FormData) -> List[Dict[str, Any]]:
     """경력정보 리스트 추출"""
     items = extract_relation_list(form_data, 'career_', {
         'company_name': 'company_name',
@@ -211,7 +213,7 @@ def extract_career_list(form_data) -> List[Dict[str, Any]]:
     return items
 
 
-def extract_certificate_list(form_data) -> List[Dict[str, Any]]:
+def extract_certificate_list(form_data: FormData) -> List[Dict[str, Any]]:
     """자격증정보 리스트 추출"""
     return extract_relation_list(form_data, 'certificate_', {
         'name': 'certificate_name',
@@ -225,7 +227,7 @@ def extract_certificate_list(form_data) -> List[Dict[str, Any]]:
     })
 
 
-def extract_language_list(form_data) -> List[Dict[str, Any]]:
+def extract_language_list(form_data: FormData) -> List[Dict[str, Any]]:
     """언어능력정보 리스트 추출"""
     return extract_relation_list(form_data, 'language_', {
         'language': 'language_name',
@@ -237,7 +239,7 @@ def extract_language_list(form_data) -> List[Dict[str, Any]]:
     })
 
 
-def extract_military_data(form_data) -> Optional[Dict[str, Any]]:
+def extract_military_data(form_data: FormData) -> Optional[Dict[str, Any]]:
     """병역정보 추출 (1:1 관계)"""
     military_status = form_data.get('military_status', '').strip()
     if not military_status:
@@ -253,7 +255,7 @@ def extract_military_data(form_data) -> Optional[Dict[str, Any]]:
     }
 
 
-def extract_hr_project_list(form_data) -> List[Dict[str, Any]]:
+def extract_hr_project_list(form_data: FormData) -> List[Dict[str, Any]]:
     """인사이력 프로젝트 리스트 추출"""
     return extract_relation_list(form_data, 'hr_project_', {
         'name': 'project_name',
@@ -265,7 +267,7 @@ def extract_hr_project_list(form_data) -> List[Dict[str, Any]]:
     })
 
 
-def extract_project_participation_list(form_data) -> List[Dict[str, Any]]:
+def extract_project_participation_list(form_data: FormData) -> List[Dict[str, Any]]:
     """프로젝트 참여이력 리스트 추출"""
     return extract_relation_list(form_data, 'participation_', {
         'project_name': 'project_name',
@@ -277,7 +279,7 @@ def extract_project_participation_list(form_data) -> List[Dict[str, Any]]:
     })
 
 
-def extract_award_list(form_data) -> List[Dict[str, Any]]:
+def extract_award_list(form_data: FormData) -> List[Dict[str, Any]]:
     """수상정보 리스트 추출"""
     return extract_relation_list(form_data, 'award_', {
         'date': 'award_date',

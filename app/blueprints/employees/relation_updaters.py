@@ -9,6 +9,7 @@ Phase 27.1: 개발 원칙 준수 리팩토링
 - 레이어 분리: Service 경유 (profile_relation_service)
 - SRP: 폼 추출(form_extractors) / 데이터 저장(relation_updaters) 분리
 """
+from app.types import FormData, OwnerType
 from ...utils.transaction import atomic_transaction
 from ...services.profile_relation_service import profile_relation_service
 from .form_extractors import (
@@ -37,7 +38,7 @@ class EmployeeRelationUpdater:
         self.service = profile_relation_service
         self.owner_type = 'employee'
 
-    def update_family(self, employee_id: int, form_data) -> bool:
+    def update_family(self, employee_id: int, form_data: FormData) -> bool:
         """가족정보 업데이트 (트랜잭션 안전)"""
         with atomic_transaction():
             items = extract_family_list(form_data)
@@ -47,7 +48,7 @@ class EmployeeRelationUpdater:
                     self.service.add_family(employee_id, item, self.owner_type, commit=False)
         return True
 
-    def update_education(self, employee_id: int, form_data) -> bool:
+    def update_education(self, employee_id: int, form_data: FormData) -> bool:
         """학력정보 업데이트 (트랜잭션 안전)"""
         with atomic_transaction():
             items = extract_education_list(form_data)
@@ -57,7 +58,7 @@ class EmployeeRelationUpdater:
                     self.service.add_education(employee_id, item, self.owner_type, commit=False)
         return True
 
-    def update_career(self, employee_id: int, form_data) -> bool:
+    def update_career(self, employee_id: int, form_data: FormData) -> bool:
         """경력정보 업데이트 (트랜잭션 안전)"""
         with atomic_transaction():
             items = extract_career_list(form_data)
@@ -67,7 +68,7 @@ class EmployeeRelationUpdater:
                     self.service.add_career(employee_id, item, self.owner_type, commit=False)
         return True
 
-    def update_certificate(self, employee_id: int, form_data) -> bool:
+    def update_certificate(self, employee_id: int, form_data: FormData) -> bool:
         """자격증정보 업데이트 (트랜잭션 안전)"""
         with atomic_transaction():
             items = extract_certificate_list(form_data)
@@ -77,7 +78,7 @@ class EmployeeRelationUpdater:
                     self.service.add_certificate(employee_id, item, self.owner_type, commit=False)
         return True
 
-    def update_language(self, employee_id: int, form_data) -> bool:
+    def update_language(self, employee_id: int, form_data: FormData) -> bool:
         """언어능력정보 업데이트 (트랜잭션 안전)"""
         with atomic_transaction():
             items = extract_language_list(form_data)
@@ -87,7 +88,7 @@ class EmployeeRelationUpdater:
                     self.service.add_language(employee_id, item, self.owner_type, commit=False)
         return True
 
-    def update_military(self, employee_id: int, form_data) -> bool:
+    def update_military(self, employee_id: int, form_data: FormData) -> bool:
         """병역정보 업데이트 (트랜잭션 안전)"""
         with atomic_transaction():
             data = extract_military_data(form_data)
@@ -96,7 +97,7 @@ class EmployeeRelationUpdater:
                 self.service.add_military(employee_id, data, self.owner_type, commit=False)
         return True
 
-    def update_hr_project(self, employee_id: int, form_data) -> bool:
+    def update_hr_project(self, employee_id: int, form_data: FormData) -> bool:
         """인사이력 프로젝트 업데이트 (트랜잭션 안전)"""
         with atomic_transaction():
             items = extract_hr_project_list(form_data)
@@ -106,7 +107,7 @@ class EmployeeRelationUpdater:
                     self.service.add_hr_project(employee_id, item, self.owner_type, commit=False)
         return True
 
-    def update_project_participation(self, employee_id: int, form_data) -> bool:
+    def update_project_participation(self, employee_id: int, form_data: FormData) -> bool:
         """프로젝트 참여이력 업데이트 (트랜잭션 안전)"""
         with atomic_transaction():
             items = extract_project_participation_list(form_data)
@@ -116,7 +117,7 @@ class EmployeeRelationUpdater:
                     self.service.add_project_participation(employee_id, item, self.owner_type, commit=False)
         return True
 
-    def update_award(self, employee_id: int, form_data) -> bool:
+    def update_award(self, employee_id: int, form_data: FormData) -> bool:
         """수상정보 업데이트 (트랜잭션 안전)"""
         with atomic_transaction():
             items = extract_award_list(form_data)
@@ -126,7 +127,7 @@ class EmployeeRelationUpdater:
                     self.service.add_award(employee_id, item, self.owner_type, commit=False)
         return True
 
-    def update_all_relations(self, employee_id: int, form_data) -> bool:
+    def update_all_relations(self, employee_id: int, form_data: FormData) -> bool:
         """모든 관계형 데이터 단일 트랜잭션 업데이트
 
         트랜잭션 안전성: 하나라도 실패하면 전체 롤백
@@ -205,32 +206,32 @@ employee_relation_updater = EmployeeRelationUpdater()
 # 래퍼 함수 (기존 API 호환)
 # ========================================
 
-def update_family_data(employee_id, form_data):
+def update_family_data(employee_id: int, form_data: FormData) -> bool:
     """가족정보 업데이트 (기존 API 호환)"""
     return employee_relation_updater.update_family(employee_id, form_data)
 
 
-def update_education_data(employee_id, form_data):
+def update_education_data(employee_id: int, form_data: FormData) -> bool:
     """학력정보 업데이트 (기존 API 호환)"""
     return employee_relation_updater.update_education(employee_id, form_data)
 
 
-def update_career_data(employee_id, form_data):
+def update_career_data(employee_id: int, form_data: FormData) -> bool:
     """경력정보 업데이트 (기존 API 호환)"""
     return employee_relation_updater.update_career(employee_id, form_data)
 
 
-def update_certificate_data(employee_id, form_data):
+def update_certificate_data(employee_id: int, form_data: FormData) -> bool:
     """자격증정보 업데이트 (기존 API 호환)"""
     return employee_relation_updater.update_certificate(employee_id, form_data)
 
 
-def update_language_data(employee_id, form_data):
+def update_language_data(employee_id: int, form_data: FormData) -> bool:
     """언어능력정보 업데이트 (기존 API 호환)"""
     return employee_relation_updater.update_language(employee_id, form_data)
 
 
-def update_military_data(employee_id, form_data, commit: bool = True):
+def update_military_data(employee_id: int, form_data: FormData, commit: bool = True) -> bool:
     """병역정보 업데이트 (기존 API 호환)
 
     Note: commit 파라미터는 하위 호환을 위해 유지하지만,
@@ -239,16 +240,16 @@ def update_military_data(employee_id, form_data, commit: bool = True):
     return employee_relation_updater.update_military(employee_id, form_data)
 
 
-def update_hr_project_data(employee_id, form_data):
+def update_hr_project_data(employee_id: int, form_data: FormData) -> bool:
     """인사이력 프로젝트 업데이트 (기존 API 호환)"""
     return employee_relation_updater.update_hr_project(employee_id, form_data)
 
 
-def update_project_participation_data(employee_id, form_data):
+def update_project_participation_data(employee_id: int, form_data: FormData) -> bool:
     """프로젝트 참여이력 업데이트 (기존 API 호환)"""
     return employee_relation_updater.update_project_participation(employee_id, form_data)
 
 
-def update_award_data(employee_id, form_data):
+def update_award_data(employee_id: int, form_data: FormData) -> bool:
     """수상정보 업데이트 (기존 API 호환)"""
     return employee_relation_updater.update_award(employee_id, form_data)

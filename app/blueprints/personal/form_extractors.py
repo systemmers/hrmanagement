@@ -5,10 +5,13 @@ FieldRegistry 기반 필드명 정규화를 적용합니다. (SSOT 원칙)
 공통 헬퍼 모듈을 사용합니다. (DRY 원칙)
 Phase 25: 공통 헬퍼 모듈로 이동 (2025-12-29)
 """
+from typing import Any, Dict, List, Optional
+
+from app.types import FormData
 from ...utils.form_helpers import parse_boolean as _parse_boolean, normalize_form_field
 
 
-def extract_profile_data(form_data, existing_profile=None):
+def extract_profile_data(form_data: FormData, existing_profile=None) -> Dict[str, Any]:
     """폼 데이터에서 Profile 데이터 추출 (FieldRegistry 기반)
 
     Args:

@@ -15,7 +15,9 @@ Phase 10: 트랜잭션 안전성 개선
 Phase 27.1: 추가 관계 모델 CRUD
 - FamilyMember, HrProject, ProjectParticipation, Award 추가
 """
-from typing import Dict, List, Optional, Tuple, Type
+from typing import Dict, List, Optional, Tuple, Type, Any
+
+from app.types import OwnerType, JsonData
 from dataclasses import dataclass
 
 from ..database import db
@@ -56,7 +58,7 @@ class ProfileRelationService:
         'award': Award,
     }
 
-    def _get_owner(self, owner_id: int, owner_type: str) -> RelationOwner:
+    def _get_owner(self, owner_id: int, owner_type: OwnerType) -> RelationOwner:
         """소유자 정보 생성"""
         owner_field = 'profile_id' if owner_type == 'profile' else 'employee_id'
         return RelationOwner(
@@ -65,7 +67,7 @@ class ProfileRelationService:
             owner_field=owner_field
         )
 
-    def _get_filter_kwargs(self, owner: RelationOwner) -> Dict:
+    def _get_filter_kwargs(self, owner: RelationOwner) -> Dict[str, int]:
         """소유자 기반 필터 조건 생성"""
         return {owner.owner_field: owner.owner_id}
 
@@ -76,7 +78,7 @@ class ProfileRelationService:
     def get_educations(
         self,
         owner_id: int,
-        owner_type: str = 'profile'
+        owner_type: OwnerType = 'profile'
     ) -> List[Dict]:
         """학력 목록 조회"""
         owner = self._get_owner(owner_id, owner_type)
@@ -89,7 +91,7 @@ class ProfileRelationService:
         self,
         owner_id: int,
         data: Dict,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> Dict:
         """학력 추가
@@ -118,7 +120,7 @@ class ProfileRelationService:
         self,
         education_id: int,
         owner_id: int,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> bool:
         """학력 삭제 (소유권 확인)"""
@@ -137,7 +139,7 @@ class ProfileRelationService:
     def delete_all_educations(
         self,
         owner_id: int,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> int:
         """모든 학력 삭제"""
@@ -156,7 +158,7 @@ class ProfileRelationService:
     def get_careers(
         self,
         owner_id: int,
-        owner_type: str = 'profile'
+        owner_type: OwnerType = 'profile'
     ) -> List[Dict]:
         """경력 목록 조회"""
         owner = self._get_owner(owner_id, owner_type)
@@ -169,7 +171,7 @@ class ProfileRelationService:
         self,
         owner_id: int,
         data: Dict,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> Dict:
         """경력 추가"""
@@ -206,7 +208,7 @@ class ProfileRelationService:
         self,
         career_id: int,
         owner_id: int,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> bool:
         """경력 삭제 (소유권 확인)"""
@@ -225,7 +227,7 @@ class ProfileRelationService:
     def delete_all_careers(
         self,
         owner_id: int,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> int:
         """모든 경력 삭제"""
@@ -244,7 +246,7 @@ class ProfileRelationService:
     def get_certificates(
         self,
         owner_id: int,
-        owner_type: str = 'profile'
+        owner_type: OwnerType = 'profile'
     ) -> List[Dict]:
         """자격증 목록 조회"""
         owner = self._get_owner(owner_id, owner_type)
@@ -257,7 +259,7 @@ class ProfileRelationService:
         self,
         owner_id: int,
         data: Dict,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> Dict:
         """자격증 추가"""
@@ -281,7 +283,7 @@ class ProfileRelationService:
         self,
         certificate_id: int,
         owner_id: int,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> bool:
         """자격증 삭제 (소유권 확인)"""
@@ -300,7 +302,7 @@ class ProfileRelationService:
     def delete_all_certificates(
         self,
         owner_id: int,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> int:
         """모든 자격증 삭제"""
@@ -319,7 +321,7 @@ class ProfileRelationService:
     def get_languages(
         self,
         owner_id: int,
-        owner_type: str = 'profile'
+        owner_type: OwnerType = 'profile'
     ) -> List[Dict]:
         """어학 목록 조회"""
         owner = self._get_owner(owner_id, owner_type)
@@ -332,7 +334,7 @@ class ProfileRelationService:
         self,
         owner_id: int,
         data: Dict,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> Dict:
         """어학 추가"""
@@ -355,7 +357,7 @@ class ProfileRelationService:
         self,
         language_id: int,
         owner_id: int,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> bool:
         """어학 삭제 (소유권 확인)"""
@@ -374,7 +376,7 @@ class ProfileRelationService:
     def delete_all_languages(
         self,
         owner_id: int,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> int:
         """모든 어학 삭제"""
@@ -393,7 +395,7 @@ class ProfileRelationService:
     def get_military(
         self,
         owner_id: int,
-        owner_type: str = 'profile'
+        owner_type: OwnerType = 'profile'
     ) -> Optional[Dict]:
         """병역 정보 조회 (1:1 관계)"""
         owner = self._get_owner(owner_id, owner_type)
@@ -405,7 +407,7 @@ class ProfileRelationService:
     def get_military_list(
         self,
         owner_id: int,
-        owner_type: str = 'profile'
+        owner_type: OwnerType = 'profile'
     ) -> List[Dict]:
         """병역 목록 조회 (1:N 지원)"""
         owner = self._get_owner(owner_id, owner_type)
@@ -418,7 +420,7 @@ class ProfileRelationService:
         self,
         owner_id: int,
         data: Dict,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> Dict:
         """병역 추가"""
@@ -445,7 +447,7 @@ class ProfileRelationService:
         self,
         owner_id: int,
         data: Dict,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> Dict:
         """병역 정보 업데이트 또는 생성 (1:1 관계용)"""
@@ -491,7 +493,7 @@ class ProfileRelationService:
         self,
         military_id: int,
         owner_id: int,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> bool:
         """병역 삭제 (소유권 확인)"""
@@ -510,7 +512,7 @@ class ProfileRelationService:
     def delete_all_military(
         self,
         owner_id: int,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> int:
         """모든 병역 정보 삭제"""
@@ -529,7 +531,7 @@ class ProfileRelationService:
     def get_families(
         self,
         owner_id: int,
-        owner_type: str = 'profile'
+        owner_type: OwnerType = 'profile'
     ) -> List[Dict]:
         """가족 목록 조회"""
         owner = self._get_owner(owner_id, owner_type)
@@ -542,7 +544,7 @@ class ProfileRelationService:
         self,
         owner_id: int,
         data: Dict,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> Dict:
         """가족 추가"""
@@ -567,7 +569,7 @@ class ProfileRelationService:
         self,
         family_id: int,
         owner_id: int,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> bool:
         """가족 삭제 (소유권 확인)"""
@@ -586,7 +588,7 @@ class ProfileRelationService:
     def delete_all_families(
         self,
         owner_id: int,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> int:
         """모든 가족 삭제"""
@@ -606,7 +608,7 @@ class ProfileRelationService:
     def get_hr_projects(
         self,
         owner_id: int,
-        owner_type: str = 'employee'
+        owner_type: OwnerType = 'employee'
     ) -> List[Dict]:
         """인사이력 프로젝트 목록 조회"""
         if owner_type != 'employee':
@@ -618,7 +620,7 @@ class ProfileRelationService:
         self,
         owner_id: int,
         data: Dict,
-        owner_type: str = 'employee',
+        owner_type: OwnerType = 'employee',
         commit: bool = True
     ) -> Optional[Dict]:
         """인사이력 프로젝트 추가"""
@@ -642,7 +644,7 @@ class ProfileRelationService:
     def delete_all_hr_projects(
         self,
         owner_id: int,
-        owner_type: str = 'employee',
+        owner_type: OwnerType = 'employee',
         commit: bool = True
     ) -> int:
         """모든 인사이력 프로젝트 삭제"""
@@ -660,7 +662,7 @@ class ProfileRelationService:
     def get_project_participations(
         self,
         owner_id: int,
-        owner_type: str = 'profile'
+        owner_type: OwnerType = 'profile'
     ) -> List[Dict]:
         """프로젝트 참여이력 목록 조회"""
         owner = self._get_owner(owner_id, owner_type)
@@ -673,7 +675,7 @@ class ProfileRelationService:
         self,
         owner_id: int,
         data: Dict,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> Dict:
         """프로젝트 참여이력 추가"""
@@ -696,7 +698,7 @@ class ProfileRelationService:
     def delete_all_project_participations(
         self,
         owner_id: int,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> int:
         """모든 프로젝트 참여이력 삭제"""
@@ -715,7 +717,7 @@ class ProfileRelationService:
     def get_awards(
         self,
         owner_id: int,
-        owner_type: str = 'profile'
+        owner_type: OwnerType = 'profile'
     ) -> List[Dict]:
         """수상 목록 조회"""
         owner = self._get_owner(owner_id, owner_type)
@@ -728,7 +730,7 @@ class ProfileRelationService:
         self,
         owner_id: int,
         data: Dict,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> Dict:
         """수상 추가"""
@@ -748,7 +750,7 @@ class ProfileRelationService:
     def delete_all_awards(
         self,
         owner_id: int,
-        owner_type: str = 'profile',
+        owner_type: OwnerType = 'profile',
         commit: bool = True
     ) -> int:
         """모든 수상 삭제"""
@@ -767,7 +769,7 @@ class ProfileRelationService:
     def get_all_relations(
         self,
         owner_id: int,
-        owner_type: str = 'profile'
+        owner_type: OwnerType = 'profile'
     ) -> Dict[str, List[Dict]]:
         """모든 관계 데이터 한번에 조회"""
         return {
@@ -781,7 +783,7 @@ class ProfileRelationService:
     def get_relation_counts(
         self,
         owner_id: int,
-        owner_type: str = 'profile'
+        owner_type: OwnerType = 'profile'
     ) -> Dict[str, int]:
         """관계 데이터 카운트 조회"""
         owner = self._get_owner(owner_id, owner_type)
