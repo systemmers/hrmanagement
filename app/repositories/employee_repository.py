@@ -8,10 +8,11 @@ from app.database import db
 from app.models import Employee
 from app.constants.status import EmployeeStatus
 from .base_repository import BaseRepository
+from .mixins import TenantFilterMixin
 
 
-class EmployeeRepository(BaseRepository[Employee]):
-    """직원 저장소 - 멀티테넌시 지원"""
+class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
+    """직원 저장소 - 멀티테넌시 지원 (TenantFilterMixin)"""
 
     def __init__(self):
         super().__init__(Employee)
@@ -33,17 +34,14 @@ class EmployeeRepository(BaseRepository[Employee]):
         """
         query = Employee.query
         if organization_id:
-            # 루트 조직과 모든 하위 조직 ID 수집
-            org_ids = self._get_organization_ids_under_root(organization_id)
-            if org_ids:
-                query = query.filter(Employee.organization_id.in_(org_ids))
-            else:
-                # 하위 조직이 없으면 루트만 포함
-                query = query.filter_by(organization_id=organization_id)
+            # TenantFilterMixin 사용
+            query = self.apply_tenant_filter(query, Employee.organization_id, organization_id)
         return query
 
     def _get_organization_ids_under_root(self, root_org_id: int) -> List[int]:
         """루트 조직과 모든 하위 조직의 ID 목록 반환
+
+        [DEPRECATED] TenantFilterMixin.get_tenant_org_ids_list() 사용 권장
 
         Args:
             root_org_id: 루트 조직 ID
@@ -51,15 +49,7 @@ class EmployeeRepository(BaseRepository[Employee]):
         Returns:
             조직 ID 목록 (루트 포함)
         """
-        from app.models.organization import Organization
-        root_org = Organization.query.get(root_org_id)
-        if not root_org:
-            return []
-        # 루트 조직 ID + 모든 하위 조직 ID
-        org_ids = [root_org_id]
-        descendants = root_org.get_descendants()
-        org_ids.extend([d.id for d in descendants])
-        return org_ids
+        return self.get_tenant_org_ids_list(root_org_id)
 
     def get_by_company(self, company_id: int) -> List[Dict]:
         """회사 ID로 직원 조회 (편의 메서드)

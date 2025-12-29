@@ -48,7 +48,8 @@ class TestSyncServiceFieldQueries:
 
     def test_get_syncable_fields_returns_dict(self, app):
         """동기화 가능 필드 목록 반환 형식 확인"""
-        with patch('app.services.sync_service.DataSharingSettings') as mock_settings:
+        # Note: sync_service.py는 호환성 래퍼이므로 실제 구현 경로로 patch
+        with patch('app.services.sync.sync_service.DataSharingSettings') as mock_settings:
             mock_settings.query.filter_by.return_value.first.return_value = None
 
             result = sync_service.get_syncable_fields(contract_id=1)
@@ -71,7 +72,8 @@ class TestSyncServiceFieldQueries:
         mock_setting.share_military = False
         mock_setting.share_family = False
 
-        with patch('app.services.sync_service.DataSharingSettings') as mock_settings:
+        # Note: sync_service.py는 호환성 래퍼이므로 실제 구현 경로로 patch
+        with patch('app.services.sync.sync_service.DataSharingSettings') as mock_settings:
             mock_settings.query.filter_by.return_value.first.return_value = mock_setting
 
             result = sync_service.get_syncable_fields(contract_id=1)
@@ -117,7 +119,8 @@ class TestSyncServiceValidation:
 
     def test_sync_with_invalid_contract_id(self, app):
         """잘못된 계약 ID로 동기화 시도"""
-        with patch('app.services.sync_service.PersonCorporateContract') as mock_contract:
+        # Note: sync_service.py는 호환성 래퍼이므로 실제 구현 경로로 patch
+        with patch('app.services.sync.sync_service.PersonCorporateContract') as mock_contract:
             mock_contract.query.get.return_value = None
 
             # 메서드가 None/에러 처리를 하는지 확인

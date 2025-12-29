@@ -8,45 +8,34 @@ from typing import List, Optional, Dict, Set
 from app.database import db
 from app.models.organization import Organization
 from .base_repository import BaseRepository
+from .mixins import TenantFilterMixin
 
 
-class OrganizationRepository(BaseRepository[Organization]):
-    """조직 저장소"""
+class OrganizationRepository(BaseRepository[Organization], TenantFilterMixin):
+    """조직 저장소 - 멀티테넌시 지원 (TenantFilterMixin)"""
 
     def __init__(self):
         super().__init__(Organization)
 
     def _get_descendant_ids(self, root_org_id: int) -> Set[int]:
-        """특정 조직과 모든 하위 조직의 ID 집합 반환 (멀티테넌시 필터용)"""
-        if not root_org_id:
-            return set()
+        """특정 조직과 모든 하위 조직의 ID 집합 반환 (멀티테넌시 필터용)
 
-        root_org = Organization.query.get(root_org_id)
-        if not root_org:
-            return set()
-
-        ids = {root_org_id}
-        descendants = root_org.get_descendants()
-        for desc in descendants:
-            ids.add(desc.id)
-        return ids
+        [DEPRECATED] TenantFilterMixin.get_tenant_org_ids() 사용 권장
+        """
+        return self.get_tenant_org_ids(root_org_id)
 
     def _filter_by_tenant(self, query, root_organization_id: int = None):
-        """쿼리에 멀티테넌시 필터 적용"""
+        """쿼리에 멀티테넌시 필터 적용
+
+        [DEPRECATED] TenantFilterMixin.apply_tenant_filter() 사용 권장
+        """
         if root_organization_id:
-            allowed_ids = self._get_descendant_ids(root_organization_id)
-            if allowed_ids:
-                query = query.filter(Organization.id.in_(allowed_ids))
-            else:
-                query = query.filter(db.false())
+            return self.apply_tenant_filter(query, Organization.id, root_organization_id)
         return query
 
     def verify_ownership(self, org_id: int, root_organization_id: int) -> bool:
         """특정 조직이 해당 테넌트 소속인지 확인"""
-        if not root_organization_id:
-            return False
-        allowed_ids = self._get_descendant_ids(root_organization_id)
-        return org_id in allowed_ids
+        return self.verify_tenant_ownership(org_id, root_organization_id)
 
     def get_by_code(self, code: str, root_organization_id: int = None) -> Optional[Organization]:
         """조직 코드로 조회"""
