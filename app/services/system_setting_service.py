@@ -6,8 +6,6 @@ Phase 2: Service 계층 표준화
 """
 from typing import Dict, Optional, Any
 
-from ..extensions import system_setting_repo
-
 
 class SystemSettingService:
     """
@@ -15,6 +13,12 @@ class SystemSettingService:
 
     시스템 설정 조회 기능을 제공합니다.
     """
+
+    @property
+    def system_setting_repo(self):
+        """지연 초기화된 시스템 설정 Repository"""
+        from ..extensions import system_setting_repo
+        return system_setting_repo
 
     def get_by_key(self, key: str) -> Optional[Dict]:
         """
@@ -26,7 +30,7 @@ class SystemSettingService:
         Returns:
             설정 값 또는 None
         """
-        return system_setting_repo.get_by_key(key)
+        return self.system_setting_repo.get_by_key(key)
 
     def get_value(self, key: str, default: Any = None) -> Any:
         """
@@ -39,7 +43,7 @@ class SystemSettingService:
         Returns:
             설정 값 또는 기본값
         """
-        setting = system_setting_repo.get_by_key(key)
+        setting = self.system_setting_repo.get_by_key(key)
         if setting:
             return setting.get('value', default) if isinstance(setting, dict) else setting.value
         return default
@@ -60,7 +64,7 @@ class SystemSettingService:
         ]
 
         for key in company_keys:
-            setting = system_setting_repo.get_by_key(key)
+            setting = self.system_setting_repo.get_by_key(key)
             if setting:
                 field_name = key.replace('company.', '')
                 company_data[field_name] = setting.get('value', '') if isinstance(setting, dict) else setting.value

@@ -7,8 +7,6 @@ Phase 24: Option A 레이어 분리 - Service는 Dict 반환 표준화
 """
 from typing import Dict, List, Optional, Any
 
-from ..extensions import organization_repo
-
 
 class OrganizationService:
     """
@@ -17,8 +15,11 @@ class OrganizationService:
     조직 구조 CRUD 및 트리 관리 기능을 제공합니다.
     """
 
-    def __init__(self):
-        self.organization_repo = organization_repo
+    @property
+    def organization_repo(self):
+        """지연 초기화된 조직 Repository"""
+        from ..extensions import organization_repo
+        return organization_repo
 
     # ========================================
     # 조직 조회

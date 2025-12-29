@@ -243,6 +243,38 @@ class AuditService:
         start_date = datetime.utcnow() - timedelta(days=days)
         return self.get_logs(user_id=user_id, start_date=start_date)
 
+    def count_logs(
+        self,
+        user_id: int = None,
+        company_id: int = None,
+        action: str = None,
+        resource_type: str = None
+    ) -> int:
+        """
+        감사 로그 개수 조회 (페이지네이션용)
+
+        Args:
+            user_id: 사용자 ID 필터
+            company_id: 법인 ID 필터
+            action: 액션 유형 필터
+            resource_type: 리소스 유형 필터
+
+        Returns:
+            로그 개수
+        """
+        query = AuditLog.query
+
+        if company_id:
+            query = query.filter_by(company_id=company_id)
+        if user_id:
+            query = query.filter_by(user_id=user_id)
+        if action:
+            query = query.filter_by(action=action)
+        if resource_type:
+            query = query.filter_by(resource_type=resource_type)
+
+        return query.count()
+
     def get_company_audit_trail(self, company_id: int, days: int = 30) -> List[Dict]:
         """법인 감사 추적 조회"""
         start_date = datetime.utcnow() - timedelta(days=days)

@@ -19,44 +19,127 @@ from app.models import Employee
 from app.utils.transaction import atomic_transaction
 from app.models.military_service import MilitaryService
 from app.utils.tenant import get_current_organization_id
-from app.extensions import (
-    employee_repo, family_repo, education_repo, career_repo,
-    certificate_repo, language_repo, military_repo,
-    hr_project_repo, project_participation_repo, award_repo, attachment_repo,
-    salary_repo, benefit_repo, contract_repo, salary_history_repo,
-    promotion_repo, evaluation_repo, training_repo, attendance_repo,
-    insurance_repo, asset_repo, salary_payment_repo, classification_repo
-)
 from app.services.base import relation_updater, get_relation_config, SUPPORTED_RELATION_TYPES
 
 
 class EmployeeService:
     """법인 직원 서비스"""
 
-    def __init__(self):
-        self.employee_repo = employee_repo
-        self.family_repo = family_repo
-        self.education_repo = education_repo
-        self.career_repo = career_repo
-        self.certificate_repo = certificate_repo
-        self.language_repo = language_repo
-        self.military_repo = military_repo
-        self.hr_project_repo = hr_project_repo
-        self.project_participation_repo = project_participation_repo
-        self.award_repo = award_repo
-        self.attachment_repo = attachment_repo
-        self.salary_repo = salary_repo
-        self.benefit_repo = benefit_repo
-        self.contract_repo = contract_repo
-        self.salary_history_repo = salary_history_repo
-        self.promotion_repo = promotion_repo
-        self.evaluation_repo = evaluation_repo
-        self.training_repo = training_repo
-        self.attendance_repo = attendance_repo
-        self.insurance_repo = insurance_repo
-        self.asset_repo = asset_repo
-        self.salary_payment_repo = salary_payment_repo
-        self.classification_repo = classification_repo
+    # Repository Properties (지연 초기화)
+    @property
+    def employee_repo(self):
+        from app.extensions import employee_repo
+        return employee_repo
+
+    @property
+    def family_repo(self):
+        from app.extensions import family_repo
+        return family_repo
+
+    @property
+    def education_repo(self):
+        from app.extensions import education_repo
+        return education_repo
+
+    @property
+    def career_repo(self):
+        from app.extensions import career_repo
+        return career_repo
+
+    @property
+    def certificate_repo(self):
+        from app.extensions import certificate_repo
+        return certificate_repo
+
+    @property
+    def language_repo(self):
+        from app.extensions import language_repo
+        return language_repo
+
+    @property
+    def military_repo(self):
+        from app.extensions import military_repo
+        return military_repo
+
+    @property
+    def hr_project_repo(self):
+        from app.extensions import hr_project_repo
+        return hr_project_repo
+
+    @property
+    def project_participation_repo(self):
+        from app.extensions import project_participation_repo
+        return project_participation_repo
+
+    @property
+    def award_repo(self):
+        from app.extensions import award_repo
+        return award_repo
+
+    @property
+    def attachment_repo(self):
+        from app.extensions import attachment_repo
+        return attachment_repo
+
+    @property
+    def salary_repo(self):
+        from app.extensions import salary_repo
+        return salary_repo
+
+    @property
+    def benefit_repo(self):
+        from app.extensions import benefit_repo
+        return benefit_repo
+
+    @property
+    def contract_repo(self):
+        from app.extensions import contract_repo
+        return contract_repo
+
+    @property
+    def salary_history_repo(self):
+        from app.extensions import salary_history_repo
+        return salary_history_repo
+
+    @property
+    def promotion_repo(self):
+        from app.extensions import promotion_repo
+        return promotion_repo
+
+    @property
+    def evaluation_repo(self):
+        from app.extensions import evaluation_repo
+        return evaluation_repo
+
+    @property
+    def training_repo(self):
+        from app.extensions import training_repo
+        return training_repo
+
+    @property
+    def attendance_repo(self):
+        from app.extensions import attendance_repo
+        return attendance_repo
+
+    @property
+    def insurance_repo(self):
+        from app.extensions import insurance_repo
+        return insurance_repo
+
+    @property
+    def asset_repo(self):
+        from app.extensions import asset_repo
+        return asset_repo
+
+    @property
+    def salary_payment_repo(self):
+        from app.extensions import salary_payment_repo
+        return salary_payment_repo
+
+    @property
+    def classification_repo(self):
+        from app.extensions import classification_repo
+        return classification_repo
 
     def _get_repositories(self) -> Dict[str, Any]:
         """RelationDataUpdater용 Repository 딕셔너리 반환"""

@@ -16,7 +16,6 @@ from typing import Dict, Optional, Tuple, List
 
 from app.database import db
 from app.models import Employee, User
-from app.extensions import employee_repo, user_repo
 from app.utils.transaction import atomic_transaction
 from app.utils.tenant import get_current_organization_id
 
@@ -28,9 +27,17 @@ class EmployeeAccountService:
     PASSWORD_LENGTH = 12
     PASSWORD_CHARS = string.ascii_letters + string.digits + "!@#$%"
 
-    def __init__(self):
-        self.employee_repo = employee_repo
-        self.user_repo = user_repo
+    @property
+    def employee_repo(self):
+        """지연 초기화된 직원 Repository"""
+        from app.extensions import employee_repo
+        return employee_repo
+
+    @property
+    def user_repo(self):
+        """지연 초기화된 사용자 Repository"""
+        from app.extensions import user_repo
+        return user_repo
 
     # ========================================
     # 직원 + 계정 생성 (Part A)

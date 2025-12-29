@@ -17,7 +17,6 @@ from typing import Dict, Optional, List, Any, Tuple
 from flask import session
 
 from ..constants.session_keys import AccountType
-from ..extensions import person_contract_repo, user_repo, employee_repo
 from ..database import db
 from ..models.user import User
 from ..models.employee import Employee
@@ -27,9 +26,17 @@ from ..constants.status import ContractStatus
 class ContractService:
     """계약 관리 서비스"""
 
-    def __init__(self):
-        self.contract_repo = person_contract_repo
-        self.user_repo = user_repo
+    @property
+    def contract_repo(self):
+        """지연 초기화된 계약 Repository"""
+        from ..extensions import person_contract_repo
+        return person_contract_repo
+
+    @property
+    def user_repo(self):
+        """지연 초기화된 사용자 Repository"""
+        from ..extensions import user_repo
+        return user_repo
 
     # ========================================
     # 개인 계정용 메서드

@@ -7,8 +7,6 @@ Phase 24: Option A 레이어 분리 - Service는 Dict 반환 표준화
 """
 from typing import Dict, Optional, Any
 
-from ..extensions import user_repo
-
 
 class UserService:
     """
@@ -17,8 +15,11 @@ class UserService:
     인증, 비밀번호 관리, 계정 설정 기능을 제공합니다.
     """
 
-    def __init__(self):
-        self.user_repo = user_repo
+    @property
+    def user_repo(self):
+        """지연 초기화된 사용자 Repository"""
+        from ..extensions import user_repo
+        return user_repo
 
     # ========================================
     # 인증

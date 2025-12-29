@@ -10,7 +10,8 @@ from datetime import datetime, timedelta
 from flask import Blueprint, request, session
 
 from app.constants.session_keys import SessionKeys, AccountType
-from app.services.audit_service import audit_service, AuditLog
+from app.services.audit_service import audit_service
+from app.models.audit_log import AuditLog
 from app.utils.decorators import (
     api_login_required as login_required,
     api_admin_or_manager_required as admin_required,
@@ -89,17 +90,13 @@ def get_logs():
         offset=offset
     )
 
-    # 전체 개수 (페이지네이션용)
-    total_query = AuditLog.query
-    if company_id:
-        total_query = total_query.filter_by(company_id=company_id)
-    if user_id:
-        total_query = total_query.filter_by(user_id=user_id)
-    if action:
-        total_query = total_query.filter_by(action=action)
-    if resource_type:
-        total_query = total_query.filter_by(resource_type=resource_type)
-    total = total_query.count()
+    # 전체 개수 (페이지네이션용) - Service 경유
+    total = audit_service.count_logs(
+        user_id=user_id,
+        company_id=company_id,
+        action=action,
+        resource_type=resource_type
+    )
 
     return api_success({
         'logs': logs,

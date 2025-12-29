@@ -185,5 +185,7 @@ class TestCorporateEdgeCases:
         )
         assert response.status_code == 200
         data = response.get_json()
+        # api_success() 래핑 구조: {'success': True, 'data': {...}}
+        inner_data = data.get('data', data)  # 래핑된 경우와 아닌 경우 모두 처리
         # available이 false이거나 exists가 true여야 함
-        assert data.get('available') is False or data.get('exists') is True
+        assert inner_data.get('available') is False or inner_data.get('exists') is True

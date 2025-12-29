@@ -6,8 +6,6 @@ Phase 2: Service 계층 표준화
 """
 from typing import List, Dict, Optional
 
-from ..extensions import attachment_repo
-
 
 class AttachmentService:
     """
@@ -15,6 +13,12 @@ class AttachmentService:
 
     첨부파일 CRUD 및 조회 기능을 제공합니다.
     """
+
+    @property
+    def attachment_repo(self):
+        """지연 초기화된 첨부파일 Repository"""
+        from ..extensions import attachment_repo
+        return attachment_repo
 
     def get_by_employee_id(self, employee_id: int) -> List[Dict]:
         """
@@ -26,7 +30,7 @@ class AttachmentService:
         Returns:
             첨부파일 목록
         """
-        models = attachment_repo.find_by_employee_id(employee_id)
+        models = self.attachment_repo.find_by_employee_id(employee_id)
         return [m.to_dict() for m in models]
 
     def get_by_category(self, employee_id: int, category: str) -> List[Dict]:
@@ -40,7 +44,7 @@ class AttachmentService:
         Returns:
             해당 카테고리의 첨부파일 목록
         """
-        return attachment_repo.get_by_category(employee_id, category)
+        return self.attachment_repo.get_by_category(employee_id, category)
 
     def get_one_by_category(self, employee_id: int, category: str) -> Optional[Dict]:
         """
@@ -53,7 +57,7 @@ class AttachmentService:
         Returns:
             첨부파일 또는 None
         """
-        return attachment_repo.get_one_by_category(employee_id, category)
+        return self.attachment_repo.get_one_by_category(employee_id, category)
 
     def get_by_file_type(self, employee_id: int, file_type: str) -> List[Dict]:
         """
@@ -66,7 +70,7 @@ class AttachmentService:
         Returns:
             해당 타입의 첨부파일 목록
         """
-        return attachment_repo.get_by_file_type(employee_id, file_type)
+        return self.attachment_repo.get_by_file_type(employee_id, file_type)
 
     def delete_by_category(self, employee_id: int, category: str) -> bool:
         """
@@ -79,7 +83,7 @@ class AttachmentService:
         Returns:
             삭제 성공 여부
         """
-        return attachment_repo.delete_by_category(employee_id, category)
+        return self.attachment_repo.delete_by_category(employee_id, category)
 
 
 # 싱글톤 인스턴스
