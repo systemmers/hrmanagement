@@ -139,9 +139,9 @@ class TestContractServiceEligibleTargets:
 
     def test_get_contract_eligible_targets_returns_dict(self, mock_repos):
         """계약 요청 가능 대상 목록 구조"""
-        # Mock User.query and Employee.query
-        with patch('app.services.contract_service.User') as MockUser:
-            with patch('app.services.contract_service.Employee') as MockEmployee:
+        # Note: contract_service.py는 호환성 래퍼이므로 실제 구현 경로로 patch
+        with patch('app.services.contract.contract_core_service.User') as MockUser:
+            with patch('app.services.contract.contract_core_service.Employee') as MockEmployee:
                 MockUser.query.filter.return_value.all.return_value = []
                 MockEmployee.query.filter.return_value.all.return_value = []
 
