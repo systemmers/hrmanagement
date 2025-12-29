@@ -5,11 +5,13 @@ Base Service Classes
 Phase 2 리팩토링: EmployeeService와 PersonalService의 공통 패턴 추출
 Phase 4.2: SOLID 원칙 적용 - RelationDataUpdater 추가
 Phase 6: ServiceResult 패턴 표준화 추가
+Phase 2 Task 2.2: GenericRelationCRUD 추가 (관계형 데이터 CRUD 공통화)
 """
 from .history_service import BaseHistoryService
 from .relation_updater import RelationDataUpdater, RelationDataConfig, relation_updater
 from .relation_configs import get_relation_config, SUPPORTED_RELATION_TYPES
 from .service_result import ServiceResult
+from .generic_relation_crud import GenericRelationCRUD, RelationConfig as GenericRelationConfig
 
 __all__ = [
     'BaseHistoryService',
@@ -19,4 +21,6 @@ __all__ = [
     'get_relation_config',
     'SUPPORTED_RELATION_TYPES',
     'ServiceResult',
+    'GenericRelationCRUD',
+    'GenericRelationConfig',
 ]
