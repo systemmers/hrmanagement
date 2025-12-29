@@ -2,17 +2,19 @@
 퇴사/종료 처리 라우트
 
 계약 종료 및 데이터 보관 관련 API 라우트를 정의합니다.
+Phase 5.3: 양측 동의 계약 종료 API 추가
 """
 from flask import request, session
 
 from app.blueprints.sync import sync_bp
 from app.constants.session_keys import SessionKeys, AccountType
 from app.services.termination_service import termination_service
+from app.services.contract_service import contract_service
 from app.utils.decorators import (
     api_login_required as login_required,
     contract_access_required
 )
-from app.utils.api_helpers import api_success, api_error
+from app.utils.api_helpers import api_success, api_error, api_forbidden
 
 
 @sync_bp.route('/terminate/<int:contract_id>', methods=['POST'])
@@ -113,3 +115,133 @@ def get_termination_history():
         return api_error('잘못된 계정 유형입니다.')
 
     return api_success({'contracts': history})
+
+
+# ========================================
+# 양측 동의 계약 종료 API (Phase 5.3)
+# ========================================
+
+@sync_bp.route('/contracts/<int:contract_id>/request-termination', methods=['POST'])
+@login_required
+@contract_access_required
+def request_termination(contract_id):
+    """
+    계약 종료 요청 (양측 동의 프로세스 시작)
+
+    개인 또는 법인 어느 쪽이든 종료 요청 가능.
+    상대방이 승인해야 최종 종료됨.
+
+    Request Body:
+    {
+        "reason": "종료 요청 사유 (선택)"
+    }
+
+    Response:
+    {
+        "success": true,
+        "data": {...}  // 계약 정보
+    }
+    """
+    user_id = session.get(SessionKeys.USER_ID)
+    data = request.get_json() or {}
+    reason = data.get('reason')
+
+    success, result, error = contract_service.request_termination(
+        contract_id=contract_id,
+        requester_user_id=user_id,
+        reason=reason
+    )
+
+    if success:
+        return api_success(result)
+    else:
+        return api_error(error)
+
+
+@sync_bp.route('/contracts/<int:contract_id>/approve-termination', methods=['POST'])
+@login_required
+@contract_access_required
+def approve_termination(contract_id):
+    """
+    계약 종료 승인 (상대방이 승인)
+
+    종료 요청의 상대방만 승인 가능.
+    승인 시 최종 계약 종료 처리.
+
+    Response:
+    {
+        "success": true,
+        "data": {...}  // 계약 정보
+    }
+    """
+    user_id = session.get(SessionKeys.USER_ID)
+
+    success, result, error = contract_service.approve_termination(
+        contract_id=contract_id,
+        approver_user_id=user_id
+    )
+
+    if success:
+        return api_success(result)
+    else:
+        return api_error(error)
+
+
+@sync_bp.route('/contracts/<int:contract_id>/reject-termination', methods=['POST'])
+@login_required
+@contract_access_required
+def reject_termination(contract_id):
+    """
+    계약 종료 거절 (상대방이 거절)
+
+    종료 요청의 상대방만 거절 가능.
+    거절 시 계약 상태가 approved로 원복됨.
+
+    Request Body:
+    {
+        "reason": "거절 사유 (선택)"
+    }
+
+    Response:
+    {
+        "success": true,
+        "data": {...}  // 계약 정보
+    }
+    """
+    user_id = session.get(SessionKeys.USER_ID)
+    data = request.get_json() or {}
+    reason = data.get('reason')
+
+    success, result, error = contract_service.reject_termination(
+        contract_id=contract_id,
+        rejector_user_id=user_id,
+        reason=reason
+    )
+
+    if success:
+        return api_success(result)
+    else:
+        return api_error(error)
+
+
+@sync_bp.route('/termination-pending', methods=['GET'])
+@login_required
+def get_termination_pending():
+    """
+    종료 요청 대기 중인 계약 목록 조회
+
+    현재 사용자가 승인/거절해야 하는 종료 요청 목록
+
+    Response:
+    {
+        "success": true,
+        "data": {
+            "contracts": [...]
+        }
+    }
+    """
+    user_id = session.get(SessionKeys.USER_ID)
+
+    contracts = contract_service.get_termination_pending_contracts(user_id)
+
+    return api_success({'contracts': contracts})

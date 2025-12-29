@@ -20,14 +20,18 @@ class ContractStatus:
     APPROVED = 'approved'      # 계약 승인/완료
     REJECTED = 'rejected'      # 계약 거절
     TERMINATED = 'terminated'  # 계약 종료
+    TERMINATION_REQUESTED = 'termination_requested'  # 계약 종료 요청 (양측 동의 대기)
 
     # 상태 그룹
-    ACTIVE_STATUSES = [APPROVED]
+    ACTIVE_STATUSES = [APPROVED, TERMINATION_REQUESTED]  # 종료 요청 중에도 계약은 유효
     INACTIVE_STATUSES = [REJECTED, TERMINATED]
-    ALL_STATUSES = [PENDING, APPROVED, REJECTED, TERMINATED]
+    ALL_STATUSES = [PENDING, APPROVED, REJECTED, TERMINATED, TERMINATION_REQUESTED]
 
     # 재계약 가능 상태 (기존 계약이 이 상태일 때 새 계약 가능)
     RECONTRACTABLE = [REJECTED, TERMINATED]
+
+    # 종료 요청 가능 상태
+    TERMINABLE = [APPROVED]
 
     @classmethod
     def is_active(cls, status: str) -> bool:
@@ -38,6 +42,16 @@ class ContractStatus:
     def can_recontract(cls, status: str) -> bool:
         """재계약 가능 상태인지 확인"""
         return status in cls.RECONTRACTABLE
+
+    @classmethod
+    def can_request_termination(cls, status: str) -> bool:
+        """종료 요청 가능 상태인지 확인"""
+        return status in cls.TERMINABLE
+
+    @classmethod
+    def is_termination_requested(cls, status: str) -> bool:
+        """종료 요청 상태인지 확인"""
+        return status == cls.TERMINATION_REQUESTED
 
 
 class EmployeeStatus:

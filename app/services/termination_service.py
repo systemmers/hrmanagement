@@ -17,6 +17,7 @@ from app.models.person_contract import (
     DataSharingSettings,
     SyncLog
 )
+from app.constants.status import EmployeeStatus
 
 
 class TerminationService:

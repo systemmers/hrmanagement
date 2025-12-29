@@ -12,6 +12,7 @@ Contract Service
 - employee_sub 계정: 직원-법인 계약 (동일한 프로세스)
 
 Phase 24: Option A 레이어 분리 - Service는 Dict 반환 표준화
+Phase 1 Refactoring: Repository 비즈니스 로직을 Service로 이동
 """
 from typing import Dict, Optional, List, Any, Tuple
 from flask import session
@@ -20,7 +21,10 @@ from ..constants.session_keys import AccountType
 from ..database import db
 from ..models.user import User
 from ..models.employee import Employee
-from ..constants.status import ContractStatus
+from ..models.personal_profile import PersonalProfile
+from ..models.person_contract import PersonCorporateContract, DataSharingSettings
+from ..constants.status import ContractStatus, EmployeeStatus
+from ..utils.transaction import atomic_transaction
 
 
 class ContractService:
@@ -185,6 +189,39 @@ class ContractService:
         """
         from ..models.person_contract import DataSharingSettings
         return DataSharingSettings.query.filter_by(contract_id=contract_id).first()
+
+    def update_or_create_sharing_settings(
+        self, contract_id: int, commit: bool = True, **kwargs
+    ) -> Any:
+        """데이터 공유 설정 생성 또는 업데이트
+
+        Phase 2: Blueprint db.session 직접 사용 제거 - SSOT
+
+        Args:
+            contract_id: 계약 ID
+            commit: 트랜잭션 커밋 여부 (atomic_transaction 내에서는 False)
+            **kwargs: 업데이트할 필드 (share_basic_info, is_realtime_sync 등)
+
+        Returns:
+            DataSharingSettings 모델
+        """
+        from ..models.person_contract import DataSharingSettings
+
+        settings = self.get_sharing_settings_model(contract_id)
+        if not settings:
+            settings = DataSharingSettings(contract_id=contract_id)
+            db.session.add(settings)
+
+        for key, value in kwargs.items():
+            if hasattr(settings, key):
+                setattr(settings, key, value)
+
+        if commit:
+            db.session.commit()
+        else:
+            db.session.flush()
+
+        return settings
 
     def get_sync_logs_filtered(
         self, contract_id: int, sync_type: str = None, limit: int = 50
@@ -388,38 +425,401 @@ class ContractService:
     def approve_contract(self, contract_id: int, user_id: int) -> Tuple[bool, Optional[Dict], Optional[str]]:
         """계약 승인
 
+        Phase 1 Refactoring: Repository에서 비즈니스 로직 이동
+
+        21번 원칙: 계약 승인 시 Employee.status = 'active' 연동
+        23번 원칙: 계약 승인 시 PCC.employee_number 동기화
+
+        개인 계정(personal):
+        - 항상 새 Employee 생성 (회사별 분리, full_sync=True)
+        - 전체 프로필 데이터 동기화 (기본 필드 + 관계형 데이터)
+        - DataSharingSettings 자동 생성 (전체 공유 기본값)
+        - employee_number 자동 동기화
+
+        직원 계정(employee_sub):
+        - 기존 Employee의 status만 active로 변경
+        - organization_id를 계약 회사에 맞게 업데이트
+        - employee_number 자동 동기화
+
         Returns:
             Tuple[성공여부, 결과, 에러메시지]
         """
+        from ..models.company import Company
+        from ..services.sync_service import sync_service
+
+        contract = self.contract_repo.find_by_id(contract_id)
+        if not contract:
+            return False, None, "계약을 찾을 수 없습니다."
+
+        user = User.query.get(contract.person_user_id)
+        company = Company.query.get(contract.company_id)
+
+        # 사전 검증 (employee_sub)
+        if user and user.account_type == 'employee_sub':
+            if not user.employee_id:
+                return False, None, "Employee 연결이 필요합니다. (User.employee_id NULL)"
+
+            existing_employee = db.session.get(Employee, user.employee_id)
+            if existing_employee and existing_employee.status == EmployeeStatus.RESIGNED:
+                return False, None, "퇴사한 직원은 재계약할 수 없습니다."
+
         try:
-            result = self.contract_repo.approve_contract(contract_id, user_id)
-            return True, result, None
-        except ValueError as e:
-            return False, None, str(e)
+            with atomic_transaction():
+                contract.approve(user_id)
+
+                if user:
+                    if user.account_type == 'personal':
+                        # 개인 계정: 항상 새 Employee 생성 (회사별 분리)
+                        profile = PersonalProfile.query.filter_by(user_id=user.id).first()
+                        if profile:
+                            # force_create=True: 기존 Employee 무시, 새로 생성
+                            # full_sync=True: 전체 프로필 데이터 동기화
+                            employee = sync_service._find_or_create_employee(
+                                contract, profile,
+                                full_sync=True,
+                                force_create=True
+                            )
+                            if employee:
+                                user.employee_id = employee.id
+                                employee.status = EmployeeStatus.ACTIVE
+
+                                # DataSharingSettings 생성 (전체 공유 기본값)
+                                self._create_default_sharing_settings(contract_id)
+
+                                # 관계형 데이터 동기화 실행
+                                sync_service.set_current_user(user_id)
+                                sync_service.sync_personal_to_employee(
+                                    contract_id=contract_id,
+                                    sync_type='initial'
+                                )
+
+                                # 23번 원칙: employee_number 동기화
+                                if employee.employee_number:
+                                    contract.employee_number = employee.employee_number
+                    else:
+                        # 직원 계정(employee_sub): 기존 Employee 상태 업데이트
+                        if user.employee_id:
+                            employee = db.session.get(Employee, user.employee_id)
+                            if employee:
+                                employee.status = EmployeeStatus.ACTIVE
+                                # organization_id를 계약 회사에 맞게 업데이트
+                                if company and company.root_organization_id:
+                                    employee.organization_id = company.root_organization_id
+
+                                # 23번 원칙: employee_number 동기화
+                                if employee.employee_number:
+                                    contract.employee_number = employee.employee_number
+
+            return True, contract.to_dict(include_relations=True), None
+        except Exception as e:
+            return False, None, f"계약 승인 실패: {str(e)}"
+
+    def _create_default_sharing_settings(self, contract_id: int) -> DataSharingSettings:
+        """기본 데이터 공유 설정 생성 (내부용)
+
+        Args:
+            contract_id: 계약 ID
+
+        Returns:
+            DataSharingSettings 모델
+        """
+        settings = DataSharingSettings.query.filter_by(
+            contract_id=contract_id
+        ).first()
+        if not settings:
+            settings = DataSharingSettings(
+                contract_id=contract_id,
+                share_basic_info=True,
+                share_contact=True,
+                share_education=True,
+                share_career=True,
+                share_certificates=True,
+                share_languages=True,
+                share_military=True,
+                is_realtime_sync=False,
+            )
+            db.session.add(settings)
+            db.session.flush()
+        return settings
 
     def reject_contract(self, contract_id: int, user_id: int, reason: str = None) -> Tuple[bool, Optional[Dict], Optional[str]]:
         """계약 거절
 
+        Phase 1 Refactoring: Repository에서 비즈니스 로직 이동
+
         Returns:
             Tuple[성공여부, 결과, 에러메시지]
         """
+        contract = self.contract_repo.find_by_id(contract_id)
+        if not contract:
+            return False, None, "계약을 찾을 수 없습니다."
+
         try:
-            result = self.contract_repo.reject_contract(contract_id, user_id, reason)
-            return True, result, None
-        except ValueError as e:
-            return False, None, str(e)
+            with atomic_transaction():
+                contract.reject(user_id, reason)
+
+            return True, contract.to_dict(include_relations=True), None
+        except Exception as e:
+            return False, None, f"계약 거절 실패: {str(e)}"
 
     def terminate_contract(self, contract_id: int, user_id: int, reason: str = None) -> Tuple[bool, Optional[Dict], Optional[str]]:
         """계약 종료
 
+        Phase 1 Refactoring: Repository에서 비즈니스 로직 이동
+
+        21번 원칙: 계약 종료 시 Employee.status = 'terminated' 연동
+        스냅샷 저장: termination_service를 통해 전체 인사기록 스냅샷 저장
+
         Returns:
             Tuple[성공여부, 결과, 에러메시지]
         """
+        from ..services.termination_service import termination_service
+
+        contract = self.contract_repo.find_by_id(contract_id)
+        if not contract:
+            return False, None, "계약을 찾을 수 없습니다."
+
         try:
-            result = self.contract_repo.terminate_contract(contract_id, user_id, reason)
-            return True, result, None
-        except ValueError as e:
-            return False, None, str(e)
+            # termination_service를 통해 종료 처리 (스냅샷 포함)
+            termination_service.set_current_user(user_id)
+            result = termination_service.terminate_contract(
+                contract_id=contract_id,
+                reason=reason,
+                terminate_by_user_id=user_id
+            )
+
+            if not result.get('success'):
+                return False, None, result.get('error', '계약 종료 실패')
+
+            # 갱신된 계약 정보 조회
+            contract = self.contract_repo.find_by_id(contract_id)
+            return True, contract.to_dict(include_relations=True), None
+        except Exception as e:
+            return False, None, f"계약 종료 실패: {str(e)}"
+
+    # ========================================
+    # 양측 동의 계약 종료 (Phase 5.3)
+    # ========================================
+
+    def request_termination(
+        self,
+        contract_id: int,
+        requester_user_id: int,
+        reason: str = None
+    ) -> Tuple[bool, Optional[Dict], Optional[str]]:
+        """계약 종료 요청 (양측 동의 프로세스 시작)
+
+        개인 또는 법인 어느 쪽이든 종료 요청 가능.
+        상대방이 승인해야 최종 종료됨.
+
+        상태 변경: approved -> termination_requested
+
+        Args:
+            contract_id: 계약 ID
+            requester_user_id: 요청자 User ID
+            reason: 종료 요청 사유
+
+        Returns:
+            Tuple[성공여부, 계약정보, 에러메시지]
+        """
+        contract = self.contract_repo.find_by_id(contract_id)
+        if not contract:
+            return False, None, "계약을 찾을 수 없습니다."
+
+        # 상태 검증
+        if not ContractStatus.can_request_termination(contract.status):
+            return False, None, f"현재 상태({contract.status})에서는 종료 요청을 할 수 없습니다."
+
+        # 요청자 권한 검증 (계약 당사자인지 확인)
+        user = User.query.get(requester_user_id)
+        if not user:
+            return False, None, "사용자를 찾을 수 없습니다."
+
+        # 개인 측 또는 법인 측인지 확인
+        is_person_side = (contract.person_user_id == requester_user_id)
+        is_company_side = (user.company_id == contract.company_id and user.account_type == 'corporate')
+
+        if not is_person_side and not is_company_side:
+            return False, None, "계약 당사자만 종료 요청을 할 수 있습니다."
+
+        try:
+            with atomic_transaction():
+                contract.status = ContractStatus.TERMINATION_REQUESTED
+                contract.termination_requested_by = requester_user_id
+                contract.termination_requested_at = db.func.now()
+                contract.termination_reason = reason
+
+            return True, contract.to_dict(include_relations=True), None
+        except Exception as e:
+            return False, None, f"종료 요청 실패: {str(e)}"
+
+    def approve_termination(
+        self,
+        contract_id: int,
+        approver_user_id: int
+    ) -> Tuple[bool, Optional[Dict], Optional[str]]:
+        """계약 종료 승인 (상대방이 승인)
+
+        종료 요청의 상대방만 승인 가능.
+        승인 시 최종 계약 종료 처리.
+
+        상태 변경: termination_requested -> terminated
+
+        Args:
+            contract_id: 계약 ID
+            approver_user_id: 승인자 User ID
+
+        Returns:
+            Tuple[성공여부, 계약정보, 에러메시지]
+        """
+        from ..services.termination_service import termination_service
+
+        contract = self.contract_repo.find_by_id(contract_id)
+        if not contract:
+            return False, None, "계약을 찾을 수 없습니다."
+
+        # 상태 검증
+        if not ContractStatus.is_termination_requested(contract.status):
+            return False, None, f"종료 요청 상태가 아닙니다. (현재: {contract.status})"
+
+        # 승인자 권한 검증 (종료 요청자의 상대방인지 확인)
+        user = User.query.get(approver_user_id)
+        if not user:
+            return False, None, "사용자를 찾을 수 없습니다."
+
+        # 요청자가 개인이면 법인만 승인 가능, 요청자가 법인이면 개인만 승인 가능
+        requester_is_person = (contract.termination_requested_by == contract.person_user_id)
+
+        if requester_is_person:
+            # 요청자가 개인 -> 법인만 승인 가능
+            is_company_side = (user.company_id == contract.company_id and user.account_type == 'corporate')
+            if not is_company_side:
+                return False, None, "법인 관리자만 종료를 승인할 수 있습니다."
+        else:
+            # 요청자가 법인 -> 개인만 승인 가능
+            is_person_side = (contract.person_user_id == approver_user_id)
+            if not is_person_side:
+                return False, None, "개인 계정 소유자만 종료를 승인할 수 있습니다."
+
+        try:
+            # termination_service를 통해 최종 종료 처리 (스냅샷 포함)
+            termination_service.set_current_user(approver_user_id)
+            result = termination_service.terminate_contract(
+                contract_id=contract_id,
+                reason=contract.termination_reason,
+                terminate_by_user_id=approver_user_id
+            )
+
+            if not result.get('success'):
+                return False, None, result.get('error', '계약 종료 실패')
+
+            # 갱신된 계약 정보 조회
+            contract = self.contract_repo.find_by_id(contract_id)
+            return True, contract.to_dict(include_relations=True), None
+        except Exception as e:
+            return False, None, f"종료 승인 실패: {str(e)}"
+
+    def reject_termination(
+        self,
+        contract_id: int,
+        rejector_user_id: int,
+        reason: str = None
+    ) -> Tuple[bool, Optional[Dict], Optional[str]]:
+        """계약 종료 거절 (상대방이 거절)
+
+        종료 요청의 상대방만 거절 가능.
+        거절 시 계약 상태가 approved로 원복됨.
+
+        상태 변경: termination_requested -> approved
+
+        Args:
+            contract_id: 계약 ID
+            rejector_user_id: 거절자 User ID
+            reason: 거절 사유
+
+        Returns:
+            Tuple[성공여부, 계약정보, 에러메시지]
+        """
+        contract = self.contract_repo.find_by_id(contract_id)
+        if not contract:
+            return False, None, "계약을 찾을 수 없습니다."
+
+        # 상태 검증
+        if not ContractStatus.is_termination_requested(contract.status):
+            return False, None, f"종료 요청 상태가 아닙니다. (현재: {contract.status})"
+
+        # 거절자 권한 검증 (종료 요청자의 상대방인지 확인)
+        user = User.query.get(rejector_user_id)
+        if not user:
+            return False, None, "사용자를 찾을 수 없습니다."
+
+        # 요청자가 개인이면 법인만 거절 가능, 요청자가 법인이면 개인만 거절 가능
+        requester_is_person = (contract.termination_requested_by == contract.person_user_id)
+
+        if requester_is_person:
+            # 요청자가 개인 -> 법인만 거절 가능
+            is_company_side = (user.company_id == contract.company_id and user.account_type == 'corporate')
+            if not is_company_side:
+                return False, None, "법인 관리자만 종료를 거절할 수 있습니다."
+        else:
+            # 요청자가 법인 -> 개인만 거절 가능
+            is_person_side = (contract.person_user_id == rejector_user_id)
+            if not is_person_side:
+                return False, None, "개인 계정 소유자만 종료를 거절할 수 있습니다."
+
+        try:
+            with atomic_transaction():
+                contract.status = ContractStatus.APPROVED
+                contract.termination_rejected_by = rejector_user_id
+                contract.termination_rejected_at = db.func.now()
+                contract.termination_rejection_reason = reason
+                # 종료 요청 관련 필드 초기화
+                contract.termination_requested_by = None
+                contract.termination_requested_at = None
+                contract.termination_reason = None
+
+            return True, contract.to_dict(include_relations=True), None
+        except Exception as e:
+            return False, None, f"종료 거절 실패: {str(e)}"
+
+    def get_termination_pending_contracts(
+        self,
+        user_id: int
+    ) -> List[Dict]:
+        """종료 요청 대기 중인 계약 목록 조회
+
+        현재 사용자가 승인/거절해야 하는 종료 요청 목록
+
+        Args:
+            user_id: 사용자 ID
+
+        Returns:
+            종료 요청 대기 중인 계약 목록
+        """
+        user = User.query.get(user_id)
+        if not user:
+            return []
+
+        # termination_requested 상태인 계약 조회
+        contracts = PersonCorporateContract.query.filter_by(
+            status=ContractStatus.TERMINATION_REQUESTED
+        ).all()
+
+        result = []
+        for contract in contracts:
+            # 요청자가 누구인지에 따라 승인 권한 확인
+            requester_is_person = (contract.termination_requested_by == contract.person_user_id)
+
+            if requester_is_person:
+                # 개인이 요청 -> 법인 관리자만 승인 가능
+                if user.company_id == contract.company_id and user.account_type == 'corporate':
+                    result.append(contract.to_dict(include_relations=True))
+            else:
+                # 법인이 요청 -> 개인만 승인 가능
+                if contract.person_user_id == user_id:
+                    result.append(contract.to_dict(include_relations=True))
+
+        return result
 
 
 # 싱글톤 인스턴스

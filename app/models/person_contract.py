@@ -81,12 +81,20 @@ class PersonCorporateContract(db.Model):
     rejected_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     terminated_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
+    # 양측 동의 종료 요청 관련 필드 (Phase 5.3)
+    termination_requested_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    termination_requested_at = db.Column(db.DateTime, nullable=True)
+    termination_rejected_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    termination_rejected_at = db.Column(db.DateTime, nullable=True)
+    termination_rejection_reason = db.Column(db.Text, nullable=True)
+
     # 상태 상수
     STATUS_REQUESTED = 'requested'
     STATUS_APPROVED = 'approved'
     STATUS_REJECTED = 'rejected'
     STATUS_TERMINATED = 'terminated'
     STATUS_EXPIRED = 'expired'
+    STATUS_TERMINATION_REQUESTED = 'termination_requested'  # 양측 동의 종료 요청
 
     # 계약 유형 상수 (하위 호환용)
     TYPE_EMPLOYMENT = 'employment'
@@ -146,6 +154,12 @@ class PersonCorporateContract(db.Model):
             'terminated_at': self.terminated_at.isoformat() if self.terminated_at else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            # 양측 동의 종료 요청 관련 필드
+            'termination_requested_by': self.termination_requested_by,
+            'termination_requested_at': self.termination_requested_at.isoformat() if self.termination_requested_at else None,
+            'termination_rejected_by': self.termination_rejected_by,
+            'termination_rejected_at': self.termination_rejected_at.isoformat() if self.termination_rejected_at else None,
+            'termination_rejection_reason': self.termination_rejection_reason,
         }
 
         if include_relations:

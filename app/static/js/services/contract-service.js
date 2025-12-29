@@ -78,7 +78,8 @@ export async function rejectContract(contractId, options = {}) {
 }
 
 /**
- * 계약 종료
+ * 계약 종료 요청 (양측 동의 방식)
+ * 상대방이 승인해야 최종 종료됨
  * @param {number|string} contractId - 계약 ID
  * @param {Object} options - 옵션
  * @param {string} options.reasonPrompt - 사유 입력 프롬프트
@@ -91,22 +92,81 @@ export async function terminateContract(contractId, options = {}) {
     const reason = prompt(options.reasonPrompt || '계약 종료 사유를 입력해주세요 (선택사항):');
     if (reason === null) return false;
 
-    const confirmMsg = options.confirmMessage || '정말 이 계약을 종료하시겠습니까?';
+    const confirmMsg = options.confirmMessage || '계약 종료를 요청하시겠습니까?\n상대방이 승인해야 최종 종료됩니다.';
     if (!confirm(confirmMsg)) return false;
 
     try {
-        const result = await post(`${API_BASE}/${contractId}/terminate`, { reason });
+        // 양측 동의 API 호출
+        const result = await post(`/api/sync/contracts/${contractId}/request-termination`, { reason });
+
+        if (result.success) {
+            showToast(options.successMessage || '계약 종료가 요청되었습니다. 상대방의 승인을 기다려주세요.', 'success');
+            if (options.reload !== false) location.reload();
+            return true;
+        } else {
+            showToast(result.message || result.error || '오류가 발생했습니다.', 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('계약 종료 요청 오류:', error);
+        showToast(error.message || '요청 처리 중 오류가 발생했습니다.', 'error');
+        return false;
+    }
+}
+
+/**
+ * 계약 종료 승인 (양측 동의 방식)
+ * 상대방의 종료 요청을 승인하여 최종 종료
+ * @param {number|string} contractId - 계약 ID
+ * @param {Object} options - 옵션
+ * @returns {Promise<boolean>} 성공 여부
+ */
+export async function approveTermination(contractId, options = {}) {
+    const confirmMsg = options.confirmMessage || '계약 종료를 승인하시겠습니까?\n승인 시 계약이 최종 종료됩니다.';
+    if (!confirm(confirmMsg)) return false;
+
+    try {
+        const result = await post(`/api/sync/contracts/${contractId}/approve-termination`);
 
         if (result.success) {
             showToast(options.successMessage || '계약이 종료되었습니다.', 'success');
             if (options.reload !== false) location.reload();
             return true;
         } else {
-            showToast(result.message || '오류가 발생했습니다.', 'error');
+            showToast(result.message || result.error || '오류가 발생했습니다.', 'error');
             return false;
         }
     } catch (error) {
-        console.error('계약 종료 오류:', error);
+        console.error('계약 종료 승인 오류:', error);
+        showToast(error.message || '요청 처리 중 오류가 발생했습니다.', 'error');
+        return false;
+    }
+}
+
+/**
+ * 계약 종료 거절 (양측 동의 방식)
+ * 상대방의 종료 요청을 거절하여 계약 유지
+ * @param {number|string} contractId - 계약 ID
+ * @param {Object} options - 옵션
+ * @returns {Promise<boolean>} 성공 여부
+ */
+export async function rejectTermination(contractId, options = {}) {
+    const reason = prompt(options.reasonPrompt || '종료 거절 사유를 입력해주세요 (선택사항):');
+    if (reason === null) return false;
+
+    try {
+        const result = await post(`/api/sync/contracts/${contractId}/reject-termination`, { reason });
+
+        if (result.success) {
+            showToast(options.successMessage || '계약 종료 요청이 거절되었습니다.', 'success');
+            if (options.reload !== false) location.reload();
+            return true;
+        } else {
+            showToast(result.message || result.error || '오류가 발생했습니다.', 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('계약 종료 거절 오류:', error);
         showToast(error.message || '요청 처리 중 오류가 발생했습니다.', 'error');
         return false;
     }
@@ -145,6 +205,8 @@ if (typeof window !== 'undefined') {
         approveContract,
         rejectContract,
         terminateContract,
+        approveTermination,
+        rejectTermination,
         checkBusinessNumber
     };
 
@@ -152,6 +214,8 @@ if (typeof window !== 'undefined') {
     window.approveContract = function(id) { return approveContract(id); };
     window.rejectContract = function(id) { return rejectContract(id); };
     window.terminateContract = function(id) { return terminateContract(id); };
+    window.approveTermination = function(id) { return approveTermination(id); };
+    window.rejectTermination = function(id) { return rejectTermination(id); };
 
     // 이벤트 위임: data-action 기반 버튼 클릭 핸들러
     document.addEventListener('DOMContentLoaded', () => {
@@ -166,12 +230,22 @@ if (typeof window !== 'undefined') {
 
             e.preventDefault();
 
-            if (action === 'approve-contract') {
-                await approveContract(contractId);
-            } else if (action === 'reject-contract') {
-                await rejectContract(contractId);
-            } else if (action === 'terminate-contract') {
-                await terminateContract(contractId);
+            switch (action) {
+                case 'approve-contract':
+                    await approveContract(contractId);
+                    break;
+                case 'reject-contract':
+                    await rejectContract(contractId);
+                    break;
+                case 'terminate-contract':
+                    await terminateContract(contractId);
+                    break;
+                case 'approve-termination':
+                    await approveTermination(contractId);
+                    break;
+                case 'reject-termination':
+                    await rejectTermination(contractId);
+                    break;
             }
         });
     });

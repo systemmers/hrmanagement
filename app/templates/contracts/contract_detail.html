@@ -39,6 +39,7 @@
                 {% elif contract.status == 'requested' %}계약진행중
                 {% elif contract.status == 'rejected' %}거절됨
                 {% elif contract.status == 'terminated' %}종료됨
+                {% elif contract.status == 'termination_requested' %}종료대기
                 {% elif contract.status == 'expired' %}만료됨
                 {% endif %}
             </span>
@@ -146,10 +147,44 @@
         </div>
         {% elif contract.status == 'approved' %}
         <div class="card-footer">
-            <button type="button" class="btn btn-danger" data-action="terminate-contract" data-contract-id="{{ contract.id }}">
-                <i class="fas fa-ban"></i>
-                <span>계약 종료</span>
+            <button type="button" class="btn btn-warning" data-action="terminate-contract" data-contract-id="{{ contract.id }}">
+                <i class="fas fa-hand-paper"></i>
+                <span>종료 요청</span>
             </button>
+        </div>
+        {% elif contract.status == 'termination_requested' %}
+        <div class="card-footer">
+            {% if contract.termination_requested_by %}
+                {% set requester_is_person = contract.termination_requested_by == contract.person_user_id %}
+                {% if is_person and not requester_is_person %}
+                {# 법인이 요청 → 개인이 승인/거절 #}
+                <p class="termination-notice">법인에서 계약 종료를 요청했습니다.</p>
+                <button type="button" class="btn btn-success" data-action="approve-termination" data-contract-id="{{ contract.id }}">
+                    <i class="fas fa-check"></i>
+                    <span>종료 승인</span>
+                </button>
+                <button type="button" class="btn btn-secondary" data-action="reject-termination" data-contract-id="{{ contract.id }}">
+                    <i class="fas fa-times"></i>
+                    <span>종료 거절</span>
+                </button>
+                {% elif is_company and requester_is_person %}
+                {# 개인이 요청 → 법인이 승인/거절 #}
+                <p class="termination-notice">개인 회원이 계약 종료를 요청했습니다.</p>
+                <button type="button" class="btn btn-success" data-action="approve-termination" data-contract-id="{{ contract.id }}">
+                    <i class="fas fa-check"></i>
+                    <span>종료 승인</span>
+                </button>
+                <button type="button" class="btn btn-secondary" data-action="reject-termination" data-contract-id="{{ contract.id }}">
+                    <i class="fas fa-times"></i>
+                    <span>종료 거절</span>
+                </button>
+                {% else %}
+                {# 본인이 요청한 경우 대기 메시지 #}
+                <p class="termination-notice">종료 요청이 진행 중입니다. 상대방의 승인을 기다리고 있습니다.</p>
+                {% endif %}
+            {% else %}
+            <p class="termination-notice">종료 요청 대기 중입니다.</p>
+            {% endif %}
         </div>
         {% endif %}
     </div>
