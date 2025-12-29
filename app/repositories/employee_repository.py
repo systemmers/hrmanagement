@@ -6,6 +6,7 @@ Employee Repository
 from typing import List, Optional, Dict
 from app.database import db
 from app.models import Employee
+from app.constants.status import EmployeeStatus
 from .base_repository import BaseRepository
 
 

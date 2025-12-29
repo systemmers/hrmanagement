@@ -9,6 +9,7 @@ from app.database import db as _db
 from app.models.user import User
 from app.models.company import Company
 from app.models.employee import Employee
+from app.models.person_contract import PersonCorporateContract
 
 
 @pytest.fixture(scope='session')
@@ -113,14 +114,15 @@ def test_user_corporate(session, test_company):
 
 
 @pytest.fixture
-def test_employee(session):
+def test_employee(session, test_company):
     """테스트용 직원 fixture"""
     employee = Employee(
         employee_number='EMP001',
         name='테스트직원',
         department='개발팀',
         position='사원',
-        status='active'
+        status='active',
+        company_id=test_company.id
     )
     session.add(employee)
     session.commit()
@@ -142,4 +144,66 @@ def auth_client_corporate(client, test_user_corporate):
     with client.session_transaction() as sess:
         sess['user_id'] = test_user_corporate.id
         sess['account_type'] = test_user_corporate.account_type
+    return client
+
+
+@pytest.fixture
+def test_contract_pending(session, test_user_personal, test_company):
+    """테스트용 대기 중인 계약 fixture"""
+    contract = PersonCorporateContract(
+        person_user_id=test_user_personal.id,
+        company_id=test_company.id,
+        status='pending',
+        contract_type='employment',
+        position='사원',
+        department='개발팀',
+        requested_by='company'
+    )
+    session.add(contract)
+    session.commit()
+    return contract
+
+
+@pytest.fixture
+def test_contract_approved(session, test_user_personal, test_company):
+    """테스트용 승인된 계약 fixture"""
+    from datetime import datetime
+    contract = PersonCorporateContract(
+        person_user_id=test_user_personal.id,
+        company_id=test_company.id,
+        status='approved',
+        contract_type='employment',
+        position='사원',
+        department='개발팀',
+        requested_by='company',
+        approved_at=datetime.utcnow(),
+        employee_number='EMP_TEST001'
+    )
+    session.add(contract)
+    session.commit()
+    return contract
+
+
+@pytest.fixture
+def auth_client_personal_full(client, test_user_personal, test_company):
+    """개인 계정으로 인증된 테스트 클라이언트 (세션 정보 풀셋)"""
+    from app.constants.session_keys import SessionKeys
+    with client.session_transaction() as sess:
+        sess[SessionKeys.USER_ID] = test_user_personal.id
+        sess[SessionKeys.USERNAME] = test_user_personal.username
+        sess[SessionKeys.ACCOUNT_TYPE] = test_user_personal.account_type
+        sess[SessionKeys.USER_ROLE] = test_user_personal.role
+    return client
+
+
+@pytest.fixture
+def auth_client_corporate_full(client, test_user_corporate, test_company):
+    """법인 계정으로 인증된 테스트 클라이언트 (세션 정보 풀셋)"""
+    from app.constants.session_keys import SessionKeys
+    with client.session_transaction() as sess:
+        sess[SessionKeys.USER_ID] = test_user_corporate.id
+        sess[SessionKeys.USERNAME] = test_user_corporate.username
+        sess[SessionKeys.ACCOUNT_TYPE] = test_user_corporate.account_type
+        sess[SessionKeys.COMPANY_ID] = test_company.id
+        sess[SessionKeys.USER_ROLE] = test_user_corporate.role
     return client

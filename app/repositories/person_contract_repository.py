@@ -10,6 +10,7 @@ from app.models.person_contract import PersonCorporateContract, DataSharingSetti
 from app.models.user import User
 from app.models.employee import Employee
 from app.models.personal_profile import PersonalProfile
+from app.constants.status import EmployeeStatus, ContractStatus
 from .base_repository import BaseRepository
 
 

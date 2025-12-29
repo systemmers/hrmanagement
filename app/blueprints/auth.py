@@ -8,6 +8,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 
 from ..constants.session_keys import SessionKeys
 from ..constants.messages import FlashMessages
+from ..constants.status import EmployeeStatus
 from ..services.user_service import user_service
 from ..services.employee_service import employee_service
 
