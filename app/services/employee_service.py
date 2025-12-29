@@ -506,7 +506,7 @@ class EmployeeService:
             photo=form_data.get('photo') or '/static/images/face/face_01_m.png',
             department=form_data.get('department', ''),
             position=form_data.get('position', ''),
-            status=form_data.get('status', 'active'),
+            status=form_data.get('status', EmployeeStatus.ACTIVE),
             hire_date=form_data.get('hire_date') or form_data.get('hireDate', ''),
             phone=form_data.get('phone', ''),
             email=form_data.get('email', ''),

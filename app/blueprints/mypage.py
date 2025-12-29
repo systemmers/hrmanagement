@@ -8,6 +8,7 @@ Phase 8: 상수 모듈 적용
 from flask import Blueprint, render_template, session, redirect, url_for, flash
 
 from ..constants.session_keys import SessionKeys, AccountType
+from ..constants.status import ContractStatus, EmployeeStatus
 from ..utils.decorators import login_required
 from ..services.employee_service import employee_service
 from ..services.system_setting_service import system_setting_service
@@ -51,12 +52,12 @@ def company_info():
 
     if user_id and company_id:
         contract_status = contract_service.get_employee_contract_status(user_id, company_id)
-        if contract_status != 'approved':
+        if contract_status != ContractStatus.APPROVED:
             return render_template('mypage/pending_contract.html', employee=employee)
 
     # 5. 프로필 미완성 체크 (pending_info → 프로필 완성 페이지로)
     employee_status = employee.get('status')
-    if employee_status == 'pending_info':
+    if employee_status == EmployeeStatus.PENDING_INFO:
         return redirect(url_for('profile.complete_profile'))
 
     # 6. 정상 상태: 인사카드 표시

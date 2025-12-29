@@ -13,6 +13,7 @@ from ..database import db
 from ..models.person_contract import PersonCorporateContract
 from ..models.employee import Employee
 from ..models.user import User
+from ..constants.status import ContractStatus
 
 
 class ContractFilterService:
@@ -22,8 +23,8 @@ class ContractFilterService:
     """
 
     # 기본 상태 값
-    DEFAULT_STATUSES = ['approved']
-    ACTIVE_STATUSES = ['approved', 'terminated']
+    DEFAULT_STATUSES = [ContractStatus.APPROVED]
+    ACTIVE_STATUSES = [ContractStatus.APPROVED, ContractStatus.TERMINATED]
 
     def get_filtered_contracts(
         self,
@@ -48,8 +49,8 @@ class ContractFilterService:
         if statuses is None:
             statuses = self.DEFAULT_STATUSES.copy()
 
-        if include_terminated and 'terminated' not in statuses:
-            statuses.append('terminated')
+        if include_terminated and ContractStatus.TERMINATED not in statuses:
+            statuses.append(ContractStatus.TERMINATED)
 
         query = PersonCorporateContract.query.options(
             joinedload(PersonCorporateContract.person_user)
@@ -88,7 +89,7 @@ class ContractFilterService:
         """
         contracts = self.get_filtered_contracts(
             company_id=company_id,
-            statuses=['approved'],
+            statuses=[ContractStatus.APPROVED],
             exclude_resigned=exclude_resigned
         )
 
@@ -195,7 +196,7 @@ class ContractFilterService:
         """
         contracts = self.get_filtered_contracts(
             company_id=company_id,
-            statuses=['approved'],
+            statuses=[ContractStatus.APPROVED],
             exclude_resigned=exclude_resigned
         )
 

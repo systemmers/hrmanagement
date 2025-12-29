@@ -283,9 +283,9 @@ class PersonalService:
         from app.models.company import Company
 
         # 조회 대상 상태
-        viewable_statuses = ['approved']
+        viewable_statuses = [ContractStatus.APPROVED]
         if include_terminated:
-            viewable_statuses.append('terminated')
+            viewable_statuses.append(ContractStatus.TERMINATED)
 
         contracts = PersonCorporateContract.query.filter(
             PersonCorporateContract.person_user_id == user_id,
@@ -302,7 +302,7 @@ class PersonalService:
 
             # 종료된 계약의 보관 기간 확인
             is_within_retention = True
-            if contract.status == 'terminated' and contract.terminated_at:
+            if contract.status == ContractStatus.TERMINATED and contract.terminated_at:
                 retention_end = contract.terminated_at + timedelta(days=retention_days)
                 is_within_retention = datetime.utcnow() < retention_end
 
@@ -321,7 +321,7 @@ class PersonalService:
                 'approved_at': contract.approved_at,
                 # 종료 상태 정보
                 'status': contract.status,
-                'is_active': contract.status == 'approved',
+                'is_active': contract.status == ContractStatus.APPROVED,
                 'terminated_at': contract.terminated_at,
                 'termination_reason': contract.termination_reason,
             })
@@ -358,14 +358,14 @@ class PersonalService:
         contract = PersonCorporateContract.query.filter(
             PersonCorporateContract.id == contract_id,
             PersonCorporateContract.person_user_id == user_id,
-            PersonCorporateContract.status.in_(['approved', 'terminated'])
+            PersonCorporateContract.status.in_([ContractStatus.APPROVED, ContractStatus.TERMINATED])
         ).first()
 
         if not contract:
             return None
 
         # 종료된 계약의 보관 기간 확인 (3년)
-        is_terminated = contract.status == 'terminated'
+        is_terminated = contract.status == ContractStatus.TERMINATED
         if is_terminated and contract.terminated_at:
             retention_end = contract.terminated_at + timedelta(days=365 * 3)
             if datetime.utcnow() >= retention_end:

@@ -250,7 +250,7 @@ def register_mutation_routes(bp: Blueprint):
 
             if success:
                 flash_msg = f'계정이 발급되었습니다. (사용자명: {result["username"]})'
-                if result.get('status') == 'pending_info':
+                if result.get('status') == EmployeeStatus.PENDING_INFO:
                     flash_msg += ' 직원이 로그인하여 정보를 입력해야 합니다.'
                 flash(flash_msg, 'success')
                 return redirect(url_for('employees.employee_list'))
@@ -351,7 +351,7 @@ def register_mutation_routes(bp: Blueprint):
             if updated_employee:
                 # employee_sub 계정이 프로필 완성한 경우 상태 전환
                 account_type = session.get(SessionKeys.ACCOUNT_TYPE)
-                if account_type == AccountType.EMPLOYEE_SUB and original_status == 'pending_info':
+                if account_type == AccountType.EMPLOYEE_SUB and original_status == EmployeeStatus.PENDING_INFO:
                     # pending_info → pending_contract 상태 전환
                     employee_service.update_employee_partial(employee_id, {'status': 'pending_contract'})
                     flash('프로필이 완성되었습니다. 계약 요청을 기다리고 있습니다.', 'success')
@@ -543,7 +543,7 @@ def _extract_employee_data_for_service(form, org_id):
         'photo': form.get('photo') or '/static/images/face/face_01_m.png',
         'department': form.get('department', ''),
         'position': form.get('position', ''),
-        'status': form.get('status', 'active'),
+        'status': form.get('status', EmployeeStatus.ACTIVE),
         'hire_date': form.get('hire_date', ''),
         'phone': form.get('phone', ''),
         'email': form.get('email', ''),

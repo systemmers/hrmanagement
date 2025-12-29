@@ -270,15 +270,15 @@ class EmployeeRepository(BaseRepository[Employee]):
         """
         query = self._build_query(organization_id)
         total = query.count()
-        active = self._build_query(organization_id).filter_by(status='active').count()
+        active = self._build_query(organization_id).filter_by(status=EmployeeStatus.ACTIVE).count()
         on_leave = self._build_query(organization_id).filter_by(status='on_leave').count()
-        resigned = self._build_query(organization_id).filter_by(status='resigned').count()
+        resigned = self._build_query(organization_id).filter_by(status=EmployeeStatus.RESIGNED).count()
 
         return {
             'total': total,
-            'active': active,
+            EmployeeStatus.ACTIVE: active,
             'onLeave': on_leave,
-            'resigned': resigned
+            EmployeeStatus.RESIGNED: resigned
         }
 
     def get_department_statistics(self, organization_id: int = None) -> Dict[str, int]:

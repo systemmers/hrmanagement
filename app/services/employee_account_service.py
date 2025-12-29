@@ -132,7 +132,7 @@ class EmployeeAccountService:
                     email=account_data.get('email', ''),
                     company_id=company_id,  # 법인 소속 설정
                     organization_id=company.root_organization_id,  # 조직 트리 연결
-                    status='pending_info'  # 정보 입력 대기 상태
+                    status=EmployeeStatus.PENDING_INFO  # 정보 입력 대기 상태
                 )
                 db.session.add(employee)
                 db.session.flush()
@@ -151,7 +151,7 @@ class EmployeeAccountService:
                 'user_id': user.id,
                 'username': user.username,
                 'email': user.email,
-                'status': 'pending_info',
+                'status': EmployeeStatus.PENDING_INFO,
                 'message': '계정이 생성되었습니다. 직원이 로그인하여 정보를 입력해야 합니다.'
             }, None
 
@@ -222,7 +222,7 @@ class EmployeeAccountService:
                 if user:
                     user.is_active = True
 
-                employee.status = 'active'
+                employee.status = EmployeeStatus.ACTIVE
 
             return True, None
 

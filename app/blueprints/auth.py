@@ -54,7 +54,7 @@ def login():
             if user.employee_id and user.account_type == 'employee_sub':
                 employee = employee_service.get_employee_model_by_id(user.employee_id)
                 if employee:
-                    if employee.status == 'pending_info':
+                    if employee.status == EmployeeStatus.PENDING_INFO:
                         flash('프로필 정보를 완성해주세요.', 'info')
                         return redirect(url_for('profile.complete_profile'))
                     elif employee.status == 'pending_contract':

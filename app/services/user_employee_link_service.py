@@ -254,7 +254,7 @@ class UserEmployeeLinkService:
             contract = contracts_map.get(emp_num)
             if contract:
                 result[emp_num] = {
-                    'status': 'approved',
+                    'status': ContractStatus.APPROVED,
                     'user': contract.person_user,
                     'contract': contract
                 }
@@ -324,7 +324,7 @@ class UserEmployeeLinkService:
                 emp_dict = emp.to_dict()
                 emp_dict['user_id'] = contract.person_user.id if contract.person_user else None
                 emp_dict['user_email'] = contract.person_user.email if contract.person_user else None
-                emp_dict['contract_status'] = 'approved'
+                emp_dict['contract_status'] = ContractStatus.APPROVED
                 result.append(emp_dict)
                 seen_employee_ids.add(emp.id)
 
@@ -337,7 +337,7 @@ class UserEmployeeLinkService:
                 emp_dict = emp.to_dict()
                 emp_dict['user_id'] = contract.person_user.id
                 emp_dict['user_email'] = contract.person_user.email
-                emp_dict['contract_status'] = 'approved'
+                emp_dict['contract_status'] = ContractStatus.APPROVED
                 result.append(emp_dict)
                 seen_employee_ids.add(emp.id)
 

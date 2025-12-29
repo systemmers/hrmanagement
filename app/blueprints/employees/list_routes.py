@@ -147,7 +147,7 @@ def register_list_routes(bp: Blueprint):
             )
 
             # 계약 없음 또는 pending (requested)
-            if contract_status in ['none', 'requested', 'pending']:
+            if contract_status in [AccountStatus.NONE, AccountStatus.REQUESTED, AccountStatus.PENDING]:
                 employee = employee_service.get_employee_model_by_id(user.employee_id)
                 if employee:
                     emp_dict = employee.to_dict()

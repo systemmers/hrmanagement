@@ -21,6 +21,7 @@ from ..extensions import person_contract_repo, user_repo, employee_repo
 from ..database import db
 from ..models.user import User
 from ..models.employee import Employee
+from ..constants.status import ContractStatus
 
 
 class ContractService:
@@ -100,7 +101,7 @@ class ContractService:
                 company_id=company_id
             )
             # 계약이 없거나, rejected/terminated 상태인 경우만 포함
-            if not existing_contract or existing_contract.get('status') in ['rejected', 'terminated']:
+            if not existing_contract or existing_contract.get('status') in [ContractStatus.REJECTED, ContractStatus.TERMINATED]:
                 result['personal_accounts'].append({
                     'user_id': user.id,
                     'name': user.username,
@@ -127,7 +128,7 @@ class ContractService:
                     company_id=company_id
                 )
                 # 계약이 없거나, rejected/terminated 상태인 경우만 포함
-                if not existing_contract or existing_contract.get('status') in ['rejected', 'terminated']:
+                if not existing_contract or existing_contract.get('status') in [ContractStatus.REJECTED, ContractStatus.TERMINATED]:
                     # 상태별 레이블 설정
                     status_label = '프로필 미완성' if emp.status == 'pending_info' else '계약 대기'
                     result['employee_accounts'].append({

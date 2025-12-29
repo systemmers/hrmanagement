@@ -151,7 +151,7 @@ class TerminationService:
 
         if employee:
             # 직원 상태를 퇴사로 변경
-            employee.status = 'terminated'
+            employee.status = EmployeeStatus.RESIGNED
             employee.resignation_date = date.today()
             revoked['employee_access'] = True
 

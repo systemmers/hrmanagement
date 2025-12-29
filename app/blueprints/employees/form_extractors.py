@@ -30,7 +30,7 @@ def extract_employee_from_form(form_data, employee_id=0):
         photo=form_data.get('photo') or '/static/images/face/face_01_m.png',
         department=form_data.get('department', ''),
         position=form_data.get('position', ''),
-        status=form_data.get('status', 'active'),
+        status=form_data.get('status', EmployeeStatus.ACTIVE),
         # hire_date: FieldRegistry 별칭 적용 (hireDate -> hire_date)
         hire_date=normalize_form_field(form_data, ORG, 'hire_date', ''),
         phone=form_data.get('phone', ''),

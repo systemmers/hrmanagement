@@ -166,7 +166,7 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
                 raise ValueError("Employee 연결이 필요합니다. (User.employee_id NULL)")
 
             existing_employee = db.session.get(Employee, user.employee_id)
-            if existing_employee and existing_employee.status == 'resigned':
+            if existing_employee and existing_employee.status == EmployeeStatus.RESIGNED:
                 raise ValueError("퇴사한 직원은 재계약할 수 없습니다.")
 
         contract.approve(approved_by_user_id)
@@ -186,7 +186,7 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
                     )
                     if employee:
                         user.employee_id = employee.id
-                        employee.status = 'active'
+                        employee.status = EmployeeStatus.ACTIVE
 
                         # DataSharingSettings 생성 (전체 공유 기본값)
                         settings = DataSharingSettings.query.filter_by(
@@ -222,7 +222,7 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
                 if user.employee_id:
                     employee = db.session.get(Employee, user.employee_id)
                     if employee:
-                        employee.status = 'active'
+                        employee.status = EmployeeStatus.ACTIVE
                         # organization_id를 계약 회사에 맞게 업데이트
                         if company and company.root_organization_id:
                             employee.organization_id = company.root_organization_id
@@ -355,7 +355,7 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
 
         return {
             'total': total,
-            'active': active,
+            EmployeeStatus.ACTIVE: active,
             'pending': pending,
             'terminated': terminated,
         }
@@ -374,7 +374,7 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
 
         return {
             'total': total,
-            'active': active,
+            EmployeeStatus.ACTIVE: active,
             'pending': pending,
         }
 
