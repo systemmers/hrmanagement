@@ -20,6 +20,7 @@ from ...services.employee_service import employee_service
 from ...services import employee_account_service
 from ...services.file_storage_service import file_storage, CATEGORY_PROFILE_PHOTO
 from ...services.user_employee_link_service import user_employee_link_service
+from ...services.contract.contract_workflow_service import contract_workflow_service
 from .helpers import (
     verify_employee_access, extract_employee_from_form, extract_basic_fields_from_form,
     update_family_data, update_education_data, update_career_data,
@@ -270,7 +271,10 @@ def register_mutation_routes(bp: Blueprint):
     @bp.route('/employees/<int:employee_id>/update', methods=['POST'])
     @login_required
     def employee_update(employee_id):
-        """직원 수정 처리 (멀티테넌시 적용)"""
+        """직원 수정 처리 (멀티테넌시 적용)
+
+        Phase 27: resignation_date 설정 시 활성 계약 자동 종료
+        """
         user_role = session.get(SessionKeys.USER_ROLE)
 
         # Employee role은 본인 정보만 수정 가능
@@ -287,6 +291,10 @@ def register_mutation_routes(bp: Blueprint):
                 return redirect(url_for('main.index'))
 
         try:
+            # Phase 27: 기존 직원 정보 조회 (퇴사일 변경 감지용)
+            existing_employee = employee_service.get_employee_by_id(employee_id)
+            original_resignation_date = existing_employee.get('resignation_date') if existing_employee else None
+
             employee = extract_employee_from_form(request.form, employee_id=employee_id)
             # Employee 객체를 Dict로 변환하여 전달 (BaseRepository.update는 Dict 기대)
             employee_data = employee.to_dict() if hasattr(employee, 'to_dict') else vars(employee)
@@ -299,6 +307,23 @@ def register_mutation_routes(bp: Blueprint):
 
             updated_employee = employee_service.update_employee_direct(employee_id, employee_data)
             if updated_employee:
+                # Phase 27: 퇴사일이 새로 설정된 경우 활성 계약 종료
+                new_resignation_date = request.form.get('resignation_date')
+                if new_resignation_date and not original_resignation_date:
+                    company_id = session.get(SessionKeys.COMPANY_ID)
+                    user_id = session.get(SessionKeys.USER_ID)
+                    employee_number = existing_employee.get('employee_number')
+
+                    if company_id and employee_number:
+                        result = contract_workflow_service.terminate_contracts_by_employee_number(
+                            employee_number=employee_number,
+                            company_id=company_id,
+                            reason='직원 편집에서 퇴사 처리',
+                            terminate_by_user_id=user_id
+                        )
+                        if result.success and result.data.get('terminated_count', 0) > 0:
+                            flash(f'활성 계약 {result.data["terminated_count"]}건이 자동 종료되었습니다.', 'info')
+
                 # update_employee_direct는 Dict 반환
                 employee_name = safe_get(updated_employee, 'name', '')
                 flash(f'{employee_name} 직원 정보가 수정되었습니다.', 'success')
@@ -314,7 +339,10 @@ def register_mutation_routes(bp: Blueprint):
     @bp.route('/employees/<int:employee_id>/update/basic', methods=['POST'])
     @login_required
     def employee_update_basic(employee_id):
-        """기본정보 전용 수정 처리"""
+        """기본정보 전용 수정 처리
+
+        Phase 27: resignation_date 설정 시 활성 계약 자동 종료
+        """
         user_role = session.get(SessionKeys.USER_ROLE)
 
         if user_role == UserRole.EMPLOYEE:
@@ -329,9 +357,10 @@ def register_mutation_routes(bp: Blueprint):
                 return redirect(url_for('main.index'))
 
         try:
-            # 기존 직원 정보 조회 (상태 확인용)
+            # 기존 직원 정보 조회 (상태 확인용 + Phase 27: 퇴사일 변경 감지용)
             existing_employee = employee_service.get_employee_by_id(employee_id)
             original_status = existing_employee.get('status') if existing_employee else None
+            original_resignation_date = existing_employee.get('resignation_date') if existing_employee else None
 
             basic_fields = extract_basic_fields_from_form(request.form)
 
@@ -350,6 +379,22 @@ def register_mutation_routes(bp: Blueprint):
                 update_family_data(employee_id, request.form)
 
             if updated_employee:
+                # Phase 27: 퇴사일이 새로 설정된 경우 활성 계약 종료
+                new_resignation_date = request.form.get('resignation_date')
+                if new_resignation_date and not original_resignation_date:
+                    user_id = session.get(SessionKeys.USER_ID)
+                    employee_number = existing_employee.get('employee_number')
+
+                    if company_id and employee_number:
+                        result = contract_workflow_service.terminate_contracts_by_employee_number(
+                            employee_number=employee_number,
+                            company_id=company_id,
+                            reason='직원 편집에서 퇴사 처리',
+                            terminate_by_user_id=user_id
+                        )
+                        if result.success and result.data.get('terminated_count', 0) > 0:
+                            flash(f'활성 계약 {result.data["terminated_count"]}건이 자동 종료되었습니다.', 'info')
+
                 # employee_sub 계정이 프로필 완성한 경우 상태 전환
                 account_type = session.get(SessionKeys.ACCOUNT_TYPE)
                 if account_type == AccountType.EMPLOYEE_SUB and original_status == EmployeeStatus.PENDING_INFO:

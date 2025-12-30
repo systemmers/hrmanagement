@@ -391,6 +391,59 @@ class ContractWorkflowService:
 
         return result
 
+    # ========================================
+    # 직원 퇴사 연동 (Phase 27)
+    # ========================================
+
+    def terminate_contracts_by_employee_number(
+        self,
+        employee_number: str,
+        company_id: int,
+        reason: str = None,
+        terminate_by_user_id: int = None
+    ) -> ServiceResult[Dict]:
+        """직원 사번으로 활성 계약 종료
+
+        직원 편집 폼에서 resignation_date 설정 시 호출됩니다.
+        해당 직원의 모든 활성 계약(approved, termination_requested)을 종료합니다.
+
+        Args:
+            employee_number: 직원 사번
+            company_id: 법인 ID
+            reason: 종료 사유
+            terminate_by_user_id: 종료 처리자 ID
+
+        Returns:
+            ServiceResult with terminated_count
+        """
+        from datetime import datetime, timezone
+
+        # 해당 직원의 활성 계약 조회
+        contracts = PersonCorporateContract.query.filter(
+            PersonCorporateContract.employee_number == employee_number,
+            PersonCorporateContract.company_id == company_id,
+            PersonCorporateContract.status.in_(ContractStatus.ACTIVE_STATUSES)
+        ).all()
+
+        if not contracts:
+            return ServiceResult.ok(data={'terminated_count': 0, 'message': '종료할 활성 계약이 없습니다.'})
+
+        try:
+            with atomic_transaction():
+                for contract in contracts:
+                    contract.status = ContractStatus.TERMINATED
+                    contract.terminated_at = datetime.now(timezone.utc)
+                    contract.termination_reason = reason or '직원 편집에서 퇴사 처리'
+                    if terminate_by_user_id:
+                        contract.terminated_by = terminate_by_user_id
+
+            return ServiceResult.ok(data={
+                'terminated_count': len(contracts),
+                'message': f'{len(contracts)}개의 계약이 종료되었습니다.'
+            })
+        except Exception as e:
+            return ServiceResult.fail(f"계약 종료 실패: {str(e)}")
+
 
 # 싱글톤 인스턴스
 contract_workflow_service = ContractWorkflowService()

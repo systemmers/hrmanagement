@@ -11,6 +11,7 @@ Phase 24: Option A - isinstance 체크 제거 (Service가 Dict 보장)
 from flask import Blueprint, render_template, request, session
 
 from ...constants.session_keys import SessionKeys, AccountType
+from ...constants.status import ContractStatus
 from ...utils.api_helpers import api_success, api_server_error
 from ...utils.decorators import manager_or_admin_required
 from ...utils.tenant import get_current_organization_id
@@ -94,10 +95,11 @@ def register_list_routes(bp: Blueprint):
                 emp.get('employee_number')
                 for emp in employees
             ]
+            # Phase 27: 종료대기(termination_requested)도 활성 계약으로 포함
             contract_map = contract_filter_service.get_contracts_by_employee_numbers(
                 employee_numbers=employee_numbers,
                 company_id=company_id,
-                statuses=['approved'],
+                statuses=ContractStatus.ACTIVE_STATUSES,
                 exclude_resigned=True
             )
 
