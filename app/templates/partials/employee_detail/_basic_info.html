@@ -11,16 +11,18 @@
         {{ card_header('개인 기본정보', 'fas fa-user') }}
         <div class="card-body">
             <div class="info-grid">
-                {# FieldRegistry personal_basic 섹션 순서 적용 #}
-                {{ info_item('성명 (한글)', employee.name) }}
-                {{ info_item('여권명 (영문)', employee.english_name) }}
-                {{ info_item('한자명', employee.chinese_name) }}
+                {# FieldRegistry personal_basic 섹션 순서 적용 - Phase 28 라벨 통일 #}
+                {{ info_item('이름', employee.name) }}
+                {{ info_item('영문 이름', employee.english_name) }}
+                {{ info_item('한자 이름', employee.chinese_name) }}
+                {{ info_item('외국어 이름', employee.foreign_name) }}
                 <div class="info-item">
                     <div class="info-label">생년월일</div>
                     <div class="info-value{% if not employee.birth_date %} empty{% endif %}">
                         {{ employee.birth_date or '정보 없음' }}{% if employee.lunar_birth %} <span class="badge badge-info">음력</span>{% endif %}
                     </div>
                 </div>
+                {{ info_item('나이', (employee.age ~ '세') if employee.age else none) }}
                 {{ info_item('성별', get_gender_label(employee.gender)) }}
                 {{ info_item('국적', get_nationality_label(employee.nationality)) }}
                 {{ info_item('주민등록번호', employee.resident_number) }}
@@ -33,16 +35,18 @@
                 {# FieldRegistry contact 섹션 순서 적용 #}
                 {{ info_item('휴대전화', format_phone(employee.phone)) }}
                 {{ info_item('자택전화', format_phone(employee.home_phone) if format_phone is defined and employee.home_phone else employee.home_phone) }}
-                {{ info_item('개인 이메일', employee.email, highlight=true) }}
+                {{ info_item('이메일', employee.email, highlight=true) }}
                 <div class="info-item">
                     <div class="info-label">비상연락처</div>
                     <div class="info-value{% if not employee.emergency_contact %} empty{% endif %}">
                         {{ employee.emergency_contact or '정보 없음' }}{% if employee.emergency_relation %} ({{ employee.emergency_relation }}){% endif %}
                     </div>
                 </div>
-                {# FieldRegistry personal_extended 섹션 #}
-                {{ info_item('혈액형', employee.blood_type) }}
-                {{ info_item('종교', employee.religion) }}
+                {# Phase 28: 계좌정보 (기본정보 섹션으로 이동) #}
+                {{ info_item('은행명', employee.bank_name) }}
+                {{ info_item('계좌번호', employee.account_number) }}
+                {{ info_item('예금주', employee.account_holder) }}
+                {# FieldRegistry personal_extended 섹션 - Phase 28: blood_type, religion 삭제 #}
                 {{ info_item('취미', employee.hobby) }}
                 {{ info_item('특기', employee.specialty) }}
                 {{ info_item('장애정보', employee.disability_info) }}
@@ -55,7 +59,7 @@
             <div class="mt-4">
                 <h5 class="info-subsection-title">실제 거주 주소</h5>
                 {{ info_item('실제 거주지', employee.actual_address) }}
-                {{ info_item('상세주소', employee.actual_detailed_address) }}
+                {{ info_item('실제 거주지 상세주소', employee.actual_detailed_address) }}
             </div>
         </div>
     </div>
@@ -69,28 +73,20 @@
         {{ card_header('소속정보', 'fas fa-building') }}
         <div class="card-body">
             <div class="info-grid">
-                {{ info_item('소속', employee.department, highlight=true) }}
-                {{ info_item('부서', employee.team or employee.department, highlight=true) }}
+                {# Phase 28: 소속 → 소속 조직, 부서 → 부서명 라벨 통일 #}
+                {{ info_item('소속 조직', employee.department, highlight=true) }}
+                {{ info_item('부서명', employee.team or employee.department, highlight=true) }}
                 {{ info_item('직위', employee.position) }}
                 {{ info_item('직급', employee.job_grade) }}
                 {{ info_item('직책', employee.job_title) }}
                 {{ info_item('직무', employee.job_role) }}
-                {{ info_item('사원번호', employee.employee_number or 'EMP-%03d'|format(employee.id)) }}
-                {{ info_item('근무형태', get_employment_type_label(employee.employment_type)) }}
+                {# Phase 28: 사원번호 → 사번 라벨 통일 #}
+                {{ info_item('사번', employee.employee_number or 'EMP-%03d'|format(employee.id)) }}
                 {{ info_item('근무지', employee.work_location or '본사') }}
                 {# 내선번호/회사이메일 - 프로필에서 소속정보로 이동 #}
                 {{ info_item('내선번호', employee.internal_phone) }}
                 {{ info_item('회사 이메일', employee.company_email) }}
-                <div class="info-item">
-                    <div class="info-label">재직상태</div>
-                    <div class="info-value">
-                        <span class="badge {{ get_status_badge_class(employee.status) }}">
-                            {{ get_status_text(employee.status) }}
-                        </span>
-                    </div>
-                </div>
-                {{ info_item('입사일', employee.hire_date) }}
-                {{ info_item('재직기간', calculate_tenure(employee.hire_date), highlight=true) }}
+                {# Phase 28: 입사일/재직상태/고용형태/재직기간 → 계약정보 섹션으로 이동 #}
             </div>
         </div>
     </div>
@@ -105,12 +101,26 @@
         {{ card_header('계약정보', 'fas fa-file-contract') }}
         <div class="card-body">
             <div class="info-grid">
+                {# Phase 28: 소속정보에서 이동된 필드들 #}
+                {{ info_item('입사일', employee.hire_date) }}
+                <div class="info-item">
+                    <div class="info-label">재직 상태</div>
+                    <div class="info-value">
+                        <span class="badge {{ get_status_badge_class(employee.status) }}">
+                            {{ get_status_text(employee.status) }}
+                        </span>
+                    </div>
+                </div>
+                {{ info_item('고용형태', get_employment_type_label(employee.employment_type)) }}
+                {{ info_item('재직기간', calculate_tenure(employee.hire_date), highlight=true) }}
+                {# 기존 계약정보 필드들 #}
                 {{ info_item('계약형태', contract.contract_type if contract else (get_employment_type_label(employee.employment_type) if employee.employment_type else none)) }}
                 {{ info_item('계약기간', contract.contract_period if contract else (employee.contract_period or '무기한')) }}
                 {{ info_item('계약시작일', contract.contract_date if contract else employee.hire_date) }}
                 {{ info_item('직원유형', contract.employee_type if contract else none) }}
                 {{ info_item('근무형태', contract.work_type if contract else none) }}
-                {{ info_item('시용기간 종료', employee.probation_end) }}
+                {# Phase 28: 시용기간 종료 → 수습종료일 라벨 통일 #}
+                {{ info_item('수습종료일', employee.probation_end) }}
                 {{ info_item('근무시간', contract.work_hours if contract and contract.work_hours else '09:00 ~ 18:00') }}
                 {{ info_item('휴게시간', contract.break_hours if contract and contract.break_hours else '12:00 ~ 13:00') }}
                 {% if employee.resignation_date %}
@@ -143,7 +153,7 @@
                 {{ info_item('총 급여', ('{:,}'.format(salary.total_salary) ~ '원') if salary else none) }}
                 {{ info_item('급여지급일', ('매월 ' ~ salary.payment_day ~ '일') if salary else none) }}
                 {{ info_item('급여지급방법', salary.payment_method if salary else none) }}
-                {{ info_item('급여계좌', salary.bank_account if salary else none) }}
+                {# Phase 28: 급여계좌는 기본정보 섹션으로 이동됨 #}
             </div>
         </div>
     </div>

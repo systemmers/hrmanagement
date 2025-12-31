@@ -3,6 +3,8 @@
     employee: 직원 객체 (수정 모드일 때)
     action: 'create' 또는 'update'
     has_person_contract: 개인계약 연동 여부 (법인에서 개인정보 수정 제한)
+
+    Phase 28: 필드 재배치, 신규 필드 추가, blood_type/religion 삭제
 #}
 {# 개인정보 읽기 전용 플래그: 법인 계정 + 개인계약 연동 시 #}
 {% set is_personal_readonly = is_corporate and has_person_contract %}
@@ -154,11 +156,12 @@
                            {% if is_personal_readonly %}readonly disabled{% endif %}>
                 </div>
 
+                {# Phase 28: name_en → english_name 별칭 제거 #}
                 <div class="form-group">
-                    <label for="name_en" class="form-label">영문 이름</label>
-                    <input type="text" id="name_en" name="name_en" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                    <label for="english_name" class="form-label">영문 이름 <span class="required" aria-hidden="true">*</span></label>
+                    <input type="text" id="english_name" name="english_name" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
                            value="{{ employee.english_name if employee and employee.english_name else '' }}"
-                           placeholder="Hong Gil-dong"
+                           placeholder="Hong Gil-dong" {% if not is_personal_readonly %}required aria-required="true"{% endif %}
                            {% if is_personal_readonly %}readonly disabled{% endif %}>
                 </div>
 
@@ -171,11 +174,30 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="foreign_name" class="form-label">외국어 이름</label>
+                    <input type="text" id="foreign_name" name="foreign_name" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                           value="{{ employee.foreign_name if employee and employee.foreign_name else '' }}"
+                           placeholder="영문 외 추가 외국어명"
+                           {% if is_personal_readonly %}readonly disabled{% endif %}>
+                </div>
+
+                {# Phase 28: rrn → resident_number 별칭 제거 #}
+                <div class="form-group">
+                    <label for="resident_number" class="form-label">주민등록번호 <span class="required" aria-hidden="true">*</span></label>
+                    <input type="text" id="resident_number" name="resident_number" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                           value="{{ employee.resident_number if employee and employee.resident_number else '' }}"
+                           placeholder="850520-1234567" maxlength="14" {% if not is_personal_readonly %}required aria-required="true"{% endif %}
+                           aria-describedby="resident_number_help"
+                           {% if is_personal_readonly %}readonly disabled{% endif %}>
+                    <small id="resident_number_help" class="form-help">입력 시 생년월일, 나이, 성별이 자동 입력됩니다</small>
+                </div>
+
+                <div class="form-group">
                     <label for="birth_date" class="form-label">생년월일</label>
                     <div class="input-with-checkbox">
-                        <input type="date" id="birth_date" name="birth_date" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                        <input type="date" id="birth_date" name="birth_date" class="form-input readonly-field"
                                value="{{ employee.birth_date if employee and employee.birth_date else '' }}"
-                               {% if is_personal_readonly %}readonly disabled{% endif %}>
+                               readonly aria-describedby="birth_date_help">
                         <label class="checkbox-inline">
                             <input type="checkbox" id="lunar_birth" name="lunar_birth" value="true"
                                    {% if employee and employee.lunar_birth %}checked{% endif %}
@@ -183,6 +205,15 @@
                             <span>음력</span>
                         </label>
                     </div>
+                    <small id="birth_date_help" class="form-help">주민등록번호 입력 시 자동 설정</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="age" class="form-label">나이</label>
+                    <input type="number" id="age" name="age" class="form-input readonly-field"
+                           value="{{ employee.age if employee and employee.age else '' }}"
+                           readonly aria-describedby="age_help">
+                    <small id="age_help" class="form-help">만 나이 (주민등록번호 기준 자동 계산)</small>
                 </div>
 
                 <div class="form-group">
@@ -243,11 +274,11 @@
                 </div>
 
                 <div class="form-group form-group-full">
-                    <label for="address" class="form-label">주소</label>
+                    <label for="address" class="form-label">주민등록상 주소 <span class="required" aria-hidden="true">*</span></label>
                     <div class="input-with-button">
                         <input type="text" id="address" name="address" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
                                value="{{ employee.address if employee and employee.address else '' }}"
-                               placeholder="주소 검색 버튼을 클릭하세요" readonly
+                               placeholder="주소 검색 버튼을 클릭하세요" readonly {% if not is_personal_readonly %}required aria-required="true"{% endif %}
                                {% if is_personal_readonly %}disabled{% endif %}>
                         {% if not is_personal_readonly %}
                         <button type="button" class="btn btn-secondary" id="searchAddressBtn" aria-label="주소 검색">
@@ -281,36 +312,7 @@
                            {% if is_personal_readonly %}readonly disabled{% endif %}>
                 </div>
 
-                <div class="form-group">
-                    <label for="rrn" class="form-label">주민등록번호</label>
-                    <input type="text" id="rrn" name="rrn" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
-                           value="{{ employee.resident_number if employee and employee.resident_number else '' }}"
-                           placeholder="850520-1******" maxlength="14"
-                           aria-describedby="rrn_help"
-                           {% if is_personal_readonly %}readonly disabled{% endif %}>
-                    <small id="rrn_help" class="form-help">마스킹 처리된 형식으로 입력 (예: 850520-1******)</small>
-                </div>
-
-                {# 신규 필드: 혈액형, 종교, 취미, 특기, 장애정보 #}
-                <div class="form-group">
-                    <label for="blood_type" class="form-label">혈액형</label>
-                    <select id="blood_type" name="blood_type" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
-                            {% if is_personal_readonly %}disabled{% endif %}>
-                        <option value="">선택하세요</option>
-                        {% for opt in BLOOD_TYPE_OPTIONS %}
-                        <option value="{{ opt.value }}" {% if employee and employee.blood_type == opt.value %}selected{% endif %}>{{ opt.label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="religion" class="form-label">종교</label>
-                    <input type="text" id="religion" name="religion" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
-                           value="{{ employee.religion if employee and employee.religion else '' }}"
-                           placeholder="기독교, 불교, 무교 등"
-                           {% if is_personal_readonly %}readonly disabled{% endif %}>
-                </div>
-
+                {# Phase 28: 취미, 특기, 장애정보 (blood_type, religion 삭제됨) #}
                 <div class="form-group">
                     <label for="hobby" class="form-label">취미</label>
                     <input type="text" id="hobby" name="hobby" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
@@ -327,25 +329,26 @@
                            {% if is_personal_readonly %}readonly disabled{% endif %}>
                 </div>
 
-                <div class="form-group form-group-full">
+                <div class="form-group">
                     <label for="disability_info" class="form-label">장애정보</label>
-                    <textarea id="disability_info" name="disability_info" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" rows="2"
-                              placeholder="장애 정보가 있는 경우 입력하세요"
-                              {% if is_personal_readonly %}readonly disabled{% endif %}>{{ employee.disability_info if employee and employee.disability_info else '' }}</textarea>
+                    <input type="text" id="disability_info" name="disability_info" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                           value="{{ employee.disability_info if employee and employee.disability_info else '' }}"
+                           placeholder="장애 등급, 유형 등"
+                           {% if is_personal_readonly %}readonly disabled{% endif %}>
                 </div>
 
-                {# 실제 거주 주소 (주민등록상 주소와 다른 경우) #}
+                {# 실제 거주 주소 #}
                 <div class="form-group form-group-full mt-4">
                     <h5 class="form-subsection-title">실제 거주 주소</h5>
                     <small class="form-help mb-3">주민등록상 주소와 다른 경우 입력하세요</small>
                 </div>
 
                 <div class="form-group form-group-full">
-                    <label for="actual_address" class="form-label">실제 거주지</label>
+                    <label for="actual_address" class="form-label">실제 거주지 <span class="required" aria-hidden="true">*</span></label>
                     <div class="input-with-button">
                         <input type="text" id="actual_address" name="actual_address" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
                                value="{{ employee.actual_address if employee and employee.actual_address else '' }}"
-                               placeholder="주소 검색 버튼을 클릭하세요" readonly
+                               placeholder="주소 검색 버튼을 클릭하세요" readonly {% if not is_personal_readonly %}required aria-required="true"{% endif %}
                                {% if is_personal_readonly %}disabled{% endif %}>
                         {% if not is_personal_readonly %}
                         <button type="button" class="btn btn-secondary" id="searchActualAddressBtn" aria-label="실제 거주지 검색">
@@ -360,6 +363,38 @@
                     <input type="text" id="actual_detailed_address" name="actual_detailed_address" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
                            value="{{ employee.actual_detailed_address if employee and employee.actual_detailed_address else '' }}"
                            placeholder="동/호수, 건물명 등"
+                           {% if is_personal_readonly %}readonly disabled{% endif %}>
+                </div>
+
+                {# Phase 28: 은행 계좌 정보 (급여정보에서 이동) #}
+                <div class="form-group form-group-full mt-4">
+                    <h5 class="form-subsection-title">급여 계좌 정보</h5>
+                </div>
+
+                <div class="form-group">
+                    <label for="bank_name" class="form-label">은행명</label>
+                    <select id="bank_name" name="bank_name" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            {% if is_personal_readonly %}disabled{% endif %}>
+                        <option value="">선택하세요</option>
+                        {% for opt in BANK_OPTIONS %}
+                        <option value="{{ opt.value }}" {% if employee and employee.bank_name == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="account_number" class="form-label">계좌번호</label>
+                    <input type="text" id="account_number" name="account_number" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                           value="{{ employee.account_number if employee and employee.account_number else '' }}"
+                           placeholder="숫자만 입력 (예: 1234567890123)"
+                           {% if is_personal_readonly %}readonly disabled{% endif %}>
+                </div>
+
+                <div class="form-group">
+                    <label for="account_holder" class="form-label">예금주</label>
+                    <input type="text" id="account_holder" name="account_holder" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                           value="{{ employee.account_holder if employee and employee.account_holder else '' }}"
+                           placeholder="예금주명"
                            {% if is_personal_readonly %}readonly disabled{% endif %}>
                 </div>
 

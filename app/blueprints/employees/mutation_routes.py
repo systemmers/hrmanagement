@@ -36,9 +36,10 @@ from ...services.organization_service import organization_service
 # ========================================
 
 # 개인 계정에서만 수정 가능한 필드 목록 (법인에서 수정 불가)
+# Phase 28: name_en→english_name, rrn→resident_number 별칭 통일
 PERSONAL_PROTECTED_FIELDS = [
-    'name', 'english_name', 'name_en', 'birth_date', 'gender',
-    'nationality', 'resident_number', 'rrn', 'mobile_phone', 'home_phone',
+    'name', 'english_name', 'birth_date', 'gender',
+    'nationality', 'resident_number', 'mobile_phone', 'home_phone',
     'address', 'detailed_address', 'postal_code',
     'blood_type', 'religion', 'hobby', 'specialty',
     'marital_status', 'emergency_contact_name', 'emergency_contact_phone',
@@ -47,6 +48,7 @@ PERSONAL_PROTECTED_FIELDS = [
 
 # 계약 후 수정 불가 필드 목록 (승인된 개인계약 존재 시 수정 불가)
 # 주의: status 필드는 관리자가 변경 가능해야 하므로 제외
+# Phase 28: transport_allowance→transportation_allowance, pay_type→salary_type 별칭 통일
 CONTRACT_PROTECTED_FIELDS = [
     # 소속정보
     'organization_id', 'department', 'team', 'position', 'job_grade',
@@ -54,8 +56,8 @@ CONTRACT_PROTECTED_FIELDS = [
     # 계약정보 (status 제외)
     'hire_date', 'employment_type', 'contract_period', 'probation_end',
     # 급여정보
-    'base_salary', 'position_allowance', 'meal_allowance', 'transport_allowance',
-    'bonus_rate', 'pay_type', 'bank_name', 'account_number',
+    'base_salary', 'position_allowance', 'meal_allowance', 'transportation_allowance',
+    'bonus_rate', 'salary_type', 'bank_name', 'account_number',
     'annual_salary', 'hourly_wage', 'overtime_hours', 'overtime_allowance',
     'night_hours', 'night_allowance', 'holiday_days', 'holiday_allowance',
     # 4대보험

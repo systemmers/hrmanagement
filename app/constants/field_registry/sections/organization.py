@@ -36,7 +36,7 @@ ORGANIZATION_FIELDS = [
     ),
     create_field(
         name='department',
-        label='부서',
+        label='부서명',  # Phase 28: 부서 → 부서명 (Edit 폼 라벨과 통일)
         order=30,
         field_type=FieldType.TEXT,
         max_length=100,
