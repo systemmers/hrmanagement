@@ -10,6 +10,8 @@
 {% from 'macros/_cards.html' import form_section_card %}
 
 {% call form_section_card('계약정보' ~ (' (계약 확정)' if is_contract_readonly else ''), 'fas fa-file-contract', 'contract-info') %}
+{# 계약정보 서브섹션 #}
+<div class="form-subsection">
 <div class="form-grid">
     <div class="form-group">
         <label for="hire_date" class="form-label">입사일 {% if not is_contract_readonly %}<span class="required">*</span>{% endif %}</label>
@@ -20,9 +22,10 @@
     </div>
 
     <div class="form-group">
-        <label for="status" class="form-label">재직 상태 <span class="required">*</span></label>
-        {# status 필드는 관리자가 변경 가능해야 하므로 readonly 제외 #}
-        <select id="status" name="status" class="form-input" required>
+        <label for="status" class="form-label">재직 상태 {% if not is_contract_readonly %}<span class="required">*</span>{% endif %}</label>
+        <select id="status" name="status" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                {% if not is_contract_readonly %}required{% endif %}
+                {% if is_contract_readonly %}disabled{% endif %}>
             {% for opt in EMPLOYEE_STATUS_OPTIONS %}
             <option value="{{ opt.value }}" {% if employee and employee.status == opt.value %}selected{% endif %}>{{ opt.label }}</option>
             {% endfor %}
@@ -61,5 +64,48 @@
                value="{{ employee.resignation_date if employee and employee.resignation_date else '' }}"
                {% if is_contract_readonly %}readonly disabled{% endif %}>
     </div>
+</div>
+</div>
+
+{# 4대보험 서브섹션 (Phase 28: 4대보험 섹션을 계약정보로 통합) #}
+<div class="form-subsection">
+<div class="form-subsection-title">4대보험</div>
+<div class="form-grid">
+    <div class="form-group">
+        <label for="national_pension" class="form-label">국민연금</label>
+        <select id="national_pension" name="national_pension" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                {% if is_contract_readonly %}disabled{% endif %}>
+            <option value="true" {% if insurance and insurance.national_pension %}selected{% endif %}>가입</option>
+            <option value="false" {% if insurance and not insurance.national_pension %}selected{% endif %}>미가입</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="health_insurance" class="form-label">건강보험</label>
+        <select id="health_insurance" name="health_insurance" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                {% if is_contract_readonly %}disabled{% endif %}>
+            <option value="true" {% if insurance and insurance.health_insurance %}selected{% endif %}>가입</option>
+            <option value="false" {% if insurance and not insurance.health_insurance %}selected{% endif %}>미가입</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="employment_insurance" class="form-label">고용보험</label>
+        <select id="employment_insurance" name="employment_insurance" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                {% if is_contract_readonly %}disabled{% endif %}>
+            <option value="true" {% if insurance and insurance.employment_insurance %}selected{% endif %}>가입</option>
+            <option value="false" {% if insurance and not insurance.employment_insurance %}selected{% endif %}>미가입</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="industrial_accident" class="form-label">산재보험</label>
+        <select id="industrial_accident" name="industrial_accident" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                {% if is_contract_readonly %}disabled{% endif %}>
+            <option value="true" {% if insurance and insurance.industrial_accident %}selected{% endif %}>가입</option>
+            <option value="false" {% if insurance and not insurance.industrial_accident %}selected{% endif %}>미가입</option>
+        </select>
+    </div>
+</div>
 </div>
 {% endcall %}

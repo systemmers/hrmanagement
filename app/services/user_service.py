@@ -5,7 +5,7 @@
 Phase 2: Service 계층 표준화
 Phase 24: Option A 레이어 분리 - Service는 Dict 반환 표준화
 """
-from typing import Dict, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 
 
 class UserService:
@@ -137,6 +137,28 @@ class UserService:
             User 모델 객체 리스트
         """
         return self.user_repo.get_by_company_and_account_type(company_id, account_type)
+
+    def get_by_company_and_account_type_paginated(
+        self,
+        company_id: int,
+        account_type: str,
+        page: int = 1,
+        per_page: int = 20
+    ) -> Tuple[List[Dict], Any]:
+        """회사 ID와 계정 유형으로 사용자 목록 조회 (페이지네이션)
+
+        Args:
+            company_id: 회사 ID
+            account_type: 계정 유형
+            page: 페이지 번호
+            per_page: 페이지당 항목 수
+
+        Returns:
+            Tuple[사용자 목록 (company_sequence 포함), 페이지네이션 객체]
+        """
+        return self.user_repo.get_by_company_and_account_type_paginated(
+            company_id, account_type, page, per_page
+        )
 
     def get_employee_sub_users_with_employee(self, company_id: int) -> list:
         """회사 소속 employee_sub 계정 목록 조회 (Employee 정보 포함)

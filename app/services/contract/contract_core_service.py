@@ -148,7 +148,11 @@ class ContractCoreService:
     def find_contract_with_history(
         self, employee_number: str, company_id: int
     ) -> Optional[Any]:
-        """계약 이력 조회 (approved/terminated/expired)"""
+        """계약 이력 조회 - 수정불가 필터용
+
+        Phase 28: termination_requested 추가
+        계약 이력이 있는 직원은 필드 수정 불가
+        """
         if not employee_number or not company_id:
             return None
 
@@ -157,6 +161,7 @@ class ContractCoreService:
             PersonCorporateContract.company_id == company_id,
             PersonCorporateContract.status.in_([
                 PersonCorporateContract.STATUS_APPROVED,
+                PersonCorporateContract.STATUS_TERMINATION_REQUESTED,
                 PersonCorporateContract.STATUS_TERMINATED,
                 PersonCorporateContract.STATUS_EXPIRED
             ])
