@@ -20,8 +20,9 @@
                 <div class="form-group">
                     <label for="employee_number" class="form-label">사번</label>
                     {% if employee and employee.employee_number %}
-                    <input type="text" id="employee_number" name="employee_number" class="form-input"
-                           value="{{ employee.employee_number }}" readonly>
+                    <input type="text" id="employee_number" name="employee_number" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                           value="{{ employee.employee_number }}" readonly
+                           {% if is_contract_readonly %}disabled{% endif %}>
                     {% else %}
                     <input type="text" id="employee_number" name="employee_number" class="form-input"
                            value="" placeholder="자동생성" readonly>

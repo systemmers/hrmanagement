@@ -119,6 +119,8 @@
         <thead>
             <tr>
                 <th data-sort="id">ID</th>
+                <th>계정유형</th>
+                <th>아이디</th>
                 <th data-sort="name">이름</th>
                 <th data-sort="department">부서</th>
                 <th data-sort="position">직급</th>
@@ -134,6 +136,8 @@
             {% for employee in employees %}
             <tr>
                 <td>{{ employee.id }}</td>
+                <td>{{ employee.account_type_label or '-' }}</td>
+                <td>{{ employee.username or '-' }}</td>
                 <td>
                     <div class="d-flex items-center gap-2">
                         {{ avatar_image(employee.photo, employee.name, size='xs') }}
@@ -170,6 +174,8 @@
                         <span class="badge badge-danger">거절됨</span>
                     {% elif employee.contract_status == 'terminated' %}
                         <span class="badge badge-secondary">종료</span>
+                    {% elif employee.contract_status == 'termination_requested' %}
+                        <span class="badge badge-warning">종료대기</span>
                     {% endif %}
                 </td>
                 <td>
@@ -220,6 +226,8 @@
                     <span class="text-danger">계약 거절</span>
                 {% elif employee.contract_status == 'terminated' %}
                     <span class="text-secondary">계약 종료</span>
+                {% elif employee.contract_status == 'termination_requested' %}
+                    <span class="text-warning">종료 대기</span>
                 {% endif %}
             </div>
         </div>

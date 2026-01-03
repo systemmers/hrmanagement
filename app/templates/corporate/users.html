@@ -21,7 +21,7 @@
             </a>
         </div>
     </div>
-    <p class="page-description">{{ company.name }} 법인 계정 목록입니다. ({{ users|length }}명)</p>
+    <p class="page-description">{{ company.name }} 법인 계정 목록입니다. (총 {{ pagination.total }}명{% if pagination.pages > 1 %}, {{ pagination.page }}/{{ pagination.pages }} 페이지{% endif %})</p>
 </div>
 
 <!-- 사용자 목록 테이블 -->
@@ -29,7 +29,7 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>No.</th>
                 <th>아이디</th>
                 <th>이메일</th>
                 <th>역할</th>
@@ -42,7 +42,7 @@
         <tbody>
             {% for user in users %}
             <tr>
-                <td>{{ user.id }}</td>
+                <td>{{ user.company_sequence }}</td>
                 <td>
                     <div class="d-flex items-center gap-2">
                         <div class="user-avatar-small">{{ user.username[:1]|upper }}</div>
@@ -75,6 +75,8 @@
                     <span class="badge badge-danger">거절됨</span>
                     {% elif user.contract_status == 'terminated' %}
                     <span class="badge badge-secondary">종료</span>
+                    {% elif user.contract_status == 'termination_requested' %}
+                    <span class="badge badge-warning">종료대기</span>
                     {% else %}
                     <span class="badge badge-light">계약없음</span>
                     {% endif %}
@@ -97,6 +99,30 @@
         </tbody>
     </table>
 </div>
+
+{% if pagination.pages > 1 %}
+<div class="pagination">
+    {% if pagination.has_prev %}
+    <a href="?page={{ pagination.prev_num }}" class="page-link">
+        <i class="fas fa-chevron-left"></i>
+    </a>
+    {% endif %}
+
+    {% for p in pagination.iter_pages() %}
+        {% if p %}
+        <a href="?page={{ p }}" class="page-link {{ 'active' if p == pagination.page else '' }}">{{ p }}</a>
+        {% else %}
+        <span class="page-ellipsis">...</span>
+        {% endif %}
+    {% endfor %}
+
+    {% if pagination.has_next %}
+    <a href="?page={{ pagination.next_num }}" class="page-link">
+        <i class="fas fa-chevron-right"></i>
+    </a>
+    {% endif %}
+</div>
+{% endif %}
 
 {% if users|length == 0 %}
 <div class="empty-state-large">

@@ -3,7 +3,8 @@ User Repository
 
 사용자 데이터의 CRUD 및 인증 기능을 제공합니다.
 """
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Tuple
+from sqlalchemy import func
 from app.database import db
 from app.models import User
 from .base_repository import BaseRepository
@@ -102,11 +103,68 @@ class UserRepository(BaseRepository[User]):
         return [user.to_dict() for user in users]
 
     def get_by_company_and_account_type(self, company_id: int, account_type: str) -> List[User]:
-        """법인 ID와 계정 타입으로 사용자 목록 조회"""
+        """법인 ID와 계정 타입으로 사용자 목록 조회 (가입순 정렬)"""
         return User.query.filter_by(
             company_id=company_id,
             account_type=account_type
-        ).all()
+        ).order_by(User.id.asc()).all()
+
+    def get_by_company_and_account_type_paginated(
+        self,
+        company_id: int,
+        account_type: str,
+        page: int = 1,
+        per_page: int = 20
+    ) -> Tuple[List[Dict], object]:
+        """법인 ID와 계정 타입으로 사용자 목록 조회 (페이지네이션 + 법인 내 시퀀스)
+
+        Args:
+            company_id: 법인 ID
+            account_type: 계정 타입
+            page: 페이지 번호
+            per_page: 페이지당 항목 수
+
+        Returns:
+            Tuple[사용자 목록 (Dict with company_sequence), 페이지네이션 객체]
+        """
+        # 1. 법인 내 시퀀스 계산을 위한 서브쿼리
+        subquery = db.session.query(
+            User.id,
+            func.row_number().over(
+                partition_by=User.company_id,
+                order_by=User.id.asc()
+            ).label('company_sequence')
+        ).filter_by(
+            company_id=company_id,
+            account_type=account_type
+        ).subquery()
+
+        # 2. 메인 쿼리 (시퀀스 포함)
+        query = db.session.query(
+            User,
+            subquery.c.company_sequence
+        ).join(
+            subquery, User.id == subquery.c.id
+        ).order_by(User.id.asc())
+
+        # 3. 페이지네이션
+        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+
+        # 4. 결과 변환 (Dict with company_sequence)
+        users = []
+        for user, company_sequence in pagination.items:
+            user_dict = user.to_dict() if hasattr(user, 'to_dict') else {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'role': user.role,
+                'is_active': user.is_active,
+                'created_at': user.created_at,
+            }
+            user_dict['company_sequence'] = company_sequence
+            users.append(user_dict)
+
+        return users, pagination
 
     def get_employee_sub_users_with_employee(self, company_id: int) -> List[User]:
         """법인 소속 employee_sub 계정 중 employee_id가 있는 사용자 조회"""
