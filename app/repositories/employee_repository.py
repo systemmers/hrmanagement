@@ -2,13 +2,35 @@
 Employee Repository
 
 직원 데이터의 CRUD 및 검색 기능을 제공합니다.
+
+Phase 28.2: Repository 레벨 필드 보호 추가
+- organization_id, company_id 등 핵심 필드 보호
+- update/update_partial 시 의도치 않은 덮어쓰기 방지
 """
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Set
 from app.database import db
 from app.models import Employee
 from app.constants.status import EmployeeStatus
 from .base_repository import BaseRepository
 from .mixins import TenantFilterMixin
+
+
+# ========================================
+# Repository 레벨 보호 필드 (Phase 28.2)
+# ========================================
+# update/update_partial 시 덮어쓰기 방지
+# 이 필드들은 생성 시에만 설정되거나, 명시적 API로만 변경 가능
+PROTECTED_FIELDS: Set[str] = {
+    'id',                # PK는 변경 불가
+    'company_id',        # 회사 소속은 변경 불가
+    'organization_id',   # 조직 소속은 폼에서 disabled로 전송 안됨 -> None 덮어쓰기 방지
+    'employee_number',   # 사번은 시스템 생성
+    'profile_id',        # 프로필 연결은 계약으로만 변경
+    # 관계 객체 보호 (SQLAlchemy 관계 설정 시 FK도 변경됨)
+    'organization',      # organization=None 설정 시 organization_id=None 됨
+    'profile',           # profile=None 설정 시 profile_id=None 됨
+    'company',           # company=None 설정 시 company_id=None 됨
+}
 
 
 class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
@@ -128,29 +150,45 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
         return employee.to_dict()
 
     def update(self, employee_id: str, data: Dict) -> Optional[Dict]:
-        """직원 정보 수정"""
+        """직원 정보 수정
+
+        Phase 28.2: PROTECTED_FIELDS 보호 적용
+        - organization_id, company_id 등 핵심 필드는 업데이트에서 제외
+        - 의도치 않은 None 덮어쓰기 방지
+        """
         employee = Employee.query.get(employee_id)
         if not employee:
             return None
 
-        # 데이터 업데이트
+        # 데이터 업데이트 (보호 필드 제외)
         for key, value in data.items():
             snake_key = self._camel_to_snake(key)
-            if hasattr(employee, snake_key) and key != 'id':
+            # Phase 28.2: 보호 필드는 스킵
+            if snake_key in PROTECTED_FIELDS:
+                continue
+            if hasattr(employee, snake_key):
                 setattr(employee, snake_key, value)
 
         db.session.commit()
         return employee.to_dict()
 
     def update_partial(self, employee_id: str, data: Dict) -> Optional[Dict]:
-        """직원 정보 부분 수정 (지정된 필드만 업데이트)"""
+        """직원 정보 부분 수정 (지정된 필드만 업데이트)
+
+        Phase 28.2: PROTECTED_FIELDS 보호 적용
+        - organization_id, company_id 등 핵심 필드는 업데이트에서 제외
+        - 의도치 않은 None 덮어쓰기 방지
+        """
         employee = Employee.query.get(employee_id)
         if not employee:
             return None
 
-        # 지정된 필드만 업데이트
+        # 지정된 필드만 업데이트 (보호 필드 제외)
         for key, value in data.items():
-            if hasattr(employee, key) and key != 'id':
+            # Phase 28.2: 보호 필드는 스킵
+            if key in PROTECTED_FIELDS:
+                continue
+            if hasattr(employee, key):
                 setattr(employee, key, value)
 
         db.session.commit()
@@ -303,7 +341,8 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
 
     def filter_employees(self, department: str = None, position: str = None, status: str = None,
                          departments: List[str] = None, positions: List[str] = None, statuses: List[str] = None,
-                         sort_by: str = None, sort_order: str = 'asc', organization_id: int = None) -> List[Dict]:
+                         search: str = None, sort_by: str = None, sort_order: str = 'asc',
+                         organization_id: int = None) -> List[Dict]:
         """다중 필터링 및 정렬
 
         Args:
@@ -313,11 +352,22 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
             departments: 복수 부서 필터
             positions: 복수 직급 필터
             statuses: 복수 상태 필터
+            search: 검색어 (이름, 부서, 직급)
             sort_by: 정렬 기준 컬럼
             sort_order: 정렬 순서 (asc/desc)
             organization_id: 조직 ID (None이면 전체 조회)
         """
+        from sqlalchemy import or_
         query = self._build_query(organization_id)
+
+        # 검색어 필터 (이름, 부서, 직급)
+        if search:
+            search_pattern = f'%{search}%'
+            query = query.filter(or_(
+                Employee.name.ilike(search_pattern),
+                Employee.department.ilike(search_pattern),
+                Employee.position.ilike(search_pattern)
+            ))
 
         # 단일 필터 (하위 호환성)
         if department:
