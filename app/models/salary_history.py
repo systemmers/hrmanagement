@@ -3,6 +3,7 @@ SalaryHistory SQLAlchemy 모델
 
 직원 연봉 계약 이력을 관리합니다.
 Phase 8: DictSerializableMixin 적용
+Phase 29: __dict_camel_mapping__ 제거
 """
 from app.database import db
 from app.models.mixins import DictSerializableMixin
@@ -11,15 +12,6 @@ from app.models.mixins import DictSerializableMixin
 class SalaryHistory(DictSerializableMixin, db.Model):
     """연봉 계약 이력 모델"""
     __tablename__ = 'salary_histories'
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'contract_year': ['contractYear'],
-        'annual_salary': ['annualSalary'],
-        'total_amount': ['totalAmount'],
-        'contract_period': ['contractPeriod'],
-    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, index=True)

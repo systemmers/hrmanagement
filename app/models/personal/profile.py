@@ -58,9 +58,7 @@ class PersonalProfile(db.Model):
     resident_number = db.Column(db.String(20), nullable=True)  # 암호화 필요
     nationality = db.Column(db.String(50), nullable=True)
 
-    # 기타 개인정보
-    blood_type = db.Column(db.String(10), nullable=True)
-    religion = db.Column(db.String(50), nullable=True)
+    # 기타 개인정보 (blood_type, religion 삭제됨 - Phase 28)
     hobby = db.Column(db.String(200), nullable=True)
     specialty = db.Column(db.String(200), nullable=True)
     disability_info = db.Column(db.Text, nullable=True)
@@ -149,8 +147,7 @@ class PersonalProfile(db.Model):
             'full_address': self.full_address,
             'nationality': self.nationality,
             'resident_number': self.resident_number,
-            'blood_type': self.blood_type,
-            'religion': self.religion,
+            # blood_type, religion 삭제됨 (Phase 28)
             'hobby': self.hobby,
             'specialty': self.specialty,
             'disability_info': self.disability_info,

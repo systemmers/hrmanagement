@@ -12,6 +12,7 @@ from app.models import ClassificationOption
 from app.services.corporate_settings_service import corporate_settings_service
 from app.utils.api_helpers import api_success, api_error, api_forbidden, api_not_found
 from app.utils.decorators import corporate_admin_required
+from app.utils.exceptions import ConflictError
 
 
 @corporate_settings_api_bp.route('/classifications', methods=['GET'])
@@ -87,14 +88,16 @@ def add_classification(category):
     if not value:
         return api_error('값을 입력해주세요.')
 
-    result = corporate_settings_service.add_classification(
-        company_id=company_id,
-        category=category,
-        value=value,
-        label=label or value
-    )
-
-    return api_success(result, status_code=201)
+    try:
+        result = corporate_settings_service.add_classification(
+            company_id=company_id,
+            category=category,
+            value=value,
+            label=label or value
+        )
+        return api_success(result, status_code=201)
+    except ConflictError as e:
+        return api_error(str(e), status_code=409)
 
 
 @corporate_settings_api_bp.route('/classifications/<category>/<int:option_id>', methods=['PUT'])
@@ -106,12 +109,14 @@ def update_classification(category, option_id):
         return api_forbidden('법인 정보를 찾을 수 없습니다.')
 
     data = request.get_json()
-    result = corporate_settings_service.update_classification(option_id, company_id, data)
 
-    if not result:
-        return api_not_found('옵션')
-
-    return api_success(result)
+    try:
+        result = corporate_settings_service.update_classification(option_id, company_id, data)
+        if not result:
+            return api_not_found('옵션')
+        return api_success(result)
+    except ConflictError as e:
+        return api_error(str(e), status_code=409)
 
 
 @corporate_settings_api_bp.route('/classifications/<category>/<int:option_id>', methods=['DELETE'])

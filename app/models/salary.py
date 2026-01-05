@@ -4,6 +4,7 @@ Salary SQLAlchemy 모델
 직원 급여 정보를 관리합니다. (1:1 관계)
 포괄임금제 급여 계산 지원
 Phase 8: DictSerializableMixin 적용
+Phase 29: __dict_camel_mapping__ 제거
 """
 from app.database import db
 from app.models.mixins import DictSerializableMixin
@@ -12,30 +13,6 @@ from app.models.mixins import DictSerializableMixin
 class Salary(DictSerializableMixin, db.Model):
     """급여 모델 (1:1)"""
     __tablename__ = 'salaries'
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'salary_type': ['salaryType'],
-        'base_salary': ['baseSalary'],
-        'position_allowance': ['positionAllowance'],
-        'meal_allowance': ['mealAllowance'],
-        'transportation_allowance': ['transportationAllowance'],
-        'total_salary': ['totalSalary'],
-        'payment_day': ['paymentDay'],
-        'payment_method': ['paymentMethod'],
-        'bank_account': ['bankAccount'],
-        'annual_salary': ['annualSalary'],
-        'monthly_salary': ['monthlySalary'],
-        'hourly_wage': ['hourlyWage'],
-        'overtime_hours': ['overtimeHours'],
-        'night_hours': ['nightHours'],
-        'holiday_days': ['holidayDays'],
-        'overtime_allowance': ['overtimeAllowance'],
-        'night_allowance': ['nightAllowance'],
-        'holiday_allowance': ['holidayAllowance'],
-        'bonus_rate': ['bonusRate'],
-    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, unique=True, index=True)

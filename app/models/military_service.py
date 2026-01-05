@@ -28,16 +28,6 @@ class MilitaryService(DictSerializableMixin, db.Model):
 
     # specialty 컬럼 추가됨 (2025-12-27) - computed 불필요
 
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'profile_id': ['profileId'],
-        'military_status': ['militaryStatus'],
-        'service_type': ['serviceType'],
-        'enlistment_date': ['enlistmentDate'],
-        'discharge_date': ['dischargeDate'],
-        'discharge_reason': ['dischargeReason'],
-        'exemption_reason': ['exemptionReason'],
-    }
 
     # ====================================
     # 컬럼 정의

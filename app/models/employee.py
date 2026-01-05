@@ -74,8 +74,7 @@ class Employee(db.Model):
     postal_code = db.Column(db.String(20), nullable=True)
     resident_number = db.Column(db.String(20), nullable=True)
     nationality = db.Column(db.String(50), nullable=True)
-    blood_type = db.Column(db.String(10), nullable=True)
-    religion = db.Column(db.String(50), nullable=True)
+    # blood_type, religion 삭제됨 (Phase 28 마이그레이션)
     hobby = db.Column(db.String(200), nullable=True)
     specialty = db.Column(db.String(200), nullable=True)
     disability_info = db.Column(db.Text, nullable=True)
@@ -153,8 +152,7 @@ class Employee(db.Model):
             'postal_code': self.postal_code,
             'resident_number': self.resident_number,
             'nationality': self.nationality,
-            'blood_type': self.blood_type,
-            'religion': self.religion,
+            # blood_type, religion 삭제됨 (Phase 28)
             'hobby': self.hobby,
             'specialty': self.specialty,
             'disability_info': self.disability_info,
@@ -262,8 +260,7 @@ class Employee(db.Model):
             postal_code=data.get('postal_code') or data.get('postalCode'),
             resident_number=data.get('resident_number') or data.get('residentNumber'),
             nationality=data.get('nationality'),
-            blood_type=data.get('blood_type') or data.get('bloodType'),
-            religion=data.get('religion'),
+            # blood_type, religion 삭제됨 (Phase 28)
             hobby=data.get('hobby'),
             specialty=data.get('specialty'),
             disability_info=data.get('disability_info') or data.get('disabilityInfo'),

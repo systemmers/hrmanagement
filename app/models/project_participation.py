@@ -21,13 +21,6 @@ class ProjectParticipation(DictSerializableMixin, db.Model):
         'notes': 'note',                       # Personal 호환
     }
 
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'profile_id': ['profileId'],
-        'project_name': ['projectName'],
-        'start_date': ['startDate'],
-        'end_date': ['endDate'],
-    }
 
     # ====================================
     # 컬럼 정의

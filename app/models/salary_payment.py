@@ -3,6 +3,7 @@ SalaryPayment SQLAlchemy 모델
 
 직원 급여 지급 이력을 관리합니다.
 Phase 8: DictSerializableMixin 적용
+Phase 29: __dict_camel_mapping__ 제거
 """
 from app.database import db
 from app.models.mixins import DictSerializableMixin
@@ -11,18 +12,6 @@ from app.models.mixins import DictSerializableMixin
 class SalaryPayment(DictSerializableMixin, db.Model):
     """급여 지급 모델"""
     __tablename__ = 'salary_payments'
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'payment_date': ['paymentDate'],
-        'payment_period': ['paymentPeriod'],
-        'base_salary': ['baseSalary'],
-        'gross_pay': ['grossPay'],
-        'income_tax': ['incomeTax'],
-        'total_deduction': ['totalDeduction'],
-        'net_pay': ['netPay'],
-    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, index=True)

@@ -21,12 +21,6 @@ class Award(DictSerializableMixin, db.Model):
         'notes': 'note',                       # Personal 호환
     }
 
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'profile_id': ['profileId'],
-        'award_date': ['awardDate'],
-        'award_name': ['awardName'],
-    }
 
     # ====================================
     # 컬럼 정의

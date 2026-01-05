@@ -4,6 +4,8 @@ Field Registry Module
 필드 순서 및 메타데이터 중앙 관리 시스템.
 SSOT(Single Source of Truth) 원칙에 따라 모든 필드 정의를 한 곳에서 관리.
 
+Phase 29 (2026-01-05): aliases 시스템 제거 - snake_case 직접 사용
+
 Usage:
     from app.constants.field_registry import FieldRegistry
 
@@ -15,9 +17,6 @@ Usage:
 
     # 데이터를 정렬된 순서로 변환
     ordered_data = FieldRegistry.to_ordered_dict('personal_basic', raw_data, account_type)
-
-    # 필드명 정규화 (별칭 -> 정규 필드명)
-    canonical = FieldRegistry.normalize_field_name('personal_basic', 'name_en')  # -> 'english_name'
 """
 from collections import OrderedDict
 from typing import Dict, List, Optional, Any
@@ -39,6 +38,8 @@ class FieldRegistry:
 
     모든 필드 정의를 중앙에서 관리하며, 섹션별/계정타입별 필드 조회 및
     데이터 정렬 기능을 제공.
+
+    Phase 29: aliases 시스템 제거 - snake_case 직접 사용
     """
 
     # 섹션 저장소 (섹션 ID -> SectionDefinition)
@@ -46,9 +47,6 @@ class FieldRegistry:
 
     # 도메인 -> 섹션 ID 매핑 (하나의 도메인이 여러 섹션을 포함할 수 있음)
     _domains: Dict[str, List[str]] = {}
-
-    # 별칭 캐시 (alias -> (section_id, canonical_name))
-    _alias_cache: Dict[str, tuple] = {}
 
     @classmethod
     def register_section(cls, section: SectionDefinition, domain: str = '') -> None:
@@ -67,11 +65,6 @@ class FieldRegistry:
                 cls._domains[domain] = []
             if section.id not in cls._domains[domain]:
                 cls._domains[domain].append(section.id)
-
-        # 별칭 캐시 갱신
-        for f in section.fields:
-            for alias in f.aliases:
-                cls._alias_cache[alias] = (section.id, f.name)
 
     @classmethod
     def get_section(cls, section_id: str) -> Optional[SectionDefinition]:
@@ -146,25 +139,15 @@ class FieldRegistry:
     @classmethod
     def normalize_field_name(cls, section_id: str, name: str) -> str:
         """
-        별칭을 정규 필드명으로 변환
+        필드명 정규화 (Phase 29: 별칭 변환 제거)
 
         Args:
-            section_id: 섹션 ID
-            name: 필드명 또는 별칭
+            section_id: 섹션 ID (미사용, 하위 호환성 유지)
+            name: 필드명
 
         Returns:
-            정규화된 필드명
+            입력된 필드명 그대로 반환
         """
-        # 캐시에서 먼저 검색
-        if name in cls._alias_cache:
-            cached_section, canonical = cls._alias_cache[name]
-            if cached_section == section_id:
-                return canonical
-
-        # 섹션에서 직접 검색
-        section = cls.get_section(section_id)
-        if section:
-            return section.normalize_field_name(name)
         return name
 
     @classmethod
@@ -331,7 +314,6 @@ class FieldRegistry:
         """
         cls._sections.clear()
         cls._domains.clear()
-        cls._alias_cache.clear()
 
 
 # 모듈 레벨에서 섹션 정의를 자동 로드

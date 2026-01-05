@@ -3,6 +3,7 @@ Evaluation SQLAlchemy 모델
 
 직원 인사평가 정보를 관리합니다.
 Phase 8: DictSerializableMixin 적용
+Phase 29: __dict_camel_mapping__ 제거
 """
 from app.database import db
 from app.models.mixins import DictSerializableMixin
@@ -11,17 +12,6 @@ from app.models.mixins import DictSerializableMixin
 class Evaluation(DictSerializableMixin, db.Model):
     """인사평가 모델"""
     __tablename__ = 'evaluations'
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'q1_grade': ['q1Grade'],
-        'q2_grade': ['q2Grade'],
-        'q3_grade': ['q3Grade'],
-        'q4_grade': ['q4Grade'],
-        'overall_grade': ['overallGrade'],
-        'salary_negotiation': ['salaryNegotiation'],
-    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, index=True)

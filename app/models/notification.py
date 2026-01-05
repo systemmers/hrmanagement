@@ -7,6 +7,7 @@ Phase 5: 알림 시스템
 - 퇴사 처리 알림
 - 시스템 알림
 Phase 8: DictSerializableMixin 적용
+Phase 29: __dict_camel_mapping__ 제거
 """
 from datetime import datetime
 from app.database import db
@@ -23,22 +24,6 @@ class Notification(DictSerializableMixin, db.Model):
 
     # JSON 필드 (자동 파싱)
     __dict_json_fields__ = ['extra_data']
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'user_id': ['userId'],
-        'notification_type': ['notificationType'],
-        'resource_type': ['resourceType'],
-        'resource_id': ['resourceId'],
-        'sender_id': ['senderId'],
-        'is_read': ['isRead'],
-        'read_at': ['readAt'],
-        'action_url': ['actionUrl'],
-        'action_label': ['actionLabel'],
-        'extra_data': ['extraData'],
-        'created_at': ['createdAt'],
-        'expires_at': ['expiresAt'],
-    }
 
     # ===== 알림 유형 상수 =====
     TYPE_CONTRACT_REQUEST = 'contract_request'      # 계약 요청 받음
@@ -154,19 +139,6 @@ class NotificationPreference(DictSerializableMixin, db.Model):
     사용자별 알림 수신 설정을 저장합니다.
     """
     __tablename__ = 'notification_preferences'
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'user_id': ['userId'],
-        'receive_contract_notifications': ['receiveContractNotifications'],
-        'receive_sync_notifications': ['receiveSyncNotifications'],
-        'receive_termination_notifications': ['receiveTerminationNotifications'],
-        'receive_system_notifications': ['receiveSystemNotifications'],
-        'email_notifications_enabled': ['emailNotificationsEnabled'],
-        'email_digest_frequency': ['emailDigestFrequency'],
-        'created_at': ['createdAt'],
-        'updated_at': ['updatedAt'],
-    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True)

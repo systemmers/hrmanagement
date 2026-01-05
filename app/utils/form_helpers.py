@@ -5,10 +5,9 @@ employees/form_extractors.py와 personal/form_extractors.py에서
 공통으로 사용되는 헬퍼 함수를 정의합니다. (DRY 원칙)
 
 Phase 25: 공통 모듈 추출 (2025-12-29)
+Phase 29: normalize_form_field 제거 (2026-01-05) - 별칭 시스템 제거
 """
 from typing import Any, Optional
-
-from app.constants.field_registry import FieldRegistry
 
 
 def parse_boolean(value) -> bool:
@@ -33,45 +32,9 @@ def parse_boolean(value) -> bool:
     return value in ('true', 'True', '1', True)
 
 
-def normalize_form_field(
-    form_data: dict,
-    section_id: str,
-    field_name: str,
-    default: Any = None
-) -> Optional[Any]:
-    """FieldRegistry 기반 폼 필드값 추출 (SSOT 원칙)
-
-    정규 필드명과 별칭을 모두 검색하여 값을 반환합니다.
-
-    Args:
-        form_data: request.form 데이터
-        section_id: FieldRegistry 섹션 ID (예: 'personal_basic', 'contact')
-        field_name: 정규 필드명 (예: 'english_name', 'resident_number')
-        default: 기본값 (기본: None)
-
-    Returns:
-        필드값 또는 default
-
-    Examples:
-        >>> normalize_form_field(form_data, 'personal_basic', 'english_name')
-        # 'english_name' 또는 'name_en' 별칭으로 값 검색
-    """
-    # 정규 필드명으로 먼저 시도
-    value = form_data.get(field_name)
-    if value:
-        return value
-
-    # FieldRegistry에서 별칭 조회
-    section = FieldRegistry.get_section(section_id)
-    if section:
-        field = section.get_field(field_name)
-        if field and field.aliases:
-            for alias in field.aliases:
-                value = form_data.get(alias)
-                if value:
-                    return value
-
-    return default
+# Phase 29: normalize_form_field() 함수 제거됨 (2026-01-05)
+# 모든 폼 필드는 snake_case로 직접 접근합니다.
+# 별칭 시스템이 제거되어 form_data.get('field_name')으로 직접 사용합니다.
 
 
 def get_form_value(form_data: dict, key: str, default: Any = '') -> Any:

@@ -3,6 +3,7 @@ Attachment SQLAlchemy 모델
 
 직원 첨부파일 정보를 관리합니다.
 Phase 8: DictSerializableMixin 적용
+Phase 29: __dict_camel_mapping__ 제거
 """
 from app.database import db
 from app.models.mixins import DictSerializableMixin
@@ -11,16 +12,6 @@ from app.models.mixins import DictSerializableMixin
 class Attachment(DictSerializableMixin, db.Model):
     """첨부파일 모델"""
     __tablename__ = 'attachments'
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'file_name': ['fileName'],
-        'file_path': ['filePath'],
-        'file_type': ['fileType'],
-        'file_size': ['fileSize'],
-        'upload_date': ['uploadDate'],
-    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, index=True)

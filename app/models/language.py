@@ -26,14 +26,6 @@ class Language(DictSerializableMixin, db.Model):
         'notes': 'note',                       # Personal 호환
     }
 
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'profile_id': ['profileId'],
-        'language_name': ['languageName'],
-        'exam_name': ['examName'],
-        'acquisition_date': ['acquisitionDate'],
-        'expiry_date': ['expiryDate'],
-    }
 
     # ====================================
     # 컬럼 정의

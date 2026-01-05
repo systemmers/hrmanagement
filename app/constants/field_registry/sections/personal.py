@@ -2,6 +2,8 @@
 Personal Section Definitions
 
 개인 프로필 관련 섹션 정의 (기본정보, 연락처, 주소 등)
+
+Phase 29 (2026-01-05): aliases 시스템 제거 - snake_case 직접 사용
 """
 from ..base import (
     FieldDefinition,
@@ -34,7 +36,6 @@ PERSONAL_BASIC_FIELDS = [
         order=20,
         field_type=FieldType.TEXT,
         required=True,  # Phase 28: 필수화
-        aliases=['englishName'],  # Phase 28: name_en 별칭 제거 (DB 컬럼명 직접 사용)
         max_length=100,
     ),
     create_field(
@@ -42,7 +43,6 @@ PERSONAL_BASIC_FIELDS = [
         label='한자 이름',  # Phase 28: 한자명 → 한자 이름
         order=30,
         field_type=FieldType.TEXT,
-        aliases=['chineseName'],
         max_length=100,
     ),
     create_field(
@@ -50,7 +50,6 @@ PERSONAL_BASIC_FIELDS = [
         label='외국어 이름',  # Phase 28: 외국어명 → 외국어 이름
         order=35,
         field_type=FieldType.TEXT,
-        aliases=['foreignName'],
         max_length=100,
         help_text='영문 외 추가 외국어 이름',
     ),
@@ -60,7 +59,6 @@ PERSONAL_BASIC_FIELDS = [
         order=40,
         field_type=FieldType.TEXT,
         required=True,  # Phase 28: 필수화
-        aliases=['residentNumber'],  # Phase 28: rrn 별칭 제거 (DB 컬럼명 직접 사용)
         max_length=20,
         help_text='입력 시 생년월일/나이/성별 자동 입력',
     ),
@@ -69,7 +67,6 @@ PERSONAL_BASIC_FIELDS = [
         label='생년월일',
         order=50,
         field_type=FieldType.DATE,
-        aliases=['birthDate'],
         readonly=True,  # Phase 28: RRN 자동입력
         help_text='주민등록번호 입력 시 자동 입력됩니다.',
     ),
@@ -78,7 +75,6 @@ PERSONAL_BASIC_FIELDS = [
         label='나이',
         order=55,
         field_type=FieldType.NUMBER,
-        aliases=['만나이'],
         readonly=True,  # Phase 28: 자동계산 (만 나이)
         help_text='주민등록번호 입력 시 자동 계산됩니다.',
     ),
@@ -96,14 +92,12 @@ PERSONAL_BASIC_FIELDS = [
         label='음력 여부',
         order=65,
         field_type=FieldType.CHECKBOX,
-        aliases=['lunarBirth'],
     ),
     create_field(
         name='marital_status',
         label='결혼여부',  # Phase 28: 결혼 여부 → 결혼여부 (공백 제거)
         order=70,
         field_type=FieldType.SELECT,
-        aliases=['maritalStatus'],
         options_category='marital_status',
     ),
     create_field(
@@ -136,7 +130,6 @@ CONTACT_FIELDS = [
         order=10,
         field_type=FieldType.TEL,
         required=True,  # Phase 28: 필수화
-        aliases=['phone', 'mobilePhone'],
         max_length=50,
     ),
     create_field(
@@ -144,7 +137,6 @@ CONTACT_FIELDS = [
         label='자택전화',
         order=20,
         field_type=FieldType.TEL,
-        aliases=['homePhone'],
         max_length=50,
     ),
     create_field(
@@ -160,7 +152,6 @@ CONTACT_FIELDS = [
         label='비상연락처',
         order=40,
         field_type=FieldType.TEL,
-        aliases=['emergencyContact'],
         max_length=50,
     ),
     create_field(
@@ -168,7 +159,6 @@ CONTACT_FIELDS = [
         label='비상연락처 관계',
         order=50,
         field_type=FieldType.TEXT,
-        aliases=['emergencyRelation'],
         max_length=50,
     ),
 ]
@@ -192,7 +182,6 @@ ADDRESS_FIELDS = [
         label='우편번호',
         order=10,
         field_type=FieldType.TEXT,
-        aliases=['postalCode'],
         max_length=20,
     ),
     create_field(
@@ -208,7 +197,6 @@ ADDRESS_FIELDS = [
         label='상세주소',
         order=30,
         field_type=FieldType.TEXT,
-        aliases=['detailedAddress'],
         max_length=500,
     ),
 ]
@@ -232,7 +220,6 @@ ACTUAL_ADDRESS_FIELDS = [
         label='우편번호',
         order=10,
         field_type=FieldType.TEXT,
-        aliases=['actualPostalCode'],
         max_length=20,
     ),
     create_field(
@@ -241,7 +228,6 @@ ACTUAL_ADDRESS_FIELDS = [
         order=20,
         field_type=FieldType.TEXT,
         required=True,  # Phase 28: 필수화
-        aliases=['actualAddress'],
         max_length=500,
     ),
     create_field(
@@ -249,7 +235,6 @@ ACTUAL_ADDRESS_FIELDS = [
         label='상세주소',
         order=30,
         field_type=FieldType.TEXT,
-        aliases=['actualDetailedAddress'],
         max_length=500,
     ),
 ]
@@ -288,7 +273,6 @@ PERSONAL_EXTENDED_FIELDS = [
         label='장애정보',  # Phase 28: 장애 정보 → 장애정보 (공백 제거)
         order=30,
         field_type=FieldType.TEXT,  # Phase 28: TEXTAREA -> TEXT 변경
-        aliases=['disabilityInfo'],
         max_length=200,
     ),
 ]
@@ -312,7 +296,6 @@ BANK_INFO_FIELDS = [
         label='은행명',
         order=10,
         field_type=FieldType.SELECT,
-        aliases=['bankName'],
         options_category='bank',
     ),
     create_field(
@@ -320,7 +303,6 @@ BANK_INFO_FIELDS = [
         label='계좌번호',
         order=20,
         field_type=FieldType.TEXT,
-        aliases=['accountNumber'],
         max_length=50,
     ),
     create_field(
@@ -328,7 +310,6 @@ BANK_INFO_FIELDS = [
         label='예금주',
         order=30,
         field_type=FieldType.TEXT,
-        aliases=['accountHolder'],
         max_length=50,
     ),
 ]
@@ -351,7 +332,6 @@ MILITARY_FIELDS = [
         label='병역구분',
         order=10,
         field_type=FieldType.SELECT,
-        aliases=['militaryStatus'],
         options_category='military_status',
     ),
     create_field(
@@ -359,7 +339,6 @@ MILITARY_FIELDS = [
         label='복무 형태',
         order=20,
         field_type=FieldType.SELECT,
-        aliases=['serviceType'],
         options_category='service_type',
     ),
     create_field(
@@ -381,21 +360,18 @@ MILITARY_FIELDS = [
         label='복무 시작일',
         order=50,
         field_type=FieldType.DATE,
-        aliases=['serviceStart', 'enlistment_date'],
     ),
     create_field(
         name='service_end',
         label='복무 종료일',
         order=60,
         field_type=FieldType.DATE,
-        aliases=['serviceEnd', 'discharge_date'],
     ),
     create_field(
         name='exemption_reason',
         label='면제 사유',
         order=70,
         field_type=FieldType.TEXT,
-        aliases=['exemptionReason'],
         max_length=200,
     ),
 ]

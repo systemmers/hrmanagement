@@ -3,6 +3,7 @@ Contract SQLAlchemy 모델
 
 직원 계약 정보를 관리합니다. (1:1 관계)
 Phase 8: DictSerializableMixin 적용
+Phase 29: __dict_camel_mapping__ 제거
 """
 from app.database import db
 from app.models.mixins import DictSerializableMixin
@@ -11,16 +12,6 @@ from app.models.mixins import DictSerializableMixin
 class Contract(DictSerializableMixin, db.Model):
     """계약 모델 (1:1)"""
     __tablename__ = 'contracts'
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'contract_date': ['contractDate'],
-        'contract_type': ['contractType'],
-        'contract_period': ['contractPeriod'],
-        'employee_type': ['employeeType', 'employment_type'],
-        'work_type': ['workType'],
-    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, unique=True, index=True)
