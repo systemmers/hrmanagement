@@ -269,54 +269,6 @@ class PlatformService:
         except Exception as e:
             return False, str(e)
 
-    # ========================================
-    # 플랫폼 설정
-    # ========================================
-
-    def get_platform_settings(self) -> Dict:
-        """플랫폼 설정 조회
-
-        Phase 30: PlatformSettings는 단일 설정이므로 Model.query 허용
-
-        Returns:
-            설정 Dict
-        """
-        from app.models.platform_settings import PlatformSettings
-        settings = PlatformSettings.query.first()
-        if settings:
-            return settings.to_dict()
-        return {}
-
-    def update_platform_settings(self, data: Dict) -> Tuple[bool, Optional[str]]:
-        """플랫폼 설정 수정
-
-        Phase 30: PlatformSettings는 단일 설정이므로 현재 패턴 유지
-        (별도 Repository 없이 직접 관리)
-
-        Args:
-            data: 설정 데이터
-
-        Returns:
-            Tuple[성공여부, 에러메시지]
-        """
-        from app.models.platform_settings import PlatformSettings
-        from app.database import db
-
-        try:
-            with atomic_transaction():
-                settings = PlatformSettings.query.first()
-                if not settings:
-                    settings = PlatformSettings()
-                    db.session.add(settings)
-
-                for key, value in data.items():
-                    if hasattr(settings, key):
-                        setattr(settings, key, value)
-
-            return True, None
-        except Exception as e:
-            return False, str(e)
-
     def get_users_by_company(self, company_id: int) -> List[User]:
         """법인 소속 사용자 목록 조회
 
