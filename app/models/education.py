@@ -16,7 +16,7 @@ class Education(DictSerializableMixin, db.Model):
 
     DictSerializableMixin 적용:
     - to_dict(): 자동 직렬화 + alias + computed
-    - from_dict(): 자동 역직렬화 (camelCase/snake_case)
+    - from_dict(): 자동 역직렬화 (snake_case)
     """
     __tablename__ = 'educations'
 
@@ -38,17 +38,6 @@ class Education(DictSerializableMixin, db.Model):
             if self.graduation_date and len(self.graduation_date) >= 4
             else None
         ),
-    }
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'profile_id': ['profileId'],
-        'school_type': ['schoolType'],
-        'school_name': ['schoolName'],
-        'admission_date': ['admissionDate'],
-        'graduation_date': ['graduationDate'],
-        'graduation_status': ['graduationStatus'],
     }
 
     # ====================================

@@ -3,6 +3,7 @@ Training SQLAlchemy 모델
 
 직원 교육 이력 정보를 관리합니다.
 Phase 8: DictSerializableMixin 적용
+Phase 29: __dict_camel_mapping__ 제거
 """
 from app.database import db
 from app.models.mixins import DictSerializableMixin
@@ -11,14 +12,6 @@ from app.models.mixins import DictSerializableMixin
 class Training(DictSerializableMixin, db.Model):
     """교육 이력 모델"""
     __tablename__ = 'trainings'
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'training_date': ['trainingDate'],
-        'training_name': ['trainingName'],
-        'completion_status': ['completionStatus'],
-    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, index=True)

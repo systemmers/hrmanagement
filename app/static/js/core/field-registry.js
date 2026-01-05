@@ -4,6 +4,8 @@
  * Backend FieldRegistry와 동기화되어 필드 순서, 타입, 옵션 등을 관리합니다.
  * SSOT(Single Source of Truth) 원칙에 따라 서버에서 정의를 로드합니다.
  *
+ * Phase 29: aliases 시스템 제거 - snake_case 직접 사용
+ *
  * Usage:
  *   import { FieldRegistry } from '/static/js/core/field-registry.js';
  *
@@ -158,8 +160,10 @@ export class FieldRegistry {
     /**
      * 특정 필드 정의 조회
      *
+     * Phase 29: alias 검색 제거 - 필드명 직접 매칭만 지원
+     *
      * @param {string} sectionId - 섹션 ID
-     * @param {string} fieldName - 필드명 또는 별칭
+     * @param {string} fieldName - 필드명
      * @returns {Object|null} 필드 정의
      */
     static getField(sectionId, fieldName) {
@@ -167,16 +171,14 @@ export class FieldRegistry {
         if (!section || !section.fields) {
             return null;
         }
-        return section.fields.find(f =>
-            f.name === fieldName || (f.aliases && f.aliases.includes(fieldName))
-        ) || null;
+        return section.fields.find(f => f.name === fieldName) || null;
     }
 
     /**
-     * 별칭을 정규 필드명으로 변환
+     * 필드명 정규화 (Phase 29: 입력값 그대로 반환)
      *
      * @param {string} sectionId - 섹션 ID
-     * @param {string} name - 필드명 또는 별칭
+     * @param {string} name - 필드명
      * @returns {string} 정규화된 필드명
      */
     static normalizeFieldName(sectionId, name) {
@@ -185,7 +187,9 @@ export class FieldRegistry {
     }
 
     /**
-     * 섹션의 별칭 -> 정규 필드명 매핑 반환
+     * 섹션의 필드명 매핑 반환
+     *
+     * Phase 29: alias 매핑 제거 - 필드명 직접 매핑만 반환
      *
      * @param {string} sectionId - 섹션 ID
      * @returns {Object} 매핑 객체
@@ -199,11 +203,6 @@ export class FieldRegistry {
         const mapping = {};
         for (const field of section.fields) {
             mapping[field.name] = field.name;
-            if (field.aliases) {
-                for (const alias of field.aliases) {
-                    mapping[alias] = field.name;
-                }
-            }
         }
         return mapping;
     }
@@ -222,7 +221,7 @@ export class FieldRegistry {
 
         // 정렬된 필드부터 추가
         for (const name of orderedNames) {
-            // 원본 데이터에서 정규 필드명 또는 별칭으로 찾기
+            // 원본 데이터에서 필드명으로 찾기
             for (const [key, value] of Object.entries(data)) {
                 if (mapping[key] === name) {
                     result[name] = value;

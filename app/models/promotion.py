@@ -3,6 +3,7 @@ Promotion SQLAlchemy 모델
 
 직원 발령/인사이동 정보를 관리합니다.
 Phase 8: DictSerializableMixin 적용
+Phase 29: __dict_camel_mapping__ 제거
 """
 from app.database import db
 from app.models.mixins import DictSerializableMixin
@@ -11,18 +12,6 @@ from app.models.mixins import DictSerializableMixin
 class Promotion(DictSerializableMixin, db.Model):
     """발령/인사이동 모델"""
     __tablename__ = 'promotions'
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'effective_date': ['effectiveDate'],
-        'promotion_type': ['promotionType'],
-        'from_department': ['fromDepartment'],
-        'to_department': ['toDepartment'],
-        'from_position': ['fromPosition'],
-        'to_position': ['toPosition'],
-        'job_role': ['jobRole'],
-    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, index=True)

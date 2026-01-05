@@ -25,15 +25,6 @@ class Certificate(DictSerializableMixin, db.Model):
         'issue_date': 'acquisition_date',      # Personal 호환
     }
 
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'profile_id': ['profileId'],
-        'certificate_name': ['certificateName'],
-        'issuing_organization': ['issuingOrganization'],
-        'certificate_number': ['certificateNumber'],
-        'acquisition_date': ['acquisitionDate'],
-        'expiry_date': ['expiryDate'],
-    }
 
     # ====================================
     # 컬럼 정의

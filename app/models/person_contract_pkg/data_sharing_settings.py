@@ -5,6 +5,7 @@ DataSharingSettings SQLAlchemy Model
 
 Phase 5: 구조화 - contract/ 폴더로 분리
 Phase 8: DictSerializableMixin 적용
+Phase 29: __dict_camel_mapping__ 제거
 """
 from datetime import datetime
 from app.database import db
@@ -14,21 +15,6 @@ from app.models.mixins import DictSerializableMixin
 class DataSharingSettings(DictSerializableMixin, db.Model):
     """데이터 공유 설정 모델"""
     __tablename__ = 'data_sharing_settings'
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'contract_id': ['contractId'],
-        'share_basic_info': ['shareBasicInfo'],
-        'share_contact': ['shareContact'],
-        'share_education': ['shareEducation'],
-        'share_career': ['shareCareer'],
-        'share_certificates': ['shareCertificates'],
-        'share_languages': ['shareLanguages'],
-        'share_military': ['shareMilitary'],
-        'is_realtime_sync': ['isRealtimeSync'],
-        'created_at': ['createdAt'],
-        'updated_at': ['updatedAt'],
-    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     contract_id = db.Column(

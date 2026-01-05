@@ -3,6 +3,8 @@ Relation Section Definitions
 
 동적 이력 관련 섹션 정의 (학력, 경력, 자격증, 언어, 가족, 수상, 프로젝트)
 이 섹션들은 is_dynamic=True로 동적 추가/삭제가 가능합니다.
+
+Phase 29 (2026-01-05): aliases 시스템 제거 - snake_case 직접 사용
 """
 from ..base import (
     FieldDefinition,
@@ -24,7 +26,6 @@ EDUCATION_FIELDS = [
         label='학교구분',
         order=10,
         field_type=FieldType.SELECT,
-        aliases=['schoolType'],
         options_category='school_type',
     ),
     create_field(
@@ -32,7 +33,6 @@ EDUCATION_FIELDS = [
         label='학교명',
         order=20,
         field_type=FieldType.TEXT,
-        aliases=['schoolName'],
         required=True,
         max_length=200,
     ),
@@ -55,7 +55,6 @@ EDUCATION_FIELDS = [
         label='졸업구분',
         order=50,
         field_type=FieldType.SELECT,
-        aliases=['graduationStatus'],
         options_category='graduation_status',
     ),
     create_field(
@@ -63,7 +62,6 @@ EDUCATION_FIELDS = [
         label='졸업년도',
         order=60,
         field_type=FieldType.TEXT,
-        aliases=['graduationDate', 'graduation_year'],
         max_length=20,
         help_text='YYYY 형식 또는 YYYY-MM 형식',
     ),
@@ -89,7 +87,6 @@ CAREER_FIELDS = [
         label='회사명',
         order=10,
         field_type=FieldType.TEXT,
-        aliases=['companyName'],
         required=True,
         max_length=200,
     ),
@@ -112,21 +109,18 @@ CAREER_FIELDS = [
         label='입사일',
         order=40,
         field_type=FieldType.DATE,
-        aliases=['startDate'],
     ),
     create_field(
         name='end_date',
         label='퇴사일',
         order=50,
         field_type=FieldType.DATE,
-        aliases=['endDate'],
     ),
     create_field(
         name='job_description',
         label='담당업무',
         order=60,
         field_type=FieldType.TEXTAREA,
-        aliases=['jobDescription', 'duties'],
     ),
 ]
 
@@ -150,7 +144,6 @@ CERTIFICATE_FIELDS = [
         label='자격증명',
         order=10,
         field_type=FieldType.TEXT,
-        aliases=['certificateName', 'name'],
         required=True,
         max_length=200,
     ),
@@ -166,7 +159,6 @@ CERTIFICATE_FIELDS = [
         label='발급기관',
         order=30,
         field_type=FieldType.TEXT,
-        aliases=['issuingOrganization', 'issuer'],
         max_length=200,
     ),
     create_field(
@@ -174,7 +166,6 @@ CERTIFICATE_FIELDS = [
         label='자격증번호',
         order=40,
         field_type=FieldType.TEXT,
-        aliases=['certificateNumber', 'number'],
         max_length=100,
     ),
     create_field(
@@ -182,7 +173,6 @@ CERTIFICATE_FIELDS = [
         label='취득일',
         order=50,
         field_type=FieldType.DATE,
-        aliases=['acquisitionDate', 'date'],
     ),
 ]
 
@@ -206,7 +196,6 @@ LANGUAGE_FIELDS = [
         label='언어',
         order=10,
         field_type=FieldType.SELECT,
-        aliases=['name'],
         required=True,
         options_category='language',
     ),
@@ -222,7 +211,6 @@ LANGUAGE_FIELDS = [
         label='시험명',
         order=30,
         field_type=FieldType.TEXT,
-        aliases=['testName'],
         max_length=100,
     ),
     create_field(
@@ -237,7 +225,6 @@ LANGUAGE_FIELDS = [
         label='응시일',
         order=50,
         field_type=FieldType.DATE,
-        aliases=['testDate'],
     ),
 ]
 
@@ -276,7 +263,6 @@ FAMILY_FIELDS = [
         label='생년월일',
         order=30,
         field_type=FieldType.DATE,
-        aliases=['birthDate'],
     ),
     create_field(
         name='occupation',
@@ -290,7 +276,6 @@ FAMILY_FIELDS = [
         label='연락처',
         order=50,
         field_type=FieldType.TEL,
-        aliases=['phone'],
         max_length=50,
     ),
     create_field(
@@ -298,7 +283,6 @@ FAMILY_FIELDS = [
         label='동거 여부',
         order=60,
         field_type=FieldType.CHECKBOX,
-        aliases=['isCohabitant', 'cohabiting'],
     ),
 ]
 
@@ -322,14 +306,12 @@ AWARD_FIELDS = [
         label='수상일',
         order=10,
         field_type=FieldType.DATE,
-        aliases=['awardDate', 'date'],
     ),
     create_field(
         name='award_name',
         label='수상명',
         order=20,
         field_type=FieldType.TEXT,
-        aliases=['awardName', 'name'],
         required=True,
         max_length=200,
     ),
@@ -368,7 +350,6 @@ PROJECT_PARTICIPATION_FIELDS = [
         label='프로젝트명',
         order=10,
         field_type=FieldType.TEXT,
-        aliases=['projectName', 'name'],
         required=True,
         max_length=200,
     ),
@@ -377,21 +358,18 @@ PROJECT_PARTICIPATION_FIELDS = [
         label='시작일',
         order=20,
         field_type=FieldType.DATE,
-        aliases=['startDate'],
     ),
     create_field(
         name='end_date',
         label='종료일',
         order=30,
         field_type=FieldType.DATE,
-        aliases=['endDate'],
     ),
     create_field(
         name='role',
         label='역할',
         order=40,
         field_type=FieldType.TEXT,
-        aliases=['duties'],
         max_length=200,
     ),
     create_field(

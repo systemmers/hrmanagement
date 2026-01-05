@@ -11,19 +11,14 @@ from typing import Any, Dict, List, Optional
 from app.types import FormData, FieldMapping
 from app.constants.status import EmployeeStatus
 from ...models import Employee
-from ...utils.form_helpers import parse_boolean as _parse_boolean, normalize_form_field
+from ...utils.form_helpers import parse_boolean as _parse_boolean
 
 
 def extract_employee_from_form(form_data: FormData, employee_id: int = 0) -> Employee:
-    """폼 데이터에서 Employee 객체 생성 (Phase 9: FieldRegistry 기반)"""
+    """폼 데이터에서 Employee 객체 생성 (Phase 29: 별칭 제거, snake_case 직접 접근)"""
     # organization_id 처리
     org_id = form_data.get('organization_id')
     organization_id = int(org_id) if org_id and org_id.strip() else None
-
-    # 섹션 ID 상수
-    BASIC = 'personal_basic'
-    CONTACT = 'contact'
-    ORG = 'organization'
 
     return Employee(
         id=employee_id,
@@ -33,8 +28,7 @@ def extract_employee_from_form(form_data: FormData, employee_id: int = 0) -> Emp
         department=form_data.get('department', ''),
         position=form_data.get('position', ''),
         status=form_data.get('status', EmployeeStatus.ACTIVE),
-        # hire_date: FieldRegistry 별칭 적용 (hireDate -> hire_date)
-        hire_date=normalize_form_field(form_data, ORG, 'hire_date', ''),
+        hire_date=form_data.get('hire_date', ''),
         phone=form_data.get('phone', ''),
         email=form_data.get('email', ''),
         # 조직 연결
@@ -49,8 +43,8 @@ def extract_employee_from_form(form_data: FormData, employee_id: int = 0) -> Emp
         work_location=form_data.get('work_location'),
         internal_phone=form_data.get('internal_phone'),
         company_email=form_data.get('company_email'),
-        # 확장 필드 - 개인정보 (FieldRegistry 별칭 적용)
-        english_name=normalize_form_field(form_data, BASIC, 'english_name'),
+        # 확장 필드 - 개인정보 (Phase 29: 직접 접근)
+        english_name=form_data.get('english_name'),
         chinese_name=form_data.get('chinese_name'),
         birth_date=form_data.get('birth_date'),
         lunar_birth=_parse_boolean(form_data.get('lunar_birth')),
@@ -58,45 +52,36 @@ def extract_employee_from_form(form_data: FormData, employee_id: int = 0) -> Emp
         address=form_data.get('address'),
         detailed_address=form_data.get('detailed_address'),
         postal_code=form_data.get('postal_code'),
-        # resident_number: FieldRegistry 별칭 적용 (rrn -> resident_number)
-        resident_number=normalize_form_field(form_data, BASIC, 'resident_number'),
-        mobile_phone=normalize_form_field(form_data, CONTACT, 'mobile_phone'),
-        home_phone=normalize_form_field(form_data, CONTACT, 'home_phone'),
+        resident_number=form_data.get('resident_number'),
+        mobile_phone=form_data.get('mobile_phone'),
+        home_phone=form_data.get('home_phone'),
         nationality=form_data.get('nationality'),
-        blood_type=form_data.get('blood_type'),
-        religion=form_data.get('religion'),
+        # Phase 28.3: blood_type, religion 삭제됨
         hobby=form_data.get('hobby'),
         specialty=form_data.get('specialty'),
     )
 
 
 def extract_basic_fields_from_form(form_data: FormData) -> Dict[str, Any]:
-    """폼 데이터에서 기본정보 필드만 추출 (Phase 9: FieldRegistry 기반)"""
-    # 섹션 ID 상수
-    BASIC = 'personal_basic'
-    CONTACT = 'contact'
-
+    """폼 데이터에서 기본정보 필드만 추출 (Phase 29: 별칭 제거, snake_case 직접 접근)"""
     return {
         'name': form_data.get('name', ''),
         'photo': form_data.get('photo') or '/static/images/face/face_01_m.png',
-        # FieldRegistry 별칭 적용
-        'english_name': normalize_form_field(form_data, BASIC, 'english_name'),
+        'english_name': form_data.get('english_name'),
         'chinese_name': form_data.get('chinese_name'),
         'birth_date': form_data.get('birth_date'),
         'lunar_birth': _parse_boolean(form_data.get('lunar_birth')),
         'gender': form_data.get('gender'),
         'phone': form_data.get('phone', ''),
         'email': form_data.get('email', ''),
-        'mobile_phone': normalize_form_field(form_data, CONTACT, 'mobile_phone'),
-        'home_phone': normalize_form_field(form_data, CONTACT, 'home_phone'),
+        'mobile_phone': form_data.get('mobile_phone'),
+        'home_phone': form_data.get('home_phone'),
         'address': form_data.get('address'),
         'detailed_address': form_data.get('detailed_address'),
         'postal_code': form_data.get('postal_code'),
-        # FieldRegistry 별칭 적용 (rrn -> resident_number)
-        'resident_number': normalize_form_field(form_data, BASIC, 'resident_number'),
+        'resident_number': form_data.get('resident_number'),
         'nationality': form_data.get('nationality'),
-        'blood_type': form_data.get('blood_type'),
-        'religion': form_data.get('religion'),
+        # Phase 28.3: blood_type, religion 삭제됨
         'hobby': form_data.get('hobby'),
         'specialty': form_data.get('specialty'),
     }
@@ -146,7 +131,7 @@ def extract_relation_list(
 
 
 def extract_family_list(form_data: FormData) -> List[Dict[str, Any]]:
-    """가족정보 리스트 추출"""
+    """가족정보 리스트 추출 (Phase 29: 레거시 별칭 제거)"""
     items = extract_relation_list(form_data, 'family_', {
         'relation': 'relation',
         'name': 'name',
@@ -154,7 +139,6 @@ def extract_family_list(form_data: FormData) -> List[Dict[str, Any]]:
         'occupation': 'occupation',
         'phone': 'contact',
         'is_cohabitant': 'is_cohabitant',
-        'living_together': 'is_cohabitant',  # 레거시 별칭
     })
 
     # is_cohabitant boolean 변환
@@ -214,24 +198,21 @@ def extract_career_list(form_data: FormData) -> List[Dict[str, Any]]:
 
 
 def extract_certificate_list(form_data: FormData) -> List[Dict[str, Any]]:
-    """자격증정보 리스트 추출"""
+    """자격증정보 리스트 추출 (Phase 29: 레거시 별칭 제거)"""
     return extract_relation_list(form_data, 'certificate_', {
         'name': 'certificate_name',
         'grade': 'grade',
         'issuing_organization': 'issuing_organization',
-        'issuer': 'issuing_organization',  # 레거시 별칭
         'number': 'certificate_number',
         'acquisition_date': 'acquisition_date',
-        'date': 'acquisition_date',  # 레거시 별칭
         'expiry_date': 'expiry_date',
     })
 
 
 def extract_language_list(form_data: FormData) -> List[Dict[str, Any]]:
-    """언어능력정보 리스트 추출"""
+    """언어능력정보 리스트 추출 (Phase 29: 레거시 별칭 제거)"""
     return extract_relation_list(form_data, 'language_', {
         'language': 'language_name',
-        'name': 'language_name',  # 레거시 별칭
         'level': 'level',
         'test_name': 'exam_name',
         'score': 'score',

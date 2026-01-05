@@ -4,6 +4,7 @@ AuditLog SQLAlchemy 모델
 감사 로그 정보를 저장합니다.
 Phase 6: 백엔드 리팩토링 - 모델 분리
 Phase 8: DictSerializableMixin 적용
+Phase 29: __dict_camel_mapping__ 제거
 """
 from datetime import datetime
 from app.database import db
@@ -16,19 +17,6 @@ class AuditLog(DictSerializableMixin, db.Model):
 
     # JSON 필드 (자동 파싱)
     __dict_json_fields__ = ['details']
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'user_id': ['userId'],
-        'account_type': ['accountType'],
-        'company_id': ['companyId'],
-        'resource_type': ['resourceType'],
-        'resource_id': ['resourceId'],
-        'ip_address': ['ipAddress'],
-        'user_agent': ['userAgent'],
-        'error_message': ['errorMessage'],
-        'created_at': ['createdAt'],
-    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 

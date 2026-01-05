@@ -3,6 +3,7 @@ Attendance SQLAlchemy 모델
 
 직원 근태 정보를 관리합니다.
 Phase 8: DictSerializableMixin 적용
+Phase 29: __dict_camel_mapping__ 제거
 """
 from app.database import db
 from app.models.mixins import DictSerializableMixin
@@ -11,16 +12,6 @@ from app.models.mixins import DictSerializableMixin
 class Attendance(DictSerializableMixin, db.Model):
     """근태 모델 (월별 집계)"""
     __tablename__ = 'attendances'
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'work_days': ['workDays'],
-        'absent_days': ['absentDays'],
-        'late_count': ['lateCount'],
-        'early_leave_count': ['earlyLeaveCount'],
-        'annual_leave_used': ['annualLeaveUsed'],
-    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, index=True)

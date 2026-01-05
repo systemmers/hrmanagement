@@ -27,13 +27,6 @@ class FamilyMember(DictSerializableMixin, db.Model):
         'education': lambda self: None,        # Personal 호환 필드 (Employee에는 없음)
     }
 
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'profile_id': ['profileId'],
-        'birth_date': ['birthDate'],
-        'is_cohabitant': ['isCohabitant'],
-        'is_dependent': ['isDependent'],
-    }
 
     # ====================================
     # 컬럼 정의

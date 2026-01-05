@@ -5,6 +5,7 @@ SyncLog SQLAlchemy Model
 
 Phase 5: 구조화 - contract/ 폴더로 분리
 Phase 8: DictSerializableMixin 적용
+Phase 29: __dict_camel_mapping__ 제거
 """
 from datetime import datetime
 from app.database import db
@@ -14,18 +15,6 @@ from app.models.mixins import DictSerializableMixin
 class SyncLog(DictSerializableMixin, db.Model):
     """동기화 이력 모델"""
     __tablename__ = 'sync_logs'
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'contract_id': ['contractId'],
-        'sync_type': ['syncType'],
-        'entity_type': ['entityType'],
-        'field_name': ['fieldName'],
-        'old_value': ['oldValue'],
-        'new_value': ['newValue'],
-        'executed_by': ['executedBy'],
-        'executed_at': ['executedAt'],
-    }
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     contract_id = db.Column(

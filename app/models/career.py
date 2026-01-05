@@ -29,22 +29,6 @@ class Career(DictSerializableMixin, db.Model):
         'achievements': lambda self: None,     # Personal 호환 필드
     }
 
-    __dict_camel_mapping__ = {
-        'employee_id': ['employeeId'],
-        'profile_id': ['profileId'],
-        'company_name': ['companyName'],
-        'job_grade': ['jobGrade'],
-        'job_title': ['jobTitle'],
-        'job_role': ['jobRole'],
-        'job_description': ['jobDescription'],
-        'start_date': ['startDate'],
-        'end_date': ['endDate'],
-        'salary_type': ['salaryType'],
-        'monthly_salary': ['monthlySalary'],
-        'pay_step': ['payStep'],
-        'resignation_reason': ['resignationReason'],
-        'is_current': ['isCurrent'],
-    }
 
     # ====================================
     # 컬럼 정의

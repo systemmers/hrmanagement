@@ -3,6 +3,8 @@ Field Registry Base Classes
 
 필드 정의 및 섹션 정의를 위한 기본 데이터 구조.
 SSOT(Single Source of Truth) 원칙에 따라 필드 메타데이터를 중앙 관리.
+
+Phase 29 (2026-01-05): aliases 시스템 제거 - snake_case 직접 사용
 """
 from dataclasses import dataclass, field
 from enum import Enum
@@ -55,7 +57,6 @@ class FieldDefinition:
         field_type: 입력 타입 (FieldType)
         order: 정렬 순서 (낮을수록 먼저 표시)
         required: 필수 입력 여부
-        aliases: 호환 별칭 목록 (예: ['name_en'] -> english_name)
         options: 직접 지정된 옵션 목록 (select/radio용)
         options_category: ClassificationOption 참조 카테고리명
         visibility: 계정 타입별 가시성 규칙
@@ -67,12 +68,16 @@ class FieldDefinition:
         help_text: 도움말 텍스트
         css_class: 추가 CSS 클래스
         attributes: 추가 HTML 속성
+
+    Note:
+        Phase 29: aliases 필드 제거됨 - 모든 필드는 snake_case로 직접 접근
     """
     name: str
     label: str
     field_type: FieldType = FieldType.TEXT
     order: int = 0
     required: bool = False
+    # Phase 29: aliases 제거됨 - 하위 호환성을 위해 필드는 유지하되 무시됨
     aliases: List[str] = field(default_factory=list)
     options: List[Option] = field(default_factory=list)
     options_category: str = ''
@@ -110,14 +115,16 @@ class FieldDefinition:
         ]
 
     def to_dict(self) -> Dict[str, Any]:
-        """필드 정의를 딕셔너리로 변환 (API/JS용)"""
+        """필드 정의를 딕셔너리로 변환 (API/JS용)
+
+        Phase 29: aliases 필드 제거됨
+        """
         return {
             'name': self.name,
             'label': self.label,
             'type': self.field_type.value,
             'order': self.order,
             'required': self.required,
-            'aliases': self.aliases,
             'options': self.get_options_list(),
             'optionsCategory': self.options_category,
             'visibility': self.visibility.value,
@@ -167,9 +174,9 @@ class SectionDefinition:
         self.fields = sorted(self.fields, key=lambda f: f.order)
 
     def get_field(self, name: str) -> Optional[FieldDefinition]:
-        """필드명 또는 별칭으로 필드 정의 조회"""
+        """필드명으로 필드 정의 조회 (Phase 29: 별칭 검색 제거)"""
         for f in self.fields:
-            if f.name == name or name in f.aliases:
+            if f.name == name:
                 return f
         return None
 
@@ -184,18 +191,12 @@ class SectionDefinition:
         return [f.name for f in self.fields]
 
     def get_field_mapping(self) -> Dict[str, str]:
-        """별칭 -> 정규 필드명 매핑 딕셔너리"""
-        mapping = {}
-        for f in self.fields:
-            mapping[f.name] = f.name  # 정규 필드명도 포함
-            for alias in f.aliases:
-                mapping[alias] = f.name
-        return mapping
+        """필드명 매핑 딕셔너리 (Phase 29: 별칭 매핑 제거, 정규 필드명만)"""
+        return {f.name: f.name for f in self.fields}
 
     def normalize_field_name(self, name: str) -> str:
-        """별칭을 정규 필드명으로 변환"""
-        mapping = self.get_field_mapping()
-        return mapping.get(name, name)
+        """필드명 정규화 (Phase 29: 별칭 변환 제거, 입력값 그대로 반환)"""
+        return name
 
     def is_visible_for(self, account_type: str) -> bool:
         """특정 계정 타입에서 섹션이 표시되는지 확인"""

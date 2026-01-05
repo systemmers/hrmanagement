@@ -3,6 +3,8 @@ Organization Section Definitions
 
 법인 소속 관련 섹션 정의 (소속정보, 계약정보, 급여정보 등)
 법인 계정(corporate)에서만 표시됨.
+
+Phase 29 (2026-01-05): aliases 시스템 제거 - snake_case 직접 사용
 """
 from ..base import (
     FieldDefinition,
@@ -24,7 +26,6 @@ ORGANIZATION_FIELDS = [
         label='사번',
         order=10,
         field_type=FieldType.TEXT,
-        aliases=['employeeNumber'],
         max_length=50,
     ),
     create_field(
@@ -32,7 +33,6 @@ ORGANIZATION_FIELDS = [
         label='소속 조직',
         order=20,
         field_type=FieldType.SELECT,
-        aliases=['organizationId'],
     ),
     create_field(
         name='department',
@@ -60,7 +60,6 @@ ORGANIZATION_FIELDS = [
         label='직책',
         order=60,
         field_type=FieldType.TEXT,
-        aliases=['jobTitle'],
         max_length=100,
     ),
     create_field(
@@ -68,7 +67,6 @@ ORGANIZATION_FIELDS = [
         label='입사일',
         order=70,
         field_type=FieldType.DATE,
-        aliases=['hireDate'],
     ),
     create_field(
         name='status',
@@ -82,7 +80,6 @@ ORGANIZATION_FIELDS = [
         label='근무지',
         order=90,
         field_type=FieldType.TEXT,
-        aliases=['workLocation'],
         max_length=200,
     ),
     create_field(
@@ -90,7 +87,6 @@ ORGANIZATION_FIELDS = [
         label='내선번호',
         order=100,
         field_type=FieldType.TEL,
-        aliases=['internalPhone'],
         max_length=20,
     ),
     create_field(
@@ -98,7 +94,6 @@ ORGANIZATION_FIELDS = [
         label='사내 이메일',
         order=110,
         field_type=FieldType.EMAIL,
-        aliases=['companyEmail'],
         max_length=200,
     ),
 ]
@@ -122,7 +117,6 @@ CONTRACT_FIELDS = [
         label='계약유형',
         order=10,
         field_type=FieldType.SELECT,
-        aliases=['contractType'],
         options_category='contract_type',
     ),
     create_field(
@@ -130,21 +124,18 @@ CONTRACT_FIELDS = [
         label='계약시작일',
         order=20,
         field_type=FieldType.DATE,
-        aliases=['contractStart', 'start_date'],
     ),
     create_field(
         name='contract_end',
         label='계약종료일',
         order=30,
         field_type=FieldType.DATE,
-        aliases=['contractEnd', 'end_date'],
     ),
     create_field(
         name='probation_period',
         label='수습기간',
         order=40,
         field_type=FieldType.NUMBER,
-        aliases=['probationPeriod'],
         help_text='개월 수',
     ),
     create_field(
@@ -152,14 +143,12 @@ CONTRACT_FIELDS = [
         label='수습종료일',
         order=50,
         field_type=FieldType.DATE,
-        aliases=['probationEnd'],
     ),
     create_field(
         name='working_hours',
         label='근무시간',
         order=60,
         field_type=FieldType.TEXT,
-        aliases=['workingHours'],
         max_length=100,
     ),
     create_field(
@@ -167,7 +156,6 @@ CONTRACT_FIELDS = [
         label='근무형태',
         order=70,
         field_type=FieldType.SELECT,
-        aliases=['workType'],
         options_category='work_type',
     ),
 ]
@@ -191,14 +179,12 @@ SALARY_FIELDS = [
         label='기본급',
         order=10,
         field_type=FieldType.NUMBER,
-        aliases=['baseSalary'],
     ),
     create_field(
         name='salary_type',
         label='급여유형',
         order=20,
         field_type=FieldType.SELECT,
-        aliases=['salaryType'],
         options_category='salary_type',
     ),
     create_field(
@@ -206,7 +192,6 @@ SALARY_FIELDS = [
         label='지급방법',
         order=30,
         field_type=FieldType.SELECT,
-        aliases=['paymentMethod'],
         options_category='payment_method',
     ),
     create_field(
@@ -214,7 +199,6 @@ SALARY_FIELDS = [
         label='은행명',
         order=40,
         field_type=FieldType.SELECT,
-        aliases=['bankName'],
         options_category='bank',
     ),
     create_field(
@@ -222,7 +206,6 @@ SALARY_FIELDS = [
         label='계좌번호',
         order=50,
         field_type=FieldType.TEXT,
-        aliases=['accountNumber'],
         max_length=50,
     ),
     create_field(
@@ -230,7 +213,6 @@ SALARY_FIELDS = [
         label='예금주',
         order=60,
         field_type=FieldType.TEXT,
-        aliases=['accountHolder'],
         max_length=50,
     ),
 ]
@@ -254,35 +236,30 @@ BENEFIT_FIELDS = [
         label='연차',
         order=10,
         field_type=FieldType.NUMBER,
-        aliases=['annualLeave'],
     ),
     create_field(
         name='used_leave',
         label='사용연차',
         order=20,
         field_type=FieldType.NUMBER,
-        aliases=['usedLeave'],
     ),
     create_field(
         name='remaining_leave',
         label='잔여연차',
         order=30,
         field_type=FieldType.NUMBER,
-        aliases=['remainingLeave'],
     ),
     create_field(
         name='meal_allowance',
         label='식대',
         order=40,
         field_type=FieldType.NUMBER,
-        aliases=['mealAllowance'],
     ),
     create_field(
         name='transportation_allowance',
         label='교통비',
         order=50,
         field_type=FieldType.NUMBER,
-        aliases=['transportationAllowance'],
     ),
 ]
 
@@ -305,35 +282,30 @@ INSURANCE_FIELDS = [
         label='국민연금',
         order=10,
         field_type=FieldType.CHECKBOX,
-        aliases=['nationalPension'],
     ),
     create_field(
         name='health_insurance',
         label='건강보험',
         order=20,
         field_type=FieldType.CHECKBOX,
-        aliases=['healthInsurance'],
     ),
     create_field(
         name='employment_insurance',
         label='고용보험',
         order=30,
         field_type=FieldType.CHECKBOX,
-        aliases=['employmentInsurance'],
     ),
     create_field(
         name='industrial_insurance',
         label='산재보험',
         order=40,
         field_type=FieldType.CHECKBOX,
-        aliases=['industrialInsurance'],
     ),
     create_field(
         name='national_pension_number',
         label='국민연금 번호',
         order=50,
         field_type=FieldType.TEXT,
-        aliases=['nationalPensionNumber'],
         max_length=50,
     ),
     create_field(
@@ -341,7 +313,6 @@ INSURANCE_FIELDS = [
         label='건강보험 번호',
         order=60,
         field_type=FieldType.TEXT,
-        aliases=['healthInsuranceNumber'],
         max_length=50,
     ),
 ]

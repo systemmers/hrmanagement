@@ -4,8 +4,9 @@ Model Mixins - 공통 모델 기능 제공
 DictSerializableMixin: to_dict/from_dict 자동화
 - 코드 중복 제거 (~3,500 LOC 감소 목표)
 - 선언적 alias/computed 필드 정의
-- camelCase/snake_case 자동 변환
 - FieldRegistry 통합 필드 순서 관리
+
+Phase 29 (2026-01-05): camelCase 폴백 제거 - snake_case 직접 사용
 """
 from collections import OrderedDict
 from typing import Dict, List, Any, Optional, Callable, Type, Union
@@ -17,6 +18,10 @@ class DictSerializableMixin:
 
     모델 클래스에서 상속하여 to_dict/from_dict 자동 구현.
     기존 37개 모델의 중복 코드를 제거합니다.
+
+    Phase 29: camelCase 폴백 및 __dict_camel_mapping__ 제거됨
+    - 모든 필드는 snake_case로 직접 접근
+    - from_dict()는 snake_case 키만 인식
 
     사용법:
         class Education(DictSerializableMixin, db.Model):
@@ -39,19 +44,13 @@ class DictSerializableMixin:
             __dict_computed__ = {
                 'graduation_year': lambda self: self.graduation_date[:4] if self.graduation_date and len(self.graduation_date) >= 4 else None
             }
-
-            # camelCase 키 매핑 (from_dict용)
-            __dict_camel_mapping__ = {
-                'employee_id': ['employeeId'],
-                'school_name': ['schoolName'],
-            }
     """
 
     # 클래스 속성 (서브클래스에서 오버라이드)
     __dict_aliases__: Dict[str, str] = {}
     __dict_excludes__: List[str] = []
     __dict_computed__: Dict[str, Callable] = {}
-    __dict_camel_mapping__: Dict[str, List[str]] = {}
+    # Phase 29: __dict_camel_mapping__ 제거됨
     __dict_json_fields__: List[str] = []  # JSON 파싱이 필요한 필드
     __dict_field_domain__: str = ''  # FieldRegistry 섹션 ID (설정 시 필드 순서 자동 적용)
 
@@ -131,12 +130,11 @@ class DictSerializableMixin:
         """
         딕셔너리에서 모델 인스턴스 생성
 
-        - snake_case 우선, camelCase 폴백
-        - __dict_camel_mapping__ 커스텀 매핑 지원
+        Phase 29: camelCase 폴백 제거 - snake_case 직접 접근만 지원
         - None 값은 건너뜀
 
         Args:
-            data: 입력 딕셔너리 (camelCase 또는 snake_case)
+            data: 입력 딕셔너리 (snake_case)
 
         Returns:
             모델 인스턴스
@@ -146,44 +144,14 @@ class DictSerializableMixin:
         for column in cls.__table__.columns:
             field_name = column.name
 
-            # 1. snake_case 직접 매칭
+            # snake_case 직접 매칭 (Phase 29: camelCase 폴백 제거)
             value = data.get(field_name)
-
-            # 2. camelCase 자동 변환 폴백
-            if value is None:
-                camel_name = cls._snake_to_camel(field_name)
-                value = data.get(camel_name)
-
-            # 3. 커스텀 매핑 확인
-            if value is None and field_name in cls.__dict_camel_mapping__:
-                for alt_key in cls.__dict_camel_mapping__[field_name]:
-                    value = data.get(alt_key)
-                    if value is not None:
-                        break
 
             # 값이 있으면 kwargs에 추가
             if value is not None:
                 kwargs[field_name] = value
 
         return cls(**kwargs)
-
-    @staticmethod
-    def _snake_to_camel(name: str) -> str:
-        """snake_case를 camelCase로 변환"""
-        components = name.split('_')
-        return components[0] + ''.join(x.title() for x in components[1:])
-
-    @staticmethod
-    def _camel_to_snake(name: str) -> str:
-        """camelCase를 snake_case로 변환"""
-        result = []
-        for char in name:
-            if char.isupper():
-                result.append('_')
-                result.append(char.lower())
-            else:
-                result.append(char)
-        return ''.join(result).lstrip('_')
 
 
 class TimestampMixin:

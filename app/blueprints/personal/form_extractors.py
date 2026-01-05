@@ -8,11 +8,11 @@ Phase 25: 공통 헬퍼 모듈로 이동 (2025-12-29)
 from typing import Any, Dict, List, Optional
 
 from app.types import FormData
-from ...utils.form_helpers import parse_boolean as _parse_boolean, normalize_form_field
+from ...utils.form_helpers import parse_boolean as _parse_boolean
 
 
 def extract_profile_data(form_data: FormData, existing_profile=None) -> Dict[str, Any]:
-    """폼 데이터에서 Profile 데이터 추출 (FieldRegistry 기반)
+    """폼 데이터에서 Profile 데이터 추출 (Phase 29: 별칭 제거, snake_case 직접 접근)
 
     Args:
         form_data: request.form 데이터
@@ -21,27 +21,23 @@ def extract_profile_data(form_data: FormData, existing_profile=None) -> Dict[str
     Returns:
         dict: 프로필 업데이트용 데이터
     """
-    # 섹션 ID 상수
-    BASIC = 'personal_basic'
-    CONTACT = 'contact'
-
     # 기본값 처리
     default_name = existing_profile.name if existing_profile else ''
     default_photo = existing_profile.photo if existing_profile else None
 
     return {
-        # 기본 정보 - FieldRegistry 별칭 적용
+        # 기본 정보 (Phase 29: 직접 접근)
         'name': form_data.get('name', default_name).strip(),
-        'english_name': normalize_form_field(form_data, BASIC, 'english_name'),
+        'english_name': (form_data.get('english_name', '') or '').strip() or None,
         'chinese_name': form_data.get('chinese_name', '').strip() or None,
-        'resident_number': normalize_form_field(form_data, BASIC, 'resident_number'),
+        'resident_number': (form_data.get('resident_number', '') or '').strip() or None,
         'birth_date': form_data.get('birth_date', '').strip() or None,
         'lunar_birth': _parse_boolean(form_data.get('lunar_birth')),
         'gender': form_data.get('gender', '').strip() or None,
 
-        # 연락처 - FieldRegistry 별칭 적용
-        'mobile_phone': normalize_form_field(form_data, CONTACT, 'mobile_phone'),
-        'home_phone': normalize_form_field(form_data, CONTACT, 'home_phone'),
+        # 연락처 (Phase 29: 직접 접근)
+        'mobile_phone': (form_data.get('mobile_phone', '') or '').strip() or None,
+        'home_phone': (form_data.get('home_phone', '') or '').strip() or None,
         'email': form_data.get('email', '').strip() or None,
 
         # 주소
@@ -51,8 +47,7 @@ def extract_profile_data(form_data: FormData, existing_profile=None) -> Dict[str
 
         # 기타 정보
         'nationality': form_data.get('nationality', '').strip() or None,
-        'blood_type': form_data.get('blood_type', '').strip() or None,
-        'religion': form_data.get('religion', '').strip() or None,
+        # Phase 28.3: blood_type, religion 삭제됨
         'hobby': form_data.get('hobby', '').strip() or None,
         'specialty': form_data.get('specialty', '').strip() or None,
         'is_public': _parse_boolean(form_data.get('is_public')),

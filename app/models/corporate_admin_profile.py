@@ -4,6 +4,7 @@ CorporateAdminProfile SQLAlchemy 모델
 법인 관리자의 프로필 정보를 관리하는 모델입니다.
 법인 관리자(account_type='corporate', employee_id=None)를 위한 경량 프로필 시스템을 제공합니다.
 Phase 8: DictSerializableMixin 적용
+Phase 29: __dict_camel_mapping__ 제거
 """
 from datetime import datetime
 from app.database import db
@@ -13,18 +14,6 @@ from app.models.mixins import DictSerializableMixin
 class CorporateAdminProfile(DictSerializableMixin, db.Model):
     """법인 관리자 프로필 모델"""
     __tablename__ = 'corporate_admin_profiles'
-
-    # camelCase 매핑 (from_dict용)
-    __dict_camel_mapping__ = {
-        'user_id': ['userId'],
-        'company_id': ['companyId'],
-        'english_name': ['englishName'],
-        'mobile_phone': ['mobilePhone'],
-        'office_phone': ['officePhone'],
-        'is_active': ['isActive'],
-        'created_at': ['createdAt'],
-        'updated_at': ['updatedAt'],
-    }
 
     # 기본 키
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
