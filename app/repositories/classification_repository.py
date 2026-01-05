@@ -3,10 +3,13 @@ Classification Options Repository
 
 부서, 직급, 재직상태 등의 분류 옵션을 관리합니다.
 법인별 커스텀 옵션을 지원합니다.
+
+Updated: 2026-01-05 - ConflictError 중복 체크 추가
 """
 from typing import List, Dict, Optional
 from app.database import db
 from app.models import ClassificationOption
+from app.utils.exceptions import ConflictError
 from .base_repository import BaseRepository
 
 
@@ -114,15 +117,18 @@ class ClassificationOptionsRepository(BaseRepository[ClassificationOption]):
     def add_option_for_company(self, company_id: int, category: str, value: str,
                                label: str = None, sort_order: int = None) -> Dict:
         """법인용 옵션 추가"""
-        # 중복 확인
-        existing = ClassificationOption.query.filter_by(
-            company_id=company_id,
-            category=category,
-            value=value
+        # 중복 확인 (글로벌 옵션 + 해당 법인 옵션 모두 체크)
+        existing = ClassificationOption.query.filter(
+            ClassificationOption.category == category,
+            ClassificationOption.value == value,
+            db.or_(
+                ClassificationOption.company_id == company_id,
+                ClassificationOption.company_id.is_(None)
+            )
         ).first()
 
         if existing:
-            return existing.to_dict()
+            raise ConflictError("이미 존재하는 항목입니다", field="value")
 
         # 정렬 순서 계산
         if sort_order is None:
@@ -164,6 +170,24 @@ class ClassificationOptionsRepository(BaseRepository[ClassificationOption]):
         # 시스템 옵션은 수정 불가
         if option.is_system:
             return None
+
+        # value 변경 시 중복 체크 (글로벌 옵션 + 해당 법인 옵션 모두 체크)
+        new_value = data.get('value')
+        if new_value and new_value != option.value:
+            existing = ClassificationOption.query.filter(
+                ClassificationOption.category == option.category,
+                ClassificationOption.value == new_value,
+                ClassificationOption.id != option_id,
+                db.or_(
+                    ClassificationOption.company_id == company_id,
+                    ClassificationOption.company_id.is_(None)
+                )
+            ).first()
+
+            if existing:
+                raise ConflictError("이미 존재하는 항목입니다", field="value")
+
+            option.value = new_value
 
         if 'label' in data:
             option.label = data['label']
