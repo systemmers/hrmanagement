@@ -7,18 +7,46 @@ Platform Service
 - 플랫폼 설정 관리
 
 Phase 24: 레이어 분리 리팩토링 - Blueprint → Service → Repository
+Phase 30: 레이어 분리 - Model.query, db.session 직접 사용 제거
 """
 from typing import Dict, List, Optional, Tuple
-from sqlalchemy import or_
 
-from app.database import db
 from app.models import User, Company
 from app.models.system_setting import SystemSetting
 from app.utils.transaction import atomic_transaction
+from app.constants.status import ContractStatus
 
 
 class PlatformService:
     """플랫폼 관리 서비스"""
+
+    # ========================================
+    # Repository Property 주입 (Phase 30)
+    # ========================================
+
+    @property
+    def user_repo(self):
+        """지연 초기화된 사용자 Repository"""
+        from app.extensions import user_repo
+        return user_repo
+
+    @property
+    def company_repo(self):
+        """지연 초기화된 법인 Repository"""
+        from app.repositories.company_repository import company_repository
+        return company_repository
+
+    @property
+    def contract_repo(self):
+        """지연 초기화된 계약 Repository"""
+        from app.repositories.contract.person_contract_repository import person_contract_repository
+        return person_contract_repository
+
+    @property
+    def system_setting_repo(self):
+        """지연 초기화된 시스템 설정 Repository"""
+        from app.repositories.system_setting_repository import system_setting_repository
+        return system_setting_repository
 
     # ========================================
     # 사용자 관리
@@ -33,6 +61,8 @@ class PlatformService:
     ) -> Tuple[List[User], object]:
         """사용자 목록 조회 (페이지네이션)
 
+        Phase 30: Repository 사용으로 변경
+
         Args:
             page: 페이지 번호
             per_page: 페이지당 항목 수
@@ -42,27 +72,17 @@ class PlatformService:
         Returns:
             Tuple[사용자 목록, 페이지네이션 객체]
         """
-        query = User.query
-
-        if search:
-            query = query.filter(
-                or_(
-                    User.username.ilike(f'%{search}%'),
-                    User.email.ilike(f'%{search}%')
-                )
-            )
-
-        if account_type:
-            query = query.filter_by(account_type=account_type)
-
-        pagination = query.order_by(User.created_at.desc()).paginate(
-            page=page, per_page=per_page, error_out=False
+        return self.user_repo.find_paginated(
+            page=page,
+            per_page=per_page,
+            search=search,
+            account_type=account_type
         )
-
-        return pagination.items, pagination
 
     def get_user_by_id(self, user_id: int) -> Optional[User]:
         """사용자 ID로 조회
+
+        Phase 30: Repository 사용으로 변경
 
         Args:
             user_id: 사용자 ID
@@ -70,7 +90,7 @@ class PlatformService:
         Returns:
             User 모델 또는 None
         """
-        return db.session.get(User, user_id)
+        return self.user_repo.find_by_id(user_id)
 
     def toggle_user_active(
         self,
@@ -148,8 +168,8 @@ class PlatformService:
         if not user.is_superadmin:
             return False, '슈퍼관리자가 아닙니다.'
 
-        # 마지막 superadmin 확인
-        superadmin_count = User.query.filter_by(is_superadmin=True).count()
+        # 마지막 superadmin 확인 (Phase 30: Repository 사용)
+        superadmin_count = self.user_repo.count_superadmins()
         if superadmin_count <= 1:
             return False, '최소 1명의 슈퍼관리자가 필요합니다.'
 
@@ -172,6 +192,8 @@ class PlatformService:
     ) -> Tuple[List[Company], object]:
         """법인 목록 조회 (페이지네이션)
 
+        Phase 30: Repository 사용으로 변경
+
         Args:
             page: 페이지 번호
             per_page: 페이지당 항목 수
@@ -180,24 +202,16 @@ class PlatformService:
         Returns:
             Tuple[법인 목록, 페이지네이션 객체]
         """
-        query = Company.query
-
-        if search:
-            query = query.filter(
-                or_(
-                    Company.name.ilike(f'%{search}%'),
-                    Company.business_number.ilike(f'%{search}%')
-                )
-            )
-
-        pagination = query.order_by(Company.created_at.desc()).paginate(
-            page=page, per_page=per_page, error_out=False
+        return self.company_repo.find_paginated(
+            page=page,
+            per_page=per_page,
+            search=search
         )
-
-        return pagination.items, pagination
 
     def get_company_by_id(self, company_id: int) -> Optional[Company]:
         """법인 ID로 조회
+
+        Phase 30: Repository 사용으로 변경
 
         Args:
             company_id: 법인 ID
@@ -205,7 +219,7 @@ class PlatformService:
         Returns:
             Company 모델 또는 None
         """
-        return db.session.get(Company, company_id)
+        return self.company_repo.find_by_id(company_id)
 
     def toggle_company_active(self, company_id: int) -> Tuple[bool, Optional[str], Optional[bool]]:
         """법인 활성화/비활성화 토글
@@ -262,6 +276,8 @@ class PlatformService:
     def get_platform_settings(self) -> Dict:
         """플랫폼 설정 조회
 
+        Phase 30: PlatformSettings는 단일 설정이므로 Model.query 허용
+
         Returns:
             설정 Dict
         """
@@ -274,6 +290,9 @@ class PlatformService:
     def update_platform_settings(self, data: Dict) -> Tuple[bool, Optional[str]]:
         """플랫폼 설정 수정
 
+        Phase 30: PlatformSettings는 단일 설정이므로 현재 패턴 유지
+        (별도 Repository 없이 직접 관리)
+
         Args:
             data: 설정 데이터
 
@@ -281,6 +300,7 @@ class PlatformService:
             Tuple[성공여부, 에러메시지]
         """
         from app.models.platform_settings import PlatformSettings
+        from app.database import db
 
         try:
             with atomic_transaction():
@@ -300,13 +320,15 @@ class PlatformService:
     def get_users_by_company(self, company_id: int) -> List[User]:
         """법인 소속 사용자 목록 조회
 
+        Phase 30: Repository 사용으로 변경
+
         Args:
             company_id: 법인 ID
 
         Returns:
             사용자 목록
         """
-        return User.query.filter_by(company_id=company_id).all()
+        return self.user_repo.find_by_company_id(company_id)
 
     # ========================================
     # 시스템 설정
@@ -315,13 +337,17 @@ class PlatformService:
     def get_all_settings(self) -> List[SystemSetting]:
         """모든 시스템 설정 조회
 
+        Phase 30: Repository 사용으로 변경
+
         Returns:
             설정 목록
         """
-        return SystemSetting.query.order_by(SystemSetting.key).all()
+        return self.system_setting_repo.find_all_ordered()
 
     def get_setting_by_key(self, key: str) -> Optional[SystemSetting]:
         """키로 시스템 설정 조회
+
+        Phase 30: Repository 사용으로 변경
 
         Args:
             key: 설정 키
@@ -329,7 +355,7 @@ class PlatformService:
         Returns:
             SystemSetting 또는 None
         """
-        return SystemSetting.query.filter_by(key=key).first()
+        return self.system_setting_repo.find_by_key(key)
 
     def update_setting(self, key: str, value: str) -> Tuple[bool, Optional[str], Optional[Dict]]:
         """시스템 설정 수정
@@ -364,6 +390,8 @@ class PlatformService:
     ) -> Tuple[bool, Optional[str], Optional[Dict]]:
         """시스템 설정 생성
 
+        Phase 30: Repository 사용으로 변경
+
         Args:
             key: 설정 키
             value: 설정 값
@@ -377,12 +405,12 @@ class PlatformService:
 
         try:
             with atomic_transaction():
-                setting = SystemSetting(
+                setting = self.system_setting_repo.create_setting(
                     key=key,
                     value=value,
-                    description=description
+                    description=description,
+                    commit=False
                 )
-                db.session.add(setting)
             return True, None, {
                 'key': setting.key,
                 'value': setting.value,
@@ -398,20 +426,18 @@ class PlatformService:
     def get_dashboard_stats(self) -> Dict:
         """대시보드 통계 조회
 
+        Phase 30: Repository 사용으로 변경
+
         Returns:
             통계 Dict
         """
-        from ..models.person_contract import PersonCorporateContract
-
-        total_users = User.query.count()
-        active_users = User.query.filter_by(is_active=True).count()
-        total_companies = Company.query.count()
-        active_companies = Company.query.filter_by(is_active=True).count()
-        total_contracts = PersonCorporateContract.query.count()
-        active_contracts = PersonCorporateContract.query.filter_by(
-            status=PersonCorporateContract.STATUS_APPROVED
-        ).count()
-        superadmins = User.query.filter_by(is_superadmin=True).count()
+        total_users = self.user_repo.count_all()
+        active_users = self.user_repo.count_by_is_active(True)
+        total_companies = self.company_repo.count_all()
+        active_companies = self.company_repo.count_active()
+        total_contracts = self.contract_repo.count_all()
+        active_contracts = self.contract_repo.count_by_status(ContractStatus.APPROVED)
+        superadmins = self.user_repo.count_superadmins()
 
         return {
             'total_users': total_users,
@@ -426,16 +452,20 @@ class PlatformService:
     def get_recent_users(self, limit: int = 5) -> list:
         """최근 가입 사용자 조회
 
+        Phase 30: Repository 사용으로 변경
+
         Args:
             limit: 조회 제한 (기본 5)
 
         Returns:
             User 모델 리스트
         """
-        return User.query.order_by(User.created_at.desc()).limit(limit).all()
+        return self.user_repo.find_recent(limit)
 
     def get_recent_companies(self, limit: int = 5) -> list:
         """최근 등록 법인 조회
+
+        Phase 30: Repository 사용으로 변경
 
         Args:
             limit: 조회 제한 (기본 5)
@@ -443,7 +473,7 @@ class PlatformService:
         Returns:
             Company 모델 리스트
         """
-        return Company.query.order_by(Company.created_at.desc()).limit(limit).all()
+        return self.company_repo.find_recent(limit)
 
 
 # 싱글톤 인스턴스

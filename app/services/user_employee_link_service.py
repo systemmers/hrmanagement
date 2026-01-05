@@ -4,12 +4,12 @@ User-Employee 연결 조회 통합 서비스
 SSOT 원칙: PersonCorporateContract가 User-Employee 관계의 유일한 진실의 원천
 DIP 원칙: Repository를 통한 데이터 접근
 SRP 원칙: User-Employee 연결 조회 로직만 담당
+
+Phase 30: 레이어 분리 - Model.query 제거, Repository 패턴 적용
 """
 from typing import Optional, List, Dict
-from app.repositories.person_contract_repository import PersonContractRepository
-from app.repositories.user_repository import UserRepository
-from app.models.user import User
-from app.models.employee import Employee
+
+from app.constants.status import ContractStatus
 
 
 class UserEmployeeLinkService:
@@ -23,14 +23,43 @@ class UserEmployeeLinkService:
     - SSOT: PersonCorporateContract가 유일한 진실의 원천
     - DIP: Repository를 통한 데이터 접근
     - SRP: 조회 로직 통합만 담당
+
+    Phase 30: Repository DI 패턴 적용
     """
 
     def __init__(self):
-        self._contract_repo = PersonContractRepository()
-        self._user_repo = UserRepository()
+        self._contract_repo = None
+        self._user_repo = None
+        self._employee_repo = None
 
-    def get_linked_user(self, employee_id: int) -> Optional[User]:
+    @property
+    def contract_repo(self):
+        """지연 초기화된 PersonContract Repository"""
+        if self._contract_repo is None:
+            from app.repositories.person_contract_repository import PersonContractRepository
+            self._contract_repo = PersonContractRepository()
+        return self._contract_repo
+
+    @property
+    def user_repo(self):
+        """지연 초기화된 User Repository"""
+        if self._user_repo is None:
+            from app.repositories.user_repository import UserRepository
+            self._user_repo = UserRepository()
+        return self._user_repo
+
+    @property
+    def employee_repo(self):
+        """지연 초기화된 Employee Repository"""
+        if self._employee_repo is None:
+            from app.repositories.employee_repository import employee_repository
+            self._employee_repo = employee_repository
+        return self._employee_repo
+
+    def get_linked_user(self, employee_id: int):
         """직원에 연결된 User 조회
+
+        Phase 30: Repository 패턴 적용
 
         Args:
             employee_id: Employee.id
@@ -38,9 +67,9 @@ class UserEmployeeLinkService:
         Returns:
             연결된 User 객체 또는 None
         """
-        contract = self._contract_repo.get_contract_for_employee(employee_id)
+        contract = self.contract_repo.get_contract_for_employee(employee_id)
         if contract and contract.person_user_id:
-            return self._user_repo.find_by_id(contract.person_user_id)
+            return self.user_repo.find_by_id(contract.person_user_id)
         return None
 
     def get_linked_user_dict(self, employee_id: int) -> Optional[Dict]:
@@ -55,7 +84,7 @@ class UserEmployeeLinkService:
         user = self.get_linked_user(employee_id)
         return user.to_dict() if user else None
 
-    def get_linked_users_bulk(self, employee_ids: List[int]) -> Dict[int, User]:
+    def get_linked_users_bulk(self, employee_ids: list) -> dict:
         """목록 페이지용 N+1 방지 벌크 조회
 
         Args:
@@ -67,7 +96,7 @@ class UserEmployeeLinkService:
         if not employee_ids:
             return {}
 
-        contracts = self._contract_repo.get_by_employee_ids_bulk(employee_ids)
+        contracts = self.contract_repo.get_by_employee_ids_bulk(employee_ids)
 
         result = {}
         for emp_id, contract in contracts.items():
@@ -76,8 +105,10 @@ class UserEmployeeLinkService:
 
         return result
 
-    def get_linked_employee(self, user_id: int, company_id: int) -> Optional[Employee]:
+    def get_linked_employee(self, user_id: int, company_id: int):
         """User와 특정 회사 간의 연결된 Employee 조회
+
+        Phase 30: Repository 패턴 적용
 
         Args:
             user_id: User.id
@@ -86,19 +117,22 @@ class UserEmployeeLinkService:
         Returns:
             해당 회사에 연결된 Employee 객체 또는 None
         """
-        contract = self._contract_repo.get_active_contract_by_person_and_company(user_id, company_id)
+        contract = self.contract_repo.get_active_contract_by_person_and_company(user_id, company_id)
         if contract and contract.employee_number:
-            return Employee.query.filter_by(
-                company_id=company_id,
-                employee_number=contract.employee_number
-            ).first()
-        # employee_number가 없으면 해당 회사 소속 Employee 조회
+            # Phase 30: Repository 사용
+            return self.employee_repo.find_by_employee_number_and_company(
+                contract.employee_number, company_id
+            )
+        # employee_number가 없으면 해당 회사 소속 첫 번째 Employee 조회
         if contract:
-            return Employee.query.filter_by(company_id=company_id).first()
+            employees = self.employee_repo.find_by_company_id(company_id)
+            return employees[0] if employees else None
         return None
 
-    def get_linked_employees(self, user_id: int) -> List[Employee]:
+    def get_linked_employees(self, user_id: int) -> list:
         """User에 연결된 모든 Employee 조회
+
+        Phase 30: Repository 패턴 적용
 
         개인 계정이 여러 법인과 계약한 경우 모든 Employee 반환
 
@@ -108,7 +142,7 @@ class UserEmployeeLinkService:
         Returns:
             연결된 Employee 목록
         """
-        contracts = self._contract_repo.get_active_contracts_by_person(user_id)
+        contracts = self.contract_repo.get_active_contracts_by_person(user_id)
         if not contracts:
             return []
 
@@ -117,7 +151,8 @@ class UserEmployeeLinkService:
         if not company_ids:
             return []
 
-        return Employee.query.filter(Employee.company_id.in_(company_ids)).all()
+        # Phase 30: Repository 사용
+        return self.employee_repo.find_by_company_ids(company_ids)
 
     def has_linked_user(self, employee_id: int) -> bool:
         """직원에 연결된 User 존재 여부 확인
@@ -128,7 +163,7 @@ class UserEmployeeLinkService:
         Returns:
             User 연결 여부
         """
-        contract = self._contract_repo.get_contract_for_employee(employee_id)
+        contract = self.contract_repo.get_contract_for_employee(employee_id)
         return contract is not None and contract.person_user_id is not None
 
     def has_approved_personal_contract(
@@ -156,7 +191,7 @@ class UserEmployeeLinkService:
         if not employee_number:
             return False
 
-        contract = self._contract_repo.find_approved_contract_by_employee_number(
+        contract = self.contract_repo.find_approved_contract_by_employee_number(
             employee_number, company_id
         )
         return contract is not None
@@ -170,7 +205,7 @@ class UserEmployeeLinkService:
         Returns:
             PersonCorporateContract 또는 None
         """
-        return self._contract_repo.get_contract_for_employee(employee_id)
+        return self.contract_repo.get_contract_for_employee(employee_id)
 
     def get_contract_for_employee_by_user(self, user_id: int):
         """User의 활성 계약 조회 (employee_sub 계정용)
@@ -181,17 +216,17 @@ class UserEmployeeLinkService:
         Returns:
             PersonCorporateContract 또는 None
         """
-        contracts = self._contract_repo.get_active_contracts_by_person(user_id)
+        contracts = self.contract_repo.get_active_contracts_by_person(user_id)
         if contracts:
             # 첫 번째 활성 계약 반환 (employee_sub는 보통 1개만 있음)
-            return self._contract_repo.find_by_id(contracts[0].get('id'))
+            return self.contract_repo.find_by_id(contracts[0].get('id'))
         return None
 
     def get_users_with_contract_status_bulk(
         self,
-        user_ids: List[int],
+        user_ids: list,
         company_id: int
-    ) -> Dict[int, Dict]:
+    ) -> dict:
         """N+1 방지: 여러 User의 계약 상태 한번에 조회
 
         DRY 원칙: corporate.py, list_routes.py 등에서 공통 사용
@@ -206,7 +241,7 @@ class UserEmployeeLinkService:
         if not user_ids or not company_id:
             return {}
 
-        contracts_map = self._contract_repo.get_contracts_by_user_ids_bulk(user_ids, company_id)
+        contracts_map = self.contract_repo.get_contracts_by_user_ids_bulk(user_ids, company_id)
 
         result = {}
         for user_id in user_ids:
@@ -226,9 +261,9 @@ class UserEmployeeLinkService:
 
     def get_employees_with_approved_contracts_bulk(
         self,
-        employee_numbers: List[str],
+        employee_numbers: list,
         company_id: int
-    ) -> Dict[str, Dict]:
+    ) -> dict:
         """N+1 방지: employee_number 목록으로 approved 계약과 User 정보 조회
 
         DRY 원칙: list_routes.py의 직원목록에서 사용
@@ -243,7 +278,7 @@ class UserEmployeeLinkService:
         if not employee_numbers or not company_id:
             return {}
 
-        contracts_map = self._contract_repo.get_approved_by_employee_numbers_bulk(
+        contracts_map = self.contract_repo.get_approved_by_employee_numbers_bulk(
             employee_numbers, company_id
         )
 
@@ -264,8 +299,10 @@ class UserEmployeeLinkService:
     def get_employees_from_approved_contracts(
         self,
         company_id: int
-    ) -> List[Dict]:
+    ) -> list:
         """승인된 계약 기반 직원 목록 조회
+
+        Phase 30: Repository 패턴 적용
 
         21번 원칙: 계약 approved인 경우만 직원목록에 표시
         employee_number NULL인 경우 email 매칭으로 fallback
@@ -280,7 +317,7 @@ class UserEmployeeLinkService:
             return []
 
         # 1. 승인된 계약 조회
-        contracts = self._contract_repo.get_approved_contracts_with_users(company_id)
+        contracts = self.contract_repo.get_approved_contracts_with_users(company_id)
         if not contracts:
             return []
 
@@ -294,23 +331,23 @@ class UserEmployeeLinkService:
                 contracts_without_emp_num.append(c)
 
         # 3. employee_number 기반 Employee 조회 (벌크)
+        # Phase 30: Repository 사용
         emp_numbers = [c.employee_number for c in contracts_with_emp_num]
         employees_by_number = {}
         if emp_numbers:
-            employees = Employee.query.filter(
-                Employee.company_id == company_id,
-                Employee.employee_number.in_(emp_numbers)
-            ).all()
+            employees = self.employee_repo.find_by_company_and_employee_numbers(
+                company_id, emp_numbers
+            )
             employees_by_number = {e.employee_number: e for e in employees}
 
         # 4. email 기반 Employee 조회 (fallback용)
+        # Phase 30: Repository 사용
         user_emails = [c.person_user.email for c in contracts_without_emp_num if c.person_user]
         employees_by_email = {}
         if user_emails:
-            employees = Employee.query.filter(
-                Employee.company_id == company_id,
-                Employee.email.in_(user_emails)
-            ).all()
+            employees = self.employee_repo.find_by_company_and_emails(
+                company_id, user_emails
+            )
             employees_by_email = {e.email: e for e in employees if e.email}
 
         # 5. 결과 조립

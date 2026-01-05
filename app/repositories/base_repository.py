@@ -60,6 +60,22 @@ class BaseRepository(Generic[ModelType]):
         """
         return self.model_class.query.get(record_id)
 
+    def find_by_ids(self, record_ids: List[Any]) -> List[ModelType]:
+        """
+        여러 ID로 모델 객체 목록 조회 (벌크)
+
+        Args:
+            record_ids: 조회할 레코드 ID 목록
+
+        Returns:
+            모델 객체 리스트
+        """
+        if not record_ids:
+            return []
+        return self.model_class.query.filter(
+            self.model_class.id.in_(record_ids)
+        ).all()
+
     def create(self, data: Dict, commit: bool = True) -> Dict:
         """새 레코드 생성 (Dict에서)
 

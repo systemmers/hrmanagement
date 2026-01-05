@@ -6,24 +6,57 @@ Contract Core Service
 - 계약 상세 조회
 - 계약 검색
 - 계약 대상 조회
+
+Phase 30: 레이어 분리 - Model.query 제거, Repository 패턴 적용
 """
 from typing import Dict, Optional, List, Any
 
-from ...constants.session_keys import AccountType
 from ...constants.status import ContractStatus
-from ...models.user import User
-from ...models.employee import Employee
-from ...models.person_contract import PersonCorporateContract
 
 
 class ContractCoreService:
-    """계약 조회 서비스"""
+    """계약 조회 서비스
+
+    Phase 30: Repository DI 패턴 적용
+    """
+
+    def __init__(self):
+        self._contract_repo = None
+        self._user_repo = None
+        self._employee_repo = None
+        self._profile_repo = None
 
     @property
     def contract_repo(self):
         """지연 초기화된 계약 Repository"""
-        from ...extensions import person_contract_repo
-        return person_contract_repo
+        if self._contract_repo is None:
+            from ...extensions import person_contract_repo
+            self._contract_repo = person_contract_repo
+        return self._contract_repo
+
+    @property
+    def user_repo(self):
+        """지연 초기화된 User Repository"""
+        if self._user_repo is None:
+            from ...repositories.user_repository import user_repository
+            self._user_repo = user_repository
+        return self._user_repo
+
+    @property
+    def employee_repo(self):
+        """지연 초기화된 Employee Repository"""
+        if self._employee_repo is None:
+            from ...repositories.employee_repository import employee_repository
+            self._employee_repo = employee_repository
+        return self._employee_repo
+
+    @property
+    def profile_repo(self):
+        """지연 초기화된 Profile Repository"""
+        if self._profile_repo is None:
+            from ...repositories.profile_repository import ProfileRepository
+            self._profile_repo = ProfileRepository()
+        return self._profile_repo
 
     # ========================================
     # 개인 계정용 메서드
@@ -70,6 +103,8 @@ class ContractCoreService:
     def get_contract_eligible_targets(self, company_id: int) -> Dict[str, List[Dict]]:
         """계약 요청 가능한 대상 목록 조회
 
+        Phase 30: Repository 패턴 적용
+
         Returns:
             {
                 'personal_accounts': [개인계정 목록],
@@ -82,10 +117,8 @@ class ContractCoreService:
         }
 
         # 1. 개인계정 중 해당 법인과 계약 미체결 (또는 거절/종료된 계약만 있는 경우)
-        personal_users = User.query.filter(
-            User.account_type == AccountType.PERSONAL,
-            User.is_active == True
-        ).all()
+        # Phase 30: Repository 사용
+        personal_users = self.user_repo.find_active_personal_users()
 
         for user in personal_users:
             existing_contract = self.contract_repo.get_contract_between(
@@ -93,23 +126,27 @@ class ContractCoreService:
                 company_id=company_id
             )
             if not existing_contract or existing_contract.get('status') in [ContractStatus.REJECTED, ContractStatus.TERMINATED]:
+                # Phase 30: Repository 사용 - Profile에서 실제 이름 조회
+                profile = self.profile_repo.get_by_user_id(user.id)
+                actual_name = profile.name if profile else user.username
+
                 result['personal_accounts'].append({
                     'user_id': user.id,
-                    'name': user.username,
+                    'username': user.username,  # 아이디 (로그인용)
+                    'name': actual_name,         # 실제 이름
                     'email': user.email,
                     'account_type': 'personal'
                 })
 
         # 2. 직원계정 중 계약 미체결 상태 (pending_info 또는 pending_contract)
-        pending_employees = Employee.query.filter(
-            Employee.company_id == company_id,
-            Employee.status.in_(['pending_info', 'pending_contract'])
-        ).all()
+        # Phase 30: Repository 사용
+        pending_employees = self.employee_repo.find_by_company_and_statuses(
+            company_id, ['pending_info', 'pending_contract']
+        )
 
         for emp in pending_employees:
-            emp_user = User.query.filter(
-                User.employee_id == emp.id
-            ).first()
+            # Phase 30: Repository 사용
+            emp_user = self.user_repo.find_by_employee_id(emp.id)
 
             if emp_user:
                 existing_contract = self.contract_repo.get_contract_between(
@@ -151,21 +188,19 @@ class ContractCoreService:
         """계약 이력 조회 - 수정불가 필터용
 
         Phase 28: termination_requested 추가
+        Phase 30: Repository 패턴 적용
         계약 이력이 있는 직원은 필드 수정 불가
         """
-        if not employee_number or not company_id:
-            return None
-
-        return PersonCorporateContract.query.filter(
-            PersonCorporateContract.employee_number == employee_number,
-            PersonCorporateContract.company_id == company_id,
-            PersonCorporateContract.status.in_([
-                PersonCorporateContract.STATUS_APPROVED,
-                PersonCorporateContract.STATUS_TERMINATION_REQUESTED,
-                PersonCorporateContract.STATUS_TERMINATED,
-                PersonCorporateContract.STATUS_EXPIRED
-            ])
-        ).first()
+        return self.contract_repo.find_with_history(
+            employee_number=employee_number,
+            company_id=company_id,
+            history_statuses=[
+                ContractStatus.APPROVED,
+                ContractStatus.TERMINATION_REQUESTED,
+                ContractStatus.TERMINATED,
+                ContractStatus.EXPIRED
+            ]
+        )
 
     def find_approved_contract(
         self, employee_number: str, company_id: int

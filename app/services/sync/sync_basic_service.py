@@ -2,12 +2,13 @@
 기본 필드 동기화 서비스
 
 개인 프로필 <-> 직원 간 기본 필드 동기화를 담당합니다.
+
+Phase 30: 레이어 분리 - db.session 제거, Repository 패턴 적용
 """
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 import json
 
-from app.database import db
 from app.models.employee import Employee
 from app.models.personal_profile import PersonalProfile
 from app.models.person_contract import (
@@ -17,10 +18,26 @@ from app.models.person_contract import (
 
 
 class SyncBasicService:
-    """기본 필드 동기화 처리"""
+    """기본 필드 동기화 처리
+
+    Phase 30: Repository DI 패턴 적용
+    """
 
     def __init__(self, current_user_id: int = None):
         self._current_user_id = current_user_id
+        self._sync_log_repo = None
+
+    # ========================================
+    # Repository Properties (지연 초기화)
+    # ========================================
+
+    @property
+    def sync_log_repo(self):
+        """지연 초기화된 SyncLog Repository"""
+        if self._sync_log_repo is None:
+            from app.repositories.sync_log_repository import sync_log_repository
+            self._sync_log_repo = sync_log_repository
+        return self._sync_log_repo
 
     def set_current_user(self, user_id: int):
         """현재 작업 사용자 설정"""
@@ -72,7 +89,8 @@ class SyncBasicService:
                 changes.append(change)
                 synced_fields.append(field)
 
-                log = SyncLog.create_log(
+                # Phase 30: Repository 패턴 적용
+                log = self.sync_log_repo.create_log(
                     contract_id=contract_id,
                     sync_type=sync_type,
                     entity_type='personal_profile',
@@ -80,10 +98,9 @@ class SyncBasicService:
                     old_value=change['old_value'],
                     new_value=change['new_value'],
                     direction='personal_to_employee',
-                    user_id=self._current_user_id
+                    user_id=self._current_user_id,
+                    commit=False
                 )
-                db.session.add(log)
-                db.session.flush()
                 log_ids.append(log.id)
 
         return {
@@ -138,7 +155,8 @@ class SyncBasicService:
                 changes.append(change)
                 synced_fields.append(field)
 
-                log = SyncLog.create_log(
+                # Phase 30: Repository 패턴 적용
+                log = self.sync_log_repo.create_log(
                     contract_id=contract_id,
                     sync_type=sync_type,
                     entity_type='employee',
@@ -146,10 +164,9 @@ class SyncBasicService:
                     old_value=change['old_value'],
                     new_value=change['new_value'],
                     direction='employee_to_personal',
-                    user_id=self._current_user_id
+                    user_id=self._current_user_id,
+                    commit=False
                 )
-                db.session.add(log)
-                db.session.flush()
                 log_ids.append(log.id)
 
         return {

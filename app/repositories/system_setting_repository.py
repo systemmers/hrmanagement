@@ -201,3 +201,64 @@ class SystemSettingRepository(BaseRepository[SystemSetting]):
             short_key = s['key'].replace('email.', '')
             result[short_key] = s['typedValue']
         return result
+
+    # ========================================
+    # Phase 30: 레이어 분리용 추가 메서드
+    # ========================================
+
+    def find_all_ordered(self) -> List[SystemSetting]:
+        """모든 시스템 설정 조회 (Model 반환, key 순서)
+
+        Phase 30: Service Layer 레이어 분리용 메서드
+
+        Returns:
+            SystemSetting 모델 리스트
+        """
+        return SystemSetting.query.order_by(SystemSetting.key).all()
+
+    def find_by_key(self, key: str) -> Optional[SystemSetting]:
+        """키로 시스템 설정 조회 (Model 반환)
+
+        Phase 30: Service Layer 레이어 분리용 메서드
+
+        Args:
+            key: 설정 키
+
+        Returns:
+            SystemSetting 모델 객체 또는 None
+        """
+        return SystemSetting.query.filter_by(key=key).first()
+
+    def create_setting(
+        self,
+        key: str,
+        value: str,
+        description: str = '',
+        commit: bool = True
+    ) -> SystemSetting:
+        """시스템 설정 생성 (Model 반환)
+
+        Phase 30: Service Layer 레이어 분리용 메서드
+
+        Args:
+            key: 설정 키
+            value: 설정 값
+            description: 설명
+            commit: 커밋 여부
+
+        Returns:
+            SystemSetting 모델 객체
+        """
+        setting = SystemSetting(
+            key=key,
+            value=value,
+            description=description
+        )
+        db.session.add(setting)
+        if commit:
+            db.session.commit()
+        return setting
+
+
+# 싱글톤 인스턴스
+system_setting_repository = SystemSettingRepository()

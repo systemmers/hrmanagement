@@ -209,6 +209,97 @@ class CompanyRepository(BaseRepository[Company]):
         clean_number = business_number.replace('-', '')
         return Company.query.filter_by(business_number=clean_number).first() is not None
 
+    # ========================================
+    # Phase 30: 레이어 분리용 추가 메서드
+    # ========================================
+
+    def count_all(self) -> int:
+        """전체 법인 수 조회
+
+        Returns:
+            전체 법인 수
+        """
+        return Company.query.count()
+
+    def count_active(self) -> int:
+        """활성화된 법인 수 조회
+
+        Returns:
+            활성 법인 수
+        """
+        return Company.query.filter_by(is_active=True).count()
+
+    def count_by_plan_type(self, plan_type: str) -> int:
+        """플랜 유형별 법인 수 조회
+
+        Args:
+            plan_type: 플랜 유형
+
+        Returns:
+            법인 수
+        """
+        return Company.query.filter_by(plan_type=plan_type, is_active=True).count()
+
+    def find_by_id(self, company_id: int) -> Optional[Company]:
+        """ID로 법인 조회 (Model 반환)
+
+        Phase 30: Service Layer 레이어 분리용 메서드
+
+        Args:
+            company_id: 법인 ID
+
+        Returns:
+            Company 모델 객체 또는 None
+        """
+        return Company.query.get(company_id)
+
+    def find_paginated(
+        self,
+        page: int = 1,
+        per_page: int = 20,
+        search: str = None
+    ) -> tuple:
+        """법인 목록 조회 (페이지네이션)
+
+        Phase 30: Service Layer 레이어 분리용 메서드
+
+        Args:
+            page: 페이지 번호
+            per_page: 페이지당 항목 수
+            search: 검색어 (name/business_number)
+
+        Returns:
+            Tuple[Company 모델 리스트, 페이지네이션 객체]
+        """
+        query = Company.query
+
+        if search:
+            query = query.filter(
+                db.or_(
+                    Company.name.ilike(f'%{search}%'),
+                    Company.business_number.ilike(f'%{search}%')
+                )
+            )
+
+        pagination = query.order_by(Company.created_at.desc()).paginate(
+            page=page, per_page=per_page, error_out=False
+        )
+
+        return pagination.items, pagination
+
+    def find_recent(self, limit: int = 5) -> List[Company]:
+        """최근 등록 법인 조회
+
+        Phase 30: Service Layer 레이어 분리용 메서드
+
+        Args:
+            limit: 조회 제한 (기본 5)
+
+        Returns:
+            Company 모델 리스트
+        """
+        return Company.query.order_by(Company.created_at.desc()).limit(limit).all()
+
 
 # 싱글톤 인스턴스
 company_repository = CompanyRepository()

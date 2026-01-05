@@ -142,3 +142,65 @@ class ProfileRepository(BaseRepository[Profile]):
         profile.user_id = user_id
         db.session.commit()
         return profile
+
+    def mobile_phone_exists(self, mobile_phone: str, exclude_user_id: int = None) -> bool:
+        """
+        휴대폰 번호 중복 확인
+
+        Args:
+            mobile_phone: 확인할 휴대폰 번호
+            exclude_user_id: 제외할 사용자 ID (수정 시 자기 자신 제외)
+
+        Returns:
+            중복 여부 (True: 존재함, False: 존재하지 않음)
+        """
+        if not mobile_phone:
+            return False
+
+        query = Profile.query.filter(Profile.mobile_phone == mobile_phone)
+
+        if exclude_user_id:
+            query = query.filter(Profile.user_id != exclude_user_id)
+
+        return query.first() is not None
+
+    # ========================================
+    # Phase 30: 레이어 분리용 추가 메서드
+    # ========================================
+
+    def create_for_user(
+        self,
+        user_id: int,
+        name: str,
+        email: str = None,
+        mobile_phone: str = None,
+        commit: bool = True
+    ) -> Profile:
+        """개인 계정용 프로필 생성
+
+        Phase 30: personal_service.register() 레이어 분리용 메서드
+
+        Args:
+            user_id: 사용자 ID
+            name: 이름
+            email: 이메일 (선택)
+            mobile_phone: 휴대폰 번호 (선택)
+            commit: 즉시 커밋 여부
+
+        Returns:
+            생성된 Profile 모델 객체
+        """
+        profile = Profile(
+            user_id=user_id,
+            name=name,
+            email=email,
+            mobile_phone=mobile_phone
+        )
+        db.session.add(profile)
+        if commit:
+            db.session.commit()
+        return profile
+
+
+# 싱글톤 인스턴스
+profile_repository = ProfileRepository()

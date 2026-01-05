@@ -4,22 +4,48 @@ Contract Settings Service
 계약 데이터 공유 설정 및 동기화 로그 관련 비즈니스 로직을 처리합니다.
 - 데이터 공유 설정 조회/수정
 - 동기화 로그 조회
+
+Phase 30: 레이어 분리 - db.session 제거, Repository 패턴 적용
 """
 from typing import Dict, Optional, List, Any
 
-from ...database import db
-from ...models.person_contract import DataSharingSettings, SyncLog
 from ..base import ServiceResult
 
 
 class ContractSettingsService:
-    """계약 설정 서비스"""
+    """계약 설정 서비스
+
+    Phase 30: Repository DI 패턴 적용
+    """
+
+    def __init__(self):
+        self._contract_repo = None
+        self._data_sharing_repo = None
+        self._sync_log_repo = None
 
     @property
     def contract_repo(self):
         """지연 초기화된 계약 Repository"""
-        from ...extensions import person_contract_repo
-        return person_contract_repo
+        if self._contract_repo is None:
+            from ...extensions import person_contract_repo
+            self._contract_repo = person_contract_repo
+        return self._contract_repo
+
+    @property
+    def data_sharing_repo(self):
+        """지연 초기화된 DataSharingSettings Repository"""
+        if self._data_sharing_repo is None:
+            from ...repositories.data_sharing_settings_repository import data_sharing_settings_repository
+            self._data_sharing_repo = data_sharing_settings_repository
+        return self._data_sharing_repo
+
+    @property
+    def sync_log_repo(self):
+        """지연 초기화된 SyncLog Repository"""
+        if self._sync_log_repo is None:
+            from ...repositories.sync_log_repository import sync_log_repository
+            self._sync_log_repo = sync_log_repository
+        return self._sync_log_repo
 
     # ========================================
     # 데이터 공유 설정
@@ -32,18 +58,22 @@ class ContractSettingsService:
     def get_sharing_settings_model(self, contract_id: int) -> Optional[Any]:
         """데이터 공유 설정 모델 조회
 
+        Phase 30: Repository 패턴 적용
+
         Args:
             contract_id: 계약 ID
 
         Returns:
             DataSharingSettings 모델 또는 None
         """
-        return DataSharingSettings.query.filter_by(contract_id=contract_id).first()
+        return self.data_sharing_repo.find_by_contract_id(contract_id)
 
     def update_or_create_sharing_settings(
         self, contract_id: int, commit: bool = True, **kwargs
     ) -> Any:
         """데이터 공유 설정 생성 또는 업데이트
+
+        Phase 30: Repository 패턴 적용
 
         Args:
             contract_id: 계약 ID
@@ -53,21 +83,7 @@ class ContractSettingsService:
         Returns:
             DataSharingSettings 모델
         """
-        settings = self.get_sharing_settings_model(contract_id)
-        if not settings:
-            settings = DataSharingSettings(contract_id=contract_id)
-            db.session.add(settings)
-
-        for key, value in kwargs.items():
-            if hasattr(settings, key):
-                setattr(settings, key, value)
-
-        if commit:
-            db.session.commit()
-        else:
-            db.session.flush()
-
-        return settings
+        return self.data_sharing_repo.update_settings(contract_id, kwargs, commit=commit)
 
     def update_sharing_settings(self, contract_id: int, settings: Dict) -> ServiceResult[Dict]:
         """데이터 공유 설정 업데이트
@@ -90,6 +106,8 @@ class ContractSettingsService:
     ) -> List[Dict]:
         """동기화 로그 조회 (필터링 지원)
 
+        Phase 30: Repository 패턴 적용
+
         Args:
             contract_id: 계약 ID
             sync_type: 동기화 유형 필터 (선택)
@@ -98,10 +116,10 @@ class ContractSettingsService:
         Returns:
             로그 목록 (Dict)
         """
-        query = SyncLog.query.filter_by(contract_id=contract_id)
         if sync_type:
-            query = query.filter_by(sync_type=sync_type)
-        logs = query.order_by(SyncLog.executed_at.desc()).limit(limit).all()
+            logs = self.sync_log_repo.find_by_sync_type(contract_id, sync_type, limit)
+        else:
+            logs = self.sync_log_repo.find_by_contract_id(contract_id, limit)
         return [log.to_dict() for log in logs]
 
     def get_sync_logs(self, contract_id: int, limit: int = 50) -> List[Dict]:

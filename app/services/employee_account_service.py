@@ -9,15 +9,14 @@ Employee Account Service
 Phase 1 (Part A): 직원 등록 + 계정 생성
 Phase 2 (Part B): 계약 프로세스 확장 (별도 구현)
 Phase 24: Option A 레이어 분리 - find_by_id() 표준 사용
+Phase 30: 레이어 분리 - Model.query, db.session 직접 사용 제거
 """
 import secrets
 import string
 from typing import Dict, Optional, Tuple, List
 
-from app.database import db
-from app.models import Employee, User
+from app.models import User
 from app.utils.transaction import atomic_transaction
-from app.utils.tenant import get_current_organization_id
 from app.constants.status import EmployeeStatus
 
 
@@ -27,6 +26,10 @@ class EmployeeAccountService:
     # 비밀번호 생성 설정
     PASSWORD_LENGTH = 12
     PASSWORD_CHARS = string.ascii_letters + string.digits + "!@#$%"
+
+    # ========================================
+    # Repository Property 주입 (Phase 30)
+    # ========================================
 
     @property
     def employee_repo(self):
@@ -39,6 +42,12 @@ class EmployeeAccountService:
         """지연 초기화된 사용자 Repository"""
         from app.extensions import user_repo
         return user_repo
+
+    @property
+    def company_repo(self):
+        """지연 초기화된 법인 Repository"""
+        from app.repositories.company_repository import company_repository
+        return company_repository
 
     # ========================================
     # 직원 + 계정 생성 (Part A)
@@ -74,9 +83,8 @@ class EmployeeAccountService:
                 return False, None, validation_error
 
             with atomic_transaction():
-                # 2. Employee 생성
+                # 2. Employee 생성 (Phase 30: Repository 사용)
                 employee = self._create_employee(employee_data, company_id)
-                db.session.flush()  # employee.id 확보
 
                 # 3. User 생성 (account_type='employee_sub')
                 user = self._create_user(
@@ -85,7 +93,6 @@ class EmployeeAccountService:
                     company_id=company_id,
                     parent_user_id=admin_user_id
                 )
-                db.session.flush()
 
             return True, {
                 'employee_id': employee.id,
@@ -127,23 +134,20 @@ class EmployeeAccountService:
             if validation_error:
                 return False, None, validation_error
 
-            # 2. Company의 root_organization_id 조회
-            from app.models.company import Company
-            company = Company.query.get(company_id)
+            # 2. Company의 root_organization_id 조회 (Phase 30: Repository 사용)
+            company = self.company_repo.find_by_id(company_id)
             if not company:
                 return False, None, "법인 정보를 찾을 수 없습니다."
 
             with atomic_transaction():
-                # 3. 최소 Employee 생성 (company_id + organization_id 포함)
-                employee = Employee(
-                    name=minimal_employee_data.get('name', ''),
-                    email=account_data.get('email', ''),
-                    company_id=company_id,  # 법인 소속 설정
-                    organization_id=company.root_organization_id,  # 조직 트리 연결
-                    status=EmployeeStatus.PENDING_INFO  # 정보 입력 대기 상태
-                )
-                db.session.add(employee)
-                db.session.flush()
+                # 3. 최소 Employee 생성 (Phase 30: Repository 사용)
+                employee = self.employee_repo.create({
+                    'name': minimal_employee_data.get('name', ''),
+                    'email': account_data.get('email', ''),
+                    'company_id': company_id,  # 법인 소속 설정
+                    'organization_id': company.root_organization_id,  # 조직 트리 연결
+                    'status': EmployeeStatus.PENDING_INFO  # 정보 입력 대기 상태
+                }, commit=False)
 
                 # 4. User 생성
                 user = self._create_user(
@@ -152,7 +156,6 @@ class EmployeeAccountService:
                     company_id=company_id,
                     parent_user_id=admin_user_id
                 )
-                db.session.flush()
 
             return True, {
                 'employee_id': employee.id,
@@ -193,8 +196,8 @@ class EmployeeAccountService:
                 return False, "직원을 찾을 수 없습니다."
 
             with atomic_transaction():
-                # User 조회 (employee_id로)
-                user = User.query.filter_by(employee_id=employee_id).first()
+                # User 조회 (Phase 30: Repository 사용)
+                user = self.user_repo.find_by_employee_id(employee_id)
                 if user:
                     user.is_active = False
 
@@ -226,7 +229,8 @@ class EmployeeAccountService:
                 return False, "직원을 찾을 수 없습니다."
 
             with atomic_transaction():
-                user = User.query.filter_by(employee_id=employee_id).first()
+                # Phase 30: Repository 사용
+                user = self.user_repo.find_by_employee_id(employee_id)
                 if user:
                     user.is_active = True
 
@@ -249,6 +253,8 @@ class EmployeeAccountService:
     ) -> Dict:
         """계정 정보 검증 (API용)
 
+        Phase 30: Repository 사용으로 변경
+
         Args:
             username: 사용자명
             email: 이메일
@@ -265,7 +271,8 @@ class EmployeeAccountService:
         elif not username.isalnum():
             errors['username'] = '사용자명은 영문과 숫자만 사용할 수 있습니다.'
         else:
-            existing = User.query.filter_by(username=username).first()
+            # Phase 30: Repository 사용
+            existing = self.user_repo.find_by_username(username)
             if existing and existing.id != exclude_user_id:
                 errors['username'] = '이미 사용 중인 사용자명입니다.'
 
@@ -273,7 +280,8 @@ class EmployeeAccountService:
         if not email or '@' not in email:
             errors['email'] = '올바른 이메일 형식이 아닙니다.'
         else:
-            existing = User.query.filter_by(email=email).first()
+            # Phase 30: Repository 사용
+            existing = self.user_repo.find_by_email(email)
             if existing and existing.id != exclude_user_id:
                 errors['email'] = '이미 사용 중인 이메일입니다.'
 
@@ -296,17 +304,21 @@ class EmployeeAccountService:
     def get_employees_without_account(self, company_id: int) -> List[Dict]:
         """계정이 없는 직원 목록 조회
 
+        Phase 30: Repository 사용으로 변경
+
         Args:
             company_id: 법인 ID
 
         Returns:
             계정 없는 직원 목록
         """
-        employees = Employee.query.filter_by(company_id=company_id).all()
+        # Phase 30: Repository 사용
+        employees = self.employee_repo.find_by_company_id(company_id)
         result = []
 
         for emp in employees:
-            user = User.query.filter_by(employee_id=emp.id).first()
+            # Phase 30: Repository 사용
+            user = self.user_repo.find_by_employee_id(emp.id)
             if not user:
                 result.append({
                     'id': emp.id,
@@ -325,6 +337,8 @@ class EmployeeAccountService:
     def _validate_account_data(self, username: str, email: str) -> Optional[str]:
         """계정 정보 내부 검증
 
+        Phase 30: Repository 사용으로 변경
+
         Returns:
             에러 메시지 (없으면 None)
         """
@@ -334,17 +348,19 @@ class EmployeeAccountService:
         if not email or '@' not in email:
             return "올바른 이메일 형식이 아닙니다."
 
-        # 중복 체크
-        if User.query.filter_by(username=username).first():
+        # Phase 30: Repository 사용 - 중복 체크
+        if self.user_repo.find_by_username(username):
             return "이미 사용 중인 사용자명입니다."
 
-        if User.query.filter_by(email=email).first():
+        if self.user_repo.find_by_email(email):
             return "이미 사용 중인 이메일입니다."
 
         return None
 
-    def _create_employee(self, employee_data: Dict, company_id: int) -> Employee:
+    def _create_employee(self, employee_data: Dict, company_id: int):
         """Employee 객체 생성
+
+        Phase 30: Repository 사용으로 변경
 
         Args:
             employee_data: 직원 정보
@@ -356,44 +372,44 @@ class EmployeeAccountService:
         # organization_id가 없으면 company의 root_organization_id 사용
         organization_id = employee_data.get('organization_id')
         if not organization_id:
-            from app.models.company import Company
-            company = Company.query.get(company_id)
+            # Phase 30: Repository 사용
+            company = self.company_repo.find_by_id(company_id)
             if company and company.root_organization_id:
                 organization_id = company.root_organization_id
 
-        employee = Employee(
-            company_id=company_id,  # 명시적 설정 (손실 방지)
-            name=employee_data.get('name', ''),
-            photo=employee_data.get('photo') or '/static/images/face/face_01_m.png',
-            department=employee_data.get('department', ''),
-            position=employee_data.get('position', ''),
-            status=employee_data.get('status', 'active'),
-            hire_date=employee_data.get('hire_date', ''),
-            phone=employee_data.get('phone', ''),
-            email=employee_data.get('email', ''),
-            organization_id=organization_id,
-            employee_number=employee_data.get('employee_number'),
-            team=employee_data.get('team'),
-            job_title=employee_data.get('job_title'),
-            work_location=employee_data.get('work_location'),
-            internal_phone=employee_data.get('internal_phone'),
-            company_email=employee_data.get('company_email'),
-            english_name=employee_data.get('english_name'),
-            birth_date=employee_data.get('birth_date'),
-            gender=employee_data.get('gender'),
-            address=employee_data.get('address'),
-            detailed_address=employee_data.get('detailed_address'),
-            postal_code=employee_data.get('postal_code'),
-            resident_number=employee_data.get('resident_number'),
-            mobile_phone=employee_data.get('mobile_phone'),
-            home_phone=employee_data.get('home_phone'),
-            nationality=employee_data.get('nationality'),
-            blood_type=employee_data.get('blood_type'),
-            religion=employee_data.get('religion'),
-            hobby=employee_data.get('hobby'),
-            specialty=employee_data.get('specialty'),
-        )
-        db.session.add(employee)
+        # Phase 30: Repository 사용 - Employee 생성
+        employee = self.employee_repo.create({
+            'company_id': company_id,  # 명시적 설정 (손실 방지)
+            'name': employee_data.get('name', ''),
+            'photo': employee_data.get('photo') or '/static/images/face/face_01_m.png',
+            'department': employee_data.get('department', ''),
+            'position': employee_data.get('position', ''),
+            'status': employee_data.get('status', 'active'),
+            'hire_date': employee_data.get('hire_date', ''),
+            'phone': employee_data.get('phone', ''),
+            'email': employee_data.get('email', ''),
+            'organization_id': organization_id,
+            'employee_number': employee_data.get('employee_number'),
+            'team': employee_data.get('team'),
+            'job_title': employee_data.get('job_title'),
+            'work_location': employee_data.get('work_location'),
+            'internal_phone': employee_data.get('internal_phone'),
+            'company_email': employee_data.get('company_email'),
+            'english_name': employee_data.get('english_name'),
+            'birth_date': employee_data.get('birth_date'),
+            'gender': employee_data.get('gender'),
+            'address': employee_data.get('address'),
+            'detailed_address': employee_data.get('detailed_address'),
+            'postal_code': employee_data.get('postal_code'),
+            'resident_number': employee_data.get('resident_number'),
+            'mobile_phone': employee_data.get('mobile_phone'),
+            'home_phone': employee_data.get('home_phone'),
+            'nationality': employee_data.get('nationality'),
+            'blood_type': employee_data.get('blood_type'),
+            'religion': employee_data.get('religion'),
+            'hobby': employee_data.get('hobby'),
+            'specialty': employee_data.get('specialty'),
+        }, commit=False)
         return employee
 
     def _create_user(
@@ -402,8 +418,10 @@ class EmployeeAccountService:
         employee_id: int,
         company_id: int,
         parent_user_id: int
-    ) -> User:
+    ):
         """User 객체 생성
+
+        Phase 30: Repository 사용으로 변경
 
         Args:
             account_data: 계정 정보
@@ -414,22 +432,23 @@ class EmployeeAccountService:
         Returns:
             생성된 User 객체
         """
-        user = User(
+        # 비밀번호 생성
+        password = account_data.get('password') or self.generate_password()
+
+        # Phase 30: user_repo.create_user 메서드 사용 (비밀번호 해싱 포함)
+        user = self.user_repo.create_user(
             username=account_data.get('username'),
             email=account_data.get('email'),
+            password=password,
             role=account_data.get('role', User.ROLE_EMPLOYEE),
-            account_type=User.ACCOUNT_EMPLOYEE_SUB,
-            employee_id=employee_id,
-            company_id=company_id,
-            parent_user_id=parent_user_id,
-            is_active=True
+            employee_id=employee_id
         )
 
-        # 비밀번호 설정
-        password = account_data.get('password') or self.generate_password()
-        user.set_password(password)
+        # 추가 필드 설정 (create_user에서 처리하지 않는 필드)
+        user.account_type = User.ACCOUNT_EMPLOYEE_SUB
+        user.company_id = company_id
+        user.parent_user_id = parent_user_id
 
-        db.session.add(user)
         return user
 
 

@@ -5,13 +5,14 @@ Phase 5: 알림 시스템
 - 알림 생성 및 관리
 - 알림 조회 및 읽음 처리
 - 알림 통계
+
+Phase 30: 레이어 분리 - Model.query, db.session 직접 사용 제거
 """
 import json
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 
 from flask import url_for
-from app.database import db
 from app.models.notification import Notification, NotificationPreference
 
 
@@ -21,6 +22,22 @@ class NotificationService:
 
     알림 생성, 조회, 읽음 처리 등을 담당합니다.
     """
+
+    # ========================================
+    # Repository Property 주입 (Phase 30)
+    # ========================================
+
+    @property
+    def notification_repo(self):
+        """지연 초기화된 알림 Repository"""
+        from app.repositories.notification_repository import notification_repository
+        return notification_repository
+
+    @property
+    def pref_repo(self):
+        """지연 초기화된 알림 설정 Repository"""
+        from app.repositories.notification_repository import notification_preference_repository
+        return notification_preference_repository
 
     # ===== 알림 생성 =====
 
@@ -63,7 +80,8 @@ class NotificationService:
         if not self._should_receive_notification(user_id, notification_type):
             return None
 
-        notification = Notification(
+        # Phase 30: Repository 사용
+        notification = self.notification_repo.create_notification(
             user_id=user_id,
             notification_type=notification_type,
             title=title,
@@ -71,21 +89,21 @@ class NotificationService:
             resource_type=resource_type,
             resource_id=resource_id,
             sender_id=sender_id,
-            priority=priority or Notification.PRIORITY_NORMAL,
+            priority=priority,
             action_url=action_url,
             action_label=action_label,
             extra_data=json.dumps(extra_data) if extra_data else None,
-            expires_at=expires_at
+            commit=True
         )
-
-        db.session.add(notification)
-        db.session.commit()
+        # expires_at는 Repository에서 지원하지 않으므로 별도 설정
+        if expires_at and notification:
+            notification.expires_at = expires_at
 
         return notification
 
     def _should_receive_notification(self, user_id: int, notification_type: str) -> bool:
-        """알림 수신 여부 확인"""
-        pref = NotificationPreference.query.filter_by(user_id=user_id).first()
+        """알림 수신 여부 확인 (Phase 30: Repository 사용)"""
+        pref = self.pref_repo.find_by_user_id(user_id)
 
         if not pref:
             return True  # 설정 없으면 기본적으로 수신
@@ -317,137 +335,69 @@ class NotificationService:
         limit: int = 50,
         offset: int = 0
     ) -> List[Dict]:
-        """알림 목록 조회"""
-        query = Notification.query.filter_by(user_id=user_id)
-
-        # 만료되지 않은 알림만
-        query = query.filter(
-            db.or_(
-                Notification.expires_at.is_(None),
-                Notification.expires_at > datetime.utcnow()
-            )
+        """알림 목록 조회 (Phase 30: Repository 사용)"""
+        notifications = self.notification_repo.find_paginated(
+            user_id=user_id,
+            unread_only=unread_only,
+            notification_type=notification_type,
+            limit=limit,
+            offset=offset
         )
-
-        if unread_only:
-            query = query.filter_by(is_read=False)
-
-        if notification_type:
-            query = query.filter_by(notification_type=notification_type)
-
-        notifications = query.order_by(
-            Notification.created_at.desc()
-        ).offset(offset).limit(limit).all()
-
         return [n.to_dict() for n in notifications]
 
     def get_unread_count(self, user_id: int) -> int:
-        """읽지 않은 알림 개수"""
-        return Notification.query.filter_by(
-            user_id=user_id,
-            is_read=False
-        ).filter(
-            db.or_(
-                Notification.expires_at.is_(None),
-                Notification.expires_at > datetime.utcnow()
-            )
-        ).count()
+        """읽지 않은 알림 개수 (Phase 30: Repository 사용)"""
+        return self.notification_repo.count_unread_valid(user_id)
 
     def get_notification(self, notification_id: int, user_id: int = None) -> Optional[Dict]:
-        """알림 상세 조회"""
-        query = Notification.query.filter_by(id=notification_id)
-
-        if user_id:
-            query = query.filter_by(user_id=user_id)
-
-        notification = query.first()
+        """알림 상세 조회 (Phase 30: Repository 사용)"""
+        notification = self.notification_repo.find_one_by_id_and_user(
+            notification_id, user_id
+        )
         return notification.to_dict() if notification else None
 
     # ===== 알림 상태 관리 =====
 
     def mark_as_read(self, notification_id: int, user_id: int) -> bool:
-        """알림 읽음 처리"""
-        notification = Notification.query.filter_by(
-            id=notification_id,
-            user_id=user_id
-        ).first()
+        """알림 읽음 처리 (Phase 30: Repository 사용)"""
+        notification = self.notification_repo.find_one_by_id_and_user(
+            notification_id, user_id
+        )
 
         if not notification:
             return False
 
-        notification.mark_as_read()
-        db.session.commit()
+        self.notification_repo.mark_as_read(notification_id)
         return True
 
     def mark_all_as_read(self, user_id: int, notification_type: str = None) -> int:
-        """모든 알림 읽음 처리"""
-        query = Notification.query.filter_by(
-            user_id=user_id,
-            is_read=False
+        """모든 알림 읽음 처리 (Phase 30: Repository 사용)"""
+        return self.notification_repo.mark_all_as_read_with_type(
+            user_id, notification_type
         )
 
-        if notification_type:
-            query = query.filter_by(notification_type=notification_type)
-
-        count = query.update({
-            'is_read': True,
-            'read_at': datetime.utcnow()
-        })
-
-        db.session.commit()
-        return count
-
     def delete_notification(self, notification_id: int, user_id: int) -> bool:
-        """알림 삭제"""
-        notification = Notification.query.filter_by(
-            id=notification_id,
-            user_id=user_id
-        ).first()
-
-        if not notification:
-            return False
-
-        db.session.delete(notification)
-        db.session.commit()
-        return True
+        """알림 삭제 (Phase 30: Repository 사용)"""
+        return self.notification_repo.delete_one(notification_id, user_id)
 
     def delete_old_notifications(self, days: int = 30) -> int:
-        """오래된 알림 삭제"""
-        cutoff_date = datetime.utcnow() - timedelta(days=days)
-
-        count = Notification.query.filter(
-            Notification.created_at < cutoff_date,
-            Notification.is_read == True
-        ).delete()
-
-        db.session.commit()
-        return count
+        """오래된 알림 삭제 (Phase 30: Repository 사용)"""
+        return self.notification_repo.delete_old_notifications(days)
 
     # ===== 알림 통계 =====
 
     def get_notification_stats(self, user_id: int, days: int = 30) -> Dict:
-        """알림 통계 조회"""
+        """알림 통계 조회 (Phase 30: Repository 사용)"""
         start_date = datetime.utcnow() - timedelta(days=days)
 
         # 전체 알림 수
-        total = Notification.query.filter(
-            Notification.user_id == user_id,
-            Notification.created_at >= start_date
-        ).count()
+        total = self.notification_repo.count_by_period(user_id, start_date)
 
         # 읽지 않은 알림 수
-        unread = Notification.query.filter(
-            Notification.user_id == user_id,
-            Notification.is_read == False
-        ).count()
+        unread = self.notification_repo.count_unread_all(user_id)
 
         # 유형별 통계
-        type_stats = db.session.query(
-            Notification.notification_type,
-            db.func.count(Notification.id)
-        ).filter(
-            Notification.user_id == user_id,
-            Notification.created_at >= start_date
-        ).group_by(Notification.notification_type).all()
+        type_stats = self.notification_repo.get_type_stats(user_id, start_date)
 
         return {
             'total': total,
@@ -459,8 +409,8 @@ class NotificationService:
     # ===== 알림 설정 =====
 
     def get_preferences(self, user_id: int) -> Dict:
-        """알림 설정 조회"""
-        pref = NotificationPreference.query.filter_by(user_id=user_id).first()
+        """알림 설정 조회 (Phase 30: Repository 사용)"""
+        pref = self.pref_repo.find_by_user_id(user_id)
 
         if not pref:
             # 기본 설정 반환
@@ -476,13 +426,7 @@ class NotificationService:
         return pref.to_dict()
 
     def update_preferences(self, user_id: int, settings: Dict) -> Dict:
-        """알림 설정 업데이트"""
-        pref = NotificationPreference.query.filter_by(user_id=user_id).first()
-
-        if not pref:
-            pref = NotificationPreference(user_id=user_id)
-            db.session.add(pref)
-
+        """알림 설정 업데이트 (Phase 30: Repository 사용)"""
         # 설정 업데이트
         allowed_fields = [
             'receive_contract_notifications',
@@ -493,11 +437,9 @@ class NotificationService:
             'email_digest_frequency'
         ]
 
-        for field in allowed_fields:
-            if field in settings:
-                setattr(pref, field, settings[field])
-
-        db.session.commit()
+        # 허용된 필드만 필터링
+        filtered_settings = {k: v for k, v in settings.items() if k in allowed_fields}
+        pref = self.pref_repo.update_preferences(user_id, filtered_settings)
         return pref.to_dict()
 
 

@@ -59,6 +59,13 @@ system_setting_repo = None
 # Phase 3: 개인-법인 계약 저장소
 person_contract_repo = None
 
+# Phase 30: 레이어 분리용 추가 저장소
+data_sharing_settings_repo = None
+personal_profile_repo = None
+sync_log_repo = None
+notification_repo = None
+notification_preference_repo = None
+
 
 def init_extensions(app):
     """앱 컨텍스트에서 저장소 초기화"""
@@ -71,6 +78,8 @@ def init_extensions(app):
     global salary_payment_repo, attachment_repo
     global user_repo, organization_repo, system_setting_repo
     global person_contract_repo
+    global data_sharing_settings_repo, personal_profile_repo, sync_log_repo
+    global notification_repo, notification_preference_repo
 
     # CSRF 보호 초기화
     csrf.init_app(app)
@@ -138,3 +147,15 @@ def init_extensions(app):
     # Phase 3: 개인-법인 계약 저장소 초기화
     from .repositories.person_contract_repository import PersonContractRepository
     person_contract_repo = PersonContractRepository()
+
+    # Phase 30: 레이어 분리용 추가 저장소 초기화
+    from .repositories.data_sharing_settings_repository import DataSharingSettingsRepository
+    from .repositories.personal_profile_repository import PersonalProfileRepository
+    from .repositories.sync_log_repository import SyncLogRepository
+    from .repositories.notification_repository import NotificationRepository, NotificationPreferenceRepository
+
+    data_sharing_settings_repo = DataSharingSettingsRepository()
+    personal_profile_repo = PersonalProfileRepository()
+    sync_log_repo = SyncLogRepository()
+    notification_repo = NotificationRepository()
+    notification_preference_repo = NotificationPreferenceRepository()

@@ -2,21 +2,93 @@
 관계형 데이터 동기화 서비스
 
 학력, 경력, 자격증, 어학, 병역 등 관계형 데이터의 동기화를 담당합니다.
+
+Phase 30: 레이어 분리 - db.session 제거, Repository 패턴 적용
 """
 from typing import Dict, Any
 import json
 
-from app.database import db
 from app.models.employee import Employee
 from app.models.profile import Profile
 from app.models.person_contract import SyncLog
 
 
 class SyncRelationService:
-    """관계형 데이터 동기화 처리"""
+    """관계형 데이터 동기화 처리
+
+    Phase 30: Repository DI 패턴 적용
+    """
 
     def __init__(self, current_user_id: int = None):
         self._current_user_id = current_user_id
+        # Repository 지연 초기화용
+        self._sync_log_repo = None
+        self._education_repo = None
+        self._career_repo = None
+        self._certificate_repo = None
+        self._language_repo = None
+        self._military_repo = None
+        self._family_repo = None
+
+    # ========================================
+    # Repository Properties (지연 초기화)
+    # ========================================
+
+    @property
+    def sync_log_repo(self):
+        """지연 초기화된 SyncLog Repository"""
+        if self._sync_log_repo is None:
+            from app.repositories.sync_log_repository import sync_log_repository
+            self._sync_log_repo = sync_log_repository
+        return self._sync_log_repo
+
+    @property
+    def education_repo(self):
+        """지연 초기화된 Education Repository"""
+        if self._education_repo is None:
+            from app.repositories.education_repository import EducationRepository
+            self._education_repo = EducationRepository()
+        return self._education_repo
+
+    @property
+    def career_repo(self):
+        """지연 초기화된 Career Repository"""
+        if self._career_repo is None:
+            from app.repositories.career_repository import CareerRepository
+            self._career_repo = CareerRepository()
+        return self._career_repo
+
+    @property
+    def certificate_repo(self):
+        """지연 초기화된 Certificate Repository"""
+        if self._certificate_repo is None:
+            from app.repositories.certificate_repository import CertificateRepository
+            self._certificate_repo = CertificateRepository()
+        return self._certificate_repo
+
+    @property
+    def language_repo(self):
+        """지연 초기화된 Language Repository"""
+        if self._language_repo is None:
+            from app.repositories.language_repository import LanguageRepository
+            self._language_repo = LanguageRepository()
+        return self._language_repo
+
+    @property
+    def military_repo(self):
+        """지연 초기화된 MilitaryService Repository"""
+        if self._military_repo is None:
+            from app.repositories.military_service_repository import MilitaryServiceRepository
+            self._military_repo = MilitaryServiceRepository()
+        return self._military_repo
+
+    @property
+    def family_repo(self):
+        """지연 초기화된 FamilyMember Repository"""
+        if self._family_repo is None:
+            from app.repositories.family_member_repository import FamilyMemberRepository
+            self._family_repo = FamilyMemberRepository()
+        return self._family_repo
 
     def set_current_user(self, user_id: int):
         """현재 작업 사용자 설정"""
@@ -108,15 +180,18 @@ class SyncRelationService:
         employee: Employee,
         sync_type: str
     ) -> Dict[str, Any]:
-        """학력 정보 동기화"""
+        """학력 정보 동기화
+
+        Phase 30: Repository 패턴 적용
+        """
         from app.models.education import Education
 
         personal_edus = list(profile.educations.all())
         if not personal_edus:
             return {'synced': False}
 
-        # 기존 직원 학력 삭제 후 새로 추가 (전체 교체 방식)
-        employee.educations.delete()
+        # Phase 30: Repository 사용 - 기존 직원 학력 삭제
+        self.education_repo.delete_by_employee_id(employee.id, commit=False)
 
         for pe in personal_edus:
             edu = Education(
@@ -132,10 +207,11 @@ class SyncRelationService:
                 location=getattr(pe, 'location', None),
                 note=getattr(pe, 'note', None),
             )
-            db.session.add(edu)
+            # Phase 30: Repository 사용
+            self.education_repo.create_model(edu, commit=False)
 
-        # 로그 생성
-        log = SyncLog.create_log(
+        # Phase 30: Repository 사용 - 로그 생성
+        log = self.sync_log_repo.create_log(
             contract_id=contract_id,
             sync_type=sync_type,
             entity_type='education',
@@ -143,10 +219,9 @@ class SyncRelationService:
             old_value=None,
             new_value=json.dumps({'count': len(personal_edus)}),
             direction='personal_to_employee',
-            user_id=self._current_user_id
+            user_id=self._current_user_id,
+            commit=False
         )
-        db.session.add(log)
-        db.session.flush()
 
         return {
             'synced': True,
@@ -161,14 +236,18 @@ class SyncRelationService:
         employee: Employee,
         sync_type: str
     ) -> Dict[str, Any]:
-        """경력 정보 동기화"""
+        """경력 정보 동기화
+
+        Phase 30: Repository 패턴 적용
+        """
         from app.models.career import Career
 
         personal_careers = list(profile.careers.all())
         if not personal_careers:
             return {'synced': False}
 
-        employee.careers.delete()
+        # Phase 30: Repository 사용
+        self.career_repo.delete_by_employee_id(employee.id, commit=False)
 
         for pc in personal_careers:
             career = Career(
@@ -186,9 +265,9 @@ class SyncRelationService:
                 resignation_reason=getattr(pc, 'resignation_reason', None),
                 note=getattr(pc, 'note', None),
             )
-            db.session.add(career)
+            self.career_repo.create_model(career, commit=False)
 
-        log = SyncLog.create_log(
+        log = self.sync_log_repo.create_log(
             contract_id=contract_id,
             sync_type=sync_type,
             entity_type='career',
@@ -196,10 +275,9 @@ class SyncRelationService:
             old_value=None,
             new_value=json.dumps({'count': len(personal_careers)}),
             direction='personal_to_employee',
-            user_id=self._current_user_id
+            user_id=self._current_user_id,
+            commit=False
         )
-        db.session.add(log)
-        db.session.flush()
 
         return {
             'synced': True,
@@ -214,14 +292,18 @@ class SyncRelationService:
         employee: Employee,
         sync_type: str
     ) -> Dict[str, Any]:
-        """자격증 정보 동기화"""
+        """자격증 정보 동기화
+
+        Phase 30: Repository 패턴 적용
+        """
         from app.models.certificate import Certificate
 
         personal_certs = list(profile.certificates.all())
         if not personal_certs:
             return {'synced': False}
 
-        employee.certificates.delete()
+        # Phase 30: Repository 사용
+        self.certificate_repo.delete_by_employee_id(employee.id, commit=False)
 
         for pc in personal_certs:
             cert = Certificate(
@@ -234,9 +316,9 @@ class SyncRelationService:
                 grade=getattr(pc, 'grade', None),
                 note=getattr(pc, 'note', None),
             )
-            db.session.add(cert)
+            self.certificate_repo.create_model(cert, commit=False)
 
-        log = SyncLog.create_log(
+        log = self.sync_log_repo.create_log(
             contract_id=contract_id,
             sync_type=sync_type,
             entity_type='certificate',
@@ -244,10 +326,9 @@ class SyncRelationService:
             old_value=None,
             new_value=json.dumps({'count': len(personal_certs)}),
             direction='personal_to_employee',
-            user_id=self._current_user_id
+            user_id=self._current_user_id,
+            commit=False
         )
-        db.session.add(log)
-        db.session.flush()
 
         return {
             'synced': True,
@@ -262,14 +343,18 @@ class SyncRelationService:
         employee: Employee,
         sync_type: str
     ) -> Dict[str, Any]:
-        """어학 능력 동기화"""
+        """어학 능력 동기화
+
+        Phase 30: Repository 패턴 적용
+        """
         from app.models.language import Language
 
         personal_langs = list(profile.languages.all())
         if not personal_langs:
             return {'synced': False}
 
-        employee.languages.delete()
+        # Phase 30: Repository 사용
+        self.language_repo.delete_by_employee_id(employee.id, commit=False)
 
         for pl in personal_langs:
             lang = Language(
@@ -282,9 +367,9 @@ class SyncRelationService:
                 expiry_date=getattr(pl, 'expiry_date', None),
                 note=getattr(pl, 'note', None),
             )
-            db.session.add(lang)
+            self.language_repo.create_model(lang, commit=False)
 
-        log = SyncLog.create_log(
+        log = self.sync_log_repo.create_log(
             contract_id=contract_id,
             sync_type=sync_type,
             entity_type='language',
@@ -292,10 +377,9 @@ class SyncRelationService:
             old_value=None,
             new_value=json.dumps({'count': len(personal_langs)}),
             direction='personal_to_employee',
-            user_id=self._current_user_id
+            user_id=self._current_user_id,
+            commit=False
         )
-        db.session.add(log)
-        db.session.flush()
 
         return {
             'synced': True,
@@ -310,7 +394,10 @@ class SyncRelationService:
         employee: Employee,
         sync_type: str
     ) -> Dict[str, Any]:
-        """병역 정보 동기화"""
+        """병역 정보 동기화
+
+        Phase 30: Repository 패턴 적용
+        """
         from app.models.military_service import MilitaryService
 
         # Profile.military_services는 dynamic 관계
@@ -318,9 +405,8 @@ class SyncRelationService:
         if not personal_military:
             return {'synced': False}
 
-        # 기존 병역 정보 삭제 (직접 쿼리로 확실하게 삭제)
-        MilitaryService.query.filter_by(employee_id=employee.id).delete()
-        db.session.flush()
+        # Phase 30: Repository 사용 - 기존 병역 정보 삭제
+        self.military_repo.delete_by_employee_id(employee.id, commit=False)
 
         military = MilitaryService(
             employee_id=employee.id,
@@ -334,9 +420,9 @@ class SyncRelationService:
             exemption_reason=getattr(personal_military, 'exemption_reason', None),
             note=getattr(personal_military, 'note', None),
         )
-        db.session.add(military)
+        self.military_repo.create_model(military, commit=False)
 
-        log = SyncLog.create_log(
+        log = self.sync_log_repo.create_log(
             contract_id=contract_id,
             sync_type=sync_type,
             entity_type='military_service',
@@ -344,10 +430,9 @@ class SyncRelationService:
             old_value=None,
             new_value='synced',
             direction='personal_to_employee',
-            user_id=self._current_user_id
+            user_id=self._current_user_id,
+            commit=False
         )
-        db.session.add(log)
-        db.session.flush()
 
         return {
             'synced': True,
@@ -362,15 +447,18 @@ class SyncRelationService:
         employee: Employee,
         sync_type: str
     ) -> Dict[str, Any]:
-        """가족 정보 동기화"""
+        """가족 정보 동기화
+
+        Phase 30: Repository 패턴 적용
+        """
         from app.models.family_member import FamilyMember
 
         personal_family = list(profile.family_members.all())
         if not personal_family:
             return {'synced': False}
 
-        # 기존 직원 가족 정보 삭제 후 새로 추가 (전체 교체 방식)
-        employee.family_members.delete()
+        # Phase 30: Repository 사용 - 기존 가족 정보 삭제
+        self.family_repo.delete_by_employee_id(employee.id, commit=False)
 
         for pf in personal_family:
             family = FamilyMember(
@@ -384,9 +472,9 @@ class SyncRelationService:
                 is_dependent=pf.is_dependent,
                 note=pf.note,
             )
-            db.session.add(family)
+            self.family_repo.create_model(family, commit=False)
 
-        log = SyncLog.create_log(
+        log = self.sync_log_repo.create_log(
             contract_id=contract_id,
             sync_type=sync_type,
             entity_type='family_member',
@@ -394,10 +482,9 @@ class SyncRelationService:
             old_value=None,
             new_value=json.dumps({'count': len(personal_family)}),
             direction='personal_to_employee',
-            user_id=self._current_user_id
+            user_id=self._current_user_id,
+            commit=False
         )
-        db.session.add(log)
-        db.session.flush()
 
         return {
             'synced': True,

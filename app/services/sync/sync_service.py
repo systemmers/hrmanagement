@@ -6,20 +6,16 @@
 
 Phase 4: 데이터 동기화 및 퇴사 처리
 Phase 5: 구조화 - sync/ 폴더로 이동
+Phase 30: 레이어 분리 - Model.query 제거, Repository 패턴 적용
 """
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 import json
 
-from app.database import db
 from app.models.employee import Employee
+from app.models.person_contract import SyncLog, PersonCorporateContract
 from app.models.personal_profile import PersonalProfile
-from app.models.profile import Profile
-from app.models.person_contract import (
-    PersonCorporateContract,
-    DataSharingSettings,
-    SyncLog
-)
+from app.utils.transaction import atomic_transaction
 
 # 서브 서비스 임포트 (같은 패키지 내)
 from .sync_basic_service import SyncBasicService
@@ -27,6 +23,7 @@ from .sync_relation_service import SyncRelationService
 
 # 필드 매핑 SSOT (Phase 4: 중앙화)
 from app.constants.sync_fields import SYNC_MAPPINGS
+from app.constants.status import ContractStatus
 
 
 class SyncService:
@@ -40,12 +37,72 @@ class SyncService:
     - 동기화 로그 기록
 
     필드 매핑은 constants/sync_fields.py에서 중앙 관리합니다.
+
+    Phase 30: 레이어 분리 - Repository DI 패턴 적용
     """
 
     def __init__(self):
         self._current_user_id = None
         self._basic_service = SyncBasicService()
         self._relation_service = SyncRelationService()
+        # Repository 지연 초기화용
+        self._data_sharing_repo = None
+        self._contract_repo = None
+        self._profile_repo = None
+        self._company_repo = None
+        self._employee_repo = None
+
+    # ========================================
+    # Repository Properties (지연 초기화)
+    # ========================================
+
+    @property
+    def data_sharing_repo(self):
+        """지연 초기화된 DataSharingSettings Repository"""
+        if self._data_sharing_repo is None:
+            from app.repositories.data_sharing_settings_repository import data_sharing_settings_repository
+            self._data_sharing_repo = data_sharing_settings_repository
+        return self._data_sharing_repo
+
+    @property
+    def contract_repo(self):
+        """지연 초기화된 계약 Repository"""
+        if self._contract_repo is None:
+            from app.repositories.contract.person_contract_repository import person_contract_repository
+            self._contract_repo = person_contract_repository
+        return self._contract_repo
+
+    @property
+    def profile_repo(self):
+        """지연 초기화된 프로필 Repository"""
+        if self._profile_repo is None:
+            from app.repositories.profile_repository import profile_repository
+            self._profile_repo = profile_repository
+        return self._profile_repo
+
+    @property
+    def company_repo(self):
+        """지연 초기화된 법인 Repository"""
+        if self._company_repo is None:
+            from app.repositories.company_repository import company_repository
+            self._company_repo = company_repository
+        return self._company_repo
+
+    @property
+    def employee_repo(self):
+        """지연 초기화된 직원 Repository"""
+        if self._employee_repo is None:
+            from app.repositories.employee_repository import employee_repository
+            self._employee_repo = employee_repository
+        return self._employee_repo
+
+    @property
+    def personal_profile_repo(self):
+        """지연 초기화된 PersonalProfile Repository"""
+        if not hasattr(self, '_personal_profile_repo') or self._personal_profile_repo is None:
+            from app.repositories.personal_profile_repository import personal_profile_repository
+            self._personal_profile_repo = personal_profile_repository
+        return self._personal_profile_repo
 
     def set_current_user(self, user_id: int):
         """현재 작업 사용자 설정 (로그 기록용)"""
@@ -59,6 +116,8 @@ class SyncService:
         """
         계약의 데이터 공유 설정에 따른 동기화 가능 필드 목록 조회
 
+        Phase 30: Repository 패턴 적용
+
         Returns:
             {
                 'basic': ['name', 'photo', ...],
@@ -68,7 +127,7 @@ class SyncService:
                 ...
             }
         """
-        settings = DataSharingSettings.query.filter_by(contract_id=contract_id).first()
+        settings = self.data_sharing_repo.find_by_contract_id(contract_id)
 
         result = {
             'basic': [],
@@ -125,36 +184,38 @@ class SyncService:
         self,
         contract_id: int,
         fields: Optional[List[str]] = None,
-        sync_type: str = SyncLog.SYNC_TYPE_AUTO
+        sync_type: str = SyncLog.SYNC_TYPE_AUTO,
+        commit: bool = True
     ) -> Dict[str, Any]:
         """
         개인 프로필 -> 법인 직원 데이터 동기화
+
+        Phase 30: Repository 패턴 적용
 
         Args:
             contract_id: 계약 ID
             fields: 동기화할 필드 목록 (None이면 설정에 따라 자동)
             sync_type: 동기화 유형 (auto, manual, initial)
+            commit: True면 commit 실행, False면 외부 트랜잭션에 위임 (Phase 30)
 
         Returns:
             동기화 결과
         """
-        contract = PersonCorporateContract.query.get(contract_id)
+        contract = self.contract_repo.find_by_id(contract_id)
         if not contract:
             return {'success': False, 'error': '계약을 찾을 수 없습니다.'}
 
-        if contract.status != PersonCorporateContract.STATUS_APPROVED:
+        if contract.status != ContractStatus.APPROVED:
             return {'success': False, 'error': '승인된 계약만 동기화할 수 있습니다.'}
 
-        personal_profile = PersonalProfile.query.filter_by(
-            user_id=contract.person_user_id
-        ).first()
+        personal_profile = self.personal_profile_repo.find_by_user_id(
+            contract.person_user_id
+        )
         if not personal_profile:
             return {'success': False, 'error': '개인 프로필을 찾을 수 없습니다.'}
 
         # 관계 데이터용 Profile 조회 (educations, careers 등)
-        profile = Profile.query.filter_by(
-            user_id=contract.person_user_id
-        ).first()
+        profile = self.profile_repo.get_by_user_id(contract.person_user_id)
 
         employee = self._find_or_create_employee(contract, personal_profile)
         if not employee:
@@ -177,7 +238,9 @@ class SyncService:
         else:
             relation_result = {'synced_relations': [], 'changes': [], 'log_ids': []}
 
-        db.session.commit()
+        if commit:
+            from app.database import db
+            db.session.commit()
 
         return {
             'success': True,
@@ -191,21 +254,30 @@ class SyncService:
         self,
         contract_id: int,
         fields: Optional[List[str]] = None,
-        sync_type: str = SyncLog.SYNC_TYPE_MANUAL
+        sync_type: str = SyncLog.SYNC_TYPE_MANUAL,
+        commit: bool = True
     ) -> Dict[str, Any]:
         """
         법인 직원 -> 개인 프로필 데이터 동기화 (역방향, 선택적)
+
+        Phase 30: Repository 패턴 적용
+
+        Args:
+            contract_id: 계약 ID
+            fields: 동기화할 필드 목록 (None이면 설정에 따라 자동)
+            sync_type: 동기화 유형 (auto, manual, initial)
+            commit: True면 commit 실행, False면 외부 트랜잭션에 위임 (Phase 30)
         """
-        contract = PersonCorporateContract.query.get(contract_id)
+        contract = self.contract_repo.find_by_id(contract_id)
         if not contract:
             return {'success': False, 'error': '계약을 찾을 수 없습니다.'}
 
-        if contract.status != PersonCorporateContract.STATUS_APPROVED:
+        if contract.status != ContractStatus.APPROVED:
             return {'success': False, 'error': '승인된 계약만 동기화할 수 있습니다.'}
 
-        profile = PersonalProfile.query.filter_by(
-            user_id=contract.person_user_id
-        ).first()
+        profile = self.personal_profile_repo.find_by_user_id(
+            contract.person_user_id
+        )
         if not profile:
             return {'success': False, 'error': '개인 프로필을 찾을 수 없습니다.'}
 
@@ -221,7 +293,9 @@ class SyncService:
             self._get_employee_field, sync_type
         )
 
-        db.session.commit()
+        if commit:
+            from app.database import db
+            db.session.commit()
 
         return {
             'success': True,
@@ -233,16 +307,20 @@ class SyncService:
     # ===== 실시간 동기화 지원 =====
 
     def should_auto_sync(self, contract_id: int) -> bool:
-        """실시간 자동 동기화 여부 확인"""
-        settings = DataSharingSettings.query.filter_by(contract_id=contract_id).first()
-        return settings.is_realtime_sync if settings else False
+        """실시간 자동 동기화 여부 확인
+
+        Phase 30: Repository 패턴 적용
+        """
+        return self.data_sharing_repo.is_realtime_sync_enabled(contract_id)
 
     def get_contracts_for_user(self, user_id: int) -> List[Dict]:
-        """사용자의 활성 계약 목록 조회 (동기화 대상)"""
-        contracts = PersonCorporateContract.query.filter_by(
-            person_user_id=user_id,
-            status=PersonCorporateContract.STATUS_APPROVED
-        ).all()
+        """사용자의 활성 계약 목록 조회 (동기화 대상)
+
+        Phase 30: Repository 패턴 적용
+        """
+        contracts = self.contract_repo.find_by_person_user_id_and_status(
+            user_id, ContractStatus.APPROVED
+        )
         return [c.to_dict(include_relations=True) for c in contracts]
 
     def sync_all_contracts_for_user(
@@ -250,11 +328,13 @@ class SyncService:
         user_id: int,
         sync_type: str = SyncLog.SYNC_TYPE_AUTO
     ) -> Dict[str, Any]:
-        """사용자의 모든 활성 계약에 대해 동기화 실행"""
-        contracts = PersonCorporateContract.query.filter_by(
-            person_user_id=user_id,
-            status=PersonCorporateContract.STATUS_APPROVED
-        ).all()
+        """사용자의 모든 활성 계약에 대해 동기화 실행
+
+        Phase 30: Repository 패턴 적용
+        """
+        contracts = self.contract_repo.find_by_person_user_id_and_status(
+            user_id, ContractStatus.APPROVED
+        )
 
         results = []
         for contract in contracts:
@@ -304,11 +384,12 @@ class SyncService:
 
         Returns:
             새 Employee 객체
+
+        Phase 30: Repository 패턴 적용
         """
-        from app.models.company import Company
         from app.utils.employee_number import generate_employee_number
 
-        company = Company.query.get(contract.company_id)
+        company = self.company_repo.find_by_id(contract.company_id)
 
         # [재입사 정책] 기존 Employee 탐색 로직 제거
         # 비즈니스 규칙: 퇴사 후 재입사는 새 Employee 레코드로 생성
@@ -318,8 +399,8 @@ class SyncService:
         employee = self._create_employee_from_profile(
             profile, contract, company, full_sync
         )
-        db.session.add(employee)
-        db.session.flush()
+        # Phase 30: Repository 패턴 적용 - db.session.add/flush -> employee_repo.create_from_model
+        self.employee_repo.create_from_model(employee, flush=True)
 
         # 새로운 사번 생성 (시퀀스 기반 - SSOT: employee_number.py)
         employee.employee_number = generate_employee_number()
@@ -370,13 +451,16 @@ class SyncService:
 
     def _find_employee_by_contract(
         self,
-        contract: PersonCorporateContract
+        contract
     ) -> Optional[Employee]:
-        """계약에 연결된 직원 조회"""
+        """계약에 연결된 직원 조회
+
+        Phase 30: Repository 패턴 적용
+        """
         if contract.employee_number:
-            return Employee.query.filter_by(
-                employee_number=contract.employee_number
-            ).first()
+            return self.employee_repo.find_by_employee_number(
+                contract.employee_number
+            )
         return None
 
 

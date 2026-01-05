@@ -9,15 +9,16 @@ Personal Service
 Phase 4.1: PersonalProfile → Profile 마이그레이션 완료
 - ProfileRepository 사용
 - 통합 이력 테이블 직접 접근
+
+Phase 30: 전화번호 중복 체크 및 형식 검증 추가
+Phase 30: 레이어 분리 - Model.query 제거, Repository 패턴 적용
 """
+import re
 from typing import Dict, Optional, List, Tuple
-from app.database import db
+from datetime import datetime, timedelta
 from app.models.user import User
 from app.models.profile import Profile
 from app.utils.transaction import atomic_transaction
-from app.models import (
-    Education, Career, Certificate, Language, MilitaryService
-)
 from app.repositories.user_repository import UserRepository
 from app.repositories.profile_repository import ProfileRepository
 from app.services.profile_relation_service import profile_relation_service
@@ -26,20 +27,69 @@ from app.constants.status import ContractStatus
 
 
 class PersonalService:
-    """개인 계정 서비스 (통합 Profile 모델 사용)"""
+    """개인 계정 서비스 (통합 Profile 모델 사용)
+
+    Phase 30: 레이어 분리 - Repository DI 패턴 적용
+    """
 
     def __init__(self):
         self.user_repo = UserRepository()
         self.profile_repo = ProfileRepository()
+        self._contract_repo = None
+        self._company_repo = None
+        self._employee_repo = None
+
+    # ========================================
+    # Repository Properties (지연 초기화)
+    # ========================================
+
+    @property
+    def contract_repo(self):
+        """지연 초기화된 계약 Repository"""
+        if self._contract_repo is None:
+            from app.repositories.contract.person_contract_repository import person_contract_repository
+            self._contract_repo = person_contract_repository
+        return self._contract_repo
+
+    @property
+    def company_repo(self):
+        """지연 초기화된 법인 Repository"""
+        if self._company_repo is None:
+            from app.repositories.company_repository import company_repository
+            self._company_repo = company_repository
+        return self._company_repo
+
+    @property
+    def employee_repo(self):
+        """지연 초기화된 직원 Repository"""
+        if self._employee_repo is None:
+            from app.repositories.employee_repository import employee_repository
+            self._employee_repo = employee_repository
+        return self._employee_repo
 
     # ========================================
     # 회원가입
     # ========================================
 
+    # 전화번호 형식 정규식 (010-XXXX-XXXX 또는 01X-XXX-XXXX)
+    PHONE_PATTERN = re.compile(r'^01[0-9]-\d{3,4}-\d{4}$')
+
     def validate_registration(self, username: str, email: str,
                               password: str, password_confirm: str,
-                              name: str) -> List[str]:
-        """회원가입 유효성 검사"""
+                              name: str, mobile_phone: str = None) -> List[str]:
+        """회원가입 유효성 검사
+
+        Args:
+            username: 아이디
+            email: 이메일
+            password: 비밀번호
+            password_confirm: 비밀번호 확인
+            name: 이름
+            mobile_phone: 휴대폰 번호 (선택)
+
+        Returns:
+            에러 메시지 리스트
+        """
         errors = []
 
         if not username:
@@ -61,37 +111,44 @@ class PersonalService:
         if email and self.user_repo.email_exists(email):
             errors.append('이미 사용 중인 이메일입니다.')
 
+        # 전화번호 검증 (입력된 경우에만)
+        if mobile_phone:
+            # 형식 검증
+            if not self.PHONE_PATTERN.match(mobile_phone):
+                errors.append('전화번호 형식이 올바르지 않습니다. (예: 010-1234-5678)')
+            # 중복 확인
+            elif self.profile_repo.mobile_phone_exists(mobile_phone):
+                errors.append('이미 등록된 전화번호입니다.')
+
         return errors
 
     def register(self, username: str, email: str, password: str,
                  name: str, mobile_phone: str = None) -> ServiceResult[User]:
         """개인 회원가입 처리 (통합 Profile 모델 사용)
 
+        Phase 30: Repository 패턴 적용
+
         Returns:
             ServiceResult[User]
         """
         try:
             with atomic_transaction():
-                # 사용자 계정 생성
-                user = User(
+                # 사용자 계정 생성 (Repository 사용)
+                user = self.user_repo.create_personal_user(
                     username=username,
                     email=email,
-                    role=User.ROLE_EMPLOYEE,
-                    account_type=User.ACCOUNT_PERSONAL,
-                    is_active=True
+                    password=password,
+                    commit=False
                 )
-                user.set_password(password)
-                db.session.add(user)
-                db.session.flush()
 
-                # 통합 Profile 생성
-                profile = Profile(
+                # 통합 Profile 생성 (Repository 사용)
+                self.profile_repo.create_for_user(
                     user_id=user.id,
                     name=name,
                     email=email,
-                    mobile_phone=mobile_phone
+                    mobile_phone=mobile_phone,
+                    commit=False
                 )
-                db.session.add(profile)
 
             return ServiceResult.ok(data=user)
 
@@ -103,8 +160,11 @@ class PersonalService:
     # ========================================
 
     def get_user_with_profile(self, user_id: int) -> Tuple[Optional[User], Optional[Profile]]:
-        """사용자와 프로필 동시 조회"""
-        user = User.query.get(user_id)
+        """사용자와 프로필 동시 조회
+
+        Phase 30: Repository 패턴 적용
+        """
+        user = self.user_repo.find_by_id(user_id)
         if not user:
             return None, None
 
@@ -273,6 +333,8 @@ class PersonalService:
 
         승인된 계약과 종료된 계약(3년 보관 기간 내)을 모두 반환합니다.
 
+        Phase 30: Repository 패턴 적용
+
         Args:
             user_id: 사용자 ID
             include_terminated: 종료된 계약 포함 여부 (기본 True)
@@ -280,25 +342,16 @@ class PersonalService:
         Returns:
             계약 목록 (활성/종료 구분 포함)
         """
-        from datetime import datetime, timedelta
-        from app.models.person_contract import PersonCorporateContract
-        from app.models.company import Company
-
-        # 조회 대상 상태
-        viewable_statuses = [ContractStatus.APPROVED]
-        if include_terminated:
-            viewable_statuses.append(ContractStatus.TERMINATED)
-
-        contracts = PersonCorporateContract.query.filter(
-            PersonCorporateContract.person_user_id == user_id,
-            PersonCorporateContract.status.in_(viewable_statuses)
-        ).all()
+        # Repository를 통해 계약 조회
+        contracts = self.contract_repo.find_viewable_by_person_user_id(
+            user_id, include_terminated
+        )
 
         result = []
         retention_days = 365 * 3  # 3년 보관
 
         for contract in contracts:
-            company = Company.query.get(contract.company_id)
+            company = self.company_repo.find_by_id(contract.company_id)
             if not company:
                 continue
 
@@ -350,18 +403,13 @@ class PersonalService:
         특정 계약에 대한 회사 인사카드 정보를 반환합니다.
         법인의 Employee 데이터를 조회하여 법인과 동일한 정보를 제공합니다.
         종료된 계약도 3년 보관 기간 내에는 열람 가능합니다.
-        """
-        from datetime import datetime, timedelta
-        from app.models.person_contract import PersonCorporateContract
-        from app.models.company import Company
-        from app.models.employee import Employee
 
+        Phase 30: Repository 패턴 적용
+        """
         # 계약 정보 조회 및 권한 확인 (approved + terminated)
-        contract = PersonCorporateContract.query.filter(
-            PersonCorporateContract.id == contract_id,
-            PersonCorporateContract.person_user_id == user_id,
-            PersonCorporateContract.status.in_([ContractStatus.APPROVED, ContractStatus.TERMINATED])
-        ).first()
+        contract = self.contract_repo.find_viewable_by_id_and_person_user(
+            contract_id, user_id
+        )
 
         if not contract:
             return None
@@ -373,23 +421,23 @@ class PersonalService:
             if datetime.utcnow() >= retention_end:
                 return None  # 보관 기간 만료
 
-        # 회사 정보 조회
-        company = Company.query.get(contract.company_id)
+        # 회사 정보 조회 (Repository 사용)
+        company = self.company_repo.find_by_id(contract.company_id)
         if not company:
             return None
 
-        # Employee 조회 (법인 DB)
+        # Employee 조회 (법인 DB, Repository 사용)
         employee = None
         if contract.employee_number:
-            employee = Employee.query.filter_by(
-                employee_number=contract.employee_number
-            ).first()
+            employee = self.employee_repo.find_by_employee_number(
+                contract.employee_number
+            )
 
         # Employee가 없으면 User.employee_id로 시도
         if not employee:
-            user = User.query.get(user_id)
+            user = self.user_repo.find_by_id(user_id)
             if user and user.employee_id:
-                employee = db.session.get(Employee, user.employee_id)
+                employee = self.employee_repo.find_by_id(user.employee_id)
 
         # Employee 데이터 구성 (법인 DB 기반)
         employee_data = None

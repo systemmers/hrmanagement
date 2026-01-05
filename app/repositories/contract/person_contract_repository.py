@@ -471,3 +471,313 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
             company_id=company_id,
             status=PersonCorporateContract.STATUS_APPROVED
         ).first()
+
+    # ========================================
+    # Phase 30: 레이어 분리용 추가 메서드
+    # ========================================
+
+    def count_all(self) -> int:
+        """전체 계약 수 조회
+
+        Returns:
+            전체 계약 수
+        """
+        return PersonCorporateContract.query.count()
+
+    def count_by_status(self, status: str) -> int:
+        """상태별 계약 수 조회
+
+        Args:
+            status: 계약 상태
+
+        Returns:
+            계약 수
+        """
+        return PersonCorporateContract.query.filter_by(status=status).count()
+
+    def find_viewable_by_person_user_id(
+        self,
+        person_user_id: int,
+        include_terminated: bool = True
+    ) -> List[PersonCorporateContract]:
+        """열람 가능한 계약 목록 조회 (approved + terminated)
+
+        Phase 30: Service Layer 레이어 분리용 메서드
+
+        Args:
+            person_user_id: 개인 사용자 ID
+            include_terminated: 종료된 계약 포함 여부
+
+        Returns:
+            PersonCorporateContract 목록
+        """
+        from app.constants.status import ContractStatus
+
+        viewable_statuses = [ContractStatus.APPROVED]
+        if include_terminated:
+            viewable_statuses.append(ContractStatus.TERMINATED)
+
+        return PersonCorporateContract.query.filter(
+            PersonCorporateContract.person_user_id == person_user_id,
+            PersonCorporateContract.status.in_(viewable_statuses)
+        ).all()
+
+    def find_viewable_by_id_and_person_user(
+        self,
+        contract_id: int,
+        person_user_id: int
+    ) -> Optional[PersonCorporateContract]:
+        """ID와 사용자ID로 열람 가능한 계약 조회
+
+        Phase 30: Service Layer 레이어 분리용 메서드
+
+        Args:
+            contract_id: 계약 ID
+            person_user_id: 개인 사용자 ID
+
+        Returns:
+            PersonCorporateContract 또는 None
+        """
+        from app.constants.status import ContractStatus
+
+        return PersonCorporateContract.query.filter(
+            PersonCorporateContract.id == contract_id,
+            PersonCorporateContract.person_user_id == person_user_id,
+            PersonCorporateContract.status.in_([ContractStatus.APPROVED, ContractStatus.TERMINATED])
+        ).first()
+
+    def find_by_person_user_id_and_status(
+        self,
+        person_user_id: int,
+        status: str
+    ) -> List[PersonCorporateContract]:
+        """개인 사용자 ID와 상태로 계약 목록 조회
+
+        Phase 30: sync_service 레이어 분리용 메서드
+
+        Args:
+            person_user_id: 개인 사용자 ID
+            status: 계약 상태 (ContractStatus 상수)
+
+        Returns:
+            PersonCorporateContract 목록
+        """
+        return PersonCorporateContract.query.filter_by(
+            person_user_id=person_user_id,
+            status=status
+        ).all()
+
+    def find_with_history(
+        self,
+        employee_number: str,
+        company_id: int,
+        history_statuses: List[str]
+    ) -> Optional[PersonCorporateContract]:
+        """계약 이력 조회 - 수정불가 필터용
+
+        Phase 30: contract_core_service 레이어 분리용 메서드
+
+        Args:
+            employee_number: 직원번호
+            company_id: 회사 ID
+            history_statuses: 이력 상태 목록 (approved, terminated 등)
+
+        Returns:
+            PersonCorporateContract 또는 None
+        """
+        if not employee_number or not company_id:
+            return None
+
+        return PersonCorporateContract.query.filter(
+            PersonCorporateContract.employee_number == employee_number,
+            PersonCorporateContract.company_id == company_id,
+            PersonCorporateContract.status.in_(history_statuses)
+        ).first()
+
+
+    def find_filtered_contracts(
+        self,
+        company_id: int = None,
+        person_user_id: int = None,
+        statuses: List[str] = None
+    ) -> List[PersonCorporateContract]:
+        """통합 계약 필터링 (contract_filter_service용)
+
+        Phase 30: contract_filter_service 레이어 분리용 메서드
+
+        Args:
+            company_id: 법인 ID (선택)
+            person_user_id: 개인 사용자 ID (선택)
+            statuses: 조회할 상태 리스트
+
+        Returns:
+            필터링된 계약 리스트
+        """
+        from sqlalchemy.orm import joinedload
+
+        if statuses is None:
+            statuses = [ContractStatus.APPROVED]
+
+        query = PersonCorporateContract.query.options(
+            joinedload(PersonCorporateContract.person_user)
+        ).filter(
+            PersonCorporateContract.status.in_(statuses)
+        )
+
+        if company_id:
+            query = query.filter(PersonCorporateContract.company_id == company_id)
+        if person_user_id:
+            query = query.filter(PersonCorporateContract.person_user_id == person_user_id)
+
+        return query.all()
+
+    def find_by_employee_numbers_and_company(
+        self,
+        employee_numbers: List[str],
+        company_id: int,
+        statuses: List[str] = None
+    ) -> List[PersonCorporateContract]:
+        """employee_number 목록으로 계약 벌크 조회
+
+        Phase 30: contract_filter_service 레이어 분리용 메서드
+
+        Args:
+            employee_numbers: 직원번호 목록
+            company_id: 법인 ID
+            statuses: 조회할 상태 리스트
+
+        Returns:
+            계약 리스트
+        """
+        from sqlalchemy.orm import joinedload
+
+        if not employee_numbers or not company_id:
+            return []
+
+        valid_numbers = [n for n in employee_numbers if n]
+        if not valid_numbers:
+            return []
+
+        if statuses is None:
+            statuses = [ContractStatus.APPROVED]
+
+        return PersonCorporateContract.query.options(
+            joinedload(PersonCorporateContract.person_user)
+        ).filter(
+            PersonCorporateContract.employee_number.in_(valid_numbers),
+            PersonCorporateContract.company_id == company_id,
+            PersonCorporateContract.status.in_(statuses)
+        ).all()
+
+    def find_by_user_ids_and_company(
+        self,
+        user_ids: List[int],
+        company_id: int,
+        statuses: List[str] = None
+    ) -> List[PersonCorporateContract]:
+        """user_id 목록으로 계약 벌크 조회
+
+        Phase 30: contract_filter_service 레이어 분리용 메서드
+
+        Args:
+            user_ids: User ID 목록
+            company_id: 법인 ID
+            statuses: 조회할 상태 리스트
+
+        Returns:
+            계약 리스트
+        """
+        from sqlalchemy.orm import joinedload
+
+        if not user_ids or not company_id:
+            return []
+
+        if statuses is None:
+            statuses = [ContractStatus.APPROVED]
+
+        return PersonCorporateContract.query.options(
+            joinedload(PersonCorporateContract.person_user)
+        ).filter(
+            PersonCorporateContract.person_user_id.in_(user_ids),
+            PersonCorporateContract.company_id == company_id,
+            PersonCorporateContract.status.in_(statuses)
+        ).all()
+
+    def find_active_by_user_and_company(
+        self,
+        user_id: int,
+        company_id: int
+    ) -> Optional[PersonCorporateContract]:
+        """특정 User와 회사 간 활성 계약 조회
+
+        Phase 30: contract_filter_service 레이어 분리용 메서드
+
+        Args:
+            user_id: User ID
+            company_id: 법인 ID
+
+        Returns:
+            계약 또는 None
+        """
+        return PersonCorporateContract.query.filter_by(
+            person_user_id=user_id,
+            company_id=company_id,
+            status=ContractStatus.APPROVED
+        ).first()
+
+    def find_terminated_contracts(
+        self,
+        company_id: int = None,
+        person_user_id: int = None,
+        limit: int = None
+    ) -> List[PersonCorporateContract]:
+        """종료된 계약 이력 조회
+
+        Phase 30: termination_service 레이어 분리용 메서드
+
+        Args:
+            company_id: 법인 ID (선택)
+            person_user_id: 개인 사용자 ID (선택)
+            limit: 조회 제한
+
+        Returns:
+            종료된 계약 목록
+        """
+        query = PersonCorporateContract.query.filter(
+            PersonCorporateContract.status == ContractStatus.TERMINATED
+        )
+
+        if company_id:
+            query = query.filter_by(company_id=company_id)
+        if person_user_id:
+            query = query.filter_by(person_user_id=person_user_id)
+
+        query = query.order_by(PersonCorporateContract.terminated_at.desc())
+
+        if limit:
+            query = query.limit(limit)
+
+        return query.all()
+
+    def find_archivable_contracts(
+        self,
+        cutoff_date
+    ) -> List[PersonCorporateContract]:
+        """아카이브 대상 계약 조회 (종료 후 일정 기간 경과)
+
+        Phase 30: termination_service 레이어 분리용 메서드
+
+        Args:
+            cutoff_date: 기준일 (이 날짜 이전에 종료된 계약)
+
+        Returns:
+            아카이브 대상 계약 목록
+        """
+        return PersonCorporateContract.query.filter(
+            PersonCorporateContract.status == ContractStatus.TERMINATED,
+            PersonCorporateContract.terminated_at <= cutoff_date
+        ).all()
+
+
+# 싱글톤 인스턴스
+person_contract_repository = PersonContractRepository()

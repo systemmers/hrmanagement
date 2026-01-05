@@ -5,14 +5,12 @@ Personal과 Employee_Sub 계정에서 동일한 조건으로 계약을 조회합
 N+1 쿼리 방지를 위한 벌크 조회 메서드를 제공합니다.
 
 SSOT 원칙: PersonCorporateContract가 계약 관계의 유일한 진실의 원천
+
+Phase 30: 레이어 분리 - Model.query 제거, Repository 패턴 적용
 """
 from typing import List, Dict, Optional
-from sqlalchemy.orm import joinedload
 
-from ..database import db
 from ..models.person_contract import PersonCorporateContract
-from ..models.employee import Employee
-from ..models.user import User
 from ..constants.status import ContractStatus
 
 
@@ -20,11 +18,33 @@ class ContractFilterService:
     """통합 계약 필터 서비스
 
     Personal과 Employee_Sub 계정의 계약 조회 조건을 통합합니다.
+
+    Phase 30: Repository DI 패턴 적용
     """
 
     # 기본 상태 값
     DEFAULT_STATUSES = [ContractStatus.APPROVED]
     ACTIVE_STATUSES = [ContractStatus.APPROVED, ContractStatus.TERMINATED]
+
+    def __init__(self):
+        self._contract_repo = None
+        self._employee_repo = None
+
+    @property
+    def contract_repo(self):
+        """지연 초기화된 계약 Repository"""
+        if self._contract_repo is None:
+            from ..repositories.contract.person_contract_repository import person_contract_repository
+            self._contract_repo = person_contract_repository
+        return self._contract_repo
+
+    @property
+    def employee_repo(self):
+        """지연 초기화된 직원 Repository"""
+        if self._employee_repo is None:
+            from ..repositories.employee_repository import employee_repository
+            self._employee_repo = employee_repository
+        return self._employee_repo
 
     def get_filtered_contracts(
         self,
@@ -52,18 +72,12 @@ class ContractFilterService:
         if include_terminated and ContractStatus.TERMINATED not in statuses:
             statuses.append(ContractStatus.TERMINATED)
 
-        query = PersonCorporateContract.query.options(
-            joinedload(PersonCorporateContract.person_user)
-        ).filter(
-            PersonCorporateContract.status.in_(statuses)
+        # Phase 30: Repository 사용
+        contracts = self.contract_repo.find_filtered_contracts(
+            company_id=company_id,
+            person_user_id=person_user_id,
+            statuses=statuses
         )
-
-        if company_id:
-            query = query.filter(PersonCorporateContract.company_id == company_id)
-        if person_user_id:
-            query = query.filter(PersonCorporateContract.person_user_id == person_user_id)
-
-        contracts = query.all()
 
         # 퇴사 직원 제외
         if exclude_resigned:
@@ -128,13 +142,12 @@ class ContractFilterService:
         if statuses is None:
             statuses = self.DEFAULT_STATUSES.copy()
 
-        contracts = PersonCorporateContract.query.options(
-            joinedload(PersonCorporateContract.person_user)
-        ).filter(
-            PersonCorporateContract.employee_number.in_(valid_numbers),
-            PersonCorporateContract.company_id == company_id,
-            PersonCorporateContract.status.in_(statuses)
-        ).all()
+        # Phase 30: Repository 사용
+        contracts = self.contract_repo.find_by_employee_numbers_and_company(
+            employee_numbers=valid_numbers,
+            company_id=company_id,
+            statuses=statuses
+        )
 
         # 퇴사 직원 제외
         if exclude_resigned:
@@ -168,13 +181,12 @@ class ContractFilterService:
         if statuses is None:
             statuses = self.DEFAULT_STATUSES.copy()
 
-        contracts = PersonCorporateContract.query.options(
-            joinedload(PersonCorporateContract.person_user)
-        ).filter(
-            PersonCorporateContract.person_user_id.in_(user_ids),
-            PersonCorporateContract.company_id == company_id,
-            PersonCorporateContract.status.in_(statuses)
-        ).all()
+        # Phase 30: Repository 사용
+        contracts = self.contract_repo.find_by_user_ids_and_company(
+            user_ids=user_ids,
+            company_id=company_id,
+            statuses=statuses
+        )
 
         return {c.person_user_id: c for c in contracts}
 
@@ -218,6 +230,8 @@ class ContractFilterService:
     def _is_resigned(self, contract: PersonCorporateContract) -> bool:
         """계약의 직원이 퇴사했는지 확인
 
+        Phase 30: Repository 사용
+
         Args:
             contract: PersonCorporateContract 객체
 
@@ -227,10 +241,10 @@ class ContractFilterService:
         # PersonCorporateContract에는 employee 관계가 없으므로
         # employee_number로 Employee를 조회하여 확인
         if contract.employee_number:
-            from ..models.employee import Employee
-            employee = Employee.query.filter_by(
-                employee_number=contract.employee_number
-            ).first()
+            # Phase 30: Repository 사용
+            employee = self.employee_repo.find_by_employee_number(
+                contract.employee_number
+            )
             if employee:
                 return employee.resignation_date is not None
         return False
@@ -242,6 +256,8 @@ class ContractFilterService:
     ) -> bool:
         """특정 User와 회사 간 활성 계약 존재 여부
 
+        Phase 30: Repository 사용
+
         Args:
             user_id: User ID
             company_id: 법인 ID
@@ -249,11 +265,11 @@ class ContractFilterService:
         Returns:
             활성 계약 존재 여부
         """
-        contract = PersonCorporateContract.query.filter_by(
-            person_user_id=user_id,
-            company_id=company_id,
-            status=PersonCorporateContract.STATUS_APPROVED
-        ).first()
+        # Phase 30: Repository 사용
+        contract = self.contract_repo.find_active_by_user_and_company(
+            user_id=user_id,
+            company_id=company_id
+        )
 
         return contract is not None
 

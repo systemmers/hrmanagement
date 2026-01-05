@@ -407,3 +407,216 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
         if last_employee:
             return last_employee.id + 1
         return 1
+
+    # ========================================
+    # Phase 30: 레이어 분리용 추가 메서드
+    # ========================================
+
+    def find_by_employee_number(self, employee_number: str) -> Optional[Employee]:
+        """사번으로 직원 조회
+
+        Args:
+            employee_number: 직원 사번
+
+        Returns:
+            Employee 모델 객체 또는 None
+        """
+        return Employee.query.filter_by(employee_number=employee_number).first()
+
+    def find_by_employee_number_and_company(
+        self,
+        employee_number: str,
+        company_id: int
+    ) -> Optional[Employee]:
+        """사번과 회사 ID로 직원 조회
+
+        Args:
+            employee_number: 직원 사번
+            company_id: 회사 ID
+
+        Returns:
+            Employee 모델 객체 또는 None
+        """
+        return Employee.query.filter_by(
+            employee_number=employee_number,
+            company_id=company_id
+        ).first()
+
+    def count_by_company_id(self, company_id: int) -> int:
+        """회사별 직원 수 조회
+
+        Args:
+            company_id: 회사 ID
+
+        Returns:
+            직원 수
+        """
+        from app.models.company import Company
+        company = Company.query.get(company_id)
+        if not company or not company.root_organization_id:
+            return 0
+        return self._build_query(company.root_organization_id).count()
+
+    def count_by_status_and_company(
+        self,
+        status: str,
+        company_id: int
+    ) -> int:
+        """상태와 회사 ID로 직원 수 조회
+
+        Args:
+            status: 재직 상태
+            company_id: 회사 ID
+
+        Returns:
+            직원 수
+        """
+        from app.models.company import Company
+        company = Company.query.get(company_id)
+        if not company or not company.root_organization_id:
+            return 0
+        return self._build_query(company.root_organization_id).filter_by(status=status).count()
+
+    def find_by_company_id(self, company_id: int) -> List[Employee]:
+        """회사 ID로 직원 목록 조회 (Model 반환)
+
+        Phase 30: Service Layer 레이어 분리용 메서드
+        - get_by_company()는 Dict 반환, 이 메서드는 Model 반환
+
+        Args:
+            company_id: 회사 ID
+
+        Returns:
+            Employee 모델 객체 리스트
+        """
+        from app.models.company import Company
+        company = Company.query.get(company_id)
+        if not company or not company.root_organization_id:
+            return []
+        return self._build_query(company.root_organization_id).all()
+
+    def find_by_id(self, employee_id: int) -> Optional[Employee]:
+        """ID로 직원 조회 (Model 반환)
+
+        Phase 30: Service Layer 레이어 분리용 메서드
+
+        Args:
+            employee_id: 직원 ID
+
+        Returns:
+            Employee 모델 객체 또는 None
+        """
+        return Employee.query.get(employee_id)
+
+    def create_from_model(
+        self,
+        employee: 'Employee',
+        flush: bool = False,
+        commit: bool = False
+    ) -> 'Employee':
+        """Employee 모델 객체를 DB에 추가
+
+        Phase 30: sync_service 레이어 분리용 메서드
+        - 이미 생성된 Employee 객체를 세션에 추가
+        - flush=True로 ID 할당 가능
+
+        Args:
+            employee: Employee 모델 객체
+            flush: True면 flush 실행 (ID 할당)
+            commit: True면 commit 실행
+
+        Returns:
+            추가된 Employee 모델 객체
+        """
+        db.session.add(employee)
+        if flush:
+            db.session.flush()
+        if commit:
+            db.session.commit()
+        return employee
+
+    def find_by_company_and_statuses(
+        self,
+        company_id: int,
+        statuses: List[str]
+    ) -> List[Employee]:
+        """회사 ID와 복수 상태로 직원 목록 조회
+
+        Phase 30: contract_core_service 레이어 분리용 메서드
+
+        Args:
+            company_id: 회사 ID
+            statuses: 상태 목록 ['pending_info', 'pending_contract', ...]
+
+        Returns:
+            Employee 모델 객체 리스트
+        """
+        return Employee.query.filter(
+            Employee.company_id == company_id,
+            Employee.status.in_(statuses)
+        ).all()
+
+    def find_by_company_and_employee_numbers(
+        self,
+        company_id: int,
+        employee_numbers: List[str]
+    ) -> List[Employee]:
+        """회사 ID와 복수 사번으로 직원 목록 조회
+
+        Phase 30: user_employee_link_service 레이어 분리용 메서드
+
+        Args:
+            company_id: 회사 ID
+            employee_numbers: 사번 목록
+
+        Returns:
+            Employee 모델 객체 리스트
+        """
+        if not employee_numbers:
+            return []
+        return Employee.query.filter(
+            Employee.company_id == company_id,
+            Employee.employee_number.in_(employee_numbers)
+        ).all()
+
+    def find_by_company_and_emails(
+        self,
+        company_id: int,
+        emails: List[str]
+    ) -> List[Employee]:
+        """회사 ID와 복수 이메일로 직원 목록 조회
+
+        Phase 30: user_employee_link_service 레이어 분리용 메서드
+
+        Args:
+            company_id: 회사 ID
+            emails: 이메일 목록
+
+        Returns:
+            Employee 모델 객체 리스트
+        """
+        if not emails:
+            return []
+        return Employee.query.filter(
+            Employee.company_id == company_id,
+            Employee.email.in_(emails)
+        ).all()
+
+    def find_by_company_ids(self, company_ids: List[int]) -> List[Employee]:
+        """복수 회사 ID로 직원 목록 조회
+
+        Phase 30: user_employee_link_service 레이어 분리용 메서드
+
+        Args:
+            company_ids: 회사 ID 목록
+
+        Returns:
+            Employee 모델 객체 리스트
+        """
+        if not company_ids:
+            return []
+        return Employee.query.filter(Employee.company_id.in_(company_ids)).all()
+
+
+# 싱글톤 인스턴스
+employee_repository = EmployeeRepository()

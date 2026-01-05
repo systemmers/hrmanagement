@@ -3,21 +3,14 @@
 
 계약 종료 시 데이터 처리 및 아카이브를 관리합니다.
 Phase 4: 데이터 동기화 및 퇴사 처리
+Phase 30: 레이어 분리 - Model.query, db.session 직접 사용 제거
 """
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta, date
 import json
 
 from app.database import db
-from app.models.employee import Employee
-from app.models.user import User
-from app.models.personal_profile import PersonalProfile
-from app.models.person_contract import (
-    PersonCorporateContract,
-    DataSharingSettings,
-    SyncLog
-)
-from app.constants.status import EmployeeStatus
+from app.constants.status import EmployeeStatus, ContractStatus
 
 
 class TerminationService:
@@ -46,6 +39,38 @@ class TerminationService:
         """현재 작업 사용자 설정"""
         self._current_user_id = user_id
 
+    # ===== Repository Property 주입 (Phase 30) =====
+
+    @property
+    def contract_repo(self):
+        from app.extensions import person_contract_repo
+        return person_contract_repo
+
+    @property
+    def employee_repo(self):
+        from app.extensions import employee_repo
+        return employee_repo
+
+    @property
+    def user_repo(self):
+        from app.extensions import user_repo
+        return user_repo
+
+    @property
+    def data_sharing_settings_repo(self):
+        from app.extensions import data_sharing_settings_repo
+        return data_sharing_settings_repo
+
+    @property
+    def personal_profile_repo(self):
+        from app.extensions import personal_profile_repo
+        return personal_profile_repo
+
+    @property
+    def sync_log_repo(self):
+        from app.extensions import sync_log_repo
+        return sync_log_repo
+
     # ===== 계약 종료 처리 =====
 
     def terminate_contract(
@@ -65,11 +90,11 @@ class TerminationService:
         Returns:
             처리 결과
         """
-        contract = PersonCorporateContract.query.get(contract_id)
+        contract = self.contract_repo.find_by_id(contract_id)
         if not contract:
             return {'success': False, 'error': '계약을 찾을 수 없습니다.'}
 
-        if contract.status == PersonCorporateContract.STATUS_TERMINATED:
+        if contract.status == ContractStatus.TERMINATED:
             return {'success': False, 'error': '이미 종료된 계약입니다.'}
 
         # 계약 상태 변경
@@ -85,18 +110,17 @@ class TerminationService:
         archive_result = self._mark_for_archive(contract)
 
         # 종료 로그 기록
-        log = SyncLog.create_log(
+        self.sync_log_repo.create_log(
             contract_id=contract_id,
             sync_type='termination',
             entity_type='contract',
             field_name='status',
-            old_value=PersonCorporateContract.STATUS_APPROVED,
-            new_value=PersonCorporateContract.STATUS_TERMINATED,
+            old_value=ContractStatus.APPROVED,
+            new_value=ContractStatus.TERMINATED,
             direction='system',
-            user_id=terminate_by_user_id or self._current_user_id
+            user_id=terminate_by_user_id or self._current_user_id,
+            commit=True
         )
-        db.session.add(log)
-        db.session.commit()
 
         return {
             'success': True,
@@ -106,7 +130,7 @@ class TerminationService:
             'archive_scheduled': archive_result,
         }
 
-    def _revoke_permissions(self, contract: PersonCorporateContract) -> Dict[str, Any]:
+    def _revoke_permissions(self, contract) -> Dict[str, Any]:
         """
         계약 종료에 따른 권한 해제
 
@@ -123,7 +147,7 @@ class TerminationService:
         }
 
         # 1. 데이터 동기화 비활성화
-        settings = DataSharingSettings.query.filter_by(contract_id=contract.id).first()
+        settings = self.data_sharing_settings_repo.find_by_contract_id(contract.id)
         if settings:
             settings.is_realtime_sync = False
             revoked['data_sync'] = True
@@ -132,18 +156,16 @@ class TerminationService:
         # employee_number 또는 User.employee_id로 Employee 조회
         employee = None
         if contract.employee_number:
-            employee = Employee.query.filter_by(
-                employee_number=contract.employee_number
-            ).first()
+            employee = self.employee_repo.find_by_employee_number(contract.employee_number)
 
-        user = User.query.get(contract.person_user_id)
+        user = self.user_repo.find_by_id(contract.person_user_id)
 
         if not employee and user:
             if user.employee_id:
-                employee = db.session.get(Employee, user.employee_id)
+                employee = self.employee_repo.find_by_id(user.employee_id)
             else:
                 # Employee가 없는 경우 (personal 계정) - Employee 생성 후 terminated 설정
-                profile = PersonalProfile.query.filter_by(user_id=user.id).first()
+                profile = self.personal_profile_repo.find_by_user_id(user.id)
                 if profile:
                     from app.services.sync_service import sync_service
                     employee = sync_service._find_or_create_employee(contract, profile)
@@ -163,7 +185,7 @@ class TerminationService:
 
     def _disable_sharing_settings(self, contract_id: int):
         """데이터 공유 설정 모두 비활성화"""
-        settings = DataSharingSettings.query.filter_by(contract_id=contract_id).first()
+        settings = self.data_sharing_settings_repo.find_by_contract_id(contract_id)
         if settings:
             settings.share_basic_info = False
             settings.share_contact = False
@@ -174,7 +196,7 @@ class TerminationService:
             settings.share_military = False
             settings.is_realtime_sync = False
 
-    def _mark_for_archive(self, contract: PersonCorporateContract) -> Dict[str, Any]:
+    def _mark_for_archive(self, contract) -> Dict[str, Any]:
         """
         아카이브 대상으로 마킹
 
@@ -199,15 +221,15 @@ class TerminationService:
         아카이브 대상 계약 목록 조회
         (종료 후 3년이 지난 계약)
 
+        Phase 30: Repository 사용
+
         Returns:
             아카이브 대상 계약 목록
         """
         cutoff_date = datetime.utcnow() - timedelta(days=self.DATA_RETENTION_DAYS)
 
-        contracts = PersonCorporateContract.query.filter(
-            PersonCorporateContract.status == PersonCorporateContract.STATUS_TERMINATED,
-            PersonCorporateContract.terminated_at <= cutoff_date
-        ).all()
+        # Phase 30: Repository 사용
+        contracts = self.contract_repo.find_archivable_contracts(cutoff_date)
 
         return [c.to_dict(include_relations=True) for c in contracts]
 
@@ -223,18 +245,16 @@ class TerminationService:
         Returns:
             아카이브 결과
         """
-        contract = PersonCorporateContract.query.get(contract_id)
+        contract = self.contract_repo.find_by_id(contract_id)
         if not contract:
             return {'success': False, 'error': '계약을 찾을 수 없습니다.'}
 
-        if contract.status != PersonCorporateContract.STATUS_TERMINATED:
+        if contract.status != ContractStatus.TERMINATED:
             return {'success': False, 'error': '종료된 계약만 아카이브할 수 있습니다.'}
 
         # 직원 데이터 익명화
         if contract.employee_number:
-            employee = Employee.query.filter_by(
-                employee_number=contract.employee_number
-            ).first()
+            employee = self.employee_repo.find_by_employee_number(contract.employee_number)
 
             if employee:
                 self._anonymize_employee(employee)
@@ -243,10 +263,10 @@ class TerminationService:
         self._clean_sync_logs(contract_id)
 
         # 데이터 공유 설정 삭제
-        DataSharingSettings.query.filter_by(contract_id=contract_id).delete()
+        self.data_sharing_settings_repo.delete_by_contract_id(contract_id, commit=False)
 
         # 아카이브 로그
-        log = SyncLog.create_log(
+        self.sync_log_repo.create_log(
             contract_id=contract_id,
             sync_type='archive',
             entity_type='contract',
@@ -254,10 +274,9 @@ class TerminationService:
             old_value=None,
             new_value=None,
             direction='system',
-            user_id=self._current_user_id
+            user_id=self._current_user_id,
+            commit=True
         )
-        db.session.add(log)
-        db.session.commit()
 
         return {
             'success': True,
@@ -265,7 +284,7 @@ class TerminationService:
             'archived_at': datetime.utcnow().isoformat(),
         }
 
-    def _anonymize_employee(self, employee: Employee):
+    def _anonymize_employee(self, employee):
         """
         직원 데이터 익명화
 
@@ -291,8 +310,7 @@ class TerminationService:
         employee.birth_date = None
         employee.gender = None
         employee.nationality = None
-        employee.blood_type = None
-        employee.religion = None
+        # Phase 28.3: blood_type, religion 삭제됨
         employee.hobby = None
         employee.specialty = None
         employee.disability_info = None
@@ -302,7 +320,7 @@ class TerminationService:
 
     def _clean_sync_logs(self, contract_id: int):
         """동기화 로그에서 개인정보 제거"""
-        logs = SyncLog.query.filter_by(contract_id=contract_id).all()
+        logs = self.sync_log_repo.find_by_contract_id(contract_id, limit=1000)
 
         for log in logs:
             # old_value, new_value에서 개인정보 마스킹
@@ -387,6 +405,8 @@ class TerminationService:
         """
         종료된 계약 이력 조회
 
+        Phase 30: Repository 사용
+
         Args:
             company_id: 법인 ID (선택)
             person_user_id: 개인 사용자 ID (선택)
@@ -395,18 +415,12 @@ class TerminationService:
         Returns:
             종료 이력 목록
         """
-        query = PersonCorporateContract.query.filter(
-            PersonCorporateContract.status == PersonCorporateContract.STATUS_TERMINATED
+        # Phase 30: Repository 사용
+        contracts = self.contract_repo.find_terminated_contracts(
+            company_id=company_id,
+            person_user_id=person_user_id,
+            limit=limit
         )
-
-        if company_id:
-            query = query.filter_by(company_id=company_id)
-        if person_user_id:
-            query = query.filter_by(person_user_id=person_user_id)
-
-        contracts = query.order_by(
-            PersonCorporateContract.terminated_at.desc()
-        ).limit(limit).all()
 
         return [c.to_dict(include_relations=True) for c in contracts]
 
@@ -420,11 +434,11 @@ class TerminationService:
         Returns:
             보관 상태 정보
         """
-        contract = PersonCorporateContract.query.get(contract_id)
+        contract = self.contract_repo.find_by_id(contract_id)
         if not contract:
             return {'success': False, 'error': '계약을 찾을 수 없습니다.'}
 
-        if contract.status != PersonCorporateContract.STATUS_TERMINATED:
+        if contract.status != ContractStatus.TERMINATED:
             return {
                 'success': True,
                 'status': 'active',

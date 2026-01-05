@@ -228,3 +228,200 @@ class UserRepository(BaseRepository[User]):
             db.session.commit()
             return True
         return False
+
+    # ========================================
+    # Phase 30: 레이어 분리용 추가 메서드
+    # ========================================
+
+    def count_all(self) -> int:
+        """전체 사용자 수 조회
+
+        Returns:
+            전체 사용자 수
+        """
+        return User.query.count()
+
+    def count_by_is_active(self, is_active: bool) -> int:
+        """활성화 상태별 사용자 수 조회
+
+        Args:
+            is_active: 활성화 상태
+
+        Returns:
+            사용자 수
+        """
+        return User.query.filter_by(is_active=is_active).count()
+
+    def count_superadmins(self) -> int:
+        """슈퍼어드민 수 조회
+
+        Returns:
+            슈퍼어드민 수
+        """
+        return User.query.filter_by(
+            account_type=User.ACCOUNT_SUPERADMIN,
+            is_active=True
+        ).count()
+
+    def count_by_account_type(self, account_type: str) -> int:
+        """계정 유형별 사용자 수 조회
+
+        Args:
+            account_type: 계정 유형
+
+        Returns:
+            사용자 수
+        """
+        return User.query.filter_by(account_type=account_type).count()
+
+    def find_by_id(self, user_id: int) -> Optional[User]:
+        """ID로 사용자 조회 (모델 반환)
+
+        Args:
+            user_id: 사용자 ID
+
+        Returns:
+            User 모델 객체 또는 None
+        """
+        return User.query.get(user_id)
+
+    def find_by_email(self, email: str) -> Optional[User]:
+        """이메일로 사용자 조회 (신규 표준 메서드명)
+
+        Args:
+            email: 이메일 주소
+
+        Returns:
+            User 모델 객체 또는 None
+        """
+        return User.query.filter_by(email=email).first()
+
+    def find_by_username(self, username: str) -> Optional[User]:
+        """사용자명으로 조회 (신규 표준 메서드명)
+
+        Args:
+            username: 사용자명
+
+        Returns:
+            User 모델 객체 또는 None
+        """
+        return User.query.filter_by(username=username).first()
+
+    def find_by_company_id(self, company_id: int) -> List[User]:
+        """법인 소속 사용자 목록 조회 (Model 반환)
+
+        Phase 30: Service Layer 레이어 분리용 메서드
+
+        Args:
+            company_id: 법인 ID
+
+        Returns:
+            User 모델 객체 리스트
+        """
+        return User.query.filter_by(company_id=company_id).all()
+
+    def find_paginated(
+        self,
+        page: int = 1,
+        per_page: int = 20,
+        search: str = None,
+        account_type: str = None
+    ) -> Tuple[List[User], object]:
+        """사용자 목록 조회 (페이지네이션)
+
+        Phase 30: Service Layer 레이어 분리용 메서드
+
+        Args:
+            page: 페이지 번호
+            per_page: 페이지당 항목 수
+            search: 검색어 (username/email)
+            account_type: 계정 타입 필터
+
+        Returns:
+            Tuple[User 모델 리스트, 페이지네이션 객체]
+        """
+        from sqlalchemy import or_
+
+        query = User.query
+
+        if search:
+            query = query.filter(
+                or_(
+                    User.username.ilike(f'%{search}%'),
+                    User.email.ilike(f'%{search}%')
+                )
+            )
+
+        if account_type:
+            query = query.filter_by(account_type=account_type)
+
+        pagination = query.order_by(User.created_at.desc()).paginate(
+            page=page, per_page=per_page, error_out=False
+        )
+
+        return pagination.items, pagination
+
+    def find_recent(self, limit: int = 5) -> List[User]:
+        """최근 가입 사용자 조회
+
+        Phase 30: Service Layer 레이어 분리용 메서드
+
+        Args:
+            limit: 조회 제한 (기본 5)
+
+        Returns:
+            User 모델 리스트
+        """
+        return User.query.order_by(User.created_at.desc()).limit(limit).all()
+
+    def create_personal_user(
+        self,
+        username: str,
+        email: str,
+        password: str,
+        commit: bool = True
+    ) -> User:
+        """개인 계정 사용자 생성
+
+        Phase 30: personal_service.register() 레이어 분리용 메서드
+
+        Args:
+            username: 사용자명
+            email: 이메일
+            password: 비밀번호
+            commit: 즉시 커밋 여부
+
+        Returns:
+            생성된 User 모델 객체
+        """
+        user = User(
+            username=username,
+            email=email,
+            role=User.ROLE_EMPLOYEE,
+            account_type=User.ACCOUNT_PERSONAL,
+            is_active=True
+        )
+        user.set_password(password)
+        db.session.add(user)
+        if commit:
+            db.session.commit()
+        else:
+            db.session.flush()
+        return user
+
+    def find_active_personal_users(self) -> List[User]:
+        """활성화된 개인 계정 사용자 목록 조회
+
+        Phase 30: contract_core_service 레이어 분리용 메서드
+
+        Returns:
+            개인 계정 User 모델 리스트
+        """
+        return User.query.filter(
+            User.account_type == User.ACCOUNT_PERSONAL,
+            User.is_active == True
+        ).all()
+
+
+# 싱글톤 인스턴스
+user_repository = UserRepository()

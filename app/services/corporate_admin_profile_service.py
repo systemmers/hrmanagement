@@ -4,9 +4,10 @@ Corporate Admin Profile Service
 법인 관리자 프로필 관련 비즈니스 로직을 처리합니다.
 - 프로필 생성/수정/조회
 - 어댑터 통합
+
+Phase 30: 레이어 분리 - Model.query 제거, Repository 패턴 적용
 """
 from typing import Dict, Optional, Tuple
-from app.database import db
 from app.utils.transaction import atomic_transaction
 from app.models.user import User
 from app.models.corporate_admin_profile import CorporateAdminProfile
@@ -16,7 +17,10 @@ from app.adapters.profile_adapter import CorporateAdminProfileAdapter
 
 
 class CorporateAdminProfileService:
-    """법인 관리자 프로필 서비스"""
+    """법인 관리자 프로필 서비스
+
+    Phase 30: Repository DI 패턴 적용
+    """
 
     def __init__(self):
         self.profile_repo = CorporateAdminProfileRepository()
@@ -31,8 +35,12 @@ class CorporateAdminProfileService:
         return self.profile_repo.get_by_user_id(user_id)
 
     def get_user_with_profile(self, user_id: int) -> Tuple[Optional[User], Optional[CorporateAdminProfile]]:
-        """사용자와 프로필 동시 조회"""
-        user = User.query.get(user_id)
+        """사용자와 프로필 동시 조회
+
+        Phase 30: Repository 사용
+        """
+        # Phase 30: Repository 사용
+        user = self.user_repo.find_by_id(user_id)
         if not user:
             return None, None
 

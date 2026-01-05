@@ -16,6 +16,7 @@ from app.models.person_contract import (
     DataSharingSettings,
     SyncLog
 )
+from app.constants.status import ContractStatus
 
 
 class SyncEventManager:
@@ -133,7 +134,7 @@ class SyncEventManager:
         # 실시간 동기화가 활성화된 계약 조회
         contracts = PersonCorporateContract.query.filter_by(
             person_user_id=user_id,
-            status=PersonCorporateContract.STATUS_APPROVED
+            status=ContractStatus.APPROVED
         ).all()
 
         for contract in contracts:
@@ -252,11 +253,11 @@ class ContractEventManager:
             return
 
         # 승인됨으로 변경 시
-        if new_status == PersonCorporateContract.STATUS_APPROVED:
+        if new_status == ContractStatus.APPROVED:
             cls._on_contract_approved(contract)
 
         # 종료됨으로 변경 시
-        elif new_status == PersonCorporateContract.STATUS_TERMINATED:
+        elif new_status == ContractStatus.TERMINATED:
             cls._on_contract_terminated(contract)
 
     @classmethod
