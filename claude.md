@@ -26,6 +26,51 @@ alembic revision --autogenerate -m "migration message"
 
 ## Architecture
 
+### Domain Structure (도메인 중심 구조)
+```
+app/domains/                    # 도메인별 패키지 (Phase 8 완료)
+├── employee/                   # 직원 도메인 (~65개 파일)
+│   ├── __init__.py             # Repository 초기화 + 외부 인터페이스
+│   ├── models/                 # Employee, Education, Career 등 20개 모델
+│   ├── repositories/           # 20개 Repository
+│   ├── services/               # employee_service, employee_relation_service
+│   └── blueprints/             # employees_bp
+├── contract/                   # 계약 도메인
+│   ├── models/                 # PersonCorporateContract, DataSharingSettings, SyncLog
+│   ├── repositories/           # PersonContractRepository
+│   ├── services/               # contract_service, contract_core_service 등
+│   └── blueprints/             # contracts_bp
+├── company/                    # 법인 도메인
+│   ├── models/                 # Company, Organization, ClassificationOption 등
+│   ├── repositories/           # 7개 Repository
+│   ├── services/               # company_service, organization_service 등
+│   └── blueprints/             # corporate_bp, corporate_settings_api_bp
+├── user/                       # 사용자 도메인
+│   ├── models/                 # User, CorporateAdminProfile, Notification
+│   ├── repositories/           # 4개 Repository
+│   ├── services/               # user_service, notification_service 등
+│   └── blueprints/             # auth_bp, mypage_bp, account_bp
+├── platform/                   # 플랫폼 도메인
+│   ├── models/                 # SystemSetting
+│   ├── repositories/           # SystemSettingRepository
+│   ├── services/               # platform_service, system_setting_service
+│   └── blueprints/             # platform_bp
+└── sync/                       # 동기화 도메인
+    ├── services/               # sync_service, termination_service
+    └── blueprints/             # sync_bp
+```
+
+**도메인 Import 패턴:**
+```python
+# 도메인에서 import (권장)
+from app.domains.employee.models import Employee
+from app.domains.employee.services import employee_service
+
+# 기존 경로에서 import (하위 호환성 유지)
+from app.models.employee import Employee
+from app.services.employee_service import employee_service
+```
+
 ### Layer Structure (3-Tier + Repository Pattern)
 ```
 blueprints/       → Routes (URL 라우팅, 요청 처리)

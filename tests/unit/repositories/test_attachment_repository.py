@@ -5,9 +5,9 @@ AttachmentRepository 단위 테스트
 """
 import pytest
 from datetime import datetime
-from app.repositories.attachment_repository import AttachmentRepository
-from app.models.attachment import Attachment
-from app.models.employee import Employee
+from app.domains.employee.repositories import AttachmentRepository
+from app.domains.employee.models import Attachment
+from app.domains.employee.models import Employee
 from app.models.company import Company
 
 

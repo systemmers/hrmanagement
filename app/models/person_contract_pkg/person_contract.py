@@ -167,7 +167,7 @@ class PersonCorporateContract(db.Model):
         if include_relations:
             if self.person_user:
                 # Profile에서 실제 이름 조회
-                from app.models.profile import Profile
+                from app.domains.employee.models import Profile
                 profile = Profile.query.filter_by(user_id=self.person_user.id).first()
                 actual_name = profile.name if profile else self.person_user.username
 
@@ -182,7 +182,7 @@ class PersonCorporateContract(db.Model):
                 # employee_id: User.employee_id 우선, 없으면 employee_number로 조회
                 employee_id = self.person_user.employee_id
                 if not employee_id and self.employee_number:
-                    from app.models.employee import Employee
+                    from app.domains.employee.models import Employee
                     emp = Employee.query.filter_by(
                         employee_number=self.employee_number
                     ).first()

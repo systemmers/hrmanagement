@@ -8,7 +8,7 @@ from flask import Blueprint, render_template, request, session, redirect, url_fo
 
 from ..shared.constants.session_keys import SessionKeys, AccountType, UserRole
 from ..shared.utils.api_helpers import api_success
-from ..services.employee_service import employee_service
+from app.domains.employee.services import employee_service
 from ..shared.utils.decorators import login_required
 from ..shared.utils.tenant import get_current_organization_id
 

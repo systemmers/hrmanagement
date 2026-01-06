@@ -9,7 +9,7 @@ AttachmentService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.attachment_service import AttachmentService, attachment_service
+from app.domains.employee.services.attachment_service import AttachmentService, attachment_service
 
 
 @pytest.fixture

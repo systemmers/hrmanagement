@@ -9,7 +9,7 @@ Phase 29: __dict_camel_mapping__ 제거
 """
 from datetime import datetime
 from app.database import db
-from app.models.mixins import DictSerializableMixin
+from app.domains.employee.models import DictSerializableMixin
 
 
 class SyncLog(DictSerializableMixin, db.Model):

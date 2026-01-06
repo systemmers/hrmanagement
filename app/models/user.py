@@ -115,7 +115,7 @@ class User(db.Model):
         if self.is_manager():
             # 매니저의 소속 부서 직원인지 확인
             if self.employee_id:
-                from app.models.employee import Employee
+                from app.domains.employee.models import Employee
                 manager_employee = Employee.query.get(self.employee_id)
                 target_employee = Employee.query.get(employee_id)
                 if manager_employee and target_employee:

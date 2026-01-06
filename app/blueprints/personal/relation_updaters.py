@@ -10,7 +10,7 @@ Phase 27.1: 개발 원칙 준수 리팩토링
 """
 from app.types import FormData, OwnerType
 from ...shared.utils.transaction import atomic_transaction
-from ...services.profile_relation_service import profile_relation_service
+from app.domains.employee.services import profile_relation_service
 from .form_extractors import (
     extract_education_list,
     extract_career_list,

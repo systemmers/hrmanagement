@@ -9,7 +9,7 @@ EmployeeCoreService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.employee.employee_core_service import (
+from app.domains.employee.services.employee_core_service import (
     EmployeeCoreService,
     employee_core_service
 )

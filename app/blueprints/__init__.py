@@ -8,7 +8,7 @@ Blueprint 등록 모듈
 def register_blueprints(app):
     """앱에 모든 Blueprint 등록"""
     from .main import main_bp
-    from .employees import employees_bp
+    from app.domains.employee.blueprints import employees_bp
     from .api import api_bp
     from .ai_test import ai_test_bp
     from .auth import auth_bp

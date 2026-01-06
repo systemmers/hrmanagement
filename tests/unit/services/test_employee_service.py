@@ -10,7 +10,7 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 from typing import Dict, List
 
-from app.services.employee_service import EmployeeService, employee_service
+from app.domains.employee.services import EmployeeService, employee_service
 
 
 @pytest.fixture

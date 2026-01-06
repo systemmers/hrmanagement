@@ -13,7 +13,7 @@ from app.shared.utils.employee_number import (
     is_valid_employee_number,
     is_employee_number_exists
 )
-from app.models.employee import Employee
+from app.domains.employee.models import Employee
 
 
 class TestEmployeeNumberConfig:

@@ -46,15 +46,15 @@ class ContractCoreService:
     def employee_repo(self):
         """지연 초기화된 Employee Repository"""
         if self._employee_repo is None:
-            from ...repositories.employee_repository import employee_repository
-            self._employee_repo = employee_repository
+            from app.domains.employee.repositories import EmployeeRepository
+            self._employee_repo = EmployeeRepository()
         return self._employee_repo
 
     @property
     def profile_repo(self):
         """지연 초기화된 Profile Repository"""
         if self._profile_repo is None:
-            from ...repositories.profile_repository import ProfileRepository
+            from app.domains.employee.repositories import ProfileRepository
             self._profile_repo = ProfileRepository()
         return self._profile_repo
 

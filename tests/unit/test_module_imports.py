@@ -146,7 +146,7 @@ class TestModelImports:
 
     def test_import_attachment(self):
         """Attachment 모델 import"""
-        from app.models.attachment import Attachment
+        from app.domains.employee.models import Attachment
         assert Attachment is not None
 
 

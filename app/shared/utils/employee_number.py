@@ -16,7 +16,7 @@ def _get_employee_repo():
     """지연 초기화된 Employee Repository"""
     global _employee_repo
     if _employee_repo is None:
-        from app.repositories.employee_repository import employee_repository
+        from app.domains.employee.repositories import employee_repository
         _employee_repo = employee_repository
     return _employee_repo
 

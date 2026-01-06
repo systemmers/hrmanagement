@@ -8,8 +8,8 @@ Phase 30: 레이어 분리 - db.session 제거, Repository 패턴 적용
 from typing import Dict, Any
 import json
 
-from app.models.employee import Employee
-from app.models.profile import Profile
+from app.domains.employee.models import Employee
+from app.domains.employee.models import Profile
 from app.models.person_contract import SyncLog
 
 
@@ -46,7 +46,7 @@ class SyncRelationService:
     def education_repo(self):
         """지연 초기화된 Education Repository"""
         if self._education_repo is None:
-            from app.repositories.education_repository import EducationRepository
+            from app.domains.employee.repositories import EducationRepository
             self._education_repo = EducationRepository()
         return self._education_repo
 
@@ -54,7 +54,7 @@ class SyncRelationService:
     def career_repo(self):
         """지연 초기화된 Career Repository"""
         if self._career_repo is None:
-            from app.repositories.career_repository import CareerRepository
+            from app.domains.employee.repositories import CareerRepository
             self._career_repo = CareerRepository()
         return self._career_repo
 
@@ -62,7 +62,7 @@ class SyncRelationService:
     def certificate_repo(self):
         """지연 초기화된 Certificate Repository"""
         if self._certificate_repo is None:
-            from app.repositories.certificate_repository import CertificateRepository
+            from app.domains.employee.repositories import CertificateRepository
             self._certificate_repo = CertificateRepository()
         return self._certificate_repo
 
@@ -70,7 +70,7 @@ class SyncRelationService:
     def language_repo(self):
         """지연 초기화된 Language Repository"""
         if self._language_repo is None:
-            from app.repositories.language_repository import LanguageRepository
+            from app.domains.employee.repositories import LanguageRepository
             self._language_repo = LanguageRepository()
         return self._language_repo
 
@@ -78,7 +78,7 @@ class SyncRelationService:
     def military_repo(self):
         """지연 초기화된 MilitaryService Repository"""
         if self._military_repo is None:
-            from app.repositories.military_service_repository import MilitaryServiceRepository
+            from app.domains.employee.repositories import MilitaryServiceRepository
             self._military_repo = MilitaryServiceRepository()
         return self._military_repo
 
@@ -86,7 +86,7 @@ class SyncRelationService:
     def family_repo(self):
         """지연 초기화된 FamilyMember Repository"""
         if self._family_repo is None:
-            from app.repositories.family_member_repository import FamilyMemberRepository
+            from app.domains.employee.repositories import FamilyMemberRepository
             self._family_repo = FamilyMemberRepository()
         return self._family_repo
 
@@ -184,7 +184,7 @@ class SyncRelationService:
 
         Phase 30: Repository 패턴 적용
         """
-        from app.models.education import Education
+        from app.domains.employee.models import Education
 
         personal_edus = list(profile.educations.all())
         if not personal_edus:
@@ -240,7 +240,7 @@ class SyncRelationService:
 
         Phase 30: Repository 패턴 적용
         """
-        from app.models.career import Career
+        from app.domains.employee.models import Career
 
         personal_careers = list(profile.careers.all())
         if not personal_careers:
@@ -296,7 +296,7 @@ class SyncRelationService:
 
         Phase 30: Repository 패턴 적용
         """
-        from app.models.certificate import Certificate
+        from app.domains.employee.models import Certificate
 
         personal_certs = list(profile.certificates.all())
         if not personal_certs:
@@ -347,7 +347,7 @@ class SyncRelationService:
 
         Phase 30: Repository 패턴 적용
         """
-        from app.models.language import Language
+        from app.domains.employee.models import Language
 
         personal_langs = list(profile.languages.all())
         if not personal_langs:
@@ -398,7 +398,7 @@ class SyncRelationService:
 
         Phase 30: Repository 패턴 적용
         """
-        from app.models.military_service import MilitaryService
+        from app.domains.employee.models import MilitaryService
 
         # Profile.military_services는 dynamic 관계
         personal_military = profile.military_services.first()
@@ -451,7 +451,7 @@ class SyncRelationService:
 
         Phase 30: Repository 패턴 적용
         """
-        from app.models.family_member import FamilyMember
+        from app.domains.employee.models import FamilyMember
 
         personal_family = list(profile.family_members.all())
         if not personal_family:

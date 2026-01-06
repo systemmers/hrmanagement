@@ -92,7 +92,7 @@ class Company(db.Model):
 
     def can_add_employee(self):
         """직원 추가 가능 여부 (플랜 제한 확인)"""
-        from app.models.employee import Employee
+        from app.domains.employee.models import Employee
         current_count = Employee.query.filter_by(
             organization_id=self.root_organization_id
         ).count() if self.root_organization_id else 0
@@ -100,7 +100,7 @@ class Company(db.Model):
 
     def get_employee_count(self):
         """현재 직원 수"""
-        from app.models.employee import Employee
+        from app.domains.employee.models import Employee
         if not self.root_organization_id:
             return 0
         return Employee.query.filter_by(

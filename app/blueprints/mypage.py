@@ -11,7 +11,7 @@ from flask import Blueprint, render_template, session, redirect, url_for, flash
 from ..shared.constants.session_keys import SessionKeys, AccountType
 from ..shared.constants.status import ContractStatus, EmployeeStatus
 from ..shared.utils.decorators import login_required
-from ..services.employee_service import employee_service
+from app.domains.employee.services import employee_service
 from ..services.system_setting_service import system_setting_service
 from ..services import contract_service
 

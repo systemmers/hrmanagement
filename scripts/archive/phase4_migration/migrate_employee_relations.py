@@ -87,7 +87,7 @@ def migrate_table(df, table_name, column_mapping, value_processors=None):
 
 def migrate_educations(xlsx):
     """학력 데이터 마이그레이션"""
-    from app.models.education import Education
+    from app.domains.employee.models import Education
 
     df = pd.read_excel(xlsx, sheet_name='Education')
 
@@ -129,7 +129,7 @@ def migrate_educations(xlsx):
 
 def migrate_careers(xlsx):
     """경력 데이터 마이그레이션"""
-    from app.models.career import Career
+    from app.domains.employee.models import Career
 
     df = pd.read_excel(xlsx, sheet_name='Career')
 
@@ -163,7 +163,7 @@ def migrate_careers(xlsx):
 
 def migrate_certificates(xlsx):
     """자격증 데이터 마이그레이션"""
-    from app.models.certificate import Certificate
+    from app.domains.employee.models import Certificate
 
     df = pd.read_excel(xlsx, sheet_name='Certificate')
 
@@ -188,7 +188,7 @@ def migrate_certificates(xlsx):
 
 def migrate_languages(xlsx):
     """어학 데이터 마이그레이션"""
-    from app.models.language import Language
+    from app.domains.employee.models import Language
 
     df = pd.read_excel(xlsx, sheet_name='Language')
 
@@ -213,7 +213,7 @@ def migrate_languages(xlsx):
 
 def migrate_military_services(xlsx):
     """병역 데이터 마이그레이션"""
-    from app.models.military_service import MilitaryService
+    from app.domains.employee.models import MilitaryService
 
     df = pd.read_excel(xlsx, sheet_name='MilitaryService')
 
@@ -240,7 +240,7 @@ def migrate_military_services(xlsx):
 
 def migrate_salaries(xlsx):
     """급여 데이터 마이그레이션"""
-    from app.models.salary import Salary
+    from app.domains.employee.models import Salary
 
     df = pd.read_excel(xlsx, sheet_name='Salary')
 
@@ -277,7 +277,7 @@ def migrate_salaries(xlsx):
 
 def migrate_benefits(xlsx):
     """복리후생 데이터 마이그레이션"""
-    from app.models.benefit import Benefit
+    from app.domains.employee.models import Benefit
 
     df = pd.read_excel(xlsx, sheet_name='Benefit')
 
@@ -302,7 +302,7 @@ def migrate_benefits(xlsx):
 
 def migrate_insurances(xlsx):
     """보험 데이터 마이그레이션"""
-    from app.models.insurance import Insurance
+    from app.domains.employee.models import Insurance
 
     df = pd.read_excel(xlsx, sheet_name='Insurance')
 
@@ -329,7 +329,7 @@ def migrate_insurances(xlsx):
 
 def migrate_contracts(xlsx):
     """계약 데이터 마이그레이션"""
-    from app.models.contract import Contract
+    from app.domains.employee.models import Contract
 
     df = pd.read_excel(xlsx, sheet_name='Contract')
 
@@ -353,7 +353,7 @@ def migrate_contracts(xlsx):
 
 def migrate_promotions(xlsx):
     """인사이동 데이터 마이그레이션"""
-    from app.models.promotion import Promotion
+    from app.domains.employee.models import Promotion
 
     df = pd.read_excel(xlsx, sheet_name='Promotion')
 
@@ -380,7 +380,7 @@ def migrate_promotions(xlsx):
 
 def migrate_evaluations(xlsx):
     """인사평가 데이터 마이그레이션"""
-    from app.models.evaluation import Evaluation
+    from app.domains.employee.models import Evaluation
 
     df = pd.read_excel(xlsx, sheet_name='Evaluation')
 
@@ -406,7 +406,7 @@ def migrate_evaluations(xlsx):
 
 def migrate_trainings(xlsx):
     """교육이력 데이터 마이그레이션"""
-    from app.models.training import Training
+    from app.domains.employee.models import Training
 
     df = pd.read_excel(xlsx, sheet_name='Training')
 
@@ -430,7 +430,7 @@ def migrate_trainings(xlsx):
 
 def migrate_attendances(xlsx):
     """근태 데이터 마이그레이션"""
-    from app.models.attendance import Attendance
+    from app.domains.employee.models import Attendance
 
     df = pd.read_excel(xlsx, sheet_name='Attendance')
 
@@ -456,7 +456,7 @@ def migrate_attendances(xlsx):
 
 def migrate_hr_projects(xlsx):
     """인사이력 프로젝트 데이터 마이그레이션"""
-    from app.models.hr_project import HrProject
+    from app.domains.employee.models import HrProject
 
     df = pd.read_excel(xlsx, sheet_name='HrProject')
 
@@ -482,7 +482,7 @@ def migrate_hr_projects(xlsx):
 
 def migrate_awards(xlsx):
     """수상 데이터 마이그레이션"""
-    from app.models.award import Award
+    from app.domains.employee.models import Award
 
     df = pd.read_excel(xlsx, sheet_name='Award')
 
@@ -504,7 +504,7 @@ def migrate_awards(xlsx):
 
 def migrate_assets(xlsx):
     """자산배정 데이터 마이그레이션"""
-    from app.models.asset import Asset
+    from app.domains.employee.models import Asset
 
     df = pd.read_excel(xlsx, sheet_name='Asset')
 
@@ -528,7 +528,7 @@ def migrate_assets(xlsx):
 
 def migrate_salary_histories(xlsx):
     """연봉계약이력 데이터 마이그레이션"""
-    from app.models.salary_history import SalaryHistory
+    from app.domains.employee.models import SalaryHistory
 
     df = pd.read_excel(xlsx, sheet_name='SalaryHistory')
 
@@ -552,7 +552,7 @@ def migrate_salary_histories(xlsx):
 
 def migrate_salary_payments(xlsx):
     """급여지급이력 데이터 마이그레이션"""
-    from app.models.salary_payment import SalaryPayment
+    from app.domains.employee.models import SalaryPayment
 
     df = pd.read_excel(xlsx, sheet_name='SalaryPayment')
 

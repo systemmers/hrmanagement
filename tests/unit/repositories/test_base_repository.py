@@ -6,7 +6,7 @@ BaseRepository의 CRUD 메서드 테스트
 import pytest
 
 from app.repositories.base_repository import BaseRepository
-from app.models.employee import Employee
+from app.domains.employee.models import Employee
 
 
 class TestBaseRepository:

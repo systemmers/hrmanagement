@@ -2,8 +2,8 @@
 EmployeeRepository 단위 테스트
 """
 import pytest
-from app.repositories.employee_repository import EmployeeRepository
-from app.models.employee import Employee
+from app.domains.employee.repositories import EmployeeRepository
+from app.domains.employee.models import Employee
 
 
 class TestEmployeeRepository:

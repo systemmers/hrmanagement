@@ -61,7 +61,7 @@ def register_context_processors(app):
                 # 매니저의 부서 직원인지 확인
                 manager_employee_id = session.get(SessionKeys.EMPLOYEE_ID)
                 if manager_employee_id:
-                    from app.models.employee import Employee
+                    from app.domains.employee.models import Employee
                     manager_employee = Employee.query.get(manager_employee_id)
                     target_employee = Employee.query.get(employee_id)
                     if manager_employee and target_employee:

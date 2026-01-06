@@ -7,7 +7,7 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 from datetime import date, datetime
 
-from app.blueprints.employees.form_extractors import (
+from app.domains.employee.blueprints.form_extractors import (
     extract_employee_from_form,
     extract_basic_fields_from_form,
     extract_education_list,

@@ -10,7 +10,7 @@ from datetime import datetime
 from app.database import db
 from app.models.person_contract import PersonCorporateContract, DataSharingSettings, SyncLog
 from app.models.user import User
-from app.models.employee import Employee
+from app.domains.employee.models import Employee
 from app.models.personal_profile import PersonalProfile
 from app.shared.constants.status import EmployeeStatus, ContractStatus
 from ..base_repository import BaseRepository

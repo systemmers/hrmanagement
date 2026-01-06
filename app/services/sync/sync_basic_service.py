@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime
 import json
 
-from app.models.employee import Employee
+from app.domains.employee.models import Employee
 from app.models.personal_profile import PersonalProfile
 from app.models.person_contract import (
     PersonCorporateContract,

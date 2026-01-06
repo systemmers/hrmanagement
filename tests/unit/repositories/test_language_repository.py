@@ -2,8 +2,8 @@
 LanguageRepository 단위 테스트
 """
 import pytest
-from app.repositories.language_repository import LanguageRepository
-from app.models.language import Language
+from app.domains.employee.repositories import LanguageRepository
+from app.domains.employee.models import Language
 
 
 class TestLanguageRepository:

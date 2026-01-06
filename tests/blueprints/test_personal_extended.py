@@ -61,7 +61,7 @@ class TestPersonalProfileEdit:
     ):
         """프로필 수정 제출 성공 테스트"""
         from app.models.user import User
-        from app.models.profile import Profile
+        from app.domains.employee.models import Profile
         
         mock_user = User(id=1, username='test')
         mock_profile = Profile(id=1, name='홍길동')

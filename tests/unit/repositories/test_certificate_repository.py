@@ -2,8 +2,8 @@
 CertificateRepository 단위 테스트
 """
 import pytest
-from app.repositories.certificate_repository import CertificateRepository
-from app.models.certificate import Certificate
+from app.domains.employee.repositories import CertificateRepository
+from app.domains.employee.models import Certificate
 
 
 class TestCertificateRepository:

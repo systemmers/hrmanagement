@@ -7,7 +7,7 @@ ProfileRelationService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.profile_relation_service import ProfileRelationService, profile_relation_service
+from app.domains.employee.services.profile_relation_service import ProfileRelationService, profile_relation_service
 from app.types import OwnerType
 
 

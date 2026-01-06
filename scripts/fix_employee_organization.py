@@ -25,7 +25,7 @@ load_dotenv(os.path.join(project_root, '.env'))
 
 from app import create_app
 from app.database import db
-from app.models import Employee
+from app.domains.employee.models import Employee
 from app.models.company import Company
 
 

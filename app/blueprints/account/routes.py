@@ -12,7 +12,7 @@ from .helpers import validate_password_change
 from ...shared.constants.session_keys import SessionKeys
 from ...shared.utils.decorators import login_required
 from ...services.user_service import user_service
-from ...services.employee_service import employee_service
+from app.domains.employee.services import employee_service
 from ...services.personal_service import personal_service
 
 

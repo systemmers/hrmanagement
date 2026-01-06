@@ -42,8 +42,8 @@ class ContractFilterService:
     def employee_repo(self):
         """지연 초기화된 직원 Repository"""
         if self._employee_repo is None:
-            from ..repositories.employee_repository import employee_repository
-            self._employee_repo = employee_repository
+            from app.domains.employee.repositories import EmployeeRepository
+            self._employee_repo = EmployeeRepository()
         return self._employee_repo
 
     def get_filtered_contracts(

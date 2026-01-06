@@ -2,8 +2,8 @@
 ProfileRepository 단위 테스트
 """
 import pytest
-from app.repositories.profile_repository import ProfileRepository
-from app.models.profile import Profile
+from app.domains.employee.repositories import ProfileRepository
+from app.domains.employee.models import Profile
 
 
 class TestProfileRepository:

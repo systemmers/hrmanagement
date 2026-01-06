@@ -198,8 +198,8 @@ class TestAttachmentModel:
 
     def test_model_creation(self, session):
         """모델 생성"""
-        from app.models.attachment import Attachment
-        from app.models.employee import Employee
+        from app.domains.employee.models import Attachment
+        from app.domains.employee.models import Employee
         from app.models.company import Company
         
         company = Company(name='테스트', business_number='123', representative='대표')
@@ -224,8 +224,8 @@ class TestAttachmentModel:
 
     def test_to_dict(self, session):
         """to_dict 메서드"""
-        from app.models.attachment import Attachment
-        from app.models.employee import Employee
+        from app.domains.employee.models import Attachment
+        from app.domains.employee.models import Employee
         from app.models.company import Company
         
         company = Company(name='테스트', business_number='123', representative='대표')

@@ -2,8 +2,8 @@
 CareerRepository 단위 테스트
 """
 import pytest
-from app.repositories.career_repository import CareerRepository
-from app.models.career import Career
+from app.domains.employee.repositories import CareerRepository
+from app.domains.employee.models import Career
 
 
 class TestCareerRepository:

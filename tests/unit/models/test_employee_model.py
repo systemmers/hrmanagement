@@ -9,7 +9,7 @@ Employee 모델의 메서드 테스트:
 import pytest
 from datetime import date
 
-from app.models.employee import Employee
+from app.domains.employee.models import Employee
 
 
 class TestEmployeeModel:
@@ -73,7 +73,7 @@ class TestEmployeeModel:
         assert employee.employment_type is None
 
         # contract가 있을 때
-        from app.models.contract import Contract
+        from app.domains.employee.models import Contract
         contract = Contract(
             employee_id=employee.id,
             employee_type='정규직'

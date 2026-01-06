@@ -2,8 +2,8 @@
 EducationRepository 단위 테스트
 """
 import pytest
-from app.repositories.education_repository import EducationRepository
-from app.models.education import Education
+from app.domains.employee.repositories import EducationRepository
+from app.domains.employee.models import Education
 
 
 class TestEducationRepository:

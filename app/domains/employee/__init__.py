@@ -16,17 +16,69 @@ _certificate_repo = None
 _family_member_repo = None
 _language_repo = None
 _military_service_repo = None
+_salary_repo = None
+_benefit_repo = None
+_contract_repo = None
+_salary_history_repo = None
+_promotion_repo = None
+_evaluation_repo = None
+_training_repo = None
+_attendance_repo = None
+_insurance_repo = None
+_hr_project_repo = None
+_project_participation_repo = None
+_award_repo = None
+_asset_repo = None
+_salary_payment_repo = None
 _attachment_repo = None
+_profile_repo = None
 
 
 def init_repositories():
     """도메인 Repository 초기화"""
-    global _employee_repo, _education_repo, _career_repo
-    global _certificate_repo, _family_member_repo, _language_repo
-    global _military_service_repo, _attachment_repo
+    global _employee_repo
+    global _education_repo, _career_repo, _certificate_repo
+    global _family_member_repo, _language_repo, _military_service_repo
+    global _salary_repo, _benefit_repo, _contract_repo, _salary_history_repo
+    global _promotion_repo, _evaluation_repo, _training_repo, _attendance_repo
+    global _insurance_repo, _hr_project_repo, _project_participation_repo
+    global _award_repo, _asset_repo, _salary_payment_repo, _attachment_repo
+    global _profile_repo
 
-    # Phase 3에서 실제 Repository import 및 초기화 예정
-    pass
+    from .repositories import (
+        EmployeeRepository,
+        EducationRepository, CareerRepository, CertificateRepository,
+        FamilyMemberRepository, LanguageRepository, MilitaryServiceRepository,
+        SalaryRepository, BenefitRepository, ContractRepository, SalaryHistoryRepository,
+        PromotionRepository, EvaluationRepository, TrainingRepository, AttendanceRepository,
+        InsuranceRepository, HrProjectRepository, ProjectParticipationRepository,
+        AwardRepository, AssetRepository, SalaryPaymentRepository, AttachmentRepository,
+        ProfileRepository
+    )
+
+    _employee_repo = EmployeeRepository()
+    _education_repo = EducationRepository()
+    _career_repo = CareerRepository()
+    _certificate_repo = CertificateRepository()
+    _family_member_repo = FamilyMemberRepository()
+    _language_repo = LanguageRepository()
+    _military_service_repo = MilitaryServiceRepository()
+    _salary_repo = SalaryRepository()
+    _benefit_repo = BenefitRepository()
+    _contract_repo = ContractRepository()
+    _salary_history_repo = SalaryHistoryRepository()
+    _promotion_repo = PromotionRepository()
+    _evaluation_repo = EvaluationRepository()
+    _training_repo = TrainingRepository()
+    _attendance_repo = AttendanceRepository()
+    _insurance_repo = InsuranceRepository()
+    _hr_project_repo = HrProjectRepository()
+    _project_participation_repo = ProjectParticipationRepository()
+    _award_repo = AwardRepository()
+    _asset_repo = AssetRepository()
+    _salary_payment_repo = SalaryPaymentRepository()
+    _attachment_repo = AttachmentRepository()
+    _profile_repo = ProfileRepository()
 
 
 def get_employee_repo():
@@ -59,3 +111,67 @@ def get_military_service_repo():
 
 def get_attachment_repo():
     return _attachment_repo
+
+
+def get_classification_repo():
+    return _classification_repo
+
+
+def get_salary_repo():
+    return _salary_repo
+
+
+def get_benefit_repo():
+    return _benefit_repo
+
+
+def get_contract_repo():
+    return _contract_repo
+
+
+def get_salary_history_repo():
+    return _salary_history_repo
+
+
+def get_promotion_repo():
+    return _promotion_repo
+
+
+def get_evaluation_repo():
+    return _evaluation_repo
+
+
+def get_training_repo():
+    return _training_repo
+
+
+def get_attendance_repo():
+    return _attendance_repo
+
+
+def get_insurance_repo():
+    return _insurance_repo
+
+
+def get_hr_project_repo():
+    return _hr_project_repo
+
+
+def get_project_participation_repo():
+    return _project_participation_repo
+
+
+def get_award_repo():
+    return _award_repo
+
+
+def get_asset_repo():
+    return _asset_repo
+
+
+def get_salary_payment_repo():
+    return _salary_payment_repo
+
+
+def get_profile_repo():
+    return _profile_repo

@@ -25,7 +25,7 @@ class TestProfileDashboard:
 
     def test_dashboard_employee_renders(self, auth_client_corporate_full, test_employee):
         """법인 직원 대시보드 렌더링"""
-        from app.services.employee_service import employee_service
+        from app.domains.employee.services import employee_service
         with patch.object(employee_service, 'get_dashboard_data') as mock_get_data:
             mock_get_data.return_value = {
                 'employee': {'name': '홍길동'},
@@ -51,7 +51,7 @@ class TestProfileView:
     def test_profile_view_renders(self, auth_client_personal_full, test_user_personal, session):
         """프로필 조회 렌더링"""
         from app.models.personal_profile import PersonalProfile
-        from app.models.profile import Profile
+        from app.domains.employee.models import Profile
         
         # 프로필 생성
         profile = Profile(
@@ -70,7 +70,7 @@ class TestProfileEdit:
 
     def test_profile_edit_get(self, auth_client_personal_full, test_user_personal, session):
         """프로필 수정 페이지 GET"""
-        from app.models.profile import Profile
+        from app.domains.employee.models import Profile
         
         # 프로필 생성
         profile = Profile(
@@ -85,7 +85,7 @@ class TestProfileEdit:
 
     def test_profile_edit_post_success(self, auth_client_personal_full, test_user_personal, session):
         """프로필 수정 POST 성공"""
-        from app.models.profile import Profile
+        from app.domains.employee.models import Profile
         
         # 프로필 생성
         profile = Profile(
@@ -107,7 +107,7 @@ class TestProfileGetSection:
 
     def test_get_section_api(self, auth_client_personal_full, test_user_personal, session):
         """섹션 조회 API"""
-        from app.models.profile import Profile
+        from app.domains.employee.models import Profile
         
         # 프로필 생성
         profile = Profile(

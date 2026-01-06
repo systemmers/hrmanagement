@@ -2,8 +2,8 @@
 FamilyMemberRepository 단위 테스트
 """
 import pytest
-from app.repositories.family_member_repository import FamilyMemberRepository
-from app.models.family_member import FamilyMember
+from app.domains.employee.repositories import FamilyMemberRepository
+from app.domains.employee.models import FamilyMember
 
 
 class TestFamilyMemberRepository:

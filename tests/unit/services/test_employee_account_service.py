@@ -11,8 +11,9 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 from typing import Dict
 
-from app.services.employee_account_service import EmployeeAccountService, employee_account_service
-from app.models import Employee, User
+from app.domains.employee.services.employee_account_service import EmployeeAccountService, employee_account_service
+from app.domains.employee.models import Employee
+from app.models import User
 
 
 @pytest.fixture

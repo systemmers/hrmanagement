@@ -21,18 +21,18 @@ load_dotenv()
 
 from app import create_app
 from app.database import db
-from app.models.employee import Employee
+from app.domains.employee.models import Employee
 from app.models.company import Company
-from app.models.education import Education
-from app.models.career import Career
-from app.models.certificate import Certificate
-from app.models.family_member import FamilyMember
-from app.models.language import Language
-from app.models.military_service import MilitaryService
-from app.models.salary import Salary
-from app.models.contract import Contract
-from app.models.benefit import Benefit
-from app.models.insurance import Insurance
+from app.domains.employee.models import Education
+from app.domains.employee.models import Career
+from app.domains.employee.models import Certificate
+from app.domains.employee.models import FamilyMember
+from app.domains.employee.models import Language
+from app.domains.employee.models import MilitaryService
+from app.domains.employee.models import Salary
+from app.domains.employee.models import Contract
+from app.domains.employee.models import Benefit
+from app.domains.employee.models import Insurance
 
 
 # ============================================

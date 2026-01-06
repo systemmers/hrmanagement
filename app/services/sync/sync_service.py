@@ -12,7 +12,7 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime
 import json
 
-from app.models.employee import Employee
+from app.domains.employee.models import Employee
 from app.models.person_contract import SyncLog, PersonCorporateContract
 from app.models.personal_profile import PersonalProfile
 from app.shared.utils.transaction import atomic_transaction
@@ -76,7 +76,7 @@ class SyncService:
     def profile_repo(self):
         """지연 초기화된 프로필 Repository"""
         if self._profile_repo is None:
-            from app.repositories.profile_repository import profile_repository
+            from app.domains.employee.repositories import profile_repository
             self._profile_repo = profile_repository
         return self._profile_repo
 
@@ -92,7 +92,7 @@ class SyncService:
     def employee_repo(self):
         """지연 초기화된 직원 Repository"""
         if self._employee_repo is None:
-            from app.repositories.employee_repository import employee_repository
+            from app.domains.employee.repositories import employee_repository
             self._employee_repo = employee_repository
         return self._employee_repo
 

@@ -2,8 +2,8 @@
 MilitaryServiceRepository 단위 테스트
 """
 import pytest
-from app.repositories.military_service_repository import MilitaryServiceRepository
-from app.models.military_service import MilitaryService
+from app.domains.employee.repositories import MilitaryServiceRepository
+from app.domains.employee.models import MilitaryService
 
 
 class TestMilitaryServiceRepository:

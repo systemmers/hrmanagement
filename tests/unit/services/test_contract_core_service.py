@@ -18,7 +18,7 @@ from app.services.contract.contract_core_service import (
 )
 from app.models.person_contract import PersonCorporateContract
 from app.models.user import User
-from app.models.employee import Employee
+from app.domains.employee.models import Employee
 from app.shared.constants.status import ContractStatus
 
 

@@ -7,7 +7,7 @@ Contract 모델의 메서드 테스트:
 """
 import pytest
 
-from app.models.contract import Contract
+from app.domains.employee.models import Contract
 
 
 class TestContractModel:

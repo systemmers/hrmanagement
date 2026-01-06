@@ -12,7 +12,7 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 from typing import Dict, List
 
-from app.services.employee.employee_relation_service import (
+from app.domains.employee.services.employee_relation_service import (
     EmployeeRelationService,
     employee_relation_service
 )

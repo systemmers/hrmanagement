@@ -11,7 +11,7 @@ from ..shared.constants.session_keys import SessionKeys
 from ..shared.constants.messages import FlashMessages
 from ..shared.constants.status import EmployeeStatus
 from ..services.user_service import user_service
-from ..services.employee_service import employee_service
+from app.domains.employee.services import employee_service
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 

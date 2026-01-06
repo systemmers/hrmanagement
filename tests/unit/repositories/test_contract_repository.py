@@ -2,8 +2,8 @@
 ContractRepository 단위 테스트
 """
 import pytest
-from app.repositories.contract_repository import ContractRepository
-from app.models.contract import Contract
+from app.domains.employee.repositories import ContractRepository
+from app.domains.employee.models import Contract
 
 
 class TestContractRepository:

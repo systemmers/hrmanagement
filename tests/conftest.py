@@ -8,7 +8,7 @@ from app import create_app
 from app.database import db as _db
 from app.models.user import User
 from app.models.company import Company
-from app.models.employee import Employee
+from app.domains.employee.models import Employee
 from app.models.person_contract import PersonCorporateContract
 
 
