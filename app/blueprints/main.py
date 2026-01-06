@@ -6,11 +6,11 @@ Phase 2: Service 계층 표준화
 """
 from flask import Blueprint, render_template, request, session, redirect, url_for
 
-from ..constants.session_keys import SessionKeys, AccountType, UserRole
-from ..utils.api_helpers import api_success
+from ..shared.constants.session_keys import SessionKeys, AccountType, UserRole
+from ..shared.utils.api_helpers import api_success
 from ..services.employee_service import employee_service
-from ..utils.decorators import login_required
-from ..utils.tenant import get_current_organization_id
+from ..shared.utils.decorators import login_required
+from ..shared.utils.tenant import get_current_organization_id
 
 main_bp = Blueprint('main', __name__)
 

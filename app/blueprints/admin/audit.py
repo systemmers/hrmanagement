@@ -6,7 +6,7 @@ Phase 5: 감사 로그 대시보드 UI
 from flask import render_template
 
 from . import admin_bp
-from ...utils.decorators import login_required, admin_required
+from ...shared.utils.decorators import login_required, admin_required
 
 
 @admin_bp.route('/audit')

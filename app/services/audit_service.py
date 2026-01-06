@@ -13,7 +13,7 @@ from functools import wraps
 import json
 
 from flask import request, session, g, current_app
-from app.constants.session_keys import SessionKeys
+from app.shared.constants.session_keys import SessionKeys
 from app.models.audit_log import AuditLog
 
 

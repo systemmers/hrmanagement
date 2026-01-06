@@ -7,9 +7,9 @@ Phase 24: PlatformService 경유로 레이어 분리 준수
 from flask import render_template, request
 
 from . import platform_bp
-from ...utils.decorators import superadmin_required, api_superadmin_required
+from ...shared.utils.decorators import superadmin_required, api_superadmin_required
 from ...services.platform_service import platform_service
-from ...utils.api_helpers import api_success, api_error, api_not_found
+from ...shared.utils.api_helpers import api_success, api_error, api_not_found
 
 
 @platform_bp.route('/settings')

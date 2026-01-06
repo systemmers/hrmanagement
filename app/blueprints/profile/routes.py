@@ -9,7 +9,7 @@ Phase 9: DRY 원칙 - photo 업로드 중앙화
 from flask import render_template, g, request, flash, redirect, url_for, session
 
 from app.blueprints.profile import profile_bp
-from app.constants.session_keys import SessionKeys, AccountType
+from app.shared.constants.session_keys import SessionKeys, AccountType
 from app.blueprints.profile.decorators import (
     unified_profile_required,
     corporate_only,
@@ -20,7 +20,7 @@ from app.services.attachment_service import attachment_service
 from app.services.corporate_admin_profile_service import corporate_admin_profile_service
 from app.services.employee_service import employee_service
 from app.services.file_storage_service import file_storage, CATEGORY_ADMIN_PHOTO
-from app.utils.api_helpers import api_success, api_error, api_not_found, api_forbidden, api_server_error
+from app.shared.utils.api_helpers import api_success, api_error, api_not_found, api_forbidden, api_server_error
 
 
 @profile_bp.route('/dashboard')

@@ -50,11 +50,11 @@ def create_app(config_name=None):
     register_blueprints(app)
 
     # 템플릿 유틸리티
-    from .utils.template_helpers import register_template_utils
+    from .shared.utils.template_helpers import register_template_utils
     register_template_utils(app)
 
     # 인증 컨텍스트 프로세서
-    from .utils.context_processors import register_context_processors
+    from .shared.utils.context_processors import register_context_processors
     register_context_processors(app)
 
     # 에러 핸들러

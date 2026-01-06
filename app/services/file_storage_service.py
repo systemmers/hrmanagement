@@ -13,7 +13,7 @@ from typing import Optional, Tuple
 from werkzeug.utils import secure_filename
 from flask import current_app
 
-from app.constants.session_keys import AccountType
+from app.shared.constants.session_keys import AccountType
 
 
 # ========================================

@@ -5,7 +5,7 @@ Decorators 헬퍼 함수 테스트
 """
 import pytest
 from flask import session
-from app.constants.session_keys import SessionKeys, AccountType
+from app.shared.constants.session_keys import SessionKeys, AccountType
 
 
 class TestCheckLoginHelpers:
@@ -13,7 +13,7 @@ class TestCheckLoginHelpers:
 
     def test_check_login_with_user(self, app):
         """로그인된 사용자 확인"""
-        from app.utils.decorators import _check_login
+        from app.shared.utils.decorators import _check_login
         
         with app.app_context():
             with app.test_request_context():
@@ -23,7 +23,7 @@ class TestCheckLoginHelpers:
 
     def test_check_login_without_user(self, app):
         """로그인하지 않은 사용자 확인"""
-        from app.utils.decorators import _check_login
+        from app.shared.utils.decorators import _check_login
         
         with app.app_context():
             with app.test_request_context():
@@ -33,7 +33,7 @@ class TestCheckLoginHelpers:
 
     def test_check_api_login_with_user(self, app):
         """API 로그인 확인 - 로그인됨"""
-        from app.utils.decorators import _check_api_login
+        from app.shared.utils.decorators import _check_api_login
         
         with app.app_context():
             with app.test_request_context():
@@ -43,7 +43,7 @@ class TestCheckLoginHelpers:
 
     def test_check_api_login_without_user(self, app):
         """API 로그인 확인 - 로그인 안됨"""
-        from app.utils.decorators import _check_api_login
+        from app.shared.utils.decorators import _check_api_login
         
         with app.app_context():
             with app.test_request_context():
@@ -59,7 +59,7 @@ class TestCheckAccountTypeHelpers:
 
     def test_check_account_type_personal_valid(self, app):
         """개인 계정 확인 - 유효"""
-        from app.utils.decorators import _check_account_type
+        from app.shared.utils.decorators import _check_account_type
         
         with app.app_context():
             with app.test_request_context():
@@ -69,7 +69,7 @@ class TestCheckAccountTypeHelpers:
 
     def test_check_account_type_personal_invalid(self, app):
         """개인 계정 확인 - 무효"""
-        from app.utils.decorators import _check_account_type
+        from app.shared.utils.decorators import _check_account_type
         
         with app.app_context():
             with app.test_request_context():
@@ -79,7 +79,7 @@ class TestCheckAccountTypeHelpers:
 
     def test_check_account_type_corporate_valid(self, app):
         """법인 계정 확인 - 유효"""
-        from app.utils.decorators import _check_account_type
+        from app.shared.utils.decorators import _check_account_type
         
         with app.app_context():
             with app.test_request_context():
@@ -89,7 +89,7 @@ class TestCheckAccountTypeHelpers:
 
     def test_check_api_account_type_personal_valid(self, app):
         """API 개인 계정 확인 - 유효"""
-        from app.utils.decorators import _check_api_account_type
+        from app.shared.utils.decorators import _check_api_account_type
         
         with app.app_context():
             with app.test_request_context():
@@ -99,7 +99,7 @@ class TestCheckAccountTypeHelpers:
 
     def test_check_api_account_type_personal_invalid(self, app):
         """API 개인 계정 확인 - 무효"""
-        from app.utils.decorators import _check_api_account_type
+        from app.shared.utils.decorators import _check_api_account_type
         
         with app.app_context():
             with app.test_request_context():
@@ -111,7 +111,7 @@ class TestCheckAccountTypeHelpers:
 
     def test_check_api_account_type_corporate_invalid(self, app):
         """API 법인 계정 확인 - 무효"""
-        from app.utils.decorators import _check_api_account_type
+        from app.shared.utils.decorators import _check_api_account_type
         
         with app.app_context():
             with app.test_request_context():
@@ -127,8 +127,8 @@ class TestCheckRoleHelpers:
 
     def test_check_role_valid(self, app):
         """역할 확인 - 유효"""
-        from app.utils.decorators import _check_role
-        from app.constants.session_keys import UserRole
+        from app.shared.utils.decorators import _check_role
+        from app.shared.constants.session_keys import UserRole
         
         with app.app_context():
             with app.test_request_context():
@@ -138,8 +138,8 @@ class TestCheckRoleHelpers:
 
     def test_check_role_invalid(self, app):
         """역할 확인 - 무효"""
-        from app.utils.decorators import _check_role
-        from app.constants.session_keys import UserRole
+        from app.shared.utils.decorators import _check_role
+        from app.shared.constants.session_keys import UserRole
         from werkzeug.exceptions import Forbidden
         
         with app.app_context():
@@ -158,7 +158,7 @@ class TestDecoratorFunctionality:
 
     def test_login_required_functionality(self, app):
         """login_required 데코레이터 기능"""
-        from app.utils.decorators import login_required
+        from app.shared.utils.decorators import login_required
         
         with app.app_context():
             with app.test_request_context():
@@ -173,7 +173,7 @@ class TestDecoratorFunctionality:
 
     def test_personal_required_functionality(self, app):
         """personal_required 데코레이터 기능 (헬퍼 함수 테스트)"""
-        from app.utils.decorators import _check_account_type
+        from app.shared.utils.decorators import _check_account_type
         
         with app.app_context():
             with app.test_request_context():
@@ -185,7 +185,7 @@ class TestDecoratorFunctionality:
 
     def test_corporate_required_functionality(self, app):
         """corporate_required 데코레이터 기능 (헬퍼 함수 테스트)"""
-        from app.utils.decorators import _check_account_type
+        from app.shared.utils.decorators import _check_account_type
         
         with app.app_context():
             with app.test_request_context():
@@ -201,7 +201,7 @@ class TestAPIDecorators:
 
     def test_api_login_required_functionality(self, app):
         """api_login_required 데코레이터 기능"""
-        from app.utils.decorators import api_login_required
+        from app.shared.utils.decorators import api_login_required
         
         with app.app_context():
             with app.test_request_context():
@@ -216,7 +216,7 @@ class TestAPIDecorators:
 
     def test_api_personal_required_functionality(self, app):
         """api_personal_required 데코레이터 기능 (헬퍼 함수 테스트)"""
-        from app.utils.decorators import _check_api_account_type
+        from app.shared.utils.decorators import _check_api_account_type
         
         with app.app_context():
             with app.test_request_context():
@@ -228,7 +228,7 @@ class TestAPIDecorators:
 
     def test_api_corporate_required_functionality(self, app):
         """api_corporate_required 데코레이터 기능 (헬퍼 함수 테스트)"""
-        from app.utils.decorators import _check_api_account_type
+        from app.shared.utils.decorators import _check_api_account_type
         
         with app.app_context():
             with app.test_request_context():
@@ -244,8 +244,8 @@ class TestRoleDecorators:
 
     def test_role_required_single(self, app):
         """단일 역할 필요"""
-        from app.utils.decorators import role_required
-        from app.constants.session_keys import UserRole
+        from app.shared.utils.decorators import role_required
+        from app.shared.constants.session_keys import UserRole
         
         with app.app_context():
             with app.test_request_context():
@@ -261,8 +261,8 @@ class TestRoleDecorators:
 
     def test_role_required_multiple(self, app):
         """다중 역할 허용"""
-        from app.utils.decorators import role_required
-        from app.constants.session_keys import UserRole
+        from app.shared.utils.decorators import role_required
+        from app.shared.constants.session_keys import UserRole
         
         with app.app_context():
             with app.test_request_context():

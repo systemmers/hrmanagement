@@ -7,7 +7,7 @@ SSOT(Single Source of Truth) 원칙에 따라 모든 필드 정의를 한 곳에
 Phase 29 (2026-01-05): aliases 시스템 제거 - snake_case 직접 사용
 
 Usage:
-    from app.constants.field_registry import FieldRegistry
+    from app.shared.constants.field_registry import FieldRegistry
 
     # 섹션 조회
     section = FieldRegistry.get_section('personal_basic')

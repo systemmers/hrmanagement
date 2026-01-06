@@ -9,8 +9,8 @@ from flask import render_template, request, redirect, url_for, flash, session
 
 from . import account_bp
 from .helpers import validate_password_change
-from ...constants.session_keys import SessionKeys
-from ...utils.decorators import login_required
+from ...shared.constants.session_keys import SessionKeys
+from ...shared.utils.decorators import login_required
 from ...services.user_service import user_service
 from ...services.employee_service import employee_service
 from ...services.personal_service import personal_service

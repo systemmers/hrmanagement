@@ -27,7 +27,7 @@ from app.services.employee import (
 )
 
 # 하위 호환성을 위한 EmployeeStatus import (기존 코드에서 사용 시)
-from app.constants.status import EmployeeStatus
+from app.shared.constants.status import EmployeeStatus
 
 __all__ = [
     "EmployeeService",

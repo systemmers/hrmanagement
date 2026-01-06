@@ -239,7 +239,7 @@ class Profile(db.Model):
             return raw
 
         # Phase 9: FieldRegistry 기반 정렬
-        from app.constants.field_registry import FieldRegistry
+        from app.shared.constants.field_registry import FieldRegistry
 
         result = OrderedDict()
         result['id'] = raw.pop('id')

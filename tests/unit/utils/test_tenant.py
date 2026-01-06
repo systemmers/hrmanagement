@@ -6,7 +6,7 @@ Tenant Utils 테스트
 import pytest
 from unittest.mock import patch, Mock
 
-from app.utils.tenant import (
+from app.shared.utils.tenant import (
     get_current_company_id,
     get_current_company,
     get_current_organization_id,
@@ -15,7 +15,7 @@ from app.utils.tenant import (
     is_corporate_account,
     is_personal_account
 )
-from app.constants.session_keys import SessionKeys, AccountType
+from app.shared.constants.session_keys import SessionKeys, AccountType
 
 
 class TestGetCurrentCompanyId:
@@ -65,7 +65,7 @@ class TestGetCurrentOrganizationId:
         with auth_client_corporate_full.session_transaction() as sess:
             sess[SessionKeys.COMPANY_ID] = test_company.id
 
-        with patch('app.utils.tenant.get_current_company') as mock_get:
+        with patch('app.shared.utils.tenant.get_current_company') as mock_get:
             mock_company = Mock()
             mock_company.root_organization_id = 10
             mock_get.return_value = mock_company

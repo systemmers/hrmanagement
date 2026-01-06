@@ -5,7 +5,7 @@
 Magic String 대신 이 모듈의 상수를 사용해야 합니다.
 
 Usage:
-    from app.constants.status import ContractStatus, EmployeeStatus
+    from app.shared.constants.status import ContractStatus, EmployeeStatus
 
     if contract.status == ContractStatus.APPROVED:
         ...

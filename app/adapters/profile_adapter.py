@@ -14,8 +14,8 @@ from abc import ABC, abstractmethod
 from collections import OrderedDict
 from typing import Dict, Any, List, Optional, Union
 
-from app.constants.session_keys import AccountType
-from app.constants.field_registry import FieldRegistry
+from app.shared.constants.session_keys import AccountType
+from app.shared.constants.field_registry import FieldRegistry
 
 
 class ProfileAdapter(ABC):

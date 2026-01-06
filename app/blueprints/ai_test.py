@@ -8,8 +8,8 @@ Phase 27.2: API 응답 표준화 (api_helpers 사용)
 from flask import Blueprint, render_template, request, current_app
 import os
 
-from ..utils.decorators import login_required, admin_required
-from ..utils.api_helpers import api_success, api_error, api_server_error
+from ..shared.utils.decorators import login_required, admin_required
+from ..shared.utils.api_helpers import api_success, api_error, api_server_error
 
 ai_test_bp = Blueprint('ai_test', __name__, url_prefix='/ai-test')
 

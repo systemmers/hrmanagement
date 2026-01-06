@@ -11,7 +11,7 @@ Sync Blueprint 테스트
 import pytest
 import json
 
-from app.constants.session_keys import SessionKeys, AccountType
+from app.shared.constants.session_keys import SessionKeys, AccountType
 from app.models.user import User
 
 

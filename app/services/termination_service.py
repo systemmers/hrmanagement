@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, date
 import json
 
 from app.database import db
-from app.constants.status import EmployeeStatus, ContractStatus
+from app.shared.constants.status import EmployeeStatus, ContractStatus
 
 
 class TerminationService:

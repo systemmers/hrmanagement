@@ -12,8 +12,8 @@ Phase 3: EmployeeService 분리 - Relation Service
 from typing import Any, Dict, List, Optional, Tuple
 
 from app.models.military_service import MilitaryService
-from app.utils.transaction import atomic_transaction
-from app.services.base import relation_updater, get_relation_config, SUPPORTED_RELATION_TYPES
+from app.shared.utils.transaction import atomic_transaction
+from app.shared.base import relation_updater, get_relation_config, SUPPORTED_RELATION_TYPES
 
 
 class EmployeeRelationService:

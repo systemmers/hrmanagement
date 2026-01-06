@@ -10,10 +10,10 @@ Phase 8: 상수 모듈 적용
 from flask import Blueprint, request, session
 from functools import wraps
 
-from app.constants.session_keys import SessionKeys
+from app.shared.constants.session_keys import SessionKeys
 from app.services.notification_service import notification_service
 from app.models.notification import Notification
-from app.utils.api_helpers import api_success, api_error, api_not_found
+from app.shared.utils.api_helpers import api_success, api_error, api_not_found
 
 notifications_bp = Blueprint('notifications', __name__, url_prefix='/api/notifications')
 

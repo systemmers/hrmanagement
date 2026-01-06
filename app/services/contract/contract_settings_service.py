@@ -9,7 +9,7 @@ Phase 30: 레이어 분리 - db.session 제거, Repository 패턴 적용
 """
 from typing import Dict, Optional, List, Any
 
-from ..base import ServiceResult
+from app.shared.base import ServiceResult
 
 
 class ContractSettingsService:

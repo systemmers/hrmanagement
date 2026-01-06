@@ -17,7 +17,7 @@ from app.models.person_contract import (
     DataSharingSettings,
     SyncLog
 )
-from app.constants.status import ContractStatus
+from app.shared.constants.status import ContractStatus
 
 
 class SyncEventManager:

@@ -9,8 +9,8 @@ SSOT: FieldOptions.CONTRACT_TYPE 참조
 """
 from datetime import datetime
 from app.database import db
-from app.constants.field_options import FieldOptions
-from app.constants.status import ContractStatus
+from app.shared.constants.field_options import FieldOptions
+from app.shared.constants.status import ContractStatus
 
 
 class PersonCorporateContract(db.Model):

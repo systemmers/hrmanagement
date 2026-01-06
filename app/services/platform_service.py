@@ -13,8 +13,8 @@ from typing import Dict, List, Optional, Tuple
 
 from app.models import User, Company
 from app.models.system_setting import SystemSetting
-from app.utils.transaction import atomic_transaction
-from app.constants.status import ContractStatus
+from app.shared.utils.transaction import atomic_transaction
+from app.shared.constants.status import ContractStatus
 
 
 class PlatformService:

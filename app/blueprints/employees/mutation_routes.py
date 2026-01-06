@@ -10,12 +10,12 @@ Phase 24: 레이어 분리 - Service 경유
 from datetime import datetime
 from flask import Blueprint, request, redirect, url_for, flash, session, render_template
 
-from ...constants.session_keys import SessionKeys, UserRole, AccountType
-from ...constants.status import EmployeeStatus
-from ...utils.employee_number import generate_employee_number
-from ...utils.decorators import login_required, admin_required, manager_or_admin_required
-from ...utils.tenant import get_current_organization_id
-from ...utils.object_helpers import safe_get
+from ...shared.constants.session_keys import SessionKeys, UserRole, AccountType
+from ...shared.constants.status import EmployeeStatus
+from ...shared.utils.employee_number import generate_employee_number
+from ...shared.utils.decorators import login_required, admin_required, manager_or_admin_required
+from ...shared.utils.tenant import get_current_organization_id
+from ...shared.utils.object_helpers import safe_get
 from ...services.employee_service import employee_service
 from ...services import employee_account_service
 from ...services.file_storage_service import file_storage, CATEGORY_PROFILE_PHOTO

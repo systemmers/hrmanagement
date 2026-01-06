@@ -116,7 +116,7 @@ class DictSerializableMixin:
 
         # 4. FieldRegistry 기반 필드 순서 적용
         if ordered and self.__dict_field_domain__:
-            from app.constants.field_registry import FieldRegistry
+            from app.shared.constants.field_registry import FieldRegistry
             result = FieldRegistry.to_ordered_dict(
                 self.__dict_field_domain__,
                 result,

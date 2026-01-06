@@ -7,7 +7,7 @@ import pytest
 from unittest.mock import patch, Mock
 from datetime import datetime
 
-from app.utils.employee_number import (
+from app.shared.utils.employee_number import (
     get_employee_number_config,
     generate_employee_number,
     is_valid_employee_number,
@@ -55,8 +55,8 @@ class TestGenerateEmployeeNumber:
 
     def test_generate_first_number(self, session):
         """첫 사번 생성 (연도 포함)"""
-        with patch('app.utils.employee_number.get_employee_number_config') as mock_config, \
-             patch('app.utils.employee_number.datetime') as mock_dt:
+        with patch('app.shared.utils.employee_number.get_employee_number_config') as mock_config, \
+             patch('app.shared.utils.employee_number.datetime') as mock_dt:
             mock_config.return_value = {
                 'prefix': 'EMP',
                 'separator': '-',
@@ -71,7 +71,7 @@ class TestGenerateEmployeeNumber:
 
     def test_generate_number_without_year(self, session):
         """사번 생성 (연도 미포함)"""
-        with patch('app.utils.employee_number.get_employee_number_config') as mock_config:
+        with patch('app.shared.utils.employee_number.get_employee_number_config') as mock_config:
             mock_config.return_value = {
                 'prefix': 'EMP',
                 'separator': '-',
@@ -86,8 +86,8 @@ class TestGenerateEmployeeNumber:
 
     def test_generate_next_number(self, session):
         """다음 사번 생성"""
-        with patch('app.utils.employee_number.get_employee_number_config') as mock_config, \
-             patch('app.utils.employee_number.datetime') as mock_dt:
+        with patch('app.shared.utils.employee_number.get_employee_number_config') as mock_config, \
+             patch('app.shared.utils.employee_number.datetime') as mock_dt:
             mock_config.return_value = {
                 'prefix': 'EMP',
                 'separator': '-',
@@ -120,7 +120,7 @@ class TestValidateEmployeeNumber:
 
     def test_valid_number_with_year(self):
         """유효한 사번 (연도 포함)"""
-        with patch('app.utils.employee_number.get_employee_number_config') as mock_config:
+        with patch('app.shared.utils.employee_number.get_employee_number_config') as mock_config:
             mock_config.return_value = {
                 'prefix': 'EMP',
                 'separator': '-',
@@ -132,7 +132,7 @@ class TestValidateEmployeeNumber:
 
     def test_valid_number_without_year(self):
         """유효한 사번 (연도 미포함)"""
-        with patch('app.utils.employee_number.get_employee_number_config') as mock_config:
+        with patch('app.shared.utils.employee_number.get_employee_number_config') as mock_config:
             mock_config.return_value = {
                 'prefix': 'EMP',
                 'separator': '-',
@@ -149,7 +149,7 @@ class TestValidateEmployeeNumber:
 
     def test_invalid_prefix(self):
         """잘못된 접두사"""
-        with patch('app.utils.employee_number.get_employee_number_config') as mock_config:
+        with patch('app.shared.utils.employee_number.get_employee_number_config') as mock_config:
             mock_config.return_value = {
                 'prefix': 'EMP',
                 'separator': '-',
@@ -161,7 +161,7 @@ class TestValidateEmployeeNumber:
 
     def test_invalid_year(self):
         """잘못된 연도"""
-        with patch('app.utils.employee_number.get_employee_number_config') as mock_config:
+        with patch('app.shared.utils.employee_number.get_employee_number_config') as mock_config:
             mock_config.return_value = {
                 'prefix': 'EMP',
                 'separator': '-',
@@ -175,7 +175,7 @@ class TestValidateEmployeeNumber:
 
     def test_invalid_sequence(self):
         """잘못된 순번"""
-        with patch('app.utils.employee_number.get_employee_number_config') as mock_config:
+        with patch('app.shared.utils.employee_number.get_employee_number_config') as mock_config:
             mock_config.return_value = {
                 'prefix': 'EMP',
                 'separator': '-',
@@ -189,7 +189,7 @@ class TestValidateEmployeeNumber:
 
     def test_invalid_format(self):
         """잘못된 형식"""
-        with patch('app.utils.employee_number.get_employee_number_config') as mock_config:
+        with patch('app.shared.utils.employee_number.get_employee_number_config') as mock_config:
             mock_config.return_value = {
                 'prefix': 'EMP',
                 'separator': '-',

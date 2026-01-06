@@ -9,9 +9,9 @@ Phase 25: 공통 헬퍼 모듈로 이동 (2025-12-29)
 from typing import Any, Dict, List, Optional
 
 from app.types import FormData, FieldMapping
-from app.constants.status import EmployeeStatus
+from app.shared.constants.status import EmployeeStatus
 from ...models import Employee
-from ...utils.form_helpers import (
+from ...shared.utils.form_helpers import (
     parse_boolean as _parse_boolean,
     extract_relation_list,  # Phase 31: DRY - 공통 모듈에서 import
 )

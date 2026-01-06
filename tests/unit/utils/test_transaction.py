@@ -6,7 +6,7 @@ Transaction Utils 테스트
 import pytest
 from unittest.mock import patch, Mock
 
-from app.utils.transaction import atomic_transaction, transactional
+from app.shared.utils.transaction import atomic_transaction, transactional
 from app.database import db
 
 

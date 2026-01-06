@@ -6,7 +6,7 @@ Profile Routes 테스트
 import pytest
 from unittest.mock import patch, Mock
 
-from app.constants.session_keys import SessionKeys, AccountType
+from app.shared.constants.session_keys import SessionKeys, AccountType
 
 
 class TestProfileDashboard:

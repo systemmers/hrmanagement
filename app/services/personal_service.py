@@ -18,12 +18,12 @@ from typing import Dict, Optional, List, Tuple
 from datetime import datetime, timedelta
 from app.models.user import User
 from app.models.profile import Profile
-from app.utils.transaction import atomic_transaction
+from app.shared.utils.transaction import atomic_transaction
 from app.repositories.user_repository import UserRepository
 from app.repositories.profile_repository import ProfileRepository
 from app.services.profile_relation_service import profile_relation_service
-from app.services.base import ServiceResult
-from app.constants.status import ContractStatus
+from app.shared.base import ServiceResult
+from app.shared.constants.status import ContractStatus
 
 
 class PersonalService:

@@ -9,16 +9,16 @@ Phase 8: 상수 모듈 적용
 from datetime import datetime, timedelta
 from flask import Blueprint, request, session
 
-from app.constants.session_keys import SessionKeys, AccountType
+from app.shared.constants.session_keys import SessionKeys, AccountType
 from app.services.audit_service import audit_service
-from app.utils.date_helpers import parse_iso_date
+from app.shared.utils.date_helpers import parse_iso_date
 from app.models.audit_log import AuditLog
-from app.utils.decorators import (
+from app.shared.utils.decorators import (
     api_login_required as login_required,
     api_admin_or_manager_required as admin_required,
     api_corporate_account_required as corporate_account_required
 )
-from app.utils.api_helpers import api_success
+from app.shared.utils.api_helpers import api_success
 
 audit_bp = Blueprint('audit', __name__, url_prefix='/api/audit')
 

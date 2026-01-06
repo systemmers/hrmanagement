@@ -10,7 +10,7 @@ from flask import session, g
 from ..constants.session_keys import SessionKeys, UserRole
 from ..constants.field_registry import FieldRegistry
 from ..constants.field_options import FieldOptions
-from ..extensions import user_repo
+from app.extensions import user_repo
 
 
 def register_context_processors(app):
@@ -61,7 +61,7 @@ def register_context_processors(app):
                 # 매니저의 부서 직원인지 확인
                 manager_employee_id = session.get(SessionKeys.EMPLOYEE_ID)
                 if manager_employee_id:
-                    from ..models.employee import Employee
+                    from app.models.employee import Employee
                     manager_employee = Employee.query.get(manager_employee_id)
                     target_employee = Employee.query.get(employee_id)
                     if manager_employee and target_employee:

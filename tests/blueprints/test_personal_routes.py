@@ -7,7 +7,7 @@ import pytest
 from flask import session
 from unittest.mock import patch, Mock
 
-from app.constants.session_keys import SessionKeys
+from app.shared.constants.session_keys import SessionKeys
 
 
 class TestPersonalDashboard:
@@ -57,7 +57,7 @@ class TestPersonalProfileEdit:
         """프로필 수정 POST 성공"""
         from app.services.personal_service import personal_service
         from app.models.personal_profile import PersonalProfile
-        from app.services.base.service_result import ServiceResult
+        from app.shared.base.service_result import ServiceResult
         from unittest.mock import MagicMock
         
         mock_profile = MagicMock(spec=PersonalProfile)
@@ -92,7 +92,7 @@ class TestPersonalPhotoUpload:
         """잘못된 파일 형식 업로드"""
         from app.services.personal_service import personal_service
         from app.models.personal_profile import PersonalProfile
-        from app.services.base.service_result import ServiceResult
+        from app.shared.base.service_result import ServiceResult
         from unittest.mock import MagicMock
         
         mock_profile = MagicMock(spec=PersonalProfile)

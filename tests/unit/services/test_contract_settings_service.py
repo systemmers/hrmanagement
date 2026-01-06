@@ -12,7 +12,7 @@ from app.services.contract.contract_settings_service import (
     ContractSettingsService,
     contract_settings_service
 )
-from app.services.base import ServiceResult
+from app.shared.base import ServiceResult
 
 
 @pytest.fixture

@@ -10,7 +10,7 @@ Phase 28.2: Repository 레벨 필드 보호 추가
 from typing import List, Optional, Dict, Set
 from app.database import db
 from app.models import Employee
-from app.constants.status import EmployeeStatus
+from app.shared.constants.status import EmployeeStatus
 from .base_repository import BaseRepository
 from .mixins import TenantFilterMixin
 

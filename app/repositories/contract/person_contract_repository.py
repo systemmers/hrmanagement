@@ -12,7 +12,7 @@ from app.models.person_contract import PersonCorporateContract, DataSharingSetti
 from app.models.user import User
 from app.models.employee import Employee
 from app.models.personal_profile import PersonalProfile
-from app.constants.status import EmployeeStatus, ContractStatus
+from app.shared.constants.status import EmployeeStatus, ContractStatus
 from ..base_repository import BaseRepository
 
 
@@ -511,7 +511,7 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
         Returns:
             PersonCorporateContract 목록
         """
-        from app.constants.status import ContractStatus
+        from app.shared.constants.status import ContractStatus
 
         viewable_statuses = [ContractStatus.APPROVED]
         if include_terminated:
@@ -538,7 +538,7 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
         Returns:
             PersonCorporateContract 또는 None
         """
-        from app.constants.status import ContractStatus
+        from app.shared.constants.status import ContractStatus
 
         return PersonCorporateContract.query.filter(
             PersonCorporateContract.id == contract_id,

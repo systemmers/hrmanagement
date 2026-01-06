@@ -11,21 +11,21 @@ Phase 8: 상수 모듈 적용
 """
 from flask import Blueprint, render_template, request, jsonify, session, flash, redirect, url_for
 
-from ..constants.field_options import FieldOptions
-from ..constants.session_keys import SessionKeys
+from ..shared.constants.field_options import FieldOptions
+from ..shared.constants.session_keys import SessionKeys
 from ..services import contract_service
-from ..utils.decorators import (
+from ..shared.utils.decorators import (
     login_required,
     personal_account_required,
     corporate_account_required,
     personal_or_employee_account_required
 )
-from ..utils.contract_helpers import (
+from ..shared.utils.contract_helpers import (
     get_contract_context,
     contract_party_required,
     approve_reject_permission_required
 )
-from ..utils.api_helpers import api_success, api_error, api_not_found, api_forbidden
+from ..shared.utils.api_helpers import api_success, api_error, api_not_found, api_forbidden
 
 contracts_bp = Blueprint('contracts', __name__, url_prefix='/contracts')
 
@@ -154,7 +154,7 @@ def request_contract():
         return redirect(url_for('main.index'))
 
     if request.method == 'POST':
-        from ..utils.date_helpers import parse_form_date
+        from ..shared.utils.date_helpers import parse_form_date
 
         # 선택된 대상의 user_id로 계약 요청
         target_user_id = request.form.get('target_user_id', type=int)

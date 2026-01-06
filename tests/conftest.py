@@ -187,7 +187,7 @@ def test_contract_approved(session, test_user_personal, test_company):
 @pytest.fixture
 def auth_client_personal_full(client, test_user_personal, test_company):
     """개인 계정으로 인증된 테스트 클라이언트 (세션 정보 풀셋)"""
-    from app.constants.session_keys import SessionKeys
+    from app.shared.constants.session_keys import SessionKeys
     with client.session_transaction() as sess:
         sess[SessionKeys.USER_ID] = test_user_personal.id
         sess[SessionKeys.USERNAME] = test_user_personal.username
@@ -199,7 +199,7 @@ def auth_client_personal_full(client, test_user_personal, test_company):
 @pytest.fixture
 def auth_client_corporate_full(client, test_user_corporate, test_company):
     """법인 계정으로 인증된 테스트 클라이언트 (세션 정보 풀셋)"""
-    from app.constants.session_keys import SessionKeys
+    from app.shared.constants.session_keys import SessionKeys
     with client.session_transaction() as sess:
         sess[SessionKeys.USER_ID] = test_user_corporate.id
         sess[SessionKeys.USERNAME] = test_user_corporate.username

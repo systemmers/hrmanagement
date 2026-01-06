@@ -12,7 +12,7 @@ Phase 2 Task 2.2: GenericRelationCRUD 패턴 적용
 from typing import Dict, List, Optional
 
 from app.types import OwnerType
-from .base.generic_relation_crud import GenericRelationCRUD, RelationConfig
+from app.shared.base.generic_relation_crud import GenericRelationCRUD, RelationConfig
 from ..models import Education, Career, Certificate, Language, MilitaryService
 from ..models.family_member import FamilyMember
 from ..models.hr_project import HrProject

@@ -112,7 +112,7 @@ class TestServiceBaseImports:
     def test_import_generic_relation_crud(self):
         """generic_relation_crud import"""
         try:
-            from app.services.base.generic_relation_crud import GenericRelationCRUDService
+            from app.shared.base.generic_relation_crud import GenericRelationCRUDService
             assert GenericRelationCRUDService is not None
         except ImportError:
             pytest.skip("GenericRelationCRUDService not available")
@@ -120,7 +120,7 @@ class TestServiceBaseImports:
     def test_import_history_service(self):
         """history_service import"""
         try:
-            from app.services.base.history_service import HistoryService
+            from app.shared.base.history_service import HistoryService
             assert HistoryService is not None
         except ImportError:
             pytest.skip("HistoryService not available")

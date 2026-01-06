@@ -4,7 +4,7 @@
 HR Management 시스템의 커스텀 예외 클래스들의 동작 확인
 """
 import pytest
-from app.utils.exceptions import (
+from app.shared.utils.exceptions import (
     HRMException,
     ValidationError,
     NotFoundError,

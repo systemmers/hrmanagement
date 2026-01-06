@@ -9,7 +9,7 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 
 from app.services.personal_service import PersonalService, personal_service
-from app.services.base import ServiceResult
+from app.shared.base import ServiceResult
 
 
 @pytest.fixture

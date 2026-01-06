@@ -6,19 +6,19 @@
 from flask import request, session
 
 from app.blueprints.sync import sync_bp
-from app.constants.session_keys import SessionKeys
+from app.shared.constants.session_keys import SessionKeys
 from app.services.sync_service import sync_service
 from app.services.contract_service import contract_service
-from app.utils.transaction import atomic_transaction
+from app.shared.utils.transaction import atomic_transaction
 from app.models.person_contract import SyncLog, PersonCorporateContract
-from app.constants.status import ContractStatus
-from app.utils.decorators import (
+from app.shared.constants.status import ContractStatus
+from app.shared.utils.decorators import (
     api_login_required as login_required,
     api_personal_account_required as personal_account_required,
     api_corporate_account_required as corporate_account_required,
     contract_access_required
 )
-from app.utils.api_helpers import api_success, api_error, api_not_found
+from app.shared.utils.api_helpers import api_success, api_error, api_not_found
 
 
 @sync_bp.route('/fields/<int:contract_id>', methods=['GET'])

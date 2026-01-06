@@ -7,7 +7,7 @@ SSOT 원칙: field_options.py를 단일 진실 공급원으로 사용합니다.
 이 모듈은 Flask 등록만 담당하고, 모든 레이블 변환 로직은 FieldOptions에 위임합니다.
 """
 from datetime import datetime, date
-from app.constants.field_options import FieldOptions
+from app.shared.constants.field_options import FieldOptions
 
 
 def register_template_utils(app):

@@ -14,10 +14,10 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from app.database import db
 from app.models import Employee
-from app.utils.transaction import atomic_transaction
-from app.utils.tenant import get_current_organization_id
-from app.constants.status import EmployeeStatus
-from app.utils.rrn_parser import RRNParser
+from app.shared.utils.transaction import atomic_transaction
+from app.shared.utils.tenant import get_current_organization_id
+from app.shared.constants.status import EmployeeStatus
+from app.shared.utils.rrn_parser import RRNParser
 
 
 class EmployeeCoreService:
@@ -285,7 +285,7 @@ class EmployeeCoreService:
             계약 정보가 추가된 직원 목록 (활성 계약 있는 직원만)
         """
         from app.services.contract_filter_service import contract_filter_service
-        from app.constants.status import ContractStatus
+        from app.shared.constants.status import ContractStatus
 
         if not company_id or not employees:
             return []

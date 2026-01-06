@@ -11,10 +11,10 @@ Phase 30: 레이어 분리 - Model.query, db.session 직접 사용 제거
 from typing import Dict, Optional, List
 from datetime import datetime, timezone
 
-from ...constants.session_keys import AccountType
-from ...constants.status import ContractStatus, EmployeeStatus
-from ...utils.transaction import atomic_transaction
-from ..base import ServiceResult
+from ...shared.constants.session_keys import AccountType
+from ...shared.constants.status import ContractStatus, EmployeeStatus
+from ...shared.utils.transaction import atomic_transaction
+from app.shared.base import ServiceResult
 
 
 class ContractWorkflowService:
@@ -283,7 +283,7 @@ class ContractWorkflowService:
         Returns:
             새로 생성된 Employee 모델
         """
-        from ...utils.employee_number import generate_employee_number
+        from ...shared.utils.employee_number import generate_employee_number
 
         # 새 사번 생성
         new_number = generate_employee_number()

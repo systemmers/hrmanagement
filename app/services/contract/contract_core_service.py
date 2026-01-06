@@ -11,7 +11,7 @@ Phase 30: 레이어 분리 - Model.query 제거, Repository 패턴 적용
 """
 from typing import Dict, Optional, List, Any
 
-from ...constants.status import ContractStatus
+from ...shared.constants.status import ContractStatus
 
 
 class ContractCoreService:

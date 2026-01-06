@@ -7,14 +7,14 @@ Phase 5.3: 양측 동의 계약 종료 API 추가
 from flask import request, session
 
 from app.blueprints.sync import sync_bp
-from app.constants.session_keys import SessionKeys, AccountType
+from app.shared.constants.session_keys import SessionKeys, AccountType
 from app.services.termination_service import termination_service
 from app.services.contract_service import contract_service
-from app.utils.decorators import (
+from app.shared.utils.decorators import (
     api_login_required as login_required,
     contract_access_required
 )
-from app.utils.api_helpers import api_success, api_error, api_forbidden
+from app.shared.utils.api_helpers import api_success, api_error, api_forbidden
 
 
 @sync_bp.route('/terminate/<int:contract_id>', methods=['POST'])

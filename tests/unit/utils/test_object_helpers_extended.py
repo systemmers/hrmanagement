@@ -4,7 +4,7 @@ Object Access Helpers 확장 테스트
 Dict/Model 객체 접근 통합 유틸리티 테스트
 """
 import pytest
-from app.utils.object_helpers import safe_get, safe_get_nested
+from app.shared.utils.object_helpers import safe_get, safe_get_nested
 
 
 class TestSafeGetExtended:

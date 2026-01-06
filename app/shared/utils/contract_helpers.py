@@ -156,7 +156,7 @@ def contract_party_required(f):
     """
     @wraps(f)
     def decorated_function(contract_id, *args, **kwargs):
-        from ..extensions import person_contract_repo
+        from app.extensions import person_contract_repo
 
         contract = person_contract_repo.find_by_id(contract_id)
         if not contract:
@@ -184,7 +184,7 @@ def approve_reject_permission_required(f):
     """
     @wraps(f)
     def decorated_function(contract_id, *args, **kwargs):
-        from ..extensions import person_contract_repo
+        from app.extensions import person_contract_repo
 
         contract = person_contract_repo.find_by_id(contract_id)
         if not contract:

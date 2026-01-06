@@ -10,11 +10,11 @@ from flask import request, session, send_file
 
 from app.blueprints.corporate_settings import corporate_settings_api_bp
 from app.blueprints.corporate_settings.helpers import get_company_id
-from app.constants.session_keys import SessionKeys
+from app.shared.constants.session_keys import SessionKeys
 from app.services.file_storage_service import file_storage
 from app.services.corporate_settings_service import corporate_settings_service
-from app.utils.api_helpers import api_success, api_error, api_forbidden, api_not_found
-from app.utils.decorators import corporate_admin_required
+from app.shared.utils.api_helpers import api_success, api_error, api_forbidden, api_not_found
+from app.shared.utils.decorators import corporate_admin_required
 
 
 @corporate_settings_api_bp.route('/documents', methods=['GET'])

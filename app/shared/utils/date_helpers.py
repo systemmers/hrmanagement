@@ -4,7 +4,7 @@
 DRY 원칙 적용: 폼 및 API 요청의 날짜 파싱 로직 중앙화
 
 Usage:
-    from app.utils.date_helpers import parse_form_date, parse_iso_date
+    from app.shared.utils.date_helpers import parse_form_date, parse_iso_date
 
     # 폼 날짜 파싱 (%Y-%m-%d)
     contract_start = parse_form_date(request.form.get('contract_start_date'))

@@ -8,7 +8,7 @@ import json
 from unittest.mock import Mock, patch, MagicMock
 from datetime import date
 
-from app.constants.session_keys import SessionKeys
+from app.shared.constants.session_keys import SessionKeys
 from app.models.user import User
 
 

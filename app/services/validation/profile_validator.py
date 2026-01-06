@@ -14,8 +14,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Any
 
-from app.services.base.service_result import ServiceResult
-from app.utils.rrn_parser import RRNParser, RRNParseResult
+from app.shared.base.service_result import ServiceResult
+from app.shared.utils.rrn_parser import RRNParser, RRNParseResult
 
 
 @dataclass

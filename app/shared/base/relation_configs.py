@@ -10,7 +10,7 @@ Phase 8: FieldRegistry 통합 - 필드 순서 자동 연동
 from typing import Dict, Any, List
 from dataclasses import dataclass, field
 from .relation_updater import RelationDataConfig
-from app.constants.field_registry import FieldRegistry
+from app.shared.constants.field_registry import FieldRegistry
 
 
 def _get_field_order(section_id: str) -> List[str]:

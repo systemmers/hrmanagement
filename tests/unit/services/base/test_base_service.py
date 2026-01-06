@@ -6,8 +6,8 @@ Base 서비스 클래스들 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.base.history_service import BaseHistoryService
-from app.services.base.relation_updater import RelationDataUpdater
+from app.shared.base.history_service import BaseHistoryService
+from app.shared.base.relation_updater import RelationDataUpdater
 
 
 class TestBaseHistoryService:
@@ -29,7 +29,7 @@ class TestRelationDataUpdater:
 
     def test_update_relation_data(self):
         """관계 데이터 업데이트"""
-        from app.services.base.relation_updater import RelationDataConfig
+        from app.shared.base.relation_updater import RelationDataConfig
         updater = RelationDataUpdater()
 
         mock_repo = Mock()

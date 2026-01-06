@@ -4,7 +4,7 @@ API 헬퍼 함수 테스트
 API 응답 형식 표준화 기능 테스트
 """
 import pytest
-from app.utils.api_helpers import (
+from app.shared.utils.api_helpers import (
     api_success,
     api_error,
     api_not_found,

@@ -8,9 +8,9 @@ Phase 24: 통합 메서드 사용으로 N+1 쿼리 최적화
 """
 from flask import Blueprint, render_template, session, redirect, url_for, flash
 
-from ..constants.session_keys import SessionKeys, AccountType
-from ..constants.status import ContractStatus, EmployeeStatus
-from ..utils.decorators import login_required
+from ..shared.constants.session_keys import SessionKeys, AccountType
+from ..shared.constants.status import ContractStatus, EmployeeStatus
+from ..shared.utils.decorators import login_required
 from ..services.employee_service import employee_service
 from ..services.system_setting_service import system_setting_service
 from ..services import contract_service

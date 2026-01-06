@@ -8,7 +8,7 @@ Phase 25: 공통 헬퍼 모듈로 이동 (2025-12-29)
 from typing import Any, Dict, List, Optional
 
 from app.types import FormData
-from ...utils.form_helpers import (
+from ...shared.utils.form_helpers import (
     parse_boolean as _parse_boolean,
     extract_relation_list,  # Phase 31: DRY - 공통 모듈에서 import
 )

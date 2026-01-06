@@ -9,11 +9,11 @@ Phase 24: 트랜잭션 SSOT 적용 + CompanyService 경유 레이어 분리, 데
 """
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 
-from app.constants.session_keys import SessionKeys, AccountType
-from app.utils.api_helpers import api_success, api_error, api_forbidden, api_not_found
+from app.shared.constants.session_keys import SessionKeys, AccountType
+from app.shared.utils.api_helpers import api_success, api_error, api_forbidden, api_not_found
 from app.models.user import User
-from app.utils.decorators import corporate_login_required, corporate_admin_required
-from app.utils.corporate_helpers import (
+from app.shared.utils.decorators import corporate_login_required, corporate_admin_required
+from app.shared.utils.corporate_helpers import (
     extract_registration_data,
     validate_registration,
     create_company_entities

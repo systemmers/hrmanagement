@@ -17,7 +17,7 @@ class TestAdminAudit:
 
     def test_audit_logs_renders(self, auth_client_corporate_full):
         """감사 로그 페이지 렌더링"""
-        from app.constants.session_keys import SessionKeys, UserRole
+        from app.shared.constants.session_keys import SessionKeys, UserRole
         
         with auth_client_corporate_full.session_transaction() as sess:
             sess[SessionKeys.USER_ROLE] = UserRole.ADMIN
@@ -36,7 +36,7 @@ class TestAdminOrganization:
 
     def test_organization_renders(self, auth_client_corporate_full, test_company):
         """조직 관리 페이지 렌더링"""
-        from app.constants.session_keys import SessionKeys, UserRole
+        from app.shared.constants.session_keys import SessionKeys, UserRole
         from app.services.organization_service import organization_service
         from app.services.company_service import company_service
         

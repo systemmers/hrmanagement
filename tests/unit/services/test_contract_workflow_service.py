@@ -13,7 +13,7 @@ from app.services.contract.contract_workflow_service import (
     ContractWorkflowService,
     contract_workflow_service
 )
-from app.services.base import ServiceResult
+from app.shared.base import ServiceResult
 
 
 @pytest.fixture

@@ -9,7 +9,7 @@ from functools import wraps
 from flask import session, redirect, url_for, flash, request, abort, jsonify
 from typing import Optional, Tuple, Callable
 
-from app.constants import SessionKeys, AccountType, UserRole, FlashMessages, ErrorMessages
+from app.shared.constants import SessionKeys, AccountType, UserRole, FlashMessages, ErrorMessages
 
 
 # ============================================================
@@ -405,7 +405,7 @@ def contract_access_required(f):
     """
     @wraps(f)
     def decorated_function(contract_id, *args, **kwargs):
-        from ..models.person_contract import PersonCorporateContract
+        from app.models.person_contract import PersonCorporateContract
 
         user_id = session.get(SessionKeys.USER_ID)
         account_type = session.get(SessionKeys.ACCOUNT_TYPE)

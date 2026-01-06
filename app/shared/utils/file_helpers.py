@@ -4,7 +4,7 @@
 DRY 원칙 적용: 파일 확장자 추출 등 공통 파일 처리 로직 중앙화
 
 Usage:
-    from app.utils.file_helpers import get_file_extension, is_allowed_extension
+    from app.shared.utils.file_helpers import get_file_extension, is_allowed_extension
 
     ext = get_file_extension('photo.jpg')  # 'jpg'
     if is_allowed_extension(filename, {'jpg', 'png', 'gif'}):

@@ -18,7 +18,7 @@ from typing import Dict, Optional, List, Any
 from .contract_core_service import ContractCoreService, contract_core_service
 from .contract_workflow_service import ContractWorkflowService, contract_workflow_service
 from .contract_settings_service import ContractSettingsService, contract_settings_service
-from ..base import ServiceResult
+from app.shared.base import ServiceResult
 
 
 class ContractService:

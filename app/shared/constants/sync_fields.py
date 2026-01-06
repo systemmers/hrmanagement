@@ -88,7 +88,7 @@ class SyncFieldMapping:
     동기화 필드 매핑 설정 (타입 안전)
 
     Usage:
-        from app.constants.sync_fields import SYNC_MAPPINGS
+        from app.shared.constants.sync_fields import SYNC_MAPPINGS
 
         # 기본 + 연락처 필드 통합 조회
         all_basic = SYNC_MAPPINGS.get_all_basic_fields()

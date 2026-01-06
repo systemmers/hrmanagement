@@ -10,7 +10,7 @@ Phase 27.1: 개발 원칙 준수 리팩토링
 - SRP: 폼 추출(form_extractors) / 데이터 저장(relation_updaters) 분리
 """
 from app.types import FormData, OwnerType
-from ...utils.transaction import atomic_transaction
+from ...shared.utils.transaction import atomic_transaction
 from ...services.profile_relation_service import profile_relation_service
 from .form_extractors import (
     extract_family_list,

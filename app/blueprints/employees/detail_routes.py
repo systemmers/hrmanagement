@@ -7,9 +7,9 @@ Phase 24: 레이어 분리 - 관계 필드 직접 접근 → Service 경유 조�
 """
 from flask import Blueprint, render_template, redirect, url_for, flash, session
 
-from ...constants.session_keys import SessionKeys, UserRole, AccountType
-from ...utils.decorators import login_required, manager_or_admin_required
-from ...utils.object_helpers import safe_get
+from ...shared.constants.session_keys import SessionKeys, UserRole, AccountType
+from ...shared.utils.decorators import login_required, manager_or_admin_required
+from ...shared.utils.object_helpers import safe_get
 from ...services.employee_service import employee_service
 from ...services.contract_service import contract_service
 from .helpers import verify_employee_access

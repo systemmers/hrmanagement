@@ -34,7 +34,7 @@ class TestAuditServiceLog:
 
     def test_log_success(self, app):
         """로그 생성 성공"""
-        from app.constants.session_keys import SessionKeys
+        from app.shared.constants.session_keys import SessionKeys
         service = AuditService()
         service.enable()
 

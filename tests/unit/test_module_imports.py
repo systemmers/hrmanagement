@@ -46,22 +46,22 @@ class TestUtilsImports:
 
     def test_import_contract_helpers(self):
         """contract_helpers import"""
-        import app.utils.contract_helpers as helpers
+        import app.shared.utils.contract_helpers as helpers
         assert helpers is not None
 
     def test_import_corporate_helpers(self):
         """corporate_helpers import"""
-        import app.utils.corporate_helpers as helpers
+        import app.shared.utils.corporate_helpers as helpers
         assert helpers is not None
 
     def test_import_context_processors(self):
         """context_processors import"""
-        import app.utils.context_processors as processors
+        import app.shared.utils.context_processors as processors
         assert processors is not None
 
     def test_import_template_helpers(self):
         """template_helpers import"""
-        import app.utils.template_helpers as helpers
+        import app.shared.utils.template_helpers as helpers
         assert helpers is not None
 
 class TestRepositoryImports:
@@ -105,13 +105,13 @@ class TestConstants:
 
     def test_session_keys_constants(self):
         """세션 키 상수"""
-        from app.constants.session_keys import SessionKeys
+        from app.shared.constants.session_keys import SessionKeys
         assert hasattr(SessionKeys, 'USER_ID')
         assert hasattr(SessionKeys, 'COMPANY_ID')
 
     def test_account_type_constants(self):
         """계정 타입 상수"""
-        from app.constants.session_keys import AccountType
+        from app.shared.constants.session_keys import AccountType
         assert hasattr(AccountType, 'CORPORATE')
         assert hasattr(AccountType, 'PERSONAL')
 
@@ -169,7 +169,7 @@ class TestExceptionImports:
 
     def test_import_hrm_exceptions(self):
         """HRM 예외 클래스 import"""
-        from app.utils.exceptions import (
+        from app.shared.utils.exceptions import (
             HRMException,
             ValidationError,
             NotFoundError,
@@ -198,24 +198,24 @@ class TestHelperFunctions:
 
     def test_safe_get_function(self):
         """safe_get 함수"""
-        from app.utils.object_helpers import safe_get
+        from app.shared.utils.object_helpers import safe_get
         result = safe_get({'key': 'value'}, 'key')
         assert result == 'value'
 
     def test_safe_get_nested_function(self):
         """safe_get_nested 함수"""
-        from app.utils.object_helpers import safe_get_nested
+        from app.shared.utils.object_helpers import safe_get_nested
         data = {'a': {'b': 'value'}}
         result = safe_get_nested(data, 'a', 'b')
         assert result == 'value'
 
     def test_api_success_function(self):
         """api_success 함수"""
-        from app.utils.api_helpers import api_success
+        from app.shared.utils.api_helpers import api_success
         assert api_success is not None
 
     def test_api_error_function(self):
         """api_error 함수"""
-        from app.utils.api_helpers import api_error
+        from app.shared.utils.api_helpers import api_error
         assert api_error is not None
 

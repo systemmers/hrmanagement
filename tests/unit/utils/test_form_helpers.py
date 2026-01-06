@@ -7,7 +7,7 @@ Phase 29: normalize_form_field 테스트 제거 (함수 삭제됨)
 """
 import pytest
 
-from app.utils.form_helpers import (
+from app.shared.utils.form_helpers import (
     parse_boolean,
     get_form_value,
     parse_int,

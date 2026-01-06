@@ -7,9 +7,9 @@ Phase 24: EmployeeStatus 상수 일관성 적용
 """
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 
-from ..constants.session_keys import SessionKeys
-from ..constants.messages import FlashMessages
-from ..constants.status import EmployeeStatus
+from ..shared.constants.session_keys import SessionKeys
+from ..shared.constants.messages import FlashMessages
+from ..shared.constants.status import EmployeeStatus
 from ..services.user_service import user_service
 from ..services.employee_service import employee_service
 

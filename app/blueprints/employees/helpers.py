@@ -21,7 +21,7 @@ from flask import request
 # 멀티테넌시 헬퍼 함수
 # ========================================
 
-from ...utils.tenant import get_current_organization_id
+from ...shared.utils.tenant import get_current_organization_id
 from ...services.employee_service import employee_service
 
 

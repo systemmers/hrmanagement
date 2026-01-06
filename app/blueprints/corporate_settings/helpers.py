@@ -5,7 +5,7 @@
 """
 from flask import session
 
-from app.constants.session_keys import SessionKeys
+from app.shared.constants.session_keys import SessionKeys
 
 
 def get_company_id():

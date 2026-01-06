@@ -7,8 +7,8 @@ Phase 27: 품질 인프라 구축 - 핵심 인증 로직 테스트 커버리지 
 import pytest
 from flask import url_for, session
 
-from app.constants import SessionKeys, AccountType, UserRole
-from app.utils.decorators import (
+from app.shared.constants import SessionKeys, AccountType, UserRole
+from app.shared.utils.decorators import (
     # 헬퍼 함수
     _check_login,
     _check_api_login,

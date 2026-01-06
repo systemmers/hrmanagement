@@ -9,7 +9,7 @@ Phase 4.2: SOLID 원칙 적용 - SRP, DRY 개선
 from dataclasses import dataclass, field
 from typing import Dict, List, Any, Optional, Callable, Type
 from app.database import db
-from app.utils.transaction import atomic_transaction
+from app.shared.utils.transaction import atomic_transaction
 
 
 @dataclass
@@ -34,7 +34,7 @@ class RelationDataUpdater:
     관계형 데이터 범용 업데이트 서비스
 
     사용법:
-        from app.services.base.relation_updater import RelationDataUpdater, RelationDataConfig
+        from app.shared.base.relation_updater import RelationDataUpdater, RelationDataConfig
 
         config = RelationDataConfig(
             model_class=Education,

@@ -15,11 +15,11 @@ from flask import (
 )
 from werkzeug.utils import secure_filename
 
-from ...constants.session_keys import SessionKeys, AccountType
+from ...shared.constants.session_keys import SessionKeys, AccountType
 from ...database import db
 from ...services.personal_service import personal_service
-from ...utils.decorators import personal_login_required
-from ...utils.personal_helpers import get_current_profile, profile_required_no_inject
+from ...shared.utils.decorators import personal_login_required
+from ...shared.utils.personal_helpers import get_current_profile, profile_required_no_inject
 
 from .form_extractors import extract_profile_data
 from .relation_updaters import update_profile_relations
@@ -35,7 +35,7 @@ MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
 
 def allowed_image_file(filename):
     """이미지 파일 확장자 검사"""
-    from ...utils.file_helpers import is_allowed_extension
+    from ...shared.utils.file_helpers import is_allowed_extension
     return is_allowed_extension(filename, ALLOWED_IMAGE_EXTENSIONS)
 
 
@@ -48,7 +48,7 @@ def get_personal_photo_folder():
 
 def save_personal_photo(file, user_id):
     """개인 프로필 사진 저장"""
-    from ...utils.file_helpers import get_file_extension
+    from ...shared.utils.file_helpers import get_file_extension
     ext = get_file_extension(file.filename)
     unique_filename = f"personal_{user_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:8]}.{ext}"
 

@@ -6,7 +6,7 @@ Auth Blueprint 테스트
 import pytest
 from flask import session
 
-from app.constants.session_keys import SessionKeys
+from app.shared.constants.session_keys import SessionKeys
 from app.models.user import User
 
 

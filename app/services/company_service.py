@@ -13,8 +13,8 @@ from typing import Dict, Optional
 from app.database import db
 from app.models.company import Company
 from app.repositories.company_repository import company_repository
-from app.utils.transaction import atomic_transaction
-from app.services.base import ServiceResult
+from app.shared.utils.transaction import atomic_transaction
+from app.shared.base import ServiceResult
 
 
 class CompanyService:

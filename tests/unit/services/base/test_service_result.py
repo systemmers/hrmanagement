@@ -5,7 +5,7 @@ ServiceResult 패턴 테스트
 """
 import pytest
 
-from app.services.base.service_result import ServiceResult
+from app.shared.base.service_result import ServiceResult
 
 
 class TestServiceResult:

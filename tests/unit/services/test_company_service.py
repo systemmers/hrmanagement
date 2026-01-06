@@ -9,7 +9,7 @@ import pytest
 from unittest.mock import Mock, patch
 
 from app.services.company_service import CompanyService, company_service
-from app.services.base import ServiceResult
+from app.shared.base import ServiceResult
 
 
 @pytest.fixture

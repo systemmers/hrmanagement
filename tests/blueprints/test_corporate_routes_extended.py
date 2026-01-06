@@ -17,7 +17,7 @@ class TestCorporateRegister:
 
     def test_register_post_success(self, client, session):
         """법인 등록 POST 성공"""
-        from app.utils.corporate_helpers import create_company_entities
+        from app.shared.utils.corporate_helpers import create_company_entities
         from app.models.user import User
         
         with patch('app.blueprints.corporate.create_company_entities', return_value=None):
@@ -56,7 +56,7 @@ class TestCorporateDashboard:
     def test_dashboard_renders(self, auth_client_corporate_full, test_company):
         """대시보드 렌더링"""
         from app.services.company_service import company_service
-        from app.constants.session_keys import SessionKeys
+        from app.shared.constants.session_keys import SessionKeys
         
         with patch.object(company_service, 'get_with_stats') as mock_get:
             mock_get.return_value = test_company

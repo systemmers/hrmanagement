@@ -15,15 +15,15 @@ import json
 from app.models.employee import Employee
 from app.models.person_contract import SyncLog, PersonCorporateContract
 from app.models.personal_profile import PersonalProfile
-from app.utils.transaction import atomic_transaction
+from app.shared.utils.transaction import atomic_transaction
 
 # 서브 서비스 임포트 (같은 패키지 내)
 from .sync_basic_service import SyncBasicService
 from .sync_relation_service import SyncRelationService
 
 # 필드 매핑 SSOT (Phase 4: 중앙화)
-from app.constants.sync_fields import SYNC_MAPPINGS
-from app.constants.status import ContractStatus
+from app.shared.constants.sync_fields import SYNC_MAPPINGS
+from app.shared.constants.status import ContractStatus
 
 
 class SyncService:
@@ -387,7 +387,7 @@ class SyncService:
 
         Phase 30: Repository 패턴 적용
         """
-        from app.utils.employee_number import generate_employee_number
+        from app.shared.utils.employee_number import generate_employee_number
 
         company = self.company_repo.find_by_id(contract.company_id)
 

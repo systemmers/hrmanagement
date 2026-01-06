@@ -13,7 +13,7 @@ from typing import Optional
 from sqlalchemy import event
 
 from app.database import db
-from app.constants.status import ContractStatus
+from app.shared.constants.status import ContractStatus
 
 
 class Employee(db.Model):
@@ -200,7 +200,7 @@ class Employee(db.Model):
             return raw
 
         # Phase 9: FieldRegistry 기반 정렬
-        from app.constants.field_registry import FieldRegistry
+        from app.shared.constants.field_registry import FieldRegistry
 
         result = OrderedDict()
         result['id'] = raw.pop('id')

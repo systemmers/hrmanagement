@@ -9,7 +9,7 @@ Updated: 2026-01-05 - ConflictError 중복 체크 추가
 from typing import List, Dict, Optional
 from app.database import db
 from app.models import ClassificationOption
-from app.utils.exceptions import ConflictError
+from app.shared.utils.exceptions import ConflictError
 from .base_repository import BaseRepository
 
 

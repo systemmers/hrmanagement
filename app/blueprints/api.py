@@ -8,10 +8,10 @@ Phase 2.4: API 응답 표준화 (2025-12-29)
 """
 from flask import Blueprint, request, session
 
-from ..constants.field_registry import FieldRegistry
-from ..constants.session_keys import SessionKeys
-from ..utils.api_helpers import api_success, api_error, api_not_found, api_forbidden
-from ..utils.decorators import login_required
+from ..shared.constants.field_registry import FieldRegistry
+from ..shared.constants.session_keys import SessionKeys
+from ..shared.utils.api_helpers import api_success, api_error, api_not_found, api_forbidden
+from ..shared.utils.decorators import login_required
 
 api_bp = Blueprint('api', __name__)
 

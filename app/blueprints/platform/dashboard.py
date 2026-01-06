@@ -7,7 +7,7 @@ Phase 24: Model.query 제거 - PlatformService 경유
 from flask import render_template
 
 from . import platform_bp
-from ...utils.decorators import superadmin_required
+from ...shared.utils.decorators import superadmin_required
 from ...services.platform_service import platform_service
 
 

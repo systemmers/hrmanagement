@@ -9,7 +9,7 @@ Phase 27.1: 개발 원칙 준수 리팩토링
 - employees/relation_updaters.py 패턴과 일관성 유지
 """
 from app.types import FormData, OwnerType
-from ...utils.transaction import atomic_transaction
+from ...shared.utils.transaction import atomic_transaction
 from ...services.profile_relation_service import profile_relation_service
 from .form_extractors import (
     extract_education_list,
