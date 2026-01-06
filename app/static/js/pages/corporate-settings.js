@@ -155,7 +155,9 @@ async function loadDocumentsData() {
             DocumentsApi.getStatistics()
         ]);
 
-        const documents = documentsResponse.data || documentsResponse;
+        // API 응답 구조: { success: true, data: { documents: [...], statistics: {...} } }
+        const responseData = documentsResponse.data || documentsResponse;
+        const documents = Array.isArray(responseData) ? responseData : (responseData.documents || []);
         const statistics = statisticsResponse.data || statisticsResponse;
 
         // 통계 업데이트
