@@ -8,7 +8,7 @@ from datetime import datetime
 from app.domains.employee.repositories import AttachmentRepository
 from app.domains.employee.models import Attachment
 from app.domains.employee.models import Employee
-from app.models.company import Company
+from app.models import Company
 
 
 class TestAttachmentRepositoryInit:

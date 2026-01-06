@@ -5,7 +5,7 @@ ClassificationOptionsRepository 단위 테스트
 """
 import pytest
 from app.repositories.classification_repository import ClassificationOptionsRepository
-from app.models.classification_option import ClassificationOption
+from app.models import ClassificationOption
 
 
 class TestClassificationRepositoryInit:
@@ -137,7 +137,7 @@ class TestClassificationRepositoryCRUD:
     @pytest.mark.unit
     def test_delete_other_company_option_fails(self, session):
         """다른 법인의 옵션 삭제 불가 확인"""
-        from app.models.company import Company
+        from app.models import Company
         other_company = Company(
             name='다른법인',
             business_number='9999999999',

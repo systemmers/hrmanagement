@@ -3,7 +3,7 @@ CompanyRepository 단위 테스트
 """
 import pytest
 from app.repositories.company_repository import CompanyRepository
-from app.models.company import Company
+from app.models import Company
 
 
 class TestCompanyRepository:

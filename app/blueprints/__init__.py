@@ -6,24 +6,28 @@ Blueprint 등록 모듈
 
 
 def register_blueprints(app):
-    """앱에 모든 Blueprint 등록"""
-    from .main import main_bp
+    """앱에 모든 Blueprint 등록
+
+    Phase 7: 도메인 중심 마이그레이션 완료
+    - 모든 Blueprint는 app/domains/에서 import
+    - 레거시 경로 (app/blueprints/*.py)는 삭제됨
+    """
+    # 도메인 Blueprints
     from app.domains.employee.blueprints import employees_bp
+    from app.domains.contract.blueprints import contracts_bp
+    from app.domains.company.blueprints import corporate_bp
+    from app.domains.company.blueprints.settings import corporate_settings_api_bp
+    from app.domains.user.blueprints import auth_bp, mypage_bp, personal_bp, account_bp, notifications_bp
+    from app.domains.platform.blueprints import platform_bp
+    from app.domains.sync.blueprints import sync_bp
+
+    # 미마이그레이션 Blueprints (app/blueprints/ 유지)
+    from .main import main_bp
     from .api import api_bp
     from .ai_test import ai_test_bp
-    from .auth import auth_bp
     from .admin import admin_bp
-    from .mypage import mypage_bp
-    from .corporate import corporate_bp  # Phase 1: 법인 계정
-    from .personal import personal_bp  # Phase 2: 개인 계정
-    from .contracts import contracts_bp  # Phase 3: 계약 관리
-    from .sync import sync_bp  # Phase 4: 데이터 동기화
-    from .audit import audit_bp  # Phase 4: 감사 로그
-    from .notifications import notifications_bp  # Phase 5: 알림 시스템
-    from .profile import profile_bp  # 통합 프로필 (법인/개인 인터페이스 통합)
-    from .account import account_bp  # 계정 관리 (설정, 비밀번호, 공개설정, 탈퇴)
-    from .corporate_settings import corporate_settings_api_bp  # 법인 세팅 API (패키지)
-    from .platform import platform_bp  # 플랫폼 관리자
+    from .audit import audit_bp
+    from .profile import profile_bp
 
     # 플랫폼 관리자 (/platform/*) - 슈퍼관리자 전용
     app.register_blueprint(platform_bp)

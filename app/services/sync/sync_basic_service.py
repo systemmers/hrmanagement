@@ -10,11 +10,7 @@ from datetime import datetime
 import json
 
 from app.domains.employee.models import Employee
-from app.models.personal_profile import PersonalProfile
-from app.models.person_contract import (
-    PersonCorporateContract,
-    SyncLog
-)
+from app.models import PersonalProfile, PersonCorporateContract, SyncLog
 
 
 class SyncBasicService:

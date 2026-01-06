@@ -5,7 +5,7 @@ SystemSettingRepository 단위 테스트
 """
 import pytest
 from app.repositories.system_setting_repository import SystemSettingRepository
-from app.models.system_setting import SystemSetting
+from app.models import SystemSetting
 
 
 class TestSystemSettingRepositoryInit:

@@ -50,7 +50,7 @@ class TestProfileView:
 
     def test_profile_view_renders(self, auth_client_personal_full, test_user_personal, session):
         """프로필 조회 렌더링"""
-        from app.models.personal_profile import PersonalProfile
+        from app.models import PersonalProfile
         from app.domains.employee.models import Profile
         
         # 프로필 생성

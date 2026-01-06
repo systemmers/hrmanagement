@@ -13,8 +13,8 @@ from datetime import datetime
 import json
 
 from app.domains.employee.models import Employee
-from app.models.person_contract import SyncLog, PersonCorporateContract
-from app.models.personal_profile import PersonalProfile
+from app.models import SyncLog, PersonCorporateContract
+from app.models import PersonalProfile
 from app.shared.utils.transaction import atomic_transaction
 
 # 서브 서비스 임포트 (같은 패키지 내)

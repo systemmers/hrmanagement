@@ -9,7 +9,7 @@ Phase 30: 레이어 분리 - Service의 Model.query 직접 사용 제거
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 from app.database import db
-from app.models.notification import Notification, NotificationPreference
+from app.models import Notification, NotificationPreference
 from app.repositories.base_repository import BaseRepository
 
 

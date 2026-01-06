@@ -3,9 +3,11 @@ SQLAlchemy 모델 패키지
 
 모든 데이터베이스 모델을 정의하고 export합니다.
 
-Phase 3: Employee 도메인 모델은 app.domains.employee.models로 이동됨
+Phase 7: 도메인 중심 마이그레이션 완료
+- 모든 모델은 app/domains/에서 import
+- 레거시 경로 (app/models/*.py)는 삭제됨
 """
-# Employee Domain Models (새 위치)
+# Employee Domain Models
 from app.domains.employee.models import (
     # Mixins
     DictSerializableMixin,
@@ -39,35 +41,43 @@ from app.domains.employee.models import (
     Insurance,
 )
 
-# Company Domain Models (추후 이동 예정)
-from .classification_option import ClassificationOption
-from .company import Company
-from .organization import Organization
-from .company_settings import CompanySettings
-from .company_document import CompanyDocument
-from .company_visibility_settings import CompanyVisibilitySettings
-from .number_category import NumberCategory
-from .number_registry import NumberRegistry
-from .ip_range import IpRange
-from .ip_assignment import IpAssignment
-
-# User Domain Models (추후 이동 예정)
-from .user import User
-from .corporate_admin_profile import CorporateAdminProfile
-from .notification import Notification, NotificationPreference
-
-# Contract Domain Models (추후 이동 예정)
-from .person_contract import (
-    PersonCorporateContract,
-    DataSharingSettings,
-    SyncLog
+# Company Domain Models
+from app.domains.company.models import (
+    ClassificationOption,
+    Company,
+    Organization,
+    CompanySettings,
+    CompanyDocument,
+    CompanyVisibilitySettings,
+    NumberCategory,
+    NumberRegistry,
+    IpRange,
+    IpAssignment,
 )
 
-# Platform Domain Models (추후 이동 예정)
-from .system_setting import SystemSetting
-from .audit_log import AuditLog
+# User Domain Models
+from app.domains.user.models import (
+    User,
+    CorporateAdminProfile,
+    Notification,
+    NotificationPreference,
+    PersonalProfile,
+)
 
-# Project Models (Employee 도메인의 ProjectParticipation과 연관)
+# Contract Domain Models
+from app.domains.contract.models import (
+    PersonCorporateContract,
+    DataSharingSettings,
+    SyncLog,
+)
+
+# Platform Domain Models
+from app.domains.platform.models import (
+    SystemSetting,
+    AuditLog,
+)
+
+# Project Models (미마이그레이션 - app/models/ 유지)
 from .project import Project
 
 
@@ -116,6 +126,7 @@ __all__ = [
     'CorporateAdminProfile',
     'Notification',
     'NotificationPreference',
+    'PersonalProfile',
     # Contract Domain
     'PersonCorporateContract',
     'DataSharingSettings',

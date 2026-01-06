@@ -8,10 +8,10 @@ Phase 3 구조화: repositories/contract/ 폴더로 이동
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 from app.database import db
-from app.models.person_contract import PersonCorporateContract, DataSharingSettings, SyncLog
-from app.models.user import User
+from app.models import PersonCorporateContract, DataSharingSettings, SyncLog
+from app.models import User
 from app.domains.employee.models import Employee
-from app.models.personal_profile import PersonalProfile
+from app.models import PersonalProfile
 from app.shared.constants.status import EmployeeStatus, ContractStatus
 from ..base_repository import BaseRepository
 

@@ -10,7 +10,7 @@ from unittest.mock import Mock, patch, MagicMock
 from werkzeug.datastructures import FileStorage
 
 from app.shared.constants.session_keys import SessionKeys
-from app.models.user import User
+from app.models import User
 
 
 class TestAttachmentAPI:

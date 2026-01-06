@@ -10,7 +10,7 @@ from app.domains.platform.services.audit_service import (
     audit_log,
 )
 # 하위 호환성: AuditLog 모델도 함께 re-export
-from app.models.audit_log import AuditLog
+from app.models import AuditLog
 
 __all__ = [
     'AuditService',

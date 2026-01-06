@@ -13,7 +13,7 @@ Phase 30: 레이어 분리 - Model.query, db.session 직접 사용 제거
 from typing import Dict, List, Optional, Tuple
 
 from app.models import User, Company
-from app.models.system_setting import SystemSetting
+from app.models import SystemSetting
 from app.shared.utils.transaction import atomic_transaction
 from app.shared.constants.status import ContractStatus
 

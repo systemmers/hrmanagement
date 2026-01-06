@@ -121,27 +121,27 @@ class TestModelImports:
 
     def test_import_company_document(self):
         """CompanyDocument 모델 import"""
-        from app.models.company_document import CompanyDocument
+        from app.models import CompanyDocument
         assert CompanyDocument is not None
 
     def test_import_company_visibility_settings(self):
         """CompanyVisibilitySettings 모델 import"""
-        from app.models.company_visibility_settings import CompanyVisibilitySettings
+        from app.models import CompanyVisibilitySettings
         assert CompanyVisibilitySettings is not None
 
     def test_import_company_settings(self):
         """CompanySettings 모델 import"""
-        from app.models.company_settings import CompanySettings
+        from app.models import CompanySettings
         assert CompanySettings is not None
 
     def test_import_number_category(self):
         """NumberCategory 모델 import"""
-        from app.models.number_category import NumberCategory
+        from app.models import NumberCategory
         assert NumberCategory is not None
 
     def test_import_system_setting(self):
         """SystemSetting 모델 import"""
-        from app.models.system_setting import SystemSetting
+        from app.models import SystemSetting
         assert SystemSetting is not None
 
     def test_import_attachment(self):

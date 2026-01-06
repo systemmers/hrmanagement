@@ -17,7 +17,7 @@ Phase 30: 레이어 분리 - Model.query 제거, Repository 패턴 적용
 import re
 from typing import Dict, Optional, List, Tuple
 from datetime import datetime, timedelta
-from app.models.user import User
+from app.models import User
 from app.domains.employee.models import Profile
 from app.shared.utils.transaction import atomic_transaction
 from app.domains.employee.services.profile_relation_service import profile_relation_service

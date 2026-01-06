@@ -405,7 +405,7 @@ def contract_access_required(f):
     """
     @wraps(f)
     def decorated_function(contract_id, *args, **kwargs):
-        from app.models.person_contract import PersonCorporateContract
+        from app.models import PersonCorporateContract
 
         user_id = session.get(SessionKeys.USER_ID)
         account_type = session.get(SessionKeys.ACCOUNT_TYPE)

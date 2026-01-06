@@ -15,8 +15,8 @@ from app.services.event_listeners import (
     get_model_changes,
     track_field_changes
 )
-from app.models.personal_profile import PersonalProfile
-from app.models.person_contract import PersonCorporateContract, DataSharingSettings, SyncLog
+from app.models import PersonalProfile
+from app.models import PersonCorporateContract, DataSharingSettings, SyncLog
 
 
 class TestSyncEventManagerInit:

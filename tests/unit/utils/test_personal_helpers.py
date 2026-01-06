@@ -13,7 +13,7 @@ from app.shared.utils.personal_helpers import (
     profile_required,
     profile_required_no_inject
 )
-from app.models.personal_profile import PersonalProfile
+from app.models import PersonalProfile
 
 
 class TestGetCurrentProfile:
@@ -40,7 +40,7 @@ class TestGetCurrentProfile:
 
     def test_get_profile_from_db(self, app, session):
         """DB에서 프로필 조회"""
-        from app.models.user import User
+        from app.models import User
 
         with app.app_context():
             with app.test_request_context():

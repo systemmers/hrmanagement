@@ -8,7 +8,7 @@ Phase 7: 도메인 중심 마이그레이션 완료
 """
 from typing import List, Optional, Dict, Set
 from app.database import db
-from app.models.organization import Organization
+from app.models import Organization
 from app.repositories.base_repository import BaseRepository
 from app.repositories.mixins import TenantFilterMixin
 

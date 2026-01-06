@@ -97,7 +97,7 @@ class TestGenerateEmployeeNumber:
             mock_dt.now.return_value = datetime(2025, 1, 1)
 
             # 기존 사번 추가
-            from app.models.company import Company
+            from app.models import Company
             company = Company(name='테스트회사', business_number='1234567890', representative='대표')
             session.add(company)
             session.commit()
@@ -212,7 +212,7 @@ class TestEmployeeNumberExists:
 
     def test_number_exists(self, session):
         """사번이 존재함"""
-        from app.models.company import Company
+        from app.models import Company
 
         company = Company(name='테스트회사', business_number='1234567890', representative='대표')
         session.add(company)
@@ -231,7 +231,7 @@ class TestEmployeeNumberExists:
 
     def test_number_exists_exclude_self(self, session):
         """사번 존재 확인 (본인 제외)"""
-        from app.models.company import Company
+        from app.models import Company
 
         company = Company(name='테스트회사', business_number='1234567890', representative='대표')
         session.add(company)

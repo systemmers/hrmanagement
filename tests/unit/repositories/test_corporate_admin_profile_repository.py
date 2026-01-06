@@ -5,7 +5,7 @@ Corporate Admin Profile Repository 테스트
 """
 import pytest
 from app.repositories.corporate_admin_profile_repository import CorporateAdminProfileRepository
-from app.models.corporate_admin_profile import CorporateAdminProfile
+from app.models import CorporateAdminProfile
 from app.models import Company, User
 
 

@@ -9,9 +9,9 @@ from app.services.corporate_admin_profile_service import (
     CorporateAdminProfileService,
     corporate_admin_profile_service
 )
-from app.models.corporate_admin_profile import CorporateAdminProfile
-from app.models.user import User
-from app.models.company import Company
+from app.models import CorporateAdminProfile
+from app.models import User
+from app.models import Company
 
 
 class TestCorporateAdminProfileServiceInit:

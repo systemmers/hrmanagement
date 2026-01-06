@@ -6,10 +6,10 @@ ContractFilterService 단위 테스트
 import pytest
 from datetime import datetime
 from app.services.contract_filter_service import ContractFilterService, contract_filter_service
-from app.models.person_contract import PersonCorporateContract
+from app.models import PersonCorporateContract
 from app.domains.employee.models import Employee
-from app.models.user import User
-from app.models.company import Company
+from app.models import User
+from app.models import Company
 from app.shared.constants.status import ContractStatus
 
 

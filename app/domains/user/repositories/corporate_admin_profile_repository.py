@@ -7,7 +7,7 @@ Phase 7: 도메인 중심 마이그레이션 완료
 """
 from typing import Optional, Dict, List
 from app.database import db
-from app.models.corporate_admin_profile import CorporateAdminProfile
+from app.models import CorporateAdminProfile
 from app.repositories.base_repository import BaseRepository
 
 

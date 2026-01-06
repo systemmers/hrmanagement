@@ -11,11 +11,11 @@ from sqlalchemy.orm import Session
 from flask import current_app, has_app_context
 
 from app.database import db
-from app.models.personal_profile import PersonalProfile
-from app.models.person_contract import (
+from app.models import (
+    PersonalProfile,
     PersonCorporateContract,
     DataSharingSettings,
-    SyncLog
+    SyncLog,
 )
 from app.shared.constants.status import ContractStatus
 

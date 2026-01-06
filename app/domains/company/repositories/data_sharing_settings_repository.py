@@ -8,7 +8,7 @@ Phase 30: 레이어 분리 - Service의 Model.query 직접 사용 제거
 """
 from typing import Optional, Dict, Any
 from app.database import db
-from app.models.person_contract import DataSharingSettings
+from app.models import DataSharingSettings
 from app.repositories.base_repository import BaseRepository
 
 

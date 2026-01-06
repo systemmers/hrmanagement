@@ -7,7 +7,7 @@ Phase 7: 도메인 중심 마이그레이션 완료
 """
 from typing import List, Optional, Dict
 from app.database import db
-from app.models.company import Company
+from app.models import Company
 from app.repositories.base_repository import BaseRepository
 
 
@@ -72,7 +72,7 @@ class CompanyRepository(BaseRepository[Company]):
 
         # 루트 조직 생성이 필요한 경우
         if organization_data:
-            from app.models.organization import Organization
+            from app.models import Organization
 
             # 루트 조직 생성
             root_org = Organization(

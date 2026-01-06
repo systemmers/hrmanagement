@@ -4,7 +4,7 @@ Corporate Blueprint Route Tests
 app/blueprints/corporate.py의 모든 라우트를 테스트
 """
 import pytest
-from app.models.company import Company
+from app.models import Company
 
 
 class TestCorporatePublicRoutes:
