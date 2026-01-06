@@ -2,14 +2,16 @@
 Platform Settings Management
 
 시스템 설정 관리 라우트
+
+Phase 7: 도메인 중심 마이그레이션 (app/domains/platform/blueprints/)
 Phase 24: PlatformService 경유로 레이어 분리 준수
 """
 from flask import render_template, request
 
 from . import platform_bp
-from ...shared.utils.decorators import superadmin_required, api_superadmin_required
-from ...services.platform_service import platform_service
-from ...shared.utils.api_helpers import api_success, api_error, api_not_found
+from app.shared.utils.decorators import superadmin_required, api_superadmin_required
+from app.services.platform_service import platform_service
+from app.shared.utils.api_helpers import api_success, api_error, api_not_found
 
 
 @platform_bp.route('/settings')

@@ -2,16 +2,18 @@
 Platform Users Management
 
 사용자 관리 라우트
+
+Phase 7: 도메인 중심 마이그레이션 (app/domains/platform/blueprints/)
 Phase 24: PlatformService 경유로 레이어 분리 준수
 """
 from flask import render_template, request, session, abort
 
 from . import platform_bp
-from ...shared.utils.decorators import superadmin_required, api_superadmin_required
-from ...services.platform_service import platform_service
-from ...shared.constants import SessionKeys
-from ...shared.constants.field_options import FieldOptions
-from ...shared.utils.api_helpers import api_success, api_error
+from app.shared.utils.decorators import superadmin_required, api_superadmin_required
+from app.services.platform_service import platform_service
+from app.shared.constants import SessionKeys
+from app.shared.constants.field_options import FieldOptions
+from app.shared.utils.api_helpers import api_success, api_error
 
 
 @platform_bp.route('/users')

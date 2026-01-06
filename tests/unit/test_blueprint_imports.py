@@ -50,17 +50,17 @@ class TestBlueprintImports:
             pytest.skip("detail_routes not available")
 
     def test_import_personal_form_extractors(self):
-        """personal/form_extractors import"""
+        """personal/form_extractors import (domain path)"""
         try:
-            import app.blueprints.personal.form_extractors as extractors
+            import app.domains.user.blueprints.personal.form_extractors as extractors
             assert extractors is not None
         except ImportError:
             pytest.skip("personal form_extractors not available")
 
     def test_import_personal_relation_updaters(self):
-        """personal/relation_updaters import"""
+        """personal/relation_updaters import (domain path)"""
         try:
-            import app.blueprints.personal.relation_updaters as updaters
+            import app.domains.user.blueprints.personal.relation_updaters as updaters
             assert updaters is not None
         except ImportError:
             pytest.skip("personal relation_updaters not available")
@@ -82,25 +82,25 @@ class TestBlueprintImports:
             pytest.skip("ai_test not available")
 
     def test_import_corporate_settings_classifications(self):
-        """corporate_settings/classifications_api import"""
+        """corporate_settings/classifications_api import (domain path)"""
         try:
-            import app.blueprints.corporate_settings.classifications_api as api
+            import app.domains.company.blueprints.settings.classifications_api as api
             assert api is not None
         except ImportError:
             pytest.skip("classifications_api not available")
 
     def test_import_corporate_settings_documents(self):
-        """corporate_settings/documents_api import"""
+        """corporate_settings/documents_api import (domain path)"""
         try:
-            import app.blueprints.corporate_settings.documents_api as api
+            import app.domains.company.blueprints.settings.documents_api as api
             assert api is not None
         except ImportError:
             pytest.skip("documents_api not available")
 
     def test_import_corporate_settings_number_categories(self):
-        """corporate_settings/number_categories_api import"""
+        """corporate_settings/number_categories_api import (domain path)"""
         try:
-            import app.blueprints.corporate_settings.number_categories_api as api
+            import app.domains.company.blueprints.settings.number_categories_api as api
             assert api is not None
         except ImportError:
             pytest.skip("number_categories_api not available")

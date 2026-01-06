@@ -2,6 +2,7 @@
 Corporate Routes 확장 테스트
 
 법인 등록/관리 라우트 추가 테스트
+Phase 2 Migration: 도메인 경로로 patch 경로 업데이트
 """
 import pytest
 from unittest.mock import patch, Mock
@@ -19,8 +20,8 @@ class TestCorporateRegister:
         """법인 등록 POST 성공"""
         from app.shared.utils.corporate_helpers import create_company_entities
         from app.models.user import User
-        
-        with patch('app.blueprints.corporate.create_company_entities', return_value=None):
+
+        with patch('app.domains.company.blueprints.corporate.create_company_entities', return_value=None):
             response = client.post('/corporate/register', data={
                 'company_name': '테스트법인',
                 'business_number': '1234567890',
@@ -57,13 +58,12 @@ class TestCorporateDashboard:
         """대시보드 렌더링"""
         from app.services.company_service import company_service
         from app.shared.constants.session_keys import SessionKeys
-        
+
         with patch.object(company_service, 'get_with_stats') as mock_get:
             mock_get.return_value = test_company
-            
+
             with auth_client_corporate_full.session_transaction() as sess:
                 sess[SessionKeys.COMPANY_ID] = test_company.id
 
             response = auth_client_corporate_full.get('/corporate/dashboard')
             assert response.status_code == 200
-

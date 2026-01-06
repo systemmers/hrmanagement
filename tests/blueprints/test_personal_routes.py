@@ -67,9 +67,9 @@ class TestPersonalProfileEdit:
         with patch.object(personal_service, 'get_user_with_profile') as mock_get_user, \
              patch.object(personal_service, 'ensure_profile_exists') as mock_ensure, \
              patch.object(personal_service, 'update_profile') as mock_update, \
-             patch('app.blueprints.personal.routes.handle_photo_upload') as mock_photo, \
-             patch('app.blueprints.personal.routes.extract_profile_data') as mock_extract, \
-             patch('app.blueprints.personal.routes.update_profile_relations') as mock_update_relations:
+             patch('app.domains.user.blueprints.personal.routes.handle_photo_upload') as mock_photo, \
+             patch('app.domains.user.blueprints.personal.routes.extract_profile_data') as mock_extract, \
+             patch('app.domains.user.blueprints.personal.routes.update_profile_relations') as mock_update_relations:
             mock_get_user.return_value = (test_user_personal, mock_profile)
             mock_ensure.return_value = mock_profile
             mock_photo.return_value = (None, None)
@@ -102,9 +102,9 @@ class TestPersonalPhotoUpload:
         with patch.object(personal_service, 'get_user_with_profile') as mock_get_user, \
              patch.object(personal_service, 'ensure_profile_exists') as mock_ensure, \
              patch.object(personal_service, 'update_profile') as mock_update, \
-             patch('app.blueprints.personal.routes.handle_photo_upload') as mock_photo, \
-             patch('app.blueprints.personal.routes.extract_profile_data') as mock_extract, \
-             patch('app.blueprints.personal.routes.update_profile_relations') as mock_update_relations:
+             patch('app.domains.user.blueprints.personal.routes.handle_photo_upload') as mock_photo, \
+             patch('app.domains.user.blueprints.personal.routes.extract_profile_data') as mock_extract, \
+             patch('app.domains.user.blueprints.personal.routes.update_profile_relations') as mock_update_relations:
             mock_get_user.return_value = (test_user_personal, mock_profile)
             mock_ensure.return_value = mock_profile
             mock_photo.return_value = (None, 'Invalid file type')

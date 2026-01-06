@@ -1,18 +1,20 @@
 """
 User Domain Models
 
-Phase 6: 도메인 중심 마이그레이션
-기존 모델을 re-export하여 점진적 마이그레이션 지원
+Phase 2 Migration: 모델을 도메인 내부로 이동 완료
+기존 경로(app.models.user, app.models.notification 등)에서도 import 가능
 """
 
-# 기존 모델에서 re-export (중복 정의 방지)
-from app.models.user import User
-from app.models.corporate_admin_profile import CorporateAdminProfile
-from app.models.notification import Notification, NotificationPreference
+# 도메인 내부에서 import
+from .user import User
+from .notification import Notification, NotificationPreference
+from .corporate_admin_profile import CorporateAdminProfile
+from .personal import PersonalProfile
 
 __all__ = [
     'User',
-    'CorporateAdminProfile',
     'Notification',
     'NotificationPreference',
+    'CorporateAdminProfile',
+    'PersonalProfile',
 ]

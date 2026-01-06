@@ -3,11 +3,12 @@
 
 사번, 자산번호 등 번호 분류코드 CRUD API를 제공합니다.
 Phase 2.4: API 응답 표준화 (2025-12-29)
+Phase 2 Migration: 도메인으로 이동
 """
 from flask import request
 
-from app.blueprints.corporate_settings import corporate_settings_api_bp
-from app.blueprints.corporate_settings.helpers import get_company_id
+from app.domains.company.blueprints.settings import corporate_settings_api_bp
+from app.domains.company.blueprints.settings.helpers import get_company_id
 from app.services.corporate_settings_service import corporate_settings_service
 from app.shared.utils.api_helpers import api_success, api_error, api_forbidden, api_not_found
 from app.shared.utils.decorators import corporate_admin_required

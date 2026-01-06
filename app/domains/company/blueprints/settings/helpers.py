@@ -2,6 +2,7 @@
 법인 설정 API 공통 헬퍼
 
 모든 법인 설정 API 모듈에서 사용하는 공통 함수와 import를 정의합니다.
+Phase 2 Migration: 도메인으로 이동
 """
 from flask import session
 

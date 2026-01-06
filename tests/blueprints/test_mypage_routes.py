@@ -33,9 +33,9 @@ class TestMypageCompanyInfo:
 
     def test_company_info_renders(self, auth_client_corporate_full):
         """인사카드 렌더링"""
-        with patch('app.blueprints.mypage.employee_service') as mock_service, \
-             patch('app.blueprints.mypage.contract_service') as mock_contract, \
-             patch('app.blueprints.mypage.system_setting_service') as mock_system:
+        with patch('app.domains.user.blueprints.mypage.employee_service') as mock_service, \
+             patch('app.domains.user.blueprints.mypage.contract_service') as mock_contract, \
+             patch('app.domains.user.blueprints.mypage.system_setting_service') as mock_system:
             mock_service.get_employee_by_id.return_value = {'id': 1, 'name': '홍길동', 'status': 'active'}
             mock_contract.get_employee_contract_status.return_value = 'approved'
             mock_system.get_company_data.return_value = {'name': '테스트법인'}
@@ -72,8 +72,8 @@ class TestMypageCompanyInfo:
 
     def test_company_info_pending_contract(self, auth_client_corporate_full):
         """계약 미승인 시 대기 페이지"""
-        with patch('app.blueprints.mypage.employee_service') as mock_service, \
-             patch('app.blueprints.mypage.contract_service') as mock_contract:
+        with patch('app.domains.user.blueprints.mypage.employee_service') as mock_service, \
+             patch('app.domains.user.blueprints.mypage.contract_service') as mock_contract:
             mock_service.get_employee_by_id.return_value = {'id': 1, 'name': '홍길동'}
             mock_contract.get_employee_contract_status.return_value = 'pending'
 
@@ -87,7 +87,7 @@ class TestMypageCompanyInfo:
 
     def test_company_info_employee_not_found(self, auth_client_corporate_full):
         """직원 정보 없을 때"""
-        with patch('app.blueprints.mypage.employee_service') as mock_service:
+        with patch('app.domains.user.blueprints.mypage.employee_service') as mock_service:
             mock_service.get_employee_by_id.return_value = None
 
             with auth_client_corporate_full.session_transaction() as sess:
@@ -100,8 +100,8 @@ class TestMypageCompanyInfo:
 
     def test_company_info_pending_info_redirect(self, auth_client_corporate_full):
         """프로필 미완성 시 리다이렉트"""
-        with patch('app.blueprints.mypage.employee_service') as mock_service, \
-             patch('app.blueprints.mypage.contract_service') as mock_contract:
+        with patch('app.domains.user.blueprints.mypage.employee_service') as mock_service, \
+             patch('app.domains.user.blueprints.mypage.contract_service') as mock_contract:
             mock_service.get_employee_by_id.return_value = {'id': 1, 'name': '홍길동', 'status': 'pending_info', 'get': lambda key, default: {'id': 1, 'name': '홍길동', 'status': 'pending_info'}.get(key, default)}
             mock_contract.get_employee_contract_status.return_value = 'approved'
 

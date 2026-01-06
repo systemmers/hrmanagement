@@ -1,11 +1,12 @@
 """
-Platform Blueprint
+Platform Blueprint (Compatibility Wrapper)
 
-플랫폼 마스터 관리자(Superadmin) 전용 Blueprint입니다.
-법인 관리, 사용자 관리, 시스템 설정 등 플랫폼 전체 관리 기능을 제공합니다.
+[DEPRECATED] 레거시 경로 호환성 유지용
+권장: from app.domains.platform.blueprints import platform_bp
+
+Phase 7: 도메인 중심 마이그레이션
 """
-from flask import Blueprint
 
-platform_bp = Blueprint('platform', __name__, url_prefix='/platform')
+from app.domains.platform.blueprints import platform_bp
 
-from . import dashboard, companies, users, settings
+__all__ = ['platform_bp']

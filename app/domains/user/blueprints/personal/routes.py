@@ -1,10 +1,12 @@
 """
-개인 계정 라우트 (Personal Blueprint)
+Personal Account Routes (Personal Blueprint)
 
-SRP 원칙 적용:
-- 라우트 정의만 담당
-- 데이터 추출은 form_extractors.py로 위임
-- 관계형 데이터 업데이트는 relation_updaters.py로 위임
+SRP principle applied:
+- Route definitions only
+- Data extraction delegated to form_extractors.py
+- Relation data updates delegated to relation_updaters.py
+
+Phase 1 Migration: domains/user/blueprints/personal/routes.py
 """
 import os
 import uuid
@@ -15,18 +17,18 @@ from flask import (
 )
 from werkzeug.utils import secure_filename
 
-from ...shared.constants.session_keys import SessionKeys, AccountType
-from ...database import db
-from ...services.personal_service import personal_service
-from ...shared.utils.decorators import personal_login_required
-from ...shared.utils.personal_helpers import get_current_profile, profile_required_no_inject
+from app.shared.constants.session_keys import SessionKeys, AccountType
+from app.database import db
+from app.services.personal_service import personal_service
+from app.shared.utils.decorators import personal_login_required
+from app.shared.utils.personal_helpers import get_current_profile, profile_required_no_inject
 
 from .form_extractors import extract_profile_data
 from .relation_updaters import update_profile_relations
 
 
 # ========================================
-# 사진 업로드 헬퍼 함수
+# Photo upload helper functions
 # ========================================
 
 ALLOWED_IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
@@ -34,21 +36,21 @@ MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
 
 
 def allowed_image_file(filename):
-    """이미지 파일 확장자 검사"""
-    from ...shared.utils.file_helpers import is_allowed_extension
+    """Check image file extension"""
+    from app.shared.utils.file_helpers import is_allowed_extension
     return is_allowed_extension(filename, ALLOWED_IMAGE_EXTENSIONS)
 
 
 def get_personal_photo_folder():
-    """개인 프로필 사진 저장 폴더 반환"""
+    """Get personal profile photo folder"""
     folder = os.path.join(current_app.static_folder, 'uploads', 'personal_photos')
     os.makedirs(folder, exist_ok=True)
     return folder
 
 
 def save_personal_photo(file, user_id):
-    """개인 프로필 사진 저장"""
-    from ...shared.utils.file_helpers import get_file_extension
+    """Save personal profile photo"""
+    from app.shared.utils.file_helpers import get_file_extension
     ext = get_file_extension(file.filename)
     unique_filename = f"personal_{user_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:8]}.{ext}"
 
@@ -60,12 +62,12 @@ def save_personal_photo(file, user_id):
 
 
 def handle_photo_upload(request_files, user_id, existing_photo_path):
-    """사진 업로드 처리 (SRP: 사진 업로드 로직 분리)
+    """Handle photo upload (SRP: photo upload logic separated)
 
     Args:
-        request_files: request.files 객체
-        user_id: 사용자 ID
-        existing_photo_path: 기존 사진 경로
+        request_files: request.files object
+        user_id: User ID
+        existing_photo_path: Existing photo path
 
     Returns:
         tuple: (photo_path, error_message)
@@ -82,7 +84,7 @@ def handle_photo_upload(request_files, user_id, existing_photo_path):
     if not allowed_image_file(photo_file.filename):
         return photo_path, '이미지 파일만 업로드 가능합니다. (jpg, png, gif, webp)'
 
-    # 파일 크기 검사
+    # File size check
     photo_file.seek(0, os.SEEK_END)
     file_size = photo_file.tell()
     photo_file.seek(0)
@@ -95,34 +97,34 @@ def handle_photo_upload(request_files, user_id, existing_photo_path):
 
 
 # ========================================
-# 라우트 등록 함수
+# Route registration function
 # ========================================
 
 def register_routes(bp):
-    """Blueprint에 라우트 등록 (SRP 적용)"""
+    """Register routes to Blueprint (SRP applied)"""
 
     # ========================================
-    # 회원가입 / 대시보드
+    # Registration / Dashboard
     # ========================================
 
     @bp.route('/register', methods=['GET', 'POST'])
     def register():
-        """개인 회원가입"""
+        """Personal registration"""
         if session.get(SessionKeys.USER_ID):
             return redirect(url_for('main.index'))
 
         if request.method == 'POST':
-            # 계정 정보
+            # Account info
             username = request.form.get('username', '').strip()
             email = request.form.get('email', '').strip()
             password = request.form.get('password', '')
             password_confirm = request.form.get('password_confirm', '')
 
-            # 프로필 정보
+            # Profile info
             name = request.form.get('name', '').strip()
             mobile_phone = request.form.get('mobile_phone', '').strip()
 
-            # 유효성 검사 (전화번호 중복/형식 체크 포함)
+            # Validation (including phone duplicate/format check)
             errors = personal_service.validate_registration(
                 username, email, password, password_confirm, name, mobile_phone
             )
@@ -136,7 +138,7 @@ def register_routes(bp):
                                        name=name,
                                        mobile_phone=mobile_phone)
 
-            # 회원가입 처리
+            # Process registration
             result = personal_service.register(
                 username=username,
                 email=email,
@@ -161,7 +163,7 @@ def register_routes(bp):
     @bp.route('/dashboard')
     @personal_login_required
     def dashboard():
-        """개인 대시보드"""
+        """Personal dashboard"""
         user_id = session.get(SessionKeys.USER_ID)
         data = personal_service.get_dashboard_data(user_id)
 
@@ -180,41 +182,41 @@ def register_routes(bp):
                                stats=data['stats'])
 
     # ========================================
-    # 프로필 조회 / 수정
+    # Profile view / edit
     # ========================================
 
     @bp.route('/profile')
     @personal_login_required
     def profile():
-        """프로필 조회 - 통합 프로필로 리다이렉트"""
+        """Profile view - redirect to unified profile"""
         return redirect(url_for('profile.view'), code=301)
 
     @bp.route('/profile/edit', methods=['GET', 'POST'])
     @personal_login_required
     def profile_edit():
-        """프로필 수정
+        """Profile edit
 
-        GET: 통합 프로필 수정 페이지로 리다이렉트
-        POST: 폼 데이터 저장 처리 (form_extractors + relation_updaters 활용)
+        GET: Redirect to unified profile edit page
+        POST: Save form data (using form_extractors + relation_updaters)
         """
         user_id = session.get(SessionKeys.USER_ID)
 
-        # GET 요청: 통합 프로필 수정 페이지로 리다이렉트
+        # GET request: Redirect to unified profile edit page
         if request.method == 'GET':
             return redirect(url_for('profile.edit'), code=301)
 
-        # POST 요청: 폼 데이터 저장 처리
+        # POST request: Save form data
         user, profile_obj = personal_service.get_user_with_profile(user_id)
 
         if not user:
             flash('사용자 정보를 찾을 수 없습니다.', 'error')
             return redirect(url_for('main.index'))
 
-        # 프로필이 없으면 생성
+        # Create profile if not exists
         if not profile_obj:
             profile_obj = personal_service.ensure_profile_exists(user_id, user.username)
 
-        # 사진 업로드 처리 (헬퍼 함수 사용)
+        # Handle photo upload (using helper)
         photo_path, photo_error = handle_photo_upload(
             request.files, user_id, profile_obj.photo
         )
@@ -222,10 +224,10 @@ def register_routes(bp):
             flash(photo_error, 'warning')
 
         # ========================================
-        # 기본 프로필 데이터 저장 (form_extractors 활용)
+        # Save basic profile data (using form_extractors)
         # ========================================
         profile_data = extract_profile_data(request.form, profile_obj)
-        profile_data['photo'] = photo_path  # 사진 경로 추가
+        profile_data['photo'] = photo_path
 
         result = personal_service.update_profile(user_id, profile_data)
 
@@ -234,8 +236,8 @@ def register_routes(bp):
             return redirect(url_for('profile.edit'))
 
         # ========================================
-        # 관계형 데이터 일괄 저장 (relation_updaters 활용)
-        # 트랜잭션 안전성: 단일 트랜잭션으로 처리
+        # Batch save relation data (using relation_updaters)
+        # Transaction safety: processed in single transaction
         # ========================================
         try:
             update_profile_relations(profile_obj.id, request.form)
@@ -247,14 +249,14 @@ def register_routes(bp):
         return redirect(url_for('profile.view'))
 
     # ========================================
-    # 학력 관리 API
+    # Education API
     # ========================================
 
     @bp.route('/education', methods=['GET'])
     @personal_login_required
     @profile_required_no_inject
     def education_list():
-        """학력 목록 조회"""
+        """Get education list"""
         profile = get_current_profile()
         educations = personal_service.get_educations(profile.id)
         return jsonify({'educations': educations})
@@ -263,7 +265,7 @@ def register_routes(bp):
     @personal_login_required
     @profile_required_no_inject
     def education_add():
-        """학력 추가"""
+        """Add education"""
         profile = get_current_profile()
         data = request.get_json()
         education = personal_service.add_education(profile.id, data)
@@ -273,7 +275,7 @@ def register_routes(bp):
     @personal_login_required
     @profile_required_no_inject
     def education_delete(education_id):
-        """학력 삭제"""
+        """Delete education"""
         profile = get_current_profile()
         success = personal_service.delete_education(education_id, profile.id)
 
@@ -283,14 +285,14 @@ def register_routes(bp):
         return jsonify({'success': True})
 
     # ========================================
-    # 경력 관리 API
+    # Career API
     # ========================================
 
     @bp.route('/career', methods=['GET'])
     @personal_login_required
     @profile_required_no_inject
     def career_list():
-        """경력 목록 조회"""
+        """Get career list"""
         profile = get_current_profile()
         careers = personal_service.get_careers(profile.id)
         return jsonify({'careers': careers})
@@ -299,7 +301,7 @@ def register_routes(bp):
     @personal_login_required
     @profile_required_no_inject
     def career_add():
-        """경력 추가"""
+        """Add career"""
         profile = get_current_profile()
         data = request.get_json()
         career = personal_service.add_career(profile.id, data)
@@ -309,7 +311,7 @@ def register_routes(bp):
     @personal_login_required
     @profile_required_no_inject
     def career_delete(career_id):
-        """경력 삭제"""
+        """Delete career"""
         profile = get_current_profile()
         success = personal_service.delete_career(career_id, profile.id)
 
@@ -319,14 +321,14 @@ def register_routes(bp):
         return jsonify({'success': True})
 
     # ========================================
-    # 자격증 관리 API
+    # Certificate API
     # ========================================
 
     @bp.route('/certificate', methods=['GET'])
     @personal_login_required
     @profile_required_no_inject
     def certificate_list():
-        """자격증 목록 조회"""
+        """Get certificate list"""
         profile = get_current_profile()
         certificates = personal_service.get_certificates(profile.id)
         return jsonify({'certificates': certificates})
@@ -335,7 +337,7 @@ def register_routes(bp):
     @personal_login_required
     @profile_required_no_inject
     def certificate_add():
-        """자격증 추가"""
+        """Add certificate"""
         profile = get_current_profile()
         data = request.get_json()
         certificate = personal_service.add_certificate(profile.id, data)
@@ -345,7 +347,7 @@ def register_routes(bp):
     @personal_login_required
     @profile_required_no_inject
     def certificate_delete(certificate_id):
-        """자격증 삭제"""
+        """Delete certificate"""
         profile = get_current_profile()
         success = personal_service.delete_certificate(certificate_id, profile.id)
 
@@ -355,14 +357,14 @@ def register_routes(bp):
         return jsonify({'success': True})
 
     # ========================================
-    # 어학 관리 API
+    # Language API
     # ========================================
 
     @bp.route('/language', methods=['GET'])
     @personal_login_required
     @profile_required_no_inject
     def language_list():
-        """어학 목록 조회"""
+        """Get language list"""
         profile = get_current_profile()
         languages = personal_service.get_languages(profile.id)
         return jsonify({'languages': languages})
@@ -371,7 +373,7 @@ def register_routes(bp):
     @personal_login_required
     @profile_required_no_inject
     def language_add():
-        """어학 추가"""
+        """Add language"""
         profile = get_current_profile()
         data = request.get_json()
         language = personal_service.add_language(profile.id, data)
@@ -381,7 +383,7 @@ def register_routes(bp):
     @personal_login_required
     @profile_required_no_inject
     def language_delete(language_id):
-        """어학 삭제"""
+        """Delete language"""
         profile = get_current_profile()
         success = personal_service.delete_language(language_id, profile.id)
 
@@ -391,14 +393,14 @@ def register_routes(bp):
         return jsonify({'success': True})
 
     # ========================================
-    # 병역 관리 API
+    # Military API
     # ========================================
 
     @bp.route('/military', methods=['GET'])
     @personal_login_required
     @profile_required_no_inject
     def military_get():
-        """병역 정보 조회"""
+        """Get military info"""
         profile = get_current_profile()
         military = personal_service.get_military(profile.id)
         return jsonify({'military': military})
@@ -407,30 +409,30 @@ def register_routes(bp):
     @personal_login_required
     @profile_required_no_inject
     def military_save():
-        """병역 정보 저장/수정"""
+        """Save/update military info"""
         profile = get_current_profile()
         data = request.get_json()
         military = personal_service.save_military(profile.id, data)
         return jsonify({'success': True, 'military': military})
 
     # ========================================
-    # 회사 인사카드 (Phase 2: 개인 계정용)
+    # Company HR Card (Phase 2: for personal accounts)
     # ========================================
 
     @bp.route('/company-cards')
     @personal_login_required
     def company_card_list():
-        """계약된 회사 인사카드 목록
+        """Contracted company HR card list
 
-        개인 계정이 계약한 법인들의 인사카드 목록을 표시합니다.
-        종료된 계약도 3년 보관 기간 내에는 열람 가능합니다.
+        Displays HR card list of companies contracted with personal account.
+        Terminated contracts are viewable within 3-year retention period.
         """
         user_id = session.get(SessionKeys.USER_ID)
 
-        # 열람 가능한 모든 계약 조회 (활성 + 종료)
+        # Get all viewable contracts (active + terminated)
         contracts = personal_service.get_viewable_contracts(user_id, include_terminated=True)
 
-        # 활성/종료 계약 분리 (템플릿에서 그룹화 표시용)
+        # Separate active/terminated contracts (for template grouping)
         active_contracts = [c for c in contracts if c.get('is_active')]
         terminated_contracts = [c for c in contracts if not c.get('is_active')]
 
@@ -442,35 +444,35 @@ def register_routes(bp):
     @bp.route('/company-cards/<int:contract_id>')
     @personal_login_required
     def company_card_detail(contract_id):
-        """특정 회사 인사카드 상세
+        """Specific company HR card detail
 
-        개인 계정의 특정 법인 계약에 대한 인사카드 상세 정보를 표시합니다.
-        공유 파셜 템플릿을 사용하여 법인 직원 인사카드와 동일한 구조로 표시합니다.
-        종료된 계약도 3년 보관 기간 내에는 읽기 전용으로 열람 가능합니다.
+        Displays detailed HR card info for a specific company contract.
+        Uses shared partial templates for consistent structure with corporate employee HR cards.
+        Terminated contracts are viewable (read-only) within 3-year retention period.
         """
         user_id = session.get(SessionKeys.USER_ID)
 
-        # 계약 정보 및 회사 인사카드 데이터 조회
+        # Get contract info and company HR card data
         card_data = personal_service.get_company_card_data(user_id, contract_id)
 
         if not card_data:
             flash('인사카드 정보를 찾을 수 없습니다.', 'error')
             return redirect(url_for('personal.company_card_list'))
 
-        # 종료된 계약 여부
+        # Terminated contract status
         is_terminated = card_data.get('is_terminated', False)
 
         return render_template('personal/company_card_detail.html',
-                               # 기본 정보
+                               # Basic info
                                contract=card_data['contract'],
                                company=card_data['company'],
                                employee=card_data.get('employee'),
                                contract_info=card_data.get('contract_info'),
-                               # 급여/복리후생 (현재 미구현)
+                               # Salary/benefits (currently not implemented)
                                salary=card_data.get('salary'),
                                benefit=card_data.get('benefit'),
                                insurance=card_data.get('insurance'),
-                               # 이력 정보 (공유 파셜용 - _history_info.html)
+                               # History info (for shared partial - _history_info.html)
                                education_list=card_data.get('education_list', []),
                                career_list=card_data.get('career_list', []),
                                certificate_list=card_data.get('certificate_list', []),
@@ -478,7 +480,7 @@ def register_routes(bp):
                                military=card_data.get('military'),
                                award_list=card_data.get('award_list', []),
                                family_list=card_data.get('family_list', []),
-                               # 인사기록 정보 (법인 DB 기반)
+                               # HR record info (based on corporate DB)
                                salary_history_list=card_data.get('salary_history_list', []),
                                salary_payment_list=card_data.get('salary_payment_list', []),
                                promotion_list=card_data.get('promotion_list', []),
@@ -486,15 +488,15 @@ def register_routes(bp):
                                training_list=card_data.get('training_list', []),
                                attendance_summary=card_data.get('attendance_summary'),
                                asset_list=card_data.get('asset_list', []),
-                               # 첨부파일 (인사카드에서는 조회 전용)
+                               # Attachments (view only in HR card)
                                attachment_list=[],
                                is_readonly=True,
-                               # 종료 상태 정보
+                               # Terminated status info
                                is_terminated=is_terminated,
                                terminated_at=card_data.get('terminated_at'),
                                termination_reason=card_data.get('termination_reason'),
                                show_termination_notice=is_terminated,
-                               # 페이지 모드 및 계정 타입
+                               # Page mode and account type
                                page_mode='hr_card',
                                account_type=AccountType.PERSONAL,
                                is_corporate=False)

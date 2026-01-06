@@ -1,19 +1,14 @@
 """
-법인 세팅 API Blueprint 패키지
+법인 세팅 API Blueprint 패키지 (호환성 래퍼)
 
-법인별 조직구조, 패턴규칙, 노출설정 API를 제공합니다.
-Phase 2: Service 계층 표준화
-Phase 25: 패키지 분할 (2025-12-29)
+[DEPRECATED] 기존 경로 호환성 유지
+새 코드는 다음을 사용하세요:
+    from app.domains.company.blueprints.settings import corporate_settings_api_bp
+
+Phase 2 Migration: 도메인으로 이동, 이 파일은 호환성 래퍼로 유지
 """
-from flask import Blueprint
 
-corporate_settings_api_bp = Blueprint(
-    'corporate_settings_api', __name__, url_prefix='/api/corporate'
-)
+# 도메인에서 re-export (Phase 2 Migration)
+from app.domains.company.blueprints.settings import corporate_settings_api_bp
 
-# 라우트 등록
-from app.blueprints.corporate_settings import classifications_api
-from app.blueprints.corporate_settings import settings_api
-from app.blueprints.corporate_settings import number_categories_api
-from app.blueprints.corporate_settings import visibility_api
-from app.blueprints.corporate_settings import documents_api
+__all__ = ['corporate_settings_api_bp']

@@ -1,15 +1,15 @@
 """
-관계형 데이터 업데이트 함수 (Personal Blueprint)
+Relation Data Update Functions (Personal Blueprint)
 
-ProfileRelationService를 활용하여 트랜잭션 안전성을 보장합니다.
+Uses ProfileRelationService for transaction safety.
 
-Phase 27.1: 개발 원칙 준수 리팩토링
-- DRY: atomic_transaction() 사용으로 트랜잭션 패턴 중복 제거
-- SSOT: transaction.py의 atomic_transaction() 단일 진실 공급원
-- employees/relation_updaters.py 패턴과 일관성 유지
+Phase 1 Migration: domains/user/blueprints/personal/relation_updaters.py
+- DRY: atomic_transaction() for transaction pattern
+- SSOT: transaction.py's atomic_transaction() as single source
+- Consistent with employees/relation_updaters.py pattern
 """
 from app.types import FormData, OwnerType
-from ...shared.utils.transaction import atomic_transaction
+from app.shared.utils.transaction import atomic_transaction
 from app.domains.employee.services import profile_relation_service
 from .form_extractors import (
     extract_education_list,
@@ -21,23 +21,22 @@ from .form_extractors import (
 
 
 class ProfileRelationUpdater:
-    """프로필 관계형 데이터 업데이트 클래스
+    """Profile relation data update class
 
-    Phase 27.1: atomic_transaction() 적용
-    - 트랜잭션 안전성 보장
-    - DRY 원칙 준수
+    Uses atomic_transaction() for transaction safety
+    Follows DRY principle
     """
 
     def __init__(self, owner_type: OwnerType = 'profile') -> None:
         """
         Args:
-            owner_type: 'profile' (개인계정) 또는 'employee' (법인직원)
+            owner_type: 'profile' (personal account) or 'employee' (corporate employee)
         """
         self.owner_type: OwnerType = owner_type
         self.service = profile_relation_service
 
     def update_educations(self, owner_id: int, form_data: FormData) -> bool:
-        """학력 정보 일괄 업데이트 (트랜잭션 안전)"""
+        """Batch update education info (transaction safe)"""
         with atomic_transaction():
             items = extract_education_list(form_data)
             self.service.delete_all_educations(owner_id, self.owner_type, commit=False)
@@ -47,7 +46,7 @@ class ProfileRelationUpdater:
         return True
 
     def update_careers(self, owner_id: int, form_data: FormData) -> bool:
-        """경력 정보 일괄 업데이트 (트랜잭션 안전)"""
+        """Batch update career info (transaction safe)"""
         with atomic_transaction():
             items = extract_career_list(form_data)
             self.service.delete_all_careers(owner_id, self.owner_type, commit=False)
@@ -57,7 +56,7 @@ class ProfileRelationUpdater:
         return True
 
     def update_certificates(self, owner_id: int, form_data: FormData) -> bool:
-        """자격증 정보 일괄 업데이트 (트랜잭션 안전)"""
+        """Batch update certificate info (transaction safe)"""
         with atomic_transaction():
             items = extract_certificate_list(form_data)
             self.service.delete_all_certificates(owner_id, self.owner_type, commit=False)
@@ -67,7 +66,7 @@ class ProfileRelationUpdater:
         return True
 
     def update_languages(self, owner_id: int, form_data: FormData) -> bool:
-        """언어능력 정보 일괄 업데이트 (트랜잭션 안전)"""
+        """Batch update language proficiency info (transaction safe)"""
         with atomic_transaction():
             items = extract_language_list(form_data)
             self.service.delete_all_languages(owner_id, self.owner_type, commit=False)
@@ -77,7 +76,7 @@ class ProfileRelationUpdater:
         return True
 
     def update_military(self, owner_id: int, form_data: FormData) -> bool:
-        """병역 정보 업데이트 (1:1 관계, 트랜잭션 안전)"""
+        """Update military service info (1:1 relation, transaction safe)"""
         with atomic_transaction():
             data = extract_military_data(form_data)
             if data:
@@ -85,40 +84,40 @@ class ProfileRelationUpdater:
         return True
 
     def update_all_relations(self, owner_id: int, form_data) -> bool:
-        """모든 관계형 데이터 일괄 업데이트 (단일 트랜잭션)
+        """Batch update all relation data (single transaction)
 
-        트랜잭션 안전성: 하나라도 실패하면 전체 롤백
+        Transaction safety: Rollback all if any fails
         """
         with atomic_transaction():
-            # 학력
+            # Education
             items = extract_education_list(form_data)
             self.service.delete_all_educations(owner_id, self.owner_type, commit=False)
             for item in items:
                 if item.get('school_name'):
                     self.service.add_education(owner_id, item, self.owner_type, commit=False)
 
-            # 경력
+            # Career
             items = extract_career_list(form_data)
             self.service.delete_all_careers(owner_id, self.owner_type, commit=False)
             for item in items:
                 if item.get('company_name'):
                     self.service.add_career(owner_id, item, self.owner_type, commit=False)
 
-            # 자격증
+            # Certificates
             items = extract_certificate_list(form_data)
             self.service.delete_all_certificates(owner_id, self.owner_type, commit=False)
             for item in items:
                 if item.get('name'):
                     self.service.add_certificate(owner_id, item, self.owner_type, commit=False)
 
-            # 언어능력
+            # Languages
             items = extract_language_list(form_data)
             self.service.delete_all_languages(owner_id, self.owner_type, commit=False)
             for item in items:
                 if item.get('language'):
                     self.service.add_language(owner_id, item, self.owner_type, commit=False)
 
-            # 병역
+            # Military
             military_data = extract_military_data(form_data)
             if military_data:
                 self.service.update_or_create_military(owner_id, military_data, self.owner_type, commit=False)
@@ -126,25 +125,25 @@ class ProfileRelationUpdater:
         return True
 
 
-# 싱글톤 인스턴스 (개인계정용)
+# Singleton instance (for personal accounts)
 profile_relation_updater = ProfileRelationUpdater(owner_type='profile')
 
 
 # ========================================
-# 래퍼 함수 (기존 API 호환)
+# Wrapper functions (existing API compatibility)
 # ========================================
 
 def update_profile_relations(profile_id: int, form_data) -> bool:
-    """프로필 관계형 데이터 일괄 업데이트 (트랜잭션 안전)
+    """Batch update profile relation data (transaction safe)
 
     Args:
-        profile_id: 프로필 ID
-        form_data: request.form 데이터
+        profile_id: Profile ID
+        form_data: request.form data
 
     Returns:
-        bool: 성공 여부
+        bool: Success status
 
     Raises:
-        Exception: 업데이트 실패 시
+        Exception: On update failure
     """
     return profile_relation_updater.update_all_relations(profile_id, form_data)

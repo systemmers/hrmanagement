@@ -19,8 +19,8 @@ class TestAccountSettings:
 
     def test_settings_renders(self, auth_client_personal_full):
         """설정 페이지 렌더링"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service, \
-             patch('app.blueprints.account.routes.employee_service') as mock_emp_service:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service, \
+             patch('app.domains.user.blueprints.account.routes.employee_service') as mock_emp_service:
             mock_user = Mock()
             mock_user.id = 1
             mock_user.employee_id = None  # 명시적으로 None 설정
@@ -40,7 +40,7 @@ class TestAccountPassword:
 
     def test_password_change_post_success(self, auth_client_personal_full):
         """비밀번호 변경 POST 성공"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service:
             mock_service.authenticate.return_value = Mock(id=1)
             mock_service.update_password.return_value = True
 
@@ -74,8 +74,8 @@ class TestAccountPrivacy:
 
     def test_privacy_get(self, auth_client_personal_full):
         """공개 설정 페이지 GET"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service, \
-             patch('app.blueprints.account.routes.personal_service') as mock_personal:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service, \
+             patch('app.domains.user.blueprints.account.routes.personal_service') as mock_personal:
             mock_user = Mock()
             mock_service.get_model_by_id.return_value = mock_user
             mock_service.get_privacy_settings.return_value = {}
@@ -86,8 +86,8 @@ class TestAccountPrivacy:
 
     def test_privacy_post_success(self, auth_client_personal_full):
         """공개 설정 저장 성공"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service, \
-             patch('app.blueprints.account.routes.personal_service') as mock_personal:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service, \
+             patch('app.domains.user.blueprints.account.routes.personal_service') as mock_personal:
             mock_user = Mock()
             mock_service.get_model_by_id.return_value = mock_user
             mock_service.update_privacy_settings.return_value = True
@@ -107,7 +107,7 @@ class TestAccountDelete:
 
     def test_delete_get(self, auth_client_personal_full):
         """계정 탈퇴 페이지 GET"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service:
             mock_user = Mock()
             mock_service.get_model_by_id.return_value = mock_user
 
@@ -116,7 +116,7 @@ class TestAccountDelete:
 
     def test_delete_post_success(self, auth_client_personal_full):
         """계정 탈퇴 POST 성공"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service:
             mock_user = Mock()
             mock_service.get_model_by_id.return_value = mock_user
             mock_service.authenticate.return_value = mock_user
@@ -135,7 +135,7 @@ class TestAccountDelete:
 
     def test_delete_post_wrong_password(self, auth_client_personal_full):
         """계정 탈퇴 - 잘못된 비밀번호"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service:
             mock_user = Mock()
             mock_service.get_model_by_id.return_value = mock_user
             mock_service.authenticate.return_value = None
@@ -154,7 +154,7 @@ class TestAccountDelete:
 
     def test_delete_post_wrong_confirm_text(self, auth_client_personal_full):
         """계정 탈퇴 - 잘못된 확인 텍스트"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service:
             mock_user = Mock()
             mock_service.get_model_by_id.return_value = mock_user
             mock_service.authenticate.return_value = mock_user
@@ -173,7 +173,7 @@ class TestAccountDelete:
 
     def test_delete_user_not_found(self, auth_client_personal_full):
         """계정 탈퇴 - 사용자 없음"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service:
             mock_service.get_model_by_id.return_value = None
 
             response = auth_client_personal_full.get('/account/delete', follow_redirects=False)
@@ -186,7 +186,7 @@ class TestAccountSettingsEdgeCases:
 
     def test_settings_user_not_found(self, auth_client_personal_full):
         """설정 페이지 - 사용자 없음"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service:
             mock_service.get_model_by_id.return_value = None
 
             response = auth_client_personal_full.get('/account/settings', follow_redirects=False)
@@ -194,8 +194,8 @@ class TestAccountSettingsEdgeCases:
 
     def test_settings_with_employee(self, auth_client_personal_full):
         """설정 페이지 - 직원 연결된 경우"""
-        with patch('app.blueprints.account.routes.user_service') as mock_user_service, \
-             patch('app.blueprints.account.routes.employee_service') as mock_emp_service:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_user_service, \
+             patch('app.domains.user.blueprints.account.routes.employee_service') as mock_emp_service:
             mock_user = Mock()
             mock_user.id = 1
             mock_user.employee_id = 1
@@ -226,7 +226,7 @@ class TestAccountPasswordEdgeCases:
 
     def test_password_change_short_password(self, auth_client_personal_full):
         """비밀번호 변경 - 짧은 비밀번호"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service:
             mock_service.authenticate.return_value = Mock(id=1)
 
             with auth_client_personal_full.session_transaction() as sess:
@@ -245,7 +245,7 @@ class TestAccountPasswordEdgeCases:
 
     def test_password_change_wrong_current_password(self, auth_client_personal_full):
         """비밀번호 변경 - 현재 비밀번호 불일치"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service:
             mock_service.authenticate.return_value = None
 
             with auth_client_personal_full.session_transaction() as sess:
@@ -263,7 +263,7 @@ class TestAccountPasswordEdgeCases:
 
     def test_password_change_update_failed(self, auth_client_personal_full):
         """비밀번호 변경 - 업데이트 실패"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service:
             mock_service.authenticate.return_value = Mock(id=1)
             mock_service.update_password.return_value = False
 
@@ -287,7 +287,7 @@ class TestAccountPrivacyEdgeCases:
 
     def test_privacy_user_not_found(self, auth_client_personal_full):
         """공개 설정 - 사용자 없음"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service:
             mock_service.get_model_by_id.return_value = None
 
             response = auth_client_personal_full.get('/account/privacy', follow_redirects=False)
@@ -295,8 +295,8 @@ class TestAccountPrivacyEdgeCases:
 
     def test_privacy_update_failed(self, auth_client_personal_full):
         """공개 설정 저장 실패"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service, \
-             patch('app.blueprints.account.routes.personal_service') as mock_personal:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service, \
+             patch('app.domains.user.blueprints.account.routes.personal_service') as mock_personal:
             mock_user = Mock()
             mock_service.get_model_by_id.return_value = mock_user
             mock_service.update_privacy_settings.return_value = False
@@ -312,7 +312,7 @@ class TestAccountPrivacyEdgeCases:
 
     def test_privacy_corporate_account(self, auth_client_corporate_full):
         """법인 계정 공개 설정"""
-        with patch('app.blueprints.account.routes.user_service') as mock_service:
+        with patch('app.domains.user.blueprints.account.routes.user_service') as mock_service:
             mock_user = Mock()
             mock_service.get_model_by_id.return_value = mock_user
             mock_service.get_privacy_settings.return_value = {}

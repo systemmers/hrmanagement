@@ -1,17 +1,30 @@
 """
 User Domain Blueprints
 
-Phase 6: 도메인 중심 마이그레이션
-기존 Blueprint를 re-export하여 점진적 마이그레이션 지원
+Phase 1 Migration: Domain-first architecture
+All user-related blueprints are now in domain
+Legacy paths re-export from here for backward compatibility
 """
 
-# 기존 Blueprint에서 re-export
-from app.blueprints.auth import auth_bp
-from app.blueprints.mypage import mypage_bp
-from app.blueprints.account import account_bp
+# Auth blueprint
+from .auth import auth_bp
+
+# MyPage blueprint
+from .mypage import mypage_bp
+
+# Notifications API blueprint
+from .notifications import notifications_bp
+
+# Account management blueprint
+from .account import account_bp
+
+# Personal account blueprint
+from .personal import personal_bp
 
 __all__ = [
     'auth_bp',
     'mypage_bp',
+    'notifications_bp',
     'account_bp',
+    'personal_bp',
 ]

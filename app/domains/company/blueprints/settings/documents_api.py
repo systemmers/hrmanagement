@@ -3,13 +3,14 @@
 
 법인 서류 CRUD 및 파일 업로드/다운로드 API를 제공합니다.
 Phase 2.4: API 응답 표준화 (2025-12-29)
+Phase 2 Migration: 도메인으로 이동
 """
 import os
 
 from flask import request, session, send_file
 
-from app.blueprints.corporate_settings import corporate_settings_api_bp
-from app.blueprints.corporate_settings.helpers import get_company_id
+from app.domains.company.blueprints.settings import corporate_settings_api_bp
+from app.domains.company.blueprints.settings.helpers import get_company_id
 from app.shared.constants.session_keys import SessionKeys
 from app.services.file_storage_service import file_storage
 from app.services.corporate_settings_service import corporate_settings_service

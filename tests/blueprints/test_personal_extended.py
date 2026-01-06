@@ -55,7 +55,7 @@ class TestPersonalProfileEdit:
     @patch('app.services.personal_service.personal_service.get_user_with_profile')
     @patch('app.services.personal_service.personal_service.ensure_profile_exists')
     @patch('app.services.personal_service.personal_service.update_profile')
-    @patch('app.blueprints.personal.relation_updaters.update_profile_relations')
+    @patch('app.domains.user.blueprints.personal.relation_updaters.update_profile_relations')
     def test_profile_edit_submit_success(
         self, mock_update_relations, mock_update, mock_ensure, mock_get_user, auth_client_personal_full
     ):

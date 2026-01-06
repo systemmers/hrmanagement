@@ -2,10 +2,12 @@
 계약 및 설정 라우트
 
 계약 목록 조회 및 동기화 설정 관련 API 라우트를 정의합니다.
+
+Phase 7: 도메인 중심 마이그레이션 (app/domains/sync/blueprints/)
 """
 from flask import request, session
 
-from app.blueprints.sync import sync_bp
+from app.domains.sync.blueprints import sync_bp
 from app.shared.constants.session_keys import SessionKeys
 from app.services.sync_service import sync_service
 from app.services.contract_service import contract_service

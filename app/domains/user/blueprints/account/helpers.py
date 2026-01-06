@@ -1,7 +1,7 @@
 """
-계정 관리 헬퍼 함수
+Account Management Helper Functions
 
-DRY 원칙 적용: 계정 관련 검증 로직 중앙화
+DRY principle: Centralized account-related validation logic
 
 Usage:
     from .helpers import validate_password_change
@@ -19,16 +19,16 @@ def validate_password_change(
     new_password: str,
     confirm_password: str
 ) -> Tuple[bool, Optional[str]]:
-    """비밀번호 변경 유효성 검사
+    """Password change validation
 
     Args:
-        current_password: 현재 비밀번호
-        new_password: 새 비밀번호
-        confirm_password: 새 비밀번호 확인
+        current_password: Current password
+        new_password: New password
+        confirm_password: New password confirmation
 
     Returns:
-        (is_valid, error_message): 검증 성공 시 (True, None),
-                                   실패 시 (False, 에러 메시지)
+        (is_valid, error_message): (True, None) on success,
+                                   (False, error message) on failure
 
     Example:
         >>> validate_password_change('', 'newpass', 'newpass')
@@ -40,15 +40,15 @@ def validate_password_change(
         >>> validate_password_change('old', 'validpass', 'validpass')
         (True, None)
     """
-    # 필수 입력 검증
+    # Required field validation
     if not all([current_password, new_password, confirm_password]):
         return False, '모든 필드를 입력해주세요.'
 
-    # 새 비밀번호 일치 검증
+    # New password match validation
     if new_password != confirm_password:
         return False, '새 비밀번호가 일치하지 않습니다.'
 
-    # 비밀번호 길이 검증
+    # Password length validation
     if len(new_password) < 8:
         return False, '비밀번호는 최소 8자 이상이어야 합니다.'
 

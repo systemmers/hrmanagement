@@ -2,13 +2,15 @@
 Platform Dashboard
 
 플랫폼 대시보드 라우트
+
+Phase 7: 도메인 중심 마이그레이션 (app/domains/platform/blueprints/)
 Phase 24: Model.query 제거 - PlatformService 경유
 """
 from flask import render_template
 
 from . import platform_bp
-from ...shared.utils.decorators import superadmin_required
-from ...services.platform_service import platform_service
+from app.shared.utils.decorators import superadmin_required
+from app.services.platform_service import platform_service
 
 
 @platform_bp.route('/')

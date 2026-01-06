@@ -2,11 +2,13 @@
 퇴사/종료 처리 라우트
 
 계약 종료 및 데이터 보관 관련 API 라우트를 정의합니다.
+
 Phase 5.3: 양측 동의 계약 종료 API 추가
+Phase 7: 도메인 중심 마이그레이션 (app/domains/sync/blueprints/)
 """
 from flask import request, session
 
-from app.blueprints.sync import sync_bp
+from app.domains.sync.blueprints import sync_bp
 from app.shared.constants.session_keys import SessionKeys, AccountType
 from app.services.termination_service import termination_service
 from app.services.contract_service import contract_service

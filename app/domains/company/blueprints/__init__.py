@@ -1,13 +1,13 @@
 """
 Company Domain Blueprints
 
-Phase 5: 도메인 중심 마이그레이션
-기존 Blueprint를 re-export하여 점진적 마이그레이션 지원
+Phase 2 Migration: 도메인 내부에서 Blueprint 정의
+기존 경로(app.blueprints.corporate, app.blueprints.corporate_settings)에서도 import 가능
 """
 
-# 기존 Blueprint에서 re-export
-from app.blueprints.corporate import corporate_bp
-from app.blueprints.corporate_settings import corporate_settings_api_bp
+# 도메인 내부에서 import
+from .corporate import corporate_bp
+from .settings import corporate_settings_api_bp
 
 __all__ = [
     'corporate_bp',
