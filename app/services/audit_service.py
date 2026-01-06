@@ -5,6 +5,7 @@
 Phase 4: 데이터 동기화 및 퇴사 처리
 Phase 6: 백엔드 리팩토링 - AuditLog 모델 분리
 Phase 8: 상수 모듈 적용
+Phase 31: 컨벤션 준수 - Repository 패턴 적용
 """
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
@@ -13,7 +14,6 @@ import json
 
 from flask import request, session, g, current_app
 from app.constants.session_keys import SessionKeys
-from app.database import db
 from app.models.audit_log import AuditLog
 
 
@@ -43,6 +43,15 @@ class AuditService:
 
     def __init__(self):
         self._enabled = True
+        self._repo = None
+
+    @property
+    def repo(self):
+        """지연 초기화된 AuditLog Repository"""
+        if self._repo is None:
+            from app.repositories.audit_log_repository import audit_log_repository
+            self._repo = audit_log_repository
+        return self._repo
 
     def enable(self):
         """감사 로깅 활성화"""
@@ -100,13 +109,14 @@ class AuditService:
             if details:
                 details = self._mask_sensitive_data(details)
 
-            log = AuditLog(
-                user_id=user_id,
-                account_type=account_type,
-                company_id=company_id,
+            # Phase 31: Repository 패턴 적용
+            log = self.repo.create_log(
                 action=action,
                 resource_type=resource_type,
                 resource_id=resource_id,
+                user_id=user_id,
+                account_type=account_type,
+                company_id=company_id,
                 details=json.dumps(details) if details else None,
                 ip_address=ip_address,
                 user_agent=user_agent,
@@ -115,9 +125,6 @@ class AuditService:
                 status=status,
                 error_message=error_message,
             )
-
-            db.session.add(log)
-            db.session.commit()
 
             return log
 
@@ -202,26 +209,19 @@ class AuditService:
         Returns:
             로그 목록
         """
-        query = AuditLog.query
-
-        if user_id:
-            query = query.filter_by(user_id=user_id)
-        if company_id:
-            query = query.filter_by(company_id=company_id)
-        if action:
-            query = query.filter_by(action=action)
-        if resource_type:
-            query = query.filter_by(resource_type=resource_type)
-        if resource_id:
-            query = query.filter_by(resource_id=resource_id)
-        if status:
-            query = query.filter_by(status=status)
-        if start_date:
-            query = query.filter(AuditLog.created_at >= start_date)
-        if end_date:
-            query = query.filter(AuditLog.created_at <= end_date)
-
-        logs = query.order_by(AuditLog.created_at.desc()).offset(offset).limit(limit).all()
+        # Phase 31: Repository 패턴 적용
+        logs = self.repo.find_logs(
+            user_id=user_id,
+            company_id=company_id,
+            action=action,
+            resource_type=resource_type,
+            resource_id=resource_id,
+            status=status,
+            start_date=start_date,
+            end_date=end_date,
+            limit=limit,
+            offset=offset
+        )
 
         return [log.to_dict() for log in logs]
 
@@ -262,18 +262,13 @@ class AuditService:
         Returns:
             로그 개수
         """
-        query = AuditLog.query
-
-        if company_id:
-            query = query.filter_by(company_id=company_id)
-        if user_id:
-            query = query.filter_by(user_id=user_id)
-        if action:
-            query = query.filter_by(action=action)
-        if resource_type:
-            query = query.filter_by(resource_type=resource_type)
-
-        return query.count()
+        # Phase 31: Repository 패턴 적용
+        return self.repo.count_logs(
+            user_id=user_id,
+            company_id=company_id,
+            action=action,
+            resource_type=resource_type
+        )
 
     def get_company_audit_trail(self, company_id: int, days: int = 30) -> List[Dict]:
         """법인 감사 추적 조회"""
@@ -300,16 +295,13 @@ class AuditService:
                 'by_date': {...}
             }
         """
-        query = AuditLog.query
-
-        if company_id:
-            query = query.filter_by(company_id=company_id)
-        if start_date:
-            query = query.filter(AuditLog.created_at >= start_date)
-        if end_date:
-            query = query.filter(AuditLog.created_at <= end_date)
-
-        logs = query.all()
+        # Phase 31: Repository 패턴 적용
+        logs = self.repo.find_logs(
+            company_id=company_id,
+            start_date=start_date,
+            end_date=end_date,
+            limit=10000  # 통계용 대량 조회
+        )
 
         stats = {
             'total': len(logs),
@@ -349,12 +341,14 @@ class AuditService:
         """
         start_date = datetime.utcnow() - timedelta(days=days)
 
-        logs = AuditLog.query.filter(
-            AuditLog.resource_type == resource_type,
-            AuditLog.resource_id == resource_id,
-            AuditLog.action == AuditLog.ACTION_VIEW,
-            AuditLog.created_at >= start_date
-        ).all()
+        # Phase 31: Repository 패턴 적용
+        logs = self.repo.find_for_resource(
+            resource_type=resource_type,
+            resource_id=resource_id,
+            action=AuditLog.ACTION_VIEW,
+            start_date=start_date,
+            limit=1000
+        )
 
         users = {}
         for log in logs:
@@ -443,18 +437,3 @@ def audit_log(action: str, resource_type: str):
 
         return decorated_function
     return decorator
-
-
-def track_employee_access(f):
-    """직원 정보 접근 추적 데코레이터"""
-    return audit_log(AuditLog.ACTION_VIEW, 'employee')(f)
-
-
-def track_contract_access(f):
-    """계약 정보 접근 추적 데코레이터"""
-    return audit_log(AuditLog.ACTION_VIEW, 'contract')(f)
-
-
-def track_sync_operation(f):
-    """동기화 작업 추적 데코레이터"""
-    return audit_log(AuditLog.ACTION_SYNC, 'sync')(f)

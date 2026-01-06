@@ -10,6 +10,7 @@ SSOT: FieldOptions.CONTRACT_TYPE 참조
 from datetime import datetime
 from app.database import db
 from app.constants.field_options import FieldOptions
+from app.constants.status import ContractStatus
 
 
 class PersonCorporateContract(db.Model):
@@ -88,13 +89,14 @@ class PersonCorporateContract(db.Model):
     termination_rejected_at = db.Column(db.DateTime, nullable=True)
     termination_rejection_reason = db.Column(db.Text, nullable=True)
 
-    # 상태 상수
-    STATUS_REQUESTED = 'requested'
-    STATUS_APPROVED = 'approved'
-    STATUS_REJECTED = 'rejected'
-    STATUS_TERMINATED = 'terminated'
-    STATUS_EXPIRED = 'expired'
-    STATUS_TERMINATION_REQUESTED = 'termination_requested'  # 양측 동의 종료 요청
+    # 상태 상수 (Deprecated: ContractStatus 사용 권장)
+    # 하위 호환용 별칭 - SSOT는 app.constants.status.ContractStatus
+    STATUS_REQUESTED = ContractStatus.REQUESTED
+    STATUS_APPROVED = ContractStatus.APPROVED
+    STATUS_REJECTED = ContractStatus.REJECTED
+    STATUS_TERMINATED = ContractStatus.TERMINATED
+    STATUS_EXPIRED = ContractStatus.EXPIRED
+    STATUS_TERMINATION_REQUESTED = ContractStatus.TERMINATION_REQUESTED
 
     # 계약 유형 상수 (하위 호환용)
     TYPE_EMPLOYMENT = 'employment'
@@ -164,8 +166,19 @@ class PersonCorporateContract(db.Model):
 
         if include_relations:
             if self.person_user:
-                data['person_name'] = self.person_user.username
+                # Profile에서 실제 이름 조회
+                from app.models.profile import Profile
+                profile = Profile.query.filter_by(user_id=self.person_user.id).first()
+                actual_name = profile.name if profile else self.person_user.username
+
+                data['person_name'] = actual_name
+                data['username'] = self.person_user.username
                 data['person_email'] = self.person_user.email
+                data['person_phone'] = profile.mobile_phone if profile else None
+
+                # 계정유형 레이블 (SSOT: User.get_account_type_label() 사용)
+                data['account_type_label'] = self.person_user.get_account_type_label()
+
                 # employee_id: User.employee_id 우선, 없으면 employee_number로 조회
                 employee_id = self.person_user.employee_id
                 if not employee_id and self.employee_number:
@@ -182,14 +195,45 @@ class PersonCorporateContract(db.Model):
         return data
 
     def approve(self, user_id=None):
-        """계약 승인"""
+        """
+        계약 승인
+
+        상태 전이 검증 포함 (Phase 30)
+        유효한 전이: requested -> approved, termination_requested -> approved
+
+        Args:
+            user_id: 승인 처리 사용자 ID
+
+        Raises:
+            ValueError: 유효하지 않은 상태 전이
+        """
+        valid, msg = ContractStatus.validate_transition(self.status, ContractStatus.APPROVED)
+        if not valid:
+            raise ValueError(msg)
+
         self.status = self.STATUS_APPROVED
         self.approved_at = datetime.utcnow()
         self.approved_by = user_id
         self.updated_at = datetime.utcnow()
 
     def reject(self, user_id=None, reason=None):
-        """계약 거절"""
+        """
+        계약 거절
+
+        상태 전이 검증 포함 (Phase 30)
+        유효한 전이: requested -> rejected
+
+        Args:
+            user_id: 거절 처리 사용자 ID
+            reason: 거절 사유
+
+        Raises:
+            ValueError: 유효하지 않은 상태 전이
+        """
+        valid, msg = ContractStatus.validate_transition(self.status, ContractStatus.REJECTED)
+        if not valid:
+            raise ValueError(msg)
+
         self.status = self.STATUS_REJECTED
         self.rejected_at = datetime.utcnow()
         self.rejected_by = user_id
@@ -197,7 +241,23 @@ class PersonCorporateContract(db.Model):
         self.updated_at = datetime.utcnow()
 
     def terminate(self, user_id=None, reason=None):
-        """계약 종료"""
+        """
+        계약 종료
+
+        상태 전이 검증 포함 (Phase 30)
+        유효한 전이: approved -> terminated, termination_requested -> terminated
+
+        Args:
+            user_id: 종료 처리 사용자 ID
+            reason: 종료 사유
+
+        Raises:
+            ValueError: 유효하지 않은 상태 전이
+        """
+        valid, msg = ContractStatus.validate_transition(self.status, ContractStatus.TERMINATED)
+        if not valid:
+            raise ValueError(msg)
+
         self.status = self.STATUS_TERMINATED
         self.terminated_at = datetime.utcnow()
         self.terminated_by = user_id

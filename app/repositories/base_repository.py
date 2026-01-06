@@ -224,6 +224,26 @@ class BaseRelationRepository(BaseRepository[ModelType]):
         data['employeeId'] = employee_id
         return self.create(data, commit=commit)
 
+    def delete_by_id_and_employee(self, record_id: int, employee_id: int, commit: bool = True) -> bool:
+        """레코드 삭제 (소유권 확인)
+
+        Phase 31: 컨벤션 준수를 위해 추가
+
+        Args:
+            record_id: 레코드 ID
+            employee_id: 직원 ID
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
+        record = self.model_class.query.filter_by(
+            id=record_id, employee_id=employee_id
+        ).first()
+        if not record:
+            return False
+        db.session.delete(record)
+        if commit:
+            db.session.commit()
+        return True
+
 
 class BaseProfileRelationRepository(BaseRepository[ModelType]):
     """

@@ -1,15 +1,15 @@
 /**
  * Employee List Page JavaScript
  * - 뷰 토글 (목록형/카드형)
- * - 필터링
  * - 정렬
  * - 계약 요청 (21번 원칙)
+ *
+ * 필터링: FilterBar (filter-bar.js) + URL 모드로 처리
+ * Last Updated: 2026-01-06 (Phase 31 필터 통합)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     initViewToggle();
-    initFilterReset();
-    initFilterRemove();
     initSorting();
     initEmployeeCardClick();
     initContractRequest();  // 21번 원칙: 계약 요청 기능
@@ -54,56 +54,6 @@ function toggleEmployeeView(view) {
 
     // 사용자 선호 저장
     localStorage.setItem('employeeViewPreference', view);
-}
-
-/**
- * 필터 초기화 버튼 설정
- */
-function initFilterReset() {
-    const resetBtn = document.querySelector('.filter-reset');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', resetFilters);
-    }
-}
-
-/**
- * 필터 초기화
- */
-function resetFilters() {
-    window.location.href = window.location.pathname;
-}
-
-/**
- * 필터 제거 버튼 설정 - data-action 기반 이벤트 위임
- */
-function initFilterRemove() {
-    document.addEventListener('click', (e) => {
-        const target = e.target.closest('[data-action="remove-filter"]');
-        if (!target) return;
-
-        const filterType = target.dataset.filterType;
-        const filterValue = target.dataset.filterValue;
-
-        if (filterType && filterValue) {
-            removeFilter(filterType, filterValue);
-        }
-    });
-}
-
-/**
- * 특정 필터 제거
- * @param {string} filterType - 필터 종류 (department, position, status)
- * @param {string} value - 제거할 값
- */
-function removeFilter(filterType, value) {
-    const url = new URL(window.location.href);
-    const params = url.searchParams;
-    const values = params.getAll(filterType);
-
-    params.delete(filterType);
-    values.filter(v => v !== value).forEach(v => params.append(filterType, v));
-
-    window.location.href = url.toString();
 }
 
 /**
@@ -263,7 +213,5 @@ function showContractToast(message, type = 'info') {
 
 // 전역 함수로 노출 (기존 onclick 호환성 유지)
 window.toggleEmployeeView = toggleEmployeeView;
-window.resetFilters = resetFilters;
-window.removeFilter = removeFilter;
 window.applySorting = applySorting;
 window.requestEmployeeContract = requestEmployeeContract;

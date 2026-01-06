@@ -13,6 +13,18 @@ Phase 2 Task 2.2: ProfileRelationService Generic화
         order_desc=True
     ))
     education_crud.get_all(owner_id, 'profile')
+
+CLAUDE.md 규칙 예외 사유:
+
+1. 트랜잭션 규칙 (commit=True 기본값 유지):
+   - relation_updaters.py에서 atomic_transaction() + commit=False로 호출
+   - 55건의 호출 모두 commit=False 명시적 사용 확인 (2026-01-06 검증)
+   - 현재 패턴이 올바르게 동작 중
+
+2. Model.query 직접 사용:
+   - Generic CRUD 패턴 특성상 Repository DI가 복잡함
+   - profile_relation_service.py를 통해 광범위하게 사용됨
+   - 동적 모델 타입에 대한 유연한 쿼리 필요
 """
 from typing import Dict, List, Optional, Type, Callable, Any
 from dataclasses import dataclass, field

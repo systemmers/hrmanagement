@@ -259,7 +259,7 @@ class UserRepository(BaseRepository[User]):
             슈퍼어드민 수
         """
         return User.query.filter_by(
-            account_type=User.ACCOUNT_SUPERADMIN,
+            is_superadmin=True,
             is_active=True
         ).count()
 

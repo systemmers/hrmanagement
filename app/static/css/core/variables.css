@@ -106,14 +106,7 @@
     --color-warning-600: #D97706;
     --color-warning-700: #B45309;
 
-    /* Info Colors - 정보 상태 */
-    --color-info-50: #EFF6FF;
-    --color-info-100: #DBEAFE;
-    --color-info-500: #3B82F6;
-    --color-info-600: #2563EB;
-    --color-info-700: #1D4ED8;
-
-    /* Blue Colors - 버튼, 링크 등 */
+    /* Blue Colors - 버튼, 링크, 정보 상태 (Phase 31.2: Info 통합) */
     --color-blue-50: #EFF6FF;
     --color-blue-100: #DBEAFE;
     --color-blue-500: #3B82F6;
@@ -136,17 +129,9 @@
     --color-personal-50: #D1FAE5;
     --color-personal-100: #A7F3D0;
     --color-personal-500: #059669;
-    --color-personal-600: #059669;
+    --color-personal-600: #047857;
     --color-personal-700: #047857;
     --color-personal-bg-hover: #ECFDF5;
-
-    /* Employee Sub Theme - 직원 계정 (보라색 계열) */
-    --color-employee-50: #EDE9FE;
-    --color-employee-100: #DDD6FE;
-    --color-employee-500: #7C3AED;
-    --color-employee-600: #7C3AED;
-    --color-employee-700: #6D28D9;
-    --color-employee-bg-hover: #F5F3FF;
 
     /* Platform Theme - 플랫폼 관리자 (보라색 계열) */
     --color-platform-50: #EDE9FE;
@@ -155,6 +140,14 @@
     --color-platform-600: #7C3AED;
     --color-platform-700: #6D28D9;
     --color-platform-900: #5B21B6;
+
+    /* Employee Sub Theme - Platform 별칭 (Phase 31.2: 중복 제거) */
+    --color-employee-50: var(--color-platform-50);
+    --color-employee-100: var(--color-platform-100);
+    --color-employee-500: var(--color-platform-500);
+    --color-employee-600: var(--color-platform-600);
+    --color-employee-700: var(--color-platform-700);
+    --color-employee-bg-hover: #F5F3FF;
 
     /* ========================================
        Auxiliary Colors - 보조 색상
@@ -259,14 +252,6 @@
     --color-danger: var(--color-error-500);
     --color-danger-dark: var(--color-error-600);
     --color-danger-bg: var(--color-error-50);
-
-    /* Spacing Aliases (for template compatibility) */
-    --spacing-xs: var(--space-1);
-    --spacing-sm: var(--space-2);
-    --spacing-md: var(--space-4);
-    --spacing-lg: var(--space-6);
-    --spacing-xl: var(--space-8);
-    --spacing-xxl: var(--space-12);
 
     /* Layout Constants */
     --header-height: 64px;

@@ -11,7 +11,10 @@ from typing import Any, Dict, List, Optional
 from app.types import FormData, FieldMapping
 from app.constants.status import EmployeeStatus
 from ...models import Employee
-from ...utils.form_helpers import parse_boolean as _parse_boolean
+from ...utils.form_helpers import (
+    parse_boolean as _parse_boolean,
+    extract_relation_list,  # Phase 31: DRY - 공통 모듈에서 import
+)
 
 
 def extract_employee_from_form(form_data: FormData, employee_id: int = 0) -> Employee:
@@ -89,46 +92,8 @@ def extract_basic_fields_from_form(form_data: FormData) -> Dict[str, Any]:
 
 # ========================================
 # 관계형 데이터 추출 함수 (Phase 27.1)
+# Phase 31: extract_relation_list -> utils/form_helpers.py로 이동
 # ========================================
-
-def extract_relation_list(
-    form_data: FormData,
-    prefix: str,
-    field_mapping: FieldMapping
-) -> List[Dict[str, Any]]:
-    """동적 관계형 데이터 리스트 추출 (범용, DRY 원칙)
-
-    Args:
-        form_data: request.form 데이터
-        prefix: 폼 필드 접두사 (예: 'family_', 'education_')
-        field_mapping: {form_suffix: model_field} 매핑
-
-    Returns:
-        list[dict]: 관계형 데이터 리스트
-    """
-    # 폼 리스트 데이터 수집
-    form_lists = {}
-    for form_suffix in field_mapping.keys():
-        form_key = f"{prefix}{form_suffix}[]"
-        form_lists[form_suffix] = form_data.getlist(form_key)
-
-    # 첫 번째 필드를 기준으로 레코드 수 결정
-    first_field = list(field_mapping.keys())[0]
-    count = len(form_lists.get(first_field, []))
-
-    result = []
-    for i in range(count):
-        record = {}
-        for form_suffix, model_field in field_mapping.items():
-            values = form_lists.get(form_suffix, [])
-            value = values[i] if i < len(values) else None
-            if value:
-                value = value.strip() if isinstance(value, str) else value
-            record[model_field] = value or None
-        result.append(record)
-
-    return result
-
 
 def extract_family_list(form_data: FormData) -> List[Dict[str, Any]]:
     """가족정보 리스트 추출 (Phase 29: 레거시 별칭 제거)"""
@@ -221,7 +186,7 @@ def extract_language_list(form_data: FormData) -> List[Dict[str, Any]]:
 
 
 def extract_military_data(form_data: FormData) -> Optional[Dict[str, Any]]:
-    """병역정보 추출 (1:1 관계)"""
+    """병역정보 추출 (1:1 관계, Phase 30: DB 컬럼명 통일)"""
     military_status = form_data.get('military_status', '').strip()
     if not military_status:
         return None
@@ -229,10 +194,12 @@ def extract_military_data(form_data: FormData) -> Optional[Dict[str, Any]]:
     return {
         'military_status': military_status,
         'branch': form_data.get('military_branch') or None,
+        'rank': form_data.get('military_rank') or None,
         'enlistment_date': form_data.get('military_start_date') or None,
         'discharge_date': form_data.get('military_end_date') or None,
-        'rank': form_data.get('military_rank') or None,
-        'discharge_reason': form_data.get('military_discharge_reason') or None,
+        'service_type': form_data.get('military_duty') or None,           # Phase 30: 추가
+        'specialty': form_data.get('military_specialty') or None,         # Phase 30: 추가
+        'exemption_reason': form_data.get('military_exemption_reason') or None,  # Phase 30: discharge_reason → exemption_reason
     }
 
 
@@ -261,10 +228,10 @@ def extract_project_participation_list(form_data: FormData) -> List[Dict[str, An
 
 
 def extract_award_list(form_data: FormData) -> List[Dict[str, Any]]:
-    """수상정보 리스트 추출"""
+    """수상정보 리스트 추출 (Phase 30: DB 컬럼명 통일)"""
     return extract_relation_list(form_data, 'award_', {
         'date': 'award_date',
         'name': 'award_name',
-        'issuer': 'issuer',
+        'issuer': 'institution',      # Phase 30: issuer → institution (DB 컬럼명)
         'note': 'note',
     })

@@ -287,48 +287,7 @@
             color: var(--color-gray-700);
         }
 
-        .filter-select {
-            padding: var(--space-2) var(--space-3);
-            border: 1px solid var(--color-gray-300);
-            border-radius: var(--radius-md);
-            font-size: var(--text-sm);
-            background-color: var(--color-pure-white);
-            color: var(--color-gray-900);
-            min-height: 100px;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--color-gray-500);
-            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
-        }
-
-        .filter-checkboxes {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-2);
-        }
-
-        .filter-checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: var(--space-2);
-            font-size: var(--text-sm);
-            color: var(--color-gray-700);
-            cursor: pointer;
-        }
-
-        .filter-checkbox {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-        }
-
-        .filter-reset {
-            align-self: flex-end;
-        }
+        /* 필터 스타일은 filter.css (SSOT) 참조 */
 
         /* 정렬 바 */
         .sort-bar {

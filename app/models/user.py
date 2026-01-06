@@ -77,9 +77,9 @@ class User(db.Model):
     VALID_ACCOUNT_TYPES = [ACCOUNT_PERSONAL, ACCOUNT_CORPORATE, ACCOUNT_EMPLOYEE_SUB, ACCOUNT_PLATFORM]
 
     ACCOUNT_TYPE_LABELS = {
-        ACCOUNT_PERSONAL: '개인',
-        ACCOUNT_CORPORATE: '법인',
-        ACCOUNT_EMPLOYEE_SUB: '법인직원',
+        ACCOUNT_PERSONAL: '개인계정',
+        ACCOUNT_CORPORATE: '법인계정',
+        ACCOUNT_EMPLOYEE_SUB: '직원계정',
         ACCOUNT_PLATFORM: '플랫폼관리자',
     }
 

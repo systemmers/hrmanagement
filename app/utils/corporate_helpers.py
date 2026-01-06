@@ -3,16 +3,29 @@
 
 법인 회원가입 로직을 분할하여 단일 책임 원칙을 준수합니다.
 Phase 6: 백엔드 리팩토링
+Phase 31: 컨벤션 준수 - Repository 패턴 적용
 """
 from dataclasses import dataclass
 from typing import List, Optional
 
 from app.database import db
 from app.models.company import Company
-from app.models.user import User
 from app.models.organization import Organization
 from app.repositories.company_repository import company_repository
 from app.utils.transaction import atomic_transaction
+
+
+# 지연 초기화용
+_user_repo = None
+
+
+def _get_user_repo():
+    """지연 초기화된 User Repository"""
+    global _user_repo
+    if _user_repo is None:
+        from app.repositories.user_repository import user_repository
+        _user_repo = user_repository
+    return _user_repo
 
 
 @dataclass
@@ -116,10 +129,11 @@ def validate_registration(data: RegistrationData) -> List[str]:
     if data.business_number and company_repository.exists_by_business_number(data.business_number):
         errors.append('이미 등록된 사업자등록번호입니다.')
 
-    # 아이디/이메일 중복 확인
-    if data.admin_username and User.query.filter_by(username=data.admin_username).first():
+    # Phase 31: Repository 패턴 적용
+    user_repo = _get_user_repo()
+    if data.admin_username and user_repo.find_by_username(data.admin_username):
         errors.append('이미 사용 중인 아이디입니다.')
-    if data.admin_email and User.query.filter_by(email=data.admin_email).first():
+    if data.admin_email and user_repo.find_by_email(data.admin_email):
         errors.append('이미 사용 중인 이메일입니다.')
 
     return errors

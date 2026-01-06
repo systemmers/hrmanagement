@@ -1,66 +1,15 @@
 /**
  * contracts.js - 계약 페이지 공통 스크립트
- * 
+ *
  * 포함 기능:
- * - filterTable: 테이블 필터링 기능
- * - initContractFilters: 계약 필터 초기화
  * - initContractActions: 계약 액션 버튼 초기화
+ * - getContractStatusLabel: 상태 레이블 반환
+ * - getContractTypeLabel: 유형 레이블 반환
+ *
+ * 필터링은 filter-bar.js (SSOT)에서 처리
  */
 
 import { approveContract, rejectContract, terminateContract } from '../services/contract-service.js';
-
-/**
- * 테이블 필터링 기능
- * @param {object} config - 필터 설정
- */
-export function filterTable(config = {}) {
-    const searchInput = document.getElementById(config.searchInputId || 'searchInput');
-    const statusFilter = document.getElementById(config.statusFilterId || 'statusFilter');
-    const typeFilter = document.getElementById(config.typeFilterId || 'typeFilter');
-    const tableBody = document.getElementById(config.tableBodyId || 'contractsTableBody');
-    
-    if (\!tableBody) return;
-    
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-    const statusValue = statusFilter ? statusFilter.value : '';
-    const typeValue = typeFilter ? typeFilter.value : '';
-    
-    const rows = tableBody.querySelectorAll('tr[data-status]');
-    
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        const status = row.dataset.status || '';
-        const type = row.dataset.type || '';
-        
-        const matchesSearch = \!searchTerm || text.includes(searchTerm);
-        const matchesStatus = \!statusValue || status === statusValue;
-        const matchesType = \!typeValue || type === typeValue;
-        
-        row.style.display = matchesSearch && matchesStatus && matchesType ? '' : 'none';
-    });
-}
-
-/**
- * 계약 필터 초기화
- * @param {object} config - 필터 설정
- */
-export function initContractFilters(config = {}) {
-    const searchInput = document.getElementById(config.searchInputId || 'searchInput');
-    const statusFilter = document.getElementById(config.statusFilterId || 'statusFilter');
-    const typeFilter = document.getElementById(config.typeFilterId || 'typeFilter');
-    
-    const doFilter = () => filterTable(config);
-    
-    if (searchInput) {
-        searchInput.addEventListener('input', doFilter);
-    }
-    if (statusFilter) {
-        statusFilter.addEventListener('change', doFilter);
-    }
-    if (typeFilter) {
-        typeFilter.addEventListener('change', doFilter);
-    }
-}
 
 /**
  * 계약 액션 버튼 초기화 (이벤트 위임)
@@ -129,23 +78,32 @@ export function getContractTypeLabel(type) {
 }
 
 // 전역 함수로 노출 (비모듈 환경 호환)
-if (typeof window \!== 'undefined') {
+if (typeof window !== 'undefined') {
     window.HRContracts = {
-        filterTable,
-        initContractFilters,
         initContractActions,
         getContractStatusLabel,
         getContractTypeLabel
     };
-    
-    // 기존 전역 함수 호환성 유지
-    window.filterTable = filterTable;
+}
+
+/**
+ * 이벤트 전파 방지 버튼 초기화 (이벤트 위임)
+ * CLAUDE.md 규칙: 인라인 onclick 금지 → addEventListener 사용
+ */
+function initPreventPropagationButtons() {
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-prevent-propagation');
+        if (btn) {
+            e.stopPropagation();
+        }
+    });
 }
 
 // 페이지 로드 시 자동 초기화
 document.addEventListener('DOMContentLoaded', () => {
-    // 필터가 있으면 자동 초기화
-    if (document.getElementById('searchInput') || document.getElementById('statusFilter')) {
-        initContractFilters();
-    }
+    // 계약 액션 버튼 초기화
+    initContractActions();
+
+    // 이벤트 전파 방지 버튼 초기화
+    initPreventPropagationButtons();
 });

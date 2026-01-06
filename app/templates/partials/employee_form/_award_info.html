@@ -49,11 +49,11 @@
                                        value="{{ award.issuer or award.institution or '' }}" placeholder="수여기관"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group form-group-full">
+                            <div class="form-group">
                                 <label class="form-label">비고</label>
-                                <textarea name="award_note[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" rows="2"
-                                          placeholder="수상 내용 및 비고"
-                                          {% if is_personal_readonly %}readonly disabled{% endif %}>{{ award.note or award.description or '' }}</textarea>
+                                <input type="text" name="award_note[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                                       value="{{ award.note or award.description or '' }}" placeholder="수상 내용 및 비고"
+                                       {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
                         </div>
                         {% if not is_personal_readonly %}
@@ -81,11 +81,11 @@
                             <input type="text" name="award_issuer[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="수여기관"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group form-group-full">
+                        <div class="form-group">
                             <label class="form-label">비고</label>
-                            <textarea name="award_note[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" rows="2"
-                                      placeholder="수상 내용 및 비고"
-                                      {% if is_personal_readonly %}readonly disabled{% endif %}></textarea>
+                            <input type="text" name="award_note[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                                   placeholder="수상 내용 및 비고"
+                                   {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
                     </div>
                     {% if not is_personal_readonly %}

@@ -3,10 +3,12 @@
 
 계정 설정, 비밀번호 변경, 개인정보 공개 설정, 계정 탈퇴 기능을 제공합니다.
 Phase 2: Service 계층 표준화
+Phase 24: 검증 로직 헬퍼 추출 (DRY 원칙)
 """
 from flask import render_template, request, redirect, url_for, flash, session
 
 from . import account_bp
+from .helpers import validate_password_change
 from ...constants.session_keys import SessionKeys
 from ...utils.decorators import login_required
 from ...services.user_service import user_service
@@ -44,19 +46,12 @@ def password():
         new_password = request.form.get('new_password', '')
         confirm_password = request.form.get('confirm_password', '')
 
-        # 필수 입력 검증
-        if not all([current_password, new_password, confirm_password]):
-            flash('모든 필드를 입력해주세요.', 'error')
-            return render_template('account/password.html')
-
-        # 새 비밀번호 확인
-        if new_password != confirm_password:
-            flash('새 비밀번호가 일치하지 않습니다.', 'error')
-            return render_template('account/password.html')
-
-        # 비밀번호 길이 검증
-        if len(new_password) < 8:
-            flash('비밀번호는 최소 8자 이상이어야 합니다.', 'error')
+        # Phase 24: 검증 로직을 헬퍼로 추출 (DRY 원칙)
+        is_valid, error = validate_password_change(
+            current_password, new_password, confirm_password
+        )
+        if not is_valid:
+            flash(error, 'error')
             return render_template('account/password.html')
 
         # 현재 비밀번호 확인

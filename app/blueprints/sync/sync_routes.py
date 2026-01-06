@@ -10,7 +10,8 @@ from app.constants.session_keys import SessionKeys
 from app.services.sync_service import sync_service
 from app.services.contract_service import contract_service
 from app.utils.transaction import atomic_transaction
-from app.models.person_contract import SyncLog
+from app.models.person_contract import SyncLog, PersonCorporateContract
+from app.constants.status import ContractStatus
 from app.utils.decorators import (
     api_login_required as login_required,
     api_personal_account_required as personal_account_required,
@@ -137,8 +138,6 @@ def full_sync_from_corporate(contract_id):
         "relations": [...]
     }
     """
-    from app.models.person_contract import PersonCorporateContract
-
     user_id = session.get(SessionKeys.USER_ID)
     sync_service.set_current_user(user_id)
 
@@ -147,7 +146,7 @@ def full_sync_from_corporate(contract_id):
     if not contract:
         return api_not_found('계약')
 
-    if contract.status != PersonCorporateContract.STATUS_APPROVED:
+    if contract.status != ContractStatus.APPROVED:
         return api_error('승인된 계약만 동기화할 수 있습니다.')
 
     try:
@@ -169,7 +168,8 @@ def full_sync_from_corporate(contract_id):
             # 전체 동기화 실행
             result = sync_service.sync_personal_to_employee(
                 contract_id=contract_id,
-                sync_type=SyncLog.SYNC_TYPE_MANUAL
+                sync_type=SyncLog.SYNC_TYPE_MANUAL,
+                commit=False  # Phase 30: 외부 트랜잭션에 위임
             )
 
             if not result.get('success'):

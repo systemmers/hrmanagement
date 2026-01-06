@@ -186,6 +186,55 @@ class UserService:
         """
         return self.user_repo.find_by_employee_id(employee_id)
 
+    def get_users_with_contract_and_employee_details(
+        self,
+        users: List[Dict],
+        company_id: int
+    ) -> List[Dict]:
+        """사용자 목록에 계약 상태 및 직원 정보 추가 (레이어 분리용)
+
+        Blueprint의 for 루프 데이터 변환 로직을 Service로 이동.
+
+        Args:
+            users: 사용자 Dict 목록
+            company_id: 법인 ID
+
+        Returns:
+            계약 상태와 직원 이름이 추가된 사용자 목록
+        """
+        from app.services.user_employee_link_service import user_employee_link_service
+        from app.services.employee_service import employee_service
+
+        if not users or not company_id:
+            return users
+
+        # 계약 상태 벌크 조회
+        user_ids = [u['id'] for u in users]
+        contract_map = user_employee_link_service.get_users_with_contract_status_bulk(
+            user_ids, company_id
+        )
+
+        # Employee 정보 벌크 조회 (이름 표시용)
+        employee_ids = [u.get('employee_id') for u in users if u.get('employee_id')]
+        employee_map = {}
+        if employee_ids:
+            employees = employee_service.get_employees_by_ids(employee_ids)
+            employee_map = {emp.get('id'): emp for emp in employees}
+
+        # contract_status, name 추가
+        for user in users:
+            contract_info = contract_map.get(user['id'], {})
+            user['contract_status'] = contract_info.get('status', 'none')
+
+            # Employee에서 이름 조회
+            employee_id = user.get('employee_id')
+            if employee_id and employee_id in employee_map:
+                user['name'] = employee_map[employee_id].get('name', '-')
+            else:
+                user['name'] = '-'
+
+        return users
+
 
 # 싱글톤 인스턴스
 user_service = UserService()

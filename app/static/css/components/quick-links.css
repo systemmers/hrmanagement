@@ -32,10 +32,10 @@
     transform: translateY(-2px);
 }
 
-/* Personal Theme - Green hover */
+/* Personal Theme - Green hover (Phase 31: CSS 변수 적용) */
 .personal-dashboard .quick-link:hover,
 .quick-link.personal-theme:hover {
-    background: #10b981;
+    background: var(--color-personal-500);
     color: var(--color-pure-white);
     transform: translateY(-2px);
 }

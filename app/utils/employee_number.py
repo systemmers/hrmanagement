@@ -3,10 +3,22 @@
 
 형식: {PREFIX}-{YYYY}-{NNNN} (예: EMP-2025-0001)
 SystemSetting을 통해 설정 가능
+Phase 31: 컨벤션 준수 - Repository 패턴 적용
 """
 from datetime import datetime
-from app.database import db
-from app.models.employee import Employee
+
+
+# 지연 초기화용
+_employee_repo = None
+
+
+def _get_employee_repo():
+    """지연 초기화된 Employee Repository"""
+    global _employee_repo
+    if _employee_repo is None:
+        from app.repositories.employee_repository import employee_repository
+        _employee_repo = employee_repository
+    return _employee_repo
 
 
 def get_employee_number_config():
@@ -53,12 +65,8 @@ def generate_employee_number():
     else:
         pattern = f'{prefix}{separator}%'
 
-    last_employee = (
-        Employee.query
-        .filter(Employee.employee_number.like(pattern))
-        .order_by(Employee.employee_number.desc())
-        .first()
-    )
+    # Phase 31: Repository 패턴 적용
+    last_employee = _get_employee_repo().find_last_by_number_pattern(pattern)
 
     if last_employee and last_employee.employee_number:
         # 마지막 순번 추출 후 +1
@@ -143,9 +151,5 @@ def is_employee_number_exists(employee_number, exclude_id=None):
     Returns:
         bool: 존재 여부
     """
-    query = Employee.query.filter(Employee.employee_number == employee_number)
-
-    if exclude_id:
-        query = query.filter(Employee.id != exclude_id)
-
-    return query.first() is not None
+    # Phase 31: Repository 패턴 적용
+    return _get_employee_repo().exists_by_employee_number(employee_number, exclude_id)

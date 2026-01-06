@@ -325,7 +325,10 @@
 </div>
 {% endmacro %}
 
-{# 필터 바 (기업용) #}
+{#
+    [DEPRECATED] 필터 바 (기업용) - _filters.html의 filter_bar 매크로 사용 권장
+    2026-01-06: company_list.html, company_contracts.html에서 _filters.html 매크로로 대체됨
+#}
 {% macro contract_filter_bar(show_type_filter=true) %}
 <div class="filter-bar">
     <div class="search-box">
@@ -354,15 +357,20 @@
 </div>
 {% endmacro %}
 
-{# 기업 계약 테이블 행 #}
+{# 기업 계약 테이블 행 - 12개 컬럼 #}
 {% macro contract_table_row(contract) %}
-<tr data-status="{{ contract.status }}" data-type="{{ contract.contract_type }}">
+<tr data-filter-target data-status="{{ contract.status }}" data-type="{{ contract.contract_type }}">
+    <td>{{ contract.id }}</td>
+    <td>{{ contract.account_type_label or '-' }}</td>
+    <td>{{ contract.username or '-' }}</td>
     <td>
         <div class="person-info">
             <div class="person-avatar">{{ contract.person_name[:1] if contract.person_name else 'U' }}</div>
             <span class="person-name">{{ contract.person_name or '이름 없음' }}</span>
         </div>
     </td>
+    <td>{{ contract.person_phone or '-' }}</td>
+    <td>{{ contract.person_email or '-' }}</td>
     <td>{{ contract.department or '-' }}</td>
     <td>{{ contract.position or '-' }}</td>
     <td>{{ contract.contract_type_label or contract.contract_type }}</td>

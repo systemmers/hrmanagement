@@ -6,8 +6,13 @@ employees/form_extractors.py와 personal/form_extractors.py에서
 
 Phase 25: 공통 모듈 추출 (2025-12-29)
 Phase 29: normalize_form_field 제거 (2026-01-05) - 별칭 시스템 제거
+Phase 31: extract_relation_list 통합 (2026-01-06) - DRY 위반 수정
 """
-from typing import Any, Optional
+from typing import Any, Dict, List, Optional
+
+# 타입 별칭 정의
+FormData = Any  # werkzeug.datastructures.ImmutableMultiDict
+FieldMapping = Dict[str, str]  # {form_suffix: model_field}
 
 
 def parse_boolean(value) -> bool:
@@ -78,3 +83,53 @@ def parse_int(value, default: int = None) -> Optional[int]:
         except ValueError:
             return default
     return default
+
+
+def extract_relation_list(
+    form_data: FormData,
+    prefix: str,
+    field_mapping: FieldMapping
+) -> List[Dict[str, Any]]:
+    """동적 관계형 데이터 리스트 추출 (범용, DRY 원칙)
+
+    employees/form_extractors.py와 personal/form_extractors.py에서
+    공통으로 사용되는 관계형 데이터 추출 함수입니다.
+
+    Args:
+        form_data: request.form 데이터
+        prefix: 폼 필드 접두사 (예: 'family_', 'education_')
+        field_mapping: {form_suffix: model_field} 매핑
+
+    Returns:
+        list[dict]: 관계형 데이터 리스트
+
+    Example:
+        >>> extract_relation_list(form_data, 'family_', {
+        ...     'relation': 'relation',
+        ...     'name': 'name',
+        ...     'birth_date': 'birth_date',
+        ... })
+        [{'relation': '부', 'name': '홍길동', 'birth_date': '1960-01-01'}, ...]
+    """
+    # 폼 리스트 데이터 수집
+    form_lists = {}
+    for form_suffix in field_mapping.keys():
+        form_key = f"{prefix}{form_suffix}[]"
+        form_lists[form_suffix] = form_data.getlist(form_key)
+
+    # 첫 번째 필드를 기준으로 레코드 수 결정
+    first_field = list(field_mapping.keys())[0]
+    count = len(form_lists.get(first_field, []))
+
+    result = []
+    for i in range(count):
+        record = {}
+        for form_suffix, model_field in field_mapping.items():
+            values = form_lists.get(form_suffix, [])
+            value = values[i] if i < len(values) else None
+            if value:
+                value = value.strip() if isinstance(value, str) else value
+            record[model_field] = value or None
+        result.append(record)
+
+    return result

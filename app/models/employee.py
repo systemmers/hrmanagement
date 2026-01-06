@@ -13,6 +13,7 @@ from typing import Optional
 from sqlalchemy import event
 
 from app.database import db
+from app.constants.status import ContractStatus
 
 
 class Employee(db.Model):
@@ -320,9 +321,9 @@ def _update_pcc_status_to_terminated(employee: Employee):
     # employee_number로 approved 상태인 PCC 조회
     contracts = PersonCorporateContract.query.filter_by(
         employee_number=employee.employee_number,
-        status=PersonCorporateContract.STATUS_APPROVED
+        status=ContractStatus.APPROVED
     ).all()
 
     for contract in contracts:
-        contract.status = PersonCorporateContract.STATUS_TERMINATED
+        contract.status = ContractStatus.TERMINATED
         contract.terminated_at = datetime.utcnow()

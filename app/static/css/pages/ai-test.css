@@ -54,10 +54,11 @@
     font-size: var(--text-sm);
 }
 
+/* Phase 31: CSS 변수 적용 */
 .ai-test-container .page-header .badge {
     display: inline-block;
-    background: #ffeaa7;
-    color: #d35400;
+    background: var(--color-warning-100);
+    color: var(--color-warning-700);
     padding: var(--space-1) var(--space-2);
     border-radius: var(--radius-sm);
     font-size: var(--text-xs);
@@ -555,10 +556,10 @@
     font-size: var(--text-base);
 }
 
-/* Info & Warning Boxes */
+/* Info & Warning Boxes (Phase 31.2: info -> blue 통합) */
 .info-box {
-    background: #e7f3ff;
-    border: 1px solid #b8daff;
+    background: var(--color-blue-50);
+    border: 1px solid var(--color-blue-100);
     border-radius: var(--radius-md);
     padding: var(--space-4);
     margin-top: var(--space-4);
@@ -567,13 +568,13 @@
 .info-box h4 {
     font-size: var(--text-sm);
     font-weight: 600;
-    color: #004085;
+    color: var(--color-blue-700);
     margin-bottom: var(--space-2);
 }
 
 .info-box p {
     font-size: var(--text-xs);
-    color: #004085;
+    color: var(--color-blue-700);
     margin: 0;
     line-height: 1.5;
 }

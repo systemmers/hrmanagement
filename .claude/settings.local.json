@@ -104,7 +104,8 @@
       "Bash(git -C D:/projects/hrmanagement add app/static/css/pages/company-card-list.css app/static/css/pages/company-card-detail.css app/static/js/pages/profile-sync.js app/templates/personal/company_card_detail.html app/templates/personal/company_card_list.html app/templates/personal/register.html app/templates/profile/detail.html)",
       "Bash(git -C D:/projects/hrmanagement commit -m \"$\\(cat <<''EOF''\ncleanup\\(frontend\\): 인라인 코드 외부 파일로 추출\n\nCLAUDE.md 규칙 \"인라인 스타일/스크립트 금지\" 준수를 위한 클린업\n\n변경 내용:\n- profile/detail.html: 42줄 임베디드 스크립트 → profile-sync.js\n- company_card_detail.html: 67줄 임베디드 CSS → company-card-detail.css  \n- company_card_list.html: 53줄 임베디드 CSS + 인라인 스타일 3건 → 외부 CSS\n- register.html: 불필요한 인라인 스타일 제거 \\(CSS 클래스와 중복\\)\n\n신규 파일:\n- app/static/js/pages/profile-sync.js\n- app/static/css/pages/company-card-detail.css\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git -C \"D:/projects/hrmanagement\" log --oneline -3)",
-      "Bash(git -C \"D:/projects/hrmanagement\" diff --stat)"
+      "Bash(git -C \"D:/projects/hrmanagement\" diff --stat)",
+      "Bash(DATABASE_URL=\"postgresql://hrm_user:hrm_secure_password_2024@localhost:5433/hrmanagement_db\" python:*)"
     ],
     "deny": [],
     "ask": []

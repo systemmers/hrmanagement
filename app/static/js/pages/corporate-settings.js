@@ -18,21 +18,19 @@ const TOAST_COLORS = {
     info: '#3b82f6'
 };
 
-function showLoadingError(loadingEl) {
-    if (!loadingEl) return;
-    loadingEl.classList.remove('d-none');
-    loadingEl.innerHTML = `
+/**
+ * 콘텐츠 영역에 에러 메시지 표시
+ * @param {Element} contentEl - 콘텐츠 엘리먼트
+ */
+function showContentError(contentEl) {
+    if (!contentEl) return;
+    contentEl.innerHTML = `
         <div class="category-empty">
             <i class="fas fa-exclamation-circle"></i>
             <p>데이터를 불러오는데 실패했습니다</p>
             <button class="btn btn-sm btn-secondary" onclick="location.reload()">다시 시도</button>
         </div>
     `;
-}
-
-function toggleLoadingState(loadingEl, contentEl, isLoading) {
-    loadingEl.classList.toggle('d-none', !isLoading);
-    contentEl.classList.toggle('d-none', isLoading);
 }
 
 function initTabs() {
@@ -93,67 +91,55 @@ async function loadTabData(tabId) {
 }
 
 async function loadOrganizationData() {
-    const loading = document.getElementById('organization-loading');
     const content = document.getElementById('organization-content');
 
     try {
-        const data = await ClassificationApi.getOrganization();
-        Object.entries(data).forEach(([category, options]) => {
+        const response = await ClassificationApi.getOrganization();
+        Object.entries(response.data).forEach(([category, options]) => {
             renderCategoryList(`#tab-organization [data-category="${category}"]`, category, options);
         });
     } catch (error) {
         console.error('조직 구조 데이터 로드 실패:', error);
-        showLoadingError(loading);
-    } finally {
-        toggleLoadingState(loading, content, false);
+        showContentError(content);
     }
 }
 
 async function loadEmploymentData() {
-    const loading = document.getElementById('employment-loading');
     const content = document.getElementById('employment-content');
 
     try {
-        const data = await ClassificationApi.getEmployment();
-        Object.entries(data).forEach(([category, options]) => {
+        const response = await ClassificationApi.getEmployment();
+        Object.entries(response.data).forEach(([category, options]) => {
             renderCategoryList(`#tab-employment [data-category="${category}"]`, category, options);
         });
     } catch (error) {
         console.error('고용 정책 데이터 로드 실패:', error);
-        showLoadingError(loading);
-    } finally {
-        toggleLoadingState(loading, content, false);
+        showContentError(content);
     }
 }
 
 async function loadPatternsData() {
-    const loading = document.getElementById('patterns-loading');
     const content = document.getElementById('patterns-content');
 
     try {
-        const data = await SettingsApi.getAll();
-        applySettingsToForm(data);
+        const response = await SettingsApi.getAll();
+        applySettingsToForm(response.data);
         updatePreviews();
     } catch (error) {
         console.error('패턴 규칙 데이터 로드 실패:', error);
-        showLoadingError(loading);
-    } finally {
-        toggleLoadingState(loading, content, false);
+        showContentError(content);
     }
 }
 
 async function loadVisibilityData() {
-    const loading = document.getElementById('visibility-loading');
     const content = document.getElementById('visibility-content');
 
     try {
-        const data = await VisibilityApi.get();
-        applyVisibilityToForm(data);
+        const response = await VisibilityApi.get();
+        applyVisibilityToForm(response.data);
     } catch (error) {
         console.error('노출 설정 데이터 로드 실패:', error);
-        showLoadingError(loading);
-    } finally {
-        toggleLoadingState(loading, content, false);
+        showContentError(content);
     }
 }
 
@@ -161,14 +147,16 @@ async function loadVisibilityData() {
  * 법인 서류 데이터 로드
  */
 async function loadDocumentsData() {
-    const loading = document.getElementById('documents-loading');
     const content = document.getElementById('documents-content');
 
     try {
-        const [documents, statistics] = await Promise.all([
+        const [documentsResponse, statisticsResponse] = await Promise.all([
             DocumentsApi.getAll(),
             DocumentsApi.getStatistics()
         ]);
+
+        const documents = documentsResponse.data || documentsResponse;
+        const statistics = statisticsResponse.data || statisticsResponse;
 
         // 통계 업데이트
         updateDocumentStatistics(statistics);
@@ -185,9 +173,7 @@ async function loadDocumentsData() {
         });
     } catch (error) {
         console.error('법인 서류 데이터 로드 실패:', error);
-        showLoadingError(loading);
-    } finally {
-        toggleLoadingState(loading, content, false);
+        showContentError(content);
     }
 }
 
@@ -759,8 +745,9 @@ function startInlineEdit(item, category, optionId) {
 
 async function refreshCategory(tabId, category) {
     try {
-        const data = await ClassificationApi.getByCategory(category);
-        renderCategoryList(`#tab-${tabId} [data-category="${category}"]`, category, data.options || []);
+        const response = await ClassificationApi.getByCategory(category);
+        const options = response.data?.options || response.options || [];
+        renderCategoryList(`#tab-${tabId} [data-category="${category}"]`, category, options);
     } catch (error) {
         console.error(`카테고리 갱신 실패: ${category}`, error);
         showToast(`${category} 목록 갱신에 실패했습니다`, 'error');

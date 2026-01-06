@@ -184,47 +184,7 @@
 </section>
 {% endif %}
 
-{# 섹션 6: 4대보험 (인사카드 전용) #}
-{% if page_mode == 'hr_card' %}
-<section id="insurance-info" class="content-section">
-    {{ section_title('4대보험') }}
-    <div class="card">
-        {{ card_header('4대보험', 'fas fa-shield-alt') }}
-        <div class="card-body">
-            <div class="info-grid">
-                <div class="info-item">
-                    <div class="info-label">4대보험</div>
-                    <div class="info-value">
-                        {% if insurance and (insurance.national_pension or insurance.health_insurance or insurance.employment_insurance or insurance.industrial_accident) %}
-                        <span class="badge badge-success">가입</span>
-                        {% else %}
-                        <span class="badge badge-secondary">미가입</span>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">건강보험</div>
-                    <div class="info-value">{% if insurance and insurance.health_insurance %}<span class="badge badge-success">가입</span>{% else %}<span class="badge badge-secondary">미가입</span>{% endif %}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">국민연금</div>
-                    <div class="info-value">{% if insurance and insurance.national_pension %}<span class="badge badge-success">가입</span>{% else %}<span class="badge badge-secondary">미가입</span>{% endif %}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">고용보험</div>
-                    <div class="info-value">{% if insurance and insurance.employment_insurance %}<span class="badge badge-success">가입</span>{% else %}<span class="badge badge-secondary">미가입</span>{% endif %}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">산재보험</div>
-                    <div class="info-value">{% if insurance and insurance.industrial_accident %}<span class="badge badge-success">가입</span>{% else %}<span class="badge badge-secondary">미가입</span>{% endif %}</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-{% endif %}
-
-{# 섹션 7: 가족정보 #}
+{# 섹션 6: 가족정보 #}
 <section id="family-info" class="content-section">
     {{ section_title('가족정보') }}
     <div class="card">

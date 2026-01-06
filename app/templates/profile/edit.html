@@ -140,11 +140,6 @@
                 {% include 'partials/employee_form/_benefit_info.html' %}
             {% endif %}
 
-            {# 인사카드 전용: 4대보험 #}
-            {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
-                {% include 'partials/employee_form/_insurance_info.html' %}
-            {% endif %}
-
             {# 공통 섹션: 가족사항 #}
             {% if account_type != 'corporate_admin' %}
                 {% include 'partials/employee_form/_family_info.html' %}
@@ -215,6 +210,7 @@
 {% if is_corporate %}
 <script src="{{ url_for('static', filename='js/components/tree-selector.js') }}"></script>
 {% endif %}
+<script src="{{ url_for('static', filename='js/pages/employee/rrn-autofill.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/pages/employee-form.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
 {# 카카오 주소 API #}

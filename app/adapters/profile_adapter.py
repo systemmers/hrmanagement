@@ -309,8 +309,7 @@ class EmployeeProfileAdapter(ProfileAdapter):
             'photo': self.employee.photo,
             'employee_number': self.employee.employee_number,
             'nationality': self.employee.nationality,
-            'blood_type': self.employee.blood_type,
-            'religion': self.employee.religion,
+            # Phase 28.3: blood_type, religion 삭제됨
             'hobby': self.employee.hobby,
             'specialty': self.employee.specialty,
             'disability_info': self.employee.disability_info,
@@ -497,8 +496,7 @@ class PersonalProfileAdapter(ProfileAdapter):
             'photo': self.profile.photo,
             'employee_number': None,  # 개인은 사번 없음
             'nationality': self.profile.nationality,
-            'blood_type': self.profile.blood_type,
-            'religion': self.profile.religion,
+            # Phase 28.3: blood_type, religion 삭제됨
             'hobby': self.profile.hobby,
             'specialty': self.profile.specialty,
             'disability_info': self.profile.disability_info,
@@ -648,8 +646,7 @@ class CorporateAdminProfileAdapter(ProfileAdapter):
             'photo': self.admin_profile.photo,
             'employee_number': None,
             'nationality': None,
-            'blood_type': None,
-            'religion': None,
+            # Phase 28.3: blood_type, religion 삭제됨
             'hobby': None,
             'specialty': None,
             'disability_info': None,

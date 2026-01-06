@@ -50,9 +50,9 @@
 }
 
 .alert-info {
-    background-color: var(--color-info-100);
-    color: var(--color-info-700);
-    border: 1px solid var(--color-info-100);
+    background-color: var(--color-blue-100);
+    color: var(--color-blue-700);
+    border: 1px solid var(--color-blue-100);
 }
 
 /* 알림 닫기 버튼 */
@@ -110,8 +110,8 @@
 }
 
 .flash-message.info {
-    background-color: var(--color-info-100);
-    color: var(--color-info-700);
+    background-color: var(--color-blue-100);
+    color: var(--color-blue-700);
 }
 
 .flash-close {
@@ -176,7 +176,7 @@
 }
 
 .toast.info {
-    background-color: var(--color-info-700);
+    background-color: var(--color-blue-700);
     color: var(--color-pure-white);
 }
 

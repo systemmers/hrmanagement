@@ -5,6 +5,7 @@ BaseHistoryService
 EmployeeService와 PersonalService에서 공통으로 사용할 수 있는 패턴입니다.
 
 Phase 2 리팩토링: Strategy 패턴 적용
+Phase 31: 컨벤션 준수 - Repository 패턴 적용
 """
 from typing import Dict, List, Optional, Tuple, Type, Callable
 from app.database import db
@@ -72,7 +73,7 @@ class BaseHistoryService:
         return record.to_dict() if hasattr(record, 'to_dict') else record
 
     def delete_item(self, repository, item_id: int, owner_id: int,
-                    owner_field: str = 'profile_id') -> bool:
+                    owner_field: str = 'profile_id', commit: bool = True) -> bool:
         """
         이력 데이터 삭제 (소유권 확인)
 
@@ -81,22 +82,16 @@ class BaseHistoryService:
             item_id: 삭제할 아이템 ID
             owner_id: 프로필 ID 또는 직원 ID
             owner_field: 'profile_id' 또는 'employee_id'
+            commit: True면 즉시 커밋 (Phase 31)
 
         Returns:
             삭제 성공 여부
         """
         if owner_field == 'profile_id':
-            return repository.delete_by_id_and_profile(item_id, owner_id)
+            return repository.delete_by_id_and_profile(item_id, owner_id, commit=commit)
         else:
-            # Employee용 삭제 메서드 (기존 패턴 유지)
-            record = repository.model_class.query.filter_by(
-                id=item_id, employee_id=owner_id
-            ).first()
-            if record:
-                db.session.delete(record)
-                db.session.commit()
-                return True
-            return False
+            # Phase 31: Repository 패턴 적용
+            return repository.delete_by_id_and_employee(item_id, owner_id, commit=commit)
 
     def delete_all_items(self, repository, owner_id: int,
                          owner_field: str = 'profile_id') -> int:

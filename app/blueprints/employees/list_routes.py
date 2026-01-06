@@ -6,20 +6,18 @@
 21번 원칙 확장: 직원 계약 상태 표시 및 계약 요청 기능
 Phase 8: 상수 모듈 적용
 Phase 9: 통합 계약 필터 서비스 적용 (N+1 쿼리 제거)
-Phase 24: Option A - isinstance 체크 제거 (Service가 Dict 보장)
+Phase 24: Option A - isinstance 체크 제거, 데이터 변환 로직 Service 이동
 """
 from flask import Blueprint, render_template, request, session
 
-from ...constants.session_keys import SessionKeys, AccountType
-from ...constants.status import ContractStatus
+from ...constants.session_keys import SessionKeys
+from ...constants.status import AccountStatus
 from ...utils.api_helpers import api_success, api_server_error
 from ...utils.decorators import manager_or_admin_required
 from ...utils.tenant import get_current_organization_id
 from ...services.employee_service import employee_service
 from ...services.contract_service import contract_service
-from ...services.contract_filter_service import contract_filter_service
 from ...services.user_service import user_service
-from ...models.user import User
 
 
 def register_list_routes(bp: Blueprint):
@@ -32,6 +30,7 @@ def register_list_routes(bp: Blueprint):
         org_id = get_current_organization_id()
 
         # 필터 파라미터 추출
+        search = request.args.get('search', '').strip()
         departments = request.args.getlist('department')
         positions = request.args.getlist('position')
         statuses = request.args.getlist('status')
@@ -57,8 +56,9 @@ def register_list_routes(bp: Blueprint):
         status = request.args.get('status', None) if not statuses else None
 
         # 다중 필터 적용 (organization_id 필터 추가)
-        if departments or positions or statuses or sort_column:
+        if search or departments or positions or statuses or sort_column:
             employees = employee_service.filter_employees(
+                search=search if search else None,
                 departments=departments if departments else None,
                 positions=positions if positions else None,
                 statuses=statuses if statuses else None,
@@ -68,6 +68,7 @@ def register_list_routes(bp: Blueprint):
             )
         elif department or position or status:
             employees = employee_service.filter_employees(
+                search=search if search else None,
                 department=department,
                 position=position,
                 status=status,
@@ -77,6 +78,7 @@ def register_list_routes(bp: Blueprint):
             )
         else:
             employees = employee_service.filter_employees(
+                search=search if search else None,
                 sort_by=sort_column,
                 sort_order=sort_order,
                 organization_id=org_id
@@ -89,41 +91,14 @@ def register_list_routes(bp: Blueprint):
         if not company_id:
             employees_with_contract = []
         else:
-            # 벌크 조회: 모든 employee_number에 대해 한번에 계약 조회
-            # Phase 24: filter_employees()가 항상 Dict 리스트 반환하므로 isinstance 불필요
-            employee_numbers = [
-                emp.get('employee_number')
-                for emp in employees
-            ]
-            # Phase 27: 종료대기(termination_requested)도 활성 계약으로 포함
-            contract_map = contract_filter_service.get_contracts_by_employee_numbers(
-                employee_numbers=employee_numbers,
-                company_id=company_id,
-                statuses=ContractStatus.ACTIVE_STATUSES,
-                exclude_resigned=True
+            # Phase 24: 데이터 변환 로직을 Service 레이어로 이동
+            # 계약 정보 추가 및 퇴사 직원 필터링을 Service에서 처리
+            employees_with_contract = employee_service.get_employees_with_contracts(
+                employees, company_id
             )
 
-            employees_with_contract = []
-            for emp in employees:
-                # Phase 24: emp는 항상 Dict (isinstance 체크 제거)
-                employee_number = emp.get('employee_number')
-
-                # 퇴사 직원 제외 (resignation_date가 있으면 퇴사 처리된 직원)
-                if emp.get('resignation_date'):
-                    continue
-
-                # 벌크 조회 결과에서 계약 확인
-                contract = contract_map.get(employee_number)
-                if contract:
-                    emp['user_id'] = contract.person_user_id
-                    emp['user_email'] = (
-                        contract.person_user.email
-                        if contract.person_user else None
-                    )
-                    emp['contract_status'] = contract.status
-                    employees_with_contract.append(emp)
-
-        classification_options = employee_service.get_classification_options()
+        # Phase 31: 카테고리별 분류 옵션 반환 (departments, positions, statuses)
+        classification_options = employee_service.get_all_classification_options(company_id)
         return render_template('employees/list.html',
                                employees=employees_with_contract,
                                classification_options=classification_options)

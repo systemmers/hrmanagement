@@ -35,7 +35,8 @@ MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
 
 def allowed_image_file(filename):
     """이미지 파일 확장자 검사"""
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_IMAGE_EXTENSIONS
+    from ...utils.file_helpers import is_allowed_extension
+    return is_allowed_extension(filename, ALLOWED_IMAGE_EXTENSIONS)
 
 
 def get_personal_photo_folder():
@@ -47,7 +48,8 @@ def get_personal_photo_folder():
 
 def save_personal_photo(file, user_id):
     """개인 프로필 사진 저장"""
-    ext = file.filename.rsplit('.', 1)[1].lower()
+    from ...utils.file_helpers import get_file_extension
+    ext = get_file_extension(file.filename)
     unique_filename = f"personal_{user_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:8]}.{ext}"
 
     folder = get_personal_photo_folder()
@@ -120,9 +122,9 @@ def register_routes(bp):
             name = request.form.get('name', '').strip()
             mobile_phone = request.form.get('mobile_phone', '').strip()
 
-            # 유효성 검사
+            # 유효성 검사 (전화번호 중복/형식 체크 포함)
             errors = personal_service.validate_registration(
-                username, email, password, password_confirm, name
+                username, email, password, password_confirm, name, mobile_phone
             )
 
             if errors:

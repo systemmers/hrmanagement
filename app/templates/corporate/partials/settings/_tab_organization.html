@@ -1,0 +1,16 @@
+{# 조직 구조 탭 #}
+{% from "macros/_accordion.html" import accordion_section %}
+
+<div id="tab-organization" class="tab-panel" role="tabpanel">
+    <div id="organization-content" data-accordion>
+        {{ accordion_section('department', '부서', 'building', '부서명') }}
+        {{ accordion_section('position', '직급', 'level-up-alt', '직급명') }}
+        {{ accordion_section('rank', '직위', 'sort-numeric-up', '직위명') }}
+        {{ accordion_section('job_title', '직책', 'user-tag', '직책명') }}
+        {{ accordion_section('team', '팀', 'users', '팀명') }}
+        {{ accordion_section('work_location', '근무지', 'map-marker-alt', '근무지명') }}
+        {{ accordion_section('job_role', '직무', 'briefcase', '직무명') }}
+        {{ accordion_section('job_grade', '호봉', 'layer-group', '호봉명') }}
+        {{ accordion_section('org_unit', '조직단위', 'sitemap', '조직단위명') }}
+    </div>
+</div>

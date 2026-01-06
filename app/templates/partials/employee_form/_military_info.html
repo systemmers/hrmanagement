@@ -74,7 +74,7 @@
                            {% if is_personal_readonly %}readonly disabled{% endif %}>
                 </div>
 
-                <div class="form-group form-group-full">
+                <div class="form-group">
                     <label for="military_exemption_reason" class="form-label">면제사유</label>
                     <input type="text" id="military_exemption_reason" name="military_exemption_reason" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
                            value="{{ mil.exemption_reason if mil.exemption_reason else (employee.military_exemption_reason if employee and employee.military_exemption_reason else '') }}"

@@ -617,6 +617,49 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
             return []
         return Employee.query.filter(Employee.company_id.in_(company_ids)).all()
 
+    # ========================================
+    # Phase 31: 컨벤션 준수용 추가 메서드
+    # ========================================
+
+    def find_last_by_number_pattern(self, pattern: str) -> Optional[Employee]:
+        """패턴으로 마지막 사번 직원 조회 (사번 생성용)
+
+        Phase 31: employee_number.py 컨벤션 준수
+
+        Args:
+            pattern: LIKE 패턴 (예: 'EMP-2025-%')
+
+        Returns:
+            Employee 모델 객체 또는 None
+        """
+        return (
+            Employee.query
+            .filter(Employee.employee_number.like(pattern))
+            .order_by(Employee.employee_number.desc())
+            .first()
+        )
+
+    def exists_by_employee_number(
+        self,
+        employee_number: str,
+        exclude_id: int = None
+    ) -> bool:
+        """사번 존재 여부 확인
+
+        Phase 31: employee_number.py 컨벤션 준수
+
+        Args:
+            employee_number: 확인할 사번
+            exclude_id: 제외할 직원 ID (수정 시 사용)
+
+        Returns:
+            존재 여부
+        """
+        query = Employee.query.filter(Employee.employee_number == employee_number)
+        if exclude_id:
+            query = query.filter(Employee.id != exclude_id)
+        return query.first() is not None
+
 
 # 싱글톤 인스턴스
 employee_repository = EmployeeRepository()

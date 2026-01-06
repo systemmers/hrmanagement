@@ -3,6 +3,7 @@
 
 직원 상세 정보 조회 및 편집 폼 렌더링을 제공합니다.
 Phase 8: 상수 모듈 적용
+Phase 24: 레이어 분리 - 관계 필드 직접 접근 → Service 경유 조회
 """
 from flask import Blueprint, render_template, redirect, url_for, flash, session
 
@@ -120,6 +121,19 @@ def register_detail_routes(bp: Blueprint):
         else:
             linked_user = user_service.find_by_employee_id(employee_id)
 
+        # 관계형 데이터 조회 (Service 레이어 경유 - Phase 24 레이어 분리)
+        education_list = employee_service.get_education_list(employee_id)
+        career_list = employee_service.get_career_list(employee_id)
+        certificate_list = employee_service.get_certificate_list(employee_id)
+        family_list = employee_service.get_family_list(employee_id)
+        language_list = employee_service.get_language_list(employee_id)
+        hr_project_list = employee_service.get_hr_project_list(employee_id)
+        project_participation_list = employee_service.get_project_participation_list(employee_id)
+        award_list = employee_service.get_award_list(employee_id)
+        salary = employee_service.get_salary_info(employee_id)
+        insurance = employee_service.get_insurance_info(employee_id)
+        military = employee_service.get_military_info(employee_id)
+
         return render_template('profile/edit.html',
                                employee=employee,
                                action='update',
@@ -130,17 +144,17 @@ def register_detail_routes(bp: Blueprint):
                                business_card_front=business_card_front,
                                business_card_back=business_card_back,
                                classification_options=classification_options,
-                               education_list=list(employee.educations),
-                               career_list=list(employee.careers),
-                               certificate_list=list(employee.certificates),
-                               family_list=list(employee.family_members),
-                               language_list=list(employee.languages),
-                               hr_project_list=list(employee.hr_projects),
-                               project_participation_list=list(employee.project_participations),
-                               award_list=list(employee.awards),
-                               salary=employee.salary,
-                               insurance=employee.insurance,
-                               military=employee.military_service,
+                               education_list=education_list,
+                               career_list=career_list,
+                               certificate_list=certificate_list,
+                               family_list=family_list,
+                               language_list=language_list,
+                               hr_project_list=hr_project_list,
+                               project_participation_list=project_participation_list,
+                               award_list=award_list,
+                               salary=salary,
+                               insurance=insurance,
+                               military=military,
                                has_person_contract=has_person_contract,
                                person_contract=person_contract,
                                user=linked_user)
@@ -163,45 +177,19 @@ def register_detail_routes(bp: Blueprint):
 
 
 def _render_employee_full_view(employee_id, employee):
-    """전체 정보 페이지 렌더링 (관리자/매니저용)"""
-    # 관계형 데이터 조회
-    education_list = employee_service.get_education_list(employee_id)
-    career_list = employee_service.get_career_list(employee_id)
-    certificate_list = employee_service.get_certificate_list(employee_id)
-    family_list = employee_service.get_family_list(employee_id)
-    language_list = employee_service.get_language_list(employee_id)
-    military = employee_service.get_military_info(employee_id)
+    """전체 정보 페이지 렌더링 (관리자/매니저용)
 
-    # 핵심 기능 데이터 조회
-    salary = employee_service.get_salary_info(employee_id)
-    benefit = employee_service.get_benefit_info(employee_id)
-    contract = employee_service.get_contract_info(employee_id)
-    salary_history_list = employee_service.get_salary_history_list(employee_id)
+    Phase 24: 통합 메서드 사용으로 N+1 쿼리 최적화
+    - 21개 개별 호출 → 1개 통합 호출 + 부가 조회
+    """
+    from ...services.user_service import user_service
 
-    # 인사평가 기능 데이터 조회
-    promotion_list = employee_service.get_promotion_list(employee_id)
-    evaluation_list = employee_service.get_evaluation_list(employee_id)
-    training_list = employee_service.get_training_list(employee_id)
-    attendance_summary = employee_service.get_attendance_summary(employee_id, 2025)
+    # 통합 데이터 조회 (Phase 24: N+1 최적화)
+    full_view_data = employee_service.get_employee_full_view_data(employee_id)
 
-    # 부가 기능 데이터 조회
-    insurance = employee_service.get_insurance_info(employee_id)
-    hr_project_list = employee_service.get_hr_project_list(employee_id)
-    project_participation_list = employee_service.get_project_participation_list(employee_id)
-    award_list = employee_service.get_award_list(employee_id)
-    asset_list = employee_service.get_asset_list(employee_id)
-
-    # 급여 지급 이력 조회
-    salary_payment_list = employee_service.get_salary_payment_list(employee_id)
-
-    # 첨부파일 조회
-    attachment_list = employee_service.get_attachment_list(employee_id)
-
-    # 명함 이미지 조회
+    # 명함 이미지 조회 (별도 조회 필요)
     business_card_front = employee_service.get_attachment_by_category(employee_id, 'business_card_front')
     business_card_back = employee_service.get_attachment_by_category(employee_id, 'business_card_back')
-
-    from ...services.user_service import user_service
 
     # 명함 편집 권한 체크
     can_edit_business_card = (
@@ -210,7 +198,6 @@ def _render_employee_full_view(employee_id, employee):
     )
 
     # 개인계약 조회 (동기화 버튼용 + 계정정보 섹션용)
-    # 개인계약을 먼저 조회하여 linked_user 결정에 활용
     company_id = session.get(SessionKeys.COMPANY_ID)
     person_contract = None
     emp_number = safe_get(employee, 'employee_number')
@@ -220,8 +207,6 @@ def _render_employee_full_view(employee_id, employee):
         )
 
     # 연결된 계정 조회 (계정정보 섹션용)
-    # 개인계약이 있으면 person_user_id로 조회 (다중 법인 계약 지원)
-    # 없으면 User.employee_id로 직접 조회 (법인 직접 생성 계정)
     if person_contract:
         linked_user = user_service.get_model_by_id(person_contract.person_user_id)
     else:
@@ -232,29 +217,9 @@ def _render_employee_full_view(employee_id, employee):
                            is_corporate=True,
                            account_type=AccountType.CORPORATE,
                            page_mode='hr_card',
-                           education_list=education_list,
-                           career_list=career_list,
-                           certificate_list=certificate_list,
-                           family_list=family_list,
-                           language_list=language_list,
-                           military=military,
-                           salary=salary,
-                           benefit=benefit,
-                           contract=contract,
-                           salary_history_list=salary_history_list,
-                           promotion_list=promotion_list,
-                           evaluation_list=evaluation_list,
-                           training_list=training_list,
-                           attendance_summary=attendance_summary,
-                           insurance=insurance,
-                           hr_project_list=hr_project_list,
-                           project_participation_list=project_participation_list,
-                           award_list=award_list,
-                           asset_list=asset_list,
-                           salary_payment_list=salary_payment_list,
-                           attachment_list=attachment_list,
                            business_card_front=business_card_front,
                            business_card_back=business_card_back,
                            can_edit_business_card=can_edit_business_card,
                            person_contract=person_contract,
-                           user=linked_user)
+                           user=linked_user,
+                           **full_view_data)

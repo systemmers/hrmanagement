@@ -48,7 +48,8 @@
                         <td>
                             <button type="button"
                                     class="btn btn-sm btn-primary"
-                                    onclick="updateSetting('{{ setting.key }}')">
+                                    data-action="update-setting"
+                                    data-setting-key="{{ setting.key }}">
                                 <i class="fas fa-save"></i>
                                 저장
                             </button>
@@ -66,28 +67,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-function updateSetting(key) {
-    const input = document.getElementById(`setting-${key}`);
-    const value = input.value;
-
-    fetch(`/platform/api/settings/${key}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ value: value })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-        } else {
-            alert(data.error || '오류가 발생했습니다.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('오류가 발생했습니다.');
-    });
-}
-</script>
+<script type="module" src="{{ url_for('static', filename='js/pages/platform.js') }}"></script>
 {% endblock %}

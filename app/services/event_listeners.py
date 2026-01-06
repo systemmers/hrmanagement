@@ -3,6 +3,7 @@ SQLAlchemy 이벤트 리스너
 
 데이터 변경 시 자동 동기화를 트리거합니다.
 Phase 4: 데이터 동기화 및 퇴사 처리
+Phase 31: 컨벤션 준수 - Repository 패턴 적용
 """
 from typing import Any, Set
 from sqlalchemy import event
@@ -29,6 +30,24 @@ class SyncEventManager:
 
     _enabled = False
     _pending_syncs: Set[int] = set()
+    _contract_repo = None
+    _data_sharing_repo = None
+
+    @classmethod
+    def _get_contract_repo(cls):
+        """지연 초기화된 계약 Repository"""
+        if cls._contract_repo is None:
+            from app.repositories.contract.person_contract_repository import person_contract_repository
+            cls._contract_repo = person_contract_repository
+        return cls._contract_repo
+
+    @classmethod
+    def _get_data_sharing_repo(cls):
+        """지연 초기화된 데이터 공유 설정 Repository"""
+        if cls._data_sharing_repo is None:
+            from app.repositories.data_sharing_settings_repository import data_sharing_settings_repository
+            cls._data_sharing_repo = data_sharing_settings_repository
+        return cls._data_sharing_repo
 
     @classmethod
     def enable(cls):
@@ -131,17 +150,14 @@ class SyncEventManager:
         Args:
             user_id: 개인 사용자 ID
         """
-        # 실시간 동기화가 활성화된 계약 조회
-        contracts = PersonCorporateContract.query.filter_by(
-            person_user_id=user_id,
-            status=ContractStatus.APPROVED
-        ).all()
+        # Phase 31: Repository 패턴 적용
+        contracts = cls._get_contract_repo().find_by_person_user_id_and_status(
+            user_id, ContractStatus.APPROVED
+        )
 
         for contract in contracts:
             # 실시간 동기화 설정 확인
-            settings = DataSharingSettings.query.filter_by(
-                contract_id=contract.id
-            ).first()
+            settings = cls._get_data_sharing_repo().find_by_contract_id(contract.id)
 
             if settings and settings.is_realtime_sync:
                 cls._execute_sync(contract.id, user_id)
@@ -192,6 +208,15 @@ class ContractEventManager:
     """
 
     _enabled = False
+    _data_sharing_repo = None
+
+    @classmethod
+    def _get_data_sharing_repo(cls):
+        """지연 초기화된 데이터 공유 설정 Repository"""
+        if cls._data_sharing_repo is None:
+            from app.repositories.data_sharing_settings_repository import data_sharing_settings_repository
+            cls._data_sharing_repo = data_sharing_settings_repository
+        return cls._data_sharing_repo
 
     @classmethod
     def enable(cls):
@@ -268,25 +293,26 @@ class ContractEventManager:
         - 기본 데이터 공유 설정 생성
         - 초기 동기화 수행
         """
-        # 데이터 공유 설정이 없으면 기본값으로 생성
-        settings = DataSharingSettings.query.filter_by(
-            contract_id=contract.id
-        ).first()
+        # Phase 31: Repository 패턴 적용
+        repo = cls._get_data_sharing_repo()
+        settings = repo.find_by_contract_id(contract.id)
 
         if not settings:
-            settings = DataSharingSettings(
+            # 기본값으로 생성 (commit=False로 현재 트랜잭션 유지)
+            settings = repo.create_for_contract(
                 contract_id=contract.id,
-                share_basic_info=True,
-                share_contact=True,
-                share_education=False,
-                share_career=False,
-                share_certificates=False,
-                share_languages=False,
-                share_military=False,
-                is_realtime_sync=False,  # 기본값은 수동 동기화
+                settings={
+                    'share_basic_info': True,
+                    'share_contact': True,
+                    'share_education': False,
+                    'share_career': False,
+                    'share_certificates': False,
+                    'share_languages': False,
+                    'share_military': False,
+                    'is_realtime_sync': False,  # 기본값은 수동 동기화
+                },
+                commit=False  # 이벤트 리스너 내에서는 commit 하지 않음
             )
-            db.session.add(settings)
-            db.session.flush()
 
         if current_app:
             current_app.logger.info(
@@ -301,12 +327,13 @@ class ContractEventManager:
         - 실시간 동기화 비활성화
         - 로그 기록
         """
-        settings = DataSharingSettings.query.filter_by(
-            contract_id=contract.id
-        ).first()
+        # Phase 31: Repository 패턴 적용
+        repo = cls._get_data_sharing_repo()
+        settings = repo.find_by_contract_id(contract.id)
 
         if settings:
             settings.is_realtime_sync = False
+            # 이벤트 리스너 내에서는 commit 하지 않음 (외부 트랜잭션에서 처리)
 
         if current_app:
             current_app.logger.info(

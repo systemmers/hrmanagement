@@ -1,9 +1,11 @@
 {% extends "base.html" %}
+{% from 'macros/_filters.html' import filter_bar, search_box, filter_select %}
 
 {% block title %}사용자 관리 - 플랫폼 관리{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/platform.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/filter.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -19,25 +21,11 @@
     </div>
 
     <div class="content-card">
-        <div class="filter-bar">
-            <form method="get" class="filter-form">
-                <div class="search-input-wrapper">
-                    <i class="fas fa-search"></i>
-                    <input type="text" name="search" value="{{ search }}" placeholder="사용자명 또는 이메일 검색...">
-                </div>
-                <select name="account_type" class="filter-select">
-                    <option value="">전체 계정타입</option>
-                    <option value="personal" {{ 'selected' if account_type == 'personal' else '' }}>개인</option>
-                    <option value="corporate" {{ 'selected' if account_type == 'corporate' else '' }}>법인</option>
-                    <option value="employee_sub" {{ 'selected' if account_type == 'employee_sub' else '' }}>법인직원</option>
-                    <option value="platform" {{ 'selected' if account_type == 'platform' else '' }}>플랫폼관리자</option>
-                </select>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-filter"></i>
-                    필터
-                </button>
-            </form>
-        </div>
+        <!-- 검색 및 필터 (매크로 기반) -->
+        {% call filter_bar(mode='url', css_class='filter-bar--simple') %}
+            {{ search_box(name='search', placeholder='사용자명 또는 이메일 검색...', value=search) }}
+            {{ filter_select('account-type', 'account_type', field_options.ACCOUNT_TYPE, account_type, '전체 계정타입') }}
+        {% endcall %}
 
         <table class="data-table">
             <thead>

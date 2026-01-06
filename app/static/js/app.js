@@ -11,10 +11,11 @@
 
 import { Toast, showToast } from './components/toast.js';
 import { FormValidator } from './components/form-validator.js';
-import { Filter, applyFilters, resetFilters, removeFilter, toggleFilterBar } from './components/filter.js';
 import { searchEmployees } from './services/employee-service.js';
-import { SalaryCalculator, SalaryCalculatorModal } from './components/salary-calculator.js';
+import { SalaryCalculator, SalaryCalculatorModal } from './components/salary/index.js';
 import { initAvatarFallback } from './components/avatar-fallback.js';
+
+// 필터링은 filter-bar.js와 각 페이지 스크립트에서 처리 (Phase 31)
 
 /**
  * 정렬 적용 함수
@@ -67,14 +68,15 @@ function toggleEmployeeView(viewType) {
         return;
     }
 
+    // Phase 31.1: 인라인 스타일 제거 - classList 사용
     if (viewType === 'list') {
-        listView.style.display = 'block';
-        cardView.style.display = 'none';
+        listView.classList.remove('hidden');
+        cardView.classList.add('hidden');
         listBtn.classList.add('active');
         cardBtn.classList.remove('active');
     } else if (viewType === 'card') {
-        listView.style.display = 'none';
-        cardView.style.display = 'grid';
+        listView.classList.add('hidden');
+        cardView.classList.remove('hidden');
         listBtn.classList.remove('active');
         cardBtn.classList.add('active');
     }
@@ -90,12 +92,8 @@ window.HRApp = {
         show: showToast
     },
 
-    filter: {
-        apply: applyFilters,
-        reset: resetFilters,
-        remove: removeFilter,
-        toggle: toggleFilterBar
-    },
+    // filter: 레거시 필터 제거됨 (Phase 31)
+    // 필터링은 filter-bar.js에서 처리
 
     employee: {
         search: searchEmployees
@@ -114,34 +112,16 @@ window.HRApp = {
  *
  * 마이그레이션 가이드:
  * - window.showToast() → HRApp.toast.show()
- * - window.applyFilters() → HRApp.filter.apply()
- * - window.resetFilters() → HRApp.filter.reset()
- * - window.removeFilter() → HRApp.filter.remove()
- * - window.toggleFilterBar() → HRApp.filter.toggle()
  * - window.searchEmployees() → HRApp.employee.search()
  * - window.applySorting() → HRApp.ui.applySorting()
  * - window.handleLogout() → HRApp.ui.handleLogout()
  * - window.toggleEmployeeView() → HRApp.ui.toggleView()
+ *
+ * Phase 31: 필터 관련 전역 함수 제거됨 (filter-bar.js로 대체)
  */
 window.showToast = (...args) => {
     console.warn('DEPRECATED: window.showToast() → HRApp.toast.show()');
     return showToast(...args);
-};
-window.applyFilters = (...args) => {
-    console.warn('DEPRECATED: window.applyFilters() → HRApp.filter.apply()');
-    return applyFilters(...args);
-};
-window.resetFilters = (...args) => {
-    console.warn('DEPRECATED: window.resetFilters() → HRApp.filter.reset()');
-    return resetFilters(...args);
-};
-window.removeFilter = (...args) => {
-    console.warn('DEPRECATED: window.removeFilter() → HRApp.filter.remove()');
-    return removeFilter(...args);
-};
-window.toggleFilterBar = (...args) => {
-    console.warn('DEPRECATED: window.toggleFilterBar() → HRApp.filter.toggle()');
-    return toggleFilterBar(...args);
 };
 window.searchEmployees = (...args) => {
     console.warn('DEPRECATED: window.searchEmployees() → HRApp.employee.search()');
@@ -197,9 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.toggleEmployeeView('list');
     }
 
-    // 필터 초기화
-    const filterContext = document.body.dataset.pageContext || 'list';
-    new Filter(filterContext);
+    // 필터 초기화 - Phase 31: filter-bar.js로 대체됨
+    // 각 페이지에서 filter-bar.js 또는 개별 필터 스크립트 사용
 
     // 카드 클릭 이벤트 처리
     document.addEventListener('click', (e) => {

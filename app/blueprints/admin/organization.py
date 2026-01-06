@@ -58,7 +58,7 @@ def api_get_organizations():
     else:
         data = organization_service.get_tree(root_organization_id=root_org_id)
 
-    return api_success({'data': data})
+    return api_success(data)
 
 
 @admin_bp.route('/api/organizations/<int:org_id>', methods=['GET'])
@@ -75,7 +75,7 @@ def api_get_organization(org_id):
     if not org:
         return api_not_found('조직')
 
-    return api_success({'data': org})
+    return api_success(org)
 
 
 @admin_bp.route('/api/organizations', methods=['POST'])
@@ -192,7 +192,7 @@ def api_get_children(org_id):
     """하위 조직 목록 API (멀티테넌시 적용)"""
     root_org_id = get_current_root_organization_id()
     children = organization_service.get_children(org_id, root_organization_id=root_org_id)
-    return api_success({'data': children})
+    return api_success(children)
 
 
 @admin_bp.route('/api/organizations/search', methods=['GET'])
@@ -202,7 +202,7 @@ def api_search_organizations():
     root_org_id = get_current_root_organization_id()
     query = request.args.get('q', '').strip()
     if not query:
-        return api_success({'data': []})
+        return api_success([])
 
     results = organization_service.search(query, root_organization_id=root_org_id)
-    return api_success({'data': results})
+    return api_success(results)

@@ -10,6 +10,7 @@ from . import platform_bp
 from ...utils.decorators import superadmin_required, api_superadmin_required
 from ...services.platform_service import platform_service
 from ...constants import SessionKeys
+from ...constants.field_options import FieldOptions
 from ...utils.api_helpers import api_success, api_error
 
 
@@ -34,7 +35,8 @@ def users_list():
         users=users,
         pagination=pagination,
         search=search or '',
-        account_type=account_type or ''
+        account_type=account_type or '',
+        field_options=FieldOptions
     )
 
 

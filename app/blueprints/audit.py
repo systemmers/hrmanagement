@@ -11,6 +11,7 @@ from flask import Blueprint, request, session
 
 from app.constants.session_keys import SessionKeys, AccountType
 from app.services.audit_service import audit_service
+from app.utils.date_helpers import parse_iso_date
 from app.models.audit_log import AuditLog
 from app.utils.decorators import (
     api_login_required as login_required,
@@ -63,19 +64,9 @@ def get_logs():
     limit = request.args.get('limit', 100, type=int)
     offset = request.args.get('offset', 0, type=int)
 
-    # 날짜 파싱
-    start_date = None
-    end_date = None
-    if request.args.get('start_date'):
-        try:
-            start_date = datetime.fromisoformat(request.args.get('start_date'))
-        except ValueError:
-            pass
-    if request.args.get('end_date'):
-        try:
-            end_date = datetime.fromisoformat(request.args.get('end_date'))
-        except ValueError:
-            pass
+    # 날짜 파싱 (Phase 24: DRY 원칙 - date_helpers 사용)
+    start_date = parse_iso_date(request.args.get('start_date'))
+    end_date = parse_iso_date(request.args.get('end_date'))
 
     logs = audit_service.get_logs(
         user_id=user_id,
@@ -232,22 +223,13 @@ def get_statistics():
     company_id = session.get(SessionKeys.COMPANY_ID) if session.get(SessionKeys.ACCOUNT_TYPE) == AccountType.CORPORATE else None
 
     days = request.args.get('days', 30, type=int)
-    start_date = None
-    end_date = None
 
-    if request.args.get('start_date'):
-        try:
-            start_date = datetime.fromisoformat(request.args.get('start_date'))
-        except ValueError:
-            pass
-    else:
+    # Phase 24: DRY 원칙 - date_helpers 사용
+    start_date = parse_iso_date(request.args.get('start_date'))
+    if not start_date:
         start_date = datetime.utcnow() - timedelta(days=days)
 
-    if request.args.get('end_date'):
-        try:
-            end_date = datetime.fromisoformat(request.args.get('end_date'))
-        except ValueError:
-            pass
+    end_date = parse_iso_date(request.args.get('end_date'))
 
     stats = audit_service.get_statistics(
         company_id=company_id,

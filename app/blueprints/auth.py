@@ -3,6 +3,7 @@
 
 로그인/로그아웃 및 세션 관리를 처리합니다.
 Phase 2: Service 계층 표준화
+Phase 24: EmployeeStatus 상수 일관성 적용
 """
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 
@@ -58,7 +59,7 @@ def login():
                     if employee.status == EmployeeStatus.PENDING_INFO:
                         flash('프로필 정보를 완성해주세요.', 'info')
                         return redirect(url_for('profile.complete_profile'))
-                    elif employee.status == 'pending_contract':
+                    elif employee.status == EmployeeStatus.PENDING_CONTRACT:
                         flash('계약 요청을 기다리고 있습니다.', 'info')
                         return redirect(url_for('mypage.company_info'))
 

@@ -1,0 +1,106 @@
+/**
+ * Page Header Component
+ * 페이지 헤더 공통 스타일 (SSOT)
+ * 기준: layouts/main-content.css 패턴
+ * 사용: 모든 계정 유형 (corporate, personal, employee_sub, platform)
+ */
+
+/* ========================================
+   Page Header Container
+   ======================================== */
+.page-header {
+    margin-bottom: var(--space-6);
+}
+
+/* 헤더 레이아웃 (flex 기반) - Platform 호환 */
+.page-header.flex-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+
+/* ========================================
+   Title Row - 제목 + 액션 버튼 행
+   ======================================== */
+.page-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2);
+}
+
+/* Platform 호환: page-title-section (deprecated, page-title-row 사용 권장) */
+.page-title-section {
+    flex: 1;
+}
+
+/* ========================================
+   Page Title
+   - 기본: text-3xl (main-content.css 기준)
+   - 테마 아이콘 색상 적용
+   ======================================== */
+.page-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-gray-900);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: 0;
+}
+
+/* 제목 아이콘 - 테마 색상 적용 */
+.page-title i {
+    color: var(--theme-primary);
+}
+
+/* Platform 호환: 작은 제목 변형 */
+.page-title.title-md {
+    font-size: var(--text-2xl);
+}
+
+/* ========================================
+   Page Description / Subtitle
+   ======================================== */
+.page-description,
+.page-subtitle {
+    font-size: var(--text-sm);
+    color: var(--color-gray-600);
+    margin: 0;
+}
+
+/* ========================================
+   Page Actions - 버튼 영역
+   ======================================== */
+.page-actions {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+@media (max-width: 767px) {
+    .page-header.flex-layout {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .page-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+
+    .page-actions {
+        justify-content: flex-end;
+        width: 100%;
+    }
+
+    .page-title {
+        font-size: var(--text-2xl);
+    }
+}

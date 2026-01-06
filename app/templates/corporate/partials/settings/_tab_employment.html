@@ -1,0 +1,15 @@
+{# 분류옵션 탭 #}
+{% from "macros/_accordion.html" import accordion_section %}
+
+<div id="tab-employment" class="tab-panel" role="tabpanel">
+    <div id="employment-content" data-accordion>
+        {{ accordion_section('employment_type', '고용형태', 'file-contract', '고용형태명') }}
+        {{ accordion_section('status', '재직상태', 'user-check', '재직상태명') }}
+        {{ accordion_section('pay_type', '급여지급방식', 'money-bill-wave', '급여지급방식') }}
+        {{ accordion_section('bank', '은행 목록', 'university', '은행명') }}
+        {{ accordion_section('contract_type', '계약유형', 'file-signature', '계약유형명') }}
+        {{ accordion_section('language', '언어', 'language', '언어명') }}
+        {{ accordion_section('language_level', '언어수준', 'signal', '언어수준명') }}
+        {{ accordion_section('family_relation', '가족관계', 'users', '가족관계명') }}
+    </div>
+</div>

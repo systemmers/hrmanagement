@@ -81,6 +81,56 @@
     box-shadow: var(--shadow-sm);
 }
 
+/* 폼 선택 박스 */
+.form-select {
+    padding: var(--space-3);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    transition: all var(--transition-fast);
+    font-family: var(--font-family);
+    background-color: var(--color-pure-white);
+    cursor: pointer;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--color-gray-900);
+    box-shadow: var(--shadow-sm);
+}
+
+.form-select:disabled {
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-500);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* 폼 텍스트에어리어 */
+.form-textarea {
+    padding: var(--space-3);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    transition: all var(--transition-fast);
+    font-family: var(--font-family);
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--color-gray-900);
+    box-shadow: var(--shadow-sm);
+}
+
+.form-textarea:disabled {
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-500);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
 /* 폼 입력 필드 비활성화 상태 */
 .form-input:disabled,
 .form-input.readonly-field {

@@ -109,6 +109,33 @@ class FieldOptions:
         Option('expired', '만료됨'),
     ]
 
+    # 계약 상태 필터 옵션 (필터용, 종료대기 포함)
+    CONTRACT_STATUS_FILTER = [
+        Option('approved', '계약완료'),
+        Option('requested', '계약진행중'),
+        Option('termination_requested', '종료대기'),
+        Option('rejected', '거절됨'),
+        Option('terminated', '종료됨'),
+    ]
+
+    # ========================================
+    # 계정/플랫폼 옵션
+    # ========================================
+
+    # 계정 유형 옵션
+    ACCOUNT_TYPE = [
+        Option('personal', '개인'),
+        Option('corporate', '법인'),
+        Option('employee_sub', '법인직원'),
+        Option('platform', '플랫폼관리자'),
+    ]
+
+    # 법인 상태 옵션
+    COMPANY_STATUS = [
+        Option('active', '활성'),
+        Option('inactive', '비활성'),
+    ]
+
     # ========================================
     # 학력정보 옵션
     # ========================================

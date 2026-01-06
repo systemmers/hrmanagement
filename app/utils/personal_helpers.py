@@ -4,17 +4,31 @@
 개인 프로필 관련 중복 로직을 통합합니다.
 Phase 6: 백엔드 리팩토링
 Phase 8: 상수 모듈 적용
+Phase 31: 컨벤션 준수 - Repository 패턴 적용
 """
 from functools import wraps
-from typing import Optional, Tuple
+from typing import Optional, Tuple, TYPE_CHECKING
 from flask import session, jsonify, g
 
 from ..constants.session_keys import SessionKeys
 
-from app.models.personal_profile import PersonalProfile
+if TYPE_CHECKING:
+    from app.models.personal_profile import PersonalProfile
+
+# 지연 초기화용
+_personal_profile_repo = None
 
 
-def get_current_profile() -> Optional[PersonalProfile]:
+def _get_personal_profile_repo():
+    """지연 초기화된 PersonalProfile Repository"""
+    global _personal_profile_repo
+    if _personal_profile_repo is None:
+        from app.repositories.personal_profile_repository import personal_profile_repository
+        _personal_profile_repo = personal_profile_repository
+    return _personal_profile_repo
+
+
+def get_current_profile() -> Optional["PersonalProfile"]:
     """
     현재 로그인한 사용자의 프로필 조회
 
@@ -30,7 +44,8 @@ def get_current_profile() -> Optional[PersonalProfile]:
     if not user_id:
         return None
 
-    profile = PersonalProfile.query.filter_by(user_id=user_id).first()
+    # Phase 31: Repository 패턴 적용
+    profile = _get_personal_profile_repo().find_by_user_id(user_id)
     g._current_profile = profile
     return profile
 

@@ -5,7 +5,7 @@
 Phase 1: Company 모델 구현의 일부입니다.
 Phase 6: 백엔드 리팩토링 - register() 헬퍼 분할
 Phase 8: 상수 모듈 적용
-Phase 24: 트랜잭션 SSOT 적용 + CompanyService 경유 레이어 분리
+Phase 24: 트랜잭션 SSOT 적용 + CompanyService 경유 레이어 분리, 데이터 변환 로직 Service 이동
 """
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 
@@ -20,7 +20,6 @@ from app.utils.corporate_helpers import (
 )
 from app.services.company_service import company_service
 from app.services.user_service import user_service
-from app.services.user_employee_link_service import user_employee_link_service
 
 corporate_bp = Blueprint('corporate', __name__, url_prefix='/corporate')
 
@@ -134,16 +133,9 @@ def users():
         per_page=per_page
     )
 
-    # 계약 상태 벌크 조회 (N+1 방지)
-    user_ids = [u['id'] for u in users]
-    contract_map = user_employee_link_service.get_users_with_contract_status_bulk(
-        user_ids, company_id
-    )
-
-    # contract_status 추가
-    for user in users:
-        contract_info = contract_map.get(user['id'], {})
-        user['contract_status'] = contract_info.get('status', 'none')
+    # Phase 24: 데이터 변환 로직을 Service 레이어로 이동
+    # 계약 상태 및 직원 이름 추가를 Service에서 처리
+    users = user_service.get_users_with_contract_and_employee_details(users, company_id)
 
     return render_template(
         'corporate/users.html',

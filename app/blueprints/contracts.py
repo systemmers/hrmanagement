@@ -11,6 +11,7 @@ Phase 8: 상수 모듈 적용
 """
 from flask import Blueprint, render_template, request, jsonify, session, flash, redirect, url_for
 
+from ..constants.field_options import FieldOptions
 from ..constants.session_keys import SessionKeys
 from ..services import contract_service
 from ..utils.decorators import (
@@ -114,7 +115,8 @@ def company_contracts():
     return render_template(
         'contracts/company_contracts.html',
         contracts=contracts,
-        stats=stats
+        stats=stats,
+        field_options=FieldOptions
     )
 
 
@@ -152,12 +154,18 @@ def request_contract():
         return redirect(url_for('main.index'))
 
     if request.method == 'POST':
+        from ..utils.date_helpers import parse_form_date
+
         # 선택된 대상의 user_id로 계약 요청
         target_user_id = request.form.get('target_user_id', type=int)
         contract_type = request.form.get('contract_type', 'employment')
         position = request.form.get('position')
         department = request.form.get('department')
         notes = request.form.get('notes')
+
+        # Phase 24: 날짜 파싱 헬퍼 사용 (DRY 원칙)
+        contract_start_date = parse_form_date(request.form.get('contract_start_date'))
+        contract_end_date = parse_form_date(request.form.get('contract_end_date'))
 
         if not target_user_id:
             flash('계약 대상을 선택해주세요.', 'error')
@@ -170,7 +178,9 @@ def request_contract():
             contract_type=contract_type,
             position=position,
             department=department,
-            notes=notes
+            notes=notes,
+            contract_start_date=contract_start_date,
+            contract_end_date=contract_end_date
         )
 
         if result:

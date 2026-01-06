@@ -4,14 +4,15 @@ Profile Decorators - 통합 프로필 인증 데코레이터
 법인 직원, 법인 관리자, 개인 계정에 대한 통합 인증 처리
 Phase 8: 상수 모듈 적용
 Phase 4.1: PersonalProfile → Profile 마이그레이션 완료
+Phase 24: 레이어 분리 - Model.query → Service 경유 조회
 """
 from functools import wraps
 from flask import session, g, flash, redirect, url_for, current_app
 
 from app.constants.session_keys import SessionKeys, AccountType
-from app.models.employee import Employee
-from app.models.profile import Profile
-from app.models.corporate_admin_profile import CorporateAdminProfile
+from app.services.personal_service import personal_service
+from app.services.employee_service import employee_service
+from app.services.corporate_admin_profile_service import corporate_admin_profile_service
 from app.adapters.profile_adapter import (
     EmployeeProfileAdapter,
     PersonalProfileAdapter,
@@ -54,8 +55,8 @@ def unified_profile_required(f):
         # 개인 계정은 계약 승인 시 employee_id가 설정될 수 있지만,
         # 프로필 조회는 항상 Profile 모델(PersonalProfileAdapter)을 사용해야 함
         if account_type == AccountType.PERSONAL:
-            # 통합 Profile 모델 조회
-            profile = Profile.query.filter_by(user_id=user_id).first()
+            # 통합 Profile 모델 조회 (Service 레이어 경유)
+            _, profile = personal_service.get_user_with_profile(user_id)
             if not profile:
                 # 프로필이 없으면 프로필 수정 페이지로 리다이렉트
                 flash('프로필을 먼저 생성해주세요.', 'info')
@@ -68,7 +69,7 @@ def unified_profile_required(f):
 
         # 법인 직원 어댑터 생성 (employee_sub 계정)
         elif employee_id and account_type == AccountType.EMPLOYEE_SUB:
-            employee = Employee.query.get(employee_id)
+            employee = employee_service.get_employee_model_by_id(employee_id)
             if not employee:
                 flash('직원 정보를 찾을 수 없습니다.', 'error')
                 session.pop(SessionKeys.EMPLOYEE_ID, None)
@@ -86,8 +87,8 @@ def unified_profile_required(f):
                 flash('법인 관리자 프로필 기능이 비활성화되어 있습니다.', 'info')
                 return redirect(url_for('main.index'))
 
-            # 법인 관리자 프로필 조회
-            admin_profile = CorporateAdminProfile.query.filter_by(user_id=user_id).first()
+            # 법인 관리자 프로필 조회 (Service 레이어 경유)
+            admin_profile = corporate_admin_profile_service.get_profile_by_user_id(user_id)
             if not admin_profile:
                 # 프로필이 없으면 프로필 생성 안내
                 flash('법인 관리자 프로필을 먼저 생성해주세요.', 'info')

@@ -10,6 +10,7 @@ from . import platform_bp
 from ...utils.decorators import superadmin_required, api_superadmin_required
 from ...services.platform_service import platform_service
 from ...utils.api_helpers import api_success, api_error
+from ...constants.field_options import FieldOptions
 
 
 @platform_bp.route('/companies')
@@ -31,7 +32,8 @@ def companies_list():
         companies=companies,
         pagination=pagination,
         search=search or '',
-        status=request.args.get('status', '')
+        status=request.args.get('status', ''),
+        field_options=FieldOptions
     )
 
 

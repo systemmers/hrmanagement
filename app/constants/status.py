@@ -41,6 +41,9 @@ class ContractStatus:
     # 재계약 가능 상태 (기존 계약이 이 상태일 때 새 계약 가능)
     RECONTRACTABLE = [REJECTED, TERMINATED, EXPIRED]
 
+    # 계약갱신 가능 상태
+
+
     # 종료 요청 가능 상태
     TERMINABLE = [APPROVED]
 
@@ -108,13 +111,14 @@ class ContractStatus:
 
 class EmployeeStatus:
     """직원 상태 (Employee.status)"""
-    ACTIVE = 'active'              # 정상 재직
-    PENDING_INFO = 'pending_info'  # 정보 입력 대기 (계약 승인 전)
-    RESIGNED = 'resigned'          # 퇴사
+    ACTIVE = 'active'                      # 정상 재직
+    PENDING_INFO = 'pending_info'          # 정보 입력 대기 (계정 발급 후)
+    PENDING_CONTRACT = 'pending_contract'  # 계약 요청 대기 (정보 입력 완료 후)
+    RESIGNED = 'resigned'                  # 퇴사
 
     # 상태 그룹
-    WORKING_STATUSES = [ACTIVE, PENDING_INFO]  # 재직 중
-    ALL_STATUSES = [ACTIVE, PENDING_INFO, RESIGNED]
+    WORKING_STATUSES = [ACTIVE, PENDING_INFO, PENDING_CONTRACT]  # 재직 중
+    ALL_STATUSES = [ACTIVE, PENDING_INFO, PENDING_CONTRACT, RESIGNED]
 
     @classmethod
     def is_working(cls, status: str) -> bool:

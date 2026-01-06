@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 {% from 'macros/_avatar.html' import avatar_image %}
+{% from 'macros/_filters.html' import filter_bar, search_box, filter_select %}
 
 {% block title %}직원 목록 - 인사카드 관리 시스템{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/filter.css') }}">
+{% endblock %}
 
 {% block content %}
 <div class="page-header">
@@ -25,77 +30,13 @@
     <p class="page-description">총 {{ employees|length }}명의 직원이 있습니다.</p>
 </div>
 
-<!-- 필터 바 -->
-<div class="filter-bar">
-    <div class="filter-group">
-        <label class="filter-label">부서</label>
-        <select multiple class="filter-select" id="filter-department" data-filter="department">
-            <option value="">전체</option>
-            {% for dept in classification_options.departments %}
-            <option value="{{ dept }}" {% if dept in request.args.getlist('department') %}selected{% endif %}>{{ dept }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="filter-group">
-        <label class="filter-label">직급</label>
-        <select multiple class="filter-select" id="filter-position" data-filter="position">
-            <option value="">전체</option>
-            {% for pos in classification_options.positions %}
-            <option value="{{ pos }}" {% if pos in request.args.getlist('position') %}selected{% endif %}>{{ pos }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="filter-group">
-        <label class="filter-label">상태</label>
-        <div class="filter-checkboxes">
-            {% for status in classification_options.statuses %}
-            <label class="filter-checkbox-label">
-                <input type="checkbox" class="filter-checkbox" 
-                       data-filter="status" 
-                       value="{{ status.value }}"
-                       {% if status.value in request.args.getlist('status') %}checked{% endif %}>
-                <span>{{ status.label }}</span>
-            </label>
-            {% endfor %}
-        </div>
-    </div>
-    <button class="btn btn-secondary filter-reset">
-        <i class="fas fa-redo"></i>
-        <span>초기화</span>
-    </button>
-</div>
-
-<!-- 활성 필터 표시 -->
-<div class="active-filters" id="active-filters">
-    {% if request.args.getlist('department') %}
-        {% for dept in request.args.getlist('department') %}
-        <span class="filter-tag">
-            부서: {{ dept }}
-            <button data-action="remove-filter" data-filter-type="department" data-filter-value="{{ dept }}">×</button>
-        </span>
-        {% endfor %}
-    {% endif %}
-    {% if request.args.getlist('position') %}
-        {% for pos in request.args.getlist('position') %}
-        <span class="filter-tag">
-            직급: {{ pos }}
-            <button data-action="remove-filter" data-filter-type="position" data-filter-value="{{ pos }}">×</button>
-        </span>
-        {% endfor %}
-    {% endif %}
-    {% if request.args.getlist('status') %}
-        {% for status_val in request.args.getlist('status') %}
-            {% for status in classification_options.statuses %}
-                {% if status.value == status_val %}
-                <span class="filter-tag">
-                    상태: {{ status.label }}
-                    <button data-action="remove-filter" data-filter-type="status" data-filter-value="{{ status_val }}">×</button>
-                </span>
-                {% endif %}
-            {% endfor %}
-        {% endfor %}
-    {% endif %}
-</div>
+<!-- 필터 바 (매크로 기반) -->
+{% call filter_bar(mode='url', css_class='filter-bar--simple') %}
+    {{ search_box(placeholder='이름, 부서, 직급 검색...', value=request.args.get('search', '')) }}
+    {{ filter_select('filter-department', 'department', classification_options.departments, request.args.get('department', ''), '전체 부서') }}
+    {{ filter_select('filter-position', 'position', classification_options.positions, request.args.get('position', ''), '전체 직급') }}
+    {{ filter_select('filter-status', 'status', classification_options.statuses, request.args.get('status', ''), '전체 상태') }}
+{% endcall %}
 
 <!-- 정렬 옵션 -->
 <div class="sort-bar">
@@ -263,6 +204,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/pages/employee-list.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/components/filter-bar.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/pages/employee-list.js') }}"></script>
 {% endblock %}
 

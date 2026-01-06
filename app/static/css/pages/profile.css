@@ -38,13 +38,13 @@
     --profile-section-gap: var(--space-8);
 }
 
-/* 개인 계정 테마 오버라이드 */
+/* 개인 계정 테마 오버라이드 (Phase 31: 글로벌 CSS 변수 참조) */
 [data-account-type="personal"] {
-    --profile-primary: #059669;
-    --profile-primary-hover: #047857;
-    --profile-primary-light: #ecfdf5;
-    --profile-accent: #10b981;
-    --profile-gradient: linear-gradient(135deg, #059669 0%, #047857 100%);
+    --profile-primary: var(--color-personal-500);
+    --profile-primary-hover: var(--color-personal-700);
+    --profile-primary-light: var(--color-success-50);
+    --profile-accent: var(--color-success-500);
+    --profile-gradient: linear-gradient(135deg, var(--color-personal-500) 0%, var(--color-personal-700) 100%);
 }
 
 /* ----------------------------------------

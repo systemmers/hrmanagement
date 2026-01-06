@@ -40,8 +40,8 @@
 /* Badge Variants - Info */
 .badge-info,
 .badge.info {
-    background: var(--color-info-100);
-    color: var(--color-info-600);
+    background: var(--color-blue-100);
+    color: var(--color-blue-600);
 }
 
 /* Badge Variants - Secondary/Gray */

@@ -119,12 +119,14 @@ D:/projects/hrmanagement/
 │   │   ├── decorators.py        # 인증/권한 데코레이터
 │   │   ├── context_processors.py # 템플릿 컨텍스트
 │   │   ├── template_helpers.py  # 템플릿 헬퍼 함수
+│   │   ├── transaction.py       # 트랜잭션 관리 (SSOT)
 │   │   ├── employee_number.py   # 사번 생성
 │   │   ├── tenant.py            # 멀티테넌시 유틸
 │   │   ├── api_helpers.py       # API 헬퍼
 │   │   ├── contract_helpers.py  # 계약 관련 헬퍼
 │   │   ├── corporate_helpers.py # 법인 관련 헬퍼
 │   │   └── personal_helpers.py  # 개인 계정 헬퍼
+│   │   # Phase 31 삭제: data_validator.py, init_system_settings.py
 │   │
 │   ├── adapters/                # 어댑터 레이어 (프로필 통합)
 │   │   ├── __init__.py
@@ -1593,6 +1595,7 @@ def create_employee(self, data: dict) -> Employee:
 
 ---
 
-**문서 버전:** 1.0
+**문서 버전:** 1.1
 **작성일:** 2025-12-16
-**최종 수정일:** 2025-12-16
+**최종 수정일:** 2026-01-06
+**Phase:** 31 완료
