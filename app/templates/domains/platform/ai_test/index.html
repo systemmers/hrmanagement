@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}AI 문서 분석 테스트{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/ai-test.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="ai-test-container">
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-robot"></i> AI 문서 분석 테스트
+            <span class="badge">프로토타입</span>
+        </h1>
+        <p class="subtitle">첨부 서류를 AI가 분석하여 정보를 추출합니다. Google Cloud AI 서비스를 테스트합니다.</p>
+    </div>
+
+    <div class="test-layout">
+        <!-- 왼쪽: 입력 영역 -->
+        <div class="input-section">
+            <div class="card">
+                <h3><i class="fas fa-upload"></i> 1. 문서 업로드</h3>
+                <form id="analyzeForm" enctype="multipart/form-data">
+                    <!-- 파일 업로드 -->
+                    <div class="form-group">
+                        <label>파일 직접 업로드</label>
+                        <input type="file" name="file" id="fileInput"
+                               accept=".pdf,.jpg,.jpeg,.png,.gif">
+                    </div>
+
+                    <div class="form-divider">또는</div>
+
+                    <!-- 샘플 파일 선택 -->
+                    <div class="form-group">
+                        <label>샘플 파일 선택 (data/db_files/)</label>
+                        <select name="sample_file" id="sampleSelect">
+                            <option value="">-- 샘플 파일 선택 --</option>
+                            {% for file in sample_files %}
+                            <option value="{{ file.name }}">{{ file.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div id="filePreview" class="file-preview hidden">
+                        <i class="fas fa-file"></i>
+                        <span id="selectedFileName"></span>
+                    </div>
+
+                    <!-- Provider 선택 -->
+                    <div class="form-group">
+                        <label>AI Provider</label>
+                        <select name="provider" id="providerSelect">
+                            {% for provider in providers %}
+                            <option value="{{ provider }}">
+                                {% if provider == 'gemini' %}Gemini (Google AI Studio)
+                                {% elif provider == 'vertex_ai' %}Vertex AI (Gemini Pro)
+                                {% elif provider == 'document_ai' %}Document AI (OCR)
+                                {% else %}{{ provider | title }}
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- 문서 유형 -->
+                    <div class="form-group">
+                        <label>문서 유형</label>
+                        <select name="document_type" id="documentTypeSelect">
+                            <option value="auto_detect">자동 감지</option>
+                            <option value="resume">이력서</option>
+                            <option value="career_certificate">경력증명서</option>
+                            <option value="graduation_certificate">졸업증명서</option>
+                            <option value="resident_registration">주민등록등본/초본</option>
+                            <option value="bank_account">통장사본</option>
+                            <option value="photo">증명사진</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="analyzeBtn">
+                        <i class="fas fa-search"></i> 분석 시작
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 오른쪽: 결과 영역 -->
+        <div class="result-section">
+            <div class="card">
+                <h3><i class="fas fa-chart-bar"></i> 2. 분석 결과</h3>
+                <div id="resultContainer">
+                    <div class="empty-state">
+                        <i class="fas fa-file-alt"></i>
+                        <p>파일을 업로드하고 분석을 시작하세요</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 추출된 필드 테이블 -->
+            <div class="card hidden" id="fieldsCard">
+                <h3><i class="fas fa-table"></i> 3. 추출된 필드</h3>
+                <div id="extractedFields"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/pages/ai-test-index.js') }}"></script>
+{% endblock %}

@@ -27,7 +27,7 @@ def dashboard():
     recent_companies = platform_service.get_recent_companies(limit=5)
 
     return render_template(
-        'platform/dashboard.html',
+        'domains/platform/dashboard.html',
         stats=stats,
         recent_users=recent_users,
         recent_companies=recent_companies

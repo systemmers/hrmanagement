@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}{{ company.name }} - 법인 상세{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/platform.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="platform-page">
+    <div class="page-header">
+        <div class="page-title-section">
+            <h2 class="page-title">
+                <i class="fas fa-building"></i>
+                {{ company.name }}
+            </h2>
+            <p class="page-subtitle">법인 상세 정보</p>
+        </div>
+        <div class="page-actions">
+            <a href="{{ url_for('platform.companies_list') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                목록으로
+            </a>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+        <div class="content-card">
+            <div class="card-header">
+                <h3><i class="fas fa-info-circle"></i> 기본 정보</h3>
+                <span class="status-badge {{ 'active' if company.is_active else 'inactive' }}">
+                    {{ '활성' if company.is_active else '비활성' }}
+                </span>
+            </div>
+            <div class="card-body">
+                <dl class="info-list">
+                    <div class="info-item">
+                        <dt>법인명</dt>
+                        <dd>{{ company.name }}</dd>
+                    </div>
+                    <div class="info-item">
+                        <dt>사업자등록번호</dt>
+                        <dd>{{ company.business_number or '-' }}</dd>
+                    </div>
+                    <div class="info-item">
+                        <dt>대표자명</dt>
+                        <dd>{{ company.representative_name or '-' }}</dd>
+                    </div>
+                    <div class="info-item">
+                        <dt>연락처</dt>
+                        <dd>{{ company.phone or '-' }}</dd>
+                    </div>
+                    <div class="info-item">
+                        <dt>주소</dt>
+                        <dd>{{ company.address or '-' }}</dd>
+                    </div>
+                    <div class="info-item">
+                        <dt>등록일</dt>
+                        <dd>{{ company.created_at.strftime('%Y-%m-%d %H:%M') if company.created_at else '-' }}</dd>
+                    </div>
+                </dl>
+            </div>
+            <div class="card-footer">
+                <button type="button"
+                        class="btn {{ 'btn-warning' if company.is_active else 'btn-success' }}"
+                        data-action="toggle-company-active"
+                        data-company-id="{{ company.id }}">
+                    <i class="fas {{ 'fa-ban' if company.is_active else 'fa-check' }}"></i>
+                    {{ '비활성화' if company.is_active else '활성화' }}
+                </button>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="card-header">
+                <h3><i class="fas fa-users"></i> 소속 사용자 ({{ users|length }}명)</h3>
+            </div>
+            <div class="card-body">
+                {% if users %}
+                <ul class="user-list">
+                    {% for user in users %}
+                    <li class="user-item">
+                        <div class="user-info">
+                            <span class="user-name">{{ user.username }}</span>
+                            <span class="user-email">{{ user.email }}</span>
+                        </div>
+                        <div class="user-meta">
+                            <span class="role-badge {{ user.role }}">{{ user.role }}</span>
+                            <span class="status-dot {{ 'active' if user.is_active else 'inactive' }}"></span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="empty-message">소속 사용자가 없습니다.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{{ url_for('static', filename='js/pages/platform.js') }}"></script>
+{% endblock %}

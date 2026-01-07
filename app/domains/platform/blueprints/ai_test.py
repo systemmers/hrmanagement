@@ -21,7 +21,7 @@ def index():
     """AI 문서 분석 테스트 메인 페이지"""
     sample_files = get_sample_files()
     providers = get_available_providers()
-    return render_template('ai_test/index.html',
+    return render_template('domains/platform/ai_test/index.html',
                           sample_files=sample_files,
                           providers=providers)
 
@@ -80,7 +80,7 @@ def settings():
     except ImportError:
         providers = []
 
-    return render_template('ai_test/settings.html',
+    return render_template('domains/platform/ai_test/settings.html',
                           config=config,
                           providers=providers)
 

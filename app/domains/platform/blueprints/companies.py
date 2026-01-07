@@ -30,7 +30,7 @@ def companies_list():
     )
 
     return render_template(
-        'platform/companies/list.html',
+        'domains/platform/companies/list.html',
         companies=companies,
         pagination=pagination,
         search=search or '',
@@ -51,7 +51,7 @@ def company_detail(company_id):
     users = platform_service.get_users_by_company(company_id)
 
     return render_template(
-        'platform/companies/detail.html',
+        'domains/platform/companies/detail.html',
         company=company,
         users=users
     )

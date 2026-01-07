@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }} - 사용자 상세{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/platform.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="platform-page">
+    <div class="page-header">
+        <div class="page-title-section">
+            <h2 class="page-title">
+                <i class="fas fa-user"></i>
+                {{ user.username }}
+                {% if user.is_superadmin %}
+                <i class="fas fa-crown superadmin-icon" title="슈퍼관리자"></i>
+                {% endif %}
+            </h2>
+            <p class="page-subtitle">사용자 상세 정보</p>
+        </div>
+        <div class="page-actions">
+            <a href="{{ url_for('platform.users_list') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                목록으로
+            </a>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="card-header">
+            <h3><i class="fas fa-info-circle"></i> 사용자 정보</h3>
+            <span class="status-badge {{ 'active' if user.is_active else 'inactive' }}">
+                {{ '활성' if user.is_active else '비활성' }}
+            </span>
+        </div>
+        <div class="card-body">
+            <dl class="info-list">
+                <div class="info-item">
+                    <dt>사용자명</dt>
+                    <dd>{{ user.username }}</dd>
+                </div>
+                <div class="info-item">
+                    <dt>이메일</dt>
+                    <dd>{{ user.email }}</dd>
+                </div>
+                <div class="info-item">
+                    <dt>계정타입</dt>
+                    <dd>
+                        <span class="type-badge {{ user.account_type }}">
+                            {{ user.get_account_type_label() }}
+                        </span>
+                    </dd>
+                </div>
+                <div class="info-item">
+                    <dt>역할</dt>
+                    <dd>{{ user.role }}</dd>
+                </div>
+                <div class="info-item">
+                    <dt>슈퍼관리자</dt>
+                    <dd>{{ '예' if user.is_superadmin else '아니오' }}</dd>
+                </div>
+                <div class="info-item">
+                    <dt>소속 법인</dt>
+                    <dd>
+                        {% if user.company %}
+                        <a href="{{ url_for('platform.company_detail', company_id=user.company_id) }}">
+                            {{ user.company.name }}
+                        </a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="info-item">
+                    <dt>가입일</dt>
+                    <dd>{{ user.created_at.strftime('%Y-%m-%d %H:%M') if user.created_at else '-' }}</dd>
+                </div>
+                <div class="info-item">
+                    <dt>마지막 로그인</dt>
+                    <dd>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else '-' }}</dd>
+                </div>
+            </dl>
+        </div>
+        <div class="card-footer">
+            <button type="button"
+                    class="btn {{ 'btn-warning' if user.is_active else 'btn-success' }}"
+                    data-action="toggle-user-active"
+                    data-user-id="{{ user.id }}">
+                <i class="fas {{ 'fa-ban' if user.is_active else 'fa-check' }}"></i>
+                {{ '비활성화' if user.is_active else '활성화' }}
+            </button>
+
+            {% if not user.is_superadmin %}
+            <button type="button" class="btn btn-primary"
+                    data-action="grant-superadmin"
+                    data-user-id="{{ user.id }}">
+                <i class="fas fa-crown"></i>
+                슈퍼관리자 권한 부여
+            </button>
+            {% else %}
+            <button type="button" class="btn btn-danger"
+                    data-action="revoke-superadmin"
+                    data-user-id="{{ user.id }}">
+                <i class="fas fa-crown"></i>
+                슈퍼관리자 권한 해제
+            </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{{ url_for('static', filename='js/pages/platform.js') }}"></script>
+{% endblock %}

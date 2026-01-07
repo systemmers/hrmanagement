@@ -217,4 +217,4 @@ def api_search_organizations():
 @admin_required
 def audit_dashboard():
     """감사 대시보드 페이지"""
-    return render_template('admin/audit_dashboard.html')
+    return render_template('domains/platform/admin/audit_dashboard.html')

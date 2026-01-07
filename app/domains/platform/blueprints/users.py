@@ -33,7 +33,7 @@ def users_list():
     )
 
     return render_template(
-        'platform/users/list.html',
+        'domains/platform/users/list.html',
         users=users,
         pagination=pagination,
         search=search or '',
@@ -51,7 +51,7 @@ def user_detail(user_id):
         abort(404)
 
     return render_template(
-        'platform/users/detail.html',
+        'domains/platform/users/detail.html',
         user=user
     )
 

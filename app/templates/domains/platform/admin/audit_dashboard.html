@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}감사 로그 대시보드 - 인사카드 관리 시스템{% endblock %}
+
+{% block extra_css %}
+<!-- CSS moved to: pages/audit-dashboard.css (to be created) -->
+<!-- Temporarily using inline styles until page-specific CSS file is created -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/stats-cards.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/badge.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="audit-dashboard">
+    <!-- 헤더 -->
+    <div class="dashboard-header">
+        <h1><i class="fas fa-shield-alt"></i> 감사 로그 대시보드</h1>
+        <div class="header-actions">
+            <button class="btn btn-outline" data-action="export-logs">
+                <i class="fas fa-download"></i> 내보내기
+            </button>
+            <button class="btn btn-primary" data-action="refresh-data">
+                <i class="fas fa-sync-alt"></i> 새로고침
+            </button>
+        </div>
+    </div>
+
+    <!-- 통계 카드 -->
+    <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-card-icon blue">
+                    <i class="fas fa-list"></i>
+                </div>
+                <span class="stat-card-title">전체 로그</span>
+            </div>
+            <div class="stat-card-value" id="totalLogs">-</div>
+            <div class="stat-card-change">최근 30일</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-card-icon green">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <span class="stat-card-title">조회</span>
+            </div>
+            <div class="stat-card-value" id="viewCount">-</div>
+            <div class="stat-card-change">가장 빈번한 액션</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-card-icon yellow">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <span class="stat-card-title">수정</span>
+            </div>
+            <div class="stat-card-value" id="updateCount">-</div>
+            <div class="stat-card-change">데이터 변경</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-card-icon red">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <span class="stat-card-title">접근 거부</span>
+            </div>
+            <div class="stat-card-value" id="deniedCount">-</div>
+            <div class="stat-card-change">보안 이벤트</div>
+        </div>
+    </div>
+
+    <!-- 필터 섹션 -->
+    <div class="filter-section">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>액션 유형</label>
+                <select id="filterAction">
+                    <option value="">전체</option>
+                    <option value="view">조회</option>
+                    <option value="create">생성</option>
+                    <option value="update">수정</option>
+                    <option value="delete">삭제</option>
+                    <option value="export">내보내기</option>
+                    <option value="sync">동기화</option>
+                    <option value="login">로그인</option>
+                    <option value="logout">로그아웃</option>
+                    <option value="access_denied">접근 거부</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>리소스 유형</label>
+                <select id="filterResource">
+                    <option value="">전체</option>
+                    <option value="employee">직원</option>
+                    <option value="contract">계약</option>
+                    <option value="personal_profile">개인 프로필</option>
+                    <option value="sync">동기화</option>
+                    <option value="user">사용자</option>
+                    <option value="company">법인</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>상태</label>
+                <select id="filterStatus">
+                    <option value="">전체</option>
+                    <option value="success">성공</option>
+                    <option value="failed">실패</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>시작일</label>
+                <input type="date" id="filterStartDate">
+            </div>
+
+            <div class="filter-group">
+                <label>종료일</label>
+                <input type="date" id="filterEndDate">
+            </div>
+
+            <button class="btn btn-primary" data-action="apply-filters">
+                <i class="fas fa-search"></i> 검색
+            </button>
+        </div>
+    </div>
+
+    <!-- 로그 테이블 -->
+    <div class="log-table-card">
+        <div class="log-table-header">
+            <span class="log-table-title">감사 로그 목록</span>
+            <span id="logCount" class="text-secondary">0건</span>
+        </div>
+
+        <table class="log-table">
+            <thead>
+                <tr>
+                    <th>시간</th>
+                    <th>사용자</th>
+                    <th>액션</th>
+                    <th>리소스</th>
+                    <th>상태</th>
+                    <th>IP</th>
+                    <th>상세</th>
+                </tr>
+            </thead>
+            <tbody id="logTableBody">
+                <tr>
+                    <td colspan="7" class="table-empty-cell">
+                        <i class="fas fa-spinner fa-spin"></i> 로딩 중...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 페이지네이션 -->
+        <div class="pagination" id="pagination">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- JS moved to: pages/admin.js -->
+<script src="{{ url_for('static', filename='js/pages/admin.js') }}"></script>
+{% endblock %}
