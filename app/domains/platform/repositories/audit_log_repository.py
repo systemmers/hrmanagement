@@ -10,8 +10,8 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 from app.database import db
-from app.models import AuditLog
-from app.repositories.base_repository import BaseRepository
+from app.domains.platform.models import AuditLog
+from app.shared.repositories.base_repository import BaseRepository
 
 
 class AuditLogRepository(BaseRepository[AuditLog]):

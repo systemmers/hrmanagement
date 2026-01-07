@@ -9,9 +9,9 @@ from app.domains.user.services.corporate_admin_profile_service import (
     CorporateAdminProfileService,
     corporate_admin_profile_service
 )
-from app.models import CorporateAdminProfile
-from app.models import User
-from app.models import Company
+from app.domains.user.models import CorporateAdminProfile
+from app.domains.user.models import User
+from app.domains.company.models import Company
 
 
 class TestCorporateAdminProfileServiceInit:
@@ -108,7 +108,7 @@ class TestCorporateAdminProfileServiceQueries:
         adapter = self.service.get_adapter(self.user_id)
 
         assert adapter is not None
-        from app.adapters.profile_adapter import CorporateAdminProfileAdapter
+        from app.shared.adapters.profile_adapter import CorporateAdminProfileAdapter
         assert isinstance(adapter, CorporateAdminProfileAdapter)
 
     @pytest.mark.unit

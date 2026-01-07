@@ -17,8 +17,8 @@ from app.shared.utils.decorators import login_required, admin_required, manager_
 from app.shared.utils.tenant import get_current_organization_id
 from app.shared.utils.object_helpers import safe_get
 from app.domains.employee.services import employee_service
-from app.services import employee_account_service
-from app.services.file_storage_service import file_storage, CATEGORY_PROFILE_PHOTO
+from app.domains.employee.services import employee_account_service
+from app.shared.services.file_storage_service import file_storage, CATEGORY_PROFILE_PHOTO
 from app.domains.user.services.user_employee_link_service import user_employee_link_service
 from app.domains.contract.services.contract_workflow_service import contract_workflow_service
 from .helpers import (

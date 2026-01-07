@@ -18,8 +18,8 @@ def mock_repos(app):
     mock_user_repo = Mock()
     mock_profile_repo = Mock()
 
-    with patch.object(personal_service, 'user_repo', mock_user_repo), \
-         patch.object(personal_service, 'profile_repo', mock_profile_repo):
+    with patch.object(personal_service, '_user_repo', mock_user_repo), \
+         patch.object(personal_service, '_profile_repo', mock_profile_repo):
         yield personal_service, mock_user_repo, mock_profile_repo
 
 
@@ -148,8 +148,12 @@ class TestPersonalServiceRegister:
         """회원가입 ServiceResult 반환 확인"""
         service, mock_user_repo, mock_profile_repo = mock_repos
 
-        with patch('app.services.personal_service.atomic_transaction'), \
-             patch('app.services.personal_service.db'):
+        # Mock user 객체 설정
+        mock_user = Mock()
+        mock_user.id = 1
+        mock_user_repo.create_personal_user.return_value = mock_user
+
+        with patch('app.domains.user.services.personal_service.atomic_transaction'):
             result = service.register(
                 username='testuser',
                 email='test@example.com',
@@ -174,11 +178,11 @@ class TestPersonalServiceProfile:
         mock_profile = Mock()
         mock_profile.user_id = 1
 
-        with patch('app.services.personal_service.User') as MockUser:
-            MockUser.query.get.return_value = mock_user
-            mock_profile_repo.get_by_user_id.return_value = mock_profile
+        # Repository mock 설정
+        mock_user_repo.find_by_id.return_value = mock_user
+        mock_profile_repo.get_by_user_id.return_value = mock_profile
 
-            user, profile = service.get_user_with_profile(user_id=1)
+        user, profile = service.get_user_with_profile(user_id=1)
 
         assert user is not None
         assert profile is not None
@@ -187,10 +191,10 @@ class TestPersonalServiceProfile:
         """존재하지 않는 사용자 조회"""
         service, mock_user_repo, _ = mock_repos
 
-        with patch('app.services.personal_service.User') as MockUser:
-            MockUser.query.get.return_value = None
+        # Repository mock에서 None 반환 설정
+        mock_user_repo.find_by_id.return_value = None
 
-            user, profile = service.get_user_with_profile(user_id=999)
+        user, profile = service.get_user_with_profile(user_id=999)
 
         assert user is None
         assert profile is None
@@ -204,7 +208,7 @@ class TestPersonalServiceProfile:
         mock_profile.to_dict = Mock(return_value={'id': 1, 'name': 'Updated'})
         mock_profile_repo.get_by_user_id.return_value = mock_profile
 
-        with patch('app.services.personal_service.atomic_transaction'):
+        with patch('app.domains.user.services.personal_service.atomic_transaction'):
             result = service.update_profile(
                 user_id=1,
                 data={'name': 'Updated Name'}

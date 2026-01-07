@@ -53,7 +53,7 @@ class TestContractSettingsServiceSharingSettings:
 
     def test_get_sharing_settings_model(self, mock_repos, session):
         """데이터 공유 설정 모델 조회"""
-        with patch('app.services.contract.contract_settings_service.DataSharingSettings') as mock_model:
+        with patch('app.domains.contract.services.contract_settings_service.DataSharingSettings') as mock_model:
             mock_settings = Mock()
             mock_model.query.filter_by.return_value.first.return_value = mock_settings
 
@@ -97,7 +97,7 @@ class TestContractSettingsServiceSyncLogs:
 
     def test_get_sync_logs_filtered(self, mock_repos, session):
         """동기화 로그 필터링 조회"""
-        with patch('app.services.contract.contract_settings_service.SyncLog') as mock_log:
+        with patch('app.domains.contract.services.contract_settings_service.SyncLog') as mock_log:
             mock_log1 = Mock()
             mock_log1.to_dict.return_value = {'id': 1, 'sync_type': 'manual'}
             mock_query = Mock()

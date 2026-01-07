@@ -6,10 +6,10 @@ pytest conftest.py - 모든 테스트에서 공유되는 fixtures 정의
 import pytest
 from app import create_app
 from app.database import db as _db
-from app.models import User
-from app.models import Company
+from app.domains.user.models import User
+from app.domains.company.models import Company
 from app.domains.employee.models import Employee
-from app.models import PersonCorporateContract
+from app.domains.contract.models import PersonCorporateContract
 
 
 @pytest.fixture(scope='session')

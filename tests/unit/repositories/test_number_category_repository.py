@@ -5,8 +5,8 @@ NumberCategoryRepository 단위 테스트
 """
 import pytest
 from app.domains.company.repositories.number_category_repository import NumberCategoryRepository
-from app.models import NumberCategory
-from app.models import Company
+from app.domains.company.models import NumberCategory
+from app.domains.company.models import Company
 
 
 class TestNumberCategoryRepositoryInit:

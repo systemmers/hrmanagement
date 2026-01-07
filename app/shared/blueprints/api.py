@@ -5,13 +5,14 @@ FieldRegistry API를 제공합니다.
 Phase 2: Service 계층 표준화
 Phase 6: FieldRegistry API 추가
 Phase 2.4: API 응답 표준화 (2025-12-29)
+Phase 9: 도메인 마이그레이션 - app/shared/blueprints/로 이동
 """
 from flask import Blueprint, request, session
 
-from ..shared.constants.field_registry import FieldRegistry
-from ..shared.constants.session_keys import SessionKeys
-from ..shared.utils.api_helpers import api_success, api_error, api_not_found, api_forbidden
-from ..shared.utils.decorators import login_required
+from app.shared.constants.field_registry import FieldRegistry
+from app.shared.constants.session_keys import SessionKeys
+from app.shared.utils.api_helpers import api_success, api_error, api_not_found, api_forbidden
+from app.shared.utils.decorators import login_required
 
 api_bp = Blueprint('api', __name__)
 

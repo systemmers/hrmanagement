@@ -7,6 +7,7 @@ Phase 8: 제네릭 타입 적용 - IDE 자동완성 및 타입 안전성 강화
 Phase 24: Option A 레이어 분리 - find_by_id(), find_all() 표준화 (Model 반환)
 Phase 26: 레거시 메서드 완전 제거 (get_by_id, get_all 등)
 Phase 27: 트랜잭션 안전성 - commit 파라미터 추가 (단일 트랜잭션 지원)
+Phase 9: app/shared/repositories/로 이동 (도메인 마이그레이션)
 """
 from typing import List, Optional, Dict, Any, Type, TypeVar, Generic
 from app.database import db

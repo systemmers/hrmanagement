@@ -6,7 +6,7 @@ FileStorageService를 래핑하여 기존 API 호환성을 유지합니다.
 import os
 from flask import current_app
 
-from app.services.file_storage_service import (
+from app.shared.services.file_storage_service import (
     file_storage,
     ALLOWED_EXTENSIONS,
     ALLOWED_IMAGE_EXTENSIONS,

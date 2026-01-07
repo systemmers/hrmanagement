@@ -16,8 +16,8 @@ from app.domains.contract.services.contract_core_service import (
     ContractCoreService,
     contract_core_service
 )
-from app.models import PersonCorporateContract
-from app.models import User
+from app.domains.contract.models import PersonCorporateContract
+from app.domains.user.models import User
 from app.domains.employee.models import Employee
 from app.shared.constants.status import ContractStatus
 
@@ -25,11 +25,10 @@ from app.shared.constants.status import ContractStatus
 @pytest.fixture
 def mock_repos(app):
     """Service의 Repository를 Mock으로 대체하는 fixture"""
-    from app import extensions
-
     mock_contract_repo = Mock()
-    with patch.object(extensions, 'person_contract_repo', mock_contract_repo):
-        yield contract_core_service
+
+    with patch('app.domains.contract.get_person_contract_repo', return_value=mock_contract_repo):
+        yield contract_core_service, mock_contract_repo
 
 
 class TestContractCoreServiceInit:
@@ -50,42 +49,45 @@ class TestContractCoreServicePersonal:
 
     def test_get_personal_contracts(self, mock_repos):
         """개인 계약 목록 조회"""
-        mock_repos.contract_repo.get_by_person_user_id.return_value = [
+        service, mock_repo = mock_repos
+        mock_repo.get_by_person_user_id.return_value = [
             {'id': 1, 'status': 'approved'},
             {'id': 2, 'status': 'pending'}
         ]
-        
-        result = mock_repos.get_personal_contracts(user_id=1)
-        
+
+        result = service.get_personal_contracts(user_id=1)
+
         assert isinstance(result, list)
         assert len(result) == 2
-        mock_repos.contract_repo.get_by_person_user_id.assert_called_once_with(1)
+        mock_repo.get_by_person_user_id.assert_called_once_with(1)
 
     def test_get_personal_pending_contracts(self, mock_repos):
         """개인 대기 중인 계약 조회"""
-        mock_repos.contract_repo.get_pending_contracts_by_person.return_value = [
+        service, mock_repo = mock_repos
+        mock_repo.get_pending_contracts_by_person.return_value = [
             {'id': 1, 'status': 'pending'}
         ]
-        
-        result = mock_repos.get_personal_pending_contracts(user_id=1)
-        
+
+        result = service.get_personal_pending_contracts(user_id=1)
+
         assert isinstance(result, list)
         assert len(result) == 1
-        mock_repos.contract_repo.get_pending_contracts_by_person.assert_called_once_with(1)
+        mock_repo.get_pending_contracts_by_person.assert_called_once_with(1)
 
     def test_get_personal_statistics(self, mock_repos):
         """개인 계약 통계 조회"""
-        mock_repos.contract_repo.get_statistics_by_person.return_value = {
+        service, mock_repo = mock_repos
+        mock_repo.get_statistics_by_person.return_value = {
             'total': 5,
             'approved': 3,
             'pending': 2
         }
-        
-        result = mock_repos.get_personal_statistics(user_id=1)
-        
+
+        result = service.get_personal_statistics(user_id=1)
+
         assert isinstance(result, dict)
         assert 'total' in result
-        mock_repos.contract_repo.get_statistics_by_person.assert_called_once_with(1)
+        mock_repo.get_statistics_by_person.assert_called_once_with(1)
 
 
 class TestContractCoreServiceCorporate:
@@ -93,57 +95,61 @@ class TestContractCoreServiceCorporate:
 
     def test_get_company_contracts(self, mock_repos):
         """법인 계약 목록 조회"""
-        mock_repos.contract_repo.get_by_company_id.return_value = [
+        service, mock_repo = mock_repos
+        mock_repo.get_by_company_id.return_value = [
             {'id': 1, 'status': 'approved'},
             {'id': 2, 'status': 'pending'}
         ]
-        
-        result = mock_repos.get_company_contracts(company_id=1)
-        
+
+        result = service.get_company_contracts(company_id=1)
+
         assert isinstance(result, list)
         assert len(result) == 2
-        mock_repos.contract_repo.get_by_company_id.assert_called_once_with(1)
+        mock_repo.get_by_company_id.assert_called_once_with(1)
 
     def test_get_company_pending_contracts(self, mock_repos):
         """법인 대기 중인 계약 조회"""
-        mock_repos.contract_repo.get_pending_contracts_by_company.return_value = [
+        service, mock_repo = mock_repos
+        mock_repo.get_pending_contracts_by_company.return_value = [
             {'id': 1, 'status': 'pending'}
         ]
-        
-        result = mock_repos.get_company_pending_contracts(company_id=1)
-        
+
+        result = service.get_company_pending_contracts(company_id=1)
+
         assert isinstance(result, list)
         assert len(result) == 1
-        mock_repos.contract_repo.get_pending_contracts_by_company.assert_called_once_with(1)
+        mock_repo.get_pending_contracts_by_company.assert_called_once_with(1)
 
     def test_get_company_statistics(self, mock_repos):
         """법인 계약 통계 조회"""
-        mock_repos.contract_repo.get_statistics_by_company.return_value = {
+        service, mock_repo = mock_repos
+        mock_repo.get_statistics_by_company.return_value = {
             'total': 10,
             'approved': 7,
             'pending': 3
         }
-        
-        result = mock_repos.get_company_statistics(company_id=1)
-        
+
+        result = service.get_company_statistics(company_id=1)
+
         assert isinstance(result, dict)
         assert 'total' in result
-        mock_repos.contract_repo.get_statistics_by_company.assert_called_once_with(1)
+        mock_repo.get_statistics_by_company.assert_called_once_with(1)
 
     def test_search_contracts(self, mock_repos):
         """계약 검색"""
-        mock_repos.contract_repo.search_contracts.return_value = [
+        service, mock_repo = mock_repos
+        mock_repo.search_contracts.return_value = [
             {'id': 1, 'status': 'approved', 'name': '홍길동'}
         ]
-        
-        result = mock_repos.search_contracts(
+
+        result = service.search_contracts(
             company_id=1,
             status='approved',
             search_term='홍길동'
         )
-        
+
         assert isinstance(result, list)
-        mock_repos.contract_repo.search_contracts.assert_called_once_with(
+        mock_repo.search_contracts.assert_called_once_with(
             company_id=1,
             status='approved',
             contract_type=None,
@@ -156,9 +162,10 @@ class TestContractCoreServiceGetEligibleTargets:
 
     def test_get_contract_eligible_targets(self, mock_repos, session):
         """계약 요청 가능한 대상 목록 조회"""
-        with patch('app.services.contract.contract_core_service.User') as mock_user, \
-             patch('app.services.contract.contract_core_service.Employee') as mock_employee:
-            
+        service, mock_repo = mock_repos
+        with patch('app.domains.contract.services.contract_core_service.User') as mock_user, \
+             patch('app.domains.contract.services.contract_core_service.Employee') as mock_employee:
+
             # 개인 계정 Mock
             personal_user = Mock()
             personal_user.id = 1
@@ -166,7 +173,7 @@ class TestContractCoreServiceGetEligibleTargets:
             personal_user.email = 'test@test.com'
             personal_user.account_type = 'personal'
             personal_user.is_active = True
-            
+
             # 직원 Mock
             employee = Mock()
             employee.id = 1
@@ -175,20 +182,20 @@ class TestContractCoreServiceGetEligibleTargets:
             employee.position = '사원'
             employee.status = 'pending_contract'
             employee.company_id = 1
-            
+
             emp_user = Mock()
             emp_user.id = 2
             emp_user.email = 'emp@test.com'
             emp_user.employee_id = 1
-            
+
             mock_user.query.filter.return_value.all.return_value = [personal_user]
             mock_employee.query.filter.return_value.all.return_value = [employee]
             mock_user.query.filter.return_value.first.return_value = emp_user
-            
-            mock_repos.contract_repo.get_contract_between.return_value = None
-            
-            result = mock_repos.get_contract_eligible_targets(company_id=1)
-            
+
+            mock_repo.get_contract_between.return_value = None
+
+            result = service.get_contract_eligible_targets(company_id=1)
+
             assert isinstance(result, dict)
             assert 'personal_accounts' in result
             assert 'employee_accounts' in result
@@ -201,101 +208,108 @@ class TestContractCoreServiceGetContract:
 
     def test_get_contract_by_id_success(self, mock_repos):
         """계약 상세 조회 성공"""
+        service, mock_repo = mock_repos
         mock_contract = Mock()
         mock_contract.to_dict.return_value = {'id': 1, 'status': 'approved'}
-        mock_repos.contract_repo.find_by_id.return_value = mock_contract
-        
-        result = mock_repos.get_contract_by_id(contract_id=1)
-        
+        mock_repo.find_by_id.return_value = mock_contract
+
+        result = service.get_contract_by_id(contract_id=1)
+
         assert isinstance(result, dict)
         assert result['id'] == 1
-        mock_repos.contract_repo.find_by_id.assert_called_once_with(1)
+        mock_repo.find_by_id.assert_called_once_with(1)
 
     def test_get_contract_by_id_not_found(self, mock_repos):
         """계약 상세 조회 - 존재하지 않음"""
-        mock_repos.contract_repo.find_by_id.return_value = None
-        
-        result = mock_repos.get_contract_by_id(contract_id=999)
-        
+        service, mock_repo = mock_repos
+        mock_repo.find_by_id.return_value = None
+
+        result = service.get_contract_by_id(contract_id=999)
+
         assert result is None
 
     def test_get_contract_model_by_id(self, mock_repos):
         """계약 모델 조회"""
+        service, mock_repo = mock_repos
         mock_contract = Mock()
-        mock_repos.contract_repo.find_by_id.return_value = mock_contract
-        
-        result = mock_repos.get_contract_model_by_id(contract_id=1)
-        
+        mock_repo.find_by_id.return_value = mock_contract
+
+        result = service.get_contract_model_by_id(contract_id=1)
+
         assert result is not None
         assert result == mock_contract
 
     def test_find_contract_with_history(self, mock_repos, session):
         """계약 이력 조회"""
-        with patch('app.services.contract.contract_core_service.PersonCorporateContract') as mock_model:
+        service, mock_repo = mock_repos
+        with patch('app.domains.contract.services.contract_core_service.PersonCorporateContract') as mock_model:
             mock_query = Mock()
             mock_query.filter.return_value = mock_query
             mock_query.first.return_value = Mock(id=1, status='approved')
             mock_model.query = mock_query
-            
-            result = mock_repos.find_contract_with_history(
+
+            result = service.find_contract_with_history(
                 employee_number='EMP001',
                 company_id=1
             )
-            
+
             assert result is not None
 
     def test_find_contract_with_history_invalid_params(self, mock_repos):
         """계약 이력 조회 - 잘못된 파라미터"""
-        result = mock_repos.find_contract_with_history(
+        service, mock_repo = mock_repos
+        result = service.find_contract_with_history(
             employee_number=None,
             company_id=1
         )
-        
+
         assert result is None
 
     def test_find_approved_contract(self, mock_repos):
         """승인된 계약 조회"""
-        mock_repos.contract_repo.find_approved_contract_by_employee_number.return_value = Mock(
+        service, mock_repo = mock_repos
+        mock_repo.find_approved_contract_by_employee_number.return_value = Mock(
             id=1,
             status='approved'
         )
-        
-        result = mock_repos.find_approved_contract(
+
+        result = service.find_approved_contract(
             employee_number='EMP001',
             company_id=1
         )
-        
+
         assert result is not None
-        mock_repos.contract_repo.find_approved_contract_by_employee_number.assert_called_once_with(
+        mock_repo.find_approved_contract_by_employee_number.assert_called_once_with(
             'EMP001',
             1
         )
 
     def test_get_employee_contract_status(self, mock_repos):
         """직원의 계약 상태 조회"""
-        mock_repos.contract_repo.get_contract_between.return_value = {
+        service, mock_repo = mock_repos
+        mock_repo.get_contract_between.return_value = {
             'status': 'approved'
         }
-        
-        result = mock_repos.get_employee_contract_status(
+
+        result = service.get_employee_contract_status(
             employee_user_id=1,
             company_id=1
         )
-        
+
         assert result == 'approved'
-        mock_repos.contract_repo.get_contract_between.assert_called_once_with(
+        mock_repo.get_contract_between.assert_called_once_with(
             person_user_id=1,
             company_id=1
         )
 
     def test_get_employee_contract_status_none(self, mock_repos):
         """직원의 계약 상태 조회 - 계약 없음"""
-        mock_repos.contract_repo.get_contract_between.return_value = None
-        
-        result = mock_repos.get_employee_contract_status(
+        service, mock_repo = mock_repos
+        mock_repo.get_contract_between.return_value = None
+
+        result = service.get_employee_contract_status(
             employee_user_id=1,
             company_id=1
         )
-        
-        assert result == 'none'
 
+        assert result == 'none'

@@ -5,7 +5,7 @@ BaseRepository의 CRUD 메서드 테스트
 """
 import pytest
 
-from app.repositories.base_repository import BaseRepository
+from app.shared.repositories.base_repository import BaseRepository
 from app.domains.employee.models import Employee
 
 

@@ -54,6 +54,31 @@ class CorporateSettingsService:
         """모든 분류 옵션 조회"""
         return self.classification_repo.get_all_options(company_id)
 
+    def get_classifications(self, company_id: int, type_code: str = None) -> Dict:
+        """분류 옵션 조회 (타입별)
+
+        Args:
+            company_id: 법인 ID
+            type_code: 분류 타입 ('employment', 'organization', 또는 특정 카테고리)
+
+        Returns:
+            분류 옵션 딕셔너리
+        """
+        if not type_code:
+            return self.get_all_classifications(company_id)
+
+        if type_code == 'employment':
+            return self.get_employment_options(company_id)
+        elif type_code == 'organization':
+            return self.get_organization_options(company_id)
+        else:
+            # 특정 카테고리 조회
+            return {type_code: self.get_classifications_by_category(type_code, company_id)}
+
+    def get_organization_classifications(self, company_id: int) -> Dict:
+        """조직 분류 조회 (API 호환용)"""
+        return self.get_organization_options(company_id)
+
     def get_organization_options(self, company_id: int) -> Dict:
         """조직 구조 분류 옵션 조회"""
         return self.classification_repo.get_organization_options(company_id)

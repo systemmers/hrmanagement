@@ -7,8 +7,8 @@ Phase 7: 도메인 중심 마이그레이션 완료
 """
 from typing import Optional, Dict, List, Any
 from app.database import db
-from app.models import SystemSetting
-from app.repositories.base_repository import BaseRepository
+from app.domains.platform.models import SystemSetting
+from app.shared.repositories.base_repository import BaseRepository
 
 
 class SystemSettingRepository(BaseRepository[SystemSetting]):

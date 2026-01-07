@@ -41,7 +41,7 @@ def clean_int(val):
 
 def migrate_personal_educations(xlsx):
     """개인 학력 데이터 마이그레이션"""
-    from app.models.personal.education import PersonalEducation
+    # DEPRECATED: PersonalEducation merged into Education
 
     df = pd.read_excel(xlsx, sheet_name='PersonalEducation')
 

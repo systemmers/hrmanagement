@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 
 from flask import url_for
-from app.models import Notification, NotificationPreference
+from app.domains.user.models import Notification, NotificationPreference
 
 
 class NotificationService:

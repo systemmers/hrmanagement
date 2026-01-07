@@ -25,9 +25,9 @@ load_dotenv()
 
 from app import create_app
 from app.database import db
-from app.models.user import User
+from app.domains.user.models import User
 from app.domains.employee.models import Employee
-from app.models.company import Company
+from app.domains.company.models import Company
 from app.domains.employee.models import Education
 from app.domains.employee.models import Career
 from app.domains.employee.models import FamilyMember

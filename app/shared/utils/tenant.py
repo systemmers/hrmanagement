@@ -9,7 +9,7 @@ Phase 8: 상수 모듈 적용
 from flask import session, g
 
 from ..constants.session_keys import SessionKeys, AccountType
-from app.models import Company
+from app.domains.company.models import Company
 
 
 def get_current_company_id():

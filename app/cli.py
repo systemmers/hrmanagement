@@ -15,7 +15,7 @@ from flask.cli import with_appcontext
 def create_superadmin(username, email, password):
     """플랫폼 마스터 관리자 계정 생성"""
     from app.database import db
-    from app.models import User
+    from app.domains.user.models import User
 
     # 중복 검사
     if User.query.filter_by(username=username).first():
@@ -50,7 +50,7 @@ def create_superadmin(username, email, password):
 @with_appcontext
 def list_superadmins():
     """플랫폼 마스터 관리자 목록 조회"""
-    from app.models import User
+    from app.domains.user.models import User
 
     superadmins = User.query.filter_by(is_superadmin=True).all()
 

@@ -4,15 +4,17 @@
 조직 구조 CRUD 및 트리 관리 기능을 제공합니다.
 멀티테넌시: 현재 로그인한 회사의 조직만 접근 가능합니다.
 Phase 2: Service 계층 표준화
+Phase 9: 도메인 마이그레이션 - app/domains/company/blueprints/로 이동
 """
-from flask import render_template, request, flash, redirect, url_for, session
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 
-from . import admin_bp
-from ...shared.constants.session_keys import SessionKeys
+from app.shared.constants.session_keys import SessionKeys
 from app.domains.company.services.organization_service import organization_service
 from app.domains.company.services.company_service import company_service
-from ...shared.utils.decorators import admin_required, login_required
-from ...shared.utils.api_helpers import api_success, api_error, api_not_found, api_server_error
+from app.shared.utils.decorators import admin_required, login_required
+from app.shared.utils.api_helpers import api_success, api_error, api_not_found, api_server_error
+
+admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
 def get_current_root_organization_id():
@@ -206,3 +208,13 @@ def api_search_organizations():
 
     results = organization_service.search(query, root_organization_id=root_org_id)
     return api_success(results)
+
+
+# ===== 감사 대시보드 (UI) =====
+
+@admin_bp.route('/audit')
+@login_required
+@admin_required
+def audit_dashboard():
+    """감사 대시보드 페이지"""
+    return render_template('admin/audit_dashboard.html')

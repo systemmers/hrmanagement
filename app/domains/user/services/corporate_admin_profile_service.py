@@ -10,9 +10,9 @@ Phase 30: 레이어 분리 - Model.query 제거, Repository 패턴 적용
 """
 from typing import Dict, Optional, Tuple
 from app.shared.utils.transaction import atomic_transaction
-from app.models import User
-from app.models import CorporateAdminProfile
-from app.adapters.profile_adapter import CorporateAdminProfileAdapter
+from app.domains.user.models import User
+from app.domains.user.models import CorporateAdminProfile
+from app.shared.adapters.profile_adapter import CorporateAdminProfileAdapter
 
 
 class CorporateAdminProfileService:

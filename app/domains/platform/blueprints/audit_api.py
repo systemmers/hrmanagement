@@ -5,6 +5,7 @@
 Phase 4: 데이터 동기화 및 퇴사 처리
 Phase 7: 데코레이터 통합 리팩토링
 Phase 8: 상수 모듈 적용
+Phase 9: 도메인 마이그레이션 - app/domains/platform/blueprints/로 이동
 """
 from datetime import datetime, timedelta
 from flask import Blueprint, request, session
@@ -12,7 +13,7 @@ from flask import Blueprint, request, session
 from app.shared.constants.session_keys import SessionKeys, AccountType
 from app.domains.platform.services.audit_service import audit_service
 from app.shared.utils.date_helpers import parse_iso_date
-from app.models import AuditLog
+from app.domains.platform.models import AuditLog
 from app.shared.utils.decorators import (
     api_login_required as login_required,
     api_admin_or_manager_required as admin_required,

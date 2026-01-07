@@ -39,6 +39,14 @@ D:/projects/hrmanagement/
 │   ├── extensions.py            # Flask 확장 초기화
 │   ├── forms.py                 # WTForms 폼 정의
 │   │
+│   ├── domains/                 # 도메인 패키지 (Phase 1 완료)
+│   │   ├── employee/            # 직원 도메인 (models, repos, services, blueprints)
+│   │   ├── contract/            # 계약 도메인 (Phase 2 완료)
+│   │   ├── company/             # 법인 도메인
+│   │   ├── user/                # 사용자 도메인
+│   │   ├── platform/            # 플랫폼 도메인
+│   │   └── sync/                # 동기화 도메인 (Phase 6 완료)
+│   │
 │   ├── blueprints/              # Flask Blueprints (라우팅 레이어)
 │   │   ├── __init__.py          # Blueprint 등록
 │   │   ├── main.py              # 메인 페이지, 검색
@@ -1595,7 +1603,7 @@ def create_employee(self, data: dict) -> Employee:
 
 ---
 
-**문서 버전:** 1.1
+**문서 버전:** 1.2
 **작성일:** 2025-12-16
-**최종 수정일:** 2026-01-06
-**Phase:** 31 완료
+**최종 수정일:** 2026-01-07
+**Phase:** 도메인 마이그레이션 Phase 1 완료

@@ -28,22 +28,22 @@ alembic revision --autogenerate -m "migration message"
 
 ### Domain Structure (도메인 중심 구조)
 ```
-app/domains/                    # 도메인별 패키지 (Phase 8 완료)
+app/domains/                    # 도메인별 패키지 (Phase 1 마이그레이션 완료)
 ├── employee/                   # 직원 도메인 (~65개 파일)
 │   ├── __init__.py             # Repository 초기화 + 외부 인터페이스
 │   ├── models/                 # Employee, Education, Career 등 20개 모델
 │   ├── repositories/           # 20개 Repository
 │   ├── services/               # employee_service, employee_relation_service
 │   └── blueprints/             # employees_bp
-├── contract/                   # 계약 도메인
-│   ├── models/                 # PersonCorporateContract, DataSharingSettings, SyncLog
+├── contract/                   # 계약 도메인 (Phase 2 완료)
+│   ├── models/                 # PersonCorporateContract, DataSharingSettings
 │   ├── repositories/           # PersonContractRepository
-│   ├── services/               # contract_service, contract_core_service 등
+│   ├── services/               # contract_service (Facade), contract_core, workflow, settings
 │   └── blueprints/             # contracts_bp
 ├── company/                    # 법인 도메인
 │   ├── models/                 # Company, Organization, ClassificationOption 등
 │   ├── repositories/           # 7개 Repository
-│   ├── services/               # company_service, organization_service 등
+│   ├── services/               # company_service, organization_service, corporate_settings_service
 │   └── blueprints/             # corporate_bp, corporate_settings_api_bp
 ├── user/                       # 사용자 도메인
 │   ├── models/                 # User, CorporateAdminProfile, Notification
@@ -55,8 +55,9 @@ app/domains/                    # 도메인별 패키지 (Phase 8 완료)
 │   ├── repositories/           # SystemSettingRepository
 │   ├── services/               # platform_service, system_setting_service
 │   └── blueprints/             # platform_bp
-└── sync/                       # 동기화 도메인
-    ├── services/               # sync_service, termination_service
+└── sync/                       # 동기화 도메인 (Phase 6 완료)
+    ├── models/                 # SyncLog
+    ├── services/               # sync_service (Facade), sync_basic, sync_relation
     └── blueprints/             # sync_bp
 ```
 
@@ -120,9 +121,10 @@ Blueprint → Service → Repository → Model
 | Service → Service | O | 순환 참조 주의 |
 | Repository → Model | O | - |
 
-**레이어 분리 완료 상태** (Phase 24, 2025-12-28):
+**레이어 분리 완료 상태**:
 - Blueprint → Repository 직접 호출: 0건
 - Blueprint → Model.query: decorators.py만 허용 (인증용)
+- 도메인 마이그레이션 Phase 1 완료 (2026-01-07): 레거시 래퍼 파일 제거, Import 경로 정리
 
 ### Account Type System
 | Type | Description | Session Keys |
@@ -334,9 +336,11 @@ static/css/
 | 폼 선택 옵션 | `app/constants/field_options.py` |
 | 필드 메타데이터 | `app/constants/field_registry/` |
 | CSS 변수 | `app/static/css/core/variables.css` |
-| 법인 데이터 관리 | `app/services/company_service.py` |
-| 플랫폼 관리 | `app/services/platform_service.py` |
-| 계약 관리 | `app/services/contract_service.py` |
+| 법인 데이터 관리 | `app/domains/company/services/company_service.py` |
+| 법인 설정 관리 | `app/domains/company/services/corporate_settings_service.py` |
+| 플랫폼 관리 | `app/domains/platform/services/platform_service.py` |
+| 계약 관리 | `app/domains/contract/services/` (Facade 패턴) |
+| 동기화 관리 | `app/domains/sync/services/` (Facade 패턴) |
 
 **SRP (Single Responsibility Principle)**
 | 모듈 | 책임 |

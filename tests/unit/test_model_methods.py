@@ -12,8 +12,8 @@ class TestCompanyVisibilitySettingsModel:
 
     def test_model_defaults(self, session):
         """기본값 테스트"""
-        from app.models import CompanyVisibilitySettings
-        from app.models import Company
+        from app.domains.company.models import CompanyVisibilitySettings
+        from app.domains.company.models import Company
         
         company = Company(name='테스트', business_number='123', representative='대표')
         session.add(company)
@@ -27,8 +27,8 @@ class TestCompanyVisibilitySettingsModel:
 
     def test_model_to_dict(self, session):
         """to_dict 메서드 테스트"""
-        from app.models import CompanyVisibilitySettings
-        from app.models import Company
+        from app.domains.company.models import CompanyVisibilitySettings
+        from app.domains.company.models import Company
         
         company = Company(name='테스트', business_number='123', representative='대표')
         session.add(company)
@@ -51,8 +51,8 @@ class TestCompanySettingsModel:
 
     def test_model_creation(self, session):
         """모델 생성 테스트"""
-        from app.models import CompanySettings
-        from app.models import Company
+        from app.domains.company.models import CompanySettings
+        from app.domains.company.models import Company
         
         company = Company(name='테스트', business_number='123', representative='대표')
         session.add(company)
@@ -71,8 +71,8 @@ class TestCompanySettingsModel:
 
     def test_get_typed_value(self, session):
         """타입 변환 값 조회"""
-        from app.models import CompanySettings
-        from app.models import Company
+        from app.domains.company.models import CompanySettings
+        from app.domains.company.models import Company
         
         company = Company(name='테스트', business_number='123', representative='대표')
         session.add(company)
@@ -93,8 +93,8 @@ class TestCompanySettingsModel:
 
     def test_set_typed_value(self, session):
         """타입 변환 값 설정"""
-        from app.models import CompanySettings
-        from app.models import Company
+        from app.domains.company.models import CompanySettings
+        from app.domains.company.models import Company
         
         company = Company(name='테스트', business_number='123', representative='대표')
         session.add(company)
@@ -118,7 +118,7 @@ class TestSystemSettingModel:
 
     def test_model_creation(self, session):
         """모델 생성"""
-        from app.models import SystemSetting
+        from app.domains.platform.models import SystemSetting
         
         setting = SystemSetting(
             key='system.test',
@@ -132,7 +132,7 @@ class TestSystemSettingModel:
 
     def test_to_dict(self, session):
         """to_dict 메서드"""
-        from app.models import SystemSetting
+        from app.domains.platform.models import SystemSetting
         
         setting = SystemSetting(
             key='system.test',
@@ -152,8 +152,8 @@ class TestNumberCategoryModel:
 
     def test_model_creation(self, session):
         """모델 생성"""
-        from app.models import NumberCategory
-        from app.models import Company
+        from app.domains.company.models import NumberCategory
+        from app.domains.company.models import Company
         
         company = Company(name='테스트', business_number='123', representative='대표')
         session.add(company)
@@ -172,8 +172,8 @@ class TestNumberCategoryModel:
 
     def test_peek_next_sequence(self, session):
         """다음 시퀀스 미리보기"""
-        from app.models import NumberCategory
-        from app.models import Company
+        from app.domains.company.models import NumberCategory
+        from app.domains.company.models import Company
         
         company = Company(name='테스트', business_number='123', representative='대표')
         session.add(company)
@@ -200,7 +200,7 @@ class TestAttachmentModel:
         """모델 생성"""
         from app.domains.employee.models import Attachment
         from app.domains.employee.models import Employee
-        from app.models import Company
+        from app.domains.company.models import Company
         
         company = Company(name='테스트', business_number='123', representative='대표')
         session.add(company)
@@ -226,7 +226,7 @@ class TestAttachmentModel:
         """to_dict 메서드"""
         from app.domains.employee.models import Attachment
         from app.domains.employee.models import Employee
-        from app.models import Company
+        from app.domains.company.models import Company
         
         company = Company(name='테스트', business_number='123', representative='대표')
         session.add(company)
@@ -256,8 +256,8 @@ class TestCompanyDocumentModel:
 
     def test_model_creation(self, session):
         """모델 생성"""
-        from app.models import CompanyDocument
-        from app.models import Company
+        from app.domains.company.models import CompanyDocument
+        from app.domains.company.models import Company
         
         company = Company(name='테스트', business_number='123', representative='대표')
         session.add(company)
@@ -283,7 +283,7 @@ class TestModelConstants:
 
     def test_company_settings_constants(self):
         """CompanySettings 상수"""
-        from app.models import CompanySettings
+        from app.domains.company.models import CompanySettings
         
         assert hasattr(CompanySettings, 'TYPE_STRING')
         assert hasattr(CompanySettings, 'TYPE_INTEGER')
@@ -291,14 +291,14 @@ class TestModelConstants:
 
     def test_number_category_constants(self):
         """NumberCategory 상수"""
-        from app.models import NumberCategory
+        from app.domains.company.models import NumberCategory
         
         assert hasattr(NumberCategory, 'TYPE_EMPLOYEE')
         assert hasattr(NumberCategory, 'TYPE_ASSET')
 
     def test_company_visibility_defaults(self):
         """CompanyVisibilitySettings 기본값"""
-        from app.models import CompanyVisibilitySettings
+        from app.domains.company.models import CompanyVisibilitySettings
         
         assert hasattr(CompanyVisibilitySettings, 'DEFAULTS')
         assert CompanyVisibilitySettings.DEFAULTS is not None

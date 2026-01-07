@@ -29,7 +29,7 @@ def get_relation_config(relation_type: str, repositories: Dict[str, Any]) -> Rel
     Returns:
         RelationDataConfig 인스턴스
     """
-    from app.models import (
+    from app.domains.employee.models import (
         Education, Career, Certificate, Language,
         FamilyMember, Award, ProjectParticipation
     )

@@ -16,7 +16,7 @@ import json
 
 from flask import request, session, g, current_app
 from app.shared.constants.session_keys import SessionKeys
-from app.models import AuditLog
+from app.domains.platform.models import AuditLog
 
 
 class AuditService:

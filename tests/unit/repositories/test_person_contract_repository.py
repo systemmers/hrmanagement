@@ -3,7 +3,7 @@ PersonContractRepository 단위 테스트
 """
 import pytest
 from app.domains.contract.repositories.person_contract_repository import PersonContractRepository
-from app.models import PersonCorporateContract
+from app.domains.contract.models import PersonCorporateContract
 
 
 class TestPersonContractRepository:

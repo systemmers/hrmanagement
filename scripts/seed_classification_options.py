@@ -14,7 +14,7 @@ load_dotenv()
 
 from app import create_app
 from app.database import db
-from app.models.classification_option import ClassificationOption
+from app.domains.company.models import ClassificationOption
 
 # 기본 데이터 정의
 DEFAULT_OPTIONS = {

@@ -4,7 +4,7 @@ Employee Service (Compatibility Layer)
 이 파일은 기존 import 경로 호환성을 유지하기 위한 리다이렉트 모듈입니다.
 
 기존 코드:
-    from app.services.employee_service import employee_service
+    from app.domains.employee.services import employee_service
 
 새로운 구조 (권장):
     from . import employee_service

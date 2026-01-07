@@ -17,7 +17,7 @@ def mock_repos(app):
     """CompanyService의 Repository를 Mock으로 대체하는 fixture"""
     mock_company_repo = Mock()
 
-    with patch.object(company_service, 'company_repo', mock_company_repo):
+    with patch('app.domains.company.get_company_repo', return_value=mock_company_repo):
         yield company_service, mock_company_repo
 
 
@@ -116,7 +116,7 @@ class TestCompanyServiceUpdate:
         mock_company.to_dict = Mock(return_value={'id': 1, 'name': 'New Name'})
         mock_repo.find_by_id.return_value = mock_company
 
-        with patch('app.services.company_service.atomic_transaction'):
+        with patch('app.domains.company.services.company_service.atomic_transaction'):
             result = service.update_company_info(
                 company_id=1,
                 form_data={
@@ -154,7 +154,7 @@ class TestCompanyServiceUpdate:
         mock_company.to_dict = Mock(return_value={'id': 1, 'name': 'Original Name'})
         mock_repo.find_by_id.return_value = mock_company
 
-        with patch('app.services.company_service.atomic_transaction'):
+        with patch('app.domains.company.services.company_service.atomic_transaction'):
             result = service.update_company_info(
                 company_id=1,
                 form_data={'phone': '02-9999-8888'}  # 전화번호만 수정
@@ -181,7 +181,7 @@ class TestCompanyServiceIntegration:
         assert company is not None
 
         # 수정
-        with patch('app.services.company_service.atomic_transaction'):
+        with patch('app.domains.company.services.company_service.atomic_transaction'):
             result = service.update_company_info(
                 company_id=1,
                 form_data={'company_name': 'Updated Corp'}

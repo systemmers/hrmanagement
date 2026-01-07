@@ -4,12 +4,13 @@ AI 테스트 Blueprint
 - AI 설정 확인
 
 Phase 27.2: API 응답 표준화 (api_helpers 사용)
+Phase 9: 도메인 마이그레이션 - app/domains/platform/blueprints/로 이동
 """
 from flask import Blueprint, render_template, request, current_app
 import os
 
-from ..shared.utils.decorators import login_required, admin_required
-from ..shared.utils.api_helpers import api_success, api_error, api_server_error
+from app.shared.utils.decorators import login_required, admin_required
+from app.shared.utils.api_helpers import api_success, api_error, api_server_error
 
 ai_test_bp = Blueprint('ai_test', __name__, url_prefix='/ai-test')
 
@@ -48,7 +49,7 @@ def analyze():
 
     try:
         # AI 분석 실행
-        from ..services.ai_service import AIService
+        from app.shared.services.ai_service import AIService
         result = AIService.analyze(
             file_path=file_path,
             provider_name=provider,
@@ -74,7 +75,7 @@ def settings():
 
     # 사용 가능한 Provider 목록
     try:
-        from ..services.ai_service import AIService
+        from app.shared.services.ai_service import AIService
         providers = list(AIService.get_available_providers().keys())
     except ImportError:
         providers = []
@@ -110,7 +111,7 @@ def get_sample_file_path(filename):
 def get_available_providers():
     """사용 가능한 AI Provider 목록"""
     try:
-        from ..services.ai_service import AIService
+        from app.shared.services.ai_service import AIService
         return list(AIService.get_available_providers().keys())
     except ImportError:
         # AI Service가 아직 구현되지 않은 경우 기본값

@@ -38,11 +38,11 @@ class TestAuditServiceLog:
         service = AuditService()
         service.enable()
 
-        with patch('app.services.audit_service.session') as mock_session, \
-             patch('app.services.audit_service.request') as mock_request, \
-             patch('app.services.audit_service.AuditLog') as mock_log_model, \
-             patch('app.services.audit_service.db') as mock_db, \
-             patch('app.services.audit_service.json') as mock_json:
+        with patch('app.domains.platform.services.audit_service.session') as mock_session, \
+             patch('app.domains.platform.services.audit_service.request') as mock_request, \
+             patch('app.domains.platform.services.audit_service.AuditLog') as mock_log_model, \
+             patch('app.domains.platform.services.audit_service.db') as mock_db, \
+             patch('app.domains.platform.services.audit_service.json') as mock_json:
             def session_get(key):
                 return {SessionKeys.USER_ID: 1, SessionKeys.ACCOUNT_TYPE: 'corporate', SessionKeys.COMPANY_ID: 1}.get(key)
             mock_session.get = session_get
@@ -92,7 +92,7 @@ class TestAuditServiceQueries:
         """로그 조회 성공"""
         service = AuditService()
 
-        with patch('app.services.audit_service.AuditLog') as mock_log:
+        with patch('app.domains.platform.services.audit_service.AuditLog') as mock_log:
             mock_log_instance = Mock()
             mock_log_instance.to_dict.return_value = {'id': 1, 'action': 'view'}
             mock_query = Mock()

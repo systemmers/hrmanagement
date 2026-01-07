@@ -7,7 +7,7 @@ import pytest
 from flask import session
 
 from app.shared.constants.session_keys import SessionKeys
-from app.models import User
+from app.domains.user.models import User
 
 
 class TestLogin:

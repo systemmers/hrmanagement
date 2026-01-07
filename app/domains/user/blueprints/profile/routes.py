@@ -5,12 +5,13 @@ Profile Routes - 통합 프로필 라우트
 Phase 8: 상수 모듈 적용
 Phase 2: Service 계층 표준화
 Phase 9: DRY 원칙 - photo 업로드 중앙화
+Phase 9: 도메인 마이그레이션 - app/domains/user/blueprints/profile/로 이동
 """
 from flask import render_template, g, request, flash, redirect, url_for, session
 
-from app.blueprints.profile import profile_bp
+from app.domains.user.blueprints.profile import profile_bp
 from app.shared.constants.session_keys import SessionKeys, AccountType
-from app.blueprints.profile.decorators import (
+from app.domains.user.blueprints.profile.decorators import (
     unified_profile_required,
     corporate_only,
     corporate_admin_only
@@ -19,7 +20,7 @@ from app.domains.user.services.user_service import user_service
 from app.domains.employee.services.attachment_service import attachment_service
 from app.domains.user.services.corporate_admin_profile_service import corporate_admin_profile_service
 from app.domains.employee.services import employee_service
-from app.services.file_storage_service import file_storage, CATEGORY_ADMIN_PHOTO
+from app.shared.services.file_storage_service import file_storage, CATEGORY_ADMIN_PHOTO
 from app.shared.utils.api_helpers import api_success, api_error, api_not_found, api_forbidden, api_server_error
 
 

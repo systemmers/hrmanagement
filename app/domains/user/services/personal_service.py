@@ -17,7 +17,7 @@ Phase 30: 레이어 분리 - Model.query 제거, Repository 패턴 적용
 import re
 from typing import Dict, Optional, List, Tuple
 from datetime import datetime, timedelta
-from app.models import User
+from app.domains.user.models import User
 from app.domains.employee.models import Profile
 from app.shared.utils.transaction import atomic_transaction
 from app.domains.employee.services.profile_relation_service import profile_relation_service
@@ -62,7 +62,7 @@ class PersonalService:
     def contract_repo(self):
         """지연 초기화된 계약 Repository"""
         if self._contract_repo is None:
-            from app.repositories.contract.person_contract_repository import person_contract_repository
+            from app.domains.contract.repositories.person_contract_repository import person_contract_repository
             self._contract_repo = person_contract_repository
         return self._contract_repo
 

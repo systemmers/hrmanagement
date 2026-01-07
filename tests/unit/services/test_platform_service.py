@@ -26,7 +26,7 @@ class TestPlatformServiceUserManagement:
 
     def test_get_users_paginated_success(self, session):
         """사용자 목록 조회 성공"""
-        with patch('app.services.platform_service.User') as mock_user:
+        with patch('app.domains.platform.services.platform_service.User') as mock_user:
             mock_user_instance = Mock(id=1, username='test')
             mock_pagination = Mock()
             mock_pagination.items = [mock_user_instance]
@@ -45,7 +45,7 @@ class TestPlatformServiceUserManagement:
 
     def test_get_user_by_id_success(self, session):
         """사용자 ID로 조회 성공"""
-        with patch('app.services.platform_service.db') as mock_db:
+        with patch('app.domains.platform.services.platform_service.db') as mock_db:
             mock_user = Mock(id=1, username='test')
             mock_db.session.get.return_value = mock_user
 
@@ -56,8 +56,8 @@ class TestPlatformServiceUserManagement:
 
     def test_toggle_user_active_success(self, session):
         """사용자 활성화/비활성화 토글 성공"""
-        with patch('app.services.platform_service.db') as mock_db, \
-             patch('app.services.platform_service.atomic_transaction'):
+        with patch('app.domains.platform.services.platform_service.db') as mock_db, \
+             patch('app.domains.platform.services.platform_service.atomic_transaction'):
             mock_user = Mock(id=2, is_active=True)
             mock_db.session.get.return_value = mock_user
 
@@ -85,7 +85,7 @@ class TestPlatformServiceCompanyManagement:
 
     def test_get_companies_paginated_success(self, session):
         """법인 목록 조회 성공"""
-        with patch('app.services.platform_service.Company') as mock_company:
+        with patch('app.domains.platform.services.platform_service.Company') as mock_company:
             mock_company_instance = Mock(id=1, name='테스트법인')
             mock_pagination = Mock()
             mock_pagination.items = [mock_company_instance]

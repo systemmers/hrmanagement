@@ -5,7 +5,7 @@ Attachment Repository
 """
 from typing import List, Dict
 from app.domains.employee.models import Attachment
-from app.repositories.base_repository import BaseRelationRepository
+from app.shared.repositories.base_repository import BaseRelationRepository
 
 
 class AttachmentRepository(BaseRelationRepository[Attachment]):

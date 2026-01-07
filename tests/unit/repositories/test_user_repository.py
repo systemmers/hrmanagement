@@ -3,7 +3,7 @@ UserRepository 단위 테스트
 """
 import pytest
 from app.domains.user.repositories.user_repository import UserRepository
-from app.models import User
+from app.domains.user.models import User
 
 
 class TestUserRepository:

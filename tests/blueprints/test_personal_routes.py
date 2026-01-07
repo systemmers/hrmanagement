@@ -56,7 +56,7 @@ class TestPersonalProfileEdit:
     def test_profile_edit_post_success(self, auth_client_personal_full, test_user_personal):
         """프로필 수정 POST 성공"""
         from app.domains.user.services.personal_service import personal_service
-        from app.models import PersonalProfile
+        from app.domains.user.models import PersonalProfile
         from app.shared.base.service_result import ServiceResult
         from unittest.mock import MagicMock
         
@@ -91,7 +91,7 @@ class TestPersonalPhotoUpload:
     def test_photo_upload_invalid_file(self, auth_client_personal_full, test_user_personal):
         """잘못된 파일 형식 업로드"""
         from app.domains.user.services.personal_service import personal_service
-        from app.models import PersonalProfile
+        from app.domains.user.models import PersonalProfile
         from app.shared.base.service_result import ServiceResult
         from unittest.mock import MagicMock
         

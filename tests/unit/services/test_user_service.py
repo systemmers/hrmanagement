@@ -15,11 +15,10 @@ from app.domains.user.services.user_service import UserService, user_service
 @pytest.fixture
 def mock_repos(app):
     """UserService의 Repository를 Mock으로 대체하는 fixture"""
-    from app import extensions
-
     mock_user_repo = Mock()
 
-    with patch.object(extensions, 'user_repo', mock_user_repo):
+    # UserService.user_repo는 get_user_repo()를 호출하므로 getter를 패치
+    with patch('app.domains.user.get_user_repo', return_value=mock_user_repo):
         yield user_service, mock_user_repo
 
 

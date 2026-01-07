@@ -12,7 +12,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 
 from app.shared.constants.session_keys import SessionKeys, AccountType
 from app.shared.utils.api_helpers import api_success, api_error, api_forbidden, api_not_found
-from app.models import User
+from app.domains.user.models import User
 from app.shared.utils.decorators import corporate_login_required, corporate_admin_required
 from app.shared.utils.corporate_helpers import (
     extract_registration_data,

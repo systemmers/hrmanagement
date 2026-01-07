@@ -13,7 +13,7 @@ from typing import Dict
 
 from app.domains.employee.services.employee_account_service import EmployeeAccountService, employee_account_service
 from app.domains.employee.models import Employee
-from app.models import User
+from app.domains.user.models import User
 
 
 @pytest.fixture
@@ -48,7 +48,7 @@ class TestEmployeeAccountServiceValidation:
 
     def test_validate_account_data_valid(self, mock_repos, session):
         """유효한 계정 정보 검증"""
-        with patch('app.services.employee_account_service.User') as mock_user:
+        with patch('app.domains.employee.services.employee_account_service.User') as mock_user:
             mock_user.query.filter_by.return_value.first.return_value = None
 
             result = mock_repos.validate_account_data(
@@ -81,7 +81,7 @@ class TestEmployeeAccountServiceValidation:
 
     def test_validate_account_data_duplicate_username(self, mock_repos, session):
         """중복된 사용자명일 때"""
-        with patch('app.services.employee_account_service.User') as mock_user:
+        with patch('app.domains.employee.services.employee_account_service.User') as mock_user:
             mock_existing = Mock()
             mock_existing.id = 1
             mock_user.query.filter_by.return_value.first.return_value = mock_existing
@@ -96,7 +96,7 @@ class TestEmployeeAccountServiceValidation:
 
     def test_validate_account_data_exclude_user_id(self, mock_repos, session):
         """수정 시 자신의 ID는 제외"""
-        with patch('app.services.employee_account_service.User') as mock_user:
+        with patch('app.domains.employee.services.employee_account_service.User') as mock_user:
             mock_existing = Mock()
             mock_existing.id = 1
             mock_user.query.filter_by.return_value.first.return_value = mock_existing
@@ -147,9 +147,9 @@ class TestEmployeeAccountServiceCreateEmployeeWithAccount:
             'role': User.ROLE_EMPLOYEE
         }
 
-        with patch('app.services.employee_account_service.User') as mock_user_model, \
-             patch('app.services.employee_account_service.Employee') as mock_employee_model, \
-             patch('app.services.employee_account_service.atomic_transaction'):
+        with patch('app.domains.employee.services.employee_account_service.User') as mock_user_model, \
+             patch('app.domains.employee.services.employee_account_service.Employee') as mock_employee_model, \
+             patch('app.domains.employee.services.employee_account_service.atomic_transaction'):
             mock_user_model.query.filter_by.return_value.first.return_value = None
             mock_employee = Mock()
             mock_employee.id = 1
@@ -182,7 +182,7 @@ class TestEmployeeAccountServiceCreateEmployeeWithAccount:
             'email': 'invalid-email'
         }
 
-        with patch('app.services.employee_account_service.User') as mock_user_model:
+        with patch('app.domains.employee.services.employee_account_service.User') as mock_user_model:
             mock_user_model.query.filter_by.return_value.first.return_value = None
 
             success, result, error = mock_repos.create_employee_with_account(
@@ -206,8 +206,8 @@ class TestEmployeeAccountServiceAccountManagement:
         mock_employee.id = 1
         mock_repos.employee_repo.find_by_id.return_value = mock_employee
 
-        with patch('app.services.employee_account_service.User') as mock_user_model, \
-             patch('app.services.employee_account_service.atomic_transaction'):
+        with patch('app.domains.employee.services.employee_account_service.User') as mock_user_model, \
+             patch('app.domains.employee.services.employee_account_service.atomic_transaction'):
             mock_user = Mock()
             mock_user_model.query.filter_by.return_value.first.return_value = mock_user
 
@@ -241,9 +241,9 @@ class TestEmployeeAccountServiceAccountManagement:
         mock_employee.id = 1
         mock_repos.employee_repo.find_by_id.return_value = mock_employee
 
-        with patch('app.services.employee_account_service.User') as mock_user_model, \
-             patch('app.services.employee_account_service.atomic_transaction'), \
-             patch('app.services.employee_account_service.EmployeeStatus') as mock_status:
+        with patch('app.domains.employee.services.employee_account_service.User') as mock_user_model, \
+             patch('app.domains.employee.services.employee_account_service.atomic_transaction'), \
+             patch('app.domains.employee.services.employee_account_service.EmployeeStatus') as mock_status:
             mock_status.ACTIVE = 'active'
             mock_user = Mock()
             mock_user_model.query.filter_by.return_value.first.return_value = mock_user
@@ -263,8 +263,8 @@ class TestEmployeeAccountServiceGetEmployeesWithoutAccount:
 
     def test_get_employees_without_account(self, mock_repos, session, test_company):
         """계정 없는 직원 목록 조회"""
-        with patch('app.services.employee_account_service.Employee') as mock_employee_model, \
-             patch('app.services.employee_account_service.User') as mock_user_model:
+        with patch('app.domains.employee.services.employee_account_service.Employee') as mock_employee_model, \
+             patch('app.domains.employee.services.employee_account_service.User') as mock_user_model:
             mock_emp1 = Mock()
             mock_emp1.id = 1
             mock_emp1.name = '직원1'

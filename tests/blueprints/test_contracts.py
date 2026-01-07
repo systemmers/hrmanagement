@@ -11,7 +11,7 @@ import pytest
 import json
 
 from app.shared.constants.session_keys import SessionKeys
-from app.models import User
+from app.domains.user.models import User
 
 
 class TestPersonalContracts:

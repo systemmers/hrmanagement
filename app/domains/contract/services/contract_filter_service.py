@@ -10,7 +10,7 @@ Phase 30: 레이어 분리 - Model.query 제거, Repository 패턴 적용
 """
 from typing import List, Dict, Optional
 
-from app.models import PersonCorporateContract
+from app.domains.contract.models import PersonCorporateContract
 from app.shared.constants.status import ContractStatus
 
 
@@ -34,8 +34,8 @@ class ContractFilterService:
     def contract_repo(self):
         """지연 초기화된 계약 Repository"""
         if self._contract_repo is None:
-            from ..repositories.contract.person_contract_repository import person_contract_repository
-            self._contract_repo = person_contract_repository
+            from app.domains.contract import get_person_contract_repo
+            self._contract_repo = get_person_contract_repo()
         return self._contract_repo
 
     @property

@@ -5,8 +5,10 @@ Shared Services
 - AI 서비스 (문서 분석)
 - 파일 스토리지 서비스
 - 이벤트 리스너
+- Validation 서비스
 
 Phase 7: 도메인 중심 마이그레이션 완료
+Phase 9: Validation 서비스 추가
 """
 
 from .ai_service import AIService
@@ -18,6 +20,12 @@ from .event_listeners import (
     cleanup_event_listeners,
     get_model_changes,
     track_field_changes,
+)
+from .validation import (
+    ProfileBasicInfoValidator,
+    ValidationResult,
+    ValidationError,
+    validate_profile_basic_info,
 )
 
 # 상수들도 export
@@ -59,4 +67,9 @@ __all__ = [
     'cleanup_event_listeners',
     'get_model_changes',
     'track_field_changes',
+    # Validation
+    'ProfileBasicInfoValidator',
+    'ValidationResult',
+    'ValidationError',
+    'validate_profile_basic_info',
 ]

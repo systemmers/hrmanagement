@@ -8,8 +8,8 @@ Phase 30: 레이어 분리 - Service의 Model.query 직접 사용 제거
 """
 from typing import Optional, List, Any
 from app.database import db
-from app.models import SyncLog
-from app.repositories.base_repository import BaseRepository
+from app.domains.contract.models import SyncLog
+from app.shared.repositories.base_repository import BaseRepository
 
 
 class SyncLogRepository(BaseRepository[SyncLog]):

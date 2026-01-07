@@ -9,7 +9,7 @@ from unittest.mock import Mock, patch, MagicMock
 from datetime import date
 
 from app.shared.constants.session_keys import SessionKeys
-from app.models import User
+from app.domains.user.models import User
 
 
 class TestPersonalProfileView:
@@ -60,7 +60,7 @@ class TestPersonalProfileEdit:
         self, mock_update_relations, mock_update, mock_ensure, mock_get_user, auth_client_personal_full
     ):
         """프로필 수정 제출 성공 테스트"""
-        from app.models import User
+        from app.domains.user.models import User
         from app.domains.employee.models import Profile
         
         mock_user = User(id=1, username='test')

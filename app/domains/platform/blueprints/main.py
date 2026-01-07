@@ -3,14 +3,15 @@
 
 대시보드 및 검색 기능을 제공합니다.
 Phase 2: Service 계층 표준화
+Phase 9: 도메인 마이그레이션 - app/domains/platform/blueprints/로 이동
 """
 from flask import Blueprint, render_template, request, session, redirect, url_for
 
-from ..shared.constants.session_keys import SessionKeys, AccountType, UserRole
-from ..shared.utils.api_helpers import api_success
+from app.shared.constants.session_keys import SessionKeys, AccountType, UserRole
+from app.shared.utils.api_helpers import api_success
 from app.domains.employee.services import employee_service
-from ..shared.utils.decorators import login_required
-from ..shared.utils.tenant import get_current_organization_id
+from app.shared.utils.decorators import login_required
+from app.shared.utils.tenant import get_current_organization_id
 
 main_bp = Blueprint('main', __name__)
 

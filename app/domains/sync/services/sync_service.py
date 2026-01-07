@@ -13,8 +13,8 @@ from datetime import datetime
 import json
 
 from app.domains.employee.models import Employee
-from app.models import SyncLog, PersonCorporateContract
-from app.models import PersonalProfile
+from app.domains.contract.models import PersonCorporateContract, SyncLog
+from app.domains.user.models import PersonalProfile
 from app.shared.utils.transaction import atomic_transaction
 
 # 서브 서비스 임포트 (같은 패키지 내)
@@ -68,7 +68,7 @@ class SyncService:
     def contract_repo(self):
         """지연 초기화된 계약 Repository"""
         if self._contract_repo is None:
-            from app.repositories.contract.person_contract_repository import person_contract_repository
+            from app.domains.contract.repositories.person_contract_repository import person_contract_repository
             self._contract_repo = person_contract_repository
         return self._contract_repo
 

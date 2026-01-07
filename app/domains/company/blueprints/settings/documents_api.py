@@ -12,7 +12,7 @@ from flask import request, session, send_file
 from app.domains.company.blueprints.settings import corporate_settings_api_bp
 from app.domains.company.blueprints.settings.helpers import get_company_id
 from app.shared.constants.session_keys import SessionKeys
-from app.services.file_storage_service import file_storage
+from app.shared.services.file_storage_service import file_storage
 from app.domains.company.services.corporate_settings_service import corporate_settings_service
 from app.shared.utils.api_helpers import api_success, api_error, api_forbidden, api_not_found
 from app.shared.utils.decorators import corporate_admin_required

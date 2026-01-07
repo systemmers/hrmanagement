@@ -29,13 +29,13 @@ def create_app(config_name=None):
     db.init_app(app)
 
     # SQLAlchemy 모델 import (테이블 생성 전 필수)
-    from .models import (
+    from .domains.employee.models import (
         Employee, Education, Career, Certificate, FamilyMember,
         Language, MilitaryService, Salary, Benefit, Contract,
         SalaryHistory, Promotion, Evaluation, Training, Attendance,
         Insurance, HrProject, ProjectParticipation, Award, Asset, SalaryPayment, Attachment,
-        ClassificationOption
     )
+    from .domains.company.models import ClassificationOption
 
     # 테이블 생성 (개발 환경)
     with app.app_context():
@@ -46,7 +46,7 @@ def create_app(config_name=None):
     init_extensions(app)
 
     # Blueprint 등록
-    from .blueprints import register_blueprints
+    from .shared.blueprints import register_blueprints
     register_blueprints(app)
 
     # 템플릿 유틸리티

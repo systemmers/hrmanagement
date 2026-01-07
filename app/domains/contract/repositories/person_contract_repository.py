@@ -9,11 +9,11 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 from app.database import db
 from app.domains.contract.models import PersonCorporateContract, DataSharingSettings, SyncLog
-from app.models import User
+from app.domains.user.models import User
 from app.domains.employee.models import Employee
-from app.models import PersonalProfile
+from app.domains.user.models import PersonalProfile
 from app.shared.constants.status import EmployeeStatus, ContractStatus
-from app.repositories.base_repository import BaseRepository
+from app.shared.repositories.base_repository import BaseRepository
 
 
 class PersonContractRepository(BaseRepository[PersonCorporateContract]):

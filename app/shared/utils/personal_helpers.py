@@ -13,7 +13,7 @@ from flask import session, jsonify, g
 from ..constants.session_keys import SessionKeys
 
 if TYPE_CHECKING:
-    from app.models import PersonalProfile
+    from app.domains.user.models import PersonalProfile
 
 # 지연 초기화용
 _personal_profile_repo = None

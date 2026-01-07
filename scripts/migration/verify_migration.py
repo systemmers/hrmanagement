@@ -53,13 +53,14 @@ def test_all_models_accessible():
     """Test that all models are accessible"""
     print("\n--- Test 2: Model Accessibility ---")
     try:
-        from app.models import (
-            User, Employee, Organization, ClassificationOption,
-            Education, Career, Certificate, FamilyMember, Language, MilitaryService,
-            Salary, Benefit, Contract, SalaryHistory,
-            Promotion, Evaluation, Training, Attendance,
-            Insurance, Project, Award, Asset,
-            SalaryPayment, Attachment, SystemSetting
+        from app.domains.user.models import User
+        from app.domains.company.models import Organization, ClassificationOption
+        from app.domains.platform.models import SystemSetting
+        from app.domains.employee.models import (
+            Employee, Education, Career, Certificate, FamilyMember, Language,
+            MilitaryService, Salary, Benefit, Contract, SalaryHistory,
+            Promotion, Evaluation, Training, Attendance, Insurance,
+            HrProject as Project, Award, Asset, SalaryPayment, Attachment
         )
 
         models = [
@@ -155,7 +156,8 @@ def test_basic_queries():
         from app import create_app
         from app.database import db
         from app.domains.employee.models import Employee
-from app.models import User, Organization
+from app.domains.company.models import Organization
+from app.domains.user.models import User
 
         app = create_app()
         with app.app_context():
@@ -192,7 +194,7 @@ def test_write_operation():
     try:
         from app import create_app
         from app.database import db
-        from app.models import SystemSetting
+        from app.domains.platform.models import SystemSetting
 
         app = create_app()
         with app.app_context():
@@ -225,7 +227,7 @@ def test_login_credentials():
     print("\n--- Test 7: Login Credentials Verification ---")
     try:
         from app import create_app
-        from app.models import User
+        from app.domains.user.models import User
 
         app = create_app()
         with app.app_context():

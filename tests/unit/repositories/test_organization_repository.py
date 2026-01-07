@@ -8,8 +8,8 @@ OrganizationRepository 단위 테스트
 """
 import pytest
 from app.domains.company.repositories.organization_repository import OrganizationRepository
-from app.models import Organization
-from app.models import Company
+from app.domains.company.models import Organization
+from app.domains.company.models import Company
 
 
 class TestOrganizationRepositoryInit:

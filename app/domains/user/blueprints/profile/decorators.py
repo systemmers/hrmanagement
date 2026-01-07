@@ -5,6 +5,7 @@ Profile Decorators - 통합 프로필 인증 데코레이터
 Phase 8: 상수 모듈 적용
 Phase 4.1: PersonalProfile → Profile 마이그레이션 완료
 Phase 24: 레이어 분리 - Model.query → Service 경유 조회
+Phase 9: 도메인 마이그레이션 - app/domains/user/blueprints/profile/로 이동
 """
 from functools import wraps
 from flask import session, g, flash, redirect, url_for, current_app
@@ -13,7 +14,7 @@ from app.shared.constants.session_keys import SessionKeys, AccountType
 from app.domains.user.services.personal_service import personal_service
 from app.domains.employee.services import employee_service
 from app.domains.user.services.corporate_admin_profile_service import corporate_admin_profile_service
-from app.adapters.profile_adapter import (
+from app.shared.adapters.profile_adapter import (
     EmployeeProfileAdapter,
     PersonalProfileAdapter,
     CorporateAdminProfileAdapter

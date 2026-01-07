@@ -34,7 +34,7 @@ class TestAIServiceGetProvider:
 
     def test_get_provider_valid_name(self, app):
         """유효한 Provider 이름으로 인스턴스 생성"""
-        with patch('app.services.ai_service.current_app') as mock_app:
+        with patch('app.shared.services.ai_service.current_app') as mock_app:
             mock_app.config = {
                 'GEMINI_API_KEY': 'test_key',
                 'GOOGLE_PROJECT_ID': 'test_project',
@@ -47,7 +47,7 @@ class TestAIServiceGetProvider:
             
             assert provider is not None
             # GeminiProvider 인스턴스인지 확인
-            from app.services.ai.gemini_provider import GeminiProvider
+            from app.shared.services.ai.gemini_provider import GeminiProvider
             assert isinstance(provider, GeminiProvider)
 
     def test_get_provider_invalid_name(self, app):
@@ -63,7 +63,7 @@ class TestAIServiceGetConfig:
 
     def test_get_config_gemini(self, app):
         """Gemini Provider 설정 로드"""
-        with patch('app.services.ai_service.current_app') as mock_app:
+        with patch('app.shared.services.ai_service.current_app') as mock_app:
             mock_app.config = {
                 'GEMINI_API_KEY': 'test_key',
                 'GOOGLE_PROJECT_ID': 'test_project',
@@ -80,7 +80,7 @@ class TestAIServiceGetConfig:
 
     def test_get_config_local_llama(self, app):
         """Local Llama Provider 설정 로드"""
-        with patch('app.services.ai_service.current_app') as mock_app:
+        with patch('app.shared.services.ai_service.current_app') as mock_app:
             mock_app.config = {
                 'LOCAL_LLM_ENDPOINT': 'http://localhost:8080',
                 'LOCAL_LLM_MODEL': 'test-model',
@@ -96,7 +96,7 @@ class TestAIServiceGetConfig:
 
     def test_get_config_document_ai(self, app):
         """Document AI Provider 설정 로드"""
-        with patch('app.services.ai_service.current_app') as mock_app:
+        with patch('app.shared.services.ai_service.current_app') as mock_app:
             mock_app.config = {
                 'GOOGLE_PROJECT_ID': 'test_project',
                 'DOCUMENTAI_LOCATION': 'us',
@@ -117,7 +117,7 @@ class TestAIServiceGetAvailableProviders:
 
     def test_get_available_providers_success(self, app):
         """사용 가능한 Provider 목록 조회 성공"""
-        with patch('app.services.ai_service.AIService.get_provider') as mock_get:
+        with patch('app.shared.services.ai_service.AIService.get_provider') as mock_get:
             mock_provider = Mock()
             mock_provider.is_available = True
             mock_get.return_value = mock_provider
@@ -129,7 +129,7 @@ class TestAIServiceGetAvailableProviders:
 
     def test_get_available_providers_with_exception(self, app):
         """Provider 생성 중 예외 발생 시"""
-        with patch('app.services.ai_service.AIService.get_provider') as mock_get:
+        with patch('app.shared.services.ai_service.AIService.get_provider') as mock_get:
             mock_get.side_effect = Exception("Provider error")
             
             result = AIService.get_available_providers()
@@ -142,7 +142,7 @@ class TestAIServiceAnalyze:
 
     def test_analyze_success(self, app):
         """문서 분석 성공"""
-        with patch('app.services.ai_service.AIService.get_provider') as mock_get:
+        with patch('app.shared.services.ai_service.AIService.get_provider') as mock_get:
             mock_provider = Mock()
             mock_provider.is_available = True
             mock_provider.analyze_document.return_value = AnalysisResult(
@@ -164,7 +164,7 @@ class TestAIServiceAnalyze:
 
     def test_analyze_provider_unavailable(self, app):
         """Provider 사용 불가능 시"""
-        with patch('app.services.ai_service.AIService.get_provider') as mock_get:
+        with patch('app.shared.services.ai_service.AIService.get_provider') as mock_get:
             mock_provider = Mock()
             mock_provider.is_available = False
             mock_get.return_value = mock_provider
@@ -177,7 +177,7 @@ class TestAIServiceAnalyze:
 
     def test_analyze_with_document_type(self, app):
         """문서 유형 지정하여 분석"""
-        with patch('app.services.ai_service.AIService.get_provider') as mock_get:
+        with patch('app.shared.services.ai_service.AIService.get_provider') as mock_get:
             mock_provider = Mock()
             mock_provider.is_available = True
             mock_provider.analyze_document.return_value = AnalysisResult(
@@ -201,12 +201,12 @@ class TestAIServiceGetVisionOCR:
 
     def test_get_vision_ocr(self, app):
         """Vision OCR 인스턴스 반환"""
-        with patch('app.services.ai_service.current_app') as mock_app:
+        with patch('app.shared.services.ai_service.current_app') as mock_app:
             mock_app.config = {
                 'GOOGLE_APPLICATION_CREDENTIALS': 'test_creds.json',
                 'GOOGLE_PROJECT_ID': 'test_project'
             }
-            with patch('app.services.ai_service.VisionOCR') as mock_vision_ocr:
+            with patch('app.shared.services.ai_service.VisionOCR') as mock_vision_ocr:
                 mock_instance = Mock()
                 mock_vision_ocr.return_value = mock_instance
                 

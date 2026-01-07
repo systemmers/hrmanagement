@@ -15,11 +15,10 @@ from app.domains.employee.services.attachment_service import AttachmentService, 
 @pytest.fixture
 def mock_repos(app):
     """Service의 Repository를 Mock으로 대체하는 fixture"""
-    from app import extensions
-
     mock_attachment_repo = Mock()
-    with patch.object(extensions, 'attachment_repo', mock_attachment_repo):
-        yield attachment_service
+
+    with patch('app.domains.employee.get_attachment_repo', return_value=mock_attachment_repo):
+        yield attachment_service, mock_attachment_repo
 
 
 class TestAttachmentServiceInit:
@@ -40,50 +39,60 @@ class TestAttachmentServiceQueries:
 
     def test_get_by_employee_id_success(self, mock_repos):
         """직원 ID로 첨부파일 목록 조회 성공"""
+        service, mock_repo = mock_repos
+
         mock_attachment1 = Mock()
         mock_attachment1.to_dict.return_value = {'id': 1, 'filename': 'test1.pdf'}
         mock_attachment2 = Mock()
         mock_attachment2.to_dict.return_value = {'id': 2, 'filename': 'test2.pdf'}
-        mock_repos.attachment_repo.find_by_employee_id.return_value = [mock_attachment1, mock_attachment2]
+        mock_repo.find_by_employee_id.return_value = [mock_attachment1, mock_attachment2]
 
-        result = mock_repos.get_by_employee_id(employee_id=1)
+        result = service.get_by_employee_id(employee_id=1)
 
         assert len(result) == 2
         assert result[0]['filename'] == 'test1.pdf'
 
     def test_get_by_category_success(self, mock_repos):
         """카테고리별 첨부파일 조회 성공"""
-        expected = [{'id': 1, 'category': 'resume'}]
-        mock_repos.attachment_repo.get_by_category.return_value = expected
+        service, mock_repo = mock_repos
 
-        result = mock_repos.get_by_category(employee_id=1, category='resume')
+        expected = [{'id': 1, 'category': 'resume'}]
+        mock_repo.get_by_category.return_value = expected
+
+        result = service.get_by_category(employee_id=1, category='resume')
 
         assert result == expected
-        mock_repos.attachment_repo.get_by_category.assert_called_once_with(1, 'resume')
+        mock_repo.get_by_category.assert_called_once_with(1, 'resume')
 
     def test_get_one_by_category_success(self, mock_repos):
         """카테고리별 첨부파일 1개 조회 성공"""
-        expected = {'id': 1, 'category': 'resume'}
-        mock_repos.attachment_repo.get_one_by_category.return_value = expected
+        service, mock_repo = mock_repos
 
-        result = mock_repos.get_one_by_category(employee_id=1, category='resume')
+        expected = {'id': 1, 'category': 'resume'}
+        mock_repo.get_one_by_category.return_value = expected
+
+        result = service.get_one_by_category(employee_id=1, category='resume')
 
         assert result == expected
 
     def test_get_one_by_category_not_found(self, mock_repos):
         """카테고리별 첨부파일 없을 때"""
-        mock_repos.attachment_repo.get_one_by_category.return_value = None
+        service, mock_repo = mock_repos
 
-        result = mock_repos.get_one_by_category(employee_id=1, category='resume')
+        mock_repo.get_one_by_category.return_value = None
+
+        result = service.get_one_by_category(employee_id=1, category='resume')
 
         assert result is None
 
     def test_get_by_file_type_success(self, mock_repos):
         """파일 타입별 첨부파일 조회 성공"""
-        expected = [{'id': 1, 'file_type': 'pdf'}]
-        mock_repos.attachment_repo.get_by_file_type.return_value = expected
+        service, mock_repo = mock_repos
 
-        result = mock_repos.get_by_file_type(employee_id=1, file_type='pdf')
+        expected = [{'id': 1, 'file_type': 'pdf'}]
+        mock_repo.get_by_file_type.return_value = expected
+
+        result = service.get_by_file_type(employee_id=1, file_type='pdf')
 
         assert result == expected
 
@@ -93,18 +102,21 @@ class TestAttachmentServiceDelete:
 
     def test_delete_by_category_success(self, mock_repos):
         """카테고리별 첨부파일 삭제 성공"""
-        mock_repos.attachment_repo.delete_by_category.return_value = True
+        service, mock_repo = mock_repos
 
-        result = mock_repos.delete_by_category(employee_id=1, category='resume')
+        mock_repo.delete_by_category.return_value = True
+
+        result = service.delete_by_category(employee_id=1, category='resume')
 
         assert result is True
-        mock_repos.attachment_repo.delete_by_category.assert_called_once_with(1, 'resume')
+        mock_repo.delete_by_category.assert_called_once_with(1, 'resume')
 
     def test_delete_by_category_failure(self, mock_repos):
         """카테고리별 첨부파일 삭제 실패"""
-        mock_repos.attachment_repo.delete_by_category.return_value = False
+        service, mock_repo = mock_repos
 
-        result = mock_repos.delete_by_category(employee_id=1, category='resume')
+        mock_repo.delete_by_category.return_value = False
+
+        result = service.delete_by_category(employee_id=1, category='resume')
 
         assert result is False
-

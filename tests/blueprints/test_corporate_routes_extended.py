@@ -19,7 +19,7 @@ class TestCorporateRegister:
     def test_register_post_success(self, client, session):
         """법인 등록 POST 성공"""
         from app.shared.utils.corporate_helpers import create_company_entities
-        from app.models import User
+        from app.domains.user.models import User
 
         with patch('app.domains.company.blueprints.corporate.create_company_entities', return_value=None):
             response = client.post('/corporate/register', data={

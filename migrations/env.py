@@ -25,15 +25,33 @@ from app import create_app
 from app.database import db
 
 # Import all models to ensure they are registered with SQLAlchemy
-from app.models import (
-    User, Employee, Organization, ClassificationOption,
-    Education, Career, Certificate, FamilyMember, Language, MilitaryService,
-    Salary, Benefit, Contract, SalaryHistory,
-    Promotion, Evaluation, Training, Attendance,
-    Insurance, HrProject, ProjectParticipation, Award, Asset,
-    SalaryPayment, Attachment, SystemSetting,
-    Company  # Phase 1: Company model
+from app.domains.company.models import ClassificationOption, Company, Organization
+from app.domains.employee.models import (
+    Asset,
+    Attachment,
+    Attendance,
+    Award,
+    Benefit,
+    Career,
+    Certificate,
+    Contract,
+    Education,
+    Employee,
+    Evaluation,
+    FamilyMember,
+    HrProject,
+    Insurance,
+    Language,
+    MilitaryService,
+    ProjectParticipation,
+    Promotion,
+    Salary,
+    SalaryHistory,
+    SalaryPayment,
+    Training,
 )
+from app.domains.platform.models import SystemSetting
+from app.domains.user.models import User
 
 # Alembic Config object
 config = context.config

@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional
 
 from app.types import FormData, FieldMapping
 from app.shared.constants.status import EmployeeStatus
-from app.models import Employee
+from app.domains.employee.models import Employee
 from app.shared.utils.form_helpers import (
     parse_boolean as _parse_boolean,
     extract_relation_list,  # Phase 31: DRY - 공통 모듈에서 import

@@ -12,8 +12,9 @@ Phase 30: 레이어 분리 - Model.query, db.session 직접 사용 제거
 """
 from typing import Dict, List, Optional, Tuple
 
-from app.models import User, Company
-from app.models import SystemSetting
+from app.domains.company.models import Company
+from app.domains.user.models import User
+from app.domains.platform.models import SystemSetting
 from app.shared.utils.transaction import atomic_transaction
 from app.shared.constants.status import ContractStatus
 
@@ -40,7 +41,7 @@ class PlatformService:
     @property
     def contract_repo(self):
         """지연 초기화된 계약 Repository"""
-        from app.repositories.contract.person_contract_repository import person_contract_repository
+        from app.domains.contract.repositories.person_contract_repository import person_contract_repository
         return person_contract_repository
 
     @property

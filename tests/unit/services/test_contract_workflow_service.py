@@ -44,7 +44,7 @@ class TestContractWorkflowServiceCreateRequest:
 
     def test_create_contract_request_success(self, mock_repos, session):
         """계약 요청 생성 성공"""
-        with patch('app.services.contract.contract_workflow_service.User') as mock_user:
+        with patch('app.domains.contract.services.contract_workflow_service.User') as mock_user:
             mock_user.query.filter.return_value.first.return_value = Mock(id=1, email='test@test.com')
             mock_repos.contract_repo.create_contract_request.return_value = {'id': 1, 'status': 'pending'}
 
@@ -59,7 +59,7 @@ class TestContractWorkflowServiceCreateRequest:
 
     def test_create_contract_request_user_not_found(self, mock_repos):
         """사용자를 찾을 수 없을 때"""
-        with patch('app.services.contract.contract_workflow_service.User') as mock_user:
+        with patch('app.domains.contract.services.contract_workflow_service.User') as mock_user:
             mock_user.query.filter.return_value.first.return_value = None
 
             result = mock_repos.create_contract_request(
@@ -88,8 +88,8 @@ class TestContractWorkflowServiceApprove:
 
         with patch('app.models.user.User') as mock_user, \
              patch('app.models.company.Company') as mock_company, \
-             patch('app.services.contract.contract_workflow_service.atomic_transaction'), \
-             patch('app.services.sync_service.sync_service') as mock_sync, \
+             patch('app.domains.contract.services.contract_workflow_service.atomic_transaction'), \
+             patch('app.domains.sync.services.sync_service.sync_service') as mock_sync, \
              patch('app.models.personal_profile.PersonalProfile') as mock_profile, \
              patch('app.models.employee.Employee') as mock_employee, \
              patch('app.database.db') as mock_db:
@@ -123,7 +123,7 @@ class TestContractWorkflowServiceReject:
         mock_contract.to_dict.return_value = {'id': 1, 'status': 'rejected'}
         mock_repos.contract_repo.find_by_id.return_value = mock_contract
 
-        with patch('app.services.contract.contract_workflow_service.atomic_transaction'):
+        with patch('app.domains.contract.services.contract_workflow_service.atomic_transaction'):
             result = mock_repos.reject_contract(contract_id=1, user_id=1, reason='테스트')
 
             assert result.success is True
@@ -140,7 +140,7 @@ class TestContractWorkflowServiceTerminate:
         mock_contract.to_dict.return_value = {'id': 1, 'status': 'terminated'}
         mock_repos.contract_repo.find_by_id.return_value = mock_contract
 
-        with patch('app.services.termination_service.termination_service') as mock_term:
+        with patch('app.domains.sync.services.termination_service.termination_service') as mock_term:
             mock_term.set_current_user = Mock()
             mock_term.terminate_contract.return_value = {'success': True}
 
@@ -162,10 +162,10 @@ class TestContractWorkflowServiceTerminationRequest:
         mock_contract.to_dict.return_value = {'id': 1, 'status': 'termination_requested'}
         mock_repos.contract_repo.find_by_id.return_value = mock_contract
 
-        with patch('app.services.contract.contract_workflow_service.User') as mock_user, \
-             patch('app.services.contract.contract_workflow_service.ContractStatus') as mock_status, \
-             patch('app.services.contract.contract_workflow_service.atomic_transaction'), \
-             patch('app.services.contract.contract_workflow_service.db') as mock_db:
+        with patch('app.domains.contract.services.contract_workflow_service.User') as mock_user, \
+             patch('app.domains.contract.services.contract_workflow_service.ContractStatus') as mock_status, \
+             patch('app.domains.contract.services.contract_workflow_service.atomic_transaction'), \
+             patch('app.domains.contract.services.contract_workflow_service.db') as mock_db:
             mock_user.query.get.return_value = Mock(id=1, company_id=1, account_type='corporate')
             mock_status.can_request_termination.return_value = True
             mock_db.func.now.return_value = Mock()
@@ -184,7 +184,7 @@ class TestContractWorkflowServiceEmployeeRequest:
 
     def test_create_employee_contract_request_success(self, mock_repos):
         """직원 계정 계약 요청 성공"""
-        with patch('app.services.contract.contract_workflow_service.User') as mock_user:
+        with patch('app.domains.contract.services.contract_workflow_service.User') as mock_user:
             mock_user.query.filter.return_value.first.return_value = Mock(
                 id=1, account_type='employee_sub'
             )
@@ -204,7 +204,7 @@ class TestContractWorkflowServiceEmployeeRequest:
 
     def test_create_employee_contract_request_already_exists(self, mock_repos):
         """이미 계약이 존재하는 경우"""
-        with patch('app.services.contract.contract_workflow_service.User') as mock_user:
+        with patch('app.domains.contract.services.contract_workflow_service.User') as mock_user:
             mock_user.query.filter.return_value.first.return_value = Mock(id=1)
             mock_repos.contract_repo.get_contract_between.return_value = Mock(id=1)
 
@@ -218,7 +218,7 @@ class TestContractWorkflowServiceEmployeeRequest:
 
     def test_create_employee_contract_request_user_not_found(self, mock_repos):
         """사용자를 찾을 수 없는 경우"""
-        with patch('app.services.contract.contract_workflow_service.User') as mock_user:
+        with patch('app.domains.contract.services.contract_workflow_service.User') as mock_user:
             mock_user.query.filter.return_value.first.return_value = None
 
             result = mock_repos.create_employee_contract_request(
@@ -235,8 +235,8 @@ class TestContractWorkflowServiceCreateDefaultSettings:
 
     def test_create_default_sharing_settings(self, mock_repos):
         """기본 공유 설정 생성"""
-        with patch('app.services.contract.contract_workflow_service.DataSharingSettings') as mock_settings, \
-             patch('app.services.contract.contract_workflow_service.db') as mock_db:
+        with patch('app.domains.contract.services.contract_workflow_service.DataSharingSettings') as mock_settings, \
+             patch('app.domains.contract.services.contract_workflow_service.db') as mock_db:
             mock_settings.query.filter_by.return_value.first.return_value = None
             
             result = mock_repos._create_default_sharing_settings(contract_id=1)
@@ -248,8 +248,8 @@ class TestContractWorkflowServiceCreateDefaultSettings:
     def test_create_default_sharing_settings_already_exists(self, mock_repos):
         """이미 설정이 있으면 재생성하지 않음"""
         existing_settings = Mock(contract_id=1)
-        with patch('app.services.contract.contract_workflow_service.DataSharingSettings') as mock_settings, \
-             patch('app.services.contract.contract_workflow_service.db') as mock_db:
+        with patch('app.domains.contract.services.contract_workflow_service.DataSharingSettings') as mock_settings, \
+             patch('app.domains.contract.services.contract_workflow_service.db') as mock_db:
             mock_settings.query.filter_by.return_value.first.return_value = existing_settings
             
             result = mock_repos._create_default_sharing_settings(contract_id=1)
@@ -264,7 +264,7 @@ class TestContractWorkflowServiceErrorCases:
 
     def test_create_contract_request_with_value_error(self, mock_repos):
         """계약 생성 시 ValueError 처리"""
-        with patch('app.services.contract.contract_workflow_service.User') as mock_user:
+        with patch('app.domains.contract.services.contract_workflow_service.User') as mock_user:
             mock_user.query.filter.return_value.first.return_value = Mock(id=1)
             mock_repos.contract_repo.create_contract_request.side_effect = ValueError("테스트 에러")
 
@@ -288,10 +288,10 @@ class TestContractWorkflowServiceErrorCases:
         # Bug 1 Fix: 중복 계약 체크
         mock_repos.contract_repo.get_active_contract_by_person_and_company.return_value = None
 
-        with patch('app.services.contract.contract_workflow_service.User') as mock_user, \
-             patch('app.services.contract.contract_workflow_service.Employee') as mock_employee, \
-             patch('app.services.contract.contract_workflow_service.db') as mock_db, \
-             patch('app.services.contract.contract_workflow_service.EmployeeStatus') as mock_status:
+        with patch('app.domains.contract.services.contract_workflow_service.User') as mock_user, \
+             patch('app.domains.contract.services.contract_workflow_service.Employee') as mock_employee, \
+             patch('app.domains.contract.services.contract_workflow_service.db') as mock_db, \
+             patch('app.domains.contract.services.contract_workflow_service.EmployeeStatus') as mock_status:
             mock_user.query.get.return_value = Mock(
                 id=1,
                 account_type='employee_sub',
@@ -313,8 +313,8 @@ class TestContractWorkflowServiceErrorCases:
         mock_contract = Mock(id=1, person_user_id=1, company_id=1)
         mock_repos.contract_repo.find_by_id.return_value = mock_contract
 
-        with patch('app.services.contract.contract_workflow_service.User') as mock_user, \
-             patch('app.services.contract.contract_workflow_service.Company') as mock_company:
+        with patch('app.domains.contract.services.contract_workflow_service.User') as mock_user, \
+             patch('app.domains.contract.services.contract_workflow_service.Company') as mock_company:
             mock_user.query.get.return_value = Mock(
                 id=1,
                 account_type='employee_sub',
@@ -334,9 +334,9 @@ class TestContractWorkflowServiceErrorCases:
         mock_contract.approve.side_effect = Exception("테스트 예외")
         mock_repos.contract_repo.find_by_id.return_value = mock_contract
 
-        with patch('app.services.contract.contract_workflow_service.User') as mock_user, \
-             patch('app.services.contract.contract_workflow_service.Company') as mock_company, \
-             patch('app.services.contract.contract_workflow_service.atomic_transaction'):
+        with patch('app.domains.contract.services.contract_workflow_service.User') as mock_user, \
+             patch('app.domains.contract.services.contract_workflow_service.Company') as mock_company, \
+             patch('app.domains.contract.services.contract_workflow_service.atomic_transaction'):
             mock_user.query.get.return_value = Mock(id=1, account_type='personal')
             mock_company.query.get.return_value = Mock(id=1)
 

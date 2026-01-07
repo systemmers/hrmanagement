@@ -7,7 +7,7 @@ Phase 5: Repository/Service 계층 리팩토링
 from typing import List, Optional, Dict, Any
 from app.database import db
 from app.domains.employee.models import Profile
-from app.repositories.base_repository import BaseRepository
+from app.shared.repositories.base_repository import BaseRepository
 
 
 class ProfileRepository(BaseRepository[Profile]):

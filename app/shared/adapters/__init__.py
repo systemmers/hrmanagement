@@ -5,7 +5,7 @@ Profile Adapters - 프로필 데이터 모델 통합 어댑터
 데이터 모델의 차이를 추상화하여 통합 인터페이스 제공
 
 사용법:
-    from app.adapters import create_profile_adapter
+    from app.shared.adapters import create_profile_adapter
 
     # 자동 감지
     adapter = create_profile_adapter(employee)
@@ -14,7 +14,7 @@ Profile Adapters - 프로필 데이터 모델 통합 어댑터
     # 템플릿 컨텍스트 생성
     context = adapter.to_template_context(variable_name='employee')
 """
-from app.adapters.profile_adapter import (
+from app.shared.adapters.profile_adapter import (
     ProfileAdapter,
     EmployeeProfileAdapter,
     PersonalProfileAdapter,

@@ -13,7 +13,7 @@ from flask import Blueprint, render_template, request, jsonify, session, flash, 
 
 from app.shared.constants.field_options import FieldOptions
 from app.shared.constants.session_keys import SessionKeys
-from app.services import contract_service
+from app.domains.contract.services import contract_service
 from app.shared.utils.decorators import (
     login_required,
     personal_account_required,

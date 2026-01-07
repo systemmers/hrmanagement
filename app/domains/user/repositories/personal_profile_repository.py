@@ -8,8 +8,8 @@ Phase 30: 레이어 분리 - Service의 Model.query 직접 사용 제거
 """
 from typing import Optional, List, Dict, Any
 from app.database import db
-from app.models import PersonalProfile
-from app.repositories.base_repository import BaseRepository
+from app.domains.user.models import PersonalProfile
+from app.shared.repositories.base_repository import BaseRepository
 
 
 class PersonalProfileRepository(BaseRepository[PersonalProfile]):

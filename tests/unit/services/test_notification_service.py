@@ -26,9 +26,9 @@ class TestNotificationServiceCreate:
 
     def test_create_notification_success(self, session):
         """알림 생성 성공"""
-        with patch('app.services.notification_service.Notification') as mock_notif, \
-             patch('app.services.notification_service.NotificationPreference') as mock_pref, \
-             patch('app.services.notification_service.db') as mock_db:
+        with patch('app.domains.user.services.notification_service.Notification') as mock_notif, \
+             patch('app.domains.user.services.notification_service.NotificationPreference') as mock_pref, \
+             patch('app.domains.user.services.notification_service.db') as mock_db:
             mock_pref.query.filter_by.return_value.first.return_value = None
             mock_notif_instance = Mock()
             mock_notif.return_value = mock_notif_instance
@@ -44,7 +44,7 @@ class TestNotificationServiceCreate:
 
     def test_create_notification_preference_disabled(self, session):
         """알림 수신 설정이 비활성화된 경우"""
-        with patch('app.services.notification_service.NotificationPreference') as mock_pref:
+        with patch('app.domains.user.services.notification_service.NotificationPreference') as mock_pref:
             mock_pref_instance = Mock()
             mock_pref_instance.receive_contract_notifications = False
             mock_pref.query.filter_by.return_value.first.return_value = mock_pref_instance
@@ -64,8 +64,8 @@ class TestNotificationServiceQueries:
     def test_get_user_notifications_success(self, session):
         """사용자 알림 조회 성공"""
         from datetime import datetime
-        with patch('app.services.notification_service.Notification') as mock_notif, \
-             patch('app.services.notification_service.db') as mock_db:
+        with patch('app.domains.user.services.notification_service.Notification') as mock_notif, \
+             patch('app.domains.user.services.notification_service.db') as mock_db:
             mock_db.or_.return_value = Mock()
             mock_notif_instance = Mock()
             mock_notif_instance.to_dict.return_value = {'id': 1, 'title': 'Test'}
@@ -87,8 +87,8 @@ class TestNotificationServiceQueries:
     def test_get_unread_count_success(self, session):
         """미읽음 알림 수 조회 성공"""
         from datetime import datetime
-        with patch('app.services.notification_service.Notification') as mock_notif, \
-             patch('app.services.notification_service.db') as mock_db:
+        with patch('app.domains.user.services.notification_service.Notification') as mock_notif, \
+             patch('app.domains.user.services.notification_service.db') as mock_db:
             mock_db.or_.return_value = Mock()
             mock_query = Mock()
             mock_query.filter_by.return_value = mock_query
@@ -108,8 +108,8 @@ class TestNotificationServiceMarkRead:
 
     def test_mark_as_read_success(self, session):
         """알림 읽음 처리 성공"""
-        with patch('app.services.notification_service.Notification') as mock_notif, \
-             patch('app.services.notification_service.db') as mock_db:
+        with patch('app.domains.user.services.notification_service.Notification') as mock_notif, \
+             patch('app.domains.user.services.notification_service.db') as mock_db:
             mock_notif_instance = Mock()
             mock_notif_instance.mark_as_read = Mock()
             mock_query = Mock()

@@ -11,12 +11,8 @@ from sqlalchemy.orm import Session
 from flask import current_app, has_app_context
 
 from app.database import db
-from app.models import (
-    PersonalProfile,
-    PersonCorporateContract,
-    DataSharingSettings,
-    SyncLog,
-)
+from app.domains.contract.models import DataSharingSettings, PersonCorporateContract, SyncLog
+from app.domains.user.models import PersonalProfile
 from app.shared.constants.status import ContractStatus
 
 
@@ -37,7 +33,7 @@ class SyncEventManager:
     def _get_contract_repo(cls):
         """지연 초기화된 계약 Repository"""
         if cls._contract_repo is None:
-            from app.repositories.contract.person_contract_repository import person_contract_repository
+            from app.domains.contract.repositories.person_contract_repository import person_contract_repository
             cls._contract_repo = person_contract_repository
         return cls._contract_repo
 

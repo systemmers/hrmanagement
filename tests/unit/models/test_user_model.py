@@ -8,7 +8,7 @@ User 모델의 메서드 테스트:
 """
 import pytest
 
-from app.models import User
+from app.domains.user.models import User
 
 
 class TestUserModel:

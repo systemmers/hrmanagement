@@ -1,33 +1,44 @@
 """
-Blueprint 등록 모듈
+Shared Blueprints Package
 
-모든 Blueprint를 앱에 등록합니다.
+도메인에 속하지 않는 공유 Blueprint를 제공합니다.
+Phase 9: 도메인 마이그레이션 완료, register_blueprints 이동
 """
+
+from .api import api_bp
 
 
 def register_blueprints(app):
     """앱에 모든 Blueprint 등록
 
-    Phase 7: 도메인 중심 마이그레이션 완료
-    - 모든 Blueprint는 app/domains/에서 import
-    - 레거시 경로 (app/blueprints/*.py)는 삭제됨
+    Phase 9: 완전 도메인 마이그레이션 완료
+    - 모든 Blueprint는 app/domains/ 또는 app/shared/blueprints/에서 import
+    - 레거시 경로 (app/blueprints/)는 삭제됨
     """
-    # 도메인 Blueprints
+    # ===== 도메인 Blueprints =====
+
+    # Employee 도메인
     from app.domains.employee.blueprints import employees_bp
+
+    # Contract 도메인
     from app.domains.contract.blueprints import contracts_bp
-    from app.domains.company.blueprints import corporate_bp
+
+    # Company 도메인
+    from app.domains.company.blueprints import corporate_bp, admin_bp
     from app.domains.company.blueprints.settings import corporate_settings_api_bp
-    from app.domains.user.blueprints import auth_bp, mypage_bp, personal_bp, account_bp, notifications_bp
-    from app.domains.platform.blueprints import platform_bp
+
+    # User 도메인
+    from app.domains.user.blueprints import (
+        auth_bp, mypage_bp, personal_bp, account_bp, notifications_bp, profile_bp
+    )
+
+    # Platform 도메인
+    from app.domains.platform.blueprints import platform_bp, main_bp, ai_test_bp, audit_bp
+
+    # Sync 도메인
     from app.domains.sync.blueprints import sync_bp
 
-    # 미마이그레이션 Blueprints (app/blueprints/ 유지)
-    from .main import main_bp
-    from .api import api_bp
-    from .ai_test import ai_test_bp
-    from .admin import admin_bp
-    from .audit import audit_bp
-    from .profile import profile_bp
+    # ===== Blueprint 등록 =====
 
     # 플랫폼 관리자 (/platform/*) - 슈퍼관리자 전용
     app.register_blueprint(platform_bp)
@@ -79,3 +90,6 @@ def register_blueprints(app):
 
     # 법인 세팅 API (/api/corporate/*)
     app.register_blueprint(corporate_settings_api_bp)
+
+
+__all__ = ['api_bp', 'register_blueprints']

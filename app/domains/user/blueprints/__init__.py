@@ -4,6 +4,7 @@ User Domain Blueprints
 Phase 1 Migration: Domain-first architecture
 All user-related blueprints are now in domain
 Legacy paths re-export from here for backward compatibility
+Phase 9: profile_bp 추가 (통합 프로필)
 """
 
 # Auth blueprint
@@ -21,10 +22,14 @@ from .account import account_bp
 # Personal account blueprint
 from .personal import personal_bp
 
+# Phase 9: 마이그레이션된 Blueprint
+from .profile import profile_bp
+
 __all__ = [
     'auth_bp',
     'mypage_bp',
     'notifications_bp',
     'account_bp',
     'personal_bp',
+    'profile_bp',
 ]

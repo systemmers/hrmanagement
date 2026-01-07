@@ -21,7 +21,8 @@ load_dotenv()
 from app import create_app
 from app.database import db
 from app.domains.employee.models import Employee
-from app.models import Company, Organization, User
+from app.domains.company.models import Company, Organization
+from app.domains.user.models import User
 
 
 def get_all_descendants(org_id):

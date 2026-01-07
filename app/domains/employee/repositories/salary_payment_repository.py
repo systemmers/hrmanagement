@@ -6,7 +6,7 @@ SalaryPayment Repository
 from typing import List, Dict
 from app.database import db
 from app.domains.employee.models import SalaryPayment
-from app.repositories.base_repository import BaseRelationRepository
+from app.shared.repositories.base_repository import BaseRelationRepository
 
 
 class SalaryPaymentRepository(BaseRelationRepository[SalaryPayment]):

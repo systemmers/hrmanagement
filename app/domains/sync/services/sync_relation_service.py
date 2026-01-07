@@ -10,7 +10,7 @@ import json
 
 from app.domains.employee.models import Employee
 from app.domains.employee.models import Profile
-from app.models import SyncLog
+from app.domains.contract.models import SyncLog
 
 
 class SyncRelationService:

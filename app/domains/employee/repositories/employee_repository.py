@@ -11,8 +11,8 @@ from typing import List, Optional, Dict, Set
 from app.database import db
 from app.domains.employee.models import Employee
 from app.shared.constants.status import EmployeeStatus
-from app.repositories.base_repository import BaseRepository
-from app.repositories.mixins import TenantFilterMixin
+from app.shared.repositories.base_repository import BaseRepository
+from app.shared.repositories.mixins import TenantFilterMixin
 
 
 # ========================================
@@ -82,7 +82,7 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
         Returns:
             해당 회사의 직원 목록
         """
-        from app.models import Company
+        from app.domains.company.models import Company
         company = Company.query.get(company_id)
         if not company or not company.root_organization_id:
             return []
@@ -451,7 +451,7 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
         Returns:
             직원 수
         """
-        from app.models import Company
+        from app.domains.company.models import Company
         company = Company.query.get(company_id)
         if not company or not company.root_organization_id:
             return 0
@@ -471,7 +471,7 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
         Returns:
             직원 수
         """
-        from app.models import Company
+        from app.domains.company.models import Company
         company = Company.query.get(company_id)
         if not company or not company.root_organization_id:
             return 0
@@ -489,7 +489,7 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
         Returns:
             Employee 모델 객체 리스트
         """
-        from app.models import Company
+        from app.domains.company.models import Company
         company = Company.query.get(company_id)
         if not company or not company.root_organization_id:
             return []

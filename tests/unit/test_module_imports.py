@@ -12,7 +12,7 @@ class TestServiceImports:
 
     def test_import_file_storage_service(self):
         """FileStorageService import"""
-        from app.services.file_storage_service import FileStorageService
+        from app.shared.services.file_storage_service import FileStorageService
         assert FileStorageService is not None
 
     def test_import_termination_service(self):
@@ -69,7 +69,7 @@ class TestRepositoryImports:
 
     def test_import_company_document_repository(self):
         """CompanyDocumentRepository import"""
-        from app.repositories.company_document_repository import CompanyDocumentRepository
+        from app.domains.company.repositories.company_document_repository import CompanyDocumentRepository
         assert CompanyDocumentRepository is not None
 
     def test_import_classification_repository(self):
@@ -88,7 +88,7 @@ class TestConstants:
 
     def test_file_storage_constants(self):
         """파일 저장 상수"""
-        from app.services.file_storage_service import (
+        from app.shared.services.file_storage_service import (
             ALLOWED_EXTENSIONS,
             ALLOWED_IMAGE_EXTENSIONS,
             MAX_FILE_SIZE,
@@ -121,27 +121,27 @@ class TestModelImports:
 
     def test_import_company_document(self):
         """CompanyDocument 모델 import"""
-        from app.models import CompanyDocument
+        from app.domains.company.models import CompanyDocument
         assert CompanyDocument is not None
 
     def test_import_company_visibility_settings(self):
         """CompanyVisibilitySettings 모델 import"""
-        from app.models import CompanyVisibilitySettings
+        from app.domains.company.models import CompanyVisibilitySettings
         assert CompanyVisibilitySettings is not None
 
     def test_import_company_settings(self):
         """CompanySettings 모델 import"""
-        from app.models import CompanySettings
+        from app.domains.company.models import CompanySettings
         assert CompanySettings is not None
 
     def test_import_number_category(self):
         """NumberCategory 모델 import"""
-        from app.models import NumberCategory
+        from app.domains.company.models import NumberCategory
         assert NumberCategory is not None
 
     def test_import_system_setting(self):
         """SystemSetting 모델 import"""
-        from app.models import SystemSetting
+        from app.domains.platform.models import SystemSetting
         assert SystemSetting is not None
 
     def test_import_attachment(self):
@@ -155,12 +155,12 @@ class TestBaseClassImports:
 
     def test_import_base_repository(self):
         """BaseRepository import"""
-        from app.repositories.base_repository import BaseRepository
+        from app.shared.repositories.base_repository import BaseRepository
         assert BaseRepository is not None
 
     def test_import_base_relation_repository(self):
         """BaseRelationRepository import"""
-        from app.repositories.base_repository import BaseRelationRepository
+        from app.shared.repositories.base_repository import BaseRelationRepository
         assert BaseRelationRepository is not None
 
 

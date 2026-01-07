@@ -8,7 +8,7 @@ Phase 3: EmployeeService 분리 - Facade 패턴
 
 사용법:
     # 기존과 동일한 방식으로 사용
-    from app.services.employee_service import employee_service
+    from app.domains.employee.services import employee_service
     employee_service.get_employee(1)
 
     # 새로운 방식 (분리된 서비스 직접 사용)

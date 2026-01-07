@@ -15,7 +15,7 @@ import secrets
 import string
 from typing import Dict, Optional, Tuple, List
 
-from app.models import User
+from app.domains.user.models import User
 from app.shared.utils.transaction import atomic_transaction
 from app.shared.constants.status import EmployeeStatus
 

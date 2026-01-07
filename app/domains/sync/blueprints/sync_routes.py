@@ -12,7 +12,7 @@ from app.shared.constants.session_keys import SessionKeys
 from app.domains.sync.services.sync_service import sync_service
 from app.domains.contract.services.contract_service import contract_service
 from app.shared.utils.transaction import atomic_transaction
-from app.models import SyncLog, PersonCorporateContract
+from app.domains.contract.models import PersonCorporateContract, SyncLog
 from app.shared.constants.status import ContractStatus
 from app.shared.utils.decorators import (
     api_login_required as login_required,

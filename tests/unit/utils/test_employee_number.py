@@ -53,10 +53,14 @@ class TestEmployeeNumberConfig:
 class TestGenerateEmployeeNumber:
     """사번 생성 테스트"""
 
-    def test_generate_first_number(self, session):
+    def test_generate_first_number(self, app):
         """첫 사번 생성 (연도 포함)"""
+        mock_repo = Mock()
+        mock_repo.find_last_by_number_pattern.return_value = None
+
         with patch('app.shared.utils.employee_number.get_employee_number_config') as mock_config, \
-             patch('app.shared.utils.employee_number.datetime') as mock_dt:
+             patch('app.shared.utils.employee_number.datetime') as mock_dt, \
+             patch('app.shared.utils.employee_number._get_employee_repo', return_value=mock_repo):
             mock_config.return_value = {
                 'prefix': 'EMP',
                 'separator': '-',
@@ -69,9 +73,13 @@ class TestGenerateEmployeeNumber:
 
             assert result == 'EMP-2025-0001'
 
-    def test_generate_number_without_year(self, session):
+    def test_generate_number_without_year(self, app):
         """사번 생성 (연도 미포함)"""
-        with patch('app.shared.utils.employee_number.get_employee_number_config') as mock_config:
+        mock_repo = Mock()
+        mock_repo.find_last_by_number_pattern.return_value = None
+
+        with patch('app.shared.utils.employee_number.get_employee_number_config') as mock_config, \
+             patch('app.shared.utils.employee_number._get_employee_repo', return_value=mock_repo):
             mock_config.return_value = {
                 'prefix': 'EMP',
                 'separator': '-',
@@ -84,10 +92,17 @@ class TestGenerateEmployeeNumber:
             assert result.startswith('EMP-')
             assert len(result.split('-')) == 2
 
-    def test_generate_next_number(self, session):
+    def test_generate_next_number(self, app):
         """다음 사번 생성"""
+        mock_last_employee = Mock()
+        mock_last_employee.employee_number = 'EMP-2025-0001'
+
+        mock_repo = Mock()
+        mock_repo.find_last_by_number_pattern.return_value = mock_last_employee
+
         with patch('app.shared.utils.employee_number.get_employee_number_config') as mock_config, \
-             patch('app.shared.utils.employee_number.datetime') as mock_dt:
+             patch('app.shared.utils.employee_number.datetime') as mock_dt, \
+             patch('app.shared.utils.employee_number._get_employee_repo', return_value=mock_repo):
             mock_config.return_value = {
                 'prefix': 'EMP',
                 'separator': '-',
@@ -95,20 +110,6 @@ class TestGenerateEmployeeNumber:
                 'sequence_digits': 4
             }
             mock_dt.now.return_value = datetime(2025, 1, 1)
-
-            # 기존 사번 추가
-            from app.models import Company
-            company = Company(name='테스트회사', business_number='1234567890', representative='대표')
-            session.add(company)
-            session.commit()
-
-            employee = Employee(
-                name='테스트',
-                employee_number='EMP-2025-0001',
-                company_id=company.id
-            )
-            session.add(employee)
-            session.commit()
 
             result = generate_employee_number()
 
@@ -212,7 +213,7 @@ class TestEmployeeNumberExists:
 
     def test_number_exists(self, session):
         """사번이 존재함"""
-        from app.models import Company
+        from app.domains.company.models import Company
 
         company = Company(name='테스트회사', business_number='1234567890', representative='대표')
         session.add(company)
@@ -231,7 +232,7 @@ class TestEmployeeNumberExists:
 
     def test_number_exists_exclude_self(self, session):
         """사번 존재 확인 (본인 제외)"""
-        from app.models import Company
+        from app.domains.company.models import Company
 
         company = Company(name='테스트회사', business_number='1234567890', representative='대표')
         session.add(company)

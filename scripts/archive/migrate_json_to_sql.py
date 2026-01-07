@@ -13,12 +13,28 @@ sys.path.insert(0, project_root)
 
 from app import create_app
 from app.database import db
-from app.models import (
-    Employee, Education, Career, Certificate, FamilyMember,
-    Language, MilitaryService, Salary, Benefit, Contract,
-    SalaryHistory, Promotion, Evaluation, Training, Attendance,
-    Insurance, Project, Award, Asset, SalaryPayment, Attachment,
-    ClassificationOption
+from app.domains.company.models import ClassificationOption
+from app.domains.employee.models import (
+    Asset,
+    Attachment,
+    Attendance,
+    Award,
+    Benefit,
+    Career,
+    Certificate,
+    Contract,
+    Education,
+    Employee,
+    Evaluation,
+    FamilyMember,
+    Insurance,
+    Language,
+    MilitaryService,
+    Promotion,
+    Salary,
+    SalaryHistory,
+    SalaryPayment,
+    Training,
 )
 
 

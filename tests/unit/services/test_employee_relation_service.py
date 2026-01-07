@@ -270,7 +270,7 @@ class TestEmployeeRelationServiceUpdate:
 
     def test_update_education(self, mock_repos):
         """학력 정보 수정"""
-        with patch('app.services.employee.employee_relation_service.relation_updater') as mock_updater:
+        with patch('app.domains.employee.services.employee_relation_service.relation_updater') as mock_updater:
             mock_updater.update_with_commit.return_value = (True, None)
             
             form_data = {'education': [{'id': 1, 'school': '테스트대학교'}]}
@@ -281,7 +281,7 @@ class TestEmployeeRelationServiceUpdate:
 
     def test_update_career(self, mock_repos):
         """경력 정보 수정"""
-        with patch('app.services.employee.employee_relation_service.relation_updater') as mock_updater:
+        with patch('app.domains.employee.services.employee_relation_service.relation_updater') as mock_updater:
             mock_updater.update_with_commit.return_value = (True, None)
             
             form_data = {'career': [{'id': 1, 'company': '테스트회사'}]}
@@ -292,7 +292,7 @@ class TestEmployeeRelationServiceUpdate:
 
     def test_update_certificate(self, mock_repos):
         """자격증 정보 수정"""
-        with patch('app.services.employee.employee_relation_service.relation_updater') as mock_updater:
+        with patch('app.domains.employee.services.employee_relation_service.relation_updater') as mock_updater:
             mock_updater.update_with_commit.return_value = (True, None)
             
             form_data = {'certificate': [{'id': 1, 'name': '정보처리기사'}]}

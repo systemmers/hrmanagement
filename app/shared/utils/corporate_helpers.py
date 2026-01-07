@@ -9,8 +9,8 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from app.database import db
-from app.models import Company
-from app.models import Organization
+from app.domains.company.models import Company
+from app.domains.company.models import Organization
 from app.domains.company.repositories.company_repository import company_repository
 from app.shared.utils.transaction import atomic_transaction
 

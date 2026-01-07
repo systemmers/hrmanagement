@@ -7,7 +7,7 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 from sqlalchemy import event
 
-from app.services.event_listeners import (
+from app.shared.services.event_listeners import (
     SyncEventManager,
     ContractEventManager,
     init_event_listeners,
@@ -15,8 +15,8 @@ from app.services.event_listeners import (
     get_model_changes,
     track_field_changes
 )
-from app.models import PersonalProfile
-from app.models import PersonCorporateContract, DataSharingSettings, SyncLog
+from app.domains.user.models import PersonalProfile
+from app.domains.contract.models import DataSharingSettings, PersonCorporateContract, SyncLog
 
 
 class TestSyncEventManagerInit:

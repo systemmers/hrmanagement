@@ -8,8 +8,8 @@ Phase 7: 도메인 중심 마이그레이션 완료
 from typing import Dict, List, Optional
 from datetime import datetime
 from app.database import db
-from app.models import CompanyDocument
-from app.repositories.base_repository import BaseRepository
+from app.domains.company.models import CompanyDocument
+from app.shared.repositories.base_repository import BaseRepository
 
 
 class CompanyDocumentRepository(BaseRepository[CompanyDocument]):

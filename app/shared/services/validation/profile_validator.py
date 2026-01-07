@@ -1,6 +1,7 @@
 """
 Profile Basic Info Validator
 
+Phase 9: app/shared/services/validation/으로 이동
 Phase 28: 기본 정보 섹션 검증 서비스
 
 기능:

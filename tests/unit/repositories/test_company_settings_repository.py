@@ -5,8 +5,8 @@ CompanySettingsRepository 단위 테스트
 """
 import pytest
 from app.domains.company.repositories.company_settings_repository import CompanySettingsRepository
-from app.models import CompanySettings
-from app.models import Company
+from app.domains.company.models import CompanySettings
+from app.domains.company.models import Company
 
 
 class TestCompanySettingsRepositoryInit:

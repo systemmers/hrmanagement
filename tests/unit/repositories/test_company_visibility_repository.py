@@ -5,8 +5,8 @@ CompanyVisibilityRepository 단위 테스트
 """
 import pytest
 from app.domains.company.repositories.company_visibility_repository import CompanyVisibilityRepository
-from app.models import CompanyVisibilitySettings
-from app.models import Company
+from app.domains.company.models import CompanyVisibilitySettings
+from app.domains.company.models import Company
 
 
 class TestCompanyVisibilityRepositoryInit:

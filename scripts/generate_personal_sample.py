@@ -23,10 +23,16 @@ load_dotenv()
 
 from app import create_app
 from app.database import db
-from app.models import (
-    User, Profile,
-    Education, Career, Certificate, Language, FamilyMember, MilitaryService
+from app.domains.employee.models import (
+    Career,
+    Certificate,
+    Education,
+    FamilyMember,
+    Language,
+    MilitaryService,
+    Profile,
 )
+from app.domains.user.models import User
 
 
 # ============================================================

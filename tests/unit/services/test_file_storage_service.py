@@ -10,7 +10,7 @@ import pytest
 from unittest.mock import Mock, patch, mock_open
 import os
 
-from app.services.file_storage_service import (
+from app.shared.services.file_storage_service import (
     FileStorageService,
     file_storage,
     ALLOWED_EXTENSIONS,

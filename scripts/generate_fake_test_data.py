@@ -30,16 +30,33 @@ load_dotenv()
 
 from app import create_app
 from app.database import db
-from app.models import (
-    User, Company, Organization, Employee,
-    Education, Career, Certificate, Language, FamilyMember,
-    MilitaryService, Salary, Benefit, Contract, Insurance,
-    SalaryHistory, SalaryPayment, Promotion, Evaluation, Training,
-    Attendance, HrProject, ProjectParticipation, Award, Asset, Attachment,
-    PersonalProfile, PersonalEducation, PersonalCareer,
-    PersonalCertificate, PersonalLanguage, PersonalMilitaryService,
-    PersonCorporateContract, DataSharingSettings
+from app.domains.company.models import Company, Organization
+from app.domains.contract.models import DataSharingSettings, PersonCorporateContract
+from app.domains.employee.models import (
+    Asset,
+    Attachment,
+    Attendance,
+    Award,
+    Benefit,
+    Career,
+    Certificate,
+    Contract,
+    Education,
+    Employee,
+    Evaluation,
+    FamilyMember,
+    HrProject,
+    Insurance,
+    Language,
+    MilitaryService,
+    ProjectParticipation,
+    Promotion,
+    Salary,
+    SalaryHistory,
+    SalaryPayment,
+    Training,
 )
+from app.domains.user.models import PersonalProfile, User
 
 
 # ============================================================

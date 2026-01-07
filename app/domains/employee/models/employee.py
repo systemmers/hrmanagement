@@ -316,7 +316,7 @@ def _update_pcc_status_to_terminated(employee: Employee):
         return
 
     # 순환 import 방지
-    from app.models import PersonCorporateContract
+    from app.domains.contract.models import PersonCorporateContract
 
     # employee_number로 approved 상태인 PCC 조회
     contracts = PersonCorporateContract.query.filter_by(

@@ -26,7 +26,7 @@ load_dotenv(os.path.join(project_root, '.env'))
 from app import create_app
 from app.database import db
 from app.domains.employee.models import Employee
-from app.models.company import Company
+from app.domains.company.models import Company
 
 
 def check_current_state():

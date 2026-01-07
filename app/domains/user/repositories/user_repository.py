@@ -8,8 +8,8 @@ Phase 7: 도메인 중심 마이그레이션 완료
 from typing import List, Optional, Dict, Tuple
 from sqlalchemy import func
 from app.database import db
-from app.models import User
-from app.repositories.base_repository import BaseRepository
+from app.domains.user.models import User
+from app.shared.repositories.base_repository import BaseRepository
 
 
 class UserRepository(BaseRepository[User]):

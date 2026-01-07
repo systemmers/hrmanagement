@@ -748,7 +748,8 @@ function startInlineEdit(item, category, optionId) {
 async function refreshCategory(tabId, category) {
     try {
         const response = await ClassificationApi.getByCategory(category);
-        const options = response.data?.options || response.options || [];
+        // API returns {data: {category: [options]}} format
+        const options = response.data?.[category] || response.data?.options || response.options || [];
         renderCategoryList(`#tab-${tabId} [data-category="${category}"]`, category, options);
     } catch (error) {
         console.error(`카테고리 갱신 실패: ${category}`, error);

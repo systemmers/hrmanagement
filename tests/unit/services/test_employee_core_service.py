@@ -43,13 +43,13 @@ class TestEmployeeCoreServiceAccessControl:
 
     def test_get_current_org_id(self, mock_repos):
         """현재 조직 ID 조회"""
-        with patch('app.services.employee.employee_core_service.get_current_organization_id', return_value=1):
+        with patch('app.domains.employee.services.employee_core_service.get_current_organization_id', return_value=1):
             org_id = mock_repos.get_current_org_id()
             assert org_id == 1
 
     def test_verify_access_success(self, mock_repos):
         """접근 권한 확인 - 성공"""
-        with patch('app.services.employee.employee_core_service.get_current_organization_id', return_value=1):
+        with patch('app.domains.employee.services.employee_core_service.get_current_organization_id', return_value=1):
             mock_repos.employee_repo.verify_ownership.return_value = True
 
             result = mock_repos.verify_access(employee_id=1)
@@ -59,7 +59,7 @@ class TestEmployeeCoreServiceAccessControl:
 
     def test_verify_access_no_org(self, mock_repos):
         """접근 권한 확인 - 조직 없음"""
-        with patch('app.services.employee.employee_core_service.get_current_organization_id', return_value=None):
+        with patch('app.domains.employee.services.employee_core_service.get_current_organization_id', return_value=None):
             result = mock_repos.verify_access(employee_id=1)
 
             assert result is False
@@ -81,7 +81,7 @@ class TestEmployeeCoreServiceQueries:
         mock_employee = Mock()
         mock_employee.to_dict.return_value = {'id': 1, 'name': '테스트'}
 
-        with patch('app.services.employee.employee_core_service.get_current_organization_id', return_value=1):
+        with patch('app.domains.employee.services.employee_core_service.get_current_organization_id', return_value=1):
             mock_repos.employee_repo.verify_ownership.return_value = True
             mock_repos.employee_repo.find_by_id.return_value = mock_employee
 
@@ -93,7 +93,7 @@ class TestEmployeeCoreServiceQueries:
 
     def test_get_employee_no_access(self, mock_repos):
         """직원 조회 - 접근 권한 없음"""
-        with patch('app.services.employee.employee_core_service.get_current_organization_id', return_value=1):
+        with patch('app.domains.employee.services.employee_core_service.get_current_organization_id', return_value=1):
             mock_repos.employee_repo.verify_ownership.return_value = False
 
             result = mock_repos.get_employee(employee_id=1)
@@ -102,7 +102,7 @@ class TestEmployeeCoreServiceQueries:
 
     def test_get_employee_not_found(self, mock_repos):
         """직원 조회 - 직원 없음"""
-        with patch('app.services.employee.employee_core_service.get_current_organization_id', return_value=1):
+        with patch('app.domains.employee.services.employee_core_service.get_current_organization_id', return_value=1):
             mock_repos.employee_repo.verify_ownership.return_value = True
             mock_repos.employee_repo.find_by_id.return_value = None
 
@@ -114,7 +114,7 @@ class TestEmployeeCoreServiceQueries:
         """조직별 직원 목록 조회"""
         mock_employees = [Mock(), Mock()]
 
-        with patch('app.services.employee.employee_core_service.get_current_organization_id', return_value=1):
+        with patch('app.domains.employee.services.employee_core_service.get_current_organization_id', return_value=1):
             mock_repos.employee_repo.get_by_company_id.return_value = mock_employees
 
             result = mock_repos.get_employees_by_org()
@@ -124,7 +124,7 @@ class TestEmployeeCoreServiceQueries:
 
     def test_get_employees_by_org_no_org(self, mock_repos):
         """조직별 직원 목록 조회 - 조직 없음"""
-        with patch('app.services.employee.employee_core_service.get_current_organization_id', return_value=None):
+        with patch('app.domains.employee.services.employee_core_service.get_current_organization_id', return_value=None):
             result = mock_repos.get_employees_by_org()
 
             assert len(result) == 0

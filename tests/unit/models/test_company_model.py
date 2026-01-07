@@ -8,7 +8,7 @@ Company 모델의 메서드 테스트:
 """
 import pytest
 
-from app.models import Company
+from app.domains.company.models import Company
 
 
 class TestCompanyModel:

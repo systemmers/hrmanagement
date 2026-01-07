@@ -7,8 +7,8 @@ Phase 7: 도메인 중심 마이그레이션 완료
 """
 from typing import Dict, Optional
 from app.database import db
-from app.models import CompanyVisibilitySettings
-from app.repositories.base_repository import BaseRepository
+from app.domains.company.models import CompanyVisibilitySettings
+from app.shared.repositories.base_repository import BaseRepository
 
 
 class CompanyVisibilityRepository(BaseRepository[CompanyVisibilitySettings]):

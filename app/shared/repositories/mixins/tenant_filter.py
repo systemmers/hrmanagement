@@ -35,7 +35,7 @@ class TenantFilterMixin:
         if not root_org_id:
             return set()
 
-        from app.models import Organization
+        from app.domains.company.models import Organization
         root_org = Organization.query.get(root_org_id)
         if not root_org:
             return set()
