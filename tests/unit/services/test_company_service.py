@@ -8,7 +8,7 @@ CompanyService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.company_service import CompanyService, company_service
+from app.domains.company.services.company_service import CompanyService, company_service
 from app.shared.base import ServiceResult
 
 

@@ -4,7 +4,7 @@ SystemSettingRepository 단위 테스트
 시스템 설정 CRUD 및 캐싱 기능 테스트
 """
 import pytest
-from app.repositories.system_setting_repository import SystemSettingRepository
+from app.domains.platform.repositories.system_setting_repository import SystemSettingRepository
 from app.models import SystemSetting
 
 

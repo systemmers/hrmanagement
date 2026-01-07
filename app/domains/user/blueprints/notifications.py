@@ -10,7 +10,7 @@ from flask import Blueprint, request, session
 from functools import wraps
 
 from app.shared.constants.session_keys import SessionKeys
-from app.services.notification_service import notification_service
+from app.domains.user.services.notification_service import notification_service
 from app.domains.user.models import Notification
 from app.shared.utils.api_helpers import api_success, api_error, api_not_found
 

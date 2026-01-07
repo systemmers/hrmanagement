@@ -4,7 +4,7 @@ Contract Service Package (Facade)
 개인-법인 계약 관련 비즈니스 로직을 처리합니다.
 
 기존 API 100% 호환성 유지:
-    from app.services.contract_service import contract_service
+    from app.domains.contract.services.contract_service import contract_service
     contract_service.approve_contract(id, user_id)
 
 새로운 방식 (서브서비스 직접 사용):
@@ -209,3 +209,7 @@ class ContractService:
     def _create_default_sharing_settings(self, contract_id: int):
         """기본 데이터 공유 설정 생성 (내부용)"""
         return self._workflow._create_default_sharing_settings(contract_id)
+
+
+# Singleton instance
+contract_service = ContractService()

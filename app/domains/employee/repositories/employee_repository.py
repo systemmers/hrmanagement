@@ -105,7 +105,7 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
         if not employee.organization_id:
             return False
         # 조직 계층 구조를 고려하여 검증 (Company 도메인)
-        from app.repositories.organization_repository import OrganizationRepository
+        from app.domains.company.repositories.organization_repository import OrganizationRepository
         org_repo = OrganizationRepository()
         return org_repo.verify_ownership(employee.organization_id, root_organization_id)
 

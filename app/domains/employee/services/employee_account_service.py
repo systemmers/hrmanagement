@@ -46,7 +46,7 @@ class EmployeeAccountService:
     @property
     def company_repo(self):
         """지연 초기화된 법인 Repository"""
-        from app.repositories.company_repository import company_repository
+        from app.domains.company.repositories.company_repository import company_repository
         return company_repository
 
     # ========================================

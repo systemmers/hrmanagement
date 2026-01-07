@@ -9,7 +9,7 @@ ContractService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
-from app.services.contract_service import ContractService, contract_service
+from app.domains.contract.services.contract_service import ContractService, contract_service
 
 
 @pytest.fixture

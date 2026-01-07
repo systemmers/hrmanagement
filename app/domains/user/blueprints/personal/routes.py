@@ -19,7 +19,7 @@ from werkzeug.utils import secure_filename
 
 from app.shared.constants.session_keys import SessionKeys, AccountType
 from app.database import db
-from app.services.personal_service import personal_service
+from app.domains.user.services.personal_service import personal_service
 from app.shared.utils.decorators import personal_login_required
 from app.shared.utils.personal_helpers import get_current_profile, profile_required_no_inject
 

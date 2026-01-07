@@ -12,7 +12,7 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 from typing import Dict, List
 
-from app.services.contract.contract_core_service import (
+from app.domains.contract.services.contract_core_service import (
     ContractCoreService,
     contract_core_service
 )

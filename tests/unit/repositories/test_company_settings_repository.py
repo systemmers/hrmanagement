@@ -4,7 +4,7 @@ CompanySettingsRepository 단위 테스트
 법인별 설정 정보 관리 기능 테스트
 """
 import pytest
-from app.repositories.company_settings_repository import CompanySettingsRepository
+from app.domains.company.repositories.company_settings_repository import CompanySettingsRepository
 from app.models import CompanySettings
 from app.models import Company
 

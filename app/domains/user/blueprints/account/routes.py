@@ -10,9 +10,9 @@ from . import account_bp
 from .helpers import validate_password_change
 from app.shared.constants.session_keys import SessionKeys
 from app.shared.utils.decorators import login_required
-from app.services.user_service import user_service
+from app.domains.user.services.user_service import user_service
 from app.domains.employee.services import employee_service
-from app.services.personal_service import personal_service
+from app.domains.user.services.personal_service import personal_service
 
 
 @account_bp.route('/settings')

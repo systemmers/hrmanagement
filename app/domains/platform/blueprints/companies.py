@@ -10,7 +10,7 @@ from flask import render_template, request, abort
 
 from . import platform_bp
 from app.shared.utils.decorators import superadmin_required, api_superadmin_required
-from app.services.platform_service import platform_service
+from app.domains.platform.services.platform_service import platform_service
 from app.shared.utils.api_helpers import api_success, api_error
 from app.shared.constants.field_options import FieldOptions
 

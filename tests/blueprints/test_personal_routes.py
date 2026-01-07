@@ -20,7 +20,7 @@ class TestPersonalDashboard:
 
     def test_dashboard_renders(self, auth_client_personal_full, test_user_personal):
         """대시보드 렌더링"""
-        from app.services.personal_service import personal_service
+        from app.domains.user.services.personal_service import personal_service
         with patch.object(personal_service, 'get_dashboard_data') as mock_get_data:
             mock_get_data.return_value = {
                 'user': test_user_personal,
@@ -55,7 +55,7 @@ class TestPersonalProfileEdit:
 
     def test_profile_edit_post_success(self, auth_client_personal_full, test_user_personal):
         """프로필 수정 POST 성공"""
-        from app.services.personal_service import personal_service
+        from app.domains.user.services.personal_service import personal_service
         from app.models import PersonalProfile
         from app.shared.base.service_result import ServiceResult
         from unittest.mock import MagicMock
@@ -90,7 +90,7 @@ class TestPersonalPhotoUpload:
 
     def test_photo_upload_invalid_file(self, auth_client_personal_full, test_user_personal):
         """잘못된 파일 형식 업로드"""
-        from app.services.personal_service import personal_service
+        from app.domains.user.services.personal_service import personal_service
         from app.models import PersonalProfile
         from app.shared.base.service_result import ServiceResult
         from unittest.mock import MagicMock

@@ -9,7 +9,7 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
 
-from app.services.sync_service import SyncService, sync_service
+from app.domains.sync.services.sync_service import SyncService, sync_service
 
 
 @pytest.fixture

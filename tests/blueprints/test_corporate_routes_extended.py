@@ -56,7 +56,7 @@ class TestCorporateDashboard:
 
     def test_dashboard_renders(self, auth_client_corporate_full, test_company):
         """대시보드 렌더링"""
-        from app.services.company_service import company_service
+        from app.domains.company.services.company_service import company_service
         from app.shared.constants.session_keys import SessionKeys
 
         with patch.object(company_service, 'get_with_stats') as mock_get:

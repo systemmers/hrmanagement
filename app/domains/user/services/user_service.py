@@ -203,7 +203,7 @@ class UserService:
         Returns:
             계약 상태와 직원 이름이 추가된 사용자 목록
         """
-        from app.services.user_employee_link_service import user_employee_link_service
+        from app.domains.user.services.user_employee_link_service import user_employee_link_service
         from app.domains.employee.services import employee_service
 
         if not users or not company_id:

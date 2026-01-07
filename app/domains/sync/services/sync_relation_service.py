@@ -38,7 +38,7 @@ class SyncRelationService:
     def sync_log_repo(self):
         """지연 초기화된 SyncLog Repository"""
         if self._sync_log_repo is None:
-            from app.repositories.sync_log_repository import sync_log_repository
+            from app.domains.sync.repositories.sync_log_repository import sync_log_repository
             self._sync_log_repo = sync_log_repository
         return self._sync_log_repo
 

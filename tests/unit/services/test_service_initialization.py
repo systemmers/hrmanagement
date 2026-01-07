@@ -12,13 +12,13 @@ class TestServiceInitializations:
 
     def test_contract_filter_service_init(self):
         """ContractFilterService 초기화"""
-        from app.services.contract_filter_service import ContractFilterService
+        from app.domains.contract.services.contract_filter_service import ContractFilterService
         service = ContractFilterService()
         assert service is not None
 
     def test_corporate_admin_profile_service_init(self):
         """CorporateAdminProfileService 초기화"""
-        from app.services.corporate_admin_profile_service import CorporateAdminProfileService
+        from app.domains.user.services.corporate_admin_profile_service import CorporateAdminProfileService
         service = CorporateAdminProfileService()
         assert service is not None
 
@@ -29,13 +29,13 @@ class TestServiceInitializations:
 
     def test_system_setting_service_init(self):
         """SystemSettingService 초기화"""
-        from app.services.system_setting_service import SystemSettingService
+        from app.domains.platform.services.system_setting_service import SystemSettingService
         service = SystemSettingService()
         assert service is not None
 
     def test_user_employee_link_service_init(self):
         """UserEmployeeLinkService 초기화"""
-        from app.services.user_employee_link_service import UserEmployeeLinkService
+        from app.domains.user.services.user_employee_link_service import UserEmployeeLinkService
         service = UserEmployeeLinkService()
         assert service is not None
 
@@ -94,7 +94,7 @@ class TestBasicFunctionality:
 
     def test_contract_filter_service_basic(self):
         """ContractFilterService 기본 기능"""
-        from app.services.contract_filter_service import ContractFilterService
+        from app.domains.contract.services.contract_filter_service import ContractFilterService
         service = ContractFilterService()
 
         # 서비스 객체가 생성되었는지만 확인
@@ -102,7 +102,7 @@ class TestBasicFunctionality:
 
     def test_system_setting_service_basic(self):
         """SystemSettingService 기본 기능"""
-        from app.services.system_setting_service import SystemSettingService
+        from app.domains.platform.services.system_setting_service import SystemSettingService
         service = SystemSettingService()
 
         # 서비스 객체가 생성되었는지만 확인

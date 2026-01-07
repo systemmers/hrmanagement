@@ -45,7 +45,7 @@ class SyncEventManager:
     def _get_data_sharing_repo(cls):
         """지연 초기화된 데이터 공유 설정 Repository"""
         if cls._data_sharing_repo is None:
-            from app.repositories.data_sharing_settings_repository import data_sharing_settings_repository
+            from app.domains.company.repositories.data_sharing_settings_repository import data_sharing_settings_repository
             cls._data_sharing_repo = data_sharing_settings_repository
         return cls._data_sharing_repo
 
@@ -172,7 +172,7 @@ class SyncEventManager:
             user_id: 사용자 ID
         """
         # 순환 import 방지
-        from app.services.sync_service import sync_service
+        from app.domains.sync.services.sync_service import sync_service
 
         try:
             sync_service.set_current_user(user_id)
@@ -214,7 +214,7 @@ class ContractEventManager:
     def _get_data_sharing_repo(cls):
         """지연 초기화된 데이터 공유 설정 Repository"""
         if cls._data_sharing_repo is None:
-            from app.repositories.data_sharing_settings_repository import data_sharing_settings_repository
+            from app.domains.company.repositories.data_sharing_settings_repository import data_sharing_settings_repository
             cls._data_sharing_repo = data_sharing_settings_repository
         return cls._data_sharing_repo
 

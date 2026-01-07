@@ -11,7 +11,7 @@ from app.shared.constants.session_keys import SessionKeys, AccountType
 from app.shared.constants.status import ContractStatus, EmployeeStatus
 from app.shared.utils.decorators import login_required
 from app.domains.employee.services import employee_service
-from app.services.system_setting_service import system_setting_service
+from app.domains.platform.services.system_setting_service import system_setting_service
 from app.services import contract_service
 
 mypage_bp = Blueprint('mypage', __name__, url_prefix='/my')

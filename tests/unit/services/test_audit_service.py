@@ -9,7 +9,7 @@ AuditService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
-from app.services.audit_service import AuditService, audit_service
+from app.domains.platform.services.audit_service import AuditService, audit_service
 
 
 class TestAuditServiceInit:

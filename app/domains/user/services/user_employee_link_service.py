@@ -37,7 +37,7 @@ class UserEmployeeLinkService:
     def contract_repo(self):
         """지연 초기화된 PersonContract Repository"""
         if self._contract_repo is None:
-            from app.repositories.person_contract_repository import PersonContractRepository
+            from app.domains.contract.repositories.person_contract_repository import PersonContractRepository
             self._contract_repo = PersonContractRepository()
         return self._contract_repo
 

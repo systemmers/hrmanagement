@@ -15,9 +15,9 @@ from app.blueprints.profile.decorators import (
     corporate_only,
     corporate_admin_only
 )
-from app.services.user_service import user_service
+from app.domains.user.services.user_service import user_service
 from app.domains.employee.services.attachment_service import attachment_service
-from app.services.corporate_admin_profile_service import corporate_admin_profile_service
+from app.domains.user.services.corporate_admin_profile_service import corporate_admin_profile_service
 from app.domains.employee.services import employee_service
 from app.services.file_storage_service import file_storage, CATEGORY_ADMIN_PHOTO
 from app.shared.utils.api_helpers import api_success, api_error, api_not_found, api_forbidden, api_server_error

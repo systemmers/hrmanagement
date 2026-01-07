@@ -12,7 +12,7 @@ class TestTerminationServiceInit:
 
     def test_service_creation(self):
         """서비스 생성"""
-        from app.services.termination_service import TerminationService
+        from app.domains.sync.services.termination_service import TerminationService
         service = TerminationService()
         assert service is not None
 
@@ -22,7 +22,7 @@ class TestTerminationServiceBasic:
 
     def test_service_creation_only(self):
         """서비스 생성만 확인"""
-        from app.services.termination_service import TerminationService
+        from app.domains.sync.services.termination_service import TerminationService
         service = TerminationService()
 
         # 서비스 객체만 확인
@@ -34,7 +34,7 @@ class TestUserEmployeeLinkServiceInit:
 
     def test_service_creation(self):
         """서비스 생성"""
-        from app.services.user_employee_link_service import UserEmployeeLinkService
+        from app.domains.user.services.user_employee_link_service import UserEmployeeLinkService
         service = UserEmployeeLinkService()
         assert service is not None
 
@@ -44,7 +44,7 @@ class TestUserEmployeeLinkServiceBasic:
 
     def test_service_creation_only(self):
         """서비스 생성만 확인"""
-        from app.services.user_employee_link_service import UserEmployeeLinkService
+        from app.domains.user.services.user_employee_link_service import UserEmployeeLinkService
         service = UserEmployeeLinkService()
 
         # 서비스 객체만 확인

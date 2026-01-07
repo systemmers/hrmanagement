@@ -8,7 +8,7 @@ PersonalService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
-from app.services.personal_service import PersonalService, personal_service
+from app.domains.user.services.personal_service import PersonalService, personal_service
 from app.shared.base import ServiceResult
 
 

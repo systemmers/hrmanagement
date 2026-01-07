@@ -9,8 +9,8 @@ from flask import request, session
 
 from app.domains.sync.blueprints import sync_bp
 from app.shared.constants.session_keys import SessionKeys
-from app.services.sync_service import sync_service
-from app.services.contract_service import contract_service
+from app.domains.sync.services.sync_service import sync_service
+from app.domains.contract.services.contract_service import contract_service
 from app.shared.utils.transaction import atomic_transaction
 from app.models import SyncLog, PersonCorporateContract
 from app.shared.constants.status import ContractStatus

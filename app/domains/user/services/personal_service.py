@@ -70,7 +70,7 @@ class PersonalService:
     def company_repo(self):
         """지연 초기화된 법인 Repository"""
         if self._company_repo is None:
-            from app.repositories.company_repository import company_repository
+            from app.domains.company.repositories.company_repository import company_repository
             self._company_repo = company_repository
         return self._company_repo
 

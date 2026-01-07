@@ -7,7 +7,7 @@ SyncRelationService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.sync.sync_relation_service import SyncRelationService
+from app.domains.sync.services.sync_relation_service import SyncRelationService
 
 
 class TestSyncRelationServiceInit:

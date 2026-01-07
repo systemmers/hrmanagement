@@ -37,8 +37,8 @@ class TestAdminOrganization:
     def test_organization_renders(self, auth_client_corporate_full, test_company):
         """조직 관리 페이지 렌더링"""
         from app.shared.constants.session_keys import SessionKeys, UserRole
-        from app.services.organization_service import organization_service
-        from app.services.company_service import company_service
+        from app.domains.company.services.organization_service import organization_service
+        from app.domains.company.services.company_service import company_service
         
         with patch.object(company_service, 'get_by_id') as mock_get_company, \
              patch.object(organization_service, 'get_tree') as mock_tree, \

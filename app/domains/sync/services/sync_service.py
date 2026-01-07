@@ -60,7 +60,7 @@ class SyncService:
     def data_sharing_repo(self):
         """지연 초기화된 DataSharingSettings Repository"""
         if self._data_sharing_repo is None:
-            from app.repositories.data_sharing_settings_repository import data_sharing_settings_repository
+            from app.domains.company.repositories.data_sharing_settings_repository import data_sharing_settings_repository
             self._data_sharing_repo = data_sharing_settings_repository
         return self._data_sharing_repo
 
@@ -84,7 +84,7 @@ class SyncService:
     def company_repo(self):
         """지연 초기화된 법인 Repository"""
         if self._company_repo is None:
-            from app.repositories.company_repository import company_repository
+            from app.domains.company.repositories.company_repository import company_repository
             self._company_repo = company_repository
         return self._company_repo
 
@@ -100,7 +100,7 @@ class SyncService:
     def personal_profile_repo(self):
         """지연 초기화된 PersonalProfile Repository"""
         if not hasattr(self, '_personal_profile_repo') or self._personal_profile_repo is None:
-            from app.repositories.personal_profile_repository import personal_profile_repository
+            from app.domains.user.repositories.personal_profile_repository import personal_profile_repository
             self._personal_profile_repo = personal_profile_repository
         return self._personal_profile_repo
 

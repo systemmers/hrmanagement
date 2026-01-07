@@ -6,7 +6,7 @@ User-Employee 연결 조회 서비스 테스트
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
-from app.services.user_employee_link_service import UserEmployeeLinkService
+from app.domains.user.services.user_employee_link_service import UserEmployeeLinkService
 
 
 class TestUserEmployeeLinkServiceInit:

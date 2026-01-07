@@ -4,7 +4,7 @@ CompanyVisibilityRepository 단위 테스트
 법인별 정보 노출 설정 관리 기능 테스트
 """
 import pytest
-from app.repositories.company_visibility_repository import CompanyVisibilityRepository
+from app.domains.company.repositories.company_visibility_repository import CompanyVisibilityRepository
 from app.models import CompanyVisibilitySettings
 from app.models import Company
 

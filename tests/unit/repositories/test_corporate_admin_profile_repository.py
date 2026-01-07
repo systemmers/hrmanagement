@@ -4,7 +4,7 @@ Corporate Admin Profile Repository 테스트
 법인 관리자 프로필 저장소 테스트
 """
 import pytest
-from app.repositories.corporate_admin_profile_repository import CorporateAdminProfileRepository
+from app.domains.user.repositories.corporate_admin_profile_repository import CorporateAdminProfileRepository
 from app.models import CorporateAdminProfile
 from app.models import Company, User
 

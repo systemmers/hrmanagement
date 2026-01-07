@@ -8,7 +8,7 @@ SyncBasicService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.sync.sync_basic_service import SyncBasicService
+from app.domains.sync.services.sync_basic_service import SyncBasicService
 
 
 class TestSyncBasicServiceInit:

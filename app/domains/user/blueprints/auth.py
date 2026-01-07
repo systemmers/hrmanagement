@@ -10,7 +10,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app.shared.constants.session_keys import SessionKeys
 from app.shared.constants.messages import FlashMessages
 from app.shared.constants.status import EmployeeStatus
-from app.services.user_service import user_service
+from app.domains.user.services.user_service import user_service
 from app.domains.employee.services import employee_service
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')

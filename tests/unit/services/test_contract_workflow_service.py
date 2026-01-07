@@ -9,7 +9,7 @@ ContractWorkflowService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 
-from app.services.contract.contract_workflow_service import (
+from app.domains.contract.services.contract_workflow_service import (
     ContractWorkflowService,
     contract_workflow_service
 )

@@ -8,7 +8,7 @@ ContractSettingsService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.contract.contract_settings_service import (
+from app.domains.contract.services.contract_settings_service import (
     ContractSettingsService,
     contract_settings_service
 )

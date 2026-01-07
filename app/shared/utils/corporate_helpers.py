@@ -11,7 +11,7 @@ from typing import List, Optional
 from app.database import db
 from app.models import Company
 from app.models import Organization
-from app.repositories.company_repository import company_repository
+from app.domains.company.repositories.company_repository import company_repository
 from app.shared.utils.transaction import atomic_transaction
 
 
@@ -23,7 +23,7 @@ def _get_user_repo():
     """지연 초기화된 User Repository"""
     global _user_repo
     if _user_repo is None:
-        from app.repositories.user_repository import user_repository
+        from app.domains.user.repositories.user_repository import user_repository
         _user_repo = user_repository
     return _user_repo
 

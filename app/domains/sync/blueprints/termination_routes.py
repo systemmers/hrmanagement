@@ -10,8 +10,8 @@ from flask import request, session
 
 from app.domains.sync.blueprints import sync_bp
 from app.shared.constants.session_keys import SessionKeys, AccountType
-from app.services.termination_service import termination_service
-from app.services.contract_service import contract_service
+from app.domains.sync.services.termination_service import termination_service
+from app.domains.contract.services.contract_service import contract_service
 from app.shared.utils.decorators import (
     api_login_required as login_required,
     contract_access_required

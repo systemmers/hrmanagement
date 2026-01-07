@@ -9,7 +9,7 @@ TerminationService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.termination_service import TerminationService, termination_service
+from app.domains.sync.services.termination_service import TerminationService, termination_service
 
 
 class TestTerminationServiceInit:

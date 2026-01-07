@@ -284,7 +284,7 @@ class EmployeeCoreService:
         Returns:
             계약 정보가 추가된 직원 목록 (활성 계약 있는 직원만)
         """
-        from app.services.contract_filter_service import contract_filter_service
+        from app.domains.contract.services.contract_filter_service import contract_filter_service
         from app.shared.constants.status import ContractStatus
 
         if not company_id or not employees:

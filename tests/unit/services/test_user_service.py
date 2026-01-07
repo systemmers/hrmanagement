@@ -9,7 +9,7 @@ UserService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.user_service import UserService, user_service
+from app.domains.user.services.user_service import UserService, user_service
 
 
 @pytest.fixture

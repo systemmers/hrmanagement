@@ -11,7 +11,7 @@ from app.shared.constants.session_keys import SessionKeys, UserRole, AccountType
 from app.shared.utils.decorators import login_required, manager_or_admin_required
 from app.shared.utils.object_helpers import safe_get
 from app.domains.employee.services import employee_service
-from app.services.contract_service import contract_service
+from app.domains.contract.services.contract_service import contract_service
 from .helpers import verify_employee_access
 
 
@@ -95,7 +95,7 @@ def register_detail_routes(bp: Blueprint):
         business_card_back = employee_service.get_attachment_by_category(employee_id, 'business_card_back')
         classification_options = employee_service.get_all_classification_options()
 
-        from app.services.user_service import user_service
+        from app.domains.user.services.user_service import user_service
 
         # 개인계약 존재 여부 확인 (개인정보 수정 제한용)
         # 개인계약을 먼저 조회하여 linked_user 결정에 활용
@@ -182,7 +182,7 @@ def _render_employee_full_view(employee_id, employee):
     Phase 24: 통합 메서드 사용으로 N+1 쿼리 최적화
     - 21개 개별 호출 → 1개 통합 호출 + 부가 조회
     """
-    from app.services.user_service import user_service
+    from app.domains.user.services.user_service import user_service
 
     # 통합 데이터 조회 (Phase 24: N+1 최적화)
     full_view_data = employee_service.get_employee_full_view_data(employee_id)

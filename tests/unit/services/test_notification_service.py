@@ -9,7 +9,7 @@ NotificationService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.notification_service import NotificationService, notification_service
+from app.domains.user.services.notification_service import NotificationService, notification_service
 
 
 class TestNotificationServiceInit:

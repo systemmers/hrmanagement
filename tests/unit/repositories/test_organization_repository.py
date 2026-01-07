@@ -7,7 +7,7 @@ OrganizationRepository 단위 테스트
 - 멀티테넌시 필터링
 """
 import pytest
-from app.repositories.organization_repository import OrganizationRepository
+from app.domains.company.repositories.organization_repository import OrganizationRepository
 from app.models import Organization
 from app.models import Company
 

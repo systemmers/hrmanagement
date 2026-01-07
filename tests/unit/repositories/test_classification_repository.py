@@ -4,7 +4,7 @@ ClassificationOptionsRepository 단위 테스트
 분류 옵션 저장소의 CRUD 및 카테고리별 조회 테스트
 """
 import pytest
-from app.repositories.classification_repository import ClassificationOptionsRepository
+from app.domains.company.repositories.classification_repository import ClassificationOptionsRepository
 from app.models import ClassificationOption
 
 

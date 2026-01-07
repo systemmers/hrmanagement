@@ -38,7 +38,7 @@ class ContractCoreService:
     def user_repo(self):
         """지연 초기화된 User Repository"""
         if self._user_repo is None:
-            from app.repositories.user_repository import user_repository
+            from app.domains.user.repositories.user_repository import user_repository
             self._user_repo = user_repository
         return self._user_repo
 

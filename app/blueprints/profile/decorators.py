@@ -10,9 +10,9 @@ from functools import wraps
 from flask import session, g, flash, redirect, url_for, current_app
 
 from app.shared.constants.session_keys import SessionKeys, AccountType
-from app.services.personal_service import personal_service
+from app.domains.user.services.personal_service import personal_service
 from app.domains.employee.services import employee_service
-from app.services.corporate_admin_profile_service import corporate_admin_profile_service
+from app.domains.user.services.corporate_admin_profile_service import corporate_admin_profile_service
 from app.adapters.profile_adapter import (
     EmployeeProfileAdapter,
     PersonalProfileAdapter,

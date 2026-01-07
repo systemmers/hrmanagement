@@ -6,7 +6,7 @@ SystemSettingService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.system_setting_service import SystemSettingService, system_setting_service
+from app.domains.platform.services.system_setting_service import SystemSettingService, system_setting_service
 
 
 class TestSystemSettingServiceInit:

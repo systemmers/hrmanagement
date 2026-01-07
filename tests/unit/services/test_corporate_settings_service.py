@@ -9,7 +9,7 @@ CorporateSettingsService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.corporate_settings_service import CorporateSettingsService
+from app.domains.company.services.corporate_settings_service import CorporateSettingsService
 
 
 class TestCorporateSettingsServiceInit:

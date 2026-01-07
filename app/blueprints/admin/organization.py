@@ -9,8 +9,8 @@ from flask import render_template, request, flash, redirect, url_for, session
 
 from . import admin_bp
 from ...shared.constants.session_keys import SessionKeys
-from ...services.organization_service import organization_service
-from ...services.company_service import company_service
+from app.domains.company.services.organization_service import organization_service
+from app.domains.company.services.company_service import company_service
 from ...shared.utils.decorators import admin_required, login_required
 from ...shared.utils.api_helpers import api_success, api_error, api_not_found, api_server_error
 

@@ -23,7 +23,7 @@ def _get_personal_profile_repo():
     """지연 초기화된 PersonalProfile Repository"""
     global _personal_profile_repo
     if _personal_profile_repo is None:
-        from app.repositories.personal_profile_repository import personal_profile_repository
+        from app.domains.user.repositories.personal_profile_repository import personal_profile_repository
         _personal_profile_repo = personal_profile_repository
     return _personal_profile_repo
 

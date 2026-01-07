@@ -5,7 +5,7 @@ CorporateAdminProfileService 단위 테스트
 """
 import pytest
 from unittest.mock import Mock, patch
-from app.services.corporate_admin_profile_service import (
+from app.domains.user.services.corporate_admin_profile_service import (
     CorporateAdminProfileService,
     corporate_admin_profile_service
 )

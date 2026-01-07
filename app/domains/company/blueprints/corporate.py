@@ -19,8 +19,8 @@ from app.shared.utils.corporate_helpers import (
     validate_registration,
     create_company_entities
 )
-from app.services.company_service import company_service
-from app.services.user_service import user_service
+from app.domains.company.services.company_service import company_service
+from app.domains.user.services.user_service import user_service
 
 corporate_bp = Blueprint('corporate', __name__, url_prefix='/corporate')
 

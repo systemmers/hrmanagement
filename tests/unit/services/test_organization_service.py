@@ -9,7 +9,7 @@ OrganizationService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.organization_service import OrganizationService, organization_service
+from app.domains.company.services.organization_service import OrganizationService, organization_service
 
 
 @pytest.fixture

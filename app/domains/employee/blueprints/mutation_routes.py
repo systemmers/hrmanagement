@@ -19,8 +19,8 @@ from app.shared.utils.object_helpers import safe_get
 from app.domains.employee.services import employee_service
 from app.services import employee_account_service
 from app.services.file_storage_service import file_storage, CATEGORY_PROFILE_PHOTO
-from app.services.user_employee_link_service import user_employee_link_service
-from app.services.contract.contract_workflow_service import contract_workflow_service
+from app.domains.user.services.user_employee_link_service import user_employee_link_service
+from app.domains.contract.services.contract_workflow_service import contract_workflow_service
 from .helpers import (
     verify_employee_access, extract_employee_from_form, extract_basic_fields_from_form,
     update_family_data, update_education_data, update_career_data,
@@ -28,7 +28,7 @@ from .helpers import (
     update_hr_project_data, update_project_participation_data, update_award_data,
     get_business_card_folder, generate_unique_filename
 )
-from app.services.organization_service import organization_service
+from app.domains.company.services.organization_service import organization_service
 
 
 # ========================================

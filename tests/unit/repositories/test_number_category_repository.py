@@ -4,7 +4,7 @@ NumberCategoryRepository 단위 테스트
 번호 체계 분류코드 관리 기능 테스트
 """
 import pytest
-from app.repositories.number_category_repository import NumberCategoryRepository
+from app.domains.company.repositories.number_category_repository import NumberCategoryRepository
 from app.models import NumberCategory
 from app.models import Company
 

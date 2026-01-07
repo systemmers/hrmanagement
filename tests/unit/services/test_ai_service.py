@@ -11,8 +11,8 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 from flask import Flask
 
-from app.services.ai_service import AIService
-from app.services.ai import AnalysisResult
+from app.shared.services.ai_service import AIService
+from app.shared.services.ai import AnalysisResult
 
 
 class TestAIServiceInit:

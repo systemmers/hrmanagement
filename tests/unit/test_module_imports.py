@@ -17,27 +17,27 @@ class TestServiceImports:
 
     def test_import_termination_service(self):
         """TerminationService import"""
-        from app.services.termination_service import TerminationService
+        from app.domains.sync.services.termination_service import TerminationService
         assert TerminationService is not None
 
     def test_import_user_employee_link_service(self):
         """UserEmployeeLinkService import"""
-        from app.services.user_employee_link_service import UserEmployeeLinkService
+        from app.domains.user.services.user_employee_link_service import UserEmployeeLinkService
         assert UserEmployeeLinkService is not None
 
     def test_import_contract_filter_service(self):
         """ContractFilterService import"""
-        from app.services.contract_filter_service import ContractFilterService
+        from app.domains.contract.services.contract_filter_service import ContractFilterService
         assert ContractFilterService is not None
 
     def test_import_corporate_admin_profile_service(self):
         """CorporateAdminProfileService import"""
-        from app.services.corporate_admin_profile_service import CorporateAdminProfileService
+        from app.domains.user.services.corporate_admin_profile_service import CorporateAdminProfileService
         assert CorporateAdminProfileService is not None
 
     def test_import_system_setting_service(self):
         """SystemSettingService import"""
-        from app.services.system_setting_service import SystemSettingService
+        from app.domains.platform.services.system_setting_service import SystemSettingService
         assert SystemSettingService is not None
 
 
@@ -74,12 +74,12 @@ class TestRepositoryImports:
 
     def test_import_classification_repository(self):
         """ClassificationOptionsRepository import"""
-        from app.repositories.classification_repository import ClassificationOptionsRepository
+        from app.domains.company.repositories.classification_repository import ClassificationOptionsRepository
         assert ClassificationOptionsRepository is not None
 
     def test_import_corporate_admin_profile_repository(self):
         """CorporateAdminProfileRepository import"""
-        from app.repositories.corporate_admin_profile_repository import CorporateAdminProfileRepository
+        from app.domains.user.repositories.corporate_admin_profile_repository import CorporateAdminProfileRepository
         assert CorporateAdminProfileRepository is not None
 
 

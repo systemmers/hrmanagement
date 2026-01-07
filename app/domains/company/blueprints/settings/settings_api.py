@@ -9,7 +9,7 @@ from flask import request
 
 from app.domains.company.blueprints.settings import corporate_settings_api_bp
 from app.domains.company.blueprints.settings.helpers import get_company_id
-from app.services.corporate_settings_service import corporate_settings_service
+from app.domains.company.services.corporate_settings_service import corporate_settings_service
 from app.shared.utils.api_helpers import api_success, api_error, api_forbidden
 from app.shared.utils.decorators import corporate_admin_required
 

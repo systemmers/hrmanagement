@@ -35,7 +35,7 @@ class ContractSettingsService:
     def data_sharing_repo(self):
         """지연 초기화된 DataSharingSettings Repository"""
         if self._data_sharing_repo is None:
-            from app.repositories.data_sharing_settings_repository import data_sharing_settings_repository
+            from app.domains.company.repositories.data_sharing_settings_repository import data_sharing_settings_repository
             self._data_sharing_repo = data_sharing_settings_repository
         return self._data_sharing_repo
 
@@ -43,7 +43,7 @@ class ContractSettingsService:
     def sync_log_repo(self):
         """지연 초기화된 SyncLog Repository"""
         if self._sync_log_repo is None:
-            from app.repositories.sync_log_repository import sync_log_repository
+            from app.domains.sync.repositories.sync_log_repository import sync_log_repository
             self._sync_log_repo = sync_log_repository
         return self._sync_log_repo
 

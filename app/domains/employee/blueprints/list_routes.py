@@ -16,8 +16,8 @@ from app.shared.utils.api_helpers import api_success, api_server_error
 from app.shared.utils.decorators import manager_or_admin_required
 from app.shared.utils.tenant import get_current_organization_id
 from app.domains.employee.services import employee_service
-from app.services.contract_service import contract_service
-from app.services.user_service import user_service
+from app.domains.contract.services.contract_service import contract_service
+from app.domains.user.services.user_service import user_service
 
 
 def register_list_routes(bp: Blueprint):

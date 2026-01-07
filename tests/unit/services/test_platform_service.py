@@ -9,7 +9,7 @@ PlatformService 단위 테스트
 import pytest
 from unittest.mock import Mock, patch
 
-from app.services.platform_service import PlatformService, platform_service
+from app.domains.platform.services.platform_service import PlatformService, platform_service
 
 
 class TestPlatformServiceInit:

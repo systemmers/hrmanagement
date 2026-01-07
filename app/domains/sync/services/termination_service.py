@@ -169,7 +169,7 @@ class TerminationService:
                 # Employee가 없는 경우 (personal 계정) - Employee 생성 후 terminated 설정
                 profile = self.personal_profile_repo.find_by_user_id(user.id)
                 if profile:
-                    from app.services.sync_service import sync_service
+                    from app.domains.sync.services.sync_service import sync_service
                     employee = sync_service._find_or_create_employee(contract, profile)
                     if employee:
                         user.employee_id = employee.id
