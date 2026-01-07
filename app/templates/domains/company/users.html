@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}계정관리 - {{ company.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/corporate-users.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-row">
+        <h1 class="page-title">계정관리</h1>
+        <div class="page-actions">
+            <a href="{{ url_for('corporate.dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                <span>대시보드로</span>
+            </a>
+            <a href="{{ url_for('corporate.add_user') }}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i>
+                <span>계정 추가</span>
+            </a>
+        </div>
+    </div>
+    <p class="page-description">{{ company.name }} 법인 계정 목록입니다. (총 {{ pagination.total }}명{% if pagination.pages > 1 %}, {{ pagination.page }}/{{ pagination.pages }} 페이지{% endif %})</p>
+</div>
+
+<!-- 사용자 목록 테이블 -->
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>아이디</th>
+                <th>이름</th>
+                <th>이메일</th>
+                <th>역할</th>
+                <th>상태</th>
+                <th>계약상태</th>
+                <th>생성일</th>
+                <th>작업</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.company_sequence }}</td>
+                <td>
+                    <div class="d-flex items-center gap-2">
+                        <div class="user-avatar-small">{{ user.username[:1]|upper }}</div>
+                        <span>{{ user.username }}</span>
+                    </div>
+                </td>
+                <td>{{ user.name or '-' }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% if user.role == 'admin' %}
+                    <span class="badge badge-primary">관리자</span>
+                    {% elif user.role == 'manager' %}
+                    <span class="badge badge-info">매니저</span>
+                    {% else %}
+                    <span class="badge badge-secondary">직원</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.is_active %}
+                    <span class="badge badge-success">활성</span>
+                    {% else %}
+                    <span class="badge badge-danger">비활성</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.contract_status == 'approved' %}
+                    <span class="badge badge-success">승인됨</span>
+                    {% elif user.contract_status == 'requested' %}
+                    <span class="badge badge-warning">대기중</span>
+                    {% elif user.contract_status == 'rejected' %}
+                    <span class="badge badge-danger">거절됨</span>
+                    {% elif user.contract_status == 'terminated' %}
+                    <span class="badge badge-secondary">종료</span>
+                    {% elif user.contract_status == 'termination_requested' %}
+                    <span class="badge badge-warning">종료대기</span>
+                    {% else %}
+                    <span class="badge badge-light">계약없음</span>
+                    {% endif %}
+                </td>
+                <td>{{ user.created_at[:10] if user.created_at else '-' }}</td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn-icon" title="수정" data-action="edit-user" data-user-id="{{ user.id }}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        {% if user.id != session.get('user_id') %}
+                        <button class="btn-icon btn-icon-danger" title="비활성화" data-action="toggle-user-status" data-user-id="{{ user.id }}">
+                            <i class="fas fa-{% if user.is_active %}ban{% else %}check{% endif %}"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if pagination.pages > 1 %}
+<div class="pagination">
+    {% if pagination.has_prev %}
+    <a href="?page={{ pagination.prev_num }}" class="page-link">
+        <i class="fas fa-chevron-left"></i>
+    </a>
+    {% endif %}
+
+    {% for p in pagination.iter_pages() %}
+        {% if p %}
+        <a href="?page={{ p }}" class="page-link {{ 'active' if p == pagination.page else '' }}">{{ p }}</a>
+        {% else %}
+        <span class="page-ellipsis">...</span>
+        {% endif %}
+    {% endfor %}
+
+    {% if pagination.has_next %}
+    <a href="?page={{ pagination.next_num }}" class="page-link">
+        <i class="fas fa-chevron-right"></i>
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if users|length == 0 %}
+<div class="empty-state-large">
+    <i class="fas fa-users"></i>
+    <p>등록된 사용자가 없습니다.</p>
+    <a href="{{ url_for('corporate.add_user') }}" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i>
+        <span>사용자 추가</span>
+    </a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/pages/corporate-users.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,110 @@
+{# 법인 서류 탭 #}
+{% from "macros/_settings.html" import document_category %}
+
+<div id="tab-documents" class="tab-panel" role="tabpanel">
+    <div id="documents-content">
+        {# 서류 현황 #}
+        <div class="form-section form-section--card">
+            <h2 class="form-section-title">
+                <i class="fas fa-chart-bar"></i>
+                서류 현황
+            </h2>
+            <div class="document-stats">
+                <div class="stat-item">
+                    <span class="stat-value">0</span>
+                    <span class="stat-label">전체 서류</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">0</span>
+                    <span class="stat-label">필수 서류</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">0</span>
+                    <span class="stat-label">만료 임박</span>
+                </div>
+            </div>
+        </div>
+
+        {# 서류 업로드 #}
+        <div class="form-section form-section--card">
+            <h2 class="form-section-title">
+                <i class="fas fa-file-upload"></i>
+                서류 업로드
+            </h2>
+            <div class="document-upload-area">
+                <div class="upload-dropzone" id="document-dropzone">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>파일을 드래그하거나 클릭하여 업로드</p>
+                    <small>PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (최대 10MB)</small>
+                    <input type="file" id="document-file-input" hidden
+                           accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                </div>
+                <form class="upload-form d-none" id="document-upload-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">선택된 파일</label>
+                            <span id="selected-file-name" class="selected-file-name">-</span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">서류명 <span class="required">*</span></label>
+                            <input type="text" class="form-input" name="title"
+                                   placeholder="서류 제목을 입력하세요" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">카테고리</label>
+                            <select class="form-input" name="category">
+                                {% for opt in DOCUMENT_CATEGORY_OPTIONS %}
+                                <option value="{{ opt.value }}">{{ opt.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">서류 유형</label>
+                            <select class="form-input" name="documentType">
+                                {% for opt in DOCUMENT_TYPE_OPTIONS %}
+                                <option value="{{ opt.value }}">{{ opt.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">만료일</label>
+                            <input type="date" class="form-input" name="expiresAt">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label class="form-label">설명</label>
+                            <input type="text" class="form-input" name="description"
+                                   placeholder="서류에 대한 간단한 설명">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">&nbsp;</label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="isRequired">
+                                필수 서류
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" data-action="cancel">취소</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> 업로드
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {# 서류 목록 (카테고리별) #}
+        {{ document_category('required', '필수 서류', 'folder-open') }}
+        {{ document_category('payroll', '급여 관련 서류', 'won-sign') }}
+        {{ document_category('welfare', '복리후생 서류', 'gift') }}
+        {{ document_category('security', '보안 서류', 'shield-alt') }}
+        {{ document_category('contract', '계약 서류', 'file-contract') }}
+        {{ document_category('other', '기타 서류', 'file-alt') }}
+    </div>
+</div>

@@ -40,7 +40,7 @@ def organization_list():
     flat_list = organization_service.get_flat_list(root_organization_id=root_org_id)
     stats = organization_service.get_organization_statistics(root_organization_id=root_org_id)
 
-    return render_template('admin/organization.html',
+    return render_template('domains/company/organization.html',
                            tree=tree,
                            organizations=flat_list,
                            stats=stats)

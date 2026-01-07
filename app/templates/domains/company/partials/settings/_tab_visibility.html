@@ -1,0 +1,47 @@
+{# 노출 설정 탭 #}
+{% from "macros/_settings.html" import visibility_option, visibility_subsection %}
+
+<div id="tab-visibility" class="tab-panel" role="tabpanel">
+    <div id="visibility-content">
+        <div class="form-section form-section--card">
+            <h2 class="form-section-title">
+                <i class="fas fa-eye"></i>
+                정보 공개 범위
+            </h2>
+
+            {# 급여 정보 #}
+            {% call visibility_subsection('급여 정보') %}
+                {{ visibility_option('salary_visibility', '급여 정보 공개', '직원 본인의 급여 정보를 공개합니다') }}
+                {{ visibility_option('show_salary_to_managers', '관리자 급여 열람', '관리자가 직원 급여를 열람할 수 있습니다') }}
+            {% endcall %}
+
+            {# 평가 정보 #}
+            {% call visibility_subsection('평가 정보') %}
+                {{ visibility_option('evaluation_visibility', '평가 결과 공개', '직원 본인의 평가 결과를 공개합니다') }}
+                {{ visibility_option('show_evaluation_to_managers', '관리자 평가 열람', '관리자가 직원 평가를 열람할 수 있습니다') }}
+            {% endcall %}
+
+            {# 조직도 및 연락처 #}
+            {% call visibility_subsection('조직도 및 연락처') %}
+                {{ visibility_option('org_chart_visibility', '조직도 공개', '모든 직원이 조직도를 볼 수 있습니다') }}
+                {{ visibility_option('contact_visibility', '연락처 공개', '직원간 연락처를 공유합니다') }}
+            {% endcall %}
+
+            {# 문서 #}
+            {% call visibility_subsection('문서') %}
+                {{ visibility_option('document_visibility', '문서 공개', '법인 문서를 직원에게 공개합니다') }}
+            {% endcall %}
+
+            <div class="tab-actions">
+                <button type="button" class="btn btn-secondary" id="reset-visibility">
+                    <i class="fas fa-undo"></i>
+                    <span>기본값으로</span>
+                </button>
+                <button type="button" class="btn btn-primary" id="save-visibility">
+                    <i class="fas fa-save"></i>
+                    <span>저장</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
