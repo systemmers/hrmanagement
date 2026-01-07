@@ -1,0 +1,18 @@
+<a href="{{ url_for('employees.employee_list') }}" class="quick-link">
+    <i class="fas fa-users"></i>
+    <span>직원 목록</span>
+</a>
+<a href="{{ url_for('employees.employee_new') }}" class="quick-link">
+    <i class="fas fa-user-plus"></i>
+    <span>직원 등록</span>
+</a>
+{% if session.get('user_role') in ['admin', 'manager'] %}
+<a href="{{ url_for('corporate.users') }}" class="quick-link">
+    <i class="fas fa-user-cog"></i>
+    <span>사용자 관리</span>
+</a>
+<a href="{{ url_for('corporate.settings') }}" class="quick-link">
+    <i class="fas fa-building"></i>
+    <span>법인 설정</span>
+</a>
+{% endif %}

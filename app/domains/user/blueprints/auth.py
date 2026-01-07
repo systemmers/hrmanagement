@@ -30,7 +30,7 @@ def login():
         # Required field validation
         if not username or not password:
             flash(FlashMessages.ENTER_USERNAME_PASSWORD, 'error')
-            return render_template('auth/login.html')
+            return render_template('domains/user/auth/login.html')
 
         # Authentication attempt
         user = user_service.authenticate(username, password)
@@ -70,9 +70,9 @@ def login():
             return redirect(url_for('main.index'))
         else:
             flash(FlashMessages.INVALID_CREDENTIALS, 'error')
-            return render_template('auth/login.html', username=username)
+            return render_template('domains/user/auth/login.html', username=username)
 
-    return render_template('auth/login.html')
+    return render_template('domains/user/auth/login.html')
 
 
 @auth_bp.route('/register')
@@ -82,7 +82,7 @@ def register():
     if session.get(SessionKeys.USER_ID):
         return redirect(url_for('main.index'))
 
-    return render_template('auth/register_select.html')
+    return render_template('domains/user/auth/register_select.html')
 
 
 @auth_bp.route('/logout')
@@ -113,23 +113,23 @@ def change_password():
         # Required field validation
         if not all([current_password, new_password, confirm_password]):
             flash(FlashMessages.FILL_ALL_FIELDS, 'error')
-            return render_template('auth/change_password.html')
+            return render_template('domains/user/auth/change_password.html')
 
         # New password confirmation
         if new_password != confirm_password:
             flash(FlashMessages.PASSWORD_MISMATCH, 'error')
-            return render_template('auth/change_password.html')
+            return render_template('domains/user/auth/change_password.html')
 
         # Password length validation
         if len(new_password) < 8:
             flash(FlashMessages.PASSWORD_TOO_SHORT, 'error')
-            return render_template('auth/change_password.html')
+            return render_template('domains/user/auth/change_password.html')
 
         # Verify current password
         user = user_service.authenticate(session[SessionKeys.USERNAME], current_password)
         if not user:
             flash(FlashMessages.INVALID_CURRENT_PASSWORD, 'error')
-            return render_template('auth/change_password.html')
+            return render_template('domains/user/auth/change_password.html')
 
         # Change password
         if user_service.update_password(session[SessionKeys.USER_ID], new_password):
@@ -138,4 +138,4 @@ def change_password():
         else:
             flash(FlashMessages.PASSWORD_CHANGE_FAILED, 'error')
 
-    return render_template('auth/change_password.html')
+    return render_template('domains/user/auth/change_password.html')

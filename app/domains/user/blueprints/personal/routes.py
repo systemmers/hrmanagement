@@ -132,7 +132,7 @@ def register_routes(bp):
             if errors:
                 for error in errors:
                     flash(error, 'error')
-                return render_template('personal/register.html',
+                return render_template('domains/user/personal/register.html',
                                        username=username,
                                        email=email,
                                        name=name,
@@ -152,13 +152,13 @@ def register_routes(bp):
                 return redirect(url_for('auth.login'))
             else:
                 flash(f'회원가입 중 오류가 발생했습니다: {result.message}', 'error')
-                return render_template('personal/register.html',
+                return render_template('domains/user/personal/register.html',
                                        username=username,
                                        email=email,
                                        name=name,
                                        mobile_phone=mobile_phone)
 
-        return render_template('personal/register.html')
+        return render_template('domains/user/personal/register.html')
 
     @bp.route('/dashboard')
     @personal_login_required
@@ -436,7 +436,7 @@ def register_routes(bp):
         active_contracts = [c for c in contracts if c.get('is_active')]
         terminated_contracts = [c for c in contracts if not c.get('is_active')]
 
-        return render_template('personal/company_card_list.html',
+        return render_template('domains/user/personal/company_card_list.html',
                                contracts=contracts,
                                active_contracts=active_contracts,
                                terminated_contracts=terminated_contracts)
@@ -462,7 +462,7 @@ def register_routes(bp):
         # Terminated contract status
         is_terminated = card_data.get('is_terminated', False)
 
-        return render_template('personal/company_card_detail.html',
+        return render_template('domains/user/personal/company_card_detail.html',
                                # Basic info
                                contract=card_data['contract'],
                                company=card_data['company'],

@@ -50,7 +50,7 @@ def register_detail_routes(bp: Blueprint):
     def employee_new():
         """직원 등록 폼 - 통합 템플릿 사용"""
         classification_options = employee_service.get_all_classification_options()
-        return render_template('profile/edit.html',
+        return render_template('domains/user/profile/edit.html',
                                employee=None,
                                action='create',
                                is_corporate=True,
@@ -134,7 +134,7 @@ def register_detail_routes(bp: Blueprint):
         insurance = employee_service.get_insurance_info(employee_id)
         military = employee_service.get_military_info(employee_id)
 
-        return render_template('profile/edit.html',
+        return render_template('domains/user/profile/edit.html',
                                employee=employee,
                                action='update',
                                is_corporate=True,
@@ -212,7 +212,7 @@ def _render_employee_full_view(employee_id, employee):
     else:
         linked_user = user_service.find_by_employee_id(employee_id)
 
-    return render_template('profile/detail.html',
+    return render_template('domains/user/profile/detail.html',
                            employee=employee,
                            is_corporate=True,
                            account_type=AccountType.CORPORATE,

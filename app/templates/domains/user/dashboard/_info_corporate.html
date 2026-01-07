@@ -1,0 +1,26 @@
+<div class="info-grid">
+    <div class="info-item">
+        <span class="info-label">법인명</span>
+        <span class="info-value">{{ company.name }}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">사업자등록번호</span>
+        <span class="info-value">{{ company.business_number_formatted }}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">대표자</span>
+        <span class="info-value">{{ company.representative }}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">업태/업종</span>
+        <span class="info-value">{{ company.business_type or '-' }} / {{ company.business_category or '-' }}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">연락처</span>
+        <span class="info-value">{{ company.phone or '-' }}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">이메일</span>
+        <span class="info-value">{{ company.email or '-' }}</span>
+    </div>
+</div>

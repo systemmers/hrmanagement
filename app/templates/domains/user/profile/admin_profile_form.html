@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% set is_create = (mode == 'create') %}
+
+{% block title %}법인 관리자 프로필 {{ '생성' if is_create else '수정' }} - HR Management{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/register.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin-profile.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-profile-form">
+    <div class="admin-profile-form__header">
+        <h1 class="admin-profile-form__title">법인 관리자 프로필 {{ '생성' if is_create else '수정' }}</h1>
+        <p class="admin-profile-form__subtitle">{{ '프로필 정보를 입력하여 서비스를 시작하세요' if is_create else '프로필 정보를 수정합니다' }}</p>
+    </div>
+
+    <!-- Flash 메시지 -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert--{{ category }} mb-4">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" class="admin-profile-form__form" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <!-- 기본 정보 섹션 -->
+        <div class="admin-profile-form__section">
+            <h3 class="admin-profile-form__section-title">
+                <i class="fas fa-user"></i> 기본 정보
+            </h3>
+
+            <!-- 프로필 사진 업로드 -->
+            <div class="image-upload-section">
+                <div class="image-preview image-preview--lg" id="photoPreview">
+                    {% if form_data.get('photo') %}
+                    <img src="{{ form_data.get('photo') }}" alt="프로필 사진" id="previewImage">
+                    {% else %}
+                    <div class="image-placeholder" id="photoPlaceholder">
+                        <i class="fas fa-user"></i>
+                        <span>사진 미등록</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="image-upload-controls">
+                    <label class="image-upload-controls__label">프로필 사진</label>
+                    <input type="file" id="photoFile" name="photoFile"
+                           accept="image/jpeg,image/png,image/gif,image/webp"
+                           class="hidden">
+                    <input type="hidden" id="photo" name="photo" value="{{ form_data.get('photo', '') }}">
+                    <div class="image-upload-controls__buttons">
+                        <button type="button" class="btn btn-secondary btn-sm" id="selectPhotoBtn">
+                            <i class="fas fa-camera"></i> 사진 선택
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm{% if not form_data.get('photo') or form_data.get('photo').startswith('http') %} hidden{% endif %}" id="deletePhotoBtn">
+                            <i class="fas fa-trash"></i> 삭제
+                        </button>
+                    </div>
+                    <small class="image-upload-controls__help">JPG, PNG, GIF, WebP (최대 5MB)</small>
+                </div>
+            </div>
+
+            <div class="admin-profile-form__row">
+                <div class="admin-profile-form__group">
+                    <label for="name" class="admin-profile-form__label">
+                        이름 <span class="text-error-500">*</span>
+                    </label>
+                    <input type="text"
+                           id="name"
+                           name="name"
+                           class="admin-profile-form__input"
+                           placeholder="홍길동"
+                           value="{{ form_data.get('name', '') }}"
+                           required>
+                </div>
+
+                <div class="admin-profile-form__group">
+                    <label for="english_name" class="admin-profile-form__label">
+                        영문 이름
+                    </label>
+                    <input type="text"
+                           id="english_name"
+                           name="english_name"
+                           class="admin-profile-form__input"
+                           placeholder="Gil Dong Hong"
+                           value="{{ form_data.get('english_name', '') }}">
+                </div>
+            </div>
+
+            <div class="admin-profile-form__row">
+                <div class="admin-profile-form__group">
+                    <label for="position" class="admin-profile-form__label">
+                        직책
+                    </label>
+                    <input type="text"
+                           id="position"
+                           name="position"
+                           class="admin-profile-form__input"
+                           placeholder="대표이사, CEO, CFO 등"
+                           value="{{ form_data.get('position', '') }}">
+                </div>
+
+                <div class="admin-profile-form__group">
+                    <label for="department" class="admin-profile-form__label">
+                        소속 부서
+                    </label>
+                    <input type="text"
+                           id="department"
+                           name="department"
+                           class="admin-profile-form__input"
+                           placeholder="경영지원팀"
+                           value="{{ form_data.get('department', '') }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- 연락처 정보 섹션 -->
+        <div class="admin-profile-form__section">
+            <h3 class="admin-profile-form__section-title">
+                <i class="fas fa-phone"></i> 연락처 정보
+            </h3>
+
+            <div class="admin-profile-form__row">
+                <div class="admin-profile-form__group">
+                    <label for="mobile_phone" class="admin-profile-form__label">
+                        휴대전화
+                    </label>
+                    <input type="tel"
+                           id="mobile_phone"
+                           name="mobile_phone"
+                           class="admin-profile-form__input"
+                           placeholder="010-0000-0000"
+                           value="{{ form_data.get('mobile_phone', '') }}">
+                </div>
+
+                <div class="admin-profile-form__group">
+                    <label for="office_phone" class="admin-profile-form__label">
+                        사무실 전화
+                    </label>
+                    <input type="tel"
+                           id="office_phone"
+                           name="office_phone"
+                           class="admin-profile-form__input"
+                           placeholder="02-0000-0000"
+                           value="{{ form_data.get('office_phone', '') }}">
+                </div>
+            </div>
+
+            <div class="admin-profile-form__group">
+                <label for="email" class="admin-profile-form__label">
+                    이메일
+                </label>
+                <input type="email"
+                       id="email"
+                       name="email"
+                       class="admin-profile-form__input"
+                       placeholder="admin@company.com"
+                       value="{{ form_data.get('email', '') or (user.email if is_create and user else '') }}">
+            </div>
+        </div>
+
+        <!-- 소개 섹션 -->
+        <div class="admin-profile-form__section">
+            <h3 class="admin-profile-form__section-title">
+                <i class="fas fa-comment"></i> 소개
+            </h3>
+
+            <div class="admin-profile-form__group">
+                <label for="bio" class="admin-profile-form__label">
+                    간략한 소개
+                </label>
+                <textarea id="bio"
+                          name="bio"
+                          class="admin-profile-form__textarea"
+                          placeholder="간략한 자기소개를 입력하세요">{{ form_data.get('bio', '') }}</textarea>
+            </div>
+        </div>
+
+        <!-- 버튼 -->
+        <div class="admin-profile-form__actions">
+            <a href="{{ url_for('main.index') if is_create else url_for('profile.view') }}" class="admin-profile-form__btn admin-profile-form__btn--secondary">
+                취소
+            </a>
+            <button type="submit" class="admin-profile-form__btn admin-profile-form__btn--primary">
+                <i class="fas fa-{{ 'check' if is_create else 'save' }}"></i> {{ '프로필 생성' if is_create else '저장' }}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- JS: utils/formatting.js - 전화번호 자동 포맷팅 (DOMContentLoaded 시 자동 초기화) -->
+<script src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
+<!-- JS: pages/profile/admin-form.js - 프로필 사진 업로드/삭제 -->
+<script src="{{ url_for('static', filename='js/pages/profile/admin-form.js') }}"></script>
+{% endblock %}
