@@ -1,0 +1,53 @@
+{#
+    정보 표시 매크로
+    - info_item: 정보 항목 표시
+    - table_empty: 빈 테이블 메시지
+    - badge: 배지 표시
+#}
+
+{# 정보 항목 표시 #}
+{% macro info_item(label, value, highlight=false) %}
+<div class="info-item">
+    <div class="info-label">{{ label }}</div>
+    <div class="info-value{% if not value %} empty{% endif %}{% if highlight %} highlight{% endif %}">
+        {{ value or '정보 없음' }}
+    </div>
+</div>
+{% endmacro %}
+
+{# 빈 테이블 메시지 #}
+{% macro table_empty(message='등록된 정보가 없습니다.', icon='fas fa-inbox') %}
+<tr>
+    <td colspan="100%" class="text-center py-8">
+        <div class="empty-state">
+            <i class="{{ icon }}"></i>
+            <p>{{ message }}</p>
+        </div>
+    </td>
+</tr>
+{% endmacro %}
+
+{# 배지 표시 #}
+{% macro badge(text, type='primary') %}
+<span class="badge badge-{{ type }}">{{ text }}</span>
+{% endmacro %}
+
+{# 상태 배지 #}
+{% macro status_badge(status, text) %}
+<span class="badge {{ status }}">{{ text }}</span>
+{% endmacro %}
+
+{# 카드 헤더 #}
+{% macro card_header(title, icon) %}
+<div class="card-header">
+    <h3 class="card-title">
+        <i class="{{ icon }}"></i>
+        {{ title }}
+    </h3>
+</div>
+{% endmacro %}
+
+{# 섹션 타이틀 #}
+{% macro section_title(title) %}
+<h2 class="section-title">{{ title }}</h2>
+{% endmacro %}

@@ -1,0 +1,157 @@
+{#
+    카드 컴포넌트 매크로
+    - card: 완전한 카드 래퍼 (caller() 사용)
+    - card_simple: 단순 카드 (header + body)
+    - card_with_action: 헤더에 액션 버튼이 있는 카드
+    - form_section_card: 폼 섹션용 카드
+    - info_card: 정보 표시용 카드 (대시보드)
+    - stat_card: 통계 표시용 카드
+#}
+
+{# 기본 카드 - caller() 내용을 card-body에 렌더링 #}
+{% macro card(title, icon, id=None, css_class='') %}
+<div class="card {{ css_class }}" {% if id %}id="{{ id }}"{% endif %}>
+    <div class="card-header">
+        <h2 class="card-title">
+            <i class="{{ icon }}"></i>
+            {{ title }}
+        </h2>
+    </div>
+    <div class="card-body">
+        {{ caller() }}
+    </div>
+</div>
+{% endmacro %}
+
+{# 헤더에 액션 버튼이 있는 카드 #}
+{% macro card_with_action(title, icon, action_id, action_text='추가', action_icon='fas fa-plus', id=None, css_class='') %}
+<div class="card {{ css_class }}" {% if id %}id="{{ id }}"{% endif %}>
+    <div class="card-header">
+        <h2 class="card-title">
+            <i class="{{ icon }}"></i>
+            {{ title }}
+        </h2>
+        <button type="button" class="btn btn-sm btn-secondary" id="{{ action_id }}">
+            <i class="{{ action_icon }}"></i> {{ action_text }}
+        </button>
+    </div>
+    <div class="card-body">
+        {{ caller() }}
+    </div>
+</div>
+{% endmacro %}
+
+{# 폼 섹션용 카드 - section 태그로 감싸짐 #}
+{% macro form_section_card(title, icon, section_id, css_class='') %}
+<section class="form-section {{ css_class }}" id="{{ section_id }}">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="{{ icon }}"></i>
+                {{ title }}
+            </h2>
+        </div>
+        <div class="card-body">
+            {{ caller() }}
+        </div>
+    </div>
+</section>
+{% endmacro %}
+
+{# 폼 섹션용 카드 (동적 항목 추가 버튼 포함) #}
+{% macro form_section_card_dynamic(title, icon, section_id, add_btn_id, add_btn_text='추가', css_class='') %}
+<section class="form-section {{ css_class }}" id="{{ section_id }}">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="{{ icon }}"></i>
+                {{ title }}
+            </h2>
+            <button type="button" class="btn btn-sm btn-secondary" id="{{ add_btn_id }}">
+                <i class="fas fa-plus"></i> {{ add_btn_text }}
+            </button>
+        </div>
+        <div class="card-body">
+            {{ caller() }}
+        </div>
+    </div>
+</section>
+{% endmacro %}
+
+{# 정보 표시용 카드 (대시보드 info-card) #}
+{% macro info_card(title, icon, link_url=None, link_text='더보기') %}
+<div class="info-card">
+    <div class="info-card-header">
+        <h3 class="info-card-title">
+            <i class="{{ icon }}"></i>
+            {{ title }}
+        </h3>
+        {% if link_url %}
+        <a href="{{ link_url }}" class="info-card-link">
+            {{ link_text }} <i class="fas fa-chevron-right"></i>
+        </a>
+        {% endif %}
+    </div>
+    <div class="info-card-content">
+        {{ caller() }}
+    </div>
+</div>
+{% endmacro %}
+
+{# 통계 카드 #}
+{% macro stat_card(label, value, change=None, trend=None) %}
+<div class="stat-card">
+    <div class="stat-label">{{ label }}</div>
+    <div class="stat-value">{{ value }}</div>
+    {% if change %}
+    <div class="stat-change {% if trend == 'up' %}trend-up{% elif trend == 'down' %}trend-down{% endif %}">
+        {% if trend == 'up' %}<i class="fas fa-arrow-up"></i>{% elif trend == 'down' %}<i class="fas fa-arrow-down"></i>{% endif %}
+        {{ change }}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 직원 카드 #}
+{% macro employee_card(employee, status='active') %}
+<div class="employee-card" data-employee-id="{{ employee.id }}">
+    <div class="employee-status {{ status }}"></div>
+    <img src="{{ employee.photo or url_for('static', filename='images/face/face_01_m.png') }}"
+         alt="{{ employee.name }}" class="employee-photo">
+    <div class="employee-name">{{ employee.name }}</div>
+    <div class="employee-position">{{ employee.position or '직원' }}</div>
+    <div class="employee-meta">
+        <div class="employee-meta-item">
+            <i class="fas fa-building"></i>
+            <span>{{ employee.department or '부서 없음' }}</span>
+        </div>
+        <div class="employee-meta-item">
+            <i class="fas fa-calendar"></i>
+            <span>{{ employee.hire_date or '입사일 미정' }}</span>
+        </div>
+    </div>
+    <div class="employee-actions">
+        {{ caller() }}
+    </div>
+</div>
+{% endmacro %}
+
+{# 상세 보기용 콘텐츠 섹션 #}
+{% macro content_section(title, section_id, css_class='') %}
+<section id="{{ section_id }}" class="content-section {{ css_class }}">
+    <h2 class="section-title">{{ title }}</h2>
+    {{ caller() }}
+</section>
+{% endmacro %}
+
+{# 빈 상태 카드 #}
+{% macro empty_card(message='등록된 정보가 없습니다.', icon='fas fa-inbox') %}
+<div class="card">
+    <div class="card-body">
+        <div class="empty-state">
+            <i class="{{ icon }}"></i>
+            <p>{{ message }}</p>
+        </div>
+    </div>
+</div>
+{% endmacro %}

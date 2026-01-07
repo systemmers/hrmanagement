@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="{% block meta_description %}중소기업을 위한 스마트한 인사관리 솔루션. 직원 정보, 급여, 계약을 한 곳에서 관리하세요.{% endblock %}">
+    <title>{% block title %}HR Management - 스마트 인사관리 솔루션{% endblock %}</title>
+
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS - Core -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/core/variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/core/reset.css') }}">
+
+    <!-- Layouts - Public -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/public-header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/public-footer.css') }}">
+
+    <!-- Components -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/button.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/alert.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/forms.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/image-upload.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/avatar.css') }}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="public-page{% block body_class %}{% endblock %}">
+    <!-- Public Header -->
+    {% block header %}
+    {% include 'partials/_public_header.html' %}
+    {% endblock %}
+
+    <!-- Main Content -->
+    <main class="public-main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Public Footer -->
+    {% block footer %}
+    {% include 'partials/_public_footer.html' %}
+    {% endblock %}
+
+    <!-- JavaScript -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

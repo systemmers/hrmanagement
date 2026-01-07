@@ -1,0 +1,25 @@
+<!-- 알림 드롭다운 컴포넌트 -->
+<div class="notification-dropdown" id="notificationDropdown">
+    <button class="notification-btn" data-action="toggle-notification">
+        <i class="fas fa-bell"></i>
+        <span class="notification-badge" id="notificationBadge"></span>
+    </button>
+
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-header">
+            <h3>알림</h3>
+            <button class="btn-text" data-action="mark-all-read">모두 읽음</button>
+        </div>
+
+        <div class="notification-list" id="notificationList">
+            <div class="notification-empty">
+                <i class="fas fa-bell-slash"></i>
+                <p>알림이 없습니다</p>
+            </div>
+        </div>
+
+        <div class="notification-footer">
+            <a href="/admin/audit" class="btn-text">감사 로그 보기</a>
+        </div>
+    </div>
+</div>

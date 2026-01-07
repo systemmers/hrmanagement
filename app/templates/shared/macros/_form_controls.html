@@ -1,0 +1,232 @@
+{#
+    폼 컨트롤 매크로
+    재사용 가능한 폼 입력 요소 매크로 정의
+#}
+
+{# 텍스트/이메일/전화 등 기본 입력 필드 #}
+{% macro form_input(name, label, type='text', value='', required=false, placeholder='', help_text='', css_class='', maxlength='') %}
+<div class="form-group {{ css_class }}">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}{% if required %} <span class="required" aria-hidden="true">*</span>{% endif %}
+    </label>
+    <input type="{{ type }}"
+           id="{{ name }}"
+           name="{{ name }}"
+           class="form-input"
+           value="{{ value }}"
+           placeholder="{{ placeholder }}"
+           {% if required %}required aria-required="true"{% endif %}
+           {% if help_text %}aria-describedby="{{ name }}_help"{% endif %}
+           {% if maxlength %}maxlength="{{ maxlength }}"{% endif %}>
+    {% if help_text %}
+    <small id="{{ name }}_help" class="form-help">{{ help_text }}</small>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 셀렉트 박스 #}
+{% macro form_select(name, label, options, selected='', required=false, css_class='', help_text='') %}
+<div class="form-group {{ css_class }}">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}{% if required %} <span class="required" aria-hidden="true">*</span>{% endif %}
+    </label>
+    <select id="{{ name }}"
+            name="{{ name }}"
+            class="form-input"
+            {% if required %}required aria-required="true"{% endif %}
+            {% if help_text %}aria-describedby="{{ name }}_help"{% endif %}>
+        <option value="">선택하세요</option>
+        {% for opt in options %}
+            {% if opt is mapping %}
+            <option value="{{ opt.value }}" {% if opt.value == selected %}selected{% endif %}>{{ opt.label }}</option>
+            {% else %}
+            <option value="{{ opt }}" {% if opt == selected %}selected{% endif %}>{{ opt }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+    {% if help_text %}
+    <small id="{{ name }}_help" class="form-help">{{ help_text }}</small>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 카드 헤더 (추가 버튼 포함 옵션) #}
+{% macro form_card_header(title, icon, add_button_id='') %}
+<div class="card-header">
+    <h2 class="card-title">
+        <i class="{{ icon }}" aria-hidden="true"></i>
+        {{ title }}
+    </h2>
+    {% if add_button_id %}
+    <button type="button"
+            class="btn btn-sm btn-secondary"
+            id="{{ add_button_id }}"
+            aria-label="{{ title }} 추가">
+        <i class="fas fa-plus" aria-hidden="true"></i> 추가
+    </button>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 동적 리스트 아이템 삭제 버튼 #}
+{% macro remove_button(item_name='항목') %}
+<button type="button" class="btn-remove" title="삭제" aria-label="{{ item_name }} 삭제">
+    <i class="fas fa-times" aria-hidden="true"></i>
+</button>
+{% endmacro %}
+
+{# 텍스트영역 입력 필드 #}
+{% macro form_textarea(name, label, value='', required=false, placeholder='', help_text='', css_class='', rows=3) %}
+<div class="form-group {{ css_class }}">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}{% if required %} <span class="required" aria-hidden="true">*</span>{% endif %}
+    </label>
+    <textarea id="{{ name }}"
+              name="{{ name }}"
+              class="form-input"
+              rows="{{ rows }}"
+              placeholder="{{ placeholder }}"
+              {% if required %}required aria-required="true"{% endif %}
+              {% if help_text %}aria-describedby="{{ name }}_help"{% endif %}>{{ value }}</textarea>
+    {% if help_text %}
+    <small id="{{ name }}_help" class="form-help">{{ help_text }}</small>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 체크박스 #}
+{% macro form_checkbox(name, label, checked=false, help_text='', css_class='') %}
+<div class="form-group form-group--checkbox {{ css_class }}">
+    <label class="form-checkbox">
+        <input type="checkbox"
+               id="{{ name }}"
+               name="{{ name }}"
+               {% if checked %}checked{% endif %}
+               {% if help_text %}aria-describedby="{{ name }}_help"{% endif %}>
+        <span class="form-checkbox__label">{{ label }}</span>
+    </label>
+    {% if help_text %}
+    <small id="{{ name }}_help" class="form-help">{{ help_text }}</small>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 날짜 입력 필드 #}
+{% macro form_date(name, label, value='', required=false, css_class='', help_text='', min='', max='') %}
+<div class="form-group {{ css_class }}">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}{% if required %} <span class="required" aria-hidden="true">*</span>{% endif %}
+    </label>
+    <input type="date"
+           id="{{ name }}"
+           name="{{ name }}"
+           class="form-input"
+           value="{{ value }}"
+           {% if required %}required aria-required="true"{% endif %}
+           {% if help_text %}aria-describedby="{{ name }}_help"{% endif %}
+           {% if min %}min="{{ min }}"{% endif %}
+           {% if max %}max="{{ max }}"{% endif %}>
+    {% if help_text %}
+    <small id="{{ name }}_help" class="form-help">{{ help_text }}</small>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 숫자 입력 필드 #}
+{% macro form_number(name, label, value='', required=false, css_class='', help_text='', min='', max='', step='') %}
+<div class="form-group {{ css_class }}">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}{% if required %} <span class="required" aria-hidden="true">*</span>{% endif %}
+    </label>
+    <input type="number"
+           id="{{ name }}"
+           name="{{ name }}"
+           class="form-input"
+           value="{{ value }}"
+           {% if required %}required aria-required="true"{% endif %}
+           {% if help_text %}aria-describedby="{{ name }}_help"{% endif %}
+           {% if min %}min="{{ min }}"{% endif %}
+           {% if max %}max="{{ max }}"{% endif %}
+           {% if step %}step="{{ step }}"{% endif %}>
+    {% if help_text %}
+    <small id="{{ name }}_help" class="form-help">{{ help_text }}</small>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 라디오 버튼 그룹 #}
+{% macro form_radio_group(name, label, options, selected='', required=false, css_class='', help_text='') %}
+<div class="form-group {{ css_class }}">
+    <label class="form-label">
+        {{ label }}{% if required %} <span class="required" aria-hidden="true">*</span>{% endif %}
+    </label>
+    <div class="form-radio-group" role="radiogroup" aria-label="{{ label }}">
+        {% for opt in options %}
+            {% if opt is mapping %}
+            <label class="form-radio">
+                <input type="radio"
+                       name="{{ name }}"
+                       value="{{ opt.value }}"
+                       {% if opt.value == selected %}checked{% endif %}
+                       {% if required and loop.first %}required{% endif %}>
+                <span class="form-radio__label">{{ opt.label }}</span>
+            </label>
+            {% else %}
+            <label class="form-radio">
+                <input type="radio"
+                       name="{{ name }}"
+                       value="{{ opt }}"
+                       {% if opt == selected %}checked{% endif %}
+                       {% if required and loop.first %}required{% endif %}>
+                <span class="form-radio__label">{{ opt }}</span>
+            </label>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% if help_text %}
+    <small class="form-help">{{ help_text }}</small>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 파일 업로드 필드 #}
+{% macro form_file(name, label, required=false, css_class='', help_text='', accept='', multiple=false) %}
+<div class="form-group {{ css_class }}">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}{% if required %} <span class="required" aria-hidden="true">*</span>{% endif %}
+    </label>
+    <input type="file"
+           id="{{ name }}"
+           name="{{ name }}"
+           class="form-input form-input--file"
+           {% if required %}required aria-required="true"{% endif %}
+           {% if help_text %}aria-describedby="{{ name }}_help"{% endif %}
+           {% if accept %}accept="{{ accept }}"{% endif %}
+           {% if multiple %}multiple{% endif %}>
+    {% if help_text %}
+    <small id="{{ name }}_help" class="form-help">{{ help_text }}</small>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# 폼 섹션 래퍼 #}
+{% macro form_section(id, title, icon='', collapsed=false) %}
+<section class="form-section{% if collapsed %} collapsed{% endif %}" id="{{ id }}">
+    <div class="form-section-header">
+        <h2 class="form-section-title">
+            {% if icon %}<i class="{{ icon }}" aria-hidden="true"></i>{% endif %}
+            {{ title }}
+        </h2>
+    </div>
+    <div class="form-section-content">
+        {{ caller() }}
+    </div>
+</section>
+{% endmacro %}
+
+{# 폼 행 (그리드 레이아웃용) #}
+{% macro form_row(cols=2) %}
+<div class="form-row form-row--{{ cols }}cols">
+    {{ caller() }}
+</div>
+{% endmacro %}
