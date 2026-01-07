@@ -1,0 +1,163 @@
+/**
+ * Contract Detail Styles
+ * 계약 상세 페이지 스타일
+ *
+ * Used by:
+ * - contracts/contract_detail.html
+ */
+
+.detail-layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.detail-card {
+    background: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-gray-200);
+    overflow: hidden;
+}
+
+.detail-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+}
+
+.detail-card .card-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-gray-700);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.detail-card .card-title i {
+    color: var(--color-success-500);
+}
+
+.detail-card .card-body {
+    padding: var(--space-5);
+}
+
+.detail-card .card-footer {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+}
+
+/* .status-badge는 components/badge.css에서 정의 */
+/* .status-approved, .status-requested 등은 badge.css 확장 */
+
+/* Notes and Reason Sections */
+.notes-section,
+.reason-section {
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-gray-200);
+}
+
+.notes-content,
+.reason-content {
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-sm);
+    color: var(--color-gray-700);
+    background: var(--color-gray-50);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+}
+
+.reason-section.rejection .reason-content {
+    background: var(--color-error-100);
+    color: var(--color-error-600);
+}
+
+.reason-section.termination .reason-content {
+    background: var(--color-gray-100);
+    color: var(--color-gray-500);
+}
+
+/* Sharing Settings Form */
+.setting-description {
+    color: var(--color-gray-600);
+    font-size: var(--text-sm);
+    margin: 0 0 var(--space-4);
+}
+
+.sharing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+}
+
+.sharing-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.sharing-item:hover {
+    background: var(--color-gray-100);
+}
+
+.sharing-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-success-500);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-gray-700);
+}
+
+.checkbox-label i {
+    width: 16px;
+    color: var(--color-gray-400);
+}
+
+.sync-option {
+    margin-bottom: var(--space-5);
+    padding: var(--space-4);
+    background: var(--color-blue-50);
+    border-radius: var(--radius-md);
+}
+
+.sync-description {
+    margin: var(--space-2) 0 0 28px;
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+}
+
+/* Termination Notice */
+.termination-notice {
+    margin: 0 0 var(--space-3);
+    padding: var(--space-3);
+    background: var(--color-warning-100);
+    color: var(--color-warning-700);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+}
+
+@media (max-width: 768px) {
+    .sharing-grid {
+        grid-template-columns: 1fr;
+    }
+}

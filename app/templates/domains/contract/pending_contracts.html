@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% from 'macros/_contracts.html' import pending_card_personal, contract_empty_state %}
+
+{% block title %}대기 중인 계약 요청 - 인사카드 관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-row">
+        <h1 class="page-title">대기 중인 계약 요청</h1>
+        <div class="page-actions">
+            <a href="{{ url_for('contracts.my_contracts') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                <span>전체 계약 목록</span>
+            </a>
+        </div>
+    </div>
+    <p class="page-description">승인이 필요한 계약 요청입니다.</p>
+</div>
+
+<div class="pending-list">
+    {% if contracts %}
+        {% for contract in contracts %}
+            {{ pending_card_personal(contract) }}
+        {% endfor %}
+    {% else %}
+        {{ contract_empty_state(
+            icon='fa-inbox',
+            title='대기 중인 요청이 없습니다',
+            message='새로운 계약 요청이 오면 여기에 표시됩니다.'
+        ) }}
+    {% endif %}
+</div>
+
+<!-- CSS: components/contract.css, badge.css, info-grid.css, empty-state.css -->
+<!-- JS: services/contract-service.js -->
+<script type="module" src="{{ url_for('static', filename='js/services/contract-service.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,222 @@
+/**
+ * Contracts Component
+ * 계약 카드/리스트 공통 스타일
+ * 사용: contracts/ 디렉토리 전체
+ */
+
+/* Contracts List */
+.contracts-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+/* Contract Card */
+.contract-card {
+    background: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-gray-200);
+    overflow: hidden;
+}
+
+/* Contract Header */
+.contract-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+}
+
+/* Company/Person Info */
+.company-info,
+.person-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+/* Company/Person Avatar */
+.company-avatar,
+.person-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--color-success-500) 0%, var(--color-success-600) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-lg);
+    font-weight: 700;
+}
+
+/* Corporate Avatar - Blue gradient */
+.company-avatar.corporate,
+.person-avatar.corporate {
+    background: linear-gradient(135deg, var(--color-blue-500) 0%, var(--color-blue-600) 100%);
+}
+
+/* Company/Person Details */
+.company-details,
+.person-details {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Company/Person Name */
+.company-name,
+.person-name {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-gray-900);
+    margin: 0;
+}
+
+/* Contract Type */
+.contract-type {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+}
+
+/* Contract Body */
+.contract-body {
+    padding: var(--space-5);
+}
+
+/* Contract Footer */
+.contract-footer {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+}
+
+/* Pending List/Card (Variant) */
+.pending-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.pending-card {
+    background: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-gray-200);
+    overflow: hidden;
+}
+
+.pending-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+}
+
+.pending-body {
+    padding: var(--space-5);
+}
+
+.pending-footer {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+}
+
+/* Filter Bar */
+.filter-bar {
+    display: flex;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+    flex-wrap: wrap;
+}
+
+.search-box {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+}
+
+.search-box i {
+    position: absolute;
+    left: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-gray-400);
+}
+
+.search-box input {
+    width: 100%;
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-10);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+}
+
+/* 필터 스타일은 filter.css (SSOT) 참조 */
+
+/* Contracts Table Wrapper */
+.contracts-table-wrapper {
+    background: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-gray-200);
+    overflow: hidden;
+}
+
+.contracts-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.contracts-table th,
+.contracts-table td {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.contracts-table th {
+    background: var(--color-gray-50);
+    font-weight: 600;
+    font-size: var(--text-xs);
+    color: var(--color-gray-600);
+    text-transform: uppercase;
+}
+
+.contracts-table td {
+    font-size: var(--text-sm);
+    color: var(--color-gray-700);
+}
+
+.contracts-table .action-buttons {
+    display: flex;
+    gap: var(--space-2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .contract-header,
+    .pending-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+
+    .filter-bar {
+        flex-direction: column;
+    }
+
+    .filter-group {
+        flex-direction: column;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+}
