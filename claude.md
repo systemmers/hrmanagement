@@ -63,47 +63,73 @@ app/domains/                    # 도메인별 패키지 (Phase 1 마이그레�
 
 **도메인 Import 패턴:**
 ```python
-# 도메인에서 import (권장)
+# 도메인에서 import (필수 - 유일한 경로)
 from app.domains.employee.models import Employee
 from app.domains.employee.services import employee_service
+from app.domains.company.models import Company, Organization
+from app.domains.contract.services import contract_service
+from app.domains.user.models import User
+from app.domains.platform.services import platform_service
 
-# 기존 경로에서 import (하위 호환성 유지)
-from app.models.employee import Employee
-from app.services.employee_service import employee_service
+# 공유 자원 import
+from app.shared.repositories import BaseRepository
+from app.shared.utils import decorators, transaction
+from app.shared.constants import FieldOptions, ContractStatus
+from app.shared.services.ai import ai_service
 ```
 
 ### Layer Structure (3-Tier + Repository Pattern)
 ```
-blueprints/       → Routes (URL 라우팅, 요청 처리)
-services/         → Business Logic (비즈니스 로직)
-    ├── base/         # relation_updater, history
-    ├── ai/           # gemini, local_llama, document_ai
-    └── profile_relation_service.py  # 관계형 데이터 CRUD (SSOT)
-repositories/     → Data Access (BaseRepository 상속)
-models/           → SQLAlchemy Models (to_dict, from_dict 필수)
-constants/        → 상수 정의
-    ├── field_options.py     # SSOT: 폼 선택 옵션 + 레거시 매핑
-    └── field_registry/      # SSOT: 필드 순서/메타데이터
-utils/            → decorators, helpers, transaction.py
+app/
+├── domains/              # 도메인별 패키지 (6개 도메인)
+│   └── {domain}/
+│       ├── models/       # SQLAlchemy 모델
+│       ├── repositories/ # 데이터 접근 계층
+│       ├── services/     # 비즈니스 로직
+│       └── blueprints/   # URL 라우팅
+├── shared/               # 공유 자원
+│   ├── base/             # relation_updater, history, service_result
+│   ├── constants/        # field_options, status, field_registry
+│   ├── repositories/     # BaseRepository
+│   ├── services/         # ai_service, file_storage, event_listeners
+│   ├── utils/            # decorators, transaction, helpers
+│   └── adapters/         # 외부 서비스 어댑터
+├── templates/            # Jinja2 템플릿
+├── static/               # CSS, JS, 이미지
+└── extensions.py         # Flask 확장
 ```
 
-### Service Layer (서비스 계층)
+### Service Layer (도메인별 서비스)
 ```
-services/
-├── Core Services (데이터 관리)
-│   ├── employee_service.py          # 직원 CRUD
-│   ├── personal_service.py          # 개인 프로필 CRUD
-│   └── company_service.py           # 법인 CRUD
-├── Business Logic
-│   ├── contract_service.py          # 계약 관리
-│   ├── user_service.py              # 사용자 관리
-│   ├── organization_service.py      # 조직 구조
-│   └── profile_relation_service.py  # 관계형 데이터 SSOT
-├── Platform/Admin
-│   └── platform_service.py          # 플랫폼 관리
-└── AI/Integration
-    ├── sync_service.py              # 데이터 동기화
-    └── audit_service.py             # 감사 로깅
+app/domains/
+├── employee/services/
+│   ├── employee_service.py           # 직원 CRUD
+│   ├── employee_core_service.py      # 조회/검색
+│   ├── employee_relation_service.py  # 관계형 데이터
+│   ├── profile_relation_service.py   # 관계형 데이터 SSOT
+│   └── attachment_service.py         # 첨부파일
+├── contract/services/                # Facade 패턴
+│   ├── contract_service.py           # 외부 인터페이스
+│   ├── contract_core_service.py      # 조회/검색
+│   ├── contract_workflow_service.py  # 승인/거절/종료
+│   └── contract_settings_service.py  # 설정/로그
+├── company/services/
+│   ├── company_service.py            # 법인 CRUD
+│   ├── organization_service.py       # 조직 구조
+│   └── corporate_settings_service.py # 법인 설정
+├── user/services/
+│   ├── user_service.py               # 사용자 관리
+│   ├── personal_service.py           # 개인 프로필
+│   └── notification_service.py       # 알림
+├── platform/services/
+│   ├── platform_service.py           # 플랫폼 관리
+│   ├── audit_service.py              # 감사 로깅
+│   └── system_setting_service.py     # 시스템 설정
+└── sync/services/                    # Facade 패턴
+    ├── sync_service.py               # 외부 인터페이스
+    ├── sync_basic_service.py         # 기본 동기화
+    ├── sync_relation_service.py      # 관계형 동기화
+    └── termination_service.py        # 퇴사 처리
 ```
 
 ### Layer Call Rules (레이어 호출 규칙)
@@ -133,7 +159,7 @@ Blueprint → Service → Repository → Model
 | `corporate` | 법인 관리자 | user_id, company_id, user_role |
 | `employee_sub` | 법인 직원 | user_id, employee_id, company_id |
 
-### Key Decorators (`app/utils/decorators.py`)
+### Key Decorators (`app/shared/utils/decorators.py`)
 ```python
 @login_required              # 로그인 필수
 @corporate_login_required    # 법인 계정만
@@ -146,13 +172,13 @@ Blueprint → Service → Repository → Model
 
 ### SSOT System (Single Source of Truth)
 
-**FieldOptions** (`app/constants/field_options.py`)
+**FieldOptions** (`app/shared/constants/field_options.py`)
 - 폼 선택 옵션 중앙 관리 (Option namedtuple: value, label)
 - 레거시 매핑 (`LEGACY_MAP`): 영문코드 → DB 저장값(한글) 변환
 - 레이블 조회: `get_label()`, `get_label_with_legacy()`
 
 ```python
-from app.constants.field_options import FieldOptions
+from app.shared.constants.field_options import FieldOptions
 
 # 옵션 조회
 FieldOptions.GENDER  # [Option('남', '남성'), Option('여', '여성')]
@@ -161,13 +187,13 @@ FieldOptions.GENDER  # [Option('남', '남성'), Option('여', '여성')]
 FieldOptions.get_label_with_legacy(FieldOptions.GENDER, 'male')  # '남성'
 ```
 
-**FieldRegistry** (`app/constants/field_registry/`)
+**FieldRegistry** (`app/shared/constants/field_registry/`)
 - 필드 순서/메타데이터 중앙 관리
 - 섹션별 필드 정의, 계정타입별 가시성
 - 필드명 정규화 (별칭 → 정규 필드명)
 
 ```python
-from app.constants.field_registry import FieldRegistry
+from app.shared.constants.field_registry import FieldRegistry
 
 # 정렬된 필드명 목록
 FieldRegistry.get_ordered_names('personal_basic', account_type='personal')
@@ -189,6 +215,8 @@ class SomeModel(db.Model):
 
 ### Repository Pattern (Generic Type)
 ```python
+from app.shared.repositories import BaseRepository, BaseRelationRepository
+
 # 기본 CRUD: BaseRepository[ModelType] 상속 (IDE 자동완성 지원)
 class EmployeeRepository(BaseRepository[Employee]):
     def __init__(self):
@@ -202,7 +230,7 @@ class EducationRepository(BaseRelationRepository):
 
 ### Transaction Management (트랜잭션 관리 SSOT)
 ```python
-from app.utils.transaction import atomic_transaction, transactional
+from app.shared.utils.transaction import atomic_transaction, transactional
 
 # 컨텍스트 매니저 방식 (권장)
 with atomic_transaction():
@@ -226,7 +254,7 @@ def update_all_relations(employee_id, form_data):
 
 **employees Blueprint**: `EmployeeRelationUpdater`
 ```python
-from app.blueprints.employees.relation_updaters import (
+from app.domains.employee.blueprints.relation_updaters import (
     employee_relation_updater,
     update_family_data,      # 래퍼 함수 (기존 API 호환)
     update_education_data,
@@ -241,7 +269,7 @@ update_family_data(employee_id, form_data)
 
 **personal Blueprint**: `ProfileRelationUpdater`
 ```python
-from app.blueprints.personal.relation_updaters import (
+from app.domains.user.blueprints.personal.relation_updaters import (
     profile_relation_updater,
     update_profile_relations,  # 전체 업데이트
 )
@@ -252,30 +280,41 @@ update_profile_relations(profile_id, form_data)  # 전체
 
 **Service Layer**: `profile_relation_service` (SSOT)
 ```python
-from app.services.profile_relation_service import profile_relation_service
+from app.domains.employee.services import profile_relation_service
 
 # owner_type: 'profile' (개인) | 'employee' (법인직원)
 profile_relation_service.add_education(owner_id, data, owner_type='employee', commit=False)
 profile_relation_service.delete_all_educations(owner_id, owner_type='employee', commit=False)
 ```
 
-### Blueprint Module Split (employees 예시)
+### Blueprint Module Split (도메인별 구조)
 ```
-employees/
+app/domains/employee/blueprints/     # 직원 도메인
 ├── __init__.py          # Blueprint 정의
 ├── routes.py            # 공통 라우트
 ├── list_routes.py       # 목록 조회
 ├── mutation_routes.py   # 생성/수정/삭제
 ├── detail_routes.py     # 상세 조회
-├── files.py             # 파일 업로드 API (8개 라우트)
-├── form_extractors.py   # 폼 데이터 추출 (FieldRegistry 기반)
-├── relation_updaters.py # 관계 데이터 업데이트 (RelationDataConfig)
+├── files.py             # 파일 업로드 API
+├── form_extractors.py   # 폼 데이터 추출
+├── relation_updaters.py # 관계 데이터 업데이트
 └── helpers.py           # 헬퍼 함수
 
-admin/
-├── __init__.py          # Blueprint 정의
-├── organization.py      # 조직 관리
-└── audit.py             # 감사 대시보드 (1개 UI 라우트)
+app/domains/company/blueprints/      # 법인 도메인
+├── __init__.py
+├── corporate.py         # 법인 페이지
+├── admin_organization.py # 조직 관리
+└── settings/            # 법인 설정 API
+    ├── classifications_api.py
+    ├── documents_api.py
+    └── visibility_api.py
+
+app/domains/platform/blueprints/     # 플랫폼 도메인
+├── __init__.py
+├── main.py              # 메인 페이지
+├── audit_api.py         # 감사 API
+├── ai_test.py           # AI 테스트
+└── users.py             # 사용자 관리
 ```
 
 ## Frontend Structure
@@ -331,15 +370,18 @@ static/css/
 **SSOT (Single Source of Truth)**
 | 항목 | SSOT 위치 |
 |------|----------|
-| 트랜잭션 관리 | `app/utils/transaction.py` |
-| 관계형 데이터 CRUD | `app/services/profile_relation_service.py` |
-| 폼 선택 옵션 | `app/constants/field_options.py` |
-| 필드 메타데이터 | `app/constants/field_registry/` |
+| 트랜잭션 관리 | `app/shared/utils/transaction.py` |
+| 관계형 데이터 CRUD | `app/domains/employee/services/profile_relation_service.py` |
+| 폼 선택 옵션 | `app/shared/constants/field_options.py` |
+| 필드 메타데이터 | `app/shared/constants/field_registry/` |
+| 상태 상수 | `app/shared/constants/status.py` |
 | CSS 변수 | `app/static/css/core/variables.css` |
+| 직원 관리 | `app/domains/employee/services/` |
 | 법인 데이터 관리 | `app/domains/company/services/company_service.py` |
 | 법인 설정 관리 | `app/domains/company/services/corporate_settings_service.py` |
-| 플랫폼 관리 | `app/domains/platform/services/platform_service.py` |
 | 계약 관리 | `app/domains/contract/services/` (Facade 패턴) |
+| 사용자 관리 | `app/domains/user/services/` |
+| 플랫폼 관리 | `app/domains/platform/services/platform_service.py` |
 | 동기화 관리 | `app/domains/sync/services/` (Facade 패턴) |
 
 **SRP (Single Responsibility Principle)**

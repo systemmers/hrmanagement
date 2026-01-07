@@ -181,3 +181,15 @@ element.style.display = 'block';
 1. **CSS 파일**: `components/` 또는 `pages/` 하위에 생성
 2. **JS 파일**: 기능에 따라 적절한 폴더에 배치
 3. **base.html**에서 CSS/JS 참조 추가 또는 페이지별 `extra_css`/`extra_js` 블록 사용
+
+## 백엔드 도메인과의 연관
+
+| 백엔드 도메인 | 프론트엔드 위치 |
+|--------------|----------------|
+| `employee` | `pages/employee/`, `pages/employee-list.js` |
+| `contract` | `pages/contracts.js`, `services/contract-service.js` |
+| `company` | `pages/corporate-settings.js`, `pages/organization.js` |
+| `user` | `pages/profile/`, `pages/auth.js` |
+| `platform` | `pages/platform.js`, `pages/ai-test-index.js` |
+
+프론트엔드는 현재 도메인 구조 없이 기능별로 분류되어 있으며, 향후 도메인 중심 리팩토링 계획 있음.
