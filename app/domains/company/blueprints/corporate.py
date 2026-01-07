@@ -68,7 +68,7 @@ def dashboard():
         flash('법인 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
 
-    return render_template('dashboard/base_dashboard.html',
+    return render_template('domains/user/dashboard/base_dashboard.html',
                            account_type=AccountType.CORPORATE,
                            company=company)
 

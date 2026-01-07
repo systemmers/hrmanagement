@@ -14,26 +14,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Custom CSS - Core -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/core/variables.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/core/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/core/variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/core/reset.css') }}">
 
     <!-- Layouts - Public -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/public-header.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/public-footer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/public-header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/public-footer.css') }}">
 
     <!-- Components -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/button.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/alert.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/forms.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/image-upload.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/avatar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/button.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/alert.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/forms.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/image-upload.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/avatar.css') }}">
 
     {% block extra_css %}{% endblock %}
 </head>
 <body class="public-page{% block body_class %}{% endblock %}">
     <!-- Public Header -->
     {% block header %}
-    {% include 'partials/_public_header.html' %}
+    {% include 'shared/partials/_public_header.html' %}
     {% endblock %}
 
     <!-- Main Content -->
@@ -43,7 +43,7 @@
 
     <!-- Public Footer -->
     {% block footer %}
-    {% include 'partials/_public_footer.html' %}
+    {% include 'shared/partials/_public_footer.html' %}
     {% endblock %}
 
     <!-- JavaScript -->

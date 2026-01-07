@@ -3,7 +3,7 @@
     Phase 8: FieldRegistry 통합 - SSOT 기반 폼 렌더링
 
     Usage:
-        {% from 'macros/_field_renderer.html' import render_field, render_section, render_dynamic_section %}
+        {% from 'shared/macros/_field_renderer.html' import render_field, render_section, render_dynamic_section %}
 
         {# 단일 필드 렌더링 #}
         {{ render_field(field, value='', prefix='') }}
@@ -15,7 +15,7 @@
         {{ render_dynamic_section(section, items=[], add_button_id='') }}
 #}
 
-{% from 'macros/_form_controls.html' import form_input, form_select, form_textarea, form_date, form_number, form_checkbox, form_card_header, remove_button %}
+{% from 'shared/macros/_form_controls.html' import form_input, form_select, form_textarea, form_date, form_number, form_checkbox, form_card_header, remove_button %}
 
 {#
     단일 필드 렌더링

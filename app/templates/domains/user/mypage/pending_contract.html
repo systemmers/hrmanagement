@@ -4,8 +4,8 @@
     employee_sub 계정의 직원 상태가 pending_contract인 경우 표시
     HR 담당자의 계약 요청을 기다리고 있음을 안내
 #}
-{% extends "base.html" %}
-{% from 'macros/_alerts.html' import info_box %}
+{% extends "shared/base.html" %}
+{% from 'shared/macros/_alerts.html' import info_box %}
 
 {% block title %}계약 요청 대기{% endblock %}
 

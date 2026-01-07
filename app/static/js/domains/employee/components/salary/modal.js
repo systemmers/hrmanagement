@@ -7,8 +7,8 @@
 
 import { AllowanceManager } from './allowance-manager.js';
 import { SalaryCalculator } from './calculator.js';
-import { showToast } from '../toast.js';
-import { formatNumber, parseNumber } from '../../../shared/utils/formatting.js';
+import { showToast } from '../../../../shared/components/toast.js';
+import { formatNumber, parseNumber } from '../../../../shared/utils/formatting.js';
 
 /**
  * SalaryCalculatorModal 클래스

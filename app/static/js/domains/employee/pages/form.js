@@ -53,9 +53,9 @@ export {
     getAwardTemplate,
     initAccountSection,
     validateAccountFields
-} from './employee/index.js';
+} from './index.js';
 
 // 기본 export
-export { default } from './employee/index.js';
+export { default } from './index.js';
 
 // 자동 초기화는 employee/index.js에서 수행됨

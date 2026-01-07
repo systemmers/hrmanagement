@@ -13,15 +13,15 @@
     - education_list, career_list 등: 이력 데이터
     - salary_history_list, promotion_list 등: 인사기록 데이터
 #}
-{% extends "base.html" %}
+{% extends "shared/base.html" %}
 
 {% block title %}{{ company.name }} 인사카드 - 인사카드 관리 시스템{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/right-sidebar.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/employee-header.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/business-card.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/section-nav.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/right-sidebar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/business-card.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/card.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/table.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/detail.css') }}">
@@ -29,7 +29,7 @@
 {% endblock %}
 
 {% block content %}
-{% from 'macros/_navigation.html' import section_nav %}
+{% from 'shared/macros/_navigation.html' import section_nav %}
 
 <div class="detail-page-layout" data-account-type="{{ account_type|default('personal') }}">
     {# 좌측 섹션 네비게이션 - 법인 직원과 동일한 full variant 사용 #}
@@ -80,17 +80,17 @@
 
         {# 직원 헤더 카드 - 공유 파셜 #}
         {% if employee %}
-        {% include 'partials/employee_detail/_employee_header.html' %}
+        {% include 'domains/employee/partials/detail/_employee_header.html' %}
         {% endif %}
 
         {# 섹션 1-7: 기본정보 - 공유 파셜 (개인정보, 소속정보, 계약정보, 급여정보, 복리후생, 4대보험, 가족정보) #}
-        {% include 'partials/employee_detail/_basic_info.html' %}
+        {% include 'domains/employee/partials/detail/_basic_info.html' %}
 
         {# 섹션 8-14: 이력 및 경력 - 공유 파셜 (학력, 경력, 자격증, 언어능력, 병역, 수상, 프로젝트) #}
-        {% include 'partials/employee_detail/_history_info.html' %}
+        {% include 'domains/employee/partials/detail/_history_info.html' %}
 
         {# 섹션 15-17: 인사기록 - 공유 파셜 (근로계약/연봉, 인사이동/고과, 근태/비품) #}
-        {% include 'partials/employee_detail/_hr_records.html' %}
+        {% include 'domains/employee/partials/detail/_hr_records.html' %}
     </div>
 </div>
 
@@ -105,10 +105,10 @@
 
 {% block sidebar_right %}
 {# 첨부파일 사이드바 (조회 전용) #}
-{% include 'partials/_attachment_sidebar.html' %}
+{% include 'shared/partials/_attachment_sidebar.html' %}
 {% endblock %}
 
 {% block extra_js %}
 <script type="module" src="{{ url_for('static', filename='js/domains/employee/pages/detail.js') }}"></script>
-<script src="{{ url_for('static', filename='js/shared/components/business-card.js') }}"></script>
+<script src="{{ url_for('static', filename='js/domains/employee/components/business-card.js') }}"></script>
 {% endblock %}

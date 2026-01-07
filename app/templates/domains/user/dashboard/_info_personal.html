@@ -1,4 +1,4 @@
-{% from 'macros/_avatar.html' import avatar_image %}
+{% from 'shared/macros/_avatar.html' import avatar_image %}
 <div class="profile-summary">
     <div class="profile-avatar">
         {{ avatar_image(profile.photo, profile.name, size='md', fallback='initial', theme='personal') }}

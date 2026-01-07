@@ -12,7 +12,7 @@
         - corporate: 회사 소속정보, 명함 표시 (파란 테마)
         - personal: 개인 연락처, 명함 없음 (그린 테마)
 #}
-{% from 'macros/_avatar.html' import avatar_image %}
+{% from 'shared/macros/_avatar.html' import avatar_image %}
 {# variant 자동 감지: page_mode가 'hr_card'가 아니면 'personal', 아니면 'corporate' #}
 {% set header_variant = variant|default('personal' if page_mode != 'hr_card' else 'corporate') %}
 <div class="employee-header{% if header_variant == 'personal' %} employee-header--personal{% endif %}">

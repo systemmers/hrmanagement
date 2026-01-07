@@ -11,7 +11,7 @@
     - sections: 사용 가능한 섹션 목록
     - basic_info, organization_info, education_list 등: 섹션별 데이터
 #}
-{% extends "base.html" %}
+{% extends "shared/base.html" %}
 
 {# 변수 통합: employee 또는 profile 중 사용 가능한 것 사용 #}
 {% set profile_data = employee if employee is defined else profile %}
@@ -20,11 +20,11 @@
 {% block title %}{{ profile_name }} - {{ '인사카드' if page_mode == 'hr_card' else '프로필' }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/right-sidebar.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/employee-header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/section-nav.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/right-sidebar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/header.css') }}">
 {% if page_mode == 'hr_card' %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/business-card.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/business-card.css') }}">
 {% endif %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/card.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/table.css') }}">
@@ -32,7 +32,7 @@
 {% endblock %}
 
 {% block content %}
-{% from 'macros/_navigation.html' import section_nav %}
+{% from 'shared/macros/_navigation.html' import section_nav %}
 
 {# 계정 타입에 따른 body 클래스 #}
 <div class="detail-page-layout" data-account-type="{{ account_type }}">
@@ -95,22 +95,22 @@
 
         {# 직원/프로필 헤더 카드 #}
         {# 개인/법인 모두 동일한 헤더 컴포넌트 사용, 개인은 그린 테마 적용 #}
-        {% include 'partials/employee_detail/_employee_header.html' %}
+        {% include 'domains/employee/partials/detail/_employee_header.html' %}
 
         {# 섹션 1-6: 기본정보 (개인정보, 소속정보, 계약정보, 급여정보, 복리후생, 4대보험) #}
-        {% include 'partials/employee_detail/_basic_info.html' %}
+        {% include 'domains/employee/partials/detail/_basic_info.html' %}
 
         {# 섹션 7-11: 이력 및 경력 (학력, 경력, 자격증, 언어능력, 병역/프로젝트/수상) #}
-        {% include 'partials/employee_detail/_history_info.html' %}
+        {% include 'domains/employee/partials/detail/_history_info.html' %}
 
         {# 인사카드 전용: 계정정보 (법인 계정만, 개인 계정 제외) #}
         {% if page_mode == 'hr_card' and is_corporate and account_type != 'corporate_admin' %}
-            {% include 'partials/employee_detail/_account_info.html' %}
+            {% include 'domains/employee/partials/detail/_account_info.html' %}
         {% endif %}
 
         {# 섹션 12-14: 인사기록 (인사카드 페이지 전용) #}
         {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
-            {% include 'partials/employee_detail/_hr_records.html' %}
+            {% include 'domains/employee/partials/detail/_hr_records.html' %}
         {% endif %}
     </div>
 </div>
@@ -125,20 +125,20 @@
 
 {# 명함 업로드 모달 (인사카드 페이지 전용) #}
 {% if page_mode == 'hr_card' and can_edit_business_card %}
-{% include 'partials/_business_card_modal.html' %}
+{% include 'shared/partials/_business_card_modal.html' %}
 {% endif %}
 {% endblock %}
 
 {% block sidebar_right %}
 {# 프로필/인사카드 모두 첨부파일 사이드바 표시 #}
 {# 프로필: is_readonly=False (수정/삭제 가능), 인사카드: is_readonly=True (조회만) #}
-{% include 'partials/_attachment_sidebar.html' %}
+{% include 'shared/partials/_attachment_sidebar.html' %}
 {% endblock %}
 
 {% block extra_js %}
 <script type="module" src="{{ url_for('static', filename='js/domains/employee/pages/detail.js') }}"></script>
 {% if page_mode == 'hr_card' %}
-<script src="{{ url_for('static', filename='js/shared/components/business-card.js') }}"></script>
+<script src="{{ url_for('static', filename='js/domains/employee/components/business-card.js') }}"></script>
 {% endif %}
 
 {# 프로필 동기화 스크립트 #}

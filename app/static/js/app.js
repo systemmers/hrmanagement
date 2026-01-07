@@ -9,11 +9,11 @@
  * - HRApp.ui: UI 유틸리티 기능
  */
 
-import { Toast, showToast } from './components/toast.js';
-import { FormValidator } from './components/form-validator.js';
-import { searchEmployees } from './services/employee-service.js';
-import { SalaryCalculator, SalaryCalculatorModal } from './components/salary/index.js';
-import { initAvatarFallback } from './components/avatar-fallback.js';
+import { Toast, showToast } from './shared/components/toast.js';
+import { FormValidator } from './shared/components/form-validator.js';
+import { searchEmployees } from './domains/employee/services/employee-service.js';
+import { SalaryCalculator, SalaryCalculatorModal } from './domains/employee/components/salary/index.js';
+import { initAvatarFallback } from './shared/components/avatar-fallback.js';
 
 // 필터링은 filter-bar.js와 각 페이지 스크립트에서 처리 (Phase 31)
 

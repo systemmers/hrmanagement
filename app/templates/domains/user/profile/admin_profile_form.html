@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'shared/base.html' %}
 
 {% set is_create = (mode == 'create') %}
 
@@ -196,7 +196,7 @@
 
 {% block extra_js %}
 <!-- JS: utils/formatting.js - 전화번호 자동 포맷팅 (DOMContentLoaded 시 자동 초기화) -->
-<script src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
+<script src="{{ url_for('static', filename='js/shared/utils/formatting.js') }}"></script>
 <!-- JS: pages/profile/admin-form.js - 프로필 사진 업로드/삭제 -->
 <script src="{{ url_for('static', filename='js/domains/user/pages/profile/admin-form.js') }}"></script>
 {% endblock %}

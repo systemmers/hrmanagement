@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "shared/base.html" %}
 
 {% block title %}법인 설정 - {{ company.name }}{% endblock %}
 
@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/accordion.css') }}">
 {% endblock %}
 
-{% from "macros/_accordion.html" import accordion_section, accordion_group %}
+{% from "shared/macros/_accordion.html" import accordion_section, accordion_group %}
 
 {% block content %}
 <div class="page-header">

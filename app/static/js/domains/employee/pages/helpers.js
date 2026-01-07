@@ -9,7 +9,7 @@ import {
     MAX_FILE_SIZE,
     MAX_FILE_SIZE_MB,
     FILE_UPLOAD_MESSAGES
-} from '../../constants/file-upload-constants.js';
+} from '../../../shared/constants/file-upload-constants.js';
 
 /**
  * 폼에서 직원 ID 추출

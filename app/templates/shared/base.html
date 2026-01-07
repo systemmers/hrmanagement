@@ -14,52 +14,52 @@
     
     <!-- Custom CSS - Modular Architecture -->
     <!-- Core -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/core/variables.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/core/reset.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/core/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/core/variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/core/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/core/theme.css') }}">
 
     <!-- Layouts -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/header.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/sidebar.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/main-content.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/section-nav.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/main-content.css') }}">
 
     <!-- Components -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/button.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/page-header.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/badge.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/alert.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/forms.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/image-upload.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/avatar.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/table.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/details.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/modal.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/card.css') }}">
-    <!-- Salary Calculator (Split from salary-calculator.css) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/salary-modal.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/salary-summary.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/salary-allowance.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/button.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/page-header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/badge.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/alert.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/forms.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/image-upload.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/avatar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/table.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/details.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/modal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/card.css') }}">
+    <!-- Salary Calculator (Domain: employee) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/salary-modal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/salary-summary.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/salary-allowance.css') }}">
 
-    <!-- Dashboard & Contract Components (Phase 1 Refactoring) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/stats-cards.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/info-grid.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/contract.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/quick-links.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/empty-state.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/notification.css') }}">
+    <!-- Dashboard & Contract Components -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/stats-cards.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/user/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/info-grid.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/contract/contract.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/quick-links.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/empty-state.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/notification.css') }}">
 
-    <!-- Pages -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/profile.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/account.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/company-card-list.css') }}">
+    <!-- Domain Pages (user) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/user/profile.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/user/account.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/user/company-card-list.css') }}">
 
     <!-- Utilities -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/core/utilities.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/core/utilities.css') }}">
 
     <!-- Responsive -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/core/responsive.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/core/responsive.css') }}">
     
     {% block extra_css %}{% endblock %}
 </head>
@@ -116,7 +116,7 @@
                 </div>
 
                 <nav class="sidebar-nav" role="navigation" aria-label="메인 메뉴">
-                    {% include 'components/navigation/_sidebar_unified.html' %}
+                    {% include 'shared/layouts/_sidebar_unified.html' %}
                 </nav>
 
                 <div class="sidebar-footer">
@@ -139,7 +139,7 @@
             <!-- 메인 컨텐츠 -->
             <main class="main-content" role="main" aria-label="메인 콘텐츠">
                 <!-- Flash 메시지 -->
-                {% from 'macros/_alerts.html' import render_flash_messages %}
+                {% from 'shared/macros/_alerts.html' import render_flash_messages %}
                 {{ render_flash_messages() }}
                 
                 {% block content %}{% endblock %}
@@ -157,7 +157,7 @@
 
     <!-- JavaScript -->
     <script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/components/notification-dropdown.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/components/notification-dropdown.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

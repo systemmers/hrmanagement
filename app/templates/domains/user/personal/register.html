@@ -1,4 +1,4 @@
-{% extends 'base_public.html' %}
+{% extends 'shared/base_public.html' %}
 
 {% block title %}개인 회원가입 - HR Management{% endblock %}
 {% block meta_description %}HR Management 개인 계정을 만들고 커리어를 관리하세요.{% endblock %}
@@ -159,5 +159,5 @@
 
 {% block extra_js %}
 <!-- JS: utils/formatting.js - 전화번호 자동 포맷팅 (DOMContentLoaded 시 자동 초기화) -->
-<script src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
+<script src="{{ url_for('static', filename='js/shared/utils/formatting.js') }}"></script>
 {% endblock %}

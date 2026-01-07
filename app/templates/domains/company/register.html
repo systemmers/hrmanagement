@@ -1,4 +1,4 @@
-{% extends 'base_public.html' %}
+{% extends 'shared/base_public.html' %}
 
 {% block title %}법인 회원가입 - HR Management{% endblock %}
 {% block meta_description %}HR Management 법인 계정을 만들고 직원 인사관리를 시작하세요.{% endblock %}
@@ -256,7 +256,7 @@
 
 {% block extra_js %}
 <!-- JS: utils/formatting.js, services/contract-service.js, pages/corporate-register.js -->
-<script src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
+<script src="{{ url_for('static', filename='js/shared/utils/formatting.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/domains/contract/services/contract-service.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/domains/company/pages/register.js') }}"></script>
 {% endblock %}

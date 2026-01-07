@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "shared/base.html" %}
 
 {% block title %}
   {% if account_type == 'corporate' %}
@@ -73,11 +73,11 @@
         </div>
         <div class="card-body">
             {% if account_type == 'corporate' %}
-                {% include 'dashboard/_info_corporate.html' %}
+                {% include 'domains/user/dashboard/_info_corporate.html' %}
             {% elif account_type == 'employee_sub' %}
-                {% include 'dashboard/_info_employee.html' %}
+                {% include 'domains/user/dashboard/_info_employee.html' %}
             {% else %}
-                {% include 'dashboard/_info_personal.html' %}
+                {% include 'domains/user/dashboard/_info_personal.html' %}
             {% endif %}
         </div>
     </div>
@@ -92,7 +92,7 @@
             </h2>
         </div>
         <div class="card-body">
-            {% include 'dashboard/_work_status_employee.html' %}
+            {% include 'domains/user/dashboard/_work_status_employee.html' %}
         </div>
     </div>
     {% endif %}
@@ -108,11 +108,11 @@
         <div class="card-body">
             <div class="stats-grid">
                 {% if account_type == 'corporate' %}
-                    {% include 'dashboard/_stats_corporate.html' %}
+                    {% include 'domains/user/dashboard/_stats_corporate.html' %}
                 {% elif account_type == 'employee_sub' %}
-                    {% include 'dashboard/_stats_employee.html' %}
+                    {% include 'domains/user/dashboard/_stats_employee.html' %}
                 {% else %}
-                    {% include 'dashboard/_stats_personal.html' %}
+                    {% include 'domains/user/dashboard/_stats_personal.html' %}
                 {% endif %}
             </div>
         </div>
@@ -129,11 +129,11 @@
         <div class="card-body">
             <div class="quick-links">
                 {% if account_type == 'corporate' %}
-                    {% include 'dashboard/_quick_links_corporate.html' %}
+                    {% include 'domains/user/dashboard/_quick_links_corporate.html' %}
                 {% elif account_type == 'employee_sub' %}
-                    {% include 'dashboard/_quick_links_employee.html' %}
+                    {% include 'domains/user/dashboard/_quick_links_employee.html' %}
                 {% else %}
-                    {% include 'dashboard/_quick_links_personal.html' %}
+                    {% include 'domains/user/dashboard/_quick_links_personal.html' %}
                 {% endif %}
             </div>
         </div>
@@ -149,7 +149,7 @@
             </h2>
         </div>
         <div class="card-body">
-            {% include 'dashboard/_visibility_status.html' %}
+            {% include 'domains/user/dashboard/_visibility_status.html' %}
         </div>
     </div>
     {% endif %}

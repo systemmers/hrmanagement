@@ -4,8 +4,8 @@
     employee_sub 계정의 직원 상태가 pending_approval인 경우 표시
     계약 승인을 기다리고 있음을 안내
 #}
-{% extends "base.html" %}
-{% from 'macros/_alerts.html' import info_box %}
+{% extends "shared/base.html" %}
+{% from 'shared/macros/_alerts.html' import info_box %}
 
 {% block title %}승인 대기 중{% endblock %}
 

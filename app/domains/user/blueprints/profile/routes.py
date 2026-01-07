@@ -56,7 +56,7 @@ def dashboard():
         return redirect(url_for('profile.view'))
 
     return render_template(
-        'dashboard/base_dashboard.html',
+        'domains/user/dashboard/base_dashboard.html',
         account_type='employee_sub',
         employee=dashboard_data['employee'],
         stats=dashboard_data['stats'],

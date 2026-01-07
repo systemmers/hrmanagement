@@ -7,7 +7,7 @@
 {# 계약 후 수정 불가 플래그: 승인된 개인계약이 있을 때 #}
 {% set is_contract_readonly = has_person_contract %}
 
-{% from 'macros/_cards.html' import form_section_card %}
+{% from 'shared/macros/_cards.html' import form_section_card %}
 
 {% call form_section_card('계약정보' ~ (' (계약 확정)' if is_contract_readonly else ''), 'fas fa-file-contract', 'contract-info') %}
 {# 계약정보 서브섹션 #}

@@ -147,7 +147,7 @@
     사용 예시 (2026-01-06 업데이트):
 
     1. URL 모드 - 권장 패턴 (employees/list.html):
-    {% from "macros/_filters.html" import filter_bar, search_box, filter_select %}
+    {% from "shared/macros/_filters.html" import filter_bar, search_box, filter_select %}
 
     {% call filter_bar(mode='url', css_class='filter-bar--simple') %}
         {{ search_box(placeholder='이름, 부서, 직급 검색...', value=request.args.get('search', '')) }}

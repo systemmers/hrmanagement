@@ -175,7 +175,7 @@ def register_routes(bp):
             flash('프로필을 먼저 작성해주세요.', 'info')
             return redirect(url_for('personal.profile_edit'))
 
-        return render_template('dashboard/base_dashboard.html',
+        return render_template('domains/user/dashboard/base_dashboard.html',
                                account_type=AccountType.PERSONAL,
                                user=data['user'],
                                profile=data['profile'],
