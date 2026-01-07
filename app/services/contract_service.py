@@ -3,13 +3,12 @@ Contract Service (호환성 래퍼)
 
 [DEPRECATED] 기존 경로 호환성 유지
 새 코드는 다음을 사용하세요:
-    from app.services.contract import contract_service
-    from app.services.contract import contract_core_service, contract_workflow_service
+    from app.domains.contract.services import contract_service
 
-Phase 2: 구조화 - contract/ 폴더로 분리, 이 파일은 호환성 래퍼로 유지
+Phase 2: 도메인 중심 마이그레이션 완료
 """
 
-from app.services.contract import (
+from app.domains.contract.services import (
     ContractService,
     ContractCoreService,
     ContractWorkflowService,

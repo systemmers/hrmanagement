@@ -1,25 +1,25 @@
 """
 Contract Domain Services
 
-Phase 4: 도메인 중심 마이그레이션
-기존 Service를 re-export하여 점진적 마이그레이션 지원
+계약 관련 비즈니스 로직 서비스
+
+Phase 2: 도메인 중심 마이그레이션 완료
+- 모든 Service가 도메인 내부에 위치
+- 레거시 경로(app.services.contract)는 이 모듈을 re-export
 """
 
-# Contract Facade 서비스 (기존 contract/ 폴더)
-from app.services.contract import (
-    ContractCoreService,
-    ContractWorkflowService,
-    ContractSettingsService,
-    contract_core_service,
-    contract_workflow_service,
-    contract_settings_service,
-)
+from .contract_core_service import ContractCoreService
+from .contract_workflow_service import ContractWorkflowService
+from .contract_settings_service import ContractSettingsService
+from .contract_filter_service import ContractFilterService
+from .contract_service import ContractService
 
-# Contract 통합 서비스 (기존 contract_service.py)
-from app.services.contract_service import ContractService, contract_service
-
-# Contract Filter 서비스 (별도 파일)
-from app.services.contract_filter_service import ContractFilterService, contract_filter_service
+# Singleton instances
+contract_core_service = ContractCoreService()
+contract_workflow_service = ContractWorkflowService()
+contract_settings_service = ContractSettingsService()
+contract_filter_service = ContractFilterService()
+contract_service = ContractService()
 
 __all__ = [
     # Classes

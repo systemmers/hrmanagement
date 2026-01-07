@@ -7,7 +7,7 @@ Contract Core Service
 - 계약 검색
 - 계약 대상 조회
 
-Phase 4: 도메인 중심 마이그레이션 - domains/contract/로 이동
+Phase 30: 레이어 분리 - Model.query 제거, Repository 패턴 적용
 """
 from typing import Dict, Optional, List, Any
 
@@ -17,7 +17,7 @@ from app.shared.constants.status import ContractStatus
 class ContractCoreService:
     """계약 조회 서비스
 
-    Phase 4: Repository DI 패턴 적용
+    Phase 30: Repository DI 패턴 적용
     """
 
     def __init__(self):

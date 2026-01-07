@@ -1,12 +1,15 @@
 """
-Contract Repositories Package
+Contract Repositories Package (호환성 래퍼)
 
-개인-법인 계약 관련 Repository 모듈입니다.
+[DEPRECATED] 기존 경로 호환성 유지
+새 코드는 다음을 사용하세요:
+    from app.domains.contract.repositories import PersonContractRepository
 
-Phase 3 구조화: repositories/contract/ 폴더로 분리
-기존 import 경로 100% 호환:
-    from app.repositories.person_contract_repository import PersonContractRepository
+Phase 2: 도메인 중심 마이그레이션 완료
 """
-from .person_contract_repository import PersonContractRepository
+from app.domains.contract.repositories import PersonContractRepository
 
-__all__ = ['PersonContractRepository']
+# Singleton instance
+person_contract_repository = PersonContractRepository()
+
+__all__ = ['PersonContractRepository', 'person_contract_repository']

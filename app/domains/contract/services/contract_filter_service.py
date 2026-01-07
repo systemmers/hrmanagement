@@ -6,11 +6,11 @@ N+1 쿼리 방지를 위한 벌크 조회 메서드를 제공합니다.
 
 SSOT 원칙: PersonCorporateContract가 계약 관계의 유일한 진실의 원천
 
-Phase 4: 도메인 중심 마이그레이션 - domains/contract/로 이동
+Phase 30: 레이어 분리 - Model.query 제거, Repository 패턴 적용
 """
 from typing import List, Dict, Optional
 
-from app.domains.contract.models import PersonCorporateContract
+from app.models import PersonCorporateContract
 from app.shared.constants.status import ContractStatus
 
 
@@ -19,7 +19,7 @@ class ContractFilterService:
 
     Personal과 Employee_Sub 계정의 계약 조회 조건을 통합합니다.
 
-    Phase 4: Repository DI 패턴 적용
+    Phase 30: Repository DI 패턴 적용
     """
 
     # 기본 상태 값
@@ -34,8 +34,8 @@ class ContractFilterService:
     def contract_repo(self):
         """지연 초기화된 계약 Repository"""
         if self._contract_repo is None:
-            from app.domains.contract.repositories import PersonContractRepository
-            self._contract_repo = PersonContractRepository()
+            from ..repositories.contract.person_contract_repository import person_contract_repository
+            self._contract_repo = person_contract_repository
         return self._contract_repo
 
     @property

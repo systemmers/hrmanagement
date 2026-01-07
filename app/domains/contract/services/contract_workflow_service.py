@@ -153,7 +153,7 @@ class ContractWorkflowService:
 
         Phase 30: Repository 사용으로 변경
         """
-        from app.services.sync_service import sync_service
+        from ...services.sync_service import sync_service
 
         contract = self.contract_repo.find_by_id(contract_id)
         if not contract:
@@ -328,7 +328,7 @@ class ContractWorkflowService:
         21번 원칙: 계약 종료 시 Employee.status = 'terminated' 연동
         스냅샷 저장: termination_service를 통해 전체 인사기록 스냅샷 저장
         """
-        from app.services.termination_service import termination_service
+        from ...services.termination_service import termination_service
 
         contract = self.contract_repo.find_by_id(contract_id)
         if not contract:
@@ -403,7 +403,7 @@ class ContractWorkflowService:
 
         Phase 30: Repository 사용으로 변경
         """
-        from app.services.termination_service import termination_service
+        from ...services.termination_service import termination_service
 
         contract = self.contract_repo.find_by_id(contract_id)
         if not contract:
