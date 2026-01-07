@@ -3,7 +3,7 @@
 {% block title %}{{ user.username }} - 사용자 상세{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/platform.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/platform/platform.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -112,5 +112,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script type="module" src="{{ url_for('static', filename='js/pages/platform.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/platform/pages/platform.js') }}"></script>
 {% endblock %}

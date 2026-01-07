@@ -3,8 +3,8 @@
 {% block title %}법인 설정 - {{ company.name }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/tabs.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/accordion.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/tabs.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/accordion.css') }}">
 {% endblock %}
 
 {% from "macros/_accordion.html" import accordion_section, accordion_group %}
@@ -757,5 +757,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script type="module" src="{{ url_for('static', filename='js/pages/corporate-settings.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/company/pages/settings.js') }}"></script>
 {% endblock %}

@@ -3,10 +3,10 @@
 {% block title %}계약 요청 - 인사카드 관리 시스템{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/tabs.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/badge.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/empty-state.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/contract-request.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/tabs.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/badge.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/empty-state.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/contract/request.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -196,5 +196,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/pages/contract-request.js') }}"></script>
+<script src="{{ url_for('static', filename='js/domains/contract/pages/request.js') }}"></script>
 {% endblock %}

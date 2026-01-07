@@ -8,8 +8,8 @@
  * - 로그 필터링 및 페이지네이션
  */
 
-import { formatDateTime } from '../utils/formatting.js';
-import { get } from '../utils/api.js';
+import { formatDateTime } from '../../shared/utils/formatting.js';
+import { get } from '../../shared/utils/api.js';
 
 /**
  * 감사 로그 대시보드 클래스

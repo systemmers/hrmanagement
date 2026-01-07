@@ -5,7 +5,7 @@
 {% block title %}직원 목록 - 인사카드 관리 시스템{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/filter.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/filter.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -204,7 +204,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script type="module" src="{{ url_for('static', filename='js/components/filter-bar.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/pages/employee-list.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/shared/components/filter-bar.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/employee/pages/list.js') }}"></script>
 {% endblock %}
 

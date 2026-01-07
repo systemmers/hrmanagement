@@ -5,7 +5,7 @@
  * 첨부파일 업로드 초기화
  */
 
-import { FileUpload } from '../../components/file-upload.js';
+import { FileUpload } from '../../../shared/components/file-upload.js';
 
 /**
  * 파일 업로드 초기화

@@ -6,7 +6,7 @@
  */
 
 import { SALARY_CONSTANTS, VALIDATION_ERROR_TYPES } from './constants.js';
-import { formatNumber, parseNumber } from '../../utils/formatting.js';
+import { formatNumber, parseNumber } from '../../../shared/utils/formatting.js';
 
 /**
  * SalaryCalculator 클래스

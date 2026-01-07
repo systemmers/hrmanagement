@@ -24,14 +24,14 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/card.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/employee-form.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/card.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/form.css') }}">
 {# 첨부파일 사이드바는 법인관리자 외 모든 계정에서 표시되므로 CSS도 동일하게 로드 #}
 {% if account_type != 'corporate_admin' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/right-sidebar.css') }}">
 {% endif %}
 {% if is_corporate %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/tree-selector.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/tree-selector.css') }}">
 {% endif %}
 {% endblock %}
 
@@ -208,10 +208,10 @@
 
 {% block extra_js %}
 {% if is_corporate %}
-<script src="{{ url_for('static', filename='js/components/tree-selector.js') }}"></script>
+<script src="{{ url_for('static', filename='js/shared/components/tree-selector.js') }}"></script>
 {% endif %}
-<script src="{{ url_for('static', filename='js/pages/employee/rrn-autofill.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/pages/employee-form.js') }}"></script>
+<script src="{{ url_for('static', filename='js/domains/employee/pages/rrn-autofill.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/employee/pages/form.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
 {# 카카오 주소 API #}
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>

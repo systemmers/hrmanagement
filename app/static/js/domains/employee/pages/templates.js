@@ -10,7 +10,7 @@
  * - FieldRegistry 미로드: 기존 하드코딩 함수 사용 (fallback)
  */
 
-import { TemplateGenerator } from '../../core/template-generator.js';
+import { TemplateGenerator } from '../../../shared/core/template-generator.js';
 
 /**
  * FieldRegistry 기반 템플릿 생성 (우선)

@@ -4,8 +4,8 @@
 {% block title %}법인 관리 - 플랫폼 관리{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/platform.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/filter.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/platform/platform.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/filter.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -107,5 +107,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script type="module" src="{{ url_for('static', filename='js/pages/platform.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/platform/pages/platform.js') }}"></script>
 {% endblock %}

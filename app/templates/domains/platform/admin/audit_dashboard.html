@@ -5,8 +5,8 @@
 {% block extra_css %}
 <!-- CSS moved to: pages/audit-dashboard.css (to be created) -->
 <!-- Temporarily using inline styles until page-specific CSS file is created -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/stats-cards.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/badge.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/stats-cards.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/badge.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -165,5 +165,5 @@
 
 {% block extra_js %}
 <!-- JS moved to: pages/admin.js -->
-<script src="{{ url_for('static', filename='js/pages/admin.js') }}"></script>
+<script src="{{ url_for('static', filename='js/domains/platform/pages/admin.js') }}"></script>
 {% endblock %}

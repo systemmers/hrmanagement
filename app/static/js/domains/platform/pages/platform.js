@@ -12,7 +12,7 @@
  * - initPlatformActions: 플랫폼 액션 버튼 초기화 (이벤트 위임)
  */
 
-import { showToast } from '../components/toast.js';
+import { showToast } from '../../shared/components/toast.js';
 
 /**
  * 법인 활성화/비활성화 토글

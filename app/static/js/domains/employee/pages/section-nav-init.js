@@ -5,7 +5,7 @@
  * 섹션 네비게이션 초기화
  */
 
-import { SectionNav } from '../../components/section-nav.js';
+import { SectionNav } from '../../../shared/components/section-nav.js';
 
 /**
  * 섹션 네비게이션 초기화

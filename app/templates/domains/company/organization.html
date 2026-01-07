@@ -3,7 +3,7 @@
 {% block title %}조직 관리 - 인사카드 관리 시스템{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/organization.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/company/organization.css') }}">
 {% endblock %}
 
 {% macro render_tree_node(org) %}
@@ -229,5 +229,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/pages/organization.js') }}"></script>
+<script src="{{ url_for('static', filename='js/domains/company/pages/organization.js') }}"></script>
 {% endblock %}

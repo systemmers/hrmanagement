@@ -4,7 +4,7 @@
 {% block meta_description %}HR Management 법인 계정을 만들고 직원 인사관리를 시작하세요.{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/register.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/user/register.css') }}">
 {% endblock %}
 
 {% block body_class %} auth-page{% endblock %}
@@ -257,6 +257,6 @@
 {% block extra_js %}
 <!-- JS: utils/formatting.js, services/contract-service.js, pages/corporate-register.js -->
 <script src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/services/contract-service.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/pages/corporate-register.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/contract/services/contract-service.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/company/pages/register.js') }}"></script>
 {% endblock %}

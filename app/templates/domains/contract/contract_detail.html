@@ -3,7 +3,7 @@
 {% block title %}계약 상세 - 인사카드 관리 시스템{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/contract-detail.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/contract/detail.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -278,6 +278,6 @@
 
 {% block extra_js %}
 <!-- JS: services/contract-service.js, pages/contract-detail.js -->
-<script type="module" src="{{ url_for('static', filename='js/services/contract-service.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/pages/contract-detail.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/contract/services/contract-service.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/contract/pages/detail.js') }}"></script>
 {% endblock %}

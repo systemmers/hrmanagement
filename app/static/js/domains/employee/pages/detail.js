@@ -4,7 +4,7 @@
  * - 파일 업로드 UI
  */
 
-import { SectionNav } from '../components/section-nav.js';
+import { SectionNav } from '../../shared/components/section-nav.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initSectionNavigation();

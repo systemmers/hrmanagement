@@ -20,7 +20,7 @@ import {
     getAwardTemplate,
     getProjectParticipationTemplate
 } from './templates.js';
-import { TemplateGenerator } from '../../core/template-generator.js';
+import { TemplateGenerator } from '../../../shared/core/template-generator.js';
 
 /**
  * 동적 항목 추가

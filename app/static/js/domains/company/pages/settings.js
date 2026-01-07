@@ -3,8 +3,8 @@
  */
 
 import { ClassificationApi, SettingsApi, VisibilityApi, DocumentsApi } from '../services/corporate-settings-api.js';
-import { Accordion } from '../components/accordion.js';
-import { MAX_FILE_SIZE, MAX_FILE_SIZE_MB, FILE_UPLOAD_MESSAGES } from '../constants/file-upload-constants.js';
+import { Accordion } from '../../shared/components/accordion.js';
+import { MAX_FILE_SIZE, MAX_FILE_SIZE_MB, FILE_UPLOAD_MESSAGES } from '../../shared/constants/file-upload-constants.js';
 
 const state = {
     activeTab: 'basic',

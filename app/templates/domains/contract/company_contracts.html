@@ -5,7 +5,7 @@
 {% block title %}기업 계약 관리 - 인사카드 관리 시스템{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/filter.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/filter.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -76,7 +76,7 @@
 
 <!-- CSS: components/stats-cards.css, contract.css, badge.css, info-grid.css, empty-state.css -->
 <!-- JS: filter-bar.js (SSOT), contract-service.js, contracts.js -->
-<script type="module" src="{{ url_for('static', filename='js/components/filter-bar.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/services/contract-service.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/pages/contracts.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/shared/components/filter-bar.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/contract/services/contract-service.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/contract/pages/list.js') }}"></script>
 {% endblock %}

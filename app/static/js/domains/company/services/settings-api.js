@@ -2,7 +2,7 @@
  * 법인 세팅 API 서비스
  */
 
-import { get, post, put, del } from '../utils/api.js';
+import { get, post, put, del } from '../../shared/utils/api.js';
 
 const BASE_URL = '/api/corporate';
 

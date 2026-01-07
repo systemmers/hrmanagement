@@ -9,8 +9,8 @@
  * - checkBusinessNumber: 사업자등록번호 중복 확인 API
  */
 
-import { post, get } from '../utils/api.js';
-import { showToast } from '../components/toast.js';
+import { post, get } from '../../shared/utils/api.js';
+import { showToast } from '../../shared/components/toast.js';
 
 const API_BASE = '/contracts/api';
 

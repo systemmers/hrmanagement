@@ -5,8 +5,8 @@
 {% block title %}법인 관리자 프로필 {{ '생성' if is_create else '수정' }} - HR Management{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/register.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin-profile.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/user/register.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/platform/admin-profile.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -198,5 +198,5 @@
 <!-- JS: utils/formatting.js - 전화번호 자동 포맷팅 (DOMContentLoaded 시 자동 초기화) -->
 <script src="{{ url_for('static', filename='js/utils/formatting.js') }}"></script>
 <!-- JS: pages/profile/admin-form.js - 프로필 사진 업로드/삭제 -->
-<script src="{{ url_for('static', filename='js/pages/profile/admin-form.js') }}"></script>
+<script src="{{ url_for('static', filename='js/domains/user/pages/profile/admin-form.js') }}"></script>
 {% endblock %}

@@ -18,11 +18,11 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/section-nav.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/layouts/right-sidebar.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/employee-header.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/business-card.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/card.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/table.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/employee-detail.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/employee-header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/business-card.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/card.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/table.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/detail.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -67,6 +67,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<script type="module" src="{{ url_for('static', filename='js/pages/employee-detail.js') }}"></script>
-<script src="{{ url_for('static', filename='js/components/business-card.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/employee/pages/detail.js') }}"></script>
+<script src="{{ url_for('static', filename='js/shared/components/business-card.js') }}"></script>
 {% endblock %}
