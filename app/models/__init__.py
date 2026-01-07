@@ -77,9 +77,6 @@ from app.domains.platform.models import (
     AuditLog,
 )
 
-# Project Models (미마이그레이션 - app/models/ 유지)
-from .project import Project
-
 
 __all__ = [
     # Mixins
@@ -134,6 +131,4 @@ __all__ = [
     # Platform Domain
     'SystemSetting',
     'AuditLog',
-    # Project
-    'Project',
 ]
