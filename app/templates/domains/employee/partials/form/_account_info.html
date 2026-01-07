@@ -1,0 +1,185 @@
+{#
+    직원 폼 - 계정정보 섹션
+    21번/22번 원칙: 직원 등록 시 계정 동시 생성
+
+    변수:
+    - action: 'create' 또는 'update'
+    - employee: 직원 객체 (수정 모드일 때)
+    - user: 연결된 사용자 객체 (수정 모드일 때)
+    - page_mode: 페이지 모드 ('hr_card' 등)
+
+    위치: 기본정보 섹션과 소속정보 섹션 사이
+#}
+
+{# 신규 등록 모드에서만 계정 생성 옵션 표시 #}
+{% if action == 'create' %}
+<section class="form-section" id="account-info" aria-labelledby="account-info-title">
+    <div class="card">
+        <div class="card-header">
+            <h2 id="account-info-title" class="card-title">
+                <i class="fas fa-user-circle" aria-hidden="true"></i>
+                계정정보
+            </h2>
+        </div>
+        <div class="card-body" id="accountInfoBody">
+            {# 계정 생성 필수 - 토글 제거, hidden input으로 항상 true #}
+            <input type="hidden" name="create_account" value="true">
+            <div id="accountFormFields">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle"></i>
+                    직원 등록 시 시스템 로그인 계정이 함께 생성됩니다.
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="account_username" class="form-label">
+                            아이디 <span class="required" aria-hidden="true">*</span>
+                        </label>
+                        <div class="input-with-validation">
+                            <input type="text" id="account_username" name="account_username"
+                                   class="form-input" placeholder="영문, 숫자 4자 이상"
+                                   minlength="4" pattern="[a-zA-Z0-9]+"
+                                   aria-describedby="username_help">
+                            <span class="validation-icon" id="usernameValidation"></span>
+                        </div>
+                        <small id="username_help" class="form-help">영문과 숫자만 사용 가능 (4자 이상)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="account_email" class="form-label">
+                            계정 이메일 <span class="required" aria-hidden="true">*</span>
+                        </label>
+                        <div class="input-with-sync">
+                            <input type="email" id="account_email" name="account_email"
+                                   class="form-input" placeholder="account@company.com"
+                                   aria-describedby="account_email_help">
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    id="syncEmailBtn" title="개인정보 이메일과 동기화">
+                                <i class="fas fa-sync"></i>
+                            </button>
+                        </div>
+                        <small id="account_email_help" class="form-help">
+                            로그인 및 알림 수신에 사용됩니다
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="account_password" class="form-label">
+                            초기 비밀번호 <span class="required" aria-hidden="true">*</span>
+                        </label>
+                        <div class="input-with-button">
+                            <input type="text" id="account_password" name="account_password"
+                                   class="form-input" placeholder="비밀번호 입력 또는 자동생성"
+                                   minlength="8" aria-describedby="password_help">
+                            <button type="button" class="btn btn-secondary" id="generatePasswordBtn">
+                                <i class="fas fa-key"></i> 자동생성
+                            </button>
+                        </div>
+                        <small id="password_help" class="form-help">
+                            8자 이상 권장. 직원에게 초기 비밀번호를 안내해주세요.
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="account_role" class="form-label">역할</label>
+                        <select id="account_role" name="account_role" class="form-input">
+                            <option value="employee" selected>일반 직원</option>
+                            <option value="manager">매니저</option>
+                            <option value="admin">관리자</option>
+                        </select>
+                        <small class="form-help">
+                            역할에 따라 시스템 접근 권한이 달라집니다
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% elif (action == 'update' or action == 'view') and user %}
+{# 수정/상세 모드: 연결된 계정 정보 표시 (읽기 전용) #}
+<section class="form-section" id="account-info" aria-labelledby="account-info-title">
+    <div class="card">
+        <div class="card-header">
+            <h2 id="account-info-title" class="card-title">
+                <i class="fas fa-user-circle" aria-hidden="true"></i>
+                계정정보
+            </h2>
+            <span class="badge badge-{{ 'success' if user.is_active else 'secondary' }}">
+                {{ '활성' if user.is_active else '비활성' }}
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">아이디</label>
+                    <input type="text" class="form-input" value="{{ user.username }}" readonly disabled>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">계정 이메일</label>
+                    <input type="text" class="form-input" value="{{ user.email }}" readonly disabled>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">역할</label>
+                    <input type="text" class="form-input"
+                           value="{% if user.role == 'admin' %}관리자{% elif user.role == 'manager' %}매니저{% else %}일반 직원{% endif %}"
+                           readonly disabled>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">계정 유형</label>
+                    <input type="text" class="form-input" value="{{ user.get_account_type_label() }}" readonly disabled>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">생성일</label>
+                    <input type="text" class="form-input"
+                           value="{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else '-' }}"
+                           readonly disabled>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">마지막 로그인</label>
+                    <input type="text" class="form-input"
+                           value="{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else '로그인 기록 없음' }}"
+                           readonly disabled>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle"></i>
+                    계정 정보 변경은 계정 관리 메뉴에서 가능합니다.
+                </small>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% elif action == 'update' and not user %}
+{# 수정 모드: 계정이 없는 경우 #}
+<section class="form-section" id="account-info" aria-labelledby="account-info-title">
+    <div class="card">
+        <div class="card-header">
+            <h2 id="account-info-title" class="card-title">
+                <i class="fas fa-user-circle" aria-hidden="true"></i>
+                계정정보
+            </h2>
+            <span class="badge badge-warning">미생성</span>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                이 직원에게 연결된 계정이 없습니다.
+            </div>
+            <button type="button" class="btn btn-primary" id="createAccountForEmployeeBtn"
+                    data-employee-id="{{ employee.id if employee else '' }}">
+                <i class="fas fa-user-plus"></i> 계정 생성하기
+            </button>
+        </div>
+    </div>
+</section>
+{% endif %}

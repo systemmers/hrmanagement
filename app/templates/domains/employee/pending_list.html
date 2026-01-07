@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}계약대기 목록 - 인사카드 관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-row">
+        <h1 class="page-title">계약대기 목록</h1>
+        <div class="page-actions">
+            <a href="{{ url_for('employees.employee_list') }}" class="btn btn-secondary">
+                <i class="fas fa-users"></i>
+                <span>직원 목록</span>
+            </a>
+            <a href="{{ url_for('employees.employee_new') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>직원 등록</span>
+            </a>
+        </div>
+    </div>
+    <p class="page-description">계약이 없거나 대기 중인 직원 {{ pending_count }}명</p>
+</div>
+
+{% if employees %}
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>이름</th>
+                    <th>이메일</th>
+                    <th>부서</th>
+                    <th>직급</th>
+                    <th>계약상태</th>
+                    <th>작업</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in employees %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('employees.employee_detail', employee_id=emp.id) }}">
+                            {{ emp.name }}
+                        </a>
+                    </td>
+                    <td>{{ emp.user_email or emp.email or '-' }}</td>
+                    <td>{{ emp.department or '-' }}</td>
+                    <td>{{ emp.position or '-' }}</td>
+                    <td>
+                        {% if emp.contract_status == 'none' %}
+                        <span class="badge badge-secondary">계약 없음</span>
+                        {% elif emp.contract_status == 'requested' %}
+                        <span class="badge badge-warning">계약진행중</span>
+                        {% elif emp.contract_status == 'pending' %}
+                        <span class="badge badge-warning">계약진행중</span>
+                        {% else %}
+                        <span class="badge badge-secondary">{{ emp.contract_status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if emp.user_id and emp.contract_status == 'none' %}
+                        <button class="btn btn-sm btn-primary btn-contract-request"
+                                data-user-id="{{ emp.user_id }}"
+                                data-employee-name="{{ emp.name }}">
+                            <i class="fas fa-file-contract"></i> 계약 요청
+                        </button>
+                        {% elif emp.contract_status == 'requested' %}
+                        <span class="text-muted">계약진행중</span>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+        <h4>계약대기 직원이 없습니다</h4>
+        <p class="text-muted">모든 직원이 계약 완료 상태입니다.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/pages/employee-list.js') }}"></script>
+{% endblock %}

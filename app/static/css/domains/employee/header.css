@@ -1,0 +1,202 @@
+/* ========================================
+   직원 헤더 컴포넌트 스타일
+   - 인사카드 상세 페이지 상단 헤더
+   ======================================== */
+
+.employee-header {
+    background: linear-gradient(135deg, var(--color-blue-600) 0%, var(--color-blue-800) 100%);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    margin-bottom: var(--space-6);
+    box-shadow: var(--shadow-lg);
+    color: var(--color-pure-white);
+}
+
+.employee-header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+}
+
+/* 좌측 영역: 사진 + 정보 */
+.employee-header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    flex: 1;
+    min-width: 0;
+}
+
+.employee-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: var(--color-gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-5xl);
+    color: var(--color-gray-500);
+    border: 4px solid var(--color-white-opacity-30);
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.employee-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.employee-info {
+    flex: 1;
+}
+
+.employee-name {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+}
+
+.employee-name-en {
+    font-size: var(--text-lg);
+    opacity: 0.9;
+    margin-bottom: var(--space-4);
+}
+
+.employee-meta {
+    display: flex;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.meta-item i {
+    opacity: 0.8;
+}
+
+.employee-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-white-opacity-20);
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-label {
+    font-size: var(--text-sm);
+    opacity: 0.8;
+    margin-bottom: var(--space-1);
+}
+
+.stat-value {
+    font-size: var(--text-xl);
+    font-weight: 600;
+}
+
+/* 헤더 액션 버튼들 */
+.employee-header-actions {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+}
+
+.header-action-btn {
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-white-opacity-30);
+    background: var(--color-white-opacity-10);
+    color: var(--color-pure-white);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.header-action-btn:hover {
+    background: var(--color-white-opacity-20);
+    border-color: var(--color-white-opacity-50);
+}
+
+/* ========================================
+   개인 계정용 헤더 스타일
+   - 그린 테마 적용
+   - 명함 영역 없이 전체 너비 사용
+   ======================================== */
+
+.employee-header--personal {
+    /* 그린 그래디언트 테마 */
+    background: linear-gradient(135deg, var(--color-success-600) 0%, var(--color-success-700) 100%);
+}
+
+.employee-header--personal .employee-header-content {
+    justify-content: flex-start;
+}
+
+.employee-header--personal .employee-header-left {
+    flex: none;
+    width: 100%;
+    max-width: 100%;
+}
+
+.employee-header--personal .employee-photo {
+    border-color: var(--color-white-opacity-40, rgba(255, 255, 255, 0.4));
+}
+
+.employee-header--personal .employee-stats {
+    border-top-color: var(--color-white-opacity-25);
+}
+
+.employee-header--personal .stat-item--wide {
+    grid-column: span 2;
+    text-align: left;
+}
+
+.employee-header--personal .stat-item--wide .stat-value {
+    font-size: var(--text-base);
+    font-weight: 500;
+}
+
+.employee-header--personal .header-action-btn:hover {
+    background: var(--color-white-opacity-25);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .employee-header {
+        padding: var(--space-5);
+    }
+
+    .employee-header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .employee-header-left {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .employee-meta {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    .employee-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
