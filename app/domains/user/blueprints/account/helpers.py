@@ -9,7 +9,7 @@ Usage:
     is_valid, error = validate_password_change(current, new, confirm)
     if not is_valid:
         flash(error, 'error')
-        return render_template('account/password.html')
+        return render_template('domains/user/account/password.html')
 """
 from typing import Tuple, Optional
 

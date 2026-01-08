@@ -1,0 +1,200 @@
+{% extends "shared/base.html" %}
+
+{% block title %}계약 요청 - 인사카드 관리 시스템{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/tabs.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/badge.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/empty-state.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/contract/request.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-row">
+        <h1 class="page-title">새 계약 요청</h1>
+        <div class="page-actions">
+            <a href="{{ url_for('contracts.company_contracts') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                <span>목록으로</span>
+            </a>
+        </div>
+    </div>
+    <p class="page-description">계약 대상을 선택하고 계약 정보를 입력합니다.</p>
+</div>
+
+<div class="form-container">
+    <form method="POST" action="{{ url_for('contracts.request_contract') }}" class="contract-form" aria-label="계약 요청 폼" id="contractForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="target_user_id" id="target_user_id" value="">
+
+        <!-- 대상 선택 -->
+        <div class="form-section">
+            <h2 class="section-title">
+                <i class="fas fa-user-check" aria-hidden="true"></i>
+                계약 대상 선택
+            </h2>
+
+            <!-- 탭 네비게이션 -->
+            <div class="tabs-nav" role="tablist">
+                <button type="button" class="tab-btn active" data-tab="employee" role="tab" aria-selected="true">
+                    <i class="fas fa-id-badge"></i>
+                    직원 계정
+                    <span class="badge">{{ employee_accounts|length }}</span>
+                </button>
+                <button type="button" class="tab-btn" data-tab="personal" role="tab" aria-selected="false">
+                    <i class="fas fa-user"></i>
+                    개인 계정
+                    <span class="badge">{{ personal_accounts|length }}</span>
+                </button>
+            </div>
+
+            <!-- 직원 계정 목록 -->
+            <div class="tab-panel active" id="panel-employee" role="tabpanel">
+                {% if employee_accounts %}
+                <div class="target-list">
+                    {% for emp in employee_accounts %}
+                    <label class="target-item" data-user-id="{{ emp.user_id }}">
+                        <input type="radio" name="target_selection" value="{{ emp.user_id }}"
+                               data-name="{{ emp.name }}" data-email="{{ emp.email }}"
+                               data-department="{{ emp.department or '' }}" data-position="{{ emp.position or '' }}"
+                               data-status="{{ emp.status }}">
+                        <div class="target-info">
+                            <div class="target-name">{{ emp.name }}</div>
+                            <div class="target-email">{{ emp.email }}</div>
+                            <div class="target-meta">
+                                {% if emp.department %}{{ emp.department }}{% endif %}
+                                {% if emp.department and emp.position %} / {% endif %}
+                                {% if emp.position %}{{ emp.position }}{% endif %}
+                                {% if emp.status == 'pending_info' %}
+                                <span class="badge badge-danger">프로필 미완성</span>
+                                {% else %}
+                                <span class="badge badge-warning">계약 대기</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="target-actions">
+                            <a href="{{ url_for('employees.employee_edit', employee_id=emp.employee_id) }}"
+                               class="btn btn-sm btn-secondary btn-prevent-propagation"
+                               title="직원 정보 입력">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>계약 요청 가능한 직원이 없습니다.</p>
+                    <small>계정을 발급하면 이 목록에 표시됩니다.</small>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- 개인 계정 목록 -->
+            <div class="tab-panel" id="panel-personal" role="tabpanel">
+                {% if personal_accounts %}
+                <div class="target-list">
+                    {% for person in personal_accounts %}
+                    <label class="target-item" data-user-id="{{ person.user_id }}">
+                        <input type="radio" name="target_selection" value="{{ person.user_id }}"
+                               data-name="{{ person.name }}" data-email="{{ person.email }}"
+                               data-department="" data-position="">
+                        <div class="target-info">
+                            <div class="target-name">{{ person.name }}</div>
+                            <div class="target-email">{{ person.email }}</div>
+                            <div class="target-meta">
+                                <span class="badge badge-info">개인 계정</span>
+                            </div>
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>계약 요청 가능한 개인 계정이 없습니다.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 계약 정보 -->
+        <div class="form-section">
+            <h2 class="section-title">
+                <i class="fas fa-file-contract" aria-hidden="true"></i>
+                계약 정보
+            </h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="contract_type" class="form-label required">계약 유형</label>
+                    <select id="contract_type" name="contract_type" class="form-select"
+                            required aria-required="true">
+                        <option value="">선택하세요</option>
+                        <option value="employment">정규직</option>
+                        <option value="contract">계약직</option>
+                        <option value="freelance">프리랜서</option>
+                        <option value="intern">인턴</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row two-col">
+                <div class="form-group">
+                    <label for="contract_start_date" class="form-label">계약 시작일</label>
+                    <input type="date" id="contract_start_date" name="contract_start_date" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="contract_end_date" class="form-label">계약 종료일</label>
+                    <input type="date" id="contract_end_date" name="contract_end_date" class="form-input">
+                </div>
+            </div>
+            <div class="form-row two-col">
+                <div class="form-group">
+                    <label for="department" class="form-label">부서</label>
+                    <input type="text" id="department" name="department" class="form-input"
+                           placeholder="배치될 부서">
+                </div>
+                <div class="form-group">
+                    <label for="position" class="form-label">직위</label>
+                    <input type="text" id="position" name="position" class="form-input"
+                           placeholder="직위/직급">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="notes" class="form-label">메모</label>
+                <textarea id="notes" name="notes" class="form-textarea" rows="4"
+                          placeholder="계약 관련 추가 정보를 입력하세요."></textarea>
+            </div>
+        </div>
+
+        <!-- 안내 사항 -->
+        <div class="notice-section">
+            <div class="notice-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <div class="notice-content">
+                <h3>안내 사항</h3>
+                <ul>
+                    <li>계약 요청이 전송되면 대상에게 알림이 발송됩니다.</li>
+                    <li>대상이 승인하면 계약이 활성화됩니다.</li>
+                    <li>직원 계정의 경우, 계약 승인 후 인사카드에 접근할 수 있습니다.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 제출 버튼 -->
+        <div class="form-actions">
+            <a href="{{ url_for('contracts.company_contracts') }}" class="btn btn-secondary" aria-label="취소">취소</a>
+            <button type="submit" class="btn btn-primary" aria-label="계약 요청 전송" id="submitBtn">
+                <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                <span>계약 요청 전송</span>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/domains/contract/pages/request.js') }}"></script>
+{% endblock %}

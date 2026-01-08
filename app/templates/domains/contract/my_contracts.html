@@ -1,0 +1,41 @@
+{% extends "shared/base.html" %}
+{% from 'shared/macros/_contracts.html' import contract_stats_row, contract_card_personal, contract_empty_state %}
+
+{% block title %}내 계약 목록 - 인사카드 관리 시스템{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-row">
+        <h1 class="page-title">내 계약 목록</h1>
+        <div class="page-actions">
+            <a href="{{ url_for('contracts.pending_contracts') }}" class="btn btn-secondary">
+                <i class="fas fa-clock"></i>
+                <span>대기 중인 요청 ({{ stats.pending or 0 }})</span>
+            </a>
+        </div>
+    </div>
+    <p class="page-description">기업과의 계약 관계를 관리합니다.</p>
+</div>
+
+<!-- 통계 카드 -->
+{{ contract_stats_row(stats) }}
+
+<!-- 계약 목록 -->
+<div class="contracts-list">
+    {% if contracts %}
+        {% for contract in contracts %}
+            {{ contract_card_personal(contract) }}
+        {% endfor %}
+    {% else %}
+        {{ contract_empty_state(
+            icon='fa-file-contract',
+            title='계약 내역이 없습니다',
+            message='기업으로부터 계약 요청이 오면 여기에 표시됩니다.'
+        ) }}
+    {% endif %}
+</div>
+
+<!-- CSS: components/stats-cards.css, contract.css, badge.css, info-grid.css, empty-state.css -->
+<!-- JS: services/contract-service.js -->
+<script type="module" src="{{ url_for('static', filename='js/domains/contract/services/contract-service.js') }}"></script>
+{% endblock %}

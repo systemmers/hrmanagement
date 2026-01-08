@@ -23,7 +23,8 @@ from app.shared.utils.decorators import (
 from app.shared.utils.contract_helpers import (
     get_contract_context,
     contract_party_required,
-    approve_reject_permission_required
+    approve_reject_permission_required,
+    cancel_permission_required
 )
 from app.shared.utils.api_helpers import api_success, api_error, api_not_found, api_forbidden
 
@@ -45,7 +46,7 @@ def my_contracts():
     stats = contract_service.get_personal_statistics(user_id)
 
     return render_template(
-        'contracts/my_contracts.html',
+        'domains/contract/my_contracts.html',
         contracts=contracts,
         stats=stats
     )
@@ -63,7 +64,7 @@ def pending_contracts():
     contracts = contract_service.get_personal_pending_contracts(user_id)
 
     return render_template(
-        'contracts/pending_contracts.html',
+        'domains/contract/pending_contracts.html',
         contracts=contracts
     )
 
@@ -89,7 +90,7 @@ def contract_detail(contract_id):
     sharing_settings = contract_service.get_sharing_settings(contract_id)
 
     return render_template(
-        'contracts/contract_detail.html',
+        'domains/contract/contract_detail.html',
         contract=contract,
         sharing_settings=sharing_settings,
         is_person=is_person,
@@ -113,7 +114,7 @@ def company_contracts():
     stats = contract_service.get_company_statistics(company_id)
 
     return render_template(
-        'contracts/company_contracts.html',
+        'domains/contract/company_contracts.html',
         contracts=contracts,
         stats=stats,
         field_options=FieldOptions
@@ -133,7 +134,7 @@ def company_pending():
     contracts = contract_service.get_company_pending_contracts(company_id)
 
     return render_template(
-        'contracts/company_pending.html',
+        'domains/contract/company_pending.html',
         contracts=contracts
     )
 
@@ -194,7 +195,7 @@ def request_contract():
     eligible_targets = contract_service.get_contract_eligible_targets(company_id)
 
     return render_template(
-        'contracts/request_contract.html',
+        'domains/contract/request_contract.html',
         personal_accounts=eligible_targets['personal_accounts'],
         employee_accounts=eligible_targets['employee_accounts']
     )
@@ -225,6 +226,24 @@ def api_reject_contract(contract, contract_id):
     reason = data.get('reason')
 
     result = contract_service.reject_contract(contract_id, user_id, reason)
+    if result:
+        return api_success(result.data)
+    return api_error(result.message)
+
+
+@contracts_bp.route('/api/<int:contract_id>/cancel', methods=['POST'])
+@login_required
+@cancel_permission_required
+def api_cancel_contract(contract, contract_id):
+    """계약 요청 취소 API (요청자만 가능)
+
+    법인이 요청한 경우 법인만, 개인이 요청한 경우 개인만 취소 가능
+    """
+    user_id = session.get(SessionKeys.USER_ID)
+    data = request.get_json() or {}
+    reason = data.get('reason')
+
+    result = contract_service.cancel_contract_request(contract_id, user_id, reason)
     if result:
         return api_success(result.data)
     return api_error(result.message)

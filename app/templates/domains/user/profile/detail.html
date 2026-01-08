@@ -1,0 +1,148 @@
+{#
+    통합 프로필 상세 페이지
+
+    법인 직원(corporate)과 개인 계정(personal) 모두 지원
+    account_type에 따라 표시되는 섹션이 다름
+
+    컨텍스트 변수:
+    - employee 또는 profile: 프로필 데이터 객체
+    - is_corporate: 법인 소속 여부
+    - account_type: 'corporate', 'personal', 'corporate_admin'
+    - sections: 사용 가능한 섹션 목록
+    - basic_info, organization_info, education_list 등: 섹션별 데이터
+#}
+{% extends "shared/base.html" %}
+
+{# 변수 통합: employee 또는 profile 중 사용 가능한 것 사용 #}
+{% set profile_data = employee if employee is defined else profile %}
+{% set profile_name = profile_data.name if profile_data else '프로필' %}
+
+{% block title %}{{ profile_name }} - {{ '인사카드' if page_mode == 'hr_card' else '프로필' }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/section-nav.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/right-sidebar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/header.css') }}">
+{% if page_mode == 'hr_card' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/business-card.css') }}">
+{% endif %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/card.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/table.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/detail.css') }}">
+{% endblock %}
+
+{% block content %}
+{% from 'shared/macros/_navigation.html' import section_nav %}
+
+{# 계정 타입에 따른 body 클래스 #}
+<div class="detail-page-layout" data-account-type="{{ account_type }}">
+    {# 좌측 섹션 네비게이션 #}
+    {% if page_mode == 'hr_card' %}
+        {{ section_nav('인사카드', profile_name, variant='full', employee=profile_data) }}
+    {% else %}
+        {{ section_nav('프로필', profile_name, variant='profile') }}
+    {% endif %}
+
+    {# 메인 콘텐츠 #}
+    <div class="detail-main-content">
+        {# 페이지 헤더 #}
+        <div class="detail-page-header">
+            {% if page_mode == 'hr_card' %}
+                <h1 class="detail-page-title">직원 상세 정보</h1>
+            {% else %}
+                <h1 class="detail-page-title">내 프로필</h1>
+            {% endif %}
+
+            <div class="detail-page-actions">
+                {# 목록으로 버튼 (인사카드 페이지에서 관리자만) #}
+                {% if page_mode == 'hr_card' and current_user and current_user.role != 'employee' %}
+                <a href="{{ url_for('employees.employee_list') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>목록으로</span>
+                </a>
+                {% endif %}
+
+                {# 수정 버튼 - 인사카드 모드에서는 직원 수정, 프로필 모드에서는 프로필 수정 #}
+                {% if page_mode == 'hr_card' and profile_data and profile_data.id %}
+                <a href="{{ url_for('employees.employee_edit', employee_id=profile_data.id) }}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i>
+                    <span>수정</span>
+                </a>
+                {% else %}
+                <a href="{{ url_for('profile.edit') }}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i>
+                    <span>수정</span>
+                </a>
+                {% endif %}
+
+                {# 삭제 버튼 (인사카드 페이지에서 관리자만) #}
+                {% if page_mode == 'hr_card' and current_user and current_user.is_admin and account_type != 'corporate_admin' %}
+                <button class="btn btn-danger" data-action="delete-employee" data-employee-id="{{ profile_data.id }}" data-employee-name="{{ profile_name }}">
+                    <i class="fas fa-trash"></i>
+                    <span>삭제</span>
+                </button>
+                {% endif %}
+
+                {# 프로필 동기화 버튼 (개인계약이 있는 경우 관리자/매니저만) #}
+                {% if page_mode == 'hr_card' and person_contract and current_user and current_user.role in ['admin', 'manager'] %}
+                <button class="btn btn-secondary" id="syncProfileBtn" data-contract-id="{{ person_contract.id }}">
+                    <i class="fas fa-sync"></i>
+                    <span>프로필 동기화</span>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        {# 직원/프로필 헤더 카드 #}
+        {# 개인/법인 모두 동일한 헤더 컴포넌트 사용, 개인은 그린 테마 적용 #}
+        {% include 'domains/employee/partials/detail/_employee_header.html' %}
+
+        {# 섹션 1-6: 기본정보 (개인정보, 소속정보, 계약정보, 급여정보, 복리후생, 4대보험) #}
+        {% include 'domains/employee/partials/detail/_basic_info.html' %}
+
+        {# 섹션 7-11: 이력 및 경력 (학력, 경력, 자격증, 언어능력, 병역/프로젝트/수상) #}
+        {% include 'domains/employee/partials/detail/_history_info.html' %}
+
+        {# 인사카드 전용: 계정정보 (법인 계정만, 개인 계정 제외) #}
+        {% if page_mode == 'hr_card' and is_corporate and account_type != 'corporate_admin' %}
+            {% include 'domains/employee/partials/detail/_account_info.html' %}
+        {% endif %}
+
+        {# 섹션 12-14: 인사기록 (인사카드 페이지 전용) #}
+        {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
+            {% include 'domains/employee/partials/detail/_hr_records.html' %}
+        {% endif %}
+    </div>
+</div>
+
+{# 모바일 섹션 네비게이션 토글 버튼 #}
+<button class="mobile-section-nav-toggle" id="mobileNavToggle">
+    <i class="fas fa-bars"></i>
+</button>
+
+{# 모바일 오버레이 #}
+<div class="section-nav-overlay" id="sectionNavOverlay"></div>
+
+{# 명함 업로드 모달 (인사카드 페이지 전용) #}
+{% if page_mode == 'hr_card' and can_edit_business_card %}
+{% include 'shared/partials/_business_card_modal.html' %}
+{% endif %}
+{% endblock %}
+
+{% block sidebar_right %}
+{# 프로필/인사카드 모두 첨부파일 사이드바 표시 #}
+{# 프로필: is_readonly=False (수정/삭제 가능), 인사카드: is_readonly=True (조회만) #}
+{% include 'shared/partials/_attachment_sidebar.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{{ url_for('static', filename='js/domains/employee/pages/detail.js') }}"></script>
+{% if page_mode == 'hr_card' %}
+<script src="{{ url_for('static', filename='js/domains/employee/components/business-card.js') }}"></script>
+{% endif %}
+
+{# 프로필 동기화 스크립트 #}
+{% if person_contract %}
+<script src="{{ url_for('static', filename='js/domains/user/pages/profile-sync.js') }}"></script>
+{% endif %}
+{% endblock %}

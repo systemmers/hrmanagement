@@ -1,0 +1,512 @@
+/**
+ * Advanced Data Table Component
+ * 고급 데이터 테이블 - 소팅, 검색, 행선택, 컬럼 토글, 컬럼 재정렬
+ */
+
+/* ========================================
+   컨테이너 및 툴바
+   ======================================== */
+.data-table-advanced-container {
+    background: var(--color-pure-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.data-table-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+}
+
+.data-table-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: 1;
+}
+
+.data-table-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+/* 검색 입력 */
+.data-table-search {
+    position: relative;
+    max-width: 320px;
+    flex: 1;
+}
+
+.data-table-search input {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    padding-left: var(--space-8);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    background: var(--color-pure-white);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.data-table-search input:focus {
+    outline: none;
+    border-color: var(--color-blue-600);
+    box-shadow: 0 0 0 3px var(--color-blue-opacity-10);
+}
+
+.data-table-search i {
+    position: absolute;
+    left: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-gray-400);
+    font-size: var(--text-sm);
+}
+
+/* 툴바 버튼 */
+.data-table-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    background: var(--color-pure-white);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-gray-700);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.data-table-btn:hover {
+    background: var(--color-gray-50);
+    border-color: var(--color-gray-400);
+}
+
+.data-table-btn.active {
+    background: var(--color-blue-600);
+    border-color: var(--color-blue-600);
+    color: var(--color-pure-white);
+}
+
+/* ========================================
+   테이블 래퍼
+   ======================================== */
+.data-table-wrapper {
+    overflow-x: auto;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.data-table-advanced {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: var(--text-sm);
+}
+
+/* ========================================
+   헤더 스타일
+   ======================================== */
+.data-table-advanced thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--color-gray-75);
+}
+
+.data-table-advanced th {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    font-weight: 600;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-gray-600);
+    border-bottom: 2px solid var(--color-gray-200);
+    white-space: nowrap;
+    user-select: none;
+}
+
+/* 드래그 가능한 헤더 */
+.data-table-advanced th.draggable {
+    cursor: grab;
+}
+
+.data-table-advanced th.draggable:active {
+    cursor: grabbing;
+}
+
+.data-table-advanced th.drag-over {
+    background: var(--color-blue-100);
+    border-left: 2px solid var(--color-blue-600);
+}
+
+.data-table-advanced th.dragging {
+    opacity: 0.5;
+    background: var(--color-gray-100);
+}
+
+/* 헤더 내용 */
+.th-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.th-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.th-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.data-table-advanced th:hover .th-actions {
+    opacity: 1;
+}
+
+/* 소팅 버튼 */
+.sort-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    color: var(--color-gray-400);
+    cursor: pointer;
+    border-radius: var(--radius-xs);
+    transition: all var(--transition-fast);
+}
+
+.sort-btn:hover {
+    background: var(--color-gray-200);
+    color: var(--color-gray-700);
+}
+
+.sort-btn.asc,
+.sort-btn.desc {
+    color: var(--color-blue-600);
+}
+
+.sort-btn.asc i::before {
+    content: '\f0de'; /* fa-sort-up */
+}
+
+.sort-btn.desc i::before {
+    content: '\f0dd'; /* fa-sort-down */
+}
+
+/* 컬럼 이동 버튼 */
+.move-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: none;
+    background: transparent;
+    color: var(--color-gray-400);
+    cursor: pointer;
+    border-radius: var(--radius-xs);
+    font-size: 10px;
+    transition: all var(--transition-fast);
+}
+
+.move-btn:hover {
+    background: var(--color-gray-200);
+    color: var(--color-gray-700);
+}
+
+.move-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* ========================================
+   바디 스타일
+   ======================================== */
+.data-table-advanced td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-gray-100);
+    color: var(--color-gray-800);
+    vertical-align: middle;
+}
+
+.data-table-advanced tbody tr {
+    transition: background var(--transition-fast);
+}
+
+.data-table-advanced tbody tr:hover {
+    background: var(--color-gray-25);
+}
+
+/* 선택된 행 */
+.data-table-advanced tbody tr.selected {
+    background: var(--color-blue-50);
+}
+
+.data-table-advanced tbody tr.selected:hover {
+    background: var(--color-blue-100);
+}
+
+/* 체크박스 컬럼 */
+.data-table-advanced .checkbox-cell {
+    width: 40px;
+    text-align: center;
+}
+
+.data-table-advanced input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--color-blue-600);
+}
+
+/* ========================================
+   푸터 스타일
+   ======================================== */
+.data-table-advanced tfoot {
+    position: sticky;
+    bottom: 0;
+    background: var(--color-gray-50);
+}
+
+.data-table-advanced tfoot td {
+    padding: var(--space-3) var(--space-4);
+    font-weight: 600;
+    border-top: 2px solid var(--color-gray-200);
+    border-bottom: none;
+}
+
+/* ========================================
+   페이지네이션 및 상태바
+   ======================================== */
+.data-table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+    font-size: var(--text-sm);
+}
+
+.data-table-info {
+    color: var(--color-gray-600);
+}
+
+.data-table-info strong {
+    color: var(--color-gray-800);
+}
+
+.data-table-pagination {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 var(--space-2);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    background: var(--color-pure-white);
+    font-size: var(--text-sm);
+    color: var(--color-gray-700);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: var(--color-gray-50);
+    border-color: var(--color-gray-400);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-btn.active {
+    background: var(--color-blue-600);
+    border-color: var(--color-blue-600);
+    color: var(--color-pure-white);
+}
+
+/* ========================================
+   컬럼 설정 팝오버
+   ======================================== */
+.column-settings-popover {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: var(--space-2);
+    width: 280px;
+    background: var(--color-pure-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    z-index: 100;
+    display: none;
+}
+
+.column-settings-popover.active {
+    display: block;
+}
+
+.column-settings-header {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-gray-200);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--color-gray-800);
+}
+
+.column-settings-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: var(--space-2);
+}
+
+.column-settings-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.column-settings-item:hover {
+    background: var(--color-gray-50);
+}
+
+.column-settings-item.dragging {
+    background: var(--color-gray-100);
+    opacity: 0.7;
+}
+
+.column-settings-item input[type="checkbox"] {
+    flex-shrink: 0;
+}
+
+.column-settings-item .drag-handle {
+    color: var(--color-gray-400);
+    cursor: grab;
+}
+
+.column-settings-item .drag-handle:active {
+    cursor: grabbing;
+}
+
+.column-settings-item span {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-gray-700);
+}
+
+.column-settings-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--color-gray-200);
+}
+
+/* .status-badge는 components/badge.css에서 정의 */
+
+/* ========================================
+   빈 상태
+   ======================================== */
+.data-table-empty {
+    text-align: center;
+    padding: var(--space-12) var(--space-4);
+    color: var(--color-gray-500);
+}
+
+.data-table-empty i {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-3);
+    opacity: 0.5;
+}
+
+.data-table-empty p {
+    font-size: var(--text-sm);
+}
+
+/* ========================================
+   로딩 상태
+   ======================================== */
+.data-table-loading {
+    position: relative;
+    min-height: 200px;
+}
+
+.data-table-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 32px;
+    height: 32px;
+    margin: -16px 0 0 -16px;
+    border: 3px solid var(--color-gray-200);
+    border-top-color: var(--color-blue-600);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   반응형
+   ======================================== */
+@media (max-width: 768px) {
+    .data-table-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-3);
+    }
+
+    .data-table-toolbar-left,
+    .data-table-toolbar-right {
+        width: 100%;
+    }
+
+    .data-table-search {
+        max-width: 100%;
+    }
+
+    .data-table-footer {
+        flex-direction: column;
+        gap: var(--space-3);
+        text-align: center;
+    }
+
+    .data-table-advanced {
+        min-width: 800px;
+    }
+}

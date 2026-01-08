@@ -1,0 +1,41 @@
+{#
+    직원 정보 미연결 안내 페이지
+
+    employee_sub 계정이지만 employee_id가 없는 경우 표시
+    HR 담당자에게 문의하도록 안내
+#}
+{% extends "shared/base.html" %}
+{% from 'shared/macros/_alerts.html' import empty_state %}
+
+{% block title %}직원 정보 없음{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/company/add-user.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">내 회사 정보</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {{ empty_state('계정에 연결된 직원 정보가 없습니다.', 'user-slash') }}
+        <div class="plan-limit-info">
+            <div class="plan-limit-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <div class="plan-limit-content">
+                <strong>안내</strong>
+                <p>HR 담당자에게 문의하여 계정과 직원 정보를 연결해주세요.</p>
+            </div>
+        </div>
+        <div class="form-actions mt-6">
+            <a href="{{ url_for('profile.view') }}" class="btn btn-primary">
+                <i class="fas fa-user"></i>
+                <span>내 프로필 보기</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

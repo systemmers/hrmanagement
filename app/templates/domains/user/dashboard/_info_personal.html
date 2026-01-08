@@ -1,0 +1,26 @@
+{% from 'shared/macros/_avatar.html' import avatar_image %}
+<div class="profile-summary">
+    <div class="profile-avatar">
+        {{ avatar_image(profile.photo, profile.name, size='md', fallback='initial', theme='personal') }}
+    </div>
+    <div class="profile-info">
+        <h3 class="profile-name">{{ profile.name }}</h3>
+        {% if profile.english_name %}
+        <p class="profile-english-name">{{ profile.english_name }}</p>
+        {% endif %}
+        <div class="profile-details">
+            {% if profile.email %}
+            <span class="detail-item">
+                <i class="fas fa-envelope"></i>
+                {{ profile.email }}
+            </span>
+            {% endif %}
+            {% if profile.mobile_phone %}
+            <span class="detail-item">
+                <i class="fas fa-phone"></i>
+                {{ profile.mobile_phone }}
+            </span>
+            {% endif %}
+        </div>
+    </div>
+</div>

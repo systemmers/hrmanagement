@@ -21,7 +21,7 @@ def settings_list():
     settings = platform_service.get_all_settings()
 
     return render_template(
-        'platform/settings.html',
+        'domains/platform/settings.html',
         settings=settings
     )
 

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}오류 - 인사카드 관리 시스템{% endblock %}</title>
+
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Core CSS Only (사이드바/헤더 레이아웃 제외) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/core/variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/core/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/core/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/button.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/core/utilities.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/pages/error.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- 단순화된 헤더 (사이드바 없음) -->
+    <header class="error-header">
+        <div class="error-header-logo">HR</div>
+        <span class="error-header-title">인사카드 관리 시스템</span>
+    </header>
+
+    <!-- 에러 콘텐츠 -->
+    <div class="error-container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- 단순화된 푸터 -->
+    <footer class="error-footer">
+        &copy; 2024 인사카드 관리 시스템
+    </footer>
+
+    <!-- Core JS for error pages -->
+    <script src="{{ url_for('static', filename='js/shared/pages/error.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

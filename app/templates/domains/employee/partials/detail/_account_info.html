@@ -1,0 +1,41 @@
+{#
+    직원 상세 - 계정정보 섹션 (디테일 뷰 전용)
+    다른 섹션과 동일한 info-grid 스타일 사용
+#}
+{% from 'shared/macros/_info_display.html' import info_item, section_title, card_header %}
+
+{{ section_title('계정정보') }}
+<section id="account-info" class="content-section">
+    <div class="card">
+        {{ card_header('계정정보', 'fas fa-user-circle') }}
+        <div class="card-body">
+            {% if user %}
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">상태</div>
+                    <div class="info-value">
+                        <span class="badge badge-{{ 'success' if user.is_active else 'secondary' }}">
+                            {{ '활성' if user.is_active else '비활성' }}
+                        </span>
+                    </div>
+                </div>
+                {{ info_item('아이디', user.username) }}
+                {{ info_item('계정 이메일', user.email) }}
+                {{ info_item('역할', user.role_display) }}
+                {{ info_item('계정 유형', user.account_type_display) }}
+                {{ info_item('생성일', user.created_at.strftime('%Y-%m-%d') if user.created_at else '-') }}
+                {{ info_item('마지막 로그인', user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else '-') }}
+            </div>
+            <p class="text-muted mt-3">
+                <i class="fas fa-info-circle"></i>
+                계정 정보 변경은 계정 관리 메뉴에서 가능합니다.
+            </p>
+            {% else %}
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>연결된 계정이 없습니다.</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>

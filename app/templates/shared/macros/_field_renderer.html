@@ -1,0 +1,262 @@
+{#
+    FieldRegistry 기반 필드 렌더러 매크로
+    Phase 8: FieldRegistry 통합 - SSOT 기반 폼 렌더링
+
+    Usage:
+        {% from 'shared/macros/_field_renderer.html' import render_field, render_section, render_dynamic_section %}
+
+        {# 단일 필드 렌더링 #}
+        {{ render_field(field, value='', prefix='') }}
+
+        {# 정적 섹션 렌더링 #}
+        {{ render_section(section, data={}, account_type=None) }}
+
+        {# 동적 섹션 렌더링 (학력, 경력 등) #}
+        {{ render_dynamic_section(section, items=[], add_button_id='') }}
+#}
+
+{% from 'shared/macros/_form_controls.html' import form_input, form_select, form_textarea, form_date, form_number, form_checkbox, form_card_header, remove_button %}
+
+{#
+    단일 필드 렌더링
+    FieldDefinition 객체를 기반으로 적절한 폼 컨트롤 생성
+
+    Args:
+        field: FieldDefinition 딕셔너리 (name, label, type, required, options 등)
+        value: 현재 값
+        prefix: 필드명 접두사 (동적 필드용, 예: 'education_')
+        suffix: 필드명 접미사 (동적 필드용, 예: '[]')
+        css_class: 추가 CSS 클래스
+#}
+{% macro render_field(field, value='', prefix='', suffix='', css_class='') %}
+{% set field_name = prefix ~ field.name ~ suffix %}
+{% set field_id = prefix ~ field.name | replace('[]', '') %}
+{% set field_css = (field.cssClass or '') ~ ' ' ~ css_class %}
+{% set field_type = field.type | default('text') %}
+
+<div class="form-group {{ field_css }}">
+    <label for="{{ field_id }}" class="form-label">
+        {{ field.label }}{% if field.required %} <span class="required" aria-hidden="true">*</span>{% endif %}
+    </label>
+
+    {# 필드 타입별 분기 #}
+    {% if field_type == 'textarea' %}
+        <textarea id="{{ field_id }}"
+                  name="{{ field_name }}"
+                  class="form-input"
+                  rows="{{ field.rows | default(2) }}"
+                  placeholder="{{ field.placeholder | default('') }}"
+                  {% if field.required %}required aria-required="true"{% endif %}
+                  {% if field.maxLength %}maxlength="{{ field.maxLength }}"{% endif %}
+                  {% if field.readonly %}readonly{% endif %}>{{ value }}</textarea>
+
+    {% elif field_type == 'select' %}
+        <select id="{{ field_id }}"
+                name="{{ field_name }}"
+                class="form-input"
+                {% if field.required %}required aria-required="true"{% endif %}
+                {% if field.readonly %}disabled{% endif %}>
+            <option value="">선택하세요</option>
+            {% for opt in get_field_options(field) %}
+                <option value="{{ opt.value }}"
+                        {% if opt.value == value or opt.value|string == value|string %}selected{% endif %}
+                        {% if opt.disabled %}disabled{% endif %}>
+                    {{ opt.label }}
+                </option>
+            {% endfor %}
+        </select>
+
+    {% elif field_type == 'date' %}
+        <input type="date"
+               id="{{ field_id }}"
+               name="{{ field_name }}"
+               class="form-input"
+               value="{{ value }}"
+               {% if field.required %}required aria-required="true"{% endif %}
+               {% if field.readonly %}readonly{% endif %}>
+
+    {% elif field_type == 'number' %}
+        <input type="number"
+               id="{{ field_id }}"
+               name="{{ field_name }}"
+               class="form-input"
+               value="{{ value }}"
+               placeholder="{{ field.placeholder | default('') }}"
+               {% if field.required %}required aria-required="true"{% endif %}
+               {% if field.maxLength %}max="{{ field.maxLength }}"{% endif %}
+               {% if field.minLength %}min="{{ field.minLength }}"{% endif %}
+               {% if field.readonly %}readonly{% endif %}>
+
+    {% elif field_type == 'tel' %}
+        <input type="tel"
+               id="{{ field_id }}"
+               name="{{ field_name }}"
+               class="form-input"
+               value="{{ value }}"
+               placeholder="{{ field.placeholder | default('') }}"
+               {% if field.required %}required aria-required="true"{% endif %}
+               {% if field.pattern %}pattern="{{ field.pattern }}"{% endif %}
+               {% if field.readonly %}readonly{% endif %}>
+
+    {% elif field_type == 'email' %}
+        <input type="email"
+               id="{{ field_id }}"
+               name="{{ field_name }}"
+               class="form-input"
+               value="{{ value }}"
+               placeholder="{{ field.placeholder | default('') }}"
+               {% if field.required %}required aria-required="true"{% endif %}
+               {% if field.readonly %}readonly{% endif %}>
+
+    {% elif field_type == 'checkbox' %}
+        <input type="checkbox"
+               id="{{ field_id }}"
+               name="{{ field_name }}"
+               {% if value %}checked{% endif %}
+               {% if field.readonly %}disabled{% endif %}>
+
+    {% elif field_type == 'hidden' %}
+        <input type="hidden"
+               id="{{ field_id }}"
+               name="{{ field_name }}"
+               value="{{ value }}">
+
+    {% else %}
+        {# 기본: text 타입 #}
+        <input type="text"
+               id="{{ field_id }}"
+               name="{{ field_name }}"
+               class="form-input"
+               value="{{ value }}"
+               placeholder="{{ field.placeholder | default('') }}"
+               {% if field.required %}required aria-required="true"{% endif %}
+               {% if field.maxLength %}maxlength="{{ field.maxLength }}"{% endif %}
+               {% if field.pattern %}pattern="{{ field.pattern }}"{% endif %}
+               {% if field.readonly %}readonly{% endif %}>
+    {% endif %}
+
+    {# 도움말 텍스트 #}
+    {% if field.helpText %}
+    <small class="form-help">{{ field.helpText }}</small>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{#
+    정적 섹션 렌더링
+    비동적 섹션의 모든 필드를 폼 그리드로 렌더링
+
+    Args:
+        section: SectionDefinition 딕셔너리
+        data: 폼 데이터 딕셔너리
+        account_type: 계정 타입 (가시성 필터링)
+        prefix: 필드명 접두사
+#}
+{% macro render_section(section, data={}, account_type=None, prefix='') %}
+<section class="form-section{% if section.collapsed %} collapsed{% endif %}" id="{{ section.id }}">
+    <div class="card">
+        {{ form_card_header(section.title, section.icon) }}
+        <div class="card-body">
+            <div class="form-grid">
+                {% for field in section.fields %}
+                    {# 가시성 체크 #}
+                    {% if not account_type or is_field_visible(field, account_type) %}
+                        {{ render_field(field, value=data.get(field.name, ''), prefix=prefix) }}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endmacro %}
+
+{#
+    동적 섹션 렌더링
+    학력, 경력 등 동적으로 추가/삭제 가능한 섹션
+
+    Args:
+        section: SectionDefinition 딕셔너리
+        items: 기존 항목 리스트 (각 항목은 데이터 딕셔너리)
+        add_button_id: 추가 버튼 ID (기본: 'add' + 섹션ID)
+        account_type: 계정 타입 (가시성 필터링)
+#}
+{% macro render_dynamic_section(section, items=[], add_button_id='', account_type=None) %}
+{% set btn_id = add_button_id or ('add' ~ section.id | capitalize) %}
+{% set list_id = section.id ~ 'List' %}
+{% set prefix = section.id ~ '_' %}
+
+<section class="form-section{% if section.collapsed %} collapsed{% endif %}" id="{{ section.id }}">
+    <div class="card">
+        {{ form_card_header(section.title, section.icon, add_button_id=btn_id) }}
+        <div class="card-body">
+            <div class="dynamic-list" id="{{ list_id }}">
+                {# 기존 항목 렌더링 #}
+                {% if items %}
+                    {% for item in items %}
+                        {{ render_dynamic_item(section, item, loop.index0, account_type) }}
+                    {% endfor %}
+                {% else %}
+                    {# 빈 항목 하나 렌더링 (최초 상태) #}
+                    {{ render_dynamic_item(section, {}, 0, account_type) }}
+                {% endif %}
+            </div>
+
+            {# 최대/최소 항목 수 안내 #}
+            {% if section.maxItems or section.minItems %}
+            <small class="form-help">
+                {% if section.minItems %}최소 {{ section.minItems }}개{% endif %}
+                {% if section.minItems and section.maxItems %} ~ {% endif %}
+                {% if section.maxItems %}최대 {{ section.maxItems }}개{% endif %}
+                까지 입력 가능합니다.
+            </small>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endmacro %}
+
+{#
+    동적 항목 단일 렌더링 (내부용)
+
+    Args:
+        section: SectionDefinition 딕셔너리
+        data: 항목 데이터 딕셔너리
+        index: 항목 인덱스
+        account_type: 계정 타입
+#}
+{% macro render_dynamic_item(section, data={}, index=0, account_type=None) %}
+{% set prefix = section.id ~ '_' %}
+<div class="dynamic-item" data-index="{{ index }}">
+    <div class="form-grid">
+        {% for field in section.fields %}
+            {% if not account_type or is_field_visible(field, account_type) %}
+                {{ render_field(field, value=data.get(field.name, ''), prefix=prefix, suffix='[]') }}
+            {% endif %}
+        {% endfor %}
+    </div>
+    {{ remove_button(section.title) }}
+</div>
+{% endmacro %}
+
+{#
+    도메인 전체 섹션 렌더링
+    도메인에 속한 모든 섹션을 순서대로 렌더링
+
+    Args:
+        domain: 도메인명 (예: 'profile', 'employee')
+        data: 전체 데이터 딕셔너리 (섹션ID -> 데이터)
+        account_type: 계정 타입
+#}
+{% macro render_domain_sections(domain, data={}, account_type=None) %}
+{% set sections = get_sections_by_domain(domain) %}
+{% for section in sections %}
+    {% if not account_type or is_section_visible(section, account_type) %}
+        {% set section_data = data.get(section.id, {}) %}
+        {% if section.isDynamic %}
+            {{ render_dynamic_section(section, items=section_data, account_type=account_type) }}
+        {% else %}
+            {{ render_section(section, data=section_data, account_type=account_type) }}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+{% endmacro %}

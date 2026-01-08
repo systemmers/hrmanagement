@@ -223,7 +223,7 @@ def register_mutation_routes(bp: Blueprint):
                 organizations = organization_service.get_flat_list(root_organization_id=org_id)
 
             return render_template(
-                'employees/account_provision.html',
+                'domains/employee/account_provision.html',
                 organizations=organizations
             )
 

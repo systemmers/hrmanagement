@@ -27,8 +27,14 @@ def mock_repos(app):
     """Service의 Repository를 Mock으로 대체하는 fixture"""
     mock_contract_repo = Mock()
 
-    with patch('app.domains.contract.get_person_contract_repo', return_value=mock_contract_repo):
-        yield contract_core_service, mock_contract_repo
+    # 서비스의 _contract_repo를 직접 주입
+    original_repo = contract_core_service._contract_repo
+    contract_core_service._contract_repo = mock_contract_repo
+
+    yield contract_core_service, mock_contract_repo
+
+    # 테스트 후 원래 상태로 복원
+    contract_core_service._contract_repo = original_repo
 
 
 class TestContractCoreServiceInit:
@@ -160,47 +166,51 @@ class TestContractCoreServiceCorporate:
 class TestContractCoreServiceGetEligibleTargets:
     """계약 요청 가능한 대상 목록 조회 테스트"""
 
-    def test_get_contract_eligible_targets(self, mock_repos, session):
+    def test_get_contract_eligible_targets(self, app):
         """계약 요청 가능한 대상 목록 조회"""
-        service, mock_repo = mock_repos
-        with patch('app.domains.contract.services.contract_core_service.User') as mock_user, \
-             patch('app.domains.contract.services.contract_core_service.Employee') as mock_employee:
+        # 모든 Repository를 Mock으로 대체
+        mock_contract_repo = Mock()
+        mock_user_repo = Mock()
+        mock_employee_repo = Mock()
+        mock_profile_repo = Mock()
+
+        # 원래 값 저장
+        original_contract_repo = contract_core_service._contract_repo
+        original_user_repo = contract_core_service._user_repo
+        original_employee_repo = contract_core_service._employee_repo
+        original_profile_repo = contract_core_service._profile_repo
+
+        try:
+            # Mock 주입
+            contract_core_service._contract_repo = mock_contract_repo
+            contract_core_service._user_repo = mock_user_repo
+            contract_core_service._employee_repo = mock_employee_repo
+            contract_core_service._profile_repo = mock_profile_repo
 
             # 개인 계정 Mock
             personal_user = Mock()
             personal_user.id = 1
             personal_user.username = 'testuser'
             personal_user.email = 'test@test.com'
-            personal_user.account_type = 'personal'
-            personal_user.is_active = True
 
-            # 직원 Mock
-            employee = Mock()
-            employee.id = 1
-            employee.name = '직원1'
-            employee.department = '개발팀'
-            employee.position = '사원'
-            employee.status = 'pending_contract'
-            employee.company_id = 1
+            mock_user_repo.find_active_personal_users.return_value = [personal_user]
+            mock_contract_repo.get_contract_between.return_value = None
+            mock_profile_repo.get_by_user_id.return_value = None
+            mock_employee_repo.find_by_company_and_statuses.return_value = []
 
-            emp_user = Mock()
-            emp_user.id = 2
-            emp_user.email = 'emp@test.com'
-            emp_user.employee_id = 1
-
-            mock_user.query.filter.return_value.all.return_value = [personal_user]
-            mock_employee.query.filter.return_value.all.return_value = [employee]
-            mock_user.query.filter.return_value.first.return_value = emp_user
-
-            mock_repo.get_contract_between.return_value = None
-
-            result = service.get_contract_eligible_targets(company_id=1)
+            result = contract_core_service.get_contract_eligible_targets(company_id=1)
 
             assert isinstance(result, dict)
             assert 'personal_accounts' in result
             assert 'employee_accounts' in result
             assert isinstance(result['personal_accounts'], list)
             assert isinstance(result['employee_accounts'], list)
+        finally:
+            # 원래 상태로 복원
+            contract_core_service._contract_repo = original_contract_repo
+            contract_core_service._user_repo = original_user_repo
+            contract_core_service._employee_repo = original_employee_repo
+            contract_core_service._profile_repo = original_profile_repo
 
 
 class TestContractCoreServiceGetContract:
@@ -239,30 +249,31 @@ class TestContractCoreServiceGetContract:
         assert result is not None
         assert result == mock_contract
 
-    def test_find_contract_with_history(self, mock_repos, session):
+    def test_find_contract_with_history(self, mock_repos):
         """계약 이력 조회"""
         service, mock_repo = mock_repos
-        with patch('app.domains.contract.services.contract_core_service.PersonCorporateContract') as mock_model:
-            mock_query = Mock()
-            mock_query.filter.return_value = mock_query
-            mock_query.first.return_value = Mock(id=1, status='approved')
-            mock_model.query = mock_query
+        mock_contract = Mock(id=1, status='approved')
+        mock_repo.find_with_history.return_value = mock_contract
 
-            result = service.find_contract_with_history(
-                employee_number='EMP001',
-                company_id=1
-            )
+        result = service.find_contract_with_history(
+            employee_number='EMP001',
+            company_id=1
+        )
 
-            assert result is not None
+        assert result is not None
+        mock_repo.find_with_history.assert_called_once()
 
     def test_find_contract_with_history_invalid_params(self, mock_repos):
         """계약 이력 조회 - 잘못된 파라미터"""
         service, mock_repo = mock_repos
+        mock_repo.find_with_history.return_value = None
+
         result = service.find_contract_with_history(
             employee_number=None,
             company_id=1
         )
 
+        # Repository가 None을 반환하면 결과도 None
         assert result is None
 
     def test_find_approved_contract(self, mock_repos):

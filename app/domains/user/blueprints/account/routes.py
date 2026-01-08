@@ -31,7 +31,7 @@ def settings():
     if user.employee_id:
         employee = employee_service.get_employee_by_id(user.employee_id)
 
-    return render_template('account/settings.html',
+    return render_template('domains/user/account/settings.html',
                            user=user,
                            employee=employee)
 
@@ -51,13 +51,13 @@ def password():
         )
         if not is_valid:
             flash(error, 'error')
-            return render_template('account/password.html')
+            return render_template('domains/user/account/password.html')
 
         # Verify current password
         user = user_service.authenticate(session['username'], current_password)
         if not user:
             flash('현재 비밀번호가 올바르지 않습니다.', 'error')
-            return render_template('account/password.html')
+            return render_template('domains/user/account/password.html')
 
         # Change password
         if user_service.update_password(session[SessionKeys.USER_ID], new_password):
@@ -66,7 +66,7 @@ def password():
         else:
             flash('비밀번호 변경에 실패했습니다.', 'error')
 
-    return render_template('account/password.html')
+    return render_template('domains/user/account/password.html')
 
 
 @account_bp.route('/privacy', methods=['GET', 'POST'])
@@ -111,7 +111,7 @@ def privacy():
     # Get current privacy settings
     privacy_settings = user_service.get_privacy_settings(user_id) or {}
 
-    return render_template('account/privacy.html',
+    return render_template('domains/user/account/privacy.html',
                            user=user,
                            privacy_settings=privacy_settings,
                            profile=profile,
@@ -137,12 +137,12 @@ def delete():
         authenticated = user_service.authenticate(session['username'], password)
         if not authenticated:
             flash('비밀번호가 올바르지 않습니다.', 'error')
-            return render_template('account/delete.html', user=user)
+            return render_template('domains/user/account/delete.html', user=user)
 
         # Verify confirmation text
         if confirm_text != '계정 탈퇴':
             flash('"계정 탈퇴"를 정확히 입력해주세요.', 'error')
-            return render_template('account/delete.html', user=user)
+            return render_template('domains/user/account/delete.html', user=user)
 
         # Deactivate account (soft delete)
         if user_service.deactivate(user_id):
@@ -152,4 +152,4 @@ def delete():
         else:
             flash('계정 탈퇴에 실패했습니다. 관리자에게 문의해주세요.', 'error')
 
-    return render_template('account/delete.html', user=user)
+    return render_template('domains/user/account/delete.html', user=user)

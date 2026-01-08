@@ -1,0 +1,352 @@
+/* ========================================
+   직원 등록/수정 폼 페이지 스타일
+   - 2단 레이아웃 (섹션 네비게이션 + 폼 콘텐츠)
+   ======================================== */
+
+/* 메인 레이아웃 */
+.form-page-layout {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+}
+
+.form-main-content {
+    flex: 1;
+    padding: var(--space-6);
+    overflow-y: auto;
+    background-color: var(--color-gray-25);
+    min-width: 0;
+}
+
+/* 페이지 헤더 */
+.form-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.form-page-title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-gray-900);
+}
+
+.form-page-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+/* 폼 섹션 */
+.form-section {
+    margin-bottom: var(--space-6);
+    scroll-margin-top: 80px;
+}
+
+/* 카드 헤더는 components/card.css에서 정의 */
+/* 폼 페이지 카드 헤더 확장 - 버튼 배치 */
+.form-section .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form-section .card-header .btn {
+    flex-shrink: 0;
+}
+
+/* 폼 그리드 */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+}
+
+.form-group-full {
+    grid-column: 1 / -1;
+}
+
+/* 폼 그룹, 레이블, 입력 필드는 components/forms.css에서 정의 */
+/* 직원 폼 페이지 특화 오버라이드 */
+.form-group {
+    gap: var(--space-1); /* 폼 페이지는 더 밀집된 레이아웃 */
+}
+
+.form-label .required {
+    color: var(--color-error-600);
+    margin-left: var(--space-1);
+}
+
+.form-input:focus {
+    border-color: var(--color-blue-600);
+    box-shadow: 0 0 0 3px var(--color-blue-opacity-10);
+}
+
+.form-input::placeholder {
+    color: var(--color-gray-400);
+}
+
+select.form-input {
+    cursor: pointer;
+}
+
+.form-help {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+    margin-top: var(--space-1);
+}
+
+/* 입력 필드 조합 패턴은 components/forms.css로 이동 */
+/* .input-with-button, .input-with-checkbox → components/forms.css */
+
+/* 사진 업로드 섹션
+   → 중앙화됨: components/image-upload.css
+   사용 클래스: .image-upload-section, .image-preview.image-preview--lg, .image-placeholder
+   기존 .photo-preview 오버라이드 제거됨 */
+
+/* 동적 리스트 (학력, 경력, 자격증, 가족) */
+.dynamic-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.dynamic-item {
+    position: relative;
+    padding: var(--space-4);
+    background-color: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-gray-200);
+}
+
+.dynamic-item .form-grid {
+    padding-right: var(--space-8);
+}
+
+.btn-remove {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-gray-200);
+    color: var(--color-gray-600);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.btn-remove:hover {
+    background-color: var(--color-error-100);
+    color: var(--color-error-600);
+}
+
+/* 폼 제출 섹션 */
+.form-submit-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-6);
+    background-color: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-gray-200);
+    position: sticky;
+    bottom: var(--space-6);
+}
+
+.form-submit-info {
+    font-size: var(--text-sm);
+    color: var(--color-gray-600);
+}
+
+.form-submit-info .required {
+    color: var(--color-error-600);
+    font-weight: 600;
+}
+
+.form-submit-actions {
+    display: flex;
+    gap: var(--space-3);
+}
+
+/* 버튼 크기는 components/button.css에서 정의 */
+
+/* 모바일 메뉴 토글 */
+.mobile-section-nav-toggle {
+    display: none;
+    position: fixed;
+    bottom: var(--space-6);
+    right: var(--space-6);
+    width: 56px;
+    height: 56px;
+    background: var(--color-blue-600);
+    color: var(--color-pure-white);
+    border: none;
+    border-radius: 50%;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    z-index: 100;
+    font-size: var(--text-xl);
+    transition: all var(--transition-normal);
+}
+
+.mobile-section-nav-toggle:hover {
+    background: var(--color-blue-700);
+    transform: scale(1.05);
+}
+
+/* 섹션 네비게이션 오버레이 */
+.section-nav-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-black-opacity-50);
+    z-index: 99;
+}
+
+.section-nav-overlay.active {
+    display: block;
+}
+
+/* 반응형 */
+@media (max-width: 1024px) {
+    .form-main-content {
+        padding: var(--space-4);
+    }
+
+    .mobile-section-nav-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .section-nav.mobile-active {
+        display: flex;
+        position: fixed;
+        top: 64px;
+        left: 0;
+        bottom: 0;
+        z-index: 100;
+        transform: translateX(0);
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .form-submit-section {
+        position: relative;
+        bottom: 0;
+        margin-bottom: 80px;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .form-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+
+    .form-page-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .image-upload-section {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .form-submit-section {
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .form-submit-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .form-submit-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ========================================
+   3단 레이아웃 (수정 모드 - 첨부파일 사이드바 포함)
+   - 섹션 네비게이션 + 폼 콘텐츠 + 첨부파일 사이드바
+   ======================================== */
+.form-page-layout-with-sidebar {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+    gap: 0;
+}
+
+.form-page-layout-with-sidebar .section-nav {
+    width: 220px;
+    flex-shrink: 0;
+}
+
+.form-page-layout-with-sidebar .form-main-content {
+    flex: 1;
+    min-width: 0;
+    padding: var(--space-6);
+    overflow-y: auto;
+    background-color: var(--color-gray-25);
+}
+
+.form-page-layout-with-sidebar .right-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+}
+
+/* 3단 레이아웃 반응형 */
+@media (max-width: 1200px) {
+    .form-page-layout-with-sidebar .right-sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    .form-page-layout-with-sidebar .form-main-content {
+        padding: var(--space-4);
+    }
+}
+
+@media (max-width: 768px) {
+    .form-page-layout-with-sidebar {
+        flex-direction: column;
+    }
+
+    .form-page-layout-with-sidebar .section-nav {
+        width: 100%;
+    }
+}
+
+/* 체크박스 섹션 */
+.checkbox-section {
+    margin-top: var(--space-4);
+}

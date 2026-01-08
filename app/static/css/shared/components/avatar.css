@@ -1,0 +1,226 @@
+/**
+ * Avatar Component
+ * 프로필/리스트 아바타 통합 스타일
+ *
+ * Used by:
+ * - dashboard (프로필 아바타)
+ * - profile/detail.html (프로필 헤더)
+ * - contracts (당사자 아바타)
+ * - header (사용자 아바타)
+ */
+
+/* ========================================
+   Avatar Base
+   ======================================== */
+
+.avatar {
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: var(--color-gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 크기 변형 */
+.avatar--xs {
+    width: 32px;
+    height: 32px;
+}
+
+.avatar--sm {
+    width: 48px;
+    height: 48px;
+}
+
+.avatar--md {
+    width: 80px;
+    height: 80px;
+}
+
+.avatar--lg {
+    width: 120px;
+    height: 120px;
+}
+
+.avatar--xl {
+    width: 150px;
+    height: 150px;
+}
+
+/* 이미지 표시 */
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ========================================
+   Avatar Placeholder
+   ======================================== */
+
+.avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: white;
+    font-weight: 700;
+}
+
+/* 테마별 배경 */
+.avatar-placeholder--personal {
+    background: linear-gradient(135deg, var(--color-success-600) 0%, var(--color-success-700) 100%);
+}
+
+.avatar-placeholder--corporate {
+    background: linear-gradient(135deg, var(--color-blue-600) 0%, var(--color-blue-700) 100%);
+}
+
+.avatar-placeholder--employee {
+    background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-700) 100%);
+}
+
+.avatar-placeholder--default {
+    background: linear-gradient(135deg, var(--color-gray-500) 0%, var(--color-gray-600) 100%);
+}
+
+/* 크기별 폰트 크기 */
+.avatar--xs .avatar-placeholder {
+    font-size: var(--text-xs);
+}
+
+.avatar--sm .avatar-placeholder {
+    font-size: var(--text-base);
+}
+
+.avatar--md .avatar-placeholder {
+    font-size: var(--text-2xl);
+}
+
+.avatar--lg .avatar-placeholder {
+    font-size: var(--text-3xl);
+}
+
+.avatar--xl .avatar-placeholder {
+    font-size: var(--text-4xl);
+}
+
+/* ========================================
+   Avatar With Border
+   ======================================== */
+
+.avatar--bordered {
+    border: 2px solid var(--color-white-opacity-30);
+}
+
+.avatar--bordered-white {
+    border: 3px solid var(--color-pure-white);
+    box-shadow: var(--shadow-md);
+}
+
+/* ========================================
+   Avatar Icon Placeholder
+   ======================================== */
+
+.avatar-icon-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: var(--color-gray-400);
+}
+
+.avatar--xs .avatar-icon-placeholder i {
+    font-size: var(--text-base);
+}
+
+.avatar--sm .avatar-icon-placeholder i {
+    font-size: var(--text-lg);
+}
+
+.avatar--md .avatar-icon-placeholder i {
+    font-size: var(--text-2xl);
+}
+
+.avatar--lg .avatar-icon-placeholder i {
+    font-size: var(--text-3xl);
+}
+
+.avatar--xl .avatar-icon-placeholder i {
+    font-size: var(--text-4xl);
+}
+
+/* ========================================
+   Avatar Group
+   ======================================== */
+
+.avatar-group {
+    display: flex;
+    align-items: center;
+}
+
+.avatar-group .avatar {
+    margin-left: -8px;
+    border: 2px solid var(--color-pure-white);
+}
+
+.avatar-group .avatar:first-child {
+    margin-left: 0;
+}
+
+/* ========================================
+   Header Avatar (프로필 헤더용)
+   ======================================== */
+
+.avatar--header {
+    width: 120px;
+    height: 120px;
+    border: 4px solid var(--color-white-opacity-30);
+    background: var(--color-pure-white);
+}
+
+/* ========================================
+   Avatar Image Fallback
+   JS 모듈과 연동하여 이미지 로드 실패 시 폴백 표시
+   ======================================== */
+
+/* Avatar 컨테이너 - 상대 위치 */
+.avatar {
+    position: relative;
+}
+
+/* 이미지 스타일 */
+.avatar__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* 이미지 로드 실패 시 숨김 */
+.avatar__image--error {
+    display: none;
+}
+
+/* 폴백 기본 (숨김) */
+.avatar-fallback {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.avatar-fallback--hidden {
+    display: none;
+}
+
+/* 폴백 표시 */
+.avatar-fallback--visible {
+    display: flex;
+}

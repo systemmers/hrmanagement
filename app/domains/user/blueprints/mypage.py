@@ -38,7 +38,7 @@ def company_info():
 
     # 2. Check for missing employee_id
     if not employee_id:
-        return render_template('mypage/no_employee_info.html')
+        return render_template('domains/user/mypage/no_employee_info.html')
 
     # 3. Fetch employee info
     employee = employee_service.get_employee_by_id(employee_id)
@@ -53,7 +53,7 @@ def company_info():
     if user_id and company_id:
         contract_status = contract_service.get_employee_contract_status(user_id, company_id)
         if contract_status != ContractStatus.APPROVED:
-            return render_template('mypage/pending_contract.html', employee=employee)
+            return render_template('domains/user/mypage/pending_contract.html', employee=employee)
 
     # 5. Check incomplete profile (pending_info -> redirect to profile completion)
     employee_status = employee.get('status')
@@ -72,7 +72,7 @@ def company_info():
     business_card_front = employee_service.get_attachment_by_category(employee_id, 'business_card_front')
     business_card_back = employee_service.get_attachment_by_category(employee_id, 'business_card_back')
 
-    return render_template('mypage/company_info.html',
+    return render_template('domains/user/mypage/company_info.html',
                            employee=employee,
                            company_info=company_data,
                            is_readonly=True,

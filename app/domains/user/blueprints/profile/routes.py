@@ -56,7 +56,7 @@ def dashboard():
         return redirect(url_for('profile.view'))
 
     return render_template(
-        'dashboard/base_dashboard.html',
+        'domains/user/dashboard/base_dashboard.html',
         account_type='employee_sub',
         employee=dashboard_data['employee'],
         stats=dashboard_data['stats'],
@@ -106,7 +106,7 @@ def view():
         context['attachment_list'] = []
     context['is_readonly'] = False  # 프로필에서는 수정 가능
 
-    return render_template('profile/detail.html', **context)
+    return render_template('domains/user/profile/detail.html', **context)
 
 
 @profile_bp.route('/edit', methods=['GET', 'POST'])
@@ -152,7 +152,7 @@ def edit():
         context['attachment_list'] = []
     context['is_readonly'] = False  # 프로필에서는 수정 가능
 
-    return render_template('profile/edit.html', **context)
+    return render_template('domains/user/profile/edit.html', **context)
 
 
 @profile_bp.route('/section/<section_name>')
@@ -354,7 +354,7 @@ def admin_profile_create():
         if not data['name']:
             flash('이름은 필수 입력 항목입니다.', 'error')
             return render_template(
-                'profile/admin_profile_form.html',
+                'domains/user/profile/admin_profile_form.html',
                 mode='create',
                 user=user,
                 form_data=data
@@ -374,7 +374,7 @@ def admin_profile_create():
             flash(f'프로필 생성 중 오류가 발생했습니다: {error}', 'error')
 
     return render_template(
-        'profile/admin_profile_form.html',
+        'domains/user/profile/admin_profile_form.html',
         mode='create',
         user=user,
         form_data={}
@@ -416,7 +416,7 @@ def admin_profile_edit():
         if not data['name']:
             flash('이름은 필수 입력 항목입니다.', 'error')
             return render_template(
-                'profile/admin_profile_form.html',
+                'domains/user/profile/admin_profile_form.html',
                 mode='edit',
                 adapter=adapter,
                 form_data=data
@@ -435,7 +435,7 @@ def admin_profile_edit():
             flash(f'프로필 수정 중 오류가 발생했습니다: {error}', 'error')
 
     return render_template(
-        'profile/admin_profile_form.html',
+        'domains/user/profile/admin_profile_form.html',
         mode='edit',
         adapter=adapter,
         form_data=adapter.get_basic_info()
@@ -537,4 +537,4 @@ def complete_profile():
         context['attachment_list'] = []
     context['is_readonly'] = False
 
-    return render_template('profile/edit.html', **context)
+    return render_template('domains/user/profile/edit.html', **context)

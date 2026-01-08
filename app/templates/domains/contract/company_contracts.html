@@ -1,0 +1,82 @@
+{% extends "shared/base.html" %}
+{% from 'shared/macros/_contracts.html' import contract_stats_row_company, contract_table_row %}
+{% from 'shared/macros/_filters.html' import filter_bar, search_box, filter_select %}
+
+{% block title %}기업 계약 관리 - 인사카드 관리 시스템{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/filter.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title-row">
+        <h1 class="page-title">기업 계약 관리</h1>
+        <div class="page-actions">
+            <a href="{{ url_for('contracts.company_pending') }}" class="btn btn-secondary">
+                <i class="fas fa-clock"></i>
+                <span>대기 중 ({{ stats.pending or 0 }})</span>
+            </a>
+            <a href="{{ url_for('contracts.request_contract') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>계약 요청</span>
+            </a>
+        </div>
+    </div>
+    <p class="page-description">개인 회원과의 계약 관계를 관리합니다.</p>
+</div>
+
+<!-- 통계 카드 -->
+{{ contract_stats_row_company(stats) }}
+
+<!-- 검색 및 필터 (매크로 기반) -->
+{% call filter_bar(mode='client', css_class='filter-bar--simple') %}
+    {{ search_box(id='searchInput', placeholder='이름, 부서, 직위, 사번으로 검색') }}
+    {{ filter_select('statusFilter', 'status', field_options.CONTRACT_STATUS_FILTER, placeholder='전체 상태') }}
+    {{ filter_select('typeFilter', 'type', field_options.CONTRACT_TYPE, placeholder='전체 유형') }}
+{% endcall %}
+
+<!-- 계약 테이블 -->
+<div class="contracts-table-wrapper">
+    <table class="contracts-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>계정유형</th>
+                <th>아이디</th>
+                <th>이름</th>
+                <th>전화번호</th>
+                <th>이메일</th>
+                <th>부서</th>
+                <th>직위</th>
+                <th>계약유형</th>
+                <th>상태</th>
+                <th>승인일</th>
+                <th>액션</th>
+            </tr>
+        </thead>
+        <tbody id="contractsTableBody">
+            {% if contracts %}
+                {% for contract in contracts %}
+                    {{ contract_table_row(contract) }}
+                {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="12" class="empty-cell">
+                    <div class="empty-state-inline">
+                        <i class="fas fa-file-contract"></i>
+                        <span>계약 내역이 없습니다.</span>
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- CSS: components/stats-cards.css, contract.css, badge.css, info-grid.css, empty-state.css -->
+<!-- JS: filter-bar.js (SSOT), contract-service.js, contracts.js -->
+<script type="module" src="{{ url_for('static', filename='js/shared/components/filter-bar.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/contract/services/contract-service.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/contract/pages/list.js') }}"></script>
+{% endblock %}

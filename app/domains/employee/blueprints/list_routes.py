@@ -99,7 +99,7 @@ def register_list_routes(bp: Blueprint):
 
         # Phase 31: 카테고리별 분류 옵션 반환 (departments, positions, statuses)
         classification_options = employee_service.get_all_classification_options(company_id)
-        return render_template('employees/list.html',
+        return render_template('domains/employee/list.html',
                                employees=employees_with_contract,
                                classification_options=classification_options)
 
@@ -109,7 +109,7 @@ def register_list_routes(bp: Blueprint):
         """계약대기 목록 - 계약 없거나 대기 중인 직원"""
         company_id = session.get(SessionKeys.COMPANY_ID)
         if not company_id:
-            return render_template('employees/pending_list.html',
+            return render_template('domains/employee/pending_list.html',
                                    employees=[],
                                    pending_count=0)
 
@@ -133,7 +133,7 @@ def register_list_routes(bp: Blueprint):
                     emp_dict['contract_status'] = contract_status
                     pending_employees.append(emp_dict)
 
-        return render_template('employees/pending_list.html',
+        return render_template('domains/employee/pending_list.html',
                                employees=pending_employees,
                                pending_count=len(pending_employees))
 

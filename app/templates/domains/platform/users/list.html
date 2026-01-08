@@ -1,0 +1,109 @@
+{% extends "shared/base.html" %}
+{% from 'shared/macros/_filters.html' import filter_bar, search_box, filter_select %}
+
+{% block title %}사용자 관리 - 플랫폼 관리{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/platform/platform.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/filter.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="platform-page">
+    <div class="page-header">
+        <div class="page-title-section">
+            <h2 class="page-title">
+                <i class="fas fa-users"></i>
+                사용자 관리
+            </h2>
+            <p class="page-subtitle">모든 사용자를 관리합니다</p>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <!-- 검색 및 필터 (매크로 기반) -->
+        {% call filter_bar(mode='url', css_class='filter-bar--simple') %}
+            {{ search_box(name='search', placeholder='사용자명 또는 이메일 검색...', value=search) }}
+            {{ filter_select('account-type', 'account_type', field_options.ACCOUNT_TYPE, account_type, '전체 계정타입') }}
+        {% endcall %}
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>사용자명</th>
+                    <th>이메일</th>
+                    <th>계정타입</th>
+                    <th>역할</th>
+                    <th>상태</th>
+                    <th>작업</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>
+                        <a href="{{ url_for('platform.user_detail', user_id=user.id) }}">
+                            {{ user.username }}
+                            {% if user.is_superadmin %}
+                            <i class="fas fa-crown superadmin-icon" title="슈퍼관리자"></i>
+                            {% endif %}
+                        </a>
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span class="type-badge {{ user.account_type }}">
+                            {{ user.get_account_type_label() }}
+                        </span>
+                    </td>
+                    <td>{{ user.role }}</td>
+                    <td>
+                        <span class="status-badge {{ 'active' if user.is_active else 'inactive' }}">
+                            {{ '활성' if user.is_active else '비활성' }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{{ url_for('platform.user_detail', user_id=user.id) }}"
+                               class="btn-icon" title="상세보기">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="empty-row">사용자가 없습니다.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if pagination.pages > 1 %}
+        <div class="pagination">
+            {% if pagination.has_prev %}
+            <a href="?page={{ pagination.prev_num }}&search={{ search }}&account_type={{ account_type }}" class="page-link">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            {% endif %}
+
+            {% for p in pagination.iter_pages() %}
+                {% if p %}
+                <a href="?page={{ p }}&search={{ search }}&account_type={{ account_type }}"
+                   class="page-link {{ 'active' if p == pagination.page else '' }}">{{ p }}</a>
+                {% else %}
+                <span class="page-ellipsis">...</span>
+                {% endif %}
+            {% endfor %}
+
+            {% if pagination.has_next %}
+            <a href="?page={{ pagination.next_num }}&search={{ search }}&account_type={{ account_type }}" class="page-link">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

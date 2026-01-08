@@ -1,9 +1,9 @@
-{% extends "base.html" %}
+{% extends "shared/base.html" %}
 
 {% block title %}고급 데이터 테이블 데모{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/data-table-advanced.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/data-table-advanced.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -65,7 +65,7 @@
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 <!-- DataTableAdvanced 모듈 로드 및 초기화 -->
 <script type="module">
-import { DataTableAdvanced } from '{{ url_for('static', filename='js/components/data-table/data-table-advanced.js') }}';
+import { DataTableAdvanced } from '{{ url_for('static', filename='js/shared/components/data-table/data-table-advanced.js') }}';
 
 document.addEventListener('DOMContentLoaded', function() {
     // 샘플 데이터

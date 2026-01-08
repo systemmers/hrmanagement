@@ -40,7 +40,7 @@ def organization_list():
     flat_list = organization_service.get_flat_list(root_organization_id=root_org_id)
     stats = organization_service.get_organization_statistics(root_organization_id=root_org_id)
 
-    return render_template('admin/organization.html',
+    return render_template('domains/company/organization.html',
                            tree=tree,
                            organizations=flat_list,
                            stats=stats)
@@ -61,6 +61,15 @@ def api_get_organizations():
         data = organization_service.get_tree(root_organization_id=root_org_id)
 
     return api_success(data)
+
+
+@admin_bp.route('/api/organizations/stats', methods=['GET'])
+@login_required
+def api_get_organization_stats():
+    """조직 통계 API (멀티테넌시 적용)"""
+    root_org_id = get_current_root_organization_id()
+    stats = organization_service.get_organization_statistics(root_organization_id=root_org_id)
+    return api_success(stats)
 
 
 @admin_bp.route('/api/organizations/<int:org_id>', methods=['GET'])
@@ -217,4 +226,4 @@ def api_search_organizations():
 @admin_required
 def audit_dashboard():
     """감사 대시보드 페이지"""
-    return render_template('admin/audit_dashboard.html')
+    return render_template('domains/platform/admin/audit_dashboard.html')

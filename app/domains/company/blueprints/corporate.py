@@ -40,18 +40,18 @@ def register():
         if errors:
             for error in errors:
                 flash(error, 'error')
-            return render_template('corporate/register.html', **data.to_template_context())
+            return render_template('domains/company/register.html', **data.to_template_context())
 
         # 엔티티 생성
         error_msg = create_company_entities(data)
         if error_msg:
             flash(error_msg, 'error')
-            return render_template('corporate/register.html', **data.to_template_context())
+            return render_template('domains/company/register.html', **data.to_template_context())
 
         flash('법인 회원가입이 완료되었습니다. 로그인해주세요.', 'success')
         return redirect(url_for('auth.login'))
 
-    return render_template('corporate/register.html')
+    return render_template('domains/company/register.html')
 
 
 @corporate_bp.route('/dashboard')
@@ -68,7 +68,7 @@ def dashboard():
         flash('법인 정보를 찾을 수 없습니다.', 'error')
         return redirect(url_for('main.index'))
 
-    return render_template('dashboard/base_dashboard.html',
+    return render_template('domains/user/dashboard/base_dashboard.html',
                            account_type=AccountType.CORPORATE,
                            company=company)
 
@@ -95,7 +95,7 @@ def settings():
         else:
             flash(f'수정 중 오류가 발생했습니다: {result.message}', 'error')
 
-    return render_template('corporate/settings.html', company=company)
+    return render_template('domains/company/settings.html', company=company)
 
 
 @corporate_bp.route('/users')
@@ -139,7 +139,7 @@ def users():
     users = user_service.get_users_with_contract_and_employee_details(users, company_id)
 
     return render_template(
-        'corporate/users.html',
+        'domains/company/users.html',
         company=company,
         users=users,
         pagination=pagination

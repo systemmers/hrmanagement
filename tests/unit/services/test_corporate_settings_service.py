@@ -33,9 +33,9 @@ class TestCorporateSettingsServiceClassifications:
         expected = {'departments': [], 'positions': []}
         mock_repo = Mock()
         mock_repo.get_all_options.return_value = expected
-        service.classification_repo = mock_repo
 
-        result = service.get_all_classifications(company_id=1)
+        with patch('app.domains.company.get_classification_repo', return_value=mock_repo):
+            result = service.get_all_classifications(company_id=1)
 
         assert result == expected
         mock_repo.get_all_options.assert_called_once_with(1)
@@ -46,9 +46,9 @@ class TestCorporateSettingsServiceClassifications:
         expected = {'departments': []}
         mock_repo = Mock()
         mock_repo.get_organization_options.return_value = expected
-        service.classification_repo = mock_repo
 
-        result = service.get_organization_options(company_id=1)
+        with patch('app.domains.company.get_classification_repo', return_value=mock_repo):
+            result = service.get_organization_options(company_id=1)
 
         assert result == expected
 
@@ -58,9 +58,9 @@ class TestCorporateSettingsServiceClassifications:
         expected = {'positions': []}
         mock_repo = Mock()
         mock_repo.get_employment_options.return_value = expected
-        service.classification_repo = mock_repo
 
-        result = service.get_employment_options(company_id=1)
+        with patch('app.domains.company.get_classification_repo', return_value=mock_repo):
+            result = service.get_employment_options(company_id=1)
 
         assert result == expected
 
@@ -70,9 +70,9 @@ class TestCorporateSettingsServiceClassifications:
         expected = [{'id': 1, 'value': '개발팀'}]
         mock_repo = Mock()
         mock_repo.get_by_category_for_company.return_value = expected
-        service.classification_repo = mock_repo
 
-        result = service.get_classifications_by_category('department', company_id=1)
+        with patch('app.domains.company.get_classification_repo', return_value=mock_repo):
+            result = service.get_classifications_by_category('department', company_id=1)
 
         assert result == expected
         mock_repo.get_by_category_for_company.assert_called_once_with('department', 1)
@@ -83,14 +83,14 @@ class TestCorporateSettingsServiceClassifications:
         expected = {'id': 1, 'category': 'department', 'value': 'DEV', 'label': '개발팀'}
         mock_repo = Mock()
         mock_repo.add_option_for_company.return_value = expected
-        service.classification_repo = mock_repo
 
-        result = service.add_classification(
-            company_id=1,
-            category='department',
-            value='DEV',
-            label='개발팀'
-        )
+        with patch('app.domains.company.get_classification_repo', return_value=mock_repo):
+            result = service.add_classification(
+                company_id=1,
+                category='department',
+                value='DEV',
+                label='개발팀'
+            )
 
         assert result == expected
         mock_repo.add_option_for_company.assert_called_once()
@@ -101,13 +101,13 @@ class TestCorporateSettingsServiceClassifications:
         expected = {'id': 1, 'label': '개발부서'}
         mock_repo = Mock()
         mock_repo.update_option.return_value = expected
-        service.classification_repo = mock_repo
 
-        result = service.update_classification(
-            option_id=1,
-            company_id=1,
-            data={'label': '개발부서'}
-        )
+        with patch('app.domains.company.get_classification_repo', return_value=mock_repo):
+            result = service.update_classification(
+                option_id=1,
+                company_id=1,
+                data={'label': '개발부서'}
+            )
 
         assert result == expected
 
@@ -116,9 +116,9 @@ class TestCorporateSettingsServiceClassifications:
         service = CorporateSettingsService()
         mock_repo = Mock()
         mock_repo.delete_option_for_company.return_value = True
-        service.classification_repo = mock_repo
 
-        result = service.delete_classification(option_id=1, company_id=1)
+        with patch('app.domains.company.get_classification_repo', return_value=mock_repo):
+            result = service.delete_classification(option_id=1, company_id=1)
 
         assert result is True
         mock_repo.delete_option_for_company.assert_called_once_with(1, 1)
@@ -129,14 +129,14 @@ class TestCorporateSettingsServiceClassifications:
         expected = {'success': True}
         mock_repo = Mock()
         mock_repo.toggle_system_option.return_value = expected
-        service.classification_repo = mock_repo
 
-        result = service.toggle_system_option(
-            company_id=1,
-            category='department',
-            value='DEV',
-            is_active=True
-        )
+        with patch('app.domains.company.get_classification_repo', return_value=mock_repo):
+            result = service.toggle_system_option(
+                company_id=1,
+                category='department',
+                value='DEV',
+                is_active=True
+            )
 
         assert result == expected
 
@@ -150,9 +150,9 @@ class TestCorporateSettingsServiceSettings:
         expected = {'key1': 'value1'}
         mock_repo = Mock()
         mock_repo.get_by_company.return_value = expected
-        service.settings_repo = mock_repo
 
-        result = service.get_settings(company_id=1)
+        with patch('app.domains.company.get_company_settings_repo', return_value=mock_repo):
+            result = service.get_settings(company_id=1)
 
         assert result == expected
 
@@ -166,9 +166,8 @@ class TestCorporateSettingsServiceNumberCategory:
         expected = [{'id': 1, 'code': 'EMP'}]
         mock_repo = Mock()
         mock_repo.get_by_company.return_value = expected
-        service.number_category_repo = mock_repo
 
-        result = service.get_number_categories(company_id=1)
+        with patch('app.domains.company.get_number_category_repo', return_value=mock_repo):
+            result = service.get_number_categories(company_id=1)
 
         assert result == expected
-

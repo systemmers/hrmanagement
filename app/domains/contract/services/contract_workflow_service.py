@@ -322,6 +322,28 @@ class ContractWorkflowService:
         except Exception as e:
             return ServiceResult.fail(f"계약 거절 실패: {str(e)}")
 
+    def cancel_contract_request(self, contract_id: int, user_id: int, reason: str = None) -> ServiceResult[Dict]:
+        """계약 요청 취소 (요청자가 직접 취소)
+
+        요청자만 취소 가능:
+        - requested_by='company'인 경우: 법인 사용자만 취소 가능
+        - requested_by='person'인 경우: 개인 사용자만 취소 가능
+        """
+        contract = self.contract_repo.find_by_id(contract_id)
+        if not contract:
+            return ServiceResult.fail("계약을 찾을 수 없습니다.")
+
+        if contract.status != ContractStatus.REQUESTED:
+            return ServiceResult.fail("요청 대기 상태의 계약만 취소할 수 있습니다.")
+
+        try:
+            with atomic_transaction():
+                contract.cancel(user_id, reason)
+
+            return ServiceResult.ok(data=contract.to_dict(include_relations=True))
+        except Exception as e:
+            return ServiceResult.fail(f"계약 요청 취소 실패: {str(e)}")
+
     def terminate_contract(self, contract_id: int, user_id: int, reason: str = None) -> ServiceResult[Dict]:
         """계약 종료
 

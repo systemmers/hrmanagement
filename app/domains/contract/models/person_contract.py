@@ -68,19 +68,22 @@ class PersonCorporateContract(db.Model):
     # 메모
     notes = db.Column(db.Text, nullable=True)
     rejection_reason = db.Column(db.Text, nullable=True)
+    cancellation_reason = db.Column(db.Text, nullable=True)
     termination_reason = db.Column(db.Text, nullable=True)
 
     # 타임스탬프
     requested_at = db.Column(db.DateTime, default=datetime.utcnow)
     approved_at = db.Column(db.DateTime, nullable=True)
     rejected_at = db.Column(db.DateTime, nullable=True)
+    cancelled_at = db.Column(db.DateTime, nullable=True)
     terminated_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # 승인/거절/종료 처리자
+    # 승인/거절/취소/종료 처리자
     approved_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     rejected_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    cancelled_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     terminated_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
     # 양측 동의 종료 요청 관련 필드 (Phase 5.3)
@@ -95,6 +98,7 @@ class PersonCorporateContract(db.Model):
     STATUS_REQUESTED = ContractStatus.REQUESTED
     STATUS_APPROVED = ContractStatus.APPROVED
     STATUS_REJECTED = ContractStatus.REJECTED
+    STATUS_CANCELLED = ContractStatus.CANCELLED
     STATUS_TERMINATED = ContractStatus.TERMINATED
     STATUS_EXPIRED = ContractStatus.EXPIRED
     STATUS_TERMINATION_REQUESTED = ContractStatus.TERMINATION_REQUESTED
@@ -150,10 +154,12 @@ class PersonCorporateContract(db.Model):
             'requested_by': self.requested_by,
             'notes': self.notes,
             'rejection_reason': self.rejection_reason,
+            'cancellation_reason': self.cancellation_reason,
             'termination_reason': self.termination_reason,
             'requested_at': self.requested_at.isoformat() if self.requested_at else None,
             'approved_at': self.approved_at.isoformat() if self.approved_at else None,
             'rejected_at': self.rejected_at.isoformat() if self.rejected_at else None,
+            'cancelled_at': self.cancelled_at.isoformat() if self.cancelled_at else None,
             'terminated_at': self.terminated_at.isoformat() if self.terminated_at else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
@@ -239,6 +245,30 @@ class PersonCorporateContract(db.Model):
         self.rejected_at = datetime.utcnow()
         self.rejected_by = user_id
         self.rejection_reason = reason
+        self.updated_at = datetime.utcnow()
+
+    def cancel(self, user_id=None, reason=None):
+        """
+        계약 요청 취소 (요청자가 직접 취소)
+
+        상태 전이 검증 포함
+        유효한 전이: requested -> cancelled
+
+        Args:
+            user_id: 취소 처리 사용자 ID (요청자)
+            reason: 취소 사유
+
+        Raises:
+            ValueError: 유효하지 않은 상태 전이
+        """
+        valid, msg = ContractStatus.validate_transition(self.status, ContractStatus.CANCELLED)
+        if not valid:
+            raise ValueError(msg)
+
+        self.status = self.STATUS_CANCELLED
+        self.cancelled_at = datetime.utcnow()
+        self.cancelled_by = user_id
+        self.cancellation_reason = reason
         self.updated_at = datetime.utcnow()
 
     def terminate(self, user_id=None, reason=None):

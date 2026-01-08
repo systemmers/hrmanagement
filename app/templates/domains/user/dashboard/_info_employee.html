@@ -1,0 +1,32 @@
+{% from 'shared/macros/_avatar.html' import avatar_image %}
+<div class="profile-summary">
+    <div class="profile-avatar">
+        {{ avatar_image(employee.photo, employee.name, size='md', fallback='initial', theme='employee') }}
+    </div>
+    <div class="profile-info">
+        <h3 class="profile-name">{{ employee.name }}</h3>
+        {% if employee.english_name %}
+        <p class="profile-english-name">{{ employee.english_name }}</p>
+        {% endif %}
+        <div class="profile-details">
+            {% if work_info.department %}
+            <span class="detail-item">
+                <i class="fas fa-building"></i>
+                {{ work_info.department.name if work_info.department.name is defined else work_info.department }}
+            </span>
+            {% endif %}
+            {% if work_info.position %}
+            <span class="detail-item">
+                <i class="fas fa-user-tie"></i>
+                {{ work_info.position.name if work_info.position.name is defined else work_info.position }}
+            </span>
+            {% endif %}
+            {% if employee.email %}
+            <span class="detail-item">
+                <i class="fas fa-envelope"></i>
+                {{ employee.email }}
+            </span>
+            {% endif %}
+        </div>
+    </div>
+</div>

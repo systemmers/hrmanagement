@@ -1,10 +1,10 @@
-{% extends "base.html" %}
-{% from 'macros/_avatar.html' import avatar_image %}
+{% extends "shared/base.html" %}
+{% from 'shared/macros/_avatar.html' import avatar_image %}
 
 {% block title %}대시보드 - 인사카드 관리 시스템{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/user/dashboard.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -154,5 +154,5 @@
 {% block extra_js %}
 <!-- SheetJS for Excel Export -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
-<script src="{{ url_for('static', filename='js/pages/dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/domains/user/pages/dashboard.js') }}"></script>
 {% endblock %}
