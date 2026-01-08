@@ -71,6 +71,9 @@ function switchTab(tabId) {
  */
 async function loadTabData(tabId) {
     switch (tabId) {
+        case 'org-management':
+            await loadOrgManagementData();
+            break;
         case 'organization':
             await loadOrganizationData();
             break;
@@ -90,6 +93,489 @@ async function loadTabData(tabId) {
     state.loadedTabs.add(tabId);
 }
 
+// ========================================
+// 조직 관리 탭 관련 변수 및 함수
+// ========================================
+let selectedOrgId = null;
+let deleteOrgId = null;
+
+/**
+ * 조직 관리 탭 데이터 로드
+ */
+async function loadOrgManagementData() {
+    const content = document.getElementById('org-management-content');
+
+    try {
+        // 조직 트리 데이터 로드
+        const [treeResponse, statsResponse] = await Promise.all([
+            fetch('/admin/api/organizations?format=tree'),
+            fetch('/admin/api/organizations/stats')
+        ]);
+
+        const treeResult = await treeResponse.json();
+        const statsResult = await statsResponse.json();
+
+        // 통계 업데이트
+        if (statsResult.success) {
+            updateOrgStats(statsResult.data);
+        }
+
+        // 트리 렌더링
+        if (treeResult.success) {
+            renderOrgTree(treeResult.data);
+            // 상위 조직 선택 옵션 업데이트
+            await updateParentOrgOptions();
+        }
+
+        // 조직관리 이벤트 핸들러 초기화
+        initOrgManagementHandlers();
+    } catch (error) {
+        console.error('조직 관리 데이터 로드 실패:', error);
+        showContentError(content);
+    }
+}
+
+/**
+ * 조직 통계 업데이트
+ */
+function updateOrgStats(stats) {
+    document.getElementById('stat-total').textContent = stats.total || 0;
+    document.getElementById('stat-company').textContent = stats.by_type?.company || 0;
+    document.getElementById('stat-division').textContent = stats.by_type?.division || 0;
+    document.getElementById('stat-department').textContent = stats.by_type?.department || 0;
+    document.getElementById('stat-team').textContent = stats.by_type?.team || 0;
+}
+
+/**
+ * 조직 트리 렌더링
+ */
+function renderOrgTree(tree) {
+    const treeContainer = document.getElementById('orgTree');
+    if (!treeContainer) return;
+
+    if (!tree || tree.length === 0) {
+        treeContainer.innerHTML = `
+            <div class="empty-tree">
+                <i class="fas fa-folder-open"></i>
+                <p>등록된 조직이 없습니다.</p>
+                <button class="btn btn-primary" data-action="add-org">
+                    첫 번째 조직 추가
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    treeContainer.innerHTML = tree.map(org => renderTreeNode(org)).join('');
+
+    // 첫 번째 레벨 펼치기
+    document.querySelectorAll('#orgTree > .tree-node > .tree-children').forEach(el => {
+        el.classList.remove('collapsed');
+    });
+    document.querySelectorAll('#orgTree > .tree-node > .tree-node-content .tree-toggle i').forEach(el => {
+        el.classList.remove('fa-chevron-right');
+        el.classList.add('fa-chevron-down');
+    });
+}
+
+/**
+ * 트리 노드 렌더링
+ */
+function renderTreeNode(org) {
+    const typeIcons = {
+        'company': 'fa-building',
+        'division': 'fa-layer-group',
+        'department': 'fa-users',
+        'team': 'fa-user-friends'
+    };
+    const icon = typeIcons[org.org_type] || 'fa-folder';
+    const hasChildren = org.children && org.children.length > 0;
+
+    return `
+        <div class="tree-node" data-id="${org.id}" data-type="${org.org_type}">
+            <div class="tree-node-content" data-action="select-org" data-org-id="${org.id}">
+                ${hasChildren ? `
+                    <span class="tree-toggle" data-action="toggle-node">
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                ` : '<span class="tree-toggle-placeholder"></span>'}
+                <span class="tree-icon">
+                    <i class="fas ${icon}"></i>
+                </span>
+                <span class="tree-label">${escapeHtml(org.name)}</span>
+                ${org.code ? `<span class="tree-code">${escapeHtml(org.code)}</span>` : ''}
+            </div>
+            ${hasChildren ? `
+                <div class="tree-children collapsed">
+                    ${org.children.map(child => renderTreeNode(child)).join('')}
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+/**
+ * 상위 조직 선택 옵션 업데이트
+ */
+async function updateParentOrgOptions() {
+    try {
+        const response = await fetch('/admin/api/organizations?format=flat');
+        const result = await response.json();
+
+        if (result.success) {
+            const select = document.getElementById('orgParent');
+            if (!select) return;
+
+            select.innerHTML = '<option value="">없음 (최상위)</option>' +
+                result.data.map(org => `<option value="${org.id}">${escapeHtml(org.path || org.name)}</option>`).join('');
+        }
+    } catch (error) {
+        console.error('상위 조직 옵션 로드 실패:', error);
+    }
+}
+
+/**
+ * 트리 노드 토글
+ */
+function toggleTreeNode(el) {
+    const node = el.closest('.tree-node');
+    const children = node.querySelector('.tree-children');
+    const icon = el.querySelector('i');
+
+    if (children) {
+        children.classList.toggle('collapsed');
+        icon.classList.toggle('fa-chevron-right');
+        icon.classList.toggle('fa-chevron-down');
+    }
+}
+
+/**
+ * 전체 펼치기
+ */
+function expandAllTree() {
+    document.querySelectorAll('#orgTree .tree-children').forEach(el => {
+        el.classList.remove('collapsed');
+    });
+    document.querySelectorAll('#orgTree .tree-toggle i').forEach(el => {
+        el.classList.remove('fa-chevron-right');
+        el.classList.add('fa-chevron-down');
+    });
+}
+
+/**
+ * 전체 접기
+ */
+function collapseAllTree() {
+    document.querySelectorAll('#orgTree .tree-children').forEach(el => {
+        el.classList.add('collapsed');
+    });
+    document.querySelectorAll('#orgTree .tree-toggle i').forEach(el => {
+        el.classList.add('fa-chevron-right');
+        el.classList.remove('fa-chevron-down');
+    });
+}
+
+/**
+ * 조직 선택
+ */
+async function selectOrganization(orgId) {
+    selectedOrgId = orgId;
+
+    // 기존 선택 해제
+    document.querySelectorAll('.tree-node-content.selected').forEach(el => {
+        el.classList.remove('selected');
+    });
+
+    // 새로운 선택
+    const node = document.querySelector(`.tree-node[data-id="${orgId}"] > .tree-node-content`);
+    if (node) {
+        node.classList.add('selected');
+    }
+
+    // 상세 정보 로드
+    try {
+        const response = await fetch(`/admin/api/organizations/${orgId}`);
+        const result = await response.json();
+
+        if (result.success) {
+            renderOrgDetail(result.data);
+        }
+    } catch (error) {
+        console.error('조직 정보 로드 오류:', error);
+    }
+}
+
+/**
+ * 조직 상세 정보 렌더링
+ */
+function renderOrgDetail(org) {
+    const panel = document.getElementById('orgDetailPanel');
+    if (!panel) return;
+
+    const typeLabels = {
+        'company': '회사',
+        'division': '본부',
+        'department': '부서',
+        'team': '팀',
+        'unit': '파트'
+    };
+
+    panel.querySelector('.panel-body').innerHTML = `
+        <div class="org-detail">
+            <div class="detail-header">
+                <h4>${escapeHtml(org.name)}</h4>
+                <span class="org-type-badge ${org.org_type}">${typeLabels[org.org_type] || org.org_type}</span>
+            </div>
+
+            <div class="detail-info">
+                <div class="info-row">
+                    <span class="info-label">조직 코드</span>
+                    <span class="info-value">${org.code || '-'}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">조직 경로</span>
+                    <span class="info-value">${org.path || org.name}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">설명</span>
+                    <span class="info-value">${org.description || '-'}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">등록일</span>
+                    <span class="info-value">${org.created_at ? new Date(org.created_at).toLocaleDateString('ko-KR') : '-'}</span>
+                </div>
+            </div>
+
+            <div class="detail-actions">
+                <button class="btn btn-secondary" data-action="edit-org" data-org-id="${org.id}">
+                    <i class="fas fa-edit"></i> 수정
+                </button>
+                <button class="btn btn-secondary" data-action="add-child" data-parent-id="${org.id}">
+                    <i class="fas fa-plus"></i> 하위 조직 추가
+                </button>
+                <button class="btn btn-danger" data-action="delete-org" data-org-id="${org.id}" data-org-name="${escapeHtml(org.name)}">
+                    <i class="fas fa-trash"></i> 삭제
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * 조직 추가 모달 표시
+ */
+function showAddOrgModal() {
+    document.getElementById('orgModalTitle').textContent = '조직 추가';
+    document.getElementById('orgForm').reset();
+    document.getElementById('orgId').value = '';
+    document.getElementById('orgModal').classList.add('show');
+}
+
+/**
+ * 하위 조직 추가 모달
+ */
+function showAddChildModal(parentId) {
+    showAddOrgModal();
+    document.getElementById('orgParent').value = parentId;
+}
+
+/**
+ * 조직 수정 모달
+ */
+async function showEditOrgModal(orgId) {
+    try {
+        const response = await fetch(`/admin/api/organizations/${orgId}`);
+        const result = await response.json();
+
+        if (result.success) {
+            const org = result.data;
+            document.getElementById('orgModalTitle').textContent = '조직 수정';
+            document.getElementById('orgId').value = org.id;
+            document.getElementById('orgName').value = org.name;
+            document.getElementById('orgCode').value = org.code || '';
+            document.getElementById('orgType').value = org.org_type;
+            document.getElementById('orgParent').value = org.parent_id || '';
+            document.getElementById('orgDescription').value = org.description || '';
+            document.getElementById('orgModal').classList.add('show');
+        }
+    } catch (error) {
+        console.error('조직 정보 로드 오류:', error);
+    }
+}
+
+/**
+ * 조직 저장
+ */
+async function saveOrganization(event) {
+    event.preventDefault();
+
+    const orgId = document.getElementById('orgId').value;
+    const parentIdValue = document.getElementById('orgParent').value;
+    const data = {
+        name: document.getElementById('orgName').value,
+        code: document.getElementById('orgCode').value || null,
+        org_type: document.getElementById('orgType').value,
+        parent_id: parentIdValue ? parseInt(parentIdValue, 10) : null,
+        description: document.getElementById('orgDescription').value || null
+    };
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    try {
+        const url = orgId ? `/admin/api/organizations/${orgId}` : '/admin/api/organizations';
+        const method = orgId ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            closeOrgModal();
+            showToast(orgId ? '조직이 수정되었습니다' : '조직이 추가되었습니다', 'success');
+            // 데이터 새로고침
+            state.loadedTabs.delete('org-management');
+            await loadOrgManagementData();
+        } else {
+            showToast(result.error || '저장에 실패했습니다', 'error');
+        }
+    } catch (error) {
+        console.error('조직 저장 오류:', error);
+        showToast('저장 중 오류가 발생했습니다', 'error');
+    }
+}
+
+/**
+ * 조직 모달 닫기
+ */
+function closeOrgModal() {
+    document.getElementById('orgModal')?.classList.remove('show');
+}
+
+/**
+ * 삭제 모달 표시
+ */
+function showDeleteModal(orgId, orgName) {
+    deleteOrgId = orgId;
+    document.getElementById('deleteMessage').textContent = `'${orgName}' 조직을 삭제하시겠습니까?`;
+    document.getElementById('cascadeDelete').checked = false;
+    document.getElementById('deleteModal').classList.add('show');
+}
+
+/**
+ * 삭제 모달 닫기
+ */
+function closeDeleteModal() {
+    document.getElementById('deleteModal')?.classList.remove('show');
+    deleteOrgId = null;
+}
+
+/**
+ * 삭제 확인
+ */
+async function confirmDeleteOrg() {
+    if (!deleteOrgId) return;
+
+    const cascade = document.getElementById('cascadeDelete').checked;
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    try {
+        const response = await fetch(`/admin/api/organizations/${deleteOrgId}?cascade=${cascade}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            closeDeleteModal();
+            showToast('조직이 삭제되었습니다', 'success');
+            // 데이터 새로고침
+            state.loadedTabs.delete('org-management');
+            await loadOrgManagementData();
+        } else {
+            showToast(result.error || '삭제에 실패했습니다', 'error');
+        }
+    } catch (error) {
+        console.error('조직 삭제 오류:', error);
+        showToast('삭제 중 오류가 발생했습니다', 'error');
+    }
+}
+
+/**
+ * 조직 관리 이벤트 핸들러 초기화
+ */
+function initOrgManagementHandlers() {
+    const container = document.getElementById('tab-org-management');
+    if (!container || container.dataset.handlersInitialized) return;
+
+    container.addEventListener('click', function(e) {
+        const target = e.target.closest('[data-action]');
+        if (!target) return;
+
+        const action = target.dataset.action;
+
+        switch (action) {
+            case 'toggle-node':
+                e.stopPropagation();
+                toggleTreeNode(target);
+                break;
+            case 'select-org':
+                selectOrganization(parseInt(target.dataset.orgId));
+                break;
+            case 'add-org':
+                showAddOrgModal();
+                break;
+            case 'expand-all':
+                expandAllTree();
+                break;
+            case 'collapse-all':
+                collapseAllTree();
+                break;
+            case 'close-org-modal':
+                closeOrgModal();
+                break;
+            case 'close-delete-modal':
+                closeDeleteModal();
+                break;
+            case 'confirm-delete':
+                confirmDeleteOrg();
+                break;
+            case 'edit-org':
+                showEditOrgModal(parseInt(target.dataset.orgId));
+                break;
+            case 'add-child':
+                showAddChildModal(parseInt(target.dataset.parentId));
+                break;
+            case 'delete-org':
+                showDeleteModal(parseInt(target.dataset.orgId), target.dataset.orgName);
+                break;
+        }
+    });
+
+    // 폼 제출 이벤트
+    container.addEventListener('submit', function(e) {
+        const target = e.target.closest('[data-action="save-org"]');
+        if (target) {
+            e.preventDefault();
+            saveOrganization(e);
+        }
+    });
+
+    container.dataset.handlersInitialized = 'true';
+}
+
+// ========================================
+// 조직 구조 탭 (분류 옵션 관리)
+// ========================================
 async function loadOrganizationData() {
     const content = document.getElementById('organization-content');
 

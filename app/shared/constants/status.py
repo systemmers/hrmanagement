@@ -21,7 +21,7 @@ class ContractStatus:
     SSOT (Single Source of Truth) for contract status values.
     Phase 30: SSOT 통합 - DB 현실에 맞춤 (PENDING='requested')
 
-    DB에 저장되는 실제 값: 'requested', 'approved', 'rejected',
+    DB에 저장되는 실제 값: 'requested', 'approved', 'rejected', 'cancelled',
                          'terminated', 'termination_requested', 'expired'
     """
     # 기본 상태
@@ -29,17 +29,18 @@ class ContractStatus:
     PENDING = 'requested'      # 하위 호환 별칭 (REQUESTED와 동일)
     APPROVED = 'approved'      # 계약 승인/완료
     REJECTED = 'rejected'      # 계약 거절
+    CANCELLED = 'cancelled'    # 계약 요청 취소 (요청자가 직접 취소)
     TERMINATED = 'terminated'  # 계약 종료
     TERMINATION_REQUESTED = 'termination_requested'  # 계약 종료 요청 (양측 동의 대기)
     EXPIRED = 'expired'        # 계약 만료
 
     # 상태 그룹
     ACTIVE_STATUSES = [APPROVED, TERMINATION_REQUESTED]  # 종료 요청 중에도 계약은 유효
-    INACTIVE_STATUSES = [REJECTED, TERMINATED, EXPIRED]
-    ALL_STATUSES = [REQUESTED, APPROVED, REJECTED, TERMINATED, TERMINATION_REQUESTED, EXPIRED]
+    INACTIVE_STATUSES = [REJECTED, CANCELLED, TERMINATED, EXPIRED]
+    ALL_STATUSES = [REQUESTED, APPROVED, REJECTED, CANCELLED, TERMINATED, TERMINATION_REQUESTED, EXPIRED]
 
     # 재계약 가능 상태 (기존 계약이 이 상태일 때 새 계약 가능)
-    RECONTRACTABLE = [REJECTED, TERMINATED, EXPIRED]
+    RECONTRACTABLE = [REJECTED, CANCELLED, TERMINATED, EXPIRED]
 
     # 계약갱신 가능 상태
 
@@ -50,10 +51,11 @@ class ContractStatus:
     # 상태 전이 규칙 (Phase 30)
     # key: 현재 상태, value: 전이 가능한 상태 목록
     TRANSITIONS = {
-        'requested': ['approved', 'rejected'],
+        'requested': ['approved', 'rejected', 'cancelled'],  # 요청자가 직접 취소 가능
         'approved': ['termination_requested', 'terminated'],
         'termination_requested': ['approved', 'terminated'],  # 거절 시 approved 복귀
         'rejected': [],      # 최종 상태
+        'cancelled': [],     # 최종 상태 (요청 취소)
         'terminated': [],    # 최종 상태
         'expired': [],       # 최종 상태
     }

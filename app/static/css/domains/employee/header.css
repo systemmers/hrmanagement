@@ -154,7 +154,7 @@
 }
 
 .employee-header--personal .employee-photo {
-    border-color: var(--color-white-opacity-40, rgba(255, 255, 255, 0.4));
+    border-color: var(--color-white-opacity-40);
 }
 
 .employee-header--personal .employee-stats {

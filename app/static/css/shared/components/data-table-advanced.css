@@ -57,7 +57,7 @@
 .data-table-search input:focus {
     outline: none;
     border-color: var(--color-blue-600);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); /* --color-blue-600 with opacity */
+    box-shadow: 0 0 0 3px var(--color-blue-opacity-10);
 }
 
 .data-table-search i {

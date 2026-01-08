@@ -155,6 +155,9 @@ class ContractService:
     def reject_contract(self, contract_id: int, user_id: int, reason: str = None) -> ServiceResult[Dict]:
         return self._workflow.reject_contract(contract_id, user_id, reason)
 
+    def cancel_contract_request(self, contract_id: int, user_id: int, reason: str = None) -> ServiceResult[Dict]:
+        return self._workflow.cancel_contract_request(contract_id, user_id, reason)
+
     def terminate_contract(self, contract_id: int, user_id: int, reason: str = None) -> ServiceResult[Dict]:
         return self._workflow.terminate_contract(contract_id, user_id, reason)
 

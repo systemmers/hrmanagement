@@ -5,6 +5,7 @@
  * 포함 기능:
  * - approveContract: 계약 승인 API
  * - rejectContract: 계약 거절 API
+ * - cancelContractRequest: 계약 요청 취소 API (요청자만)
  * - terminateContract: 계약 종료 API
  * - checkBusinessNumber: 사업자등록번호 중복 확인 API
  */
@@ -72,6 +73,42 @@ export async function rejectContract(contractId, options = {}) {
         }
     } catch (error) {
         console.error('계약 거절 오류:', error);
+        showToast(error.message || '요청 처리 중 오류가 발생했습니다.', 'error');
+        return false;
+    }
+}
+
+/**
+ * 계약 요청 취소 (요청자만 가능)
+ * 법인이 요청한 경우 법인만, 개인이 요청한 경우 개인만 취소 가능
+ * @param {number|string} contractId - 계약 ID
+ * @param {Object} options - 옵션
+ * @param {string} options.confirmMessage - 확인 메시지
+ * @param {string} options.reasonPrompt - 사유 입력 프롬프트
+ * @param {string} options.successMessage - 성공 메시지
+ * @param {boolean} options.reload - 성공 후 페이지 새로고침 (기본: true)
+ * @returns {Promise<boolean>} 성공 여부
+ */
+export async function cancelContractRequest(contractId, options = {}) {
+    const confirmMsg = options.confirmMessage || '이 계약 요청을 취소하시겠습니까?';
+    if (!confirm(confirmMsg)) return false;
+
+    const reason = prompt(options.reasonPrompt || '취소 사유를 입력해주세요 (선택사항):');
+    if (reason === null) return false;
+
+    try {
+        const result = await post(`${API_BASE}/${contractId}/cancel`, { reason });
+
+        if (result.success) {
+            showToast(options.successMessage || '계약 요청이 취소되었습니다.', 'success');
+            if (options.reload !== false) location.reload();
+            return true;
+        } else {
+            showToast(result.message || '오류가 발생했습니다.', 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('계약 요청 취소 오류:', error);
         showToast(error.message || '요청 처리 중 오류가 발생했습니다.', 'error');
         return false;
     }
@@ -204,6 +241,7 @@ if (typeof window !== 'undefined') {
     window.HRContractAPI = {
         approveContract,
         rejectContract,
+        cancelContractRequest,
         terminateContract,
         approveTermination,
         rejectTermination,
@@ -213,6 +251,7 @@ if (typeof window !== 'undefined') {
     // 기존 전역 함수 호환성 유지
     window.approveContract = function(id) { return approveContract(id); };
     window.rejectContract = function(id) { return rejectContract(id); };
+    window.cancelContractRequest = function(id) { return cancelContractRequest(id); };
     window.terminateContract = function(id) { return terminateContract(id); };
     window.approveTermination = function(id) { return approveTermination(id); };
     window.rejectTermination = function(id) { return rejectTermination(id); };
@@ -236,6 +275,9 @@ if (typeof window !== 'undefined') {
                     break;
                 case 'reject-contract':
                     await rejectContract(contractId);
+                    break;
+                case 'cancel-contract-request':
+                    await cancelContractRequest(contractId);
                     break;
                 case 'terminate-contract':
                     await terminateContract(contractId);

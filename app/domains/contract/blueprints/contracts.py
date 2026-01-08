@@ -23,7 +23,8 @@ from app.shared.utils.decorators import (
 from app.shared.utils.contract_helpers import (
     get_contract_context,
     contract_party_required,
-    approve_reject_permission_required
+    approve_reject_permission_required,
+    cancel_permission_required
 )
 from app.shared.utils.api_helpers import api_success, api_error, api_not_found, api_forbidden
 
@@ -225,6 +226,24 @@ def api_reject_contract(contract, contract_id):
     reason = data.get('reason')
 
     result = contract_service.reject_contract(contract_id, user_id, reason)
+    if result:
+        return api_success(result.data)
+    return api_error(result.message)
+
+
+@contracts_bp.route('/api/<int:contract_id>/cancel', methods=['POST'])
+@login_required
+@cancel_permission_required
+def api_cancel_contract(contract, contract_id):
+    """계약 요청 취소 API (요청자만 가능)
+
+    법인이 요청한 경우 법인만, 개인이 요청한 경우 개인만 취소 가능
+    """
+    user_id = session.get(SessionKeys.USER_ID)
+    data = request.get_json() or {}
+    reason = data.get('reason')
+
+    result = contract_service.cancel_contract_request(contract_id, user_id, reason)
     if result:
         return api_success(result.data)
     return api_error(result.message)

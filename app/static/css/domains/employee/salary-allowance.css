@@ -131,7 +131,7 @@
 .allowance-amount-input:focus {
     outline: none;
     border-color: var(--color-blue-500);
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 2px var(--color-blue-opacity-10);
 }
 
 /* 통상임금 토글 셀 */

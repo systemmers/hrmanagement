@@ -91,6 +91,11 @@
     color: var(--color-error-600);
 }
 
+.status-badge.cancelled {
+    background: var(--color-gray-100);
+    color: var(--color-gray-600);
+}
+
 .status-badge.private,
 .status-badge.inactive {
     background: var(--color-gray-100);
@@ -124,6 +129,11 @@
 }
 
 .contract-status.expired {
+    background: var(--color-gray-100);
+    color: var(--color-gray-600);
+}
+
+.contract-status.cancelled {
     background: var(--color-gray-100);
     color: var(--color-gray-600);
 }

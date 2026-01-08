@@ -63,6 +63,15 @@ def api_get_organizations():
     return api_success(data)
 
 
+@admin_bp.route('/api/organizations/stats', methods=['GET'])
+@login_required
+def api_get_organization_stats():
+    """조직 통계 API (멀티테넌시 적용)"""
+    root_org_id = get_current_root_organization_id()
+    stats = organization_service.get_organization_statistics(root_organization_id=root_org_id)
+    return api_success(stats)
+
+
 @admin_bp.route('/api/organizations/<int:org_id>', methods=['GET'])
 @login_required
 def api_get_organization(org_id):

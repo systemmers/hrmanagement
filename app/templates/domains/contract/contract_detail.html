@@ -38,6 +38,7 @@
                 {% if contract.status == 'approved' %}계약완료
                 {% elif contract.status == 'requested' %}계약진행중
                 {% elif contract.status == 'rejected' %}거절됨
+                {% elif contract.status == 'cancelled' %}요청취소
                 {% elif contract.status == 'terminated' %}종료됨
                 {% elif contract.status == 'termination_requested' %}종료대기
                 {% elif contract.status == 'expired' %}만료됨
@@ -92,6 +93,12 @@
                     <span class="info-value">{{ contract.rejected_at[:10] }}</span>
                 </div>
                 {% endif %}
+                {% if contract.cancelled_at %}
+                <div class="info-group">
+                    <span class="info-label">취소일</span>
+                    <span class="info-value">{{ contract.cancelled_at[:10] }}</span>
+                </div>
+                {% endif %}
                 {% if contract.terminated_at %}
                 <div class="info-group">
                     <span class="info-label">종료일</span>
@@ -114,6 +121,13 @@
             </div>
             {% endif %}
 
+            {% if contract.cancellation_reason %}
+            <div class="reason-section cancellation">
+                <span class="info-label">취소 사유</span>
+                <p class="reason-content">{{ contract.cancellation_reason }}</p>
+            </div>
+            {% endif %}
+
             {% if contract.termination_reason %}
             <div class="reason-section termination">
                 <span class="info-label">종료 사유</span>
@@ -126,6 +140,7 @@
         {% if contract.status == 'requested' %}
         <div class="card-footer">
             {% if is_person and contract.requested_by == 'company' %}
+            {# 법인이 요청 -> 개인이 승인/거절 #}
             <button type="button" class="btn btn-success" data-action="approve-contract" data-contract-id="{{ contract.id }}">
                 <i class="fas fa-check"></i>
                 <span>승인</span>
@@ -133,8 +148,16 @@
             <button type="button" class="btn btn-danger" data-action="reject-contract" data-contract-id="{{ contract.id }}">
                 <i class="fas fa-times"></i>
                 <span>거절</span>
+            </button>
+            {% elif is_person and contract.requested_by == 'person' %}
+            {# 개인이 요청 -> 개인이 취소 #}
+            <p class="action-notice">계약 요청을 보냈습니다. 상대방의 승인을 기다리고 있습니다.</p>
+            <button type="button" class="btn btn-secondary" data-action="cancel-contract-request" data-contract-id="{{ contract.id }}">
+                <i class="fas fa-undo"></i>
+                <span>요청 취소</span>
             </button>
             {% elif is_company and contract.requested_by == 'person' %}
+            {# 개인이 요청 -> 법인이 승인/거절 #}
             <button type="button" class="btn btn-success" data-action="approve-contract" data-contract-id="{{ contract.id }}">
                 <i class="fas fa-check"></i>
                 <span>승인</span>
@@ -142,6 +165,13 @@
             <button type="button" class="btn btn-danger" data-action="reject-contract" data-contract-id="{{ contract.id }}">
                 <i class="fas fa-times"></i>
                 <span>거절</span>
+            </button>
+            {% elif is_company and contract.requested_by == 'company' %}
+            {# 법인이 요청 -> 법인이 취소 #}
+            <p class="action-notice">계약 요청을 보냈습니다. 상대방의 승인을 기다리고 있습니다.</p>
+            <button type="button" class="btn btn-secondary" data-action="cancel-contract-request" data-contract-id="{{ contract.id }}">
+                <i class="fas fa-undo"></i>
+                <span>요청 취소</span>
             </button>
             {% endif %}
         </div>

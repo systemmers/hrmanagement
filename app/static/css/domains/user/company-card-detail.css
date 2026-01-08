@@ -43,7 +43,7 @@
 .termination-notice-banner .notice-info {
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: 1px solid var(--color-black-opacity-10);
     font-size: 13px;
     color: var(--color-warning-700);
 }

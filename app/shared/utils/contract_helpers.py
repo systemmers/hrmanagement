@@ -86,6 +86,31 @@ class ContractContext:
                 return self.is_corporate and contract.company_id == self.company_id
         return False
 
+    def can_cancel_request(self, contract) -> bool:
+        """
+        계약 요청 취소 권한 확인 (요청자만 취소 가능)
+
+        Args:
+            contract: 계약 모델
+
+        Returns:
+            bool: 요청 취소 가능 여부
+        """
+        from app.shared.constants.status import ContractStatus
+
+        # 요청 대기 상태만 취소 가능
+        if contract.status != ContractStatus.REQUESTED:
+            return False
+
+        if hasattr(contract, 'requested_by'):
+            if contract.requested_by == 'company':
+                # 법인이 요청한 경우 -> 법인만 취소 가능
+                return self.is_corporate and contract.company_id == self.company_id
+            else:
+                # 개인이 요청한 경우 -> 개인만 취소 가능
+                return contract.person_user_id == self.user_id
+        return False
+
 
 def get_contract_context() -> ContractContext:
     """
@@ -142,6 +167,23 @@ def check_approve_reject_permission(contract) -> Optional[Tuple]:
     return None
 
 
+def check_cancel_permission(contract) -> Optional[Tuple]:
+    """
+    계약 요청 취소 권한 확인 (API용)
+
+    Args:
+        contract: 계약 모델
+
+    Returns:
+        None: 권한 있음
+        Tuple: (json_response, status_code) 권한 없을시 JSON 응답
+    """
+    ctx = get_contract_context()
+    if not ctx.can_cancel_request(contract):
+        return (jsonify({'success': False, 'message': '요청 취소 권한이 없습니다.'}), 403)
+    return None
+
+
 def contract_party_required(f):
     """
     계약 당사자 필수 데코레이터
@@ -191,6 +233,34 @@ def approve_reject_permission_required(f):
             return jsonify({'success': False, 'message': '계약을 찾을 수 없습니다.'}), 404
 
         permission_check = check_approve_reject_permission(contract)
+        if permission_check:
+            return permission_check
+
+        return f(contract, contract_id, *args, **kwargs)
+    return decorated_function
+
+
+def cancel_permission_required(f):
+    """
+    계약 요청 취소 권한 필수 데코레이터
+
+    contract_id를 URL 파라미터로 받는 함수에서 사용합니다.
+    계약 모델을 함수의 첫 번째 인자로 전달합니다.
+
+    사용 예:
+        @cancel_permission_required
+        def api_cancel_contract(contract, contract_id):
+            ...
+    """
+    @wraps(f)
+    def decorated_function(contract_id, *args, **kwargs):
+        from app.extensions import person_contract_repo
+
+        contract = person_contract_repo.find_by_id(contract_id)
+        if not contract:
+            return jsonify({'success': False, 'message': '계약을 찾을 수 없습니다.'}), 404
+
+        permission_check = check_cancel_permission(contract)
         if permission_check:
             return permission_check
 
