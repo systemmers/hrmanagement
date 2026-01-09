@@ -21,20 +21,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /**
  * 뷰 토글 초기화 (목록형/카드형)
- * - URL 파라미터 우선, localStorage 백업
+ * - URL 파라미터 우선 (서버 측 렌더링과 동기화)
+ * - URL 파라미터 없으면 localStorage 사용
+ * - 서버 측 렌더링 신뢰: URL 파라미터 있으면 DOM 조작 건너뜀
  */
 function initViewToggle() {
     const toggleButtons = document.querySelectorAll('.view-toggle-btn');
 
-    // URL 파라미터에서 뷰모드 확인 (우선순위 1)
+    // URL 파라미터에서 뷰모드 확인 (우선순위 1 - 서버 측과 동기화)
     const urlParams = new URLSearchParams(window.location.search);
     const urlView = urlParams.get('view');
 
-    // localStorage에서 저장된 선호도 확인 (우선순위 2)
-    const savedView = urlView || localStorage.getItem('employeeViewPreference') || 'list';
-
-    // 초기 뷰 설정
-    toggleEmployeeView(savedView, false);
+    // URL 파라미터가 있으면 서버 측 렌더링을 신뢰하고 localStorage만 동기화
+    if (urlView) {
+        localStorage.setItem('employeeViewPreference', urlView);
+        // 명함뷰인 경우 BusinessCard 초기화만 실행
+        if (urlView === 'namecard') {
+            initBusinessCards();
+        }
+    } else {
+        // URL 파라미터 없으면 localStorage 기반으로 뷰 전환
+        const savedView = localStorage.getItem('employeeViewPreference') || 'list';
+        // 기본값(list)이 아닌 경우에만 뷰 전환 (서버 기본값과 다를 때)
+        if (savedView !== 'list') {
+            toggleEmployeeView(savedView, true);  // URL도 업데이트
+        }
+    }
 
     toggleButtons.forEach(btn => {
         btn.addEventListener('click', () => {

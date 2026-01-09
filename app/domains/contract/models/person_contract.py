@@ -173,15 +173,36 @@ class PersonCorporateContract(db.Model):
 
         if include_relations:
             if self.person_user:
-                # Profile에서 실제 이름 조회
-                from app.domains.employee.models import Profile
-                profile = Profile.query.filter_by(user_id=self.person_user.id).first()
-                actual_name = profile.name if profile else self.person_user.username
+                # 계정 유형별 이름/전화번호 조회
+                # - 개인 계정 (personal): PersonalProfile (user_id로 연결)
+                # - 직원 계정 (employee_sub): Employee (User.employee_id로 연결)
+                from app.domains.user.models import PersonalProfile
+                from app.domains.employee.models import Employee
+
+                actual_name = None
+                phone = None
+
+                # 1. PersonalProfile (개인 계정) 조회
+                personal_profile = PersonalProfile.query.filter_by(user_id=self.person_user.id).first()
+                if personal_profile and personal_profile.name:
+                    actual_name = personal_profile.name
+                    phone = personal_profile.mobile_phone
+
+                # 2. Employee (직원 계정) 조회 - User.employee_id 사용
+                if not actual_name and self.person_user.employee_id:
+                    employee = Employee.query.get(self.person_user.employee_id)
+                    if employee and employee.name:
+                        actual_name = employee.name
+                        phone = employee.phone
+
+                # 3. fallback
+                if not actual_name:
+                    actual_name = '이름 없음'
 
                 data['person_name'] = actual_name
                 data['username'] = self.person_user.username
                 data['person_email'] = self.person_user.email
-                data['person_phone'] = profile.mobile_phone if profile else None
+                data['person_phone'] = phone
 
                 # 계정유형 레이블 (SSOT: User.get_account_type_label() 사용)
                 data['account_type_label'] = self.person_user.get_account_type_label()

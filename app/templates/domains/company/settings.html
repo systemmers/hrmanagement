@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/tabs.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/accordion.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/company/organization.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/company/audit.css') }}">
 {% endblock %}
 
 {% from "shared/macros/_accordion.html" import accordion_section, accordion_group %}
@@ -53,6 +54,10 @@
         <button class="tab-btn" data-tab="visibility" role="tab" aria-selected="false">
             <i class="fas fa-eye"></i>
             노출 설정
+        </button>
+        <button class="tab-btn" data-tab="audit" role="tab" aria-selected="false">
+            <i class="fas fa-shield-alt"></i>
+            감사 로그
         </button>
     </nav>
 
@@ -225,11 +230,17 @@
 
         <div id="tab-patterns" class="tab-panel" role="tabpanel">
             <div id="patterns-content">
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
-                        <i class="fas fa-id-badge"></i>
-                        사번 규칙
-                    </h2>
+                <div class="form-section form-section--card" data-section="employee_number">
+                    <div class="form-section-header">
+                        <h2 class="form-section-title">
+                            <i class="fas fa-id-badge"></i>
+                            사번 규칙
+                        </h2>
+                        <button type="button" class="btn btn-sm btn-primary section-save-btn" data-section="employee_number">
+                            <i class="fas fa-save"></i>
+                            <span>저장</span>
+                        </button>
+                    </div>
                     <div class="form-row form-row--settings">
                         <div class="form-group">
                             <label class="form-label">회사 코드</label>
@@ -279,11 +290,17 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
-                        <i class="fas fa-envelope"></i>
-                        이메일 설정
-                    </h2>
+                <div class="form-section form-section--card" data-section="email">
+                    <div class="form-section-header">
+                        <h2 class="form-section-title">
+                            <i class="fas fa-envelope"></i>
+                            이메일 설정
+                        </h2>
+                        <button type="button" class="btn btn-sm btn-primary section-save-btn" data-section="email">
+                            <i class="fas fa-save"></i>
+                            <span>저장</span>
+                        </button>
+                    </div>
                     <div class="form-row form-row--settings">
                         <div class="form-group">
                             <label class="form-label">회사 이메일 도메인</label>
@@ -321,11 +338,17 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
-                        <i class="fas fa-phone-alt"></i>
-                        내선번호 설정
-                    </h2>
+                <div class="form-section form-section--card" data-section="internal_phone">
+                    <div class="form-section-header">
+                        <h2 class="form-section-title">
+                            <i class="fas fa-phone-alt"></i>
+                            내선번호 설정
+                        </h2>
+                        <button type="button" class="btn btn-sm btn-primary section-save-btn" data-section="internal_phone">
+                            <i class="fas fa-save"></i>
+                            <span>저장</span>
+                        </button>
+                    </div>
                     <div class="form-row form-row--settings">
                         <div class="form-group">
                             <label class="form-label">내선번호 자릿수</label>
@@ -355,11 +378,17 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
-                        <i class="fas fa-won-sign"></i>
-                        급여 설정
-                    </h2>
+                <div class="form-section form-section--card" data-section="payroll">
+                    <div class="form-section-header">
+                        <h2 class="form-section-title">
+                            <i class="fas fa-won-sign"></i>
+                            급여 설정
+                        </h2>
+                        <button type="button" class="btn btn-sm btn-primary section-save-btn" data-section="payroll">
+                            <i class="fas fa-save"></i>
+                            <span>저장</span>
+                        </button>
+                    </div>
                     <div class="form-row form-row--settings">
                         <div class="form-group">
                             <label class="form-label">급여 지급일</label>
@@ -372,11 +401,17 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
-                        <i class="fas fa-network-wired"></i>
-                        IP 주소 관리
-                    </h2>
+                <div class="form-section form-section--card" data-section="ip">
+                    <div class="form-section-header">
+                        <h2 class="form-section-title">
+                            <i class="fas fa-network-wired"></i>
+                            IP 주소 관리
+                        </h2>
+                        <button type="button" class="btn btn-sm btn-primary section-save-btn" data-section="ip">
+                            <i class="fas fa-save"></i>
+                            <span>저장</span>
+                        </button>
+                    </div>
                     <div class="form-row form-row--settings">
                         <div class="form-group">
                             <label class="form-label">IP 자동 할당</label>
@@ -408,11 +443,17 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
-                        <i class="fas fa-laptop"></i>
-                        자산번호 설정
-                    </h2>
+                <div class="form-section form-section--card" data-section="asset_number">
+                    <div class="form-section-header">
+                        <h2 class="form-section-title">
+                            <i class="fas fa-laptop"></i>
+                            자산번호 설정
+                        </h2>
+                        <button type="button" class="btn btn-sm btn-primary section-save-btn" data-section="asset_number">
+                            <i class="fas fa-save"></i>
+                            <span>저장</span>
+                        </button>
+                    </div>
                     <div class="form-row form-row--settings">
                         <div class="form-group">
                             <label class="form-label">자산번호 접두어</label>
@@ -443,13 +484,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="tab-actions">
-                    <button type="button" class="btn btn-primary" id="save-patterns">
-                        <i class="fas fa-save"></i>
-                        <span>설정 저장</span>
-                    </button>
                 </div>
             </div>
         </div>
@@ -760,6 +794,11 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- 감사 로그 탭 -->
+        <div id="tab-audit" class="tab-panel" role="tabpanel">
+            {% include 'domains/company/partials/settings/_tab_audit.html' %}
         </div>
     </div>
 </div>

@@ -1,0 +1,179 @@
+{#
+    감사 로그 탭 - 법인설정 페이지
+    법인 관리자용 활동 로그 조회 및 모니터링
+#}
+
+<div id="audit-content" class="audit-tab-content">
+    <!-- 통계 카드 섹션 -->
+    <div class="audit-stats-grid" id="auditStatsGrid">
+        <div class="audit-stat-card">
+            <div class="audit-stat-card__header">
+                <div class="audit-stat-card__icon audit-stat-card__icon--blue">
+                    <i class="fas fa-list"></i>
+                </div>
+                <span class="audit-stat-card__title">전체 로그</span>
+            </div>
+            <div class="audit-stat-card__value" id="auditTotalLogs">-</div>
+            <div class="audit-stat-card__desc">최근 30일</div>
+        </div>
+
+        <div class="audit-stat-card">
+            <div class="audit-stat-card__header">
+                <div class="audit-stat-card__icon audit-stat-card__icon--green">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <span class="audit-stat-card__title">조회</span>
+            </div>
+            <div class="audit-stat-card__value" id="auditViewCount">-</div>
+            <div class="audit-stat-card__desc">열람 활동</div>
+        </div>
+
+        <div class="audit-stat-card">
+            <div class="audit-stat-card__header">
+                <div class="audit-stat-card__icon audit-stat-card__icon--yellow">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <span class="audit-stat-card__title">수정</span>
+            </div>
+            <div class="audit-stat-card__value" id="auditUpdateCount">-</div>
+            <div class="audit-stat-card__desc">데이터 변경</div>
+        </div>
+
+        <div class="audit-stat-card">
+            <div class="audit-stat-card__header">
+                <div class="audit-stat-card__icon audit-stat-card__icon--red">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <span class="audit-stat-card__title">접근 거부</span>
+            </div>
+            <div class="audit-stat-card__value" id="auditDeniedCount">-</div>
+            <div class="audit-stat-card__desc">보안 이벤트</div>
+        </div>
+    </div>
+
+    <!-- 필터 섹션 -->
+    <div class="audit-filter-section">
+        <div class="audit-filter-row">
+            <div class="audit-filter-group">
+                <label for="auditFilterAction">액션 유형</label>
+                <select id="auditFilterAction">
+                    <option value="">전체</option>
+                    <option value="view">조회</option>
+                    <option value="create">생성</option>
+                    <option value="update">수정</option>
+                    <option value="delete">삭제</option>
+                    <option value="export">내보내기</option>
+                    <option value="sync">동기화</option>
+                    <option value="login">로그인</option>
+                    <option value="logout">로그아웃</option>
+                    <option value="access_denied">접근 거부</option>
+                </select>
+            </div>
+
+            <div class="audit-filter-group">
+                <label for="auditFilterResource">리소스 유형</label>
+                <select id="auditFilterResource">
+                    <option value="">전체</option>
+                    <option value="employee">직원</option>
+                    <option value="contract">계약</option>
+                    <option value="personal_profile">개인 프로필</option>
+                    <option value="sync">동기화</option>
+                    <option value="user">사용자</option>
+                    <option value="organization">조직</option>
+                    <option value="company">법인</option>
+                </select>
+            </div>
+
+            <div class="audit-filter-group">
+                <label for="auditFilterStatus">상태</label>
+                <select id="auditFilterStatus">
+                    <option value="">전체</option>
+                    <option value="success">성공</option>
+                    <option value="failure">실패</option>
+                    <option value="denied">거부</option>
+                </select>
+            </div>
+
+            <div class="audit-filter-group audit-filter-group--date">
+                <label for="auditFilterStartDate">시작일</label>
+                <input type="date" id="auditFilterStartDate">
+            </div>
+
+            <div class="audit-filter-group audit-filter-group--date">
+                <label for="auditFilterEndDate">종료일</label>
+                <input type="date" id="auditFilterEndDate">
+            </div>
+
+            <div class="audit-filter-actions">
+                <button class="btn btn-secondary" data-action="audit-reset-filters">
+                    <i class="fas fa-undo"></i>
+                    초기화
+                </button>
+                <button class="btn btn-primary" data-action="audit-apply-filters">
+                    <i class="fas fa-search"></i>
+                    검색
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 로그 테이블 카드 -->
+    <div class="audit-log-card">
+        <div class="audit-log-card__header">
+            <span class="audit-log-card__title">
+                <i class="fas fa-history"></i>
+                활동 로그
+            </span>
+            <span class="audit-log-card__count" id="auditLogCount">0건</span>
+        </div>
+
+        <div class="audit-table-wrapper">
+            <table class="audit-log-table">
+                <thead>
+                    <tr>
+                        <th>시간</th>
+                        <th>사용자</th>
+                        <th>액션</th>
+                        <th>리소스</th>
+                        <th>상태</th>
+                        <th>IP 주소</th>
+                        <th>상세</th>
+                    </tr>
+                </thead>
+                <tbody id="auditLogTableBody">
+                    <tr>
+                        <td colspan="7" class="audit-log-table__loading">
+                            <i class="fas fa-spinner fa-spin"></i> 로딩 중...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="audit-pagination" id="auditPagination">
+        </div>
+    </div>
+</div>
+
+<!-- 로그 상세 모달 -->
+<div class="modal" id="auditDetailModal">
+    <div class="modal-backdrop" data-action="close-audit-modal"></div>
+    <div class="modal-container modal-md">
+        <div class="modal-header">
+            <h3 class="modal-title">
+                <i class="fas fa-info-circle"></i>
+                로그 상세 정보
+            </h3>
+            <button class="modal-close" data-action="close-audit-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="audit-detail-content" id="auditDetailContent">
+                <!-- 동적으로 로드됨 -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-action="close-audit-modal">닫기</button>
+        </div>
+    </div>
+</div>
