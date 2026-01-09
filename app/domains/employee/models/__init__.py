@@ -4,7 +4,7 @@ Employee 도메인 모델 패키지
 
 직원 관련 모든 SQLAlchemy 모델을 정의하고 export합니다.
 """
-from .mixins import DictSerializableMixin, TimestampMixin, SoftDeleteMixin
+from app.shared.models.mixins import DictSerializableMixin, TimestampMixin, SoftDeleteMixin
 from .employee import Employee
 from .profile import Profile
 from .education import Education

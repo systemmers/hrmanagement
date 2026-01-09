@@ -10,7 +10,7 @@ Phase 29: __dict_camel_mapping__ 제거
 """
 from datetime import datetime
 from app.database import db
-from app.domains.employee.models import DictSerializableMixin
+from app.shared.models.mixins import DictSerializableMixin
 
 
 class AuditLog(DictSerializableMixin, db.Model):

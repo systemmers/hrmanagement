@@ -8,7 +8,7 @@ Phase 8 리팩토링: DictSerializableMixin 적용
 - 선언적 alias 정의
 """
 from app.database import db
-from .mixins import DictSerializableMixin
+from app.shared.models.mixins import DictSerializableMixin
 
 
 class Education(DictSerializableMixin, db.Model):

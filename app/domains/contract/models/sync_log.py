@@ -10,7 +10,7 @@ Phase 2 Migration: app/domains/contract/models/로 이동
 """
 from datetime import datetime
 from app.database import db
-from app.domains.employee.models import DictSerializableMixin
+from app.shared.models.mixins import DictSerializableMixin
 
 
 class SyncLog(DictSerializableMixin, db.Model):

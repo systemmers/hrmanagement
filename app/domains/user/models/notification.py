@@ -12,7 +12,7 @@ Phase 2 Migration: 도메인으로 이동
 """
 from datetime import datetime
 from app.database import db
-from app.domains.employee.models import DictSerializableMixin
+from app.shared.models.mixins import DictSerializableMixin
 
 
 class Notification(DictSerializableMixin, db.Model):

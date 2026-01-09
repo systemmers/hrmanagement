@@ -6,7 +6,7 @@ Language SQLAlchemy 모델
 Phase 8 리팩토링: DictSerializableMixin 적용
 """
 from app.database import db
-from .mixins import DictSerializableMixin
+from app.shared.models.mixins import DictSerializableMixin
 
 
 class Language(DictSerializableMixin, db.Model):
