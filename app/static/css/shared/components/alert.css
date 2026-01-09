@@ -94,22 +94,31 @@
     animation: slideIn 0.3s ease-out;
 }
 
-.flash-message.success {
+/* Flash Message Variants
+ * @deprecated 다중 클래스 패턴 (.flash-message.success)
+ * 표준 패턴: .flash-message-success (하이픈 수정자) 권장
+ * Toast 시스템으로 대체 예정 (toast.js 참조)
+ */
+.flash-message.success,
+.flash-message-success {
     background-color: var(--color-success-100);
     color: var(--color-success-700);
 }
 
-.flash-message.error {
+.flash-message.error,
+.flash-message-error {
     background-color: var(--color-error-100);
     color: var(--color-error-700);
 }
 
-.flash-message.warning {
+.flash-message.warning,
+.flash-message-warning {
     background-color: var(--color-warning-100);
     color: var(--color-warning-700);
 }
 
-.flash-message.info {
+.flash-message.info,
+.flash-message-info {
     background-color: var(--color-blue-100);
     color: var(--color-blue-700);
 }
@@ -160,22 +169,31 @@
     animation: toastIn 0.3s ease-out;
 }
 
-.toast.success {
+/* Toast Variants
+ * @deprecated 다중 클래스 패턴 (.toast.success)
+ * 표준 패턴: .toast-success (하이픈 수정자) 권장
+ * 향후 하이픈 패턴으로 통일 예정 (2026-12)
+ */
+.toast.success,
+.toast-success {
     background-color: var(--color-success-700);
     color: var(--color-pure-white);
 }
 
-.toast.error {
+.toast.error,
+.toast-error {
     background-color: var(--color-error-700);
     color: var(--color-pure-white);
 }
 
-.toast.warning {
+.toast.warning,
+.toast-warning {
     background-color: var(--color-warning-700);
     color: var(--color-pure-white);
 }
 
-.toast.info {
+.toast.info,
+.toast-info {
     background-color: var(--color-blue-700);
     color: var(--color-pure-white);
 }

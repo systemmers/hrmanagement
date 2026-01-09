@@ -1,0 +1,214 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('tabs', '탭', '탭 네비게이션 및 컨텐츠 전환 컴포넌트') %}
+
+    {% call subsection('기본 탭') %}
+    {% call demo() %}
+    <div class="tabs-container">
+        <div class="tabs-nav">
+            <button class="tab-btn active">기본 정보</button>
+            <button class="tab-btn">상세 정보</button>
+            <button class="tab-btn">설정</button>
+        </div>
+        <div class="tabs-content">
+            <div class="tab-panel active">
+                <p>기본 정보 탭 내용입니다.</p>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="tabs-container"&gt;
+    &lt;div class="tabs-nav"&gt;
+        &lt;button class="tab-btn active"&gt;기본 정보&lt;/button&gt;
+        &lt;button class="tab-btn"&gt;상세 정보&lt;/button&gt;
+        &lt;button class="tab-btn"&gt;설정&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class="tabs-content"&gt;
+        &lt;div class="tab-panel active"&gt;
+            &lt;p&gt;탭 내용&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('아이콘 포함 탭') %}
+    {% call demo() %}
+    <div class="tabs-container">
+        <div class="tabs-nav">
+            <button class="tab-btn active">
+                <i class="fas fa-user"></i> 프로필
+            </button>
+            <button class="tab-btn">
+                <i class="fas fa-cog"></i> 설정
+            </button>
+            <button class="tab-btn">
+                <i class="fas fa-bell"></i> 알림
+            </button>
+            <button class="tab-btn">
+                <i class="fas fa-shield-alt"></i> 보안
+            </button>
+        </div>
+        <div class="tabs-content">
+            <div class="tab-panel active">
+                <p>프로필 탭 내용입니다.</p>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;button class="tab-btn active"&gt;
+    &lt;i class="fas fa-user"&gt;&lt;/i&gt; 프로필
+&lt;/button&gt;
+&lt;button class="tab-btn"&gt;
+    &lt;i class="fas fa-cog"&gt;&lt;/i&gt; 설정
+&lt;/button&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('탭 패널 전환') %}
+    {% call demo() %}
+    <div class="tabs-container">
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="panel1">탭 1</button>
+            <button class="tab-btn" data-tab="panel2">탭 2</button>
+            <button class="tab-btn" data-tab="panel3">탭 3</button>
+        </div>
+        <div class="tabs-content">
+            <div class="tab-panel active" id="panel1">
+                <div class="card">
+                    <div class="card-body">
+                        <h4>탭 1 내용</h4>
+                        <p>첫 번째 탭 패널의 내용입니다.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-panel" id="panel2">
+                <div class="card">
+                    <div class="card-body">
+                        <h4>탭 2 내용</h4>
+                        <p>두 번째 탭 패널의 내용입니다.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-panel" id="panel3">
+                <div class="card">
+                    <div class="card-body">
+                        <h4>탭 3 내용</h4>
+                        <p>세 번째 탭 패널의 내용입니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="tabs-container"&gt;
+    &lt;div class="tabs-nav"&gt;
+        &lt;button class="tab-btn active" data-tab="panel1"&gt;탭 1&lt;/button&gt;
+        &lt;button class="tab-btn" data-tab="panel2"&gt;탭 2&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class="tabs-content"&gt;
+        &lt;div class="tab-panel active" id="panel1"&gt;
+            &lt;!-- 탭 1 내용 --&gt;
+        &lt;/div&gt;
+        &lt;div class="tab-panel" id="panel2"&gt;
+            &lt;!-- 탭 2 내용 (숨김) --&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('로딩 상태') %}
+    {% call demo() %}
+    <div class="tabs-container">
+        <div class="tabs-nav">
+            <button class="tab-btn active">데이터</button>
+            <button class="tab-btn">분석</button>
+        </div>
+        <div class="tabs-content">
+            <div class="tab-panel active">
+                <div class="tab-loading">
+                    <div class="tab-loading-spinner"></div>
+                    <p>데이터를 불러오는 중...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="tab-panel active"&gt;
+    &lt;div class="tab-loading"&gt;
+        &lt;div class="tab-loading-spinner"&gt;&lt;/div&gt;
+        &lt;p&gt;데이터를 불러오는 중...&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('탭 액션 영역') %}
+    {% call demo() %}
+    <div class="tabs-container">
+        <div class="tabs-nav">
+            <button class="tab-btn active">설정</button>
+            <button class="tab-btn">고급</button>
+        </div>
+        <div class="tabs-content">
+            <div class="tab-panel active">
+                <p>설정 내용...</p>
+                <div class="tab-actions">
+                    <button class="btn btn-outline">취소</button>
+                    <button class="btn btn-primary">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="tab-panel active"&gt;
+    &lt;!-- 탭 내용 --&gt;
+    &lt;div class="tab-actions"&gt;
+        &lt;button class="btn btn-outline"&gt;취소&lt;/button&gt;
+        &lt;button class="btn btn-primary"&gt;저장&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('스크롤 가능한 탭 (많은 탭)') %}
+    {% call demo() %}
+    <div class="tabs-container">
+        <div class="tabs-nav">
+            <button class="tab-btn active">기본정보</button>
+            <button class="tab-btn">연락처</button>
+            <button class="tab-btn">학력</button>
+            <button class="tab-btn">경력</button>
+            <button class="tab-btn">자격증</button>
+            <button class="tab-btn">어학</button>
+            <button class="tab-btn">가족</button>
+            <button class="tab-btn">급여</button>
+        </div>
+        <div class="tabs-content">
+            <div class="tab-panel active">
+                <p>기본정보 탭 내용입니다. (좌우 스크롤 가능)</p>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- tabs-nav는 overflow-x: auto로 스크롤 지원 --&gt;
+&lt;div class="tabs-nav"&gt;
+    &lt;button class="tab-btn active"&gt;기본정보&lt;/button&gt;
+    &lt;button class="tab-btn"&gt;연락처&lt;/button&gt;
+    &lt;!-- 많은 탭... --&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

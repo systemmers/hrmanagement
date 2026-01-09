@@ -1,0 +1,164 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('empty-state', '빈 상태', '데이터가 없을 때 표시하는 빈 상태 컴포넌트') %}
+
+    {% call subsection('기본 빈 상태') %}
+    {% call demo() %}
+    <div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <h3>데이터가 없습니다</h3>
+        <p>아직 등록된 항목이 없습니다.</p>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="empty-state"&gt;
+    &lt;i class="fas fa-inbox"&gt;&lt;/i&gt;
+    &lt;h3&gt;데이터가 없습니다&lt;/h3&gt;
+    &lt;p&gt;아직 등록된 항목이 없습니다.&lt;/p&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('액션 버튼 포함') %}
+    {% call demo() %}
+    <div class="empty-state">
+        <i class="fas fa-users"></i>
+        <h3>등록된 직원이 없습니다</h3>
+        <p>새로운 직원을 등록하여 시작하세요.</p>
+        <button class="btn btn-primary">
+            <i class="fas fa-plus"></i> 직원 등록
+        </button>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="empty-state"&gt;
+    &lt;i class="fas fa-users"&gt;&lt;/i&gt;
+    &lt;h3&gt;등록된 직원이 없습니다&lt;/h3&gt;
+    &lt;p&gt;새로운 직원을 등록하여 시작하세요.&lt;/p&gt;
+    &lt;button class="btn btn-primary"&gt;
+        &lt;i class="fas fa-plus"&gt;&lt;/i&gt; 직원 등록
+    &lt;/button&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('검색 결과 없음') %}
+    {% call demo() %}
+    <div class="empty-state">
+        <i class="fas fa-search"></i>
+        <h3>검색 결과가 없습니다</h3>
+        <p>다른 검색어로 다시 시도해 보세요.</p>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="empty-state"&gt;
+    &lt;i class="fas fa-search"&gt;&lt;/i&gt;
+    &lt;h3&gt;검색 결과가 없습니다&lt;/h3&gt;
+    &lt;p&gt;다른 검색어로 다시 시도해 보세요.&lt;/p&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('다양한 아이콘') %}
+    {% call demo() %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
+        <div class="empty-state">
+            <i class="fas fa-file-alt"></i>
+            <h3>문서 없음</h3>
+            <p>등록된 문서가 없습니다.</p>
+        </div>
+        <div class="empty-state">
+            <i class="fas fa-bell-slash"></i>
+            <h3>알림 없음</h3>
+            <p>새로운 알림이 없습니다.</p>
+        </div>
+        <div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <h3>폴더 비어있음</h3>
+            <p>폴더에 파일이 없습니다.</p>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="empty-state"&gt;
+    &lt;i class="fas fa-file-alt"&gt;&lt;/i&gt;
+    &lt;h3&gt;문서 없음&lt;/h3&gt;
+    &lt;p&gt;등록된 문서가 없습니다.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class="empty-state"&gt;
+    &lt;i class="fas fa-bell-slash"&gt;&lt;/i&gt;
+    &lt;h3&gt;알림 없음&lt;/h3&gt;
+    &lt;p&gt;새로운 알림이 없습니다.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class="empty-state"&gt;
+    &lt;i class="fas fa-folder-open"&gt;&lt;/i&gt;
+    &lt;h3&gt;폴더 비어있음&lt;/h3&gt;
+    &lt;p&gt;폴더에 파일이 없습니다.&lt;/p&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('인라인 빈 상태') %}
+    {% call demo() %}
+    <div class="card">
+        <div class="card-body">
+            <div class="empty-state-inline">
+                표시할 데이터가 없습니다.
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="empty-state-inline"&gt;
+    표시할 데이터가 없습니다.
+&lt;/div&gt;
+
+&lt;!-- 또는 --&gt;
+&lt;div class="empty-cell"&gt;
+    표시할 데이터가 없습니다.
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('테이블 빈 행') %}
+    {% call demo() %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>이름</th>
+                <th>부서</th>
+                <th>직급</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="empty-row">
+                <td colspan="3">등록된 데이터가 없습니다.</td>
+            </tr>
+        </tbody>
+    </table>
+    {% endcall %}
+    {% call code() %}
+&lt;table class="table"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;이름&lt;/th&gt;
+            &lt;th&gt;부서&lt;/th&gt;
+            &lt;th&gt;직급&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr class="empty-row"&gt;
+            &lt;td colspan="3"&gt;등록된 데이터가 없습니다.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

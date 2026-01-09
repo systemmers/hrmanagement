@@ -1,0 +1,245 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('info-grid', '정보 그리드', '정보 항목을 그리드로 표시하는 컴포넌트') %}
+
+    {% call subsection('기본 정보 그리드 (2열)') %}
+    {% call demo() %}
+    <div class="info-grid">
+        <div class="info-item">
+            <span class="info-label">이름</span>
+            <span class="info-value">홍길동</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">부서</span>
+            <span class="info-value">개발팀</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">직급</span>
+            <span class="info-value">과장</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">입사일</span>
+            <span class="info-value">2020-03-15</span>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="info-grid"&gt;
+    &lt;div class="info-item"&gt;
+        &lt;span class="info-label"&gt;이름&lt;/span&gt;
+        &lt;span class="info-value"&gt;홍길동&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="info-item"&gt;
+        &lt;span class="info-label"&gt;부서&lt;/span&gt;
+        &lt;span class="info-value"&gt;개발팀&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="info-item"&gt;
+        &lt;span class="info-label"&gt;직급&lt;/span&gt;
+        &lt;span class="info-value"&gt;과장&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="info-item"&gt;
+        &lt;span class="info-label"&gt;입사일&lt;/span&gt;
+        &lt;span class="info-value"&gt;2020-03-15&lt;/span&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('자동 맞춤 그리드 (Auto-fit)') %}
+    {% call demo() %}
+    <div class="info-grid--auto">
+        <div class="info-group">
+            <span class="info-label">회사명</span>
+            <span class="info-value">테스트 기업</span>
+        </div>
+        <div class="info-group">
+            <span class="info-label">사업자번호</span>
+            <span class="info-value">123-45-67890</span>
+        </div>
+        <div class="info-group">
+            <span class="info-label">대표자</span>
+            <span class="info-value">김대표</span>
+        </div>
+        <div class="info-group">
+            <span class="info-label">설립일</span>
+            <span class="info-value">2010-01-01</span>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="info-grid--auto"&gt;
+    &lt;div class="info-group"&gt;
+        &lt;span class="info-label"&gt;회사명&lt;/span&gt;
+        &lt;span class="info-value"&gt;테스트 기업&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="info-group"&gt;
+        &lt;span class="info-label"&gt;사업자번호&lt;/span&gt;
+        &lt;span class="info-value"&gt;123-45-67890&lt;/span&gt;
+    &lt;/div&gt;
+    ...
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('계약 정보 그리드') %}
+    {% call demo() %}
+    <div class="contract-info-grid">
+        <div class="info-item">
+            <span class="info-label">계약 상태</span>
+            <span class="info-value">
+                <span class="badge badge-success">승인됨</span>
+            </span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">계약 기간</span>
+            <span class="info-value">2024-01-01 ~ 2024-12-31</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">계약 유형</span>
+            <span class="info-value">정규직</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">담당자</span>
+            <span class="info-value">박담당</span>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="contract-info-grid"&gt;
+    &lt;div class="info-item"&gt;
+        &lt;span class="info-label"&gt;계약 상태&lt;/span&gt;
+        &lt;span class="info-value"&gt;
+            &lt;span class="badge badge-success"&gt;승인됨&lt;/span&gt;
+        &lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="info-item"&gt;
+        &lt;span class="info-label"&gt;계약 기간&lt;/span&gt;
+        &lt;span class="info-value"&gt;2024-01-01 ~ 2024-12-31&lt;/span&gt;
+    &lt;/div&gt;
+    ...
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('전체 너비 아이템') %}
+    {% call demo() %}
+    <div class="info-grid">
+        <div class="info-item">
+            <span class="info-label">이름</span>
+            <span class="info-value">홍길동</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">이메일</span>
+            <span class="info-value">hong@example.com</span>
+        </div>
+        <div class="info-group info-group--full">
+            <span class="info-label">주소</span>
+            <span class="info-value">서울특별시 강남구 테헤란로 123 테스트빌딩 10층</span>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="info-grid"&gt;
+    &lt;div class="info-item"&gt;
+        &lt;span class="info-label"&gt;이름&lt;/span&gt;
+        &lt;span class="info-value"&gt;홍길동&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="info-item"&gt;
+        &lt;span class="info-label"&gt;이메일&lt;/span&gt;
+        &lt;span class="info-value"&gt;hong@example.com&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="info-group info-group--full"&gt;
+        &lt;span class="info-label"&gt;주소&lt;/span&gt;
+        &lt;span class="info-value"&gt;서울특별시 강남구 테헤란로 123 테스트빌딩 10층&lt;/span&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('값 변형 (Highlight / Empty)') %}
+    {% call demo() %}
+    <div class="info-grid">
+        <div class="info-item">
+            <span class="info-label">연봉</span>
+            <span class="info-value info-value--highlight">50,000,000원</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">보너스</span>
+            <span class="info-value info-value--highlight">5,000,000원</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">비고</span>
+            <span class="info-value info-value--empty">미입력</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">메모</span>
+            <span class="info-value info-value--empty">-</span>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- 강조 값 --&gt;
+&lt;div class="info-item"&gt;
+    &lt;span class="info-label"&gt;연봉&lt;/span&gt;
+    &lt;span class="info-value info-value--highlight"&gt;50,000,000원&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;!-- 빈 값 --&gt;
+&lt;div class="info-item"&gt;
+    &lt;span class="info-label"&gt;비고&lt;/span&gt;
+    &lt;span class="info-value info-value--empty"&gt;미입력&lt;/span&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('카드 내 정보 그리드') %}
+    {% call demo() %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">기본 정보</h3>
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">사원번호</span>
+                    <span class="info-value">EMP-001</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">이름</span>
+                    <span class="info-value">홍길동</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">부서</span>
+                    <span class="info-value">개발팀</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">직급</span>
+                    <span class="info-value">과장</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="card"&gt;
+    &lt;div class="card-header"&gt;
+        &lt;h3 class="card-title"&gt;기본 정보&lt;/h3&gt;
+    &lt;/div&gt;
+    &lt;div class="card-body"&gt;
+        &lt;div class="info-grid"&gt;
+            &lt;div class="info-item"&gt;
+                &lt;span class="info-label"&gt;사원번호&lt;/span&gt;
+                &lt;span class="info-value"&gt;EMP-001&lt;/span&gt;
+            &lt;/div&gt;
+            ...
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

@@ -193,9 +193,17 @@ select.form-input:disabled {
    프로필 사진 업로드 섹션
    → 중앙화됨: components/image-upload.css
    레거시 클래스 호환성을 위한 최소한의 정의만 유지
+
+   @deprecated 레거시 클래스 목록 (2026-12 이후 제거 예정):
+   - .photo-upload-controls → .image-upload-controls 사용
+   - .photo-file-upload → .image-upload-section 사용
+   - .photo-upload-buttons → .image-upload-controls__buttons 사용
+   - .photo-upload-disabled → .image-upload-disabled 사용
+
+   새 코드는 image-upload.css의 클래스 사용 권장
    ======================================== */
 
-/* 레거시 호환: photo-upload-controls (폼 내 사진 컨트롤 영역) */
+/* @deprecated 레거시 호환: photo-upload-controls (폼 내 사진 컨트롤 영역) */
 .photo-upload-controls {
     flex: 1;
     display: flex;
@@ -203,18 +211,21 @@ select.form-input:disabled {
     gap: var(--space-2);
 }
 
+/* @deprecated */
 .photo-file-upload {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
 }
 
+/* @deprecated */
 .photo-upload-buttons {
     display: flex;
     gap: var(--space-2);
     flex-wrap: wrap;
 }
 
+/* @deprecated */
 .photo-upload-disabled {
     padding: var(--space-4);
     background-color: var(--color-gray-50);

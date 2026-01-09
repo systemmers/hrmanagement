@@ -1,0 +1,199 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('tree-selector', '트리 선택', '조직 트리 선택 모달 컴포넌트') %}
+
+    {% call subsection('조직 선택 입력 필드') %}
+    {% call demo() %}
+    <div style="max-width: 300px;">
+        <input type="text" class="form-input org-selector-input" placeholder="조직 선택" value="개발팀" readonly>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;input type="text"
+       class="form-input org-selector-input"
+       placeholder="조직 선택"
+       value="개발팀"
+       readonly&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('비활성화 상태') %}
+    {% call demo() %}
+    <div style="max-width: 300px;">
+        <input type="text" class="form-input org-selector-input" placeholder="조직 선택" value="미지정" disabled>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;input type="text"
+       class="form-input org-selector-input"
+       placeholder="조직 선택"
+       disabled&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('트리 모달 (펼침 상태)') %}
+    {% call demo() %}
+    <div style="position: relative; height: 450px;">
+        <div class="tree-selector-content" style="position: relative; display: flex;">
+            <div class="tree-selector-header">
+                <h3>조직 선택</h3>
+                <button class="tree-selector-close">&times;</button>
+            </div>
+            <div class="tree-selector-search">
+                <input type="text" class="tree-selector-search-input" placeholder="조직명 검색...">
+            </div>
+            <div class="tree-selector-body">
+                <div class="tree-selector-tree">
+                    <ul class="tree-list">
+                        <li class="tree-item" data-type="company">
+                            <div class="tree-item-content">
+                                <div class="tree-toggle expanded"><i class="fas fa-chevron-right"></i></div>
+                                <div class="tree-icon"><i class="fas fa-building"></i></div>
+                                <span class="tree-label">테스트 기업</span>
+                                <span class="tree-code">CORP</span>
+                            </div>
+                            <ul class="tree-list">
+                                <li class="tree-item" data-type="division">
+                                    <div class="tree-item-content">
+                                        <div class="tree-toggle expanded"><i class="fas fa-chevron-right"></i></div>
+                                        <div class="tree-icon"><i class="fas fa-layer-group"></i></div>
+                                        <span class="tree-label">경영지원본부</span>
+                                        <span class="tree-code">DIV01</span>
+                                    </div>
+                                    <ul class="tree-list">
+                                        <li class="tree-item" data-type="department">
+                                            <div class="tree-item-content selected">
+                                                <div class="tree-toggle-placeholder"></div>
+                                                <div class="tree-icon"><i class="fas fa-users"></i></div>
+                                                <span class="tree-label">인사팀</span>
+                                                <span class="tree-code">HR</span>
+                                            </div>
+                                        </li>
+                                        <li class="tree-item" data-type="department">
+                                            <div class="tree-item-content">
+                                                <div class="tree-toggle-placeholder"></div>
+                                                <div class="tree-icon"><i class="fas fa-users"></i></div>
+                                                <span class="tree-label">재무팀</span>
+                                                <span class="tree-code">FIN</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="tree-item" data-type="division">
+                                    <div class="tree-item-content">
+                                        <div class="tree-toggle"><i class="fas fa-chevron-right"></i></div>
+                                        <div class="tree-icon"><i class="fas fa-layer-group"></i></div>
+                                        <span class="tree-label">개발본부</span>
+                                        <span class="tree-code">DIV02</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tree-selector-footer">
+                <button class="btn btn-outline">취소</button>
+                <button class="btn btn-primary">선택</button>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="tree-selector-modal show"&gt;
+    &lt;div class="tree-selector-content"&gt;
+        &lt;div class="tree-selector-header"&gt;
+            &lt;h3&gt;조직 선택&lt;/h3&gt;
+            &lt;button class="tree-selector-close"&gt;&amp;times;&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;div class="tree-selector-search"&gt;
+            &lt;input type="text" class="tree-selector-search-input"&gt;
+        &lt;/div&gt;
+        &lt;div class="tree-selector-body"&gt;
+            &lt;div class="tree-selector-tree"&gt;
+                &lt;ul class="tree-list"&gt;
+                    &lt;li class="tree-item" data-type="company"&gt;
+                        &lt;div class="tree-item-content"&gt;
+                            &lt;div class="tree-toggle expanded"&gt;...&lt;/div&gt;
+                            &lt;div class="tree-icon"&gt;...&lt;/div&gt;
+                            &lt;span class="tree-label"&gt;회사명&lt;/span&gt;
+                            &lt;span class="tree-code"&gt;CODE&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;ul class="tree-list"&gt;...&lt;/ul&gt;
+                    &lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="tree-selector-footer"&gt;
+            &lt;button class="btn btn-outline"&gt;취소&lt;/button&gt;
+            &lt;button class="btn btn-primary"&gt;선택&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('트리 아이템 유형') %}
+    {% call demo() %}
+    <div style="max-width: 300px; padding: var(--space-3); border: 1px solid var(--color-gray-200); border-radius: var(--radius-md);">
+        <ul class="tree-list">
+            <li class="tree-item" data-type="company">
+                <div class="tree-item-content">
+                    <div class="tree-toggle-placeholder"></div>
+                    <div class="tree-icon"><i class="fas fa-building"></i></div>
+                    <span class="tree-label">회사 (Company)</span>
+                </div>
+            </li>
+            <li class="tree-item" data-type="division">
+                <div class="tree-item-content">
+                    <div class="tree-toggle-placeholder"></div>
+                    <div class="tree-icon"><i class="fas fa-layer-group"></i></div>
+                    <span class="tree-label">본부 (Division)</span>
+                </div>
+            </li>
+            <li class="tree-item" data-type="department">
+                <div class="tree-item-content">
+                    <div class="tree-toggle-placeholder"></div>
+                    <div class="tree-icon"><i class="fas fa-users"></i></div>
+                    <span class="tree-label">부서 (Department)</span>
+                </div>
+            </li>
+            <li class="tree-item" data-type="team">
+                <div class="tree-item-content">
+                    <div class="tree-toggle-placeholder"></div>
+                    <div class="tree-icon"><i class="fas fa-user-friends"></i></div>
+                    <span class="tree-label">팀 (Team)</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- data-type으로 아이콘 색상 구분 --&gt;
+&lt;li class="tree-item" data-type="company"&gt;...&lt;/li&gt;    &lt;!-- Primary --&gt;
+&lt;li class="tree-item" data-type="division"&gt;...&lt;/li&gt;   &lt;!-- Blue --&gt;
+&lt;li class="tree-item" data-type="department"&gt;...&lt;/li&gt; &lt;!-- Green --&gt;
+&lt;li class="tree-item" data-type="team"&gt;...&lt;/li&gt;       &lt;!-- Yellow --&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('빈 상태') %}
+    {% call demo() %}
+    <div style="max-width: 300px; padding: var(--space-3); border: 1px solid var(--color-gray-200); border-radius: var(--radius-md);">
+        <div class="tree-empty">
+            <p>조직이 없습니다.</p>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="tree-empty"&gt;
+    &lt;p&gt;조직이 없습니다.&lt;/p&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

@@ -1,0 +1,183 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('image-upload', '이미지 업로드', '사진 업로드 및 미리보기 컴포넌트') %}
+
+    {% call subsection('이미지 미리보기 크기') %}
+    {% call demo() %}
+    <div style="display: flex; align-items: flex-end; gap: var(--space-4);">
+        <div>
+            <div class="image-preview image-preview--sm">
+                <div class="image-placeholder">
+                    <i class="fas fa-user"></i>
+                    <span>SM</span>
+                </div>
+            </div>
+            <p style="text-align: center; font-size: var(--text-xs); margin-top: var(--space-1);">80px</p>
+        </div>
+        <div>
+            <div class="image-preview image-preview--md">
+                <div class="image-placeholder">
+                    <i class="fas fa-user"></i>
+                    <span>MD</span>
+                </div>
+            </div>
+            <p style="text-align: center; font-size: var(--text-xs); margin-top: var(--space-1);">120px</p>
+        </div>
+        <div>
+            <div class="image-preview image-preview--lg">
+                <div class="image-placeholder">
+                    <i class="fas fa-user"></i>
+                    <span>LG</span>
+                </div>
+            </div>
+            <p style="text-align: center; font-size: var(--text-xs); margin-top: var(--space-1);">150px</p>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- SM: 80x80px --&gt;
+&lt;div class="image-preview image-preview--sm"&gt;...&lt;/div&gt;
+
+&lt;!-- MD: 120x120px --&gt;
+&lt;div class="image-preview image-preview--md"&gt;...&lt;/div&gt;
+
+&lt;!-- LG: 150x150px --&gt;
+&lt;div class="image-preview image-preview--lg"&gt;...&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('플레이스홀더') %}
+    {% call demo() %}
+    <div class="image-preview image-preview--md">
+        <div class="image-placeholder">
+            <i class="fas fa-camera"></i>
+            <span>사진 없음</span>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="image-preview image-preview--md"&gt;
+    &lt;div class="image-placeholder"&gt;
+        &lt;i class="fas fa-camera"&gt;&lt;/i&gt;
+        &lt;span&gt;사진 없음&lt;/span&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('업로드 섹션 레이아웃') %}
+    {% call demo() %}
+    <div class="image-upload-section">
+        <div class="image-upload-preview">
+            <div class="image-preview image-preview--lg">
+                <div class="image-placeholder">
+                    <i class="fas fa-user"></i>
+                    <span>사진</span>
+                </div>
+            </div>
+        </div>
+        <div class="image-upload-controls">
+            <label class="image-upload-controls__label">프로필 사진</label>
+            <div class="image-upload-controls__buttons">
+                <button class="btn btn-outline btn-sm">
+                    <i class="fas fa-upload"></i> 업로드
+                </button>
+                <button class="btn btn-outline btn-sm btn-danger">
+                    <i class="fas fa-trash"></i> 삭제
+                </button>
+            </div>
+            <span class="image-upload-controls__help">
+                JPG, PNG 형식 / 최대 5MB
+            </span>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="image-upload-section"&gt;
+    &lt;div class="image-upload-preview"&gt;
+        &lt;div class="image-preview image-preview--lg"&gt;
+            &lt;!-- 이미지 또는 플레이스홀더 --&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="image-upload-controls"&gt;
+        &lt;label class="image-upload-controls__label"&gt;프로필 사진&lt;/label&gt;
+        &lt;div class="image-upload-controls__buttons"&gt;
+            &lt;button class="btn btn-outline btn-sm"&gt;업로드&lt;/button&gt;
+            &lt;button class="btn btn-outline btn-sm btn-danger"&gt;삭제&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;span class="image-upload-controls__help"&gt;JPG, PNG 형식 / 최대 5MB&lt;/span&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('명함 미리보기 (Card Preview)') %}
+    {% call demo() %}
+    <div style="display: flex; gap: var(--space-4); flex-wrap: wrap;">
+        <div>
+            <div class="card-preview card-preview--landscape">
+                <div class="image-placeholder">
+                    <i class="fas fa-id-card"></i>
+                    <span>명함 앞면</span>
+                </div>
+            </div>
+            <p style="font-size: var(--text-xs); margin-top: var(--space-1); color: var(--color-gray-500);">앞면 (가로)</p>
+        </div>
+        <div>
+            <div class="card-preview card-preview--landscape">
+                <div class="image-placeholder">
+                    <i class="fas fa-id-card"></i>
+                    <span>명함 뒷면</span>
+                </div>
+            </div>
+            <p style="font-size: var(--text-xs); margin-top: var(--space-1); color: var(--color-gray-500);">뒷면 (가로)</p>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- 명함 미리보기 (가로 1.8:1 비율) --&gt;
+&lt;div class="card-preview card-preview--landscape"&gt;
+    &lt;div class="image-placeholder"&gt;
+        &lt;i class="fas fa-id-card"&gt;&lt;/i&gt;
+        &lt;span&gt;명함 앞면&lt;/span&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('이미지가 있는 경우') %}
+    {% call demo() %}
+    <div class="image-upload-section">
+        <div class="image-upload-preview">
+            <div class="image-preview image-preview--lg">
+                <img src="{{ url_for('static', filename='images/placeholder-avatar.svg') }}" alt="프로필 사진">
+            </div>
+        </div>
+        <div class="image-upload-controls">
+            <label class="image-upload-controls__label">프로필 사진</label>
+            <div class="image-upload-controls__buttons">
+                <button class="btn btn-outline btn-sm">
+                    <i class="fas fa-sync"></i> 변경
+                </button>
+                <button class="btn btn-outline btn-sm btn-danger">
+                    <i class="fas fa-trash"></i> 삭제
+                </button>
+            </div>
+            <span class="image-upload-controls__help">
+                현재 파일: profile.jpg (1.2MB)
+            </span>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="image-preview image-preview--lg"&gt;
+    &lt;img src="/path/to/image.jpg" alt="프로필 사진"&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

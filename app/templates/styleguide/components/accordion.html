@@ -1,0 +1,234 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('accordion', '아코디언', '접기/펼치기 가능한 섹션 컴포넌트') %}
+
+    {% call subsection('기본 아코디언') %}
+    {% call demo() %}
+    <div class="accordion-section">
+        <div class="accordion-header">
+            <div class="accordion-toggle">
+                <i class="fas fa-chevron-down accordion-icon"></i>
+                <h3 class="accordion-title">
+                    <i class="fas fa-graduation-cap"></i> 학력 사항
+                </h3>
+            </div>
+        </div>
+        <div class="accordion-body">
+            <p>아코디언 본문 내용이 여기에 표시됩니다.</p>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="accordion-section"&gt;
+    &lt;div class="accordion-header"&gt;
+        &lt;div class="accordion-toggle"&gt;
+            &lt;i class="fas fa-chevron-down accordion-icon"&gt;&lt;/i&gt;
+            &lt;h3 class="accordion-title"&gt;
+                &lt;i class="fas fa-graduation-cap"&gt;&lt;/i&gt; 학력 사항
+            &lt;/h3&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="accordion-body"&gt;
+        &lt;p&gt;아코디언 본문 내용&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('접힌 상태 (Collapsed)') %}
+    {% call demo() %}
+    <div class="accordion-section collapsed">
+        <div class="accordion-header">
+            <div class="accordion-toggle">
+                <i class="fas fa-chevron-down accordion-icon"></i>
+                <h3 class="accordion-title">
+                    <i class="fas fa-briefcase"></i> 경력 사항
+                </h3>
+            </div>
+        </div>
+        <div class="accordion-body">
+            <p>이 내용은 접힌 상태에서 보이지 않습니다.</p>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- collapsed 클래스 추가 시 접힌 상태 --&gt;
+&lt;div class="accordion-section collapsed"&gt;
+    &lt;div class="accordion-header"&gt;
+        &lt;div class="accordion-toggle"&gt;
+            &lt;i class="fas fa-chevron-down accordion-icon"&gt;&lt;/i&gt;
+            &lt;h3 class="accordion-title"&gt;
+                &lt;i class="fas fa-briefcase"&gt;&lt;/i&gt; 경력 사항
+            &lt;/h3&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="accordion-body"&gt;
+        &lt;!-- 접힌 상태에서 숨겨짐 --&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('액션 버튼 포함') %}
+    {% call demo() %}
+    <div class="accordion-section">
+        <div class="accordion-header">
+            <div class="accordion-toggle">
+                <i class="fas fa-chevron-down accordion-icon"></i>
+                <h3 class="accordion-title">
+                    <i class="fas fa-certificate"></i> 자격증
+                </h3>
+            </div>
+            <div class="accordion-actions">
+                <button class="btn btn-outline btn-sm">
+                    <i class="fas fa-plus"></i> 추가
+                </button>
+            </div>
+        </div>
+        <div class="accordion-body">
+            <p>자격증 목록이 여기에 표시됩니다.</p>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="accordion-section"&gt;
+    &lt;div class="accordion-header"&gt;
+        &lt;div class="accordion-toggle"&gt;
+            &lt;i class="fas fa-chevron-down accordion-icon"&gt;&lt;/i&gt;
+            &lt;h3 class="accordion-title"&gt;
+                &lt;i class="fas fa-certificate"&gt;&lt;/i&gt; 자격증
+            &lt;/h3&gt;
+        &lt;/div&gt;
+        &lt;div class="accordion-actions"&gt;
+            &lt;button class="btn btn-outline btn-sm"&gt;
+                &lt;i class="fas fa-plus"&gt;&lt;/i&gt; 추가
+            &lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="accordion-body"&gt;
+        &lt;!-- 내용 --&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('카운트 표시') %}
+    {% call demo() %}
+    <div class="accordion-section">
+        <div class="accordion-header">
+            <div class="accordion-toggle">
+                <i class="fas fa-chevron-down accordion-icon"></i>
+                <h3 class="accordion-title">
+                    <i class="fas fa-users"></i> 가족 사항
+                    <span class="accordion-count">(3)</span>
+                </h3>
+            </div>
+        </div>
+        <div class="accordion-body">
+            <p>가족 정보 3건이 등록되어 있습니다.</p>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;h3 class="accordion-title"&gt;
+    &lt;i class="fas fa-users"&gt;&lt;/i&gt; 가족 사항
+    &lt;span class="accordion-count"&gt;(3)&lt;/span&gt;
+&lt;/h3&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('항목 추가 폼') %}
+    {% call demo() %}
+    <div class="accordion-section">
+        <div class="accordion-header">
+            <div class="accordion-toggle">
+                <i class="fas fa-chevron-down accordion-icon"></i>
+                <h3 class="accordion-title">
+                    <i class="fas fa-tags"></i> 카테고리
+                </h3>
+            </div>
+        </div>
+        <div class="accordion-body">
+            <p>기존 항목들...</p>
+        </div>
+        <div class="add-item-form">
+            <input type="text" class="form-input" placeholder="새 항목 입력">
+            <button class="btn btn-primary btn-sm">추가</button>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="accordion-section"&gt;
+    &lt;!-- 헤더 & 바디 --&gt;
+    &lt;div class="add-item-form"&gt;
+        &lt;input type="text" class="form-input" placeholder="새 항목 입력"&gt;
+        &lt;button class="btn btn-primary btn-sm"&gt;추가&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('아코디언 그룹') %}
+    {% call demo() %}
+    <div class="accordion-group">
+        <div class="accordion-section">
+            <div class="accordion-header">
+                <div class="accordion-toggle">
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                    <h3 class="accordion-title">
+                        <i class="fas fa-user"></i> 기본 정보
+                    </h3>
+                </div>
+            </div>
+            <div class="accordion-body">
+                <p>기본 정보 내용</p>
+            </div>
+        </div>
+        <div class="accordion-section collapsed">
+            <div class="accordion-header">
+                <div class="accordion-toggle">
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                    <h3 class="accordion-title">
+                        <i class="fas fa-graduation-cap"></i> 학력
+                    </h3>
+                </div>
+            </div>
+            <div class="accordion-body">
+                <p>학력 내용</p>
+            </div>
+        </div>
+        <div class="accordion-section collapsed">
+            <div class="accordion-header">
+                <div class="accordion-toggle">
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                    <h3 class="accordion-title">
+                        <i class="fas fa-briefcase"></i> 경력
+                    </h3>
+                </div>
+            </div>
+            <div class="accordion-body">
+                <p>경력 내용</p>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="accordion-group"&gt;
+    &lt;div class="accordion-section"&gt;
+        &lt;!-- 첫 번째 아코디언 (펼침) --&gt;
+    &lt;/div&gt;
+    &lt;div class="accordion-section collapsed"&gt;
+        &lt;!-- 두 번째 아코디언 (접힘) --&gt;
+    &lt;/div&gt;
+    &lt;div class="accordion-section collapsed"&gt;
+        &lt;!-- 세 번째 아코디언 (접힘) --&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

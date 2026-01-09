@@ -1,0 +1,218 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('filter', '필터', '검색 및 필터 바 컴포넌트') %}
+
+    {% call subsection('기본 필터 바') %}
+    {% call demo() %}
+    <div class="filter-bar">
+        <div class="filter-search">
+            <i class="fas fa-search filter-search__icon"></i>
+            <input type="text" class="filter-search__input" placeholder="검색어를 입력하세요">
+        </div>
+        <select class="filter-select">
+            <option value="">전체 부서</option>
+            <option value="dev">개발팀</option>
+            <option value="hr">인사팀</option>
+            <option value="sales">영업팀</option>
+        </select>
+        <select class="filter-select">
+            <option value="">전체 상태</option>
+            <option value="active">재직</option>
+            <option value="inactive">퇴직</option>
+        </select>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="filter-bar"&gt;
+    &lt;div class="filter-search"&gt;
+        &lt;i class="fas fa-search filter-search__icon"&gt;&lt;/i&gt;
+        &lt;input type="text" class="filter-search__input" placeholder="검색어를 입력하세요"&gt;
+    &lt;/div&gt;
+    &lt;select class="filter-select"&gt;
+        &lt;option value=""&gt;전체 부서&lt;/option&gt;
+        &lt;option value="dev"&gt;개발팀&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;select class="filter-select"&gt;
+        &lt;option value=""&gt;전체 상태&lt;/option&gt;
+        &lt;option value="active"&gt;재직&lt;/option&gt;
+    &lt;/select&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('검색 버튼 포함') %}
+    {% call demo() %}
+    <div class="filter-bar">
+        <div class="filter-search">
+            <i class="fas fa-search filter-search__icon"></i>
+            <input type="text" class="filter-search__input" placeholder="이름, 부서, 직급으로 검색">
+        </div>
+        <select class="filter-select">
+            <option value="">전체</option>
+            <option value="name">이름</option>
+            <option value="dept">부서</option>
+        </select>
+        <div class="filter-buttons">
+            <button class="filter-submit">
+                <i class="fas fa-search"></i> 검색
+            </button>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="filter-bar"&gt;
+    &lt;div class="filter-search"&gt;...&lt;/div&gt;
+    &lt;select class="filter-select"&gt;...&lt;/select&gt;
+    &lt;div class="filter-buttons"&gt;
+        &lt;button class="filter-submit"&gt;
+            &lt;i class="fas fa-search"&gt;&lt;/i&gt; 검색
+        &lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('인라인 필터 (--inline)') %}
+    {% call demo() %}
+    <div class="filter-bar filter-bar--inline">
+        <div class="filter-search">
+            <i class="fas fa-search filter-search__icon"></i>
+            <input type="text" class="filter-search__input" placeholder="검색...">
+        </div>
+        <select class="filter-select">
+            <option value="">전체</option>
+            <option value="pending">대기</option>
+            <option value="approved">승인</option>
+        </select>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="filter-bar filter-bar--inline"&gt;
+    &lt;!-- 줄어든 패딩과 마진 --&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('컴팩트 필터 (--compact)') %}
+    {% call demo() %}
+    <div class="filter-bar filter-bar--compact">
+        <div class="filter-search">
+            <i class="fas fa-search filter-search__icon"></i>
+            <input type="text" class="filter-search__input" placeholder="검색">
+        </div>
+        <select class="filter-select">
+            <option value="">필터</option>
+            <option value="1">옵션 1</option>
+        </select>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="filter-bar filter-bar--compact"&gt;
+    &lt;!-- 더 좁은 간격 --&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('간소화 모드 (--simple)') %}
+    {% call demo() %}
+    <div class="filter-bar filter-bar--simple">
+        <div class="filter-search">
+            <i class="fas fa-search filter-search__icon"></i>
+            <input type="text" class="filter-search__input" placeholder="빠른 검색">
+        </div>
+        <select class="filter-select">
+            <option value="">유형</option>
+            <option value="type1">유형 1</option>
+            <option value="type2">유형 2</option>
+        </select>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="filter-bar filter-bar--simple"&gt;
+    &lt;!-- 검색 + 셀렉트 조합에 최적화 --&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('필터 그룹 (라벨 포함)') %}
+    {% call demo() %}
+    <div class="filter-bar">
+        <div class="filter-group">
+            <label class="filter-label">부서</label>
+            <select class="filter-select">
+                <option value="">전체</option>
+                <option value="dev">개발팀</option>
+                <option value="hr">인사팀</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label class="filter-label">직급</label>
+            <select class="filter-select">
+                <option value="">전체</option>
+                <option value="manager">과장</option>
+                <option value="senior">선임</option>
+            </select>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="filter-group"&gt;
+    &lt;label class="filter-label"&gt;부서&lt;/label&gt;
+    &lt;select class="filter-select"&gt;
+        &lt;option value=""&gt;전체&lt;/option&gt;
+    &lt;/select&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('정렬 셀렉트') %}
+    {% call demo() %}
+    <div class="filter-bar">
+        <div class="filter-search">
+            <i class="fas fa-search filter-search__icon"></i>
+            <input type="text" class="filter-search__input" placeholder="검색...">
+        </div>
+        <select class="filter-select filter-sort">
+            <option value="name_asc">이름순</option>
+            <option value="date_desc">최신순</option>
+            <option value="date_asc">오래된순</option>
+        </select>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- filter-sort: 자동으로 오른쪽 정렬 --&gt;
+&lt;select class="filter-select filter-sort"&gt;
+    &lt;option value="name_asc"&gt;이름순&lt;/option&gt;
+    &lt;option value="date_desc"&gt;최신순&lt;/option&gt;
+&lt;/select&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('결과 카운트') %}
+    {% call demo() %}
+    <div class="filter-bar">
+        <div class="filter-result-count">
+            <span class="filter-result-count__number">42</span>
+            <span>건</span>
+            <span class="filter-result-count__total">/ 총 150건</span>
+        </div>
+        <div class="filter-search">
+            <i class="fas fa-search filter-search__icon"></i>
+            <input type="text" class="filter-search__input" placeholder="검색...">
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="filter-result-count"&gt;
+    &lt;span class="filter-result-count__number"&gt;42&lt;/span&gt;
+    &lt;span&gt;건&lt;/span&gt;
+    &lt;span class="filter-result-count__total"&gt;/ 총 150건&lt;/span&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

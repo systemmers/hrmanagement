@@ -16,42 +16,60 @@
     white-space: nowrap;
 }
 
-/* Badge Variants - Success */
+/* Badge Variants - Success
+ * 표준: .badge-success (하이픈 수정자)
+ * @deprecated .badge.success - 2026-12 이후 제거 예정, .badge-success 사용 권장
+ */
 .badge-success,
 .badge.success {
     background: var(--color-success-100);
     color: var(--color-success-600);
 }
 
-/* Badge Variants - Danger */
+/* Badge Variants - Danger
+ * 표준: .badge-danger (하이픈 수정자)
+ * @deprecated .badge.danger - 2026-12 이후 제거 예정, .badge-danger 사용 권장
+ */
 .badge-danger,
 .badge.danger {
     background: var(--color-error-100);
     color: var(--color-error-600);
 }
 
-/* Badge Variants - Warning */
+/* Badge Variants - Warning
+ * 표준: .badge-warning (하이픈 수정자)
+ * @deprecated .badge.warning - 2026-12 이후 제거 예정, .badge-warning 사용 권장
+ */
 .badge-warning,
 .badge.warning {
     background: var(--color-warning-100);
     color: var(--color-warning-600);
 }
 
-/* Badge Variants - Info */
+/* Badge Variants - Info
+ * 표준: .badge-info (하이픈 수정자)
+ * @deprecated .badge.info - 2026-12 이후 제거 예정, .badge-info 사용 권장
+ */
 .badge-info,
 .badge.info {
     background: var(--color-blue-100);
     color: var(--color-blue-600);
 }
 
-/* Badge Variants - Secondary/Gray */
+/* Badge Variants - Secondary/Gray
+ * 표준: .badge-secondary (하이픈 수정자)
+ * @deprecated .badge.secondary - 2026-12 이후 제거 예정, .badge-secondary 사용 권장
+ */
 .badge-secondary,
 .badge.secondary {
     background: var(--color-gray-100);
     color: var(--color-gray-600);
 }
 
-/* Badge Variants - Primary */
+/* Badge Variants - Primary
+ * 표준: .badge-primary (하이픈 수정자)
+ * @deprecated .badge.primary - 2026-12 이후 제거 예정, .badge-primary 사용 권장
+ */
 .badge-primary,
 .badge.primary {
     background: var(--color-primary);

@@ -1,0 +1,236 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('data-table-advanced', '고급 테이블', '정렬, 검색, 페이지네이션을 지원하는 고급 데이터 테이블') %}
+
+    {% call subsection('기본 고급 테이블') %}
+    {% call demo() %}
+    <div class="data-table-advanced-container">
+        <div class="data-table-toolbar">
+            <div class="data-table-toolbar-left">
+                <div class="data-table-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="검색...">
+                </div>
+            </div>
+            <div class="data-table-toolbar-right">
+                <button class="data-table-btn">
+                    <i class="fas fa-filter"></i> 필터
+                </button>
+                <button class="data-table-btn">
+                    <i class="fas fa-columns"></i> 컬럼
+                </button>
+            </div>
+        </div>
+        <div class="data-table-wrapper">
+            <table class="data-table-advanced">
+                <thead>
+                    <tr>
+                        <th class="checkbox-cell">
+                            <input type="checkbox">
+                        </th>
+                        <th>
+                            <div class="th-content">
+                                <span class="th-label">이름</span>
+                                <div class="th-actions">
+                                    <button class="sort-btn asc"><i class="fas fa-sort"></i></button>
+                                </div>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="th-content">
+                                <span class="th-label">부서</span>
+                                <div class="th-actions">
+                                    <button class="sort-btn"><i class="fas fa-sort"></i></button>
+                                </div>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="th-content">
+                                <span class="th-label">직급</span>
+                                <div class="th-actions">
+                                    <button class="sort-btn"><i class="fas fa-sort"></i></button>
+                                </div>
+                            </div>
+                        </th>
+                        <th>상태</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="checkbox-cell"><input type="checkbox"></td>
+                        <td>홍길동</td>
+                        <td>개발팀</td>
+                        <td>과장</td>
+                        <td><span class="badge badge-success">재직</span></td>
+                    </tr>
+                    <tr class="selected">
+                        <td class="checkbox-cell"><input type="checkbox" checked></td>
+                        <td>김철수</td>
+                        <td>인사팀</td>
+                        <td>대리</td>
+                        <td><span class="badge badge-success">재직</span></td>
+                    </tr>
+                    <tr>
+                        <td class="checkbox-cell"><input type="checkbox"></td>
+                        <td>이영희</td>
+                        <td>영업팀</td>
+                        <td>사원</td>
+                        <td><span class="badge badge-warning">휴직</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="data-table-footer">
+            <div class="data-table-info">
+                <strong>3</strong>건 중 <strong>1-3</strong> 표시
+            </div>
+            <div class="data-table-pagination">
+                <button class="pagination-btn" disabled><i class="fas fa-chevron-left"></i></button>
+                <button class="pagination-btn active">1</button>
+                <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="data-table-advanced-container"&gt;
+    &lt;div class="data-table-toolbar"&gt;
+        &lt;div class="data-table-toolbar-left"&gt;
+            &lt;div class="data-table-search"&gt;
+                &lt;i class="fas fa-search"&gt;&lt;/i&gt;
+                &lt;input type="text" placeholder="검색..."&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="data-table-toolbar-right"&gt;
+            &lt;button class="data-table-btn"&gt;필터&lt;/button&gt;
+            &lt;button class="data-table-btn"&gt;컬럼&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="data-table-wrapper"&gt;
+        &lt;table class="data-table-advanced"&gt;
+            &lt;thead&gt;...&lt;/thead&gt;
+            &lt;tbody&gt;...&lt;/tbody&gt;
+        &lt;/table&gt;
+    &lt;/div&gt;
+    &lt;div class="data-table-footer"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('정렬 버튼 상태') %}
+    {% call demo() %}
+    <div style="display: flex; gap: var(--space-4); align-items: center;">
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <span>기본:</span>
+            <button class="sort-btn"><i class="fas fa-sort"></i></button>
+        </div>
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <span>오름차순:</span>
+            <button class="sort-btn asc"><i class="fas fa-sort"></i></button>
+        </div>
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <span>내림차순:</span>
+            <button class="sort-btn desc"><i class="fas fa-sort"></i></button>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;button class="sort-btn"&gt;...&lt;/button&gt;      &lt;!-- 기본 --&gt;
+&lt;button class="sort-btn asc"&gt;...&lt;/button&gt;   &lt;!-- 오름차순 --&gt;
+&lt;button class="sort-btn desc"&gt;...&lt;/button&gt;  &lt;!-- 내림차순 --&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('페이지네이션') %}
+    {% call demo() %}
+    <div class="data-table-pagination">
+        <button class="pagination-btn"><i class="fas fa-angle-double-left"></i></button>
+        <button class="pagination-btn"><i class="fas fa-chevron-left"></i></button>
+        <button class="pagination-btn">1</button>
+        <button class="pagination-btn active">2</button>
+        <button class="pagination-btn">3</button>
+        <button class="pagination-btn">...</button>
+        <button class="pagination-btn">10</button>
+        <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
+        <button class="pagination-btn"><i class="fas fa-angle-double-right"></i></button>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="data-table-pagination"&gt;
+    &lt;button class="pagination-btn"&gt;&lt;i class="fas fa-chevron-left"&gt;&lt;/i&gt;&lt;/button&gt;
+    &lt;button class="pagination-btn"&gt;1&lt;/button&gt;
+    &lt;button class="pagination-btn active"&gt;2&lt;/button&gt;
+    &lt;button class="pagination-btn"&gt;3&lt;/button&gt;
+    &lt;button class="pagination-btn"&gt;&lt;i class="fas fa-chevron-right"&gt;&lt;/i&gt;&lt;/button&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('빈 상태') %}
+    {% call demo() %}
+    <div class="data-table-advanced-container">
+        <div class="data-table-toolbar">
+            <div class="data-table-toolbar-left">
+                <div class="data-table-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="검색...">
+                </div>
+            </div>
+        </div>
+        <div class="data-table-empty">
+            <i class="fas fa-inbox"></i>
+            <p>데이터가 없습니다.</p>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="data-table-empty"&gt;
+    &lt;i class="fas fa-inbox"&gt;&lt;/i&gt;
+    &lt;p&gt;데이터가 없습니다.&lt;/p&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('로딩 상태') %}
+    {% call demo() %}
+    <div class="data-table-advanced-container">
+        <div class="data-table-toolbar">
+            <div class="data-table-toolbar-left">
+                <div class="data-table-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="검색...">
+                </div>
+            </div>
+        </div>
+        <div class="data-table-loading" style="min-height: 150px;"></div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="data-table-loading"&gt;
+    &lt;!-- 스피너가 ::after로 표시됨 --&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('툴바 버튼 상태') %}
+    {% call demo() %}
+    <div style="display: flex; gap: var(--space-2);">
+        <button class="data-table-btn">
+            <i class="fas fa-filter"></i> 기본
+        </button>
+        <button class="data-table-btn active">
+            <i class="fas fa-filter"></i> 활성
+        </button>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;button class="data-table-btn"&gt;기본&lt;/button&gt;
+&lt;button class="data-table-btn active"&gt;활성&lt;/button&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

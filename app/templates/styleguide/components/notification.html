@@ -1,0 +1,203 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('notification', '알림 드롭다운', '헤더 알림 드롭다운 컴포넌트') %}
+
+    {% call subsection('알림 버튼 + 배지') %}
+    {% call demo() %}
+    <div style="display: flex; gap: var(--space-6); align-items: center;">
+        <div class="notification-dropdown">
+            <button class="notification-btn">
+                <i class="fas fa-bell"></i>
+            </button>
+        </div>
+        <div class="notification-dropdown">
+            <button class="notification-btn">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </button>
+        </div>
+        <div class="notification-dropdown">
+            <button class="notification-btn">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">99+</span>
+            </button>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- 배지 없음 --&gt;
+&lt;button class="notification-btn"&gt;
+    &lt;i class="fas fa-bell"&gt;&lt;/i&gt;
+&lt;/button&gt;
+
+&lt;!-- 배지 포함 --&gt;
+&lt;button class="notification-btn"&gt;
+    &lt;i class="fas fa-bell"&gt;&lt;/i&gt;
+    &lt;span class="notification-badge"&gt;3&lt;/span&gt;
+&lt;/button&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('알림 패널') %}
+    {% call demo() %}
+    <div style="position: relative; height: 400px;">
+        <div class="notification-panel show" style="position: relative; top: 0;">
+            <div class="notification-header">
+                <h3>알림</h3>
+                <button class="btn-text">모두 읽음</button>
+            </div>
+            <div class="notification-list">
+                <div class="notification-item unread">
+                    <div class="notification-icon contract">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">새 계약 요청</div>
+                        <div class="notification-message">홍길동님이 계약을 요청했습니다.</div>
+                        <div class="notification-time">5분 전</div>
+                    </div>
+                </div>
+                <div class="notification-item unread">
+                    <div class="notification-icon sync">
+                        <i class="fas fa-sync"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">프로필 동기화 완료</div>
+                        <div class="notification-message">프로필 정보가 동기화되었습니다.</div>
+                        <div class="notification-time">1시간 전</div>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <div class="notification-icon system">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">시스템 공지</div>
+                        <div class="notification-message">시스템 점검이 예정되어 있습니다.</div>
+                        <div class="notification-time">어제</div>
+                    </div>
+                </div>
+            </div>
+            <div class="notification-footer">
+                <button class="btn-text">모든 알림 보기</button>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="notification-panel show"&gt;
+    &lt;div class="notification-header"&gt;
+        &lt;h3&gt;알림&lt;/h3&gt;
+        &lt;button class="btn-text"&gt;모두 읽음&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class="notification-list"&gt;
+        &lt;div class="notification-item unread"&gt;
+            &lt;div class="notification-icon contract"&gt;
+                &lt;i class="fas fa-file-contract"&gt;&lt;/i&gt;
+            &lt;/div&gt;
+            &lt;div class="notification-content"&gt;
+                &lt;div class="notification-title"&gt;새 계약 요청&lt;/div&gt;
+                &lt;div class="notification-message"&gt;메시지&lt;/div&gt;
+                &lt;div class="notification-time"&gt;5분 전&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="notification-footer"&gt;
+        &lt;button class="btn-text"&gt;모든 알림 보기&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('알림 아이콘 유형') %}
+    {% call demo() %}
+    <div style="display: flex; gap: var(--space-4); flex-wrap: wrap;">
+        <div class="notification-icon contract">
+            <i class="fas fa-file-contract"></i>
+        </div>
+        <div class="notification-icon sync">
+            <i class="fas fa-sync"></i>
+        </div>
+        <div class="notification-icon termination">
+            <i class="fas fa-user-minus"></i>
+        </div>
+        <div class="notification-icon system">
+            <i class="fas fa-cog"></i>
+        </div>
+        <div class="notification-icon warning">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="notification-icon contract"&gt;...&lt;/div&gt;  &lt;!-- 파란색 --&gt;
+&lt;div class="notification-icon sync"&gt;...&lt;/div&gt;      &lt;!-- 시안색 --&gt;
+&lt;div class="notification-icon termination"&gt;...&lt;/div&gt; &lt;!-- 빨간색 --&gt;
+&lt;div class="notification-icon system"&gt;...&lt;/div&gt;    &lt;!-- 회색 --&gt;
+&lt;div class="notification-icon warning"&gt;...&lt;/div&gt;   &lt;!-- 노란색 --&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('읽음/안읽음 상태') %}
+    {% call demo() %}
+    <div style="max-width: 360px; border: 1px solid var(--color-gray-200); border-radius: var(--radius-lg);">
+        <div class="notification-item unread">
+            <div class="notification-icon contract">
+                <i class="fas fa-file-contract"></i>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title">안읽은 알림</div>
+                <div class="notification-message">왼쪽에 파란색 점이 표시됩니다.</div>
+                <div class="notification-time">방금</div>
+            </div>
+        </div>
+        <div class="notification-item">
+            <div class="notification-icon system">
+                <i class="fas fa-cog"></i>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title">읽은 알림</div>
+                <div class="notification-message">배경색이 없고 점도 없습니다.</div>
+                <div class="notification-time">1시간 전</div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- 안읽음 상태 --&gt;
+&lt;div class="notification-item unread"&gt;
+    &lt;!-- 왼쪽 파란 점 + 배경색 --&gt;
+&lt;/div&gt;
+
+&lt;!-- 읽음 상태 --&gt;
+&lt;div class="notification-item"&gt;
+    &lt;!-- 기본 스타일 --&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('빈 상태') %}
+    {% call demo() %}
+    <div style="max-width: 360px; border: 1px solid var(--color-gray-200); border-radius: var(--radius-lg);">
+        <div class="notification-header">
+            <h3>알림</h3>
+        </div>
+        <div class="notification-empty">
+            <i class="fas fa-bell-slash"></i>
+            <p>새로운 알림이 없습니다.</p>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="notification-empty"&gt;
+    &lt;i class="fas fa-bell-slash"&gt;&lt;/i&gt;
+    &lt;p&gt;새로운 알림이 없습니다.&lt;/p&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

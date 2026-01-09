@@ -1,0 +1,221 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('stats-cards', '통계 카드', '대시보드용 통계 카드 컴포넌트') %}
+
+    {% call subsection('기본 통계 카드') %}
+    {% call demo() %}
+    <div class="stat-card">
+        <div class="stat-icon total">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">150</div>
+            <div class="stat-label">전체 직원</div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="stat-card"&gt;
+    &lt;div class="stat-icon total"&gt;
+        &lt;i class="fas fa-users"&gt;&lt;/i&gt;
+    &lt;/div&gt;
+    &lt;div class="stat-content"&gt;
+        &lt;div class="stat-value"&gt;150&lt;/div&gt;
+        &lt;div class="stat-label"&gt;전체 직원&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('통계 행 (Stats Row)') %}
+    {% call demo() %}
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon total">
+                <i class="fas fa-file-contract"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">24</div>
+                <div class="stat-label">전체 계약</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon active">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">18</div>
+                <div class="stat-label">활성 계약</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon pending">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">3</div>
+                <div class="stat-label">대기 중</div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="stats-row"&gt;
+    &lt;div class="stat-card"&gt;
+        &lt;div class="stat-icon total"&gt;...&lt;/div&gt;
+        &lt;div class="stat-content"&gt;...&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="stat-card"&gt;
+        &lt;div class="stat-icon active"&gt;...&lt;/div&gt;
+        &lt;div class="stat-content"&gt;...&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="stat-card"&gt;
+        &lt;div class="stat-icon pending"&gt;...&lt;/div&gt;
+        &lt;div class="stat-content"&gt;...&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('통계 그리드 (Stats Grid)') %}
+    {% call demo() %}
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-icon education">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">3</div>
+                <div class="stat-label">학력</div>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon career">
+                <i class="fas fa-briefcase"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">5</div>
+                <div class="stat-label">경력</div>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon certificate">
+                <i class="fas fa-certificate"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">2</div>
+                <div class="stat-label">자격증</div>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon language">
+                <i class="fas fa-language"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">1</div>
+                <div class="stat-label">어학</div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="stats-grid"&gt;
+    &lt;div class="stat-item"&gt;
+        &lt;div class="stat-icon education"&gt;...&lt;/div&gt;
+        &lt;div class="stat-content"&gt;...&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="stat-item"&gt;
+        &lt;div class="stat-icon career"&gt;...&lt;/div&gt;
+        &lt;div class="stat-content"&gt;...&lt;/div&gt;
+    &lt;/div&gt;
+    ...
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('아이콘 색상 변형') %}
+    {% call demo() %}
+    <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+        <div class="stat-icon total">
+            <i class="fas fa-chart-bar"></i>
+        </div>
+        <div class="stat-icon active">
+            <i class="fas fa-check"></i>
+        </div>
+        <div class="stat-icon pending">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-icon terminated">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="stat-icon education">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div class="stat-icon career">
+            <i class="fas fa-briefcase"></i>
+        </div>
+        <div class="stat-icon certificate">
+            <i class="fas fa-certificate"></i>
+        </div>
+        <div class="stat-icon language">
+            <i class="fas fa-language"></i>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="stat-icon total"&gt;...&lt;/div&gt;       &lt;!-- 파란색 --&gt;
+&lt;div class="stat-icon active"&gt;...&lt;/div&gt;      &lt;!-- 녹색 --&gt;
+&lt;div class="stat-icon pending"&gt;...&lt;/div&gt;     &lt;!-- 노란색 --&gt;
+&lt;div class="stat-icon terminated"&gt;...&lt;/div&gt;  &lt;!-- 회색 --&gt;
+&lt;div class="stat-icon education"&gt;...&lt;/div&gt;   &lt;!-- 파란색 --&gt;
+&lt;div class="stat-icon career"&gt;...&lt;/div&gt;      &lt;!-- 녹색 --&gt;
+&lt;div class="stat-icon certificate"&gt;...&lt;/div&gt; &lt;!-- 노란색 --&gt;
+&lt;div class="stat-icon language"&gt;...&lt;/div&gt;    &lt;!-- 분홍색 --&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('법인 대시보드 예시') %}
+    {% call demo() %}
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon employees">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">42</div>
+                <div class="stat-label">등록 직원</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon limit">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">50</div>
+                <div class="stat-label">직원 한도</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon plan">
+                <i class="fas fa-crown"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">Pro</div>
+                <div class="stat-label">현재 플랜</div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- 법인 대시보드용 아이콘 변형 --&gt;
+&lt;div class="stat-icon employees"&gt;...&lt;/div&gt;
+&lt;div class="stat-icon limit"&gt;...&lt;/div&gt;
+&lt;div class="stat-icon plan"&gt;...&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

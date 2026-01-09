@@ -1,0 +1,214 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('avatar', '아바타', '프로필 이미지 및 플레이스홀더 아바타 컴포넌트') %}
+
+    {% call subsection('크기 변형') %}
+    {% call demo() %}
+    <div style="display: flex; align-items: center; gap: var(--space-4);">
+        <div class="avatar avatar--xs">
+            <div class="avatar-placeholder avatar-placeholder--default">XS</div>
+        </div>
+        <div class="avatar avatar--sm">
+            <div class="avatar-placeholder avatar-placeholder--default">SM</div>
+        </div>
+        <div class="avatar avatar--md">
+            <div class="avatar-placeholder avatar-placeholder--default">MD</div>
+        </div>
+        <div class="avatar avatar--lg">
+            <div class="avatar-placeholder avatar-placeholder--default">LG</div>
+        </div>
+        <div class="avatar avatar--xl">
+            <div class="avatar-placeholder avatar-placeholder--default">XL</div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- XS: 32px --&gt;
+&lt;div class="avatar avatar--xs"&gt;
+    &lt;div class="avatar-placeholder avatar-placeholder--default"&gt;XS&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- SM: 48px --&gt;
+&lt;div class="avatar avatar--sm"&gt;...&lt;/div&gt;
+
+&lt;!-- MD: 80px --&gt;
+&lt;div class="avatar avatar--md"&gt;...&lt;/div&gt;
+
+&lt;!-- LG: 120px --&gt;
+&lt;div class="avatar avatar--lg"&gt;...&lt;/div&gt;
+
+&lt;!-- XL: 150px --&gt;
+&lt;div class="avatar avatar--xl"&gt;...&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('테마 플레이스홀더') %}
+    {% call demo() %}
+    <div style="display: flex; align-items: center; gap: var(--space-4);">
+        <div class="avatar avatar--md">
+            <div class="avatar-placeholder avatar-placeholder--personal">JH</div>
+        </div>
+        <div class="avatar avatar--md">
+            <div class="avatar-placeholder avatar-placeholder--corporate">AB</div>
+        </div>
+        <div class="avatar avatar--md">
+            <div class="avatar-placeholder avatar-placeholder--employee">KM</div>
+        </div>
+        <div class="avatar avatar--md">
+            <div class="avatar-placeholder avatar-placeholder--default">?</div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- Personal (녹색 그라데이션) --&gt;
+&lt;div class="avatar avatar--md"&gt;
+    &lt;div class="avatar-placeholder avatar-placeholder--personal"&gt;JH&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Corporate (파란색 그라데이션) --&gt;
+&lt;div class="avatar avatar--md"&gt;
+    &lt;div class="avatar-placeholder avatar-placeholder--corporate"&gt;AB&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Employee (primary 그라데이션) --&gt;
+&lt;div class="avatar avatar--md"&gt;
+    &lt;div class="avatar-placeholder avatar-placeholder--employee"&gt;KM&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Default (회색 그라데이션) --&gt;
+&lt;div class="avatar avatar--md"&gt;
+    &lt;div class="avatar-placeholder avatar-placeholder--default"&gt;?&lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('이미지 아바타') %}
+    {% call demo() %}
+    <div style="display: flex; align-items: center; gap: var(--space-4);">
+        <div class="avatar avatar--sm">
+            <img src="{{ url_for('static', filename='images/placeholder-avatar.svg') }}" alt="프로필">
+        </div>
+        <div class="avatar avatar--md">
+            <img src="{{ url_for('static', filename='images/placeholder-avatar.svg') }}" alt="프로필">
+        </div>
+        <div class="avatar avatar--lg">
+            <img src="{{ url_for('static', filename='images/placeholder-avatar.svg') }}" alt="프로필">
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="avatar avatar--md"&gt;
+    &lt;img src="/static/images/profile.jpg" alt="프로필"&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('아이콘 플레이스홀더') %}
+    {% call demo() %}
+    <div style="display: flex; align-items: center; gap: var(--space-4);">
+        <div class="avatar avatar--sm">
+            <div class="avatar-icon-placeholder">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+        <div class="avatar avatar--md">
+            <div class="avatar-icon-placeholder">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+        <div class="avatar avatar--lg">
+            <div class="avatar-icon-placeholder">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="avatar avatar--md"&gt;
+    &lt;div class="avatar-icon-placeholder"&gt;
+        &lt;i class="fas fa-user"&gt;&lt;/i&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('테두리 변형') %}
+    {% call demo() %}
+    <div style="display: flex; align-items: center; gap: var(--space-4); background: var(--color-gray-200); padding: var(--space-4); border-radius: var(--radius-lg);">
+        <div class="avatar avatar--md avatar--bordered">
+            <div class="avatar-placeholder avatar-placeholder--corporate">A</div>
+        </div>
+        <div class="avatar avatar--md avatar--bordered-white">
+            <div class="avatar-placeholder avatar-placeholder--employee">B</div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- 반투명 테두리 --&gt;
+&lt;div class="avatar avatar--md avatar--bordered"&gt;
+    &lt;div class="avatar-placeholder avatar-placeholder--corporate"&gt;A&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- 흰색 테두리 + 그림자 --&gt;
+&lt;div class="avatar avatar--md avatar--bordered-white"&gt;
+    &lt;div class="avatar-placeholder avatar-placeholder--employee"&gt;B&lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('아바타 그룹') %}
+    {% call demo() %}
+    <div class="avatar-group">
+        <div class="avatar avatar--sm">
+            <div class="avatar-placeholder avatar-placeholder--personal">A</div>
+        </div>
+        <div class="avatar avatar--sm">
+            <div class="avatar-placeholder avatar-placeholder--corporate">B</div>
+        </div>
+        <div class="avatar avatar--sm">
+            <div class="avatar-placeholder avatar-placeholder--employee">C</div>
+        </div>
+        <div class="avatar avatar--sm">
+            <div class="avatar-placeholder avatar-placeholder--default">+3</div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="avatar-group"&gt;
+    &lt;div class="avatar avatar--sm"&gt;
+        &lt;div class="avatar-placeholder avatar-placeholder--personal"&gt;A&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="avatar avatar--sm"&gt;
+        &lt;div class="avatar-placeholder avatar-placeholder--corporate"&gt;B&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="avatar avatar--sm"&gt;
+        &lt;div class="avatar-placeholder avatar-placeholder--employee"&gt;C&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="avatar avatar--sm"&gt;
+        &lt;div class="avatar-placeholder avatar-placeholder--default"&gt;+3&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('헤더 아바타') %}
+    {% call demo() %}
+    <div style="background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700)); padding: var(--space-6); border-radius: var(--radius-lg);">
+        <div class="avatar avatar--header">
+            <div class="avatar-placeholder avatar-placeholder--default">JH</div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- 프로필 헤더에서 사용 --&gt;
+&lt;div class="avatar avatar--header"&gt;
+    &lt;div class="avatar-placeholder avatar-placeholder--default"&gt;JH&lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}
