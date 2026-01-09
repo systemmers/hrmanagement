@@ -44,11 +44,16 @@ export class FilterBar {
         }
 
         // 옵션 설정 (data-* 속성 우선)
+        const preserveParamsAttr = this.container.dataset.preserveParams;
         this.options = {
             mode: this.container.dataset.mode || options.mode || 'url',
             action: this.container.dataset.action || options.action || '',
             targetSelector: options.targetSelector || '[data-filter-target]',
             debounceDelay: options.debounceDelay || 300,
+            // URL 모드에서 유지할 파라미터 목록 (기본: view)
+            preserveParams: preserveParamsAttr
+                ? preserveParamsAttr.split(',').map(p => p.trim())
+                : options.preserveParams || ['view'],
             ...options
         };
 
@@ -57,11 +62,11 @@ export class FilterBar {
         this.listeners = {};
         this.debounceTimer = null;
 
-        // 요소 캐싱
+        // 요소 캐싱 (data-filter-exclude 속성이 있는 요소는 제외)
         this.elements = {
             searchInput: this.container.querySelector('.filter-search__input'),
-            selects: this.container.querySelectorAll('.filter-select'),
-            checkboxes: this.container.querySelectorAll('.filter-checkbox'),
+            selects: this.container.querySelectorAll('.filter-select:not([data-filter-exclude])'),
+            checkboxes: this.container.querySelectorAll('.filter-checkbox:not([data-filter-exclude])'),
             resetBtn: this.container.querySelector('[data-action="reset"]'),
             submitBtn: this.container.querySelector('[data-action="submit"]'),
             activeFilters: document.querySelector('.active-filters')
@@ -273,11 +278,22 @@ export class FilterBar {
 
     /**
      * URL 모드 필터 적용
+     * - preserveParams에 지정된 파라미터는 유지 (기본: view)
      * @param {Object} filters - 필터 객체
      */
     applyUrlFilter(filters) {
         const params = new URLSearchParams();
+        const currentParams = new URLSearchParams(window.location.search);
 
+        // preserveParams에 지정된 파라미터 유지
+        this.options.preserveParams.forEach(param => {
+            const value = currentParams.get(param);
+            if (value) {
+                params.set(param, value);
+            }
+        });
+
+        // 필터 파라미터 추가
         Object.entries(filters).forEach(([key, value]) => {
             if (Array.isArray(value)) {
                 value.forEach(v => params.append(key, v));
@@ -403,7 +419,20 @@ export class FilterBar {
         // 모드별 처리
         switch (this.options.mode) {
             case 'url':
-                window.location.href = window.location.pathname;
+                // preserveParams에 지정된 파라미터는 유지
+                const currentParams = new URLSearchParams(window.location.search);
+                const preservedParams = new URLSearchParams();
+                this.options.preserveParams.forEach(param => {
+                    const value = currentParams.get(param);
+                    if (value) {
+                        preservedParams.set(param, value);
+                    }
+                });
+                const queryString = preservedParams.toString();
+                const newUrl = queryString
+                    ? `${window.location.pathname}?${queryString}`
+                    : window.location.pathname;
+                window.location.href = newUrl;
                 break;
             case 'client':
                 this.applyClientFilter();

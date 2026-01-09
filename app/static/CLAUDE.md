@@ -38,10 +38,13 @@ css/
 │   │   ├── profile.css
 │   │   ├── register.css
 │   │   └── register-select.css
-│   └── platform/               # 플랫폼 도메인
-│       ├── admin-profile.css
-│       ├── ai-test.css
-│       └── platform.css
+│   ├── platform/               # 플랫폼 도메인
+│   │   ├── admin-profile.css
+│   │   ├── ai-test.css
+│   │   └── platform.css
+│   └── businesscard/           # 명함 도메인 (2026-01-09 신규)
+│       ├── card.css            # 명함 카드 스타일 (프리미엄 3D 플립)
+│       └── variables.css       # 명함 전용 CSS 변수
 └── shared/                     # 공유 스타일
     ├── core/                   # 기본 스타일 (SSOT)
     │   ├── variables.css       # CSS 변수 (색상, 간격, 폰트)
@@ -125,12 +128,19 @@ js/
 │   │       ├── dashboard.js
 │   │       ├── profile-sync.js
 │   │       └── profile/
-│   └── platform/               # 플랫폼 도메인
-│       ├── index.js
-│       └── pages/
-│           ├── platform.js
-│           ├── admin.js
-│           └── ai-test-index.js
+│   ├── platform/               # 플랫폼 도메인
+│   │   ├── index.js
+│   │   └── pages/
+│   │       ├── platform.js
+│   │       ├── admin.js
+│   │       └── ai-test-index.js
+│   └── businesscard/           # 명함 도메인 (2026-01-09 신규)
+│       ├── index.js            # 외부 인터페이스
+│       ├── components/
+│       │   ├── BusinessCard.js # 명함 카드 컴포넌트
+│       │   └── QRGenerator.js  # QR 코드 생성기
+│       └── services/
+│           └── businesscard-api.js  # API 통신
 └── shared/                     # 공유 모듈
     ├── components/             # 재사용 컴포넌트
     │   ├── data-table/         # 고급 테이블 시스템
@@ -166,6 +176,7 @@ js/
 | company | `js/domains/company/` | `css/domains/company/` | `templates/domains/company/` |
 | user | `js/domains/user/` | `css/domains/user/` | `templates/domains/user/` |
 | platform | `js/domains/platform/` | `css/domains/platform/` | `templates/domains/platform/` |
+| businesscard | `js/domains/businesscard/` | `css/domains/businesscard/` | `templates/domains/businesscard/` |
 
 ### 공유 자원 배치
 | 자원 유형 | JS 위치 | CSS 위치 |

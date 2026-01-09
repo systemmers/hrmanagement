@@ -38,6 +38,12 @@ def register_blueprints(app):
     # Sync 도메인
     from app.domains.sync.blueprints import sync_bp
 
+    # BusinessCard 도메인
+    from app.domains.businesscard.blueprints import businesscard_bp
+
+    # Styleguide 모듈 (독립)
+    from app.styleguide import styleguide_bp
+
     # ===== Blueprint 등록 =====
 
     # 플랫폼 관리자 (/platform/*) - 슈퍼관리자 전용
@@ -90,6 +96,12 @@ def register_blueprints(app):
 
     # 법인 세팅 API (/api/corporate/*)
     app.register_blueprint(corporate_settings_api_bp)
+
+    # 명함 API (/api/businesscard/*)
+    app.register_blueprint(businesscard_bp)
+
+    # 스타일가이드 (/styleguide/*)
+    app.register_blueprint(styleguide_bp)
 
 
 __all__ = ['api_bp', 'register_blueprints']

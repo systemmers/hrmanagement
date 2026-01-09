@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block styleguide_content %}
+<div class="styleguide-section">
+    <div class="styleguide-section-header">
+        <h1 class="styleguide-section-title">{{ meta.title }}</h1>
+        <p class="styleguide-section-desc">{{ meta.description }}</p>
+    </div>
+    <div class="styleguide-section-body">
+        <div class="styleguide-overview">
+            <div class="styleguide-overview-intro">
+                <p>이 스타일가이드는 HR Management 시스템의 디자인 시스템을 문서화합니다.</p>
+                <p>모든 컴포넌트는 실제 프로젝트 CSS를 사용하여 렌더링되므로 항상 최신 상태를 반영합니다.</p>
+            </div>
+
+            <div class="styleguide-overview-grid">
+                {% for section_key, section in navigation.items() %}
+                <div class="styleguide-overview-section">
+                    <h2 class="styleguide-overview-section-title">
+                        {{ section.label }}
+                    </h2>
+                    <p class="styleguide-overview-section-desc">{{ section.description }}</p>
+                    <ul class="styleguide-overview-list">
+                        {% for item in section.items %}
+                        <li>
+                            <a href="{{ url_for('styleguide.' ~ ('foundation' if section_key == 'foundation' else 'component'), **{('page' if section_key == 'foundation' else 'component'): item.id}) }}">
+                                <i class="fas {{ item.icon }}"></i>
+                                <span>{{ item.label }}</span>
+                                <small>{{ item.description }}</small>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="styleguide-overview-stats">
+                <div class="styleguide-stat">
+                    <span class="styleguide-stat-number">15</span>
+                    <span class="styleguide-stat-label">Gray 색상</span>
+                </div>
+                <div class="styleguide-stat">
+                    <span class="styleguide-stat-number">10</span>
+                    <span class="styleguide-stat-label">타이포 단계</span>
+                </div>
+                <div class="styleguide-stat">
+                    <span class="styleguide-stat-number">13</span>
+                    <span class="styleguide-stat-label">간격 단계</span>
+                </div>
+                <div class="styleguide-stat">
+                    <span class="styleguide-stat-number">21</span>
+                    <span class="styleguide-stat-label">컴포넌트 CSS</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,8 +1,17 @@
 /**
- * Business Card Upload Module
+ * @deprecated 2026-01-09
+ * 명함 기능은 BusinessCard 도메인으로 이동되었습니다.
+ * 새로운 위치: js/domains/businesscard/
+ *
+ * Business Card Upload Module (레거시)
  * Phase 7: 프론트엔드 리팩토링 - employee-form.js 분할
  *
  * 명함 업로드/삭제 기능
+ *
+ * Migration:
+ * - 명함 카드 렌더링: js/domains/businesscard/components/BusinessCard.js
+ * - QR 코드 생성: js/domains/businesscard/components/QRGenerator.js
+ * - API 통신: js/domains/businesscard/services/businesscard-api.js
  */
 
 import { getEmployeeIdFromForm, showToast, validateImageFile } from './helpers.js';

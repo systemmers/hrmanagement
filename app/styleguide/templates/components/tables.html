@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block styleguide_content %}
+{% from "partials/_component_demo.html" import section, subsection, code %}
+
+{% call section('tables', '테이블', '데이터를 표 형식으로 표시하는 컴포넌트') %}
+
+    {% call subsection('기본 테이블') %}
+    <div class="demo-table-container">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>이름</th>
+                        <th>부서</th>
+                        <th>직급</th>
+                        <th>상태</th>
+                        <th>작업</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>홍길동</td>
+                        <td>개발팀</td>
+                        <td>선임연구원</td>
+                        <td><span class="badge badge-success">재직</span></td>
+                        <td class="table-actions">
+                            <button class="btn-icon"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>김철수</td>
+                        <td>디자인팀</td>
+                        <td>책임연구원</td>
+                        <td><span class="badge badge-success">재직</span></td>
+                        <td class="table-actions">
+                            <button class="btn-icon"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td>이영희</td>
+                        <td>경영지원팀</td>
+                        <td>팀장</td>
+                        <td><span class="badge badge-warning">휴직</span></td>
+                        <td class="table-actions">
+                            <button class="btn-icon"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% call code() %}
+&lt;div class="table-container"&gt;
+    &lt;table&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;&lt;th&gt;이름&lt;/th&gt;&lt;th&gt;부서&lt;/th&gt;...&lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+            &lt;tr&gt;&lt;td&gt;홍길동&lt;/td&gt;&lt;td&gt;개발팀&lt;/td&gt;...&lt;/tr&gt;
+            &lt;tr class="highlight-row"&gt;...&lt;/tr&gt;
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('데이터 테이블') %}
+    <div class="demo-table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>사번</th>
+                    <th>이름</th>
+                    <th>부서</th>
+                    <th>입사일</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>EMP001</td>
+                    <td>홍길동</td>
+                    <td>개발팀</td>
+                    <td>2023-01-15</td>
+                </tr>
+                <tr>
+                    <td>EMP002</td>
+                    <td>김철수</td>
+                    <td>디자인팀</td>
+                    <td>2023-03-20</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% call code() %}
+&lt;table class="data-table"&gt;
+    &lt;thead&gt;...&lt;/thead&gt;
+    &lt;tbody&gt;...&lt;/tbody&gt;
+&lt;/table&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('빈 테이블 상태') %}
+    <div class="table-container">
+        <div class="table-empty">
+            <i class="fas fa-inbox"></i>
+            <p>등록된 데이터가 없습니다.</p>
+        </div>
+    </div>
+    {% call code() %}
+&lt;div class="table-container"&gt;
+    &lt;div class="table-empty"&gt;
+        &lt;i class="fas fa-inbox"&gt;&lt;/i&gt;
+        &lt;p&gt;등록된 데이터가 없습니다.&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('테이블 액션') %}
+    <div class="component-demo">
+        <div class="table-actions">
+            <button class="btn-icon" title="보기"><i class="fas fa-eye"></i></button>
+            <button class="btn-icon" title="수정"><i class="fas fa-edit"></i></button>
+            <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
+            <button class="btn-icon" title="더보기"><i class="fas fa-ellipsis-v"></i></button>
+        </div>
+    </div>
+    {% call code() %}
+&lt;td class="table-actions"&gt;
+    &lt;button class="btn-icon"&gt;&lt;i class="fas fa-edit"&gt;&lt;/i&gt;&lt;/button&gt;
+    &lt;button class="btn-icon"&gt;&lt;i class="fas fa-trash"&gt;&lt;/i&gt;&lt;/button&gt;
+&lt;/td&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

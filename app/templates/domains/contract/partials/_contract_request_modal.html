@@ -1,0 +1,202 @@
+{#
+    계약 요청 모달 (3-Step)
+    Step 1: 대상 선택 (직원 계정 / 개인 계정)
+    Step 2: 계약 정보 입력
+    Step 3: 확인 및 제출
+#}
+
+<div class="modal" id="contractRequestModal" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-container modal-lg">
+        <div class="modal-header">
+            <h2 class="modal-title">새 계약 요청</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="닫기">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- 스텝 인디케이터 -->
+        <div class="modal-steps">
+            <div class="step active" data-step="1">
+                <span class="step-number">1</span>
+                <span class="step-label">대상 선택</span>
+            </div>
+            <div class="step" data-step="2">
+                <span class="step-number">2</span>
+                <span class="step-label">계약 정보</span>
+            </div>
+            <div class="step" data-step="3">
+                <span class="step-number">3</span>
+                <span class="step-label">확인</span>
+            </div>
+        </div>
+
+        <form id="contractRequestForm" class="modal-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="target_user_id" id="modalTargetUserId" value="">
+
+            <!-- Step 1: 대상 선택 -->
+            <div class="modal-step-content active" data-step-content="1">
+                <div class="modal-body">
+                    <!-- 탭 네비게이션 -->
+                    <div class="tabs-nav" role="tablist">
+                        <button type="button" class="tab-btn active" data-tab="employee" role="tab" aria-selected="true">
+                            <i class="fas fa-id-badge"></i>
+                            직원 계정
+                            <span class="badge" id="employeeCount">0</span>
+                        </button>
+                        <button type="button" class="tab-btn" data-tab="personal" role="tab" aria-selected="false">
+                            <i class="fas fa-user"></i>
+                            개인 계정
+                            <span class="badge" id="personalCount">0</span>
+                        </button>
+                    </div>
+
+                    <!-- 직원 계정 목록 -->
+                    <div class="tab-panel active" id="modal-panel-employee" role="tabpanel">
+                        <div class="target-list" id="employeeTargetList">
+                            <!-- 동적으로 로드됨 -->
+                            <div class="loading-state">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>대상 목록을 불러오는 중...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 개인 계정 목록 -->
+                    <div class="tab-panel" id="modal-panel-personal" role="tabpanel">
+                        <div class="target-list" id="personalTargetList">
+                            <!-- 동적으로 로드됨 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-modal-close>취소</button>
+                    <button type="button" class="btn btn-primary" data-step-next="2" disabled id="step1NextBtn">
+                        다음
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: 계약 정보 -->
+            <div class="modal-step-content" data-step-content="2">
+                <div class="modal-body">
+                    <div class="selected-target-info" id="selectedTargetInfo">
+                        <!-- 선택된 대상 정보 표시 -->
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="modalContractType" class="form-label required">계약 유형</label>
+                                <select id="modalContractType" name="contract_type" class="form-select" required>
+                                    <option value="">선택하세요</option>
+                                    <option value="employment">정규직</option>
+                                    <option value="contract">계약직</option>
+                                    <option value="freelance">프리랜서</option>
+                                    <option value="intern">인턴</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row two-col">
+                            <div class="form-group">
+                                <label for="modalStartDate" class="form-label">계약 시작일</label>
+                                <input type="date" id="modalStartDate" name="contract_start_date" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="modalEndDate" class="form-label">계약 종료일</label>
+                                <input type="date" id="modalEndDate" name="contract_end_date" class="form-input">
+                            </div>
+                        </div>
+                        <div class="form-row two-col">
+                            <div class="form-group">
+                                <label for="modalDepartment" class="form-label">부서</label>
+                                <input type="text" id="modalDepartment" name="department" class="form-input" placeholder="배치될 부서">
+                            </div>
+                            <div class="form-group">
+                                <label for="modalPosition" class="form-label">직위</label>
+                                <input type="text" id="modalPosition" name="position" class="form-input" placeholder="직위/직급">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="modalNotes" class="form-label">메모</label>
+                            <textarea id="modalNotes" name="notes" class="form-textarea" rows="3" placeholder="계약 관련 추가 정보"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-step-prev="1">
+                        <i class="fas fa-arrow-left"></i>
+                        이전
+                    </button>
+                    <button type="button" class="btn btn-primary" data-step-next="3" id="step2NextBtn">
+                        다음
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: 확인 -->
+            <div class="modal-step-content" data-step-content="3">
+                <div class="modal-body">
+                    <div class="confirm-section">
+                        <h3 class="confirm-title">계약 요청 정보 확인</h3>
+
+                        <div class="confirm-grid">
+                            <div class="confirm-item">
+                                <span class="confirm-label">대상</span>
+                                <span class="confirm-value" id="confirmTarget">-</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">계약 유형</span>
+                                <span class="confirm-value" id="confirmContractType">-</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">부서</span>
+                                <span class="confirm-value" id="confirmDepartment">-</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">직위</span>
+                                <span class="confirm-value" id="confirmPosition">-</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">계약 기간</span>
+                                <span class="confirm-value" id="confirmPeriod">-</span>
+                            </div>
+                            <div class="confirm-item full-width">
+                                <span class="confirm-label">메모</span>
+                                <span class="confirm-value" id="confirmNotes">-</span>
+                            </div>
+                        </div>
+
+                        <div class="notice-section">
+                            <div class="notice-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="notice-content">
+                                <ul>
+                                    <li>계약 요청이 전송되면 대상에게 알림이 발송됩니다.</li>
+                                    <li>대상이 승인하면 계약이 활성화됩니다.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-step-prev="2">
+                        <i class="fas fa-arrow-left"></i>
+                        이전
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitContractBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        계약 요청 전송
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

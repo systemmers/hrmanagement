@@ -1,0 +1,98 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, spacing_item %}
+
+{% call section('spacing', '간격', '일관된 간격 시스템으로 레이아웃 구성') %}
+
+    {% call subsection('간격 단계 (13단계)') %}
+    <div class="spacing-demo">
+        {{ spacing_item('0.5 (2px)', '2px') }}
+        {{ spacing_item('1 (4px)', '4px') }}
+        {{ spacing_item('1.5 (6px)', '6px') }}
+        {{ spacing_item('2 (8px)', '8px') }}
+        {{ spacing_item('2.5 (10px)', '10px') }}
+        {{ spacing_item('3 (12px)', '12px') }}
+        {{ spacing_item('4 (16px)', '16px') }}
+        {{ spacing_item('5 (20px)', '20px') }}
+        {{ spacing_item('6 (24px)', '24px') }}
+        {{ spacing_item('8 (32px)', '32px') }}
+        {{ spacing_item('10 (40px)', '40px') }}
+        {{ spacing_item('12 (48px)', '48px') }}
+        {{ spacing_item('16 (64px)', '64px') }}
+    </div>
+    {% endcall %}
+
+    {% call subsection('사용 가이드') %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>용도</th>
+                    <th>권장 간격</th>
+                    <th>예시</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>아이콘과 텍스트 사이</td>
+                    <td>space-1 ~ space-2</td>
+                    <td>버튼 내 아이콘, 레이블</td>
+                </tr>
+                <tr>
+                    <td>인라인 요소 사이</td>
+                    <td>space-2 ~ space-3</td>
+                    <td>태그, 배지 간격</td>
+                </tr>
+                <tr>
+                    <td>폼 필드 내부</td>
+                    <td>space-2 ~ space-4</td>
+                    <td>입력 필드 패딩</td>
+                </tr>
+                <tr>
+                    <td>카드 내부</td>
+                    <td>space-4 ~ space-6</td>
+                    <td>카드 바디 패딩</td>
+                </tr>
+                <tr>
+                    <td>섹션 사이</td>
+                    <td>space-6 ~ space-8</td>
+                    <td>콘텐츠 섹션 마진</td>
+                </tr>
+                <tr>
+                    <td>페이지 레이아웃</td>
+                    <td>space-8 ~ space-16</td>
+                    <td>사이드바, 메인 콘텐츠</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endcall %}
+
+    {% call subsection('CSS 변수 사용법') %}
+    <div class="code-block">
+<code>/* 간격 변수 사용 */
+.card {
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.card-header {
+    padding: var(--space-3) var(--space-4);
+}
+
+.btn {
+    padding: var(--space-2) var(--space-4);
+    gap: var(--space-2);
+}
+
+/* 레이아웃 예시 */
+.page-content {
+    padding: var(--space-6);
+    gap: var(--space-4);
+}</code>
+    </div>
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

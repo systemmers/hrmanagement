@@ -1,11 +1,15 @@
 {% extends "shared/base.html" %}
 {% from 'shared/macros/_avatar.html' import avatar_image %}
-{% from 'shared/macros/_filters.html' import filter_bar, search_box, filter_select %}
+{% from 'shared/macros/_filters.html' import filter_bar, search_box, filter_select, sort_select %}
 
 {% block title %}직원 목록 - 인사카드 관리 시스템{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/filter.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/modal.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/account-provision-modal.css') }}">
+{# BusinessCard 도메인 CSS (플랫 모던) #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/businesscard/card.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -20,7 +24,14 @@
                 <button class="view-toggle-btn" data-view="card" title="카드형 보기">
                     <i class="fas fa-th"></i>
                 </button>
+                <button class="view-toggle-btn" data-view="namecard" title="명함형 보기">
+                    <i class="fas fa-id-card"></i>
+                </button>
             </div>
+            <button type="button" class="btn btn-secondary" id="openAccountProvisionModal">
+                <i class="fas fa-id-card"></i>
+                <span>계정 발급</span>
+            </button>
             <a href="{{ url_for('employees.employee_new') }}" class="btn btn-primary">
                 <i class="fas fa-plus"></i>
                 <span>직원 등록</span>
@@ -30,19 +41,15 @@
     <p class="page-description">총 {{ employees|length }}명의 직원이 있습니다.</p>
 </div>
 
-<!-- 필터 바 (매크로 기반) -->
+<!-- 필터 바 (매크로 기반) - 정렬 포함 -->
 {% call filter_bar(mode='url', css_class='filter-bar--simple') %}
     {{ search_box(placeholder='이름, 부서, 직급 검색...', value=request.args.get('search', '')) }}
     {{ filter_select('filter-department', 'department', classification_options.departments, request.args.get('department', ''), '전체 부서') }}
     {{ filter_select('filter-position', 'position', classification_options.positions, request.args.get('position', ''), '전체 직급') }}
     {{ filter_select('filter-status', 'status', classification_options.statuses, request.args.get('status', ''), '전체 상태') }}
-{% endcall %}
-
-<!-- 정렬 옵션 -->
-<div class="sort-bar">
-    <label class="sort-label">정렬:</label>
-    <select class="sort-select" id="sortSelect">
-        <option value="" {% if not request.args.get('sort') %}selected{% endif %}>기본순</option>
+    {# 정렬 셀렉트 - 필터바 내 오른쪽 정렬 (FilterBar 이벤트에서 제외) #}
+    <select id="sortSelect" class="filter-select filter-sort" aria-label="정렬" data-filter-exclude>
+        <option value="" {% if not request.args.get('sort') %}selected{% endif %}>정렬</option>
         <option value="name" {% if request.args.get('sort') == 'name' and request.args.get('order') != 'desc' %}selected{% endif %}>이름 (오름차순)</option>
         <option value="name-desc" {% if request.args.get('sort') == 'name' and request.args.get('order') == 'desc' %}selected{% endif %}>이름 (내림차순)</option>
         <option value="department" {% if request.args.get('sort') == 'department' and request.args.get('order') != 'desc' %}selected{% endif %}>부서 (오름차순)</option>
@@ -52,7 +59,7 @@
         <option value="hireDate" {% if request.args.get('sort') == 'hireDate' and request.args.get('order') != 'desc' %}selected{% endif %}>입사일 (오래된순)</option>
         <option value="hireDate-desc" {% if request.args.get('sort') == 'hireDate' and request.args.get('order') == 'desc' %}selected{% endif %}>입사일 (최신순)</option>
     </select>
-</div>
+{% endcall %}
 
 <!-- 목록형 뷰 -->
 <div class="table-container" id="list-view">
@@ -195,16 +202,30 @@
     {% endfor %}
 </div>
 
+<!-- 명함형 뷰 (BusinessCard 도메인) -->
+<div class="bc-grid d-none" id="namecard-view">
+    {% for employee in employees %}
+        {% include 'domains/businesscard/partials/_card.html' %}
+    {% endfor %}
+</div>
+
 {% if employees|length == 0 %}
 <div class="empty-state empty-state-large">
     <i class="fas fa-users"></i>
     <p>등록된 직원이 없습니다.</p>
 </div>
 {% endif %}
+
+{# 계정 발급 모달 #}
+{% include 'domains/employee/partials/_account_provision_modal.html' %}
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module" src="{{ url_for('static', filename='js/shared/components/filter-bar.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/domains/employee/pages/list.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/employee/pages/account-provision-modal.js') }}"></script>
+{# BusinessCard 도메인 모듈 (명함형 뷰용) #}
+<script type="module" src="{{ url_for('static', filename='js/domains/businesscard/index.js') }}"></script>
 {% endblock %}
 

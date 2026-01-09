@@ -138,15 +138,21 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
         """
         return Employee.query.get(employee_id)
 
-    def create(self, data: Dict) -> Dict:
-        """새 직원 생성"""
+    def create(self, data: Dict, commit: bool = True) -> Dict:
+        """새 직원 생성
+
+        Args:
+            data: 생성할 데이터 딕셔너리
+            commit: True면 즉시 커밋, False면 트랜잭션 유지
+        """
         # ID 자동 생성 (기존 로직 유지)
         if not data.get('id'):
             data['id'] = self._generate_new_id()
 
         employee = Employee.from_dict(data)
         db.session.add(employee)
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return employee.to_dict()
 
     def update(self, employee_id: str, data: Dict) -> Optional[Dict]:

@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block styleguide_content %}
+{% from "partials/_component_demo.html" import section, subsection, shadow_item, radius_item %}
+
+{% call section('shadows', '그림자/반경', '깊이감을 표현하는 그림자와 모서리 반경') %}
+
+    {% call subsection('그림자 (5단계)') %}
+    <div class="shadow-demo">
+        {{ shadow_item('shadow-xs', '--shadow-xs') }}
+        {{ shadow_item('shadow-sm', '--shadow-sm') }}
+        {{ shadow_item('shadow-md', '--shadow-md') }}
+        {{ shadow_item('shadow-lg', '--shadow-lg') }}
+        {{ shadow_item('shadow-xl', '--shadow-xl') }}
+    </div>
+    {% endcall %}
+
+    {% call subsection('그림자 사용 가이드') %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>그림자</th>
+                    <th>용도</th>
+                    <th>예시</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>shadow-xs</td>
+                    <td>미세한 구분</td>
+                    <td>입력 필드, 작은 카드</td>
+                </tr>
+                <tr>
+                    <td>shadow-sm</td>
+                    <td>기본 깊이</td>
+                    <td>버튼 호버, 드롭다운</td>
+                </tr>
+                <tr>
+                    <td>shadow-md</td>
+                    <td>중간 깊이</td>
+                    <td>카드, 패널</td>
+                </tr>
+                <tr>
+                    <td>shadow-lg</td>
+                    <td>강한 깊이</td>
+                    <td>모달, 팝업</td>
+                </tr>
+                <tr>
+                    <td>shadow-xl</td>
+                    <td>최대 깊이</td>
+                    <td>플로팅 요소, 오버레이</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endcall %}
+
+    {% call subsection('반경 (6단계)') %}
+    <div class="radius-demo">
+        {{ radius_item('xs (3px)', '--radius-xs') }}
+        {{ radius_item('sm (4px)', '--radius-sm') }}
+        {{ radius_item('md (6px)', '--radius-md') }}
+        {{ radius_item('lg (8px)', '--radius-lg') }}
+        {{ radius_item('xl (12px)', '--radius-xl') }}
+        {{ radius_item('2xl (16px)', '--radius-2xl') }}
+    </div>
+    {% endcall %}
+
+    {% call subsection('반경 사용 가이드') %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>반경</th>
+                    <th>용도</th>
+                    <th>예시</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>radius-xs / radius-sm</td>
+                    <td>작은 요소</td>
+                    <td>배지, 태그, 체크박스</td>
+                </tr>
+                <tr>
+                    <td>radius-md</td>
+                    <td>기본 요소</td>
+                    <td>버튼, 입력 필드</td>
+                </tr>
+                <tr>
+                    <td>radius-lg</td>
+                    <td>중간 컨테이너</td>
+                    <td>카드, 드롭다운</td>
+                </tr>
+                <tr>
+                    <td>radius-xl / radius-2xl</td>
+                    <td>큰 컨테이너</td>
+                    <td>모달, 패널</td>
+                </tr>
+                <tr>
+                    <td>radius-full</td>
+                    <td>원형</td>
+                    <td>아바타, 원형 버튼</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endcall %}
+
+    {% call subsection('CSS 변수 사용법') %}
+    <div class="code-block">
+<code>/* 그림자 변수 사용 */
+.card {
+    box-shadow: var(--shadow-sm);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.modal {
+    box-shadow: var(--shadow-xl);
+}
+
+/* 반경 변수 사용 */
+.btn {
+    border-radius: var(--radius-md);
+}
+
+.card {
+    border-radius: var(--radius-lg);
+}
+
+.avatar {
+    border-radius: var(--radius-full);
+}</code>
+    </div>
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

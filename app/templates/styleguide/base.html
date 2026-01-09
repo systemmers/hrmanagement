@@ -1,0 +1,50 @@
+{% extends "shared/base.html" %}
+
+{% block title %}{{ meta['title'] }}{% endblock %}
+
+{% block extra_css %}
+<!-- Components CSS (컴포넌트 데모용) -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/info-grid.css') }}">
+
+<!-- Styleguide 전용 CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styleguide/styleguide.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="styleguide-wrapper">
+    <!-- 스타일가이드 내부 네비게이션 -->
+    {% include 'styleguide/partials/_navigation.html' %}
+
+    <!-- 스타일가이드 콘텐츠 -->
+    <div class="styleguide-content">
+        {% block styleguide_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 스크롤 시 네비게이션 활성화
+    const sections = document.querySelectorAll('.styleguide-section[id]');
+    const navItems = document.querySelectorAll('.styleguide-nav-item');
+
+    window.addEventListener('scroll', function() {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 100;
+            if (window.scrollY >= sectionTop) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navItems.forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('href') === `#${current}`) {
+                item.classList.add('active');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

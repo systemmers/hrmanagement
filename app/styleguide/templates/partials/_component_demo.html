@@ -1,0 +1,76 @@
+{# 컴포넌트 데모 매크로 #}
+
+{% macro section(id, title, description='') %}
+<section id="{{ id }}" class="styleguide-section">
+    <div class="styleguide-section-header">
+        <h2 class="styleguide-section-title">{{ title }}</h2>
+        {% if description %}
+        <p class="styleguide-section-desc">{{ description }}</p>
+        {% endif %}
+    </div>
+    <div class="styleguide-section-body">
+        {{ caller() }}
+    </div>
+</section>
+{% endmacro %}
+
+{% macro subsection(title) %}
+<div class="styleguide-subsection">
+    <h3 class="styleguide-subsection-title">{{ title }}</h3>
+    {{ caller() }}
+</div>
+{% endmacro %}
+
+{% macro demo(dark=false) %}
+<div class="component-demo {{ 'component-demo-dark' if dark else '' }}">
+    {{ caller() }}
+</div>
+{% endmacro %}
+
+{% macro code(language='html') %}
+<div class="code-block">
+<code>{{ caller() }}</code>
+</div>
+{% endmacro %}
+
+{% macro color_grid() %}
+<div class="color-grid">
+    {{ caller() }}
+</div>
+{% endmacro %}
+
+{% macro color_swatch(name, value, border=false) %}
+<div class="color-swatch">
+    <div class="color-swatch-preview" style="background: {{ value }};{% if border %} border: 1px solid var(--color-gray-200);{% endif %}"></div>
+    <div class="color-swatch-info">
+        <div class="color-swatch-name">{{ name }}</div>
+        <div class="color-swatch-value">{{ value }}</div>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro typography_sample(label, size_var) %}
+<div class="typography-sample">
+    <div class="typography-label">{{ label }}</div>
+    <div style="font-size: var({{ size_var }});">인사카드 관리 시스템</div>
+</div>
+{% endmacro %}
+
+{% macro spacing_item(label, size) %}
+<div class="spacing-item">
+    <div class="spacing-box" style="width: {{ size }}; height: 20px;"></div>
+    <span class="spacing-label">{{ label }}</span>
+</div>
+{% endmacro %}
+
+{% macro shadow_item(label, shadow_var) %}
+<div class="shadow-item" style="box-shadow: var({{ shadow_var }});">
+    <span class="shadow-item-label">{{ label }}</span>
+</div>
+{% endmacro %}
+
+{% macro radius_item(label, radius_var) %}
+<div class="radius-item" style="border-radius: var({{ radius_var }});">
+    <span>{{ label }}</span>
+</div>
+{% endmacro %}

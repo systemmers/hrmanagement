@@ -77,6 +77,24 @@
 </div>
 {% endmacro %}
 
+{# 정렬 셀렉트 - 필터바 내 오른쪽 정렬용 #}
+{% macro sort_select(id, options, selected_sort='', selected_order='', placeholder='정렬', css_class='') %}
+<select id="{{ id }}" class="filter-select filter-sort {{ css_class }}"
+        aria-label="{{ placeholder }}">
+    <option value="">{{ placeholder }}</option>
+    {% for opt in options %}
+    {% set is_selected = (opt.value == selected_sort and selected_order != 'desc') or
+                         (opt.value ~ '-desc' == selected_sort ~ '-' ~ selected_order if selected_order == 'desc' else false) %}
+    <option value="{{ opt.value }}" {% if opt.value == selected_sort and selected_order != 'desc' %}selected{% endif %}>
+        {{ opt.label_asc if opt.label_asc else opt.label ~ ' (오름차순)' }}
+    </option>
+    <option value="{{ opt.value }}-desc" {% if opt.value == selected_sort and selected_order == 'desc' %}selected{% endif %}>
+        {{ opt.label_desc if opt.label_desc else opt.label ~ ' (내림차순)' }}
+    </option>
+    {% endfor %}
+</select>
+{% endmacro %}
+
 {# 필터 버튼 그룹 - Reset 버튼 기본 비활성화 (활성 필터 태그로 대체) #}
 {% macro filter_buttons(show_reset=false, show_submit=false, reset_text='초기화', submit_text='필터') %}
 <div class="filter-buttons">

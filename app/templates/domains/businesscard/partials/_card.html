@@ -1,0 +1,106 @@
+{#
+    BusinessCard Card Component
+    명함 카드 컴포넌트 (Executive Dark)
+
+    Design: Design 2 - Executive Dark
+    - 상단 중앙 사진 레이아웃
+    - 다크 그라데이션 배경
+    - 가로 연락처 배치
+    - 우측 하단 QR 코드
+
+    Variables:
+        employee: Employee 객체
+        company: Company 객체 (선택)
+
+    Usage:
+        {% include 'domains/businesscard/partials/_card.html' %}
+#}
+
+<div class="bc-wrapper"
+     tabindex="0"
+     data-employee-id="{{ employee.id }}"
+     data-href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}">
+    <div class="bc-card">
+        <!-- 명함 앞면 (Executive Dark) -->
+        <div class="bc-face bc-front">
+            <!-- 사진 (상단 중앙) -->
+            {% if employee.photo %}
+            <img src="{{ employee.photo }}" alt="{{ employee.name }}" class="bc-photo">
+            {% else %}
+            <div class="bc-avatar">{{ employee.name[:1] if employee.name else '?' }}</div>
+            {% endif %}
+
+            <!-- 이름 -->
+            <h3 class="bc-name">{{ employee.name }}</h3>
+            {% if employee.english_name %}
+            <p class="bc-name-en">{{ employee.english_name }}</p>
+            {% endif %}
+
+            <!-- 직책 -->
+            <p class="bc-position">{{ employee.position or '직책' }}</p>
+
+            <!-- 부서 | 회사 -->
+            <p class="bc-department">
+                {{ employee.department or '부서' }}
+                {% if company %} | {{ company.name }}{% endif %}
+            </p>
+
+            <!-- 연락처 (가로 배치) -->
+            <div class="bc-contact-row">
+                {% if employee.phone %}
+                <span><i class="fas fa-phone"></i>{{ employee.phone }}</span>
+                {% endif %}
+                {% if employee.email %}
+                <span><i class="fas fa-envelope"></i>{{ employee.email }}</span>
+                {% endif %}
+            </div>
+
+            <!-- QR 코드 (우측 하단) -->
+            <div class="bc-qr" data-employee-number="{{ employee.employee_number or employee.id }}"></div>
+        </div>
+
+        <!-- 명함 뒷면 (Executive Dark) -->
+        <div class="bc-face bc-back">
+            <div class="bc-back-header">
+                <div class="bc-back-logo">
+                    {% if company and company.logo_url %}
+                    <img src="{{ company.logo_url }}" alt="{{ company.name }}">
+                    {% else %}
+                    <i class="fas fa-crown"></i>
+                    {% endif %}
+                    <span>{{ company.name if company else '회사명' }}</span>
+                </div>
+                <span class="bc-badge{% if employee.status != 'active' %} bc-badge-inactive{% endif %}">
+                    {% if employee.status == 'active' %}재직중{% else %}{{ employee.status or '재직중' }}{% endif %}
+                </span>
+            </div>
+
+            <div class="bc-back-content">
+                <div class="bc-back-item">
+                    <i class="fas fa-id-badge"></i>
+                    <span class="bc-back-item-label">사번</span>
+                    <span class="bc-back-item-value">{{ employee.employee_number or '-' }}</span>
+                </div>
+                <div class="bc-back-item">
+                    <i class="fas fa-phone-square"></i>
+                    <span class="bc-back-item-label">내선</span>
+                    <span class="bc-back-item-value">{{ employee.internal_phone or '-' }}</span>
+                </div>
+                <div class="bc-back-item">
+                    <i class="fas fa-sitemap"></i>
+                    <span class="bc-back-item-label">소속</span>
+                    <span class="bc-back-item-value">{{ employee.department or '-' }}</span>
+                </div>
+            </div>
+
+            <div class="bc-back-footer">
+                <span class="bc-website">{{ company.website if company and company.website else '' }}</span>
+                <span class="bc-verified">
+                    <i class="fas fa-shield-alt"></i>
+                    VIP
+                </span>
+            </div>
+        </div>
+    </div>
+
+</div>
