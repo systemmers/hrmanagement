@@ -5,7 +5,7 @@ BusinessCard Repository
 Attachment 모델을 재사용하며, category 기반으로 명함 데이터를 필터링합니다.
 """
 from typing import Dict, Optional, List
-from app.domains.employee.models import Attachment
+from app.domains.attachment.models import Attachment
 from app.shared.repositories.base_repository import BaseRepository
 from app.database import db
 

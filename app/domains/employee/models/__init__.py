@@ -3,6 +3,8 @@
 Employee 도메인 모델 패키지
 
 직원 관련 모든 SQLAlchemy 모델을 정의하고 export합니다.
+
+Phase 31: Attachment는 독립 도메인으로 분리됨 (app/domains/attachment/)
 """
 from app.shared.models.mixins import DictSerializableMixin, TimestampMixin, SoftDeleteMixin
 from .employee import Employee
@@ -27,7 +29,6 @@ from .project_participation import ProjectParticipation
 from .award import Award
 from .asset import Asset
 from .salary_payment import SalaryPayment
-from .attachment import Attachment
 
 
 __all__ = [
@@ -54,7 +55,6 @@ __all__ = [
     'Award',
     'Asset',
     'SalaryPayment',
-    'Attachment',
     # 1:1 Relations
     'MilitaryService',
     'Salary',

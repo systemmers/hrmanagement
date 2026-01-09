@@ -17,7 +17,7 @@ from app.domains.user.blueprints.profile.decorators import (
     corporate_admin_only
 )
 from app.domains.user.services.user_service import user_service
-from app.domains.employee.services.attachment_service import attachment_service
+from app.domains.attachment.services import attachment_service
 from app.domains.user.services.corporate_admin_profile_service import corporate_admin_profile_service
 from app.domains.employee.services import employee_service
 from app.shared.services.file_storage_service import file_storage, CATEGORY_ADMIN_PHOTO

@@ -5,7 +5,8 @@
 직원 관련 모든 기능을 포함합니다:
 - 직원 CRUD
 - 직원 관계형 데이터 (학력, 경력, 자격증 등)
-- 직원 첨부파일
+
+Phase 31: Attachment는 독립 도메인으로 분리됨 (app/domains/attachment/)
 """
 
 # Repository 인스턴스 (지연 초기화)
@@ -30,7 +31,6 @@ _project_participation_repo = None
 _award_repo = None
 _asset_repo = None
 _salary_payment_repo = None
-_attachment_repo = None
 _profile_repo = None
 
 
@@ -42,7 +42,7 @@ def init_repositories():
     global _salary_repo, _benefit_repo, _contract_repo, _salary_history_repo
     global _promotion_repo, _evaluation_repo, _training_repo, _attendance_repo
     global _insurance_repo, _hr_project_repo, _project_participation_repo
-    global _award_repo, _asset_repo, _salary_payment_repo, _attachment_repo
+    global _award_repo, _asset_repo, _salary_payment_repo
     global _profile_repo
 
     from .repositories import (
@@ -52,7 +52,7 @@ def init_repositories():
         SalaryRepository, BenefitRepository, ContractRepository, SalaryHistoryRepository,
         PromotionRepository, EvaluationRepository, TrainingRepository, AttendanceRepository,
         InsuranceRepository, HrProjectRepository, ProjectParticipationRepository,
-        AwardRepository, AssetRepository, SalaryPaymentRepository, AttachmentRepository,
+        AwardRepository, AssetRepository, SalaryPaymentRepository,
         ProfileRepository
     )
 
@@ -77,7 +77,6 @@ def init_repositories():
     _award_repo = AwardRepository()
     _asset_repo = AssetRepository()
     _salary_payment_repo = SalaryPaymentRepository()
-    _attachment_repo = AttachmentRepository()
     _profile_repo = ProfileRepository()
 
 
@@ -107,10 +106,6 @@ def get_language_repo():
 
 def get_military_service_repo():
     return _military_service_repo
-
-
-def get_attachment_repo():
-    return _attachment_repo
 
 
 def get_classification_repo():

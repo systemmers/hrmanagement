@@ -3,6 +3,8 @@
 Employee 도메인 Repository 패키지
 
 직원 관련 모든 Repository를 정의하고 export합니다.
+
+Phase 31: AttachmentRepository는 독립 도메인으로 분리됨 (app/domains/attachment/)
 """
 from .employee_repository import EmployeeRepository
 from .profile_repository import ProfileRepository
@@ -26,7 +28,6 @@ from .project_participation_repository import ProjectParticipationRepository
 from .award_repository import AwardRepository
 from .asset_repository import AssetRepository
 from .salary_payment_repository import SalaryPaymentRepository
-from .attachment_repository import AttachmentRepository
 
 
 __all__ = [
@@ -49,7 +50,6 @@ __all__ = [
     'AwardRepository',
     'AssetRepository',
     'SalaryPaymentRepository',
-    'AttachmentRepository',
     # 1:1 Relations
     'MilitaryServiceRepository',
     'SalaryRepository',

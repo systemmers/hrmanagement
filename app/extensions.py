@@ -112,7 +112,14 @@ def init_extensions(app):
     award_repo = employee_domain.get_award_repo()
     asset_repo = employee_domain.get_asset_repo()
     salary_payment_repo = employee_domain.get_salary_payment_repo()
-    attachment_repo = employee_domain.get_attachment_repo()
+
+    # 1.5. Attachment 도메인 (Phase 31: employee에서 분리)
+    from app.domains.attachment import init_repositories as init_attachment_repos
+    from app.domains import attachment as attachment_domain
+    init_attachment_repos()
+
+    # Attachment 도메인 전역 변수 할당 (하위 호환성)
+    attachment_repo = attachment_domain.get_attachment_repo()
 
     # 2. Contract 도메인
     from app.domains.contract import init_repositories as init_contract_repos

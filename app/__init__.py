@@ -33,8 +33,9 @@ def create_app(config_name=None):
         Employee, Education, Career, Certificate, FamilyMember,
         Language, MilitaryService, Salary, Benefit, Contract,
         SalaryHistory, Promotion, Evaluation, Training, Attendance,
-        Insurance, HrProject, ProjectParticipation, Award, Asset, SalaryPayment, Attachment,
+        Insurance, HrProject, ProjectParticipation, Award, Asset, SalaryPayment,
     )
+    from .domains.attachment.models import Attachment  # Phase 31: 독립 도메인
     from .domains.company.models import ClassificationOption
 
     # 테이블 생성 (개발 환경)

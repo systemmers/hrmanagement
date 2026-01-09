@@ -9,7 +9,7 @@ Attachment 모델의 category 필드를 사용하여 명함을 구분합니다:
 - business_card_back: 명함 뒷면
 """
 
-# Attachment 모델 참조 (employee 도메인에서 import)
-from app.domains.employee.models import Attachment
+# Attachment 모델 참조 (attachment 도메인에서 import)
+from app.domains.attachment.models import Attachment
 
 __all__ = ['Attachment']
