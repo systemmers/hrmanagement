@@ -24,6 +24,22 @@
     margin-bottom: 0;
 }
 
+/* 섹션 헤더 (타이틀 + 저장 버튼) */
+.form-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.form-section-header .form-section-title {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
 .form-section-title {
     font-size: var(--text-lg);
     font-weight: 600;
@@ -38,6 +54,11 @@
 
 .form-section-title i {
     color: var(--color-primary-600);
+}
+
+/* 섹션별 저장 버튼 */
+.section-save-btn {
+    flex-shrink: 0;
 }
 
 /* 폼 레이아웃 */

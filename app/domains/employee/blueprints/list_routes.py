@@ -104,10 +104,14 @@ def register_list_routes(bp: Blueprint):
         # 명함 컴포넌트용 회사 정보 조회
         company = company_service.get_by_id(company_id) if company_id else None
 
+        # 뷰 모드 파라미터 (카드뷰/명함뷰 필터 적용 시 뷰 유지용)
+        view_mode = request.args.get('view', 'list')
+
         return render_template('domains/employee/list.html',
                                employees=employees_with_contract,
                                classification_options=classification_options,
-                               company=company)
+                               company=company,
+                               view_mode=view_mode)
 
     @bp.route('/employees/pending')
     @manager_or_admin_required

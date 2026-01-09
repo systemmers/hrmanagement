@@ -5,6 +5,7 @@
 
 Phase 7: 도메인 중심 마이그레이션 완료
 Phase 2: Service 계층 표준화
+Phase 8: save_settings, delete_setting 메서드 추가 (2026-01-09)
 """
 from typing import Dict, List, Optional, Any
 
@@ -120,9 +121,31 @@ class CorporateSettingsService:
         """법인 설정 조회"""
         return self.settings_repo.get_by_company(company_id)
 
+    def get_all_settings(self, company_id: int, category: str = None) -> Dict:
+        """전체 설정 조회 (API용)
+
+        Args:
+            company_id: 법인 ID
+            category: 카테고리 필터 (선택적)
+
+        Returns:
+            설정 딕셔너리
+        """
+        if category:
+            return self.settings_repo.get_by_company_and_category(company_id, category)
+        return self.settings_repo.get_by_company(company_id)
+
     def update_settings(self, company_id: int, data: Dict) -> List:
         """법인 설정 일괄 저장"""
         return self.settings_repo.set_bulk_settings(company_id, data)
+
+    def save_settings(self, company_id: int, data: Dict) -> List:
+        """법인 설정 저장 (update_settings 별칭)"""
+        return self.update_settings(company_id, data)
+
+    def delete_setting(self, company_id: int, key: str) -> bool:
+        """설정 삭제"""
+        return self.settings_repo.delete_setting(company_id, key)
 
     def get_setting(self, company_id: int, key: str) -> Any:
         """단일 설정값 조회"""

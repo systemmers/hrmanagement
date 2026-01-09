@@ -55,30 +55,37 @@ function handleLogout() {
 }
 
 /**
- * 직원 목록 뷰 전환 함수
- * @param {string} viewType - 'list' 또는 'card'
+ * 직원 목록 뷰 전환 함수 (레거시 호환용)
+ * Note: list.js 모듈에서 더 완전한 버전 제공 (namecard 포함)
+ * @param {string} viewType - 'list', 'card', 또는 'namecard'
  */
 function toggleEmployeeView(viewType) {
     const listView = document.getElementById('list-view');
     const cardView = document.getElementById('card-view');
-    const listBtn = document.querySelector('.view-toggle-btn[data-view="list"]');
-    const cardBtn = document.querySelector('.view-toggle-btn[data-view="card"]');
+    const namecardView = document.getElementById('namecard-view');
+    const buttons = document.querySelectorAll('.view-toggle-btn');
 
-    if (!listView || !cardView || !listBtn || !cardBtn) {
+    if (!listView || !cardView) {
         return;
     }
 
-    // Phase 31.1: 인라인 스타일 제거 - classList 사용
+    // 버튼 active 상태 업데이트
+    buttons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === viewType);
+    });
+
+    // 모든 뷰 숨기기 (d-none 클래스 사용 - 템플릿과 일관성)
+    listView.classList.add('d-none');
+    cardView.classList.add('d-none');
+    if (namecardView) namecardView.classList.add('d-none');
+
+    // 선택된 뷰만 표시
     if (viewType === 'list') {
-        listView.classList.remove('hidden');
-        cardView.classList.add('hidden');
-        listBtn.classList.add('active');
-        cardBtn.classList.remove('active');
+        listView.classList.remove('d-none');
     } else if (viewType === 'card') {
-        listView.classList.add('hidden');
-        cardView.classList.remove('hidden');
-        listBtn.classList.remove('active');
-        cardBtn.classList.add('active');
+        cardView.classList.remove('d-none');
+    } else if (viewType === 'namecard' && namecardView) {
+        namecardView.classList.remove('d-none');
     }
 }
 
@@ -170,12 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 폼 유효성 검사 초기화
     new FormValidator();
 
-    // 직원 목록 뷰 초기화
-    const listView = document.getElementById('list-view');
-    const cardView = document.getElementById('card-view');
-    if (listView && cardView) {
-        window.toggleEmployeeView('list');
-    }
+    // 직원 목록 뷰 초기화 - list.js 모듈에서 처리
+    // URL 파라미터와 localStorage 기반 뷰 전환은 list.js의 initViewToggle()에서 담당
 
     // 필터 초기화 - Phase 31: filter-bar.js로 대체됨
     // 각 페이지에서 filter-bar.js 또는 개별 필터 스크립트 사용

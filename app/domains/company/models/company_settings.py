@@ -98,7 +98,14 @@ class CompanySettings(db.Model):
         if value is None:
             self.value = None
         elif self.value_type == self.TYPE_INTEGER:
-            self.value = str(int(value))
+            # 빈 문자열 처리: None으로 저장
+            if value == '' or value is None:
+                self.value = None
+            else:
+                try:
+                    self.value = str(int(value))
+                except (ValueError, TypeError):
+                    self.value = None
         elif self.value_type == self.TYPE_BOOLEAN:
             self.value = 'true' if value else 'false'
         elif self.value_type == self.TYPE_JSON:

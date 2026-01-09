@@ -18,13 +18,13 @@
         <h1 class="page-title">직원 목록</h1>
         <div class="page-actions">
             <div class="view-toggle-group">
-                <button class="view-toggle-btn active" data-view="list" title="목록형 보기">
+                <button class="view-toggle-btn {{ 'active' if view_mode == 'list' or not view_mode else '' }}" data-view="list" title="목록형 보기">
                     <i class="fas fa-list"></i>
                 </button>
-                <button class="view-toggle-btn" data-view="card" title="카드형 보기">
+                <button class="view-toggle-btn {{ 'active' if view_mode == 'card' else '' }}" data-view="card" title="카드형 보기">
                     <i class="fas fa-th"></i>
                 </button>
-                <button class="view-toggle-btn" data-view="namecard" title="명함형 보기">
+                <button class="view-toggle-btn {{ 'active' if view_mode == 'namecard' else '' }}" data-view="namecard" title="명함형 보기">
                     <i class="fas fa-id-card"></i>
                 </button>
             </div>
@@ -61,8 +61,8 @@
     </select>
 {% endcall %}
 
-<!-- 목록형 뷰 -->
-<div class="table-container" id="list-view">
+<!-- 목록형 뷰 (view_mode: {{ view_mode }}) -->
+<div class="table-container {{ 'd-none' if view_mode and view_mode != 'list' else '' }}" id="list-view">
     <table class="data-table sortable-table">
         <thead>
             <tr>
@@ -143,7 +143,7 @@
 </div>
 
 <!-- 카드형 뷰 -->
-<div class="employee-grid d-none" id="card-view">
+<div class="employee-grid {{ 'd-none' if view_mode != 'card' else '' }}" id="card-view">
     {% for employee in employees %}
     <div class="employee-card" data-href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}">
         <div class="employee-status {{ employee.status }}"></div>
@@ -203,7 +203,7 @@
 </div>
 
 <!-- 명함형 뷰 (BusinessCard 도메인) -->
-<div class="bc-grid d-none" id="namecard-view">
+<div class="bc-grid {{ 'd-none' if view_mode != 'namecard' else '' }}" id="namecard-view">
     {% for employee in employees %}
         {% include 'domains/businesscard/partials/_card.html' %}
     {% endfor %}

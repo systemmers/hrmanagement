@@ -1,0 +1,510 @@
+/**
+ * ==========================================================
+ * Audit Log Tab Styles for Corporate Settings
+ * ==========================================================
+ * 법인설정 페이지 감사 로그 탭 전용 스타일
+ * 기존 shared/components/ 스타일을 확장
+ * ==========================================================
+ */
+
+/* ========================================
+   감사 대시보드 컨테이너
+   ======================================== */
+
+.audit-tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+/* ========================================
+   통계 카드 그리드 (4열)
+   ======================================== */
+
+.audit-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+}
+
+.audit-stat-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-5);
+    background: var(--color-pure-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-fast);
+}
+
+.audit-stat-card:hover {
+    border-color: var(--color-gray-300);
+    box-shadow: var(--shadow-sm);
+}
+
+.audit-stat-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.audit-stat-card__icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    font-size: var(--text-lg);
+}
+
+/* 아이콘 색상 변형 */
+.audit-stat-card__icon--blue {
+    background: var(--color-blue-100);
+    color: var(--color-blue-600);
+}
+
+.audit-stat-card__icon--green {
+    background: var(--color-success-100);
+    color: var(--color-success-600);
+}
+
+.audit-stat-card__icon--yellow {
+    background: var(--color-warning-100);
+    color: var(--color-warning-600);
+}
+
+.audit-stat-card__icon--red {
+    background: var(--color-error-100);
+    color: var(--color-error-600);
+}
+
+.audit-stat-card__title {
+    font-size: var(--text-sm);
+    color: var(--color-gray-600);
+    font-weight: 500;
+}
+
+.audit-stat-card__value {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-gray-900);
+    margin-bottom: var(--space-1);
+}
+
+.audit-stat-card__desc {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+}
+
+/* ========================================
+   필터 섹션
+   ======================================== */
+
+.audit-filter-section {
+    padding: var(--space-4);
+    background: var(--color-pure-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+}
+
+.audit-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--space-4);
+}
+
+.audit-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 140px;
+}
+
+.audit-filter-group--date {
+    min-width: 160px;
+}
+
+.audit-filter-group label {
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--color-gray-600);
+}
+
+/* 필터 입력 요소 */
+.audit-filter-group select,
+.audit-filter-group input[type="date"] {
+    height: 36px;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    background: var(--color-pure-white);
+    transition: all var(--transition-fast);
+}
+
+.audit-filter-group select:focus,
+.audit-filter-group input[type="date"]:focus {
+    outline: none;
+    border-color: var(--color-gray-900);
+    box-shadow: var(--shadow-sm);
+}
+
+.audit-filter-actions {
+    display: flex;
+    gap: var(--space-2);
+    margin-left: auto;
+}
+
+/* ========================================
+   로그 테이블 카드
+   ======================================== */
+
+.audit-log-card {
+    background: var(--color-pure-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.audit-log-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.audit-log-card__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-gray-900);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.audit-log-card__count {
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+}
+
+/* 테이블 래퍼 */
+.audit-table-wrapper {
+    overflow-x: auto;
+}
+
+/* 감사 로그 테이블 */
+.audit-log-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.audit-log-table thead {
+    background: var(--color-gray-50);
+}
+
+.audit-log-table th {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    font-weight: 600;
+    font-size: var(--text-xs);
+    color: var(--color-gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--color-gray-200);
+    white-space: nowrap;
+}
+
+.audit-log-table td {
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-gray-800);
+    border-bottom: 1px solid var(--color-gray-100);
+    vertical-align: middle;
+}
+
+.audit-log-table tbody tr:hover {
+    background: var(--color-gray-25);
+}
+
+.audit-log-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* 테이블 빈 상태 */
+.audit-log-table__empty {
+    text-align: center;
+    padding: var(--space-12);
+    color: var(--color-gray-500);
+}
+
+.audit-log-table__empty i {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-3);
+    display: block;
+    opacity: 0.5;
+}
+
+.audit-log-table__empty p {
+    font-size: var(--text-sm);
+    margin: 0;
+}
+
+/* 로딩 상태 */
+.audit-log-table__loading {
+    text-align: center;
+    padding: var(--space-8);
+    color: var(--color-gray-500);
+}
+
+.audit-log-table__loading i {
+    animation: audit-spin 1s linear infinite;
+}
+
+@keyframes audit-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   액션 배지 (테이블 내)
+   ======================================== */
+
+.audit-action-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: 500;
+}
+
+/* 액션별 색상 */
+.audit-action-badge--view {
+    background: var(--color-blue-100);
+    color: var(--color-blue-600);
+}
+
+.audit-action-badge--create {
+    background: var(--color-success-100);
+    color: var(--color-success-600);
+}
+
+.audit-action-badge--update {
+    background: var(--color-warning-100);
+    color: var(--color-warning-600);
+}
+
+.audit-action-badge--delete {
+    background: var(--color-error-100);
+    color: var(--color-error-600);
+}
+
+.audit-action-badge--export {
+    background: var(--color-primary-100);
+    color: var(--color-primary-600);
+}
+
+.audit-action-badge--sync {
+    background: var(--color-gray-100);
+    color: var(--color-gray-600);
+}
+
+.audit-action-badge--login,
+.audit-action-badge--logout {
+    background: var(--color-gray-100);
+    color: var(--color-gray-600);
+}
+
+.audit-action-badge--access_denied {
+    background: var(--color-error-100);
+    color: var(--color-error-600);
+}
+
+/* 상태 배지 */
+.audit-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: 500;
+}
+
+.audit-status-badge--success {
+    background: var(--color-success-100);
+    color: var(--color-success-600);
+}
+
+.audit-status-badge--failure {
+    background: var(--color-error-100);
+    color: var(--color-error-600);
+}
+
+.audit-status-badge--denied {
+    background: var(--color-warning-100);
+    color: var(--color-warning-600);
+}
+
+/* ========================================
+   페이지네이션
+   ======================================== */
+
+.audit-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    border-top: 1px solid var(--color-gray-100);
+}
+
+.audit-pagination__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-gray-700);
+    background: var(--color-pure-white);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.audit-pagination__btn:hover {
+    background: var(--color-gray-50);
+    border-color: var(--color-gray-400);
+}
+
+.audit-pagination__btn--active {
+    background: var(--color-gray-900);
+    color: var(--color-pure-white);
+    border-color: var(--color-gray-900);
+}
+
+.audit-pagination__btn--active:hover {
+    background: var(--color-gray-800);
+}
+
+.audit-pagination__btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ========================================
+   상세 정보 모달
+   ======================================== */
+
+.audit-detail-content {
+    padding: var(--space-4);
+}
+
+.audit-detail-row {
+    display: flex;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-gray-100);
+}
+
+.audit-detail-row:last-child {
+    border-bottom: none;
+}
+
+.audit-detail-label {
+    flex: 0 0 120px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-gray-600);
+}
+
+.audit-detail-value {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-gray-900);
+    word-break: break-all;
+}
+
+.audit-detail-value--json {
+    font-family: monospace;
+    font-size: var(--text-xs);
+    background: var(--color-gray-50);
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.audit-detail-value--json pre {
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+/* ========================================
+   반응형 - 태블릿 (1023px 이하)
+   ======================================== */
+
+@media (max-width: 1023px) {
+    .audit-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .audit-filter-row {
+        gap: var(--space-3);
+    }
+
+    .audit-filter-group {
+        min-width: 120px;
+    }
+}
+
+/* ========================================
+   반응형 - 모바일 (767px 이하)
+   ======================================== */
+
+@media (max-width: 767px) {
+    .audit-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .audit-filter-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .audit-filter-group {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .audit-filter-actions {
+        width: 100%;
+        margin-left: 0;
+        justify-content: stretch;
+    }
+
+    .audit-filter-actions .btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .audit-log-table {
+        min-width: 700px;
+    }
+
+    .audit-detail-row {
+        flex-direction: column;
+        gap: var(--space-1);
+    }
+
+    .audit-detail-label {
+        flex: none;
+    }
+}
