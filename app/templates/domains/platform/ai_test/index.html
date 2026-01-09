@@ -22,7 +22,7 @@
                 <h3><i class="fas fa-upload"></i> 1. 문서 업로드</h3>
                 <form id="analyzeForm" enctype="multipart/form-data">
                     <!-- 파일 업로드 -->
-                    <div class="form-group">
+                    <div class="form__group">
                         <label>파일 직접 업로드</label>
                         <input type="file" name="file" id="fileInput"
                                accept=".pdf,.jpg,.jpeg,.png,.gif">
@@ -31,7 +31,7 @@
                     <div class="form-divider">또는</div>
 
                     <!-- 샘플 파일 선택 -->
-                    <div class="form-group">
+                    <div class="form__group">
                         <label>샘플 파일 선택 (data/db_files/)</label>
                         <select name="sample_file" id="sampleSelect">
                             <option value="">-- 샘플 파일 선택 --</option>
@@ -47,7 +47,7 @@
                     </div>
 
                     <!-- Provider 선택 -->
-                    <div class="form-group">
+                    <div class="form__group">
                         <label>AI Provider</label>
                         <select name="provider" id="providerSelect">
                             {% for provider in providers %}
@@ -63,7 +63,7 @@
                     </div>
 
                     <!-- 문서 유형 -->
-                    <div class="form-group">
+                    <div class="form__group">
                         <label>문서 유형</label>
                         <select name="document_type" id="documentTypeSelect">
                             <option value="auto_detect">자동 감지</option>

@@ -6,21 +6,21 @@
 #}
 {# 개인정보 읽기 전용 플래그: 법인 계정 + 개인계약 연동 시 #}
 {% set is_personal_readonly = is_corporate and has_person_contract %}
-<section class="form-section" id="family-info">
+<section class="form__section" id="family-info">
     <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">
+        <div class="card__header">
+            <h2 class="card__title">
                 <i class="fas fa-users"></i>
                 가족사항
                 {% if is_personal_readonly %}<small class="text-muted">(동기화 전용)</small>{% endif %}
             </h2>
             {% if not is_personal_readonly %}
-            <button type="button" class="btn btn-sm btn-secondary" id="addFamily">
+            <button type="button" class="btn btn--sm btn--secondary" id="addFamily">
                 <i class="fas fa-plus"></i> 추가
             </button>
             {% endif %}
         </div>
-        <div class="card-body">
+        <div class="card__body">
             <div class="dynamic-list" id="familyList">
                 {# SSOT: Blueprint에서 family_list 전달 필수 (N+1 쿼리 방지) #}
                 {% set family_members = family_list | default([]) %}
@@ -28,9 +28,9 @@
                     {% for member in family_members %}
                     <div class="dynamic-item" data-index="{{ loop.index0 }}">
                         <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">관계</label>
-                                <select name="family_relation[]" class="form-select{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">관계</label>
+                                <select name="family_relation[]" class="form__select{% if is_personal_readonly %} readonly-field{% endif %}"
                                         {% if is_personal_readonly %}disabled{% endif %}>
                                     <option value="">선택하세요</option>
                                     {% for opt in FAMILY_RELATION_OPTIONS %}
@@ -38,33 +38,33 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">성명</label>
-                                <input type="text" name="family_name[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">성명</label>
+                                <input type="text" name="family_name[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ member.name }}" placeholder="이름"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">생년월일</label>
-                                <input type="date" name="family_birth_date[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">생년월일</label>
+                                <input type="date" name="family_birth_date[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ member.birth_date }}"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">직업</label>
-                                <input type="text" name="family_occupation[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">직업</label>
+                                <input type="text" name="family_occupation[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ member.occupation }}" placeholder="직업"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">연락처</label>
-                                <input type="tel" name="family_phone[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">연락처</label>
+                                <input type="tel" name="family_phone[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ member.phone }}" placeholder="010-0000-0000"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">동거여부</label>
-                                <select name="family_is_cohabitant[]" class="form-select{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">동거여부</label>
+                                <select name="family_is_cohabitant[]" class="form__select{% if is_personal_readonly %} readonly-field{% endif %}"
                                         {% if is_personal_readonly %}disabled{% endif %}>
                                     <option value="">선택하세요</option>
                                     {% for opt in COHABIT_OPTIONS %}
@@ -83,9 +83,9 @@
                 {% else %}
                 <div class="dynamic-item" data-index="0">
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">관계</label>
-                            <select name="family_relation[]" class="form-select{% if is_personal_readonly %} readonly-field{% endif %}"
+                        <div class="form__group">
+                            <label class="form__label">관계</label>
+                            <select name="family_relation[]" class="form__select{% if is_personal_readonly %} readonly-field{% endif %}"
                                     {% if is_personal_readonly %}disabled{% endif %}>
                                 <option value="">선택하세요</option>
                                 {% for opt in FAMILY_RELATION_OPTIONS %}
@@ -93,29 +93,29 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">성명</label>
-                            <input type="text" name="family_name[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="이름"
+                        <div class="form__group">
+                            <label class="form__label">성명</label>
+                            <input type="text" name="family_name[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="이름"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">생년월일</label>
-                            <input type="date" name="family_birth_date[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                        <div class="form__group">
+                            <label class="form__label">생년월일</label>
+                            <input type="date" name="family_birth_date[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">직업</label>
-                            <input type="text" name="family_occupation[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="직업"
+                        <div class="form__group">
+                            <label class="form__label">직업</label>
+                            <input type="text" name="family_occupation[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="직업"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">연락처</label>
-                            <input type="tel" name="family_phone[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="010-0000-0000"
+                        <div class="form__group">
+                            <label class="form__label">연락처</label>
+                            <input type="tel" name="family_phone[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="010-0000-0000"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">동거여부</label>
-                            <select name="family_is_cohabitant[]" class="form-select{% if is_personal_readonly %} readonly-field{% endif %}"
+                        <div class="form__group">
+                            <label class="form__label">동거여부</label>
+                            <select name="family_is_cohabitant[]" class="form__select{% if is_personal_readonly %} readonly-field{% endif %}"
                                     {% if is_personal_readonly %}disabled{% endif %}>
                                 <option value="">선택하세요</option>
                                 {% for opt in COHABIT_OPTIONS %}

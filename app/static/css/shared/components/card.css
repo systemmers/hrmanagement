@@ -1,8 +1,15 @@
-/* ========================================
-   카드 컴포넌트 스타일
-   - 인사카드 정보 카드
-   ======================================== */
+/**
+ * Card Component Styles
+ * 카드 컴포넌트 스타일 - 인사카드 정보 카드
+ *
+ * BEM 네이밍 전환 (2026-01-09)
+ * 표준: .card__{element}, .card--{modifier} (BEM 방식)
+ * @deprecated .card-{element} - 2026-12 이후 제거 예정
+ */
 
+/* ========================================
+   Card (Block)
+   ======================================== */
 .card {
     background: var(--color-pure-white);
     border-radius: var(--radius-lg);
@@ -17,12 +24,18 @@
     box-shadow: var(--shadow-md);
 }
 
+/* Card Elements (BEM)
+ * 표준: .card__{element}
+ * @deprecated .card-{element} - 2026-12 이후 제거 예정
+ */
+.card__header,
 .card-header {
     padding: var(--space-5) var(--space-6);
     border-bottom: 1px solid var(--color-gray-200);
     background: var(--color-gray-25);
 }
 
+.card__title,
 .card-title {
     font-size: var(--text-lg);
     font-weight: 600;
@@ -32,15 +45,44 @@
     gap: var(--space-2);
 }
 
+.card__title i,
 .card-title i {
     color: var(--color-primary-600);
 }
 
+.card__body,
 .card-body {
     padding: var(--space-6);
 }
 
-/* 콘텐츠 섹션 */
+.card__footer,
+.card-footer {
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--color-gray-200);
+    background: var(--color-gray-25);
+}
+
+.card__actions,
+.card-actions {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: flex-end;
+}
+
+/* Card Modifiers - Placeholder (Modifier)
+ * 표준: .card--placeholder (BEM 방식)
+ * @deprecated .placeholder-card - 2026-12 이후 제거 예정
+ */
+.card--placeholder .card__body,
+.card--placeholder .card-body,
+.placeholder-card .card__body,
+.placeholder-card .card-body {
+    padding: var(--space-8);
+}
+
+/* ========================================
+   Content Section (Block)
+   ======================================== */
 .content-section {
     margin-bottom: var(--space-8);
     scroll-margin-top: 80px;
@@ -68,11 +110,9 @@
     font-style: italic;
 }
 
-/* 플레이스홀더 카드 */
-.placeholder-card .card-body {
-    padding: var(--space-8);
-}
-
+/* ========================================
+   Placeholder Content
+   ======================================== */
 .placeholder-content {
     text-align: center;
     color: var(--color-gray-500);
@@ -94,7 +134,9 @@
     color: var(--color-gray-400);
 }
 
-/* 섹션 그리드 */
+/* ========================================
+   Section Grid
+   ======================================== */
 .section-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -104,8 +146,11 @@
 /* 배지 스타일은 components/badge.css에서 정의됨
  * .badge-gray는 .badge-secondary로 대체 사용 */
 
-/* 반응형 */
+/* ========================================
+   Responsive
+   ======================================== */
 @media (max-width: 768px) {
+    .card__body,
     .card-body {
         padding: var(--space-4);
     }

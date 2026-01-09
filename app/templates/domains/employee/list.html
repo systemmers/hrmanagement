@@ -28,11 +28,11 @@
                     <i class="fas fa-id-card"></i>
                 </button>
             </div>
-            <button type="button" class="btn btn-secondary" id="openAccountProvisionModal">
+            <button type="button" class="btn btn--secondary" id="openAccountProvisionModal">
                 <i class="fas fa-id-card"></i>
                 <span>계정 발급</span>
             </button>
-            <a href="{{ url_for('employees.employee_new') }}" class="btn btn-primary">
+            <a href="{{ url_for('employees.employee_new') }}" class="btn btn--primary">
                 <i class="fas fa-plus"></i>
                 <span>직원 등록</span>
             </a>
@@ -105,9 +105,9 @@
                 <td>
                     {# 21번 원칙: 계약 상태 표시 및 요청 버튼 #}
                     {% if employee.contract_status == 'no_account' %}
-                        <span class="badge badge-secondary" title="계정 없음">-</span>
+                        <span class="badge badge--secondary" title="계정 없음">-</span>
                     {% elif employee.contract_status == 'none' %}
-                        <button class="btn btn-sm btn-outline-primary btn-contract-request"
+                        <button class="btn btn--sm btn--outline-primary btn-contract-request"
                                 data-user-id="{{ employee.user_id }}"
                                 data-employee-name="{{ employee.name }}"
                                 title="계약 요청">
@@ -115,23 +115,23 @@
                             <span>요청</span>
                         </button>
                     {% elif employee.contract_status == 'requested' %}
-                        <span class="badge badge-warning">대기중</span>
+                        <span class="badge badge--warning">대기중</span>
                     {% elif employee.contract_status == 'approved' %}
-                        <span class="badge badge-success">계약완료</span>
+                        <span class="badge badge--success">계약완료</span>
                     {% elif employee.contract_status == 'rejected' %}
-                        <span class="badge badge-danger">거절됨</span>
+                        <span class="badge badge--danger">거절됨</span>
                     {% elif employee.contract_status == 'terminated' %}
-                        <span class="badge badge-secondary">종료</span>
+                        <span class="badge badge--secondary">종료</span>
                     {% elif employee.contract_status == 'termination_requested' %}
-                        <span class="badge badge-warning">종료대기</span>
+                        <span class="badge badge--warning">종료대기</span>
                     {% endif %}
                 </td>
                 <td>
                     <div class="table-actions">
-                        <a href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}" class="btn-icon" title="상세">
+                        <a href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}" class="btn--icon" title="상세">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <a href="{{ url_for('employees.employee_edit', employee_id=employee.id) }}" class="btn-icon" title="수정">
+                        <a href="{{ url_for('employees.employee_edit', employee_id=employee.id) }}" class="btn--icon" title="수정">
                             <i class="fas fa-edit"></i>
                         </a>
                     </div>
@@ -180,17 +180,17 @@
             </div>
         </div>
         <div class="employee-actions">
-            <a href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}" class="btn btn-secondary btn-sm">
+            <a href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}" class="btn btn--secondary btn--sm">
                 <i class="fas fa-eye"></i>
                 <span>보기</span>
             </a>
-            <a href="{{ url_for('employees.employee_edit', employee_id=employee.id) }}" class="btn btn-secondary btn-sm">
+            <a href="{{ url_for('employees.employee_edit', employee_id=employee.id) }}" class="btn btn--secondary btn--sm">
                 <i class="fas fa-edit"></i>
                 <span>수정</span>
             </a>
             {# 21번 원칙: 계약 요청 버튼 (계정 있고 계약 없는 경우만) #}
             {% if employee.contract_status == 'none' %}
-            <button class="btn btn-primary btn-sm btn-contract-request"
+            <button class="btn btn--primary btn--sm btn-contract-request"
                     data-user-id="{{ employee.user_id }}"
                     data-employee-name="{{ employee.name }}">
                 <i class="fas fa-file-signature"></i>

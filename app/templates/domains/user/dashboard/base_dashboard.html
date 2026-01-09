@@ -25,26 +25,26 @@
         <div class="page-actions">
             {% if account_type == 'corporate' %}
                 {% if session.get('user_role') in ['admin', 'manager'] %}
-                <a href="{{ url_for('corporate.settings') }}" class="btn btn-secondary">
+                <a href="{{ url_for('corporate.settings') }}" class="btn btn--secondary">
                     <i class="fas fa-cog"></i>
                     <span>설정</span>
                 </a>
                 {% endif %}
             {% elif account_type == 'employee_sub' %}
-                <a href="{{ url_for('profile.view') }}" class="btn btn-secondary">
+                <a href="{{ url_for('profile.view') }}" class="btn btn--secondary">
                     <i class="fas fa-user"></i>
                     <span>프로필 보기</span>
                 </a>
-                <a href="{{ url_for('profile.edit') }}" class="btn btn-primary">
+                <a href="{{ url_for('profile.edit') }}" class="btn btn--primary">
                     <i class="fas fa-edit"></i>
                     <span>정보 수정</span>
                 </a>
             {% else %}
-                <a href="{{ url_for('personal.profile') }}" class="btn btn-secondary">
+                <a href="{{ url_for('personal.profile') }}" class="btn btn--secondary">
                     <i class="fas fa-user"></i>
                     <span>프로필 보기</span>
                 </a>
-                <a href="{{ url_for('personal.profile_edit') }}" class="btn btn-primary">
+                <a href="{{ url_for('personal.profile_edit') }}" class="btn btn--primary">
                     <i class="fas fa-edit"></i>
                     <span>프로필 수정</span>
                 </a>
@@ -65,13 +65,13 @@
 <div class="dashboard-card-grid">
     <!-- 정보 카드 -->
     <div class="dashboard-card">
-        <div class="card-header">
-            <h2 class="card-title">
+        <div class="card__header">
+            <h2 class="card__title">
                 <i class="fas fa-{% if account_type == 'corporate' %}info-circle{% else %}user-circle{% endif %}"></i>
                 {% if account_type == 'corporate' %}법인 정보{% else %}프로필 요약{% endif %}
             </h2>
         </div>
-        <div class="card-body">
+        <div class="card__body">
             {% if account_type == 'corporate' %}
                 {% include 'domains/user/dashboard/_info_corporate.html' %}
             {% elif account_type == 'employee_sub' %}
@@ -85,13 +85,13 @@
     <!-- 직원 전용: 근무 현황 카드 -->
     {% if account_type == 'employee_sub' %}
     <div class="dashboard-card">
-        <div class="card-header">
-            <h2 class="card-title">
+        <div class="card__header">
+            <h2 class="card__title">
                 <i class="fas fa-building"></i>
                 근무 현황
             </h2>
         </div>
-        <div class="card-body">
+        <div class="card__body">
             {% include 'domains/user/dashboard/_work_status_employee.html' %}
         </div>
     </div>
@@ -99,13 +99,13 @@
 
     <!-- 현황/통계 카드 -->
     <div class="dashboard-card">
-        <div class="card-header">
-            <h2 class="card-title">
+        <div class="card__header">
+            <h2 class="card__title">
                 <i class="fas fa-chart-bar"></i>
                 {% if account_type == 'corporate' %}현황{% else %}이력 현황{% endif %}
             </h2>
         </div>
-        <div class="card-body">
+        <div class="card__body">
             <div class="stats-grid">
                 {% if account_type == 'corporate' %}
                     {% include 'domains/user/dashboard/_stats_corporate.html' %}
@@ -120,13 +120,13 @@
 
     <!-- 빠른 메뉴 카드 -->
     <div class="dashboard-card quick-links-card">
-        <div class="card-header">
-            <h2 class="card-title">
+        <div class="card__header">
+            <h2 class="card__title">
                 <i class="fas fa-bolt"></i>
                 빠른 메뉴
             </h2>
         </div>
-        <div class="card-body">
+        <div class="card__body">
             <div class="quick-links">
                 {% if account_type == 'corporate' %}
                     {% include 'domains/user/dashboard/_quick_links_corporate.html' %}
@@ -142,13 +142,13 @@
     <!-- 개인 전용: 공개 설정 카드 -->
     {% if account_type == 'personal' %}
     <div class="dashboard-card">
-        <div class="card-header">
-            <h2 class="card-title">
+        <div class="card__header">
+            <h2 class="card__title">
                 <i class="fas fa-eye"></i>
                 공개 설정
             </h2>
         </div>
-        <div class="card-body">
+        <div class="card__body">
             {% include 'domains/user/dashboard/_visibility_status.html' %}
         </div>
     </div>

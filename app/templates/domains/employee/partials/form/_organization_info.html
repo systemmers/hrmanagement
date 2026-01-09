@@ -6,62 +6,62 @@
 {# 계약 후 수정 불가 플래그: 승인된 개인계약이 있을 때 #}
 {% set is_contract_readonly = has_person_contract %}
 
-<section class="form-section" id="organization-info">
+<section class="form__section" id="organization-info">
     <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">
+        <div class="card__header">
+            <h2 class="card__title">
                 <i class="fas fa-building"></i>
                 소속정보
                 {% if is_contract_readonly %}<small class="text-muted">(계약 확정)</small>{% endif %}
             </h2>
         </div>
-        <div class="card-body">
+        <div class="card__body">
             <div class="form-grid">
-                <div class="form-group">
-                    <label for="employee_number" class="form-label">사번</label>
+                <div class="form__group">
+                    <label for="employee_number" class="form__label">사번</label>
                     {% if employee and employee.employee_number %}
-                    <input type="text" id="employee_number" name="employee_number" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                    <input type="text" id="employee_number" name="employee_number" class="form__input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ employee.employee_number }}" readonly
                            {% if is_contract_readonly %}disabled{% endif %}>
                     {% else %}
-                    <input type="text" id="employee_number" name="employee_number" class="form-input"
+                    <input type="text" id="employee_number" name="employee_number" class="form__input"
                            value="" placeholder="자동생성" readonly>
-                    <small class="form-help">등록 시 자동으로 생성됩니다. (형식: EMP-YYYY-NNNN)</small>
+                    <small class="form__hint">등록 시 자동으로 생성됩니다. (형식: EMP-YYYY-NNNN)</small>
                     {% endif %}
                 </div>
 
-                <div class="form-group">
-                    <label for="organization_display" class="form-label">소속 조직 {% if not is_contract_readonly %}<span class="required">*</span>{% endif %}</label>
-                    <input type="text" id="organization_display" class="form-input org-selector-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                <div class="form__group">
+                    <label for="organization_display" class="form__label">소속 조직 {% if not is_contract_readonly %}<span class="required">*</span>{% endif %}</label>
+                    <input type="text" id="organization_display" class="form__input org-selector-input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ employee.organization.name if employee and employee.organization else '' }}"
                            placeholder="조직을 선택하세요" readonly
                            {% if is_contract_readonly %}disabled{% endif %}>
                     <input type="hidden" id="organization_id" name="organization_id"
                            value="{{ employee.organization_id if employee and employee.organization_id else '' }}"
                            {% if is_contract_readonly %}disabled{% endif %}>
-                    {% if not is_contract_readonly %}<small class="form-help">클릭하여 조직 트리에서 선택하세요</small>{% endif %}
+                    {% if not is_contract_readonly %}<small class="form__hint">클릭하여 조직 트리에서 선택하세요</small>{% endif %}
                 </div>
 
-                <div class="form-group">
-                    <label for="department" class="form-label">부서명</label>
-                    <input type="text" id="department" name="department" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                <div class="form__group">
+                    <label for="department" class="form__label">부서명</label>
+                    <input type="text" id="department" name="department" class="form__input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ employee.department if employee else '' }}"
                            placeholder="개발팀"
                            {% if is_contract_readonly %}readonly disabled{% endif %}>
-                    {% if not is_contract_readonly %}<small class="form-help">조직 선택과 별도로 입력할 수 있습니다</small>{% endif %}
+                    {% if not is_contract_readonly %}<small class="form__hint">조직 선택과 별도로 입력할 수 있습니다</small>{% endif %}
                 </div>
 
-                <div class="form-group">
-                    <label for="team" class="form-label">팀</label>
-                    <input type="text" id="team" name="team" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                <div class="form__group">
+                    <label for="team" class="form__label">팀</label>
+                    <input type="text" id="team" name="team" class="form__input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ employee.team if employee and employee.team else '' }}"
                            placeholder="프론트엔드팀"
                            {% if is_contract_readonly %}readonly disabled{% endif %}>
                 </div>
 
-                <div class="form-group">
-                    <label for="position" class="form-label">직위 {% if not is_contract_readonly %}<span class="required">*</span>{% endif %}</label>
-                    <select id="position" name="position" class="form-select{% if is_contract_readonly %} readonly-field{% endif %}"
+                <div class="form__group">
+                    <label for="position" class="form__label">직위 {% if not is_contract_readonly %}<span class="required">*</span>{% endif %}</label>
+                    <select id="position" name="position" class="form__select{% if is_contract_readonly %} readonly-field{% endif %}"
                             {% if not is_contract_readonly %}required{% endif %}
                             {% if is_contract_readonly %}disabled{% endif %}>
                         <option value="">선택하세요</option>
@@ -75,21 +75,21 @@
                             {% endfor %}
                         {% endif %}
                     </select>
-                    {% if not is_contract_readonly %}<small class="form-help">서열 기준 (사원, 대리, 과장, 부장...)</small>{% endif %}
+                    {% if not is_contract_readonly %}<small class="form__hint">서열 기준 (사원, 대리, 과장, 부장...)</small>{% endif %}
                 </div>
 
-                <div class="form-group">
-                    <label for="job_grade" class="form-label">직급</label>
-                    <input type="text" id="job_grade" name="job_grade" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                <div class="form__group">
+                    <label for="job_grade" class="form__label">직급</label>
+                    <input type="text" id="job_grade" name="job_grade" class="form__input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ employee.job_grade if employee and employee.job_grade else '' }}"
                            placeholder="L3, Senior, 2호봉"
                            {% if is_contract_readonly %}readonly disabled{% endif %}>
-                    {% if not is_contract_readonly %}<small class="form-help">역량 레벨 (L3, Senior, 2호봉...)</small>{% endif %}
+                    {% if not is_contract_readonly %}<small class="form__hint">역량 레벨 (L3, Senior, 2호봉...)</small>{% endif %}
                 </div>
 
-                <div class="form-group">
-                    <label for="job_title" class="form-label">직책</label>
-                    <select id="job_title" name="job_title" class="form-select{% if is_contract_readonly %} readonly-field{% endif %}"
+                <div class="form__group">
+                    <label for="job_title" class="form__label">직책</label>
+                    <select id="job_title" name="job_title" class="form__select{% if is_contract_readonly %} readonly-field{% endif %}"
                             {% if is_contract_readonly %}disabled{% endif %}>
                         <option value="">선택하세요</option>
                         {% if classification_options and classification_options.job_titles %}
@@ -98,37 +98,37 @@
                             {% endfor %}
                         {% endif %}
                     </select>
-                    {% if not is_contract_readonly %}<small class="form-help">책임자 역할 (팀장, 본부장, CFO...)</small>{% endif %}
+                    {% if not is_contract_readonly %}<small class="form__hint">책임자 역할 (팀장, 본부장, CFO...)</small>{% endif %}
                 </div>
 
-                <div class="form-group">
-                    <label for="job_role" class="form-label">직무</label>
-                    <input type="text" id="job_role" name="job_role" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                <div class="form__group">
+                    <label for="job_role" class="form__label">직무</label>
+                    <input type="text" id="job_role" name="job_role" class="form__input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ employee.job_role if employee and employee.job_role else '' }}"
                            placeholder="인사기획, 웹개발, 회계관리"
                            {% if is_contract_readonly %}readonly disabled{% endif %}>
-                    {% if not is_contract_readonly %}<small class="form-help">수행 업무 (인사기획, 회계관리...)</small>{% endif %}
+                    {% if not is_contract_readonly %}<small class="form__hint">수행 업무 (인사기획, 회계관리...)</small>{% endif %}
                 </div>
 
-                <div class="form-group">
-                    <label for="work_location" class="form-label">근무지</label>
-                    <input type="text" id="work_location" name="work_location" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                <div class="form__group">
+                    <label for="work_location" class="form__label">근무지</label>
+                    <input type="text" id="work_location" name="work_location" class="form__input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ employee.work_location if employee and employee.work_location else '' }}"
                            placeholder="본사, 지사 등"
                            {% if is_contract_readonly %}readonly disabled{% endif %}>
                 </div>
 
-                <div class="form-group">
-                    <label for="internal_phone" class="form-label">내선번호</label>
-                    <input type="text" id="internal_phone" name="internal_phone" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                <div class="form__group">
+                    <label for="internal_phone" class="form__label">내선번호</label>
+                    <input type="text" id="internal_phone" name="internal_phone" class="form__input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ employee.internal_phone if employee and employee.internal_phone else '' }}"
                            placeholder="1234"
                            {% if is_contract_readonly %}readonly disabled{% endif %}>
                 </div>
 
-                <div class="form-group">
-                    <label for="company_email" class="form-label">회사 이메일</label>
-                    <input type="email" id="company_email" name="company_email" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+                <div class="form__group">
+                    <label for="company_email" class="form__label">회사 이메일</label>
+                    <input type="email" id="company_email" name="company_email" class="form__input{% if is_contract_readonly %} readonly-field{% endif %}"
                            value="{{ employee.company_email if employee and employee.company_email else '' }}"
                            placeholder="hong@company.co.kr"
                            {% if is_contract_readonly %}readonly disabled{% endif %}>

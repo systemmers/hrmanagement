@@ -8,8 +8,8 @@
 <div class="modal" id="contractRequestModal" aria-hidden="true">
     <div class="modal-backdrop"></div>
     <div class="modal-container modal-lg">
-        <div class="modal-header">
-            <h2 class="modal-title">새 계약 요청</h2>
+        <div class="modal__header">
+            <h2 class="modal__title">새 계약 요청</h2>
             <button type="button" class="modal-close" data-modal-close aria-label="닫기">
                 <i class="fas fa-times"></i>
             </button>
@@ -37,7 +37,7 @@
 
             <!-- Step 1: 대상 선택 -->
             <div class="modal-step-content active" data-step-content="1">
-                <div class="modal-body">
+                <div class="modal__body">
                     <!-- 탭 네비게이션 -->
                     <div class="tabs-nav" role="tablist">
                         <button type="button" class="tab-btn active" data-tab="employee" role="tab" aria-selected="true">
@@ -71,9 +71,9 @@
                     </div>
                 </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-modal-close>취소</button>
-                    <button type="button" class="btn btn-primary" data-step-next="2" disabled id="step1NextBtn">
+                <div class="modal__footer">
+                    <button type="button" class="btn btn--secondary" data-modal-close>취소</button>
+                    <button type="button" class="btn btn--primary" data-step-next="2" disabled id="step1NextBtn">
                         다음
                         <i class="fas fa-arrow-right"></i>
                     </button>
@@ -82,16 +82,16 @@
 
             <!-- Step 2: 계약 정보 -->
             <div class="modal-step-content" data-step-content="2">
-                <div class="modal-body">
+                <div class="modal__body">
                     <div class="selected-target-info" id="selectedTargetInfo">
                         <!-- 선택된 대상 정보 표시 -->
                     </div>
 
-                    <div class="form-section">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="modalContractType" class="form-label required">계약 유형</label>
-                                <select id="modalContractType" name="contract_type" class="form-select" required>
+                    <div class="form__section">
+                        <div class="form__row">
+                            <div class="form__group">
+                                <label for="modalContractType" class="form__label required">계약 유형</label>
+                                <select id="modalContractType" name="contract_type" class="form__select" required>
                                     <option value="">선택하세요</option>
                                     <option value="employment">정규직</option>
                                     <option value="contract">계약직</option>
@@ -101,38 +101,38 @@
                             </div>
                         </div>
                         <div class="form-row two-col">
-                            <div class="form-group">
-                                <label for="modalStartDate" class="form-label">계약 시작일</label>
-                                <input type="date" id="modalStartDate" name="contract_start_date" class="form-input">
+                            <div class="form__group">
+                                <label for="modalStartDate" class="form__label">계약 시작일</label>
+                                <input type="date" id="modalStartDate" name="contract_start_date" class="form__input">
                             </div>
-                            <div class="form-group">
-                                <label for="modalEndDate" class="form-label">계약 종료일</label>
-                                <input type="date" id="modalEndDate" name="contract_end_date" class="form-input">
+                            <div class="form__group">
+                                <label for="modalEndDate" class="form__label">계약 종료일</label>
+                                <input type="date" id="modalEndDate" name="contract_end_date" class="form__input">
                             </div>
                         </div>
                         <div class="form-row two-col">
-                            <div class="form-group">
-                                <label for="modalDepartment" class="form-label">부서</label>
-                                <input type="text" id="modalDepartment" name="department" class="form-input" placeholder="배치될 부서">
+                            <div class="form__group">
+                                <label for="modalDepartment" class="form__label">부서</label>
+                                <input type="text" id="modalDepartment" name="department" class="form__input" placeholder="배치될 부서">
                             </div>
-                            <div class="form-group">
-                                <label for="modalPosition" class="form-label">직위</label>
-                                <input type="text" id="modalPosition" name="position" class="form-input" placeholder="직위/직급">
+                            <div class="form__group">
+                                <label for="modalPosition" class="form__label">직위</label>
+                                <input type="text" id="modalPosition" name="position" class="form__input" placeholder="직위/직급">
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="modalNotes" class="form-label">메모</label>
-                            <textarea id="modalNotes" name="notes" class="form-textarea" rows="3" placeholder="계약 관련 추가 정보"></textarea>
+                        <div class="form__group">
+                            <label for="modalNotes" class="form__label">메모</label>
+                            <textarea id="modalNotes" name="notes" class="form__textarea" rows="3" placeholder="계약 관련 추가 정보"></textarea>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-step-prev="1">
+                <div class="modal__footer">
+                    <button type="button" class="btn btn--secondary" data-step-prev="1">
                         <i class="fas fa-arrow-left"></i>
                         이전
                     </button>
-                    <button type="button" class="btn btn-primary" data-step-next="3" id="step2NextBtn">
+                    <button type="button" class="btn btn--primary" data-step-next="3" id="step2NextBtn">
                         다음
                         <i class="fas fa-arrow-right"></i>
                     </button>
@@ -141,7 +141,7 @@
 
             <!-- Step 3: 확인 -->
             <div class="modal-step-content" data-step-content="3">
-                <div class="modal-body">
+                <div class="modal__body">
                     <div class="confirm-section">
                         <h3 class="confirm-title">계약 요청 정보 확인</h3>
 
@@ -186,12 +186,12 @@
                     </div>
                 </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-step-prev="2">
+                <div class="modal__footer">
+                    <button type="button" class="btn btn--secondary" data-step-prev="2">
                         <i class="fas fa-arrow-left"></i>
                         이전
                     </button>
-                    <button type="submit" class="btn btn-primary" id="submitContractBtn">
+                    <button type="submit" class="btn btn--primary" id="submitContractBtn">
                         <i class="fas fa-paper-plane"></i>
                         계약 요청 전송
                     </button>

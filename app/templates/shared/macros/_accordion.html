@@ -1,6 +1,9 @@
 {#
     Accordion Component Macros
     재사용 가능한 아코디언 컴포넌트 매크로
+
+    BEM 네이밍 전환 (2026-01-09)
+    표준: .btn--sm, .btn--secondary, .btn--primary, .form__input
 #}
 
 {# 아코디언 섹션 매크로 #}
@@ -17,16 +20,16 @@
             </h3>
         </div>
         <div class="accordion-actions">
-            <button class="btn btn-sm btn-secondary" data-action="add">
+            <button class="btn btn--sm btn--secondary" data-action="add">
                 <i class="fas fa-plus"></i> 추가
             </button>
         </div>
     </div>
     <div class="accordion-body category-list"></div>
     <div class="add-item-form d-none">
-        <input type="text" class="form-input" placeholder="{{ placeholder }}" data-field="value">
-        <button class="btn btn-sm btn-primary" data-action="save">저장</button>
-        <button class="btn btn-sm btn-secondary" data-action="cancel">취소</button>
+        <input type="text" class="form__input" placeholder="{{ placeholder }}" data-field="value">
+        <button class="btn btn--sm btn--primary" data-action="save">저장</button>
+        <button class="btn btn--sm btn--secondary" data-action="cancel">취소</button>
     </div>
 </div>
 {% endmacro %}

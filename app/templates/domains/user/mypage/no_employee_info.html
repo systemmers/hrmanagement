@@ -19,7 +19,7 @@
 </div>
 
 <div class="card">
-    <div class="card-body">
+    <div class="card__body">
         {{ empty_state('계정에 연결된 직원 정보가 없습니다.', 'user-slash') }}
         <div class="plan-limit-info">
             <div class="plan-limit-icon">
@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="form-actions mt-6">
-            <a href="{{ url_for('profile.view') }}" class="btn btn-primary">
+            <a href="{{ url_for('profile.view') }}" class="btn btn--primary">
                 <i class="fas fa-user"></i>
                 <span>내 프로필 보기</span>
             </a>

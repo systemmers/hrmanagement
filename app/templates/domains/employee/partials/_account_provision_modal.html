@@ -7,8 +7,8 @@
 <div class="modal" id="accountProvisionModal" aria-hidden="true">
     <div class="modal-backdrop"></div>
     <div class="modal-container modal-md">
-        <div class="modal-header">
-            <h2 class="modal-title">직원 계정 발급</h2>
+        <div class="modal__header">
+            <h2 class="modal__title">직원 계정 발급</h2>
             <button type="button" class="modal-close" data-modal-close aria-label="닫기">
                 <i class="fas fa-times"></i>
             </button>
@@ -31,22 +31,22 @@
 
             <!-- Step 1: 정보 입력 -->
             <div class="modal-step-content active" data-step-content="1">
-                <div class="modal-body">
+                <div class="modal__body">
                     <!-- 직원 기본 정보 -->
-                    <div class="form-section-title">
+                    <div class="form__section-title">
                         <i class="fas fa-user"></i>
                         직원 기본 정보
                     </div>
 
-                    <div class="form-row two-col">
-                        <div class="form-group">
-                            <label for="modalName" class="form-label required">이름</label>
-                            <input type="text" id="modalName" name="name" class="form-input"
+                    <div class="form__row two-col">
+                        <div class="form__group">
+                            <label for="modalName" class="form__label required">이름</label>
+                            <input type="text" id="modalName" name="name" class="form__input"
                                    placeholder="직원 이름" required>
                         </div>
-                        <div class="form-group">
-                            <label for="modalOrganizationId" class="form-label">소속 조직</label>
-                            <select id="modalOrganizationId" name="organization_id" class="form-select">
+                        <div class="form__group">
+                            <label for="modalOrganizationId" class="form__label">소속 조직</label>
+                            <select id="modalOrganizationId" name="organization_id" class="form__select">
                                 <option value="">미지정 (직원이 입력)</option>
                                 {% for org in organizations %}
                                 <option value="{{ org.id }}">{{ org.path or org.name }}</option>
@@ -56,41 +56,41 @@
                     </div>
 
                     <!-- 계정 정보 -->
-                    <div class="form-section-title mt-4">
+                    <div class="form__section-title mt-4">
                         <i class="fas fa-id-card"></i>
                         계정 정보
                     </div>
 
-                    <div class="form-row two-col">
-                        <div class="form-group">
-                            <label for="modalUsername" class="form-label required">사용자명</label>
-                            <input type="text" id="modalUsername" name="username" class="form-input"
+                    <div class="form__row two-col">
+                        <div class="form__group">
+                            <label for="modalUsername" class="form__label required">사용자명</label>
+                            <input type="text" id="modalUsername" name="username" class="form__input"
                                    placeholder="영문, 숫자 (4자 이상)"
                                    pattern="[a-zA-Z0-9_]+" minlength="4" required>
-                            <small class="form-help">영문, 숫자, 밑줄(_)만 사용 가능</small>
+                            <small class="form__hint">영문, 숫자, 밑줄(_)만 사용 가능</small>
                         </div>
-                        <div class="form-group">
-                            <label for="modalEmail" class="form-label required">이메일</label>
-                            <input type="email" id="modalEmail" name="email" class="form-input"
+                        <div class="form__group">
+                            <label for="modalEmail" class="form__label required">이메일</label>
+                            <input type="email" id="modalEmail" name="email" class="form__input"
                                    placeholder="user@example.com" required>
                         </div>
                     </div>
 
-                    <div class="form-row two-col">
-                        <div class="form-group">
-                            <label for="modalPassword" class="form-label">초기 비밀번호</label>
+                    <div class="form__row two-col">
+                        <div class="form__group">
+                            <label for="modalPassword" class="form__label">초기 비밀번호</label>
                             <div class="input-with-icon">
-                                <input type="text" id="modalPassword" name="password" class="form-input"
+                                <input type="text" id="modalPassword" name="password" class="form__input"
                                        placeholder="미입력 시 자동 생성">
                                 <button type="button" class="btn-icon-inside" id="generatePasswordBtn" title="비밀번호 자동 생성">
                                     <i class="fas fa-random"></i>
                                 </button>
                             </div>
-                            <small class="form-help">미입력 시 안전한 비밀번호 자동 생성</small>
+                            <small class="form__hint">미입력 시 안전한 비밀번호 자동 생성</small>
                         </div>
-                        <div class="form-group">
-                            <label for="modalRole" class="form-label">권한</label>
-                            <select id="modalRole" name="role" class="form-select">
+                        <div class="form__group">
+                            <label for="modalRole" class="form__label">권한</label>
+                            <select id="modalRole" name="role" class="form__select">
                                 <option value="employee" selected>일반 직원</option>
                                 <option value="manager">매니저</option>
                                 <option value="admin">관리자</option>
@@ -99,9 +99,9 @@
                     </div>
                 </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-modal-close>취소</button>
-                    <button type="button" class="btn btn-primary" data-step-next="2" id="step1NextBtn">
+                <div class="modal__footer">
+                    <button type="button" class="btn btn--secondary" data-modal-close>취소</button>
+                    <button type="button" class="btn btn--primary" data-step-next="2" id="step1NextBtn">
                         다음
                         <i class="fas fa-arrow-right"></i>
                     </button>
@@ -110,7 +110,7 @@
 
             <!-- Step 2: 확인 -->
             <div class="modal-step-content" data-step-content="2">
-                <div class="modal-body">
+                <div class="modal__body">
                     <div class="confirm-section">
                         <h3 class="confirm-title">계정 발급 정보 확인</h3>
 
@@ -156,12 +156,12 @@
                     </div>
                 </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-step-prev="1">
+                <div class="modal__footer">
+                    <button type="button" class="btn btn--secondary" data-step-prev="1">
                         <i class="fas fa-arrow-left"></i>
                         이전
                     </button>
-                    <button type="submit" class="btn btn-primary" id="submitProvisionBtn">
+                    <button type="submit" class="btn btn--primary" id="submitProvisionBtn">
                         <i class="fas fa-id-card"></i>
                         계정 발급
                     </button>

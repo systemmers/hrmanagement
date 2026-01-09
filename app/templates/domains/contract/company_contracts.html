@@ -17,12 +17,12 @@
         <h1 class="page-title">기업 계약 관리</h1>
         <div class="page-actions">
             {% if stats.pending > 0 %}
-            <button type="button" class="btn btn-secondary" id="filterPendingBtn">
+            <button type="button" class="btn btn--secondary" id="filterPendingBtn">
                 <i class="fas fa-clock"></i>
                 <span>대기 중 ({{ stats.pending }})</span>
             </button>
             {% endif %}
-            <button type="button" class="btn btn-primary" id="openContractRequestModal">
+            <button type="button" class="btn btn--primary" id="openContractRequestModal">
                 <i class="fas fa-plus"></i>
                 <span>계약 요청</span>
             </button>

@@ -8,7 +8,7 @@
     <div class="page-title-row">
         <h1 class="page-title">내 계약 목록</h1>
         <div class="page-actions">
-            <a href="{{ url_for('contracts.pending_contracts') }}" class="btn btn-secondary">
+            <a href="{{ url_for('contracts.pending_contracts') }}" class="btn btn--secondary">
                 <i class="fas fa-clock"></i>
                 <span>대기 중인 요청 ({{ stats.pending or 0 }})</span>
             </a>

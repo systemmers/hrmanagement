@@ -5,21 +5,21 @@
 #}
 {# 개인정보 읽기 전용 플래그: 법인 계정 + 개인계약 연동 시 #}
 {% set is_personal_readonly = is_corporate and has_person_contract %}
-<section class="form-section" id="career-info">
+<section class="form__section" id="career-info">
     <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">
+        <div class="card__header">
+            <h2 class="card__title">
                 <i class="fas fa-briefcase"></i>
                 경력정보
                 {% if is_personal_readonly %}<small class="text-muted">(동기화 전용)</small>{% endif %}
             </h2>
             {% if not is_personal_readonly %}
-            <button type="button" class="btn btn-sm btn-secondary" id="addCareer">
+            <button type="button" class="btn btn--sm btn--secondary" id="addCareer">
                 <i class="fas fa-plus"></i> 추가
             </button>
             {% endif %}
         </div>
-        <div class="card-body">
+        <div class="card__body">
             <div class="dynamic-list" id="careerList">
                 {# SSOT: Blueprint에서 career_list 전달 필수 (N+1 쿼리 방지) #}
                 {% set careers = career_list | default([]) %}
@@ -27,51 +27,51 @@
                     {% for career in careers %}
                     <div class="dynamic-item" data-index="{{ loop.index0 }}">
                         <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">회사명</label>
-                                <input type="text" name="career_company_name[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">회사명</label>
+                                <input type="text" name="career_company_name[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ career.company_name if career.company_name else '' }}" placeholder="회사명"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">부서</label>
-                                <input type="text" name="career_department[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">부서</label>
+                                <input type="text" name="career_department[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ career.department if career.department else '' }}" placeholder="개발팀"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">직위</label>
-                                <input type="text" name="career_position[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">직위</label>
+                                <input type="text" name="career_position[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ career.position if career.position else '' }}" placeholder="사원, 대리, 과장"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">직급</label>
-                                <input type="text" name="career_job_grade[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">직급</label>
+                                <input type="text" name="career_job_grade[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ career.job_grade if career.job_grade else '' }}" placeholder="L3, Senior"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">직책</label>
-                                <input type="text" name="career_job_title[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">직책</label>
+                                <input type="text" name="career_job_title[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ career.job_title if career.job_title else '' }}" placeholder="팀장, 본부장"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">직무</label>
-                                <input type="text" name="career_job_role[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">직무</label>
+                                <input type="text" name="career_job_role[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ career.job_role if career.job_role else '' }}" placeholder="인사기획, 회계관리"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">담당업무</label>
-                                <input type="text" name="career_duties[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">담당업무</label>
+                                <input type="text" name="career_duties[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ career.job_description if career.job_description else '' }}" placeholder="웹 개발, API 설계"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">급여유형</label>
-                                <select name="career_salary_type[]" class="form-select{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">급여유형</label>
+                                <select name="career_salary_type[]" class="form__select{% if is_personal_readonly %} readonly-field{% endif %}"
                                         {% if is_personal_readonly %}disabled{% endif %}>
                                     <option value="">선택</option>
                                     {% for opt in SALARY_TYPE_OPTIONS %}
@@ -79,33 +79,33 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">연봉</label>
-                                <input type="number" name="career_salary[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">연봉</label>
+                                <input type="number" name="career_salary[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ career.salary if career.salary else '' }}" placeholder="연봉 (원)"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">월급</label>
-                                <input type="number" name="career_monthly_salary[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">월급</label>
+                                <input type="number" name="career_monthly_salary[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ career.monthly_salary if career.monthly_salary else '' }}" placeholder="월급 (원)"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">호봉</label>
-                                <input type="number" name="career_pay_step[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">호봉</label>
+                                <input type="number" name="career_pay_step[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ career.pay_step if career.pay_step else '' }}" placeholder="1~50"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">입사일</label>
-                                <input type="date" name="career_start_date[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">입사일</label>
+                                <input type="date" name="career_start_date[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ career.start_date if career.start_date else '' }}"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">퇴사일</label>
-                                <input type="date" name="career_end_date[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <div class="form__group">
+                                <label class="form__label">퇴사일</label>
+                                <input type="date" name="career_end_date[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                        value="{{ career.end_date if career.end_date else '' }}"
                                        {% if is_personal_readonly %}readonly disabled{% endif %}>
                             </div>
@@ -120,44 +120,44 @@
                 {% else %}
                 <div class="dynamic-item" data-index="0">
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">회사명</label>
-                            <input type="text" name="career_company_name[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="회사명"
+                        <div class="form__group">
+                            <label class="form__label">회사명</label>
+                            <input type="text" name="career_company_name[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="회사명"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">부서</label>
-                            <input type="text" name="career_department[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="개발팀"
+                        <div class="form__group">
+                            <label class="form__label">부서</label>
+                            <input type="text" name="career_department[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="개발팀"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">직위</label>
-                            <input type="text" name="career_position[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="사원, 대리, 과장"
+                        <div class="form__group">
+                            <label class="form__label">직위</label>
+                            <input type="text" name="career_position[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="사원, 대리, 과장"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">직급</label>
-                            <input type="text" name="career_job_grade[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="L3, Senior"
+                        <div class="form__group">
+                            <label class="form__label">직급</label>
+                            <input type="text" name="career_job_grade[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="L3, Senior"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">직책</label>
-                            <input type="text" name="career_job_title[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="팀장, 본부장"
+                        <div class="form__group">
+                            <label class="form__label">직책</label>
+                            <input type="text" name="career_job_title[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="팀장, 본부장"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">직무</label>
-                            <input type="text" name="career_job_role[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="인사기획, 회계관리"
+                        <div class="form__group">
+                            <label class="form__label">직무</label>
+                            <input type="text" name="career_job_role[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="인사기획, 회계관리"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">담당업무</label>
-                            <input type="text" name="career_duties[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="웹 개발, API 설계"
+                        <div class="form__group">
+                            <label class="form__label">담당업무</label>
+                            <input type="text" name="career_duties[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="웹 개발, API 설계"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">급여유형</label>
-                            <select name="career_salary_type[]" class="form-select{% if is_personal_readonly %} readonly-field{% endif %}"
+                        <div class="form__group">
+                            <label class="form__label">급여유형</label>
+                            <select name="career_salary_type[]" class="form__select{% if is_personal_readonly %} readonly-field{% endif %}"
                                     {% if is_personal_readonly %}disabled{% endif %}>
                                 <option value="">선택</option>
                                 {% for opt in SALARY_TYPE_OPTIONS %}
@@ -165,29 +165,29 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">연봉</label>
-                            <input type="number" name="career_salary[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="연봉 (원)"
+                        <div class="form__group">
+                            <label class="form__label">연봉</label>
+                            <input type="number" name="career_salary[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="연봉 (원)"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">월급</label>
-                            <input type="number" name="career_monthly_salary[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="월급 (원)"
+                        <div class="form__group">
+                            <label class="form__label">월급</label>
+                            <input type="number" name="career_monthly_salary[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="월급 (원)"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">호봉</label>
-                            <input type="number" name="career_pay_step[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="1~50"
+                        <div class="form__group">
+                            <label class="form__label">호봉</label>
+                            <input type="number" name="career_pay_step[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}" placeholder="1~50"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">입사일</label>
-                            <input type="date" name="career_start_date[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                        <div class="form__group">
+                            <label class="form__label">입사일</label>
+                            <input type="date" name="career_start_date[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">퇴사일</label>
-                            <input type="date" name="career_end_date[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                        <div class="form__group">
+                            <label class="form__label">퇴사일</label>
+                            <input type="date" name="career_end_date[]" class="form__input{% if is_personal_readonly %} readonly-field{% endif %}"
                                    {% if is_personal_readonly %}readonly disabled{% endif %}>
                         </div>
                     </div>
@@ -199,7 +199,7 @@
                 </div>
                 {% endif %}
             </div>
-            <p class="form-help">최근 경력부터 역순으로 입력해 주세요.</p>
+            <p class="form__hint">최근 경력부터 역순으로 입력해 주세요.</p>
         </div>
     </div>
 </section>

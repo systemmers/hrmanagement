@@ -9,7 +9,7 @@
     {{ section_title('개인 기본정보') }}
     <div class="card">
         {{ card_header('개인 기본정보', 'fas fa-user') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="info-grid">
                 {# FieldRegistry personal_basic 섹션 순서 적용 - Phase 28 라벨 통일 #}
                 {{ info_item('이름', employee.name) }}
@@ -19,7 +19,7 @@
                 <div class="info-item">
                     <div class="info-label">생년월일</div>
                     <div class="info-value{% if not employee.birth_date %} empty{% endif %}">
-                        {{ employee.birth_date or '정보 없음' }}{% if employee.lunar_birth %} <span class="badge badge-info">음력</span>{% endif %}
+                        {{ employee.birth_date or '정보 없음' }}{% if employee.lunar_birth %} <span class="badge badge--info">음력</span>{% endif %}
                     </div>
                 </div>
                 {{ info_item('나이', (employee.age ~ '세') if employee.age else none) }}
@@ -71,7 +71,7 @@
     {{ section_title('소속정보') }}
     <div class="card">
         {{ card_header('소속정보', 'fas fa-building') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="info-grid">
                 {# Phase 28: 소속 → 소속 조직, 부서 → 부서명 라벨 통일 #}
                 {{ info_item('소속 조직', employee.department, highlight=true) }}
@@ -99,7 +99,7 @@
     {{ section_title('계약정보') }}
     <div class="card">
         {{ card_header('계약정보', 'fas fa-file-contract') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="info-grid">
                 {# Phase 28: 소속정보에서 이동된 필드들 #}
                 {{ info_item('입사일', employee.hire_date) }}
@@ -143,7 +143,7 @@
     {{ section_title('급여정보') }}
     <div class="card">
         {{ card_header('급여정보', 'fas fa-won-sign') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="info-grid">
                 {{ info_item('급여형태', salary.salary_type if salary else none) }}
                 {{ info_item('기본급', ('{:,}'.format(salary.base_salary) ~ '원') if salary else none) }}
@@ -165,13 +165,13 @@
 <section id="benefit-info" class="content-section">
     {{ section_title('연차 및 복리후생') }}
     <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
+        <div class="card__header">
+            <h3 class="card__title">
                 <i class="fas fa-umbrella-beach"></i>
                 연차 및 복리후생 {% if benefit %}({{ benefit.year }}년){% endif %}
             </h3>
         </div>
-        <div class="card-body">
+        <div class="card__body">
             <div class="info-grid">
                 {{ info_item('연차 발생일수', (benefit.annual_leave_granted|string ~ '일') if benefit else none) }}
                 {{ info_item('연차 사용일수', (benefit.annual_leave_used|string ~ '일') if benefit else none) }}
@@ -189,7 +189,7 @@
     {{ section_title('가족정보') }}
     <div class="card">
         {{ card_header('가족정보', 'fas fa-users') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>
@@ -211,7 +211,7 @@
                             <td>{{ family.birth_date or '-' }}</td>
                             <td>{{ family.occupation or '-' }}</td>
                             <td>{{ family.phone or '-' }}</td>
-                            <td>{% if family.living_together %}<span class="badge badge-success">동거</span>{% else %}<span class="badge badge-secondary">별거</span>{% endif %}</td>
+                            <td>{% if family.living_together %}<span class="badge badge--success">동거</span>{% else %}<span class="badge badge--secondary">별거</span>{% endif %}</td>
                         </tr>
                         {% endfor %}
                         {% else %}

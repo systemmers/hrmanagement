@@ -1,9 +1,15 @@
 /**
  * Alert Component Styles
  * 알림, 토스트, 플래시 메시지 컴포넌트
+ *
+ * BEM 네이밍 전환 (2026-01-09)
+ * 표준: .alert--{modifier}, .alert__{element} (BEM 방식)
+ * @deprecated .alert-{modifier} - 2026-12 이후 제거 예정
  */
 
-/* 기본 알림 */
+/* ========================================
+   Alert (Block)
+   ======================================== */
 .alert {
     padding: var(--space-4);
     border-radius: var(--radius-md);
@@ -12,50 +18,70 @@
     gap: var(--space-3);
 }
 
+/* Alert Elements (BEM)
+ * 표준: .alert__{element}
+ * @deprecated .alert-{element} - 2026-12 이후 제거 예정
+ */
+.alert__icon,
 .alert-icon {
     flex-shrink: 0;
     width: 20px;
     height: 20px;
 }
 
+.alert__content,
 .alert-content {
     flex: 1;
 }
 
+.alert__title,
 .alert-title {
     font-weight: 600;
     margin-bottom: var(--space-1);
 }
 
+.alert__message,
 .alert-message {
     font-size: var(--text-sm);
 }
 
+/* Alert Modifiers - Variants (BEM)
+ * 표준: .alert--{variant}
+ * @deprecated .alert-{variant} - 2026-12 이후 제거 예정
+ */
+.alert--success,
 .alert-success {
     background-color: var(--color-success-100);
     color: var(--color-success-700);
     border: 1px solid var(--color-success-100);
 }
 
+.alert--warning,
 .alert-warning {
     background-color: var(--color-warning-100);
     color: var(--color-warning-700);
     border: 1px solid var(--color-warning-100);
 }
 
+.alert--error,
 .alert-error {
     background-color: var(--color-error-100);
     color: var(--color-error-700);
     border: 1px solid var(--color-error-100);
 }
 
+.alert--info,
 .alert-info {
     background-color: var(--color-blue-100);
     color: var(--color-blue-700);
     border: 1px solid var(--color-blue-100);
 }
 
-/* 알림 닫기 버튼 */
+/* Alert Close Button (Element)
+ * 표준: .alert__close
+ * @deprecated .alert-close - 2026-12 이후 제거 예정
+ */
+.alert__close,
 .alert-close {
     background: none;
     border: none;
@@ -71,15 +97,20 @@
     margin-left: auto;
 }
 
+.alert__close:hover,
 .alert-close:hover {
     opacity: 1;
 }
 
+.alert__close i,
 .alert-close i {
     font-size: var(--text-sm);
 }
 
-/* 플래시 메시지 - JS가 Toast로 변환 후 제거 (깜빡임 방지) */
+/* ========================================
+   Flash Messages (Block)
+   플래시 메시지 - JS가 Toast로 변환 후 제거 (깜빡임 방지)
+   ======================================== */
 .flash-messages {
     display: none;
 }
@@ -94,29 +125,33 @@
     animation: slideIn 0.3s ease-out;
 }
 
-/* Flash Message Variants
- * @deprecated 다중 클래스 패턴 (.flash-message.success)
- * 표준 패턴: .flash-message-success (하이픈 수정자) 권장
+/* Flash Message Variants (BEM)
+ * 표준: .flash-message--{variant}
+ * @deprecated .flash-message.{variant}, .flash-message-{variant} - 2026-12 이후 제거 예정
  * Toast 시스템으로 대체 예정 (toast.js 참조)
  */
+.flash-message--success,
 .flash-message.success,
 .flash-message-success {
     background-color: var(--color-success-100);
     color: var(--color-success-700);
 }
 
+.flash-message--error,
 .flash-message.error,
 .flash-message-error {
     background-color: var(--color-error-100);
     color: var(--color-error-700);
 }
 
+.flash-message--warning,
 .flash-message.warning,
 .flash-message-warning {
     background-color: var(--color-warning-100);
     color: var(--color-warning-700);
 }
 
+.flash-message--info,
 .flash-message.info,
 .flash-message-info {
     background-color: var(--color-blue-100);
@@ -146,7 +181,9 @@
     }
 }
 
-/* 토스트 메시지 */
+/* ========================================
+   Toast Messages (Block)
+   ======================================== */
 .toast-container {
     position: fixed;
     bottom: var(--space-4);
@@ -169,29 +206,32 @@
     animation: toastIn 0.3s ease-out;
 }
 
-/* Toast Variants
- * @deprecated 다중 클래스 패턴 (.toast.success)
- * 표준 패턴: .toast-success (하이픈 수정자) 권장
- * 향후 하이픈 패턴으로 통일 예정 (2026-12)
+/* Toast Variants (BEM)
+ * 표준: .toast--{variant}
+ * @deprecated .toast.{variant}, .toast-{variant} - 2026-12 이후 제거 예정
  */
+.toast--success,
 .toast.success,
 .toast-success {
     background-color: var(--color-success-700);
     color: var(--color-pure-white);
 }
 
+.toast--error,
 .toast.error,
 .toast-error {
     background-color: var(--color-error-700);
     color: var(--color-pure-white);
 }
 
+.toast--warning,
 .toast.warning,
 .toast-warning {
     background-color: var(--color-warning-700);
     color: var(--color-pure-white);
 }
 
+.toast--info,
 .toast.info,
 .toast-info {
     background-color: var(--color-blue-700);
@@ -209,7 +249,9 @@
     }
 }
 
-/* 인라인 알림 */
+/* ========================================
+   Inline Alert (Block)
+   ======================================== */
 .inline-alert {
     padding: var(--space-2) var(--space-3);
     font-size: var(--text-sm);
@@ -219,21 +261,29 @@
     gap: var(--space-2);
 }
 
+/* Inline Alert Variants (BEM)
+ * 표준: .inline-alert--{variant}
+ * @deprecated .inline-alert-{variant} - 2026-12 이후 제거 예정
+ */
+.inline-alert--success,
 .inline-alert-success {
     background-color: var(--color-success-100);
     color: var(--color-success-700);
 }
 
+.inline-alert--error,
 .inline-alert-error {
     background-color: var(--color-error-100);
     color: var(--color-error-700);
 }
 
+.inline-alert--warning,
 .inline-alert-warning {
     background-color: var(--color-warning-100);
     color: var(--color-warning-700);
 }
 
+.inline-alert--info,
 .inline-alert-info {
     background-color: var(--color-blue-100);
     color: var(--color-blue-700);

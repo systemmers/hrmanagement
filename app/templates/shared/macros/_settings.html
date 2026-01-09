@@ -1,19 +1,22 @@
 {#
     Settings Page Macros
     법인 설정 페이지 전용 재사용 매크로
+
+    BEM 네이밍 전환 (2026-01-09)
+    표준: .form__group, .form__label, .form__toggle, .form__toggle-switch, .form__toggle-slider, .form__toggle-label
 #}
 
 {# 토글 스위치 (패턴 규칙용) #}
 {% macro settings_toggle(id, label, desc='') %}
-<div class="form-group">
-    <label class="form-label">{{ label }}</label>
-    <div class="form-toggle">
-        <label class="toggle-switch">
+<div class="form__group">
+    <label class="form__label">{{ label }}</label>
+    <div class="form__toggle">
+        <label class="form__toggle-switch">
             <input type="checkbox" id="{{ id }}">
-            <span class="toggle-slider"></span>
+            <span class="form__toggle-slider"></span>
         </label>
         {% if desc %}
-        <span class="toggle-label">{{ desc }}</span>
+        <span class="form__toggle-label">{{ desc }}</span>
         {% endif %}
     </div>
 </div>
@@ -21,33 +24,33 @@
 
 {# 미리보기 필드 #}
 {% macro settings_preview(id, label, default_value) %}
-<div class="form-group">
-    <label class="form-label">{{ label }}</label>
-    <div class="form-preview">
-        <span class="form-preview-label">예시:</span>
-        <span class="form-preview-value" id="{{ id }}">{{ default_value }}</span>
+<div class="form__group">
+    <label class="form__label">{{ label }}</label>
+    <div class="form__preview">
+        <span class="form__preview-label">예시:</span>
+        <span class="form__preview-value" id="{{ id }}">{{ default_value }}</span>
     </div>
 </div>
 {% endmacro %}
 
 {# 노출 설정 옵션 #}
 {% macro visibility_option(id, title, desc, checked=true) %}
-<div class="form-option">
-    <div class="form-option-content">
-        <span class="form-option-title">{{ title }}</span>
-        <span class="form-option-desc">{{ desc }}</span>
+<div class="form__option">
+    <div class="form__option-content">
+        <span class="form__option-title">{{ title }}</span>
+        <span class="form__option-desc">{{ desc }}</span>
     </div>
-    <label class="toggle-switch">
+    <label class="form__toggle-switch">
         <input type="checkbox" id="{{ id }}" {% if checked %}checked{% endif %}>
-        <span class="toggle-slider"></span>
+        <span class="form__toggle-slider"></span>
     </label>
 </div>
 {% endmacro %}
 
 {# 서류 카테고리 섹션 #}
 {% macro document_category(category, title, icon) %}
-<div class="form-section form-section--card">
-    <h2 class="form-section-title">
+<div class="form__section form__section--card">
+    <h2 class="form__section-title">
         <i class="fas fa-{{ icon }}"></i>
         {{ title }}
     </h2>
@@ -62,12 +65,12 @@
 
 {# 설정 폼 섹션 (패턴 규칙용) #}
 {% macro settings_form_section(title, icon) %}
-<div class="form-section form-section--card">
-    <h2 class="form-section-title">
+<div class="form__section form__section--card">
+    <h2 class="form__section-title">
         <i class="fas fa-{{ icon }}"></i>
         {{ title }}
     </h2>
-    <div class="form-row form-row--settings">
+    <div class="form__row form__row--settings">
         {{ caller() }}
     </div>
 </div>
@@ -75,9 +78,9 @@
 
 {# 노출 설정 서브섹션 #}
 {% macro visibility_subsection(title) %}
-<div class="form-subsection">
-    <h4 class="form-subsection-title">{{ title }}</h4>
-    <div class="form-options">
+<div class="form__subsection">
+    <h4 class="form__subsection-title">{{ title }}</h4>
+    <div class="form__options">
         {{ caller() }}
     </div>
 </div>

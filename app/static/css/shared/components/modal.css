@@ -1,181 +1,220 @@
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
+/**
+ * Modal Component Styles
+ * 모달 컴포넌트 스타일
+ *
+ * BEM 네이밍 전환 (2026-01-09)
+ * 표준: .modal__{element}, .modal--{modifier} (BEM 방식)
+ * @deprecated .modal-{element} - 2026-12 이후 제거 예정
+ */
 
-        .modal.show {
-            display: flex;
-        }
+/* ========================================
+   Modal (Block)
+   ======================================== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
 
-        /* Modal Backdrop - 반투명 배경 오버레이 */
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.6);
-            z-index: 1;
-        }
+.modal.show {
+    display: flex;
+}
 
-        /* Modal Container - 모달 컨테이너 (backdrop 사용 시) */
-        .modal-container {
-            position: relative;
-            background-color: var(--color-pure-white);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-xl);
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            width: 95%;
-            z-index: 2;
-        }
+/* Modal Elements (BEM)
+ * 표준: .modal__{element}
+ * @deprecated .modal-{element} - 2026-12 이후 제거 예정
+ */
 
-        .modal-container.modal-sm {
-            max-width: 400px;
-        }
+/* Modal Backdrop - 반투명 배경 오버레이 */
+.modal__backdrop,
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+}
 
-        .modal-container.modal-md {
-            max-width: 640px;
-        }
+/* Modal Container - 모달 컨테이너 (backdrop 사용 시) */
+.modal__container,
+.modal-container {
+    position: relative;
+    background-color: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 95%;
+    z-index: 2;
+}
 
-        .modal-container.modal-lg {
-            max-width: 800px;
-        }
+/* Modal Container Size Modifiers (BEM)
+ * 표준: .modal__container--{size}
+ * @deprecated .modal-container.modal-{size} - 2026-12 이후 제거 예정
+ */
+.modal__container--sm,
+.modal-container.modal-sm {
+    max-width: 400px;
+}
 
-        .modal-container.modal-xl {
-            max-width: 1000px;
-        }
+.modal__container--md,
+.modal-container.modal-md {
+    max-width: 640px;
+}
 
-        /* Modal Content - 레거시 지원 (backdrop 없이 직접 배경 사용) */
-        .modal-content {
-            background-color: var(--color-pure-white);
-            border-radius: var(--radius-lg);
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-xl);
-        }
+.modal__container--lg,
+.modal-container.modal-lg {
+    max-width: 800px;
+}
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: var(--space-5);
-            border-bottom: 1px solid var(--color-gray-200);
-        }
+.modal__container--xl,
+.modal-container.modal-xl {
+    max-width: 1000px;
+}
 
-        .modal-title {
-            font-size: var(--text-xl);
-            font-weight: 600;
-            color: var(--color-gray-900);
-        }
+/* Modal Content - 레거시 지원 (backdrop 없이 직접 배경 사용) */
+.modal__content,
+.modal-content {
+    background-color: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-xl);
+}
 
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: var(--text-2xl);
-            color: var(--color-gray-500);
-            cursor: pointer;
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color var(--transition-fast);
-        }
+.modal__header,
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-5);
+    border-bottom: 1px solid var(--color-gray-200);
+}
 
-        .modal-close:hover {
-            color: var(--color-gray-900);
-        }
+.modal__title,
+.modal-title {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-gray-900);
+}
 
-        .modal-body {
-            padding: var(--space-5);
-        }
+.modal__close,
+.modal-close {
+    background: none;
+    border: none;
+    font-size: var(--text-2xl);
+    color: var(--color-gray-500);
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color var(--transition-fast);
+}
 
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: var(--space-3);
-            padding: var(--space-5);
-            border-top: 1px solid var(--color-gray-200);
-        }
+.modal__close:hover,
+.modal-close:hover {
+    color: var(--color-gray-900);
+}
 
-        /* 우측 사이드바 */
-        .right-sidebar {
-            width: 320px;
-            background-color: var(--color-pure-white);
-            border-left: 1px solid var(--color-gray-200);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            height: 100%;
-            overflow-y: auto;
-        }
+.modal__body,
+.modal-body {
+    padding: var(--space-5);
+}
 
-        .right-sidebar-header {
-            padding: var(--space-6);
-            border-bottom: 1px solid var(--color-gray-200);
-        }
+.modal__footer,
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    border-top: 1px solid var(--color-gray-200);
+}
 
-        .right-sidebar-title {
-            font-size: var(--text-lg);
-            font-weight: 600;
-            color: var(--color-gray-900);
-        }
+/* ========================================
+   Right Sidebar (Block)
+   ======================================== */
+.right-sidebar {
+    width: 320px;
+    background-color: var(--color-pure-white);
+    border-left: 1px solid var(--color-gray-200);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    height: 100%;
+    overflow-y: auto;
+}
 
-        .right-sidebar-content {
-            flex: 1;
-            padding: var(--space-4);
-        }
+.right-sidebar-header {
+    padding: var(--space-6);
+    border-bottom: 1px solid var(--color-gray-200);
+}
 
-        .file-card {
-            background-color: var(--color-gray-50);
-            border: 1px solid var(--color-gray-200);
-            border-radius: var(--radius-md);
-            padding: var(--space-3);
-            margin-bottom: var(--space-3);
-            display: flex;
-            align-items: center;
-            gap: var(--space-3);
-            cursor: pointer;
-            transition: all var(--transition-fast);
-        }
+.right-sidebar-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-gray-900);
+}
 
-        .file-card:hover {
-            background-color: var(--color-gray-100);
-            border-color: var(--color-gray-300);
-        }
+.right-sidebar-content {
+    flex: 1;
+    padding: var(--space-4);
+}
 
-        .file-icon {
-            width: 40px;
-            height: 40px;
-            background-color: var(--color-pure-white);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: var(--text-xl);
-            color: var(--color-gray-600);
-        }
+/* ========================================
+   File Card (Block)
+   ======================================== */
+.file-card {
+    background-color: var(--color-gray-50);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    margin-bottom: var(--space-3);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
 
-        .file-info {
-            flex: 1;
-        }
+.file-card:hover {
+    background-color: var(--color-gray-100);
+    border-color: var(--color-gray-300);
+}
 
-        .file-name {
-            font-size: var(--text-sm);
-            font-weight: 500;
-            color: var(--color-gray-900);
-            margin-bottom: var(--space-0-5);
-        }
+.file-icon {
+    width: 40px;
+    height: 40px;
+    background-color: var(--color-pure-white);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xl);
+    color: var(--color-gray-600);
+}
+
+.file-info {
+    flex: 1;
+}
+
+.file-name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-gray-900);
+    margin-bottom: var(--space-0-5);
+}

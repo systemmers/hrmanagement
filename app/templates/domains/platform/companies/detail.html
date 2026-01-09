@@ -17,7 +17,7 @@
             <p class="page-subtitle">법인 상세 정보</p>
         </div>
         <div class="page-actions">
-            <a href="{{ url_for('platform.companies_list') }}" class="btn btn-secondary">
+            <a href="{{ url_for('platform.companies_list') }}" class="btn btn--secondary">
                 <i class="fas fa-arrow-left"></i>
                 목록으로
             </a>
@@ -26,13 +26,13 @@
 
     <div class="detail-grid">
         <div class="content-card">
-            <div class="card-header">
+            <div class="card__header">
                 <h3><i class="fas fa-info-circle"></i> 기본 정보</h3>
                 <span class="status-badge {{ 'active' if company.is_active else 'inactive' }}">
                     {{ '활성' if company.is_active else '비활성' }}
                 </span>
             </div>
-            <div class="card-body">
+            <div class="card__body">
                 <dl class="info-list">
                     <div class="info-item">
                         <dt>법인명</dt>
@@ -60,9 +60,9 @@
                     </div>
                 </dl>
             </div>
-            <div class="card-footer">
+            <div class="card__footer">
                 <button type="button"
-                        class="btn {{ 'btn-warning' if company.is_active else 'btn-success' }}"
+                        class="btn {{ 'btn--warning' if company.is_active else 'btn--success' }}"
                         data-action="toggle-company-active"
                         data-company-id="{{ company.id }}">
                     <i class="fas {{ 'fa-ban' if company.is_active else 'fa-check' }}"></i>
@@ -72,10 +72,10 @@
         </div>
 
         <div class="content-card">
-            <div class="card-header">
+            <div class="card__header">
                 <h3><i class="fas fa-users"></i> 소속 사용자 ({{ users|length }}명)</h3>
             </div>
-            <div class="card-body">
+            <div class="card__body">
                 {% if users %}
                 <ul class="user-list">
                     {% for user in users %}

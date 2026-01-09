@@ -1,9 +1,15 @@
 /**
  * Form Component Styles
  * 폼 레이아웃 및 입력 필드 스타일
+ *
+ * BEM 네이밍 전환 (2026-01-09)
+ * 표준: .form__{element}, .form--{modifier} (BEM 방식)
+ * @deprecated .form-{element} - 2026-12 이후 제거 예정
  */
 
-/* 폼 컨테이너 */
+/* ========================================
+   Form Container
+   ======================================== */
 .form-container {
     max-width: 800px;
 }
@@ -15,16 +21,23 @@
     padding: var(--space-8);
 }
 
-/* 폼 섹션 */
+/* ========================================
+   Form Section (BEM Elements)
+   표준: .form__section, .form__section-header, .form__section-title
+   @deprecated .form-section, .form-section-header, .form-section-title
+   ======================================== */
+.form__section,
 .form-section {
     margin-bottom: var(--space-8);
 }
 
+.form__section:last-of-type,
 .form-section:last-of-type {
     margin-bottom: 0;
 }
 
 /* 섹션 헤더 (타이틀 + 저장 버튼) */
+.form__section-header,
 .form-section-header {
     display: flex;
     justify-content: space-between;
@@ -34,12 +47,16 @@
     border-bottom: 1px solid var(--color-gray-200);
 }
 
+.form__section-header .form__section-title,
+.form__section-header .form-section-title,
+.form-section-header .form__section-title,
 .form-section-header .form-section-title {
     margin-bottom: 0;
     padding-bottom: 0;
     border-bottom: none;
 }
 
+.form__section-title,
 .form-section-title {
     font-size: var(--text-lg);
     font-weight: 600;
@@ -52,6 +69,7 @@
     gap: var(--space-2);
 }
 
+.form__section-title i,
 .form-section-title i {
     color: var(--color-primary-600);
 }
@@ -61,7 +79,12 @@
     flex-shrink: 0;
 }
 
-/* 폼 레이아웃 */
+/* ========================================
+   Form Layout (BEM Elements)
+   표준: .form__row, .form__group
+   @deprecated .form-row, .form-group
+   ======================================== */
+.form__row,
 .form-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -69,13 +92,19 @@
     margin-bottom: var(--space-4);
 }
 
+.form__group,
 .form-group {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
 }
 
-/* 폼 레이블 */
+/* ========================================
+   Form Label (BEM Element)
+   표준: .form__label
+   @deprecated .form-label
+   ======================================== */
+.form__label,
 .form-label {
     font-size: var(--text-sm);
     font-weight: 500;
@@ -86,7 +115,12 @@
     color: var(--color-error-500);
 }
 
-/* 폼 입력 */
+/* ========================================
+   Form Input (BEM Element)
+   표준: .form__input
+   @deprecated .form-input
+   ======================================== */
+.form__input,
 .form-input {
     padding: var(--space-3);
     border: 1px solid var(--color-gray-300);
@@ -96,13 +130,19 @@
     font-family: var(--font-family);
 }
 
+.form__input:focus,
 .form-input:focus {
     outline: none;
     border-color: var(--color-gray-900);
     box-shadow: var(--shadow-sm);
 }
 
-/* 폼 선택 박스 - 커스텀 화살표 + form-input과 높이 통일 */
+/* ========================================
+   Form Select (BEM Element)
+   표준: .form__select
+   @deprecated .form-select
+   ======================================== */
+.form__select,
 .form-select {
     padding: var(--space-3);
     padding-right: var(--space-8);
@@ -121,12 +161,14 @@
     transition: all var(--transition-fast);
 }
 
+.form__select:focus,
 .form-select:focus {
     outline: none;
     border-color: var(--color-gray-900);
     box-shadow: var(--shadow-sm);
 }
 
+.form__select:disabled,
 .form-select:disabled {
     background-color: var(--color-gray-100);
     color: var(--color-gray-500);
@@ -134,7 +176,12 @@
     opacity: 0.7;
 }
 
-/* 폼 텍스트에어리어 */
+/* ========================================
+   Form Textarea (BEM Element)
+   표준: .form__textarea
+   @deprecated .form-textarea
+   ======================================== */
+.form__textarea,
 .form-textarea {
     padding: var(--space-3);
     border: 1px solid var(--color-gray-300);
@@ -146,12 +193,14 @@
     min-height: 80px;
 }
 
+.form__textarea:focus,
 .form-textarea:focus {
     outline: none;
     border-color: var(--color-gray-900);
     box-shadow: var(--shadow-sm);
 }
 
+.form__textarea:disabled,
 .form-textarea:disabled {
     background-color: var(--color-gray-100);
     color: var(--color-gray-500);
@@ -160,7 +209,9 @@
 }
 
 /* 폼 입력 필드 비활성화 상태 */
+.form__input:disabled,
 .form-input:disabled,
+.form__input.readonly-field,
 .form-input.readonly-field {
     background-color: var(--color-gray-100);
     color: var(--color-gray-500);
@@ -169,6 +220,7 @@
 }
 
 /* select 요소 비활성화 상태 */
+select.form__input:disabled,
 select.form-input:disabled {
     background-color: var(--color-gray-100);
     color: var(--color-gray-500);
@@ -179,7 +231,12 @@ select.form-input:disabled {
     appearance: none;
 }
 
-/* 폼 액션 버튼 영역 */
+/* ========================================
+   Form Actions (BEM Element)
+   표준: .form__actions
+   @deprecated .form-actions
+   ======================================== */
+.form__actions,
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -391,6 +448,11 @@ select.form-input:disabled {
    Form Utility Classes
    ======================================== */
 
+/* Form Group Modifiers (BEM)
+ * 표준: .form__group--fixed-width
+ * @deprecated .form-group--fixed-width
+ */
+.form__group--fixed-width,
 .form-group--fixed-width {
     flex: 0 0 150px;
 }
@@ -399,7 +461,11 @@ select.form-input:disabled {
     border-color: var(--color-error-500) !important;
 }
 
-/* 폼 힌트/도움말 텍스트 */
+/* Form Hint (BEM Element)
+ * 표준: .form__hint
+ * @deprecated .form-hint
+ */
+.form__hint,
 .form-hint {
     font-size: var(--text-xs);
     color: var(--color-gray-500);
@@ -407,10 +473,13 @@ select.form-input:disabled {
 }
 
 /* ========================================
-   Form Section Variants
+   Form Section Variants (BEM Modifiers)
+   표준: .form__section--card
+   @deprecated .form-section--card
    ======================================== */
 
 /* Card Style Section */
+.form__section--card,
 .form-section--card {
     background-color: var(--color-pure-white);
     border: 1px solid var(--color-gray-200);
@@ -418,7 +487,11 @@ select.form-input:disabled {
     padding: var(--space-6);
 }
 
-/* Settings Row Layout */
+/* Settings Row Layout (BEM Modifier)
+ * 표준: .form__row--settings
+ * @deprecated .form-row--settings
+ */
+.form__row--settings,
 .form-row--settings {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -426,15 +499,19 @@ select.form-input:disabled {
 }
 
 /* ========================================
-   Form Toggle Component
+   Form Toggle Component (BEM)
+   표준: .form__toggle, .form__toggle-switch, .form__toggle-slider, .form__toggle-label
+   @deprecated .form-toggle, .toggle-switch, .toggle-slider, .toggle-label - 2026-12 이후 제거 예정
    ======================================== */
 
+.form__toggle,
 .form-toggle {
     display: flex;
     align-items: center;
     gap: var(--space-3);
 }
 
+.form__toggle-switch,
 .toggle-switch {
     position: relative;
     display: inline-block;
@@ -443,12 +520,14 @@ select.form-input:disabled {
     flex-shrink: 0;
 }
 
+.form__toggle-switch input,
 .toggle-switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
 
+.form__toggle-slider,
 .toggle-slider {
     position: absolute;
     cursor: pointer;
@@ -461,6 +540,7 @@ select.form-input:disabled {
     border-radius: 24px;
 }
 
+.form__toggle-slider:before,
 .toggle-slider:before {
     position: absolute;
     content: "";
@@ -473,23 +553,33 @@ select.form-input:disabled {
     border-radius: 50%;
 }
 
+.form__toggle-switch input:checked + .form__toggle-slider,
+.form__toggle-switch input:checked + .toggle-slider,
+.toggle-switch input:checked + .form__toggle-slider,
 .toggle-switch input:checked + .toggle-slider {
     background-color: var(--color-primary);
 }
 
+.form__toggle-switch input:checked + .form__toggle-slider:before,
+.form__toggle-switch input:checked + .toggle-slider:before,
+.toggle-switch input:checked + .form__toggle-slider:before,
 .toggle-switch input:checked + .toggle-slider:before {
     transform: translateX(24px);
 }
 
+.form__toggle-label,
 .toggle-label {
     font-size: var(--text-sm);
     color: var(--color-gray-600);
 }
 
 /* ========================================
-   Form Preview Component
+   Form Preview Component (BEM)
+   표준: .form__preview, .form__preview-label, .form__preview-value
+   @deprecated .form-preview, .form-preview-label, .form-preview-value - 2026-12 이후 제거 예정
    ======================================== */
 
+.form__preview,
 .form-preview {
     display: flex;
     align-items: center;
@@ -500,11 +590,13 @@ select.form-input:disabled {
     border: 1px solid var(--color-gray-200);
 }
 
+.form__preview-label,
 .form-preview-label {
     font-size: var(--text-sm);
     color: var(--color-gray-500);
 }
 
+.form__preview-value,
 .form-preview-value {
     font-size: var(--text-sm);
     font-weight: 600;
@@ -513,21 +605,26 @@ select.form-input:disabled {
 }
 
 /* ========================================
-   Form Subsection & Options
+   Form Subsection & Options (BEM)
+   표준: .form__subsection, .form__subsection-title, .form__options, .form__option, .form__option-content, .form__option-title, .form__option-desc
+   @deprecated .form-subsection, .form-subsection-title, .form-options, .form-option, .form-option-content, .form-option-title, .form-option-desc - 2026-12 이후 제거 예정
    ======================================== */
 
+.form__subsection,
 .form-subsection {
     margin-bottom: var(--space-6);
     padding-bottom: var(--space-4);
     border-bottom: 1px solid var(--color-gray-100);
 }
 
+.form__subsection:last-child,
 .form-subsection:last-child {
     margin-bottom: 0;
     padding-bottom: 0;
     border-bottom: none;
 }
 
+.form__subsection-title,
 .form-subsection-title {
     font-size: var(--text-base);
     font-weight: 600;
@@ -535,12 +632,14 @@ select.form-input:disabled {
     margin-bottom: var(--space-4);
 }
 
+.form__options,
 .form-options {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
 }
 
+.form__option,
 .form-option {
     display: flex;
     align-items: center;
@@ -551,18 +650,21 @@ select.form-input:disabled {
     border-radius: var(--radius-md);
 }
 
+.form__option-content,
 .form-option-content {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
 }
 
+.form__option-title,
 .form-option-title {
     font-size: var(--text-sm);
     font-weight: 500;
     color: var(--color-gray-900);
 }
 
+.form__option-desc,
 .form-option-desc {
     font-size: var(--text-xs);
     color: var(--color-gray-500);
@@ -574,14 +676,17 @@ select.form-input:disabled {
 
 /* 반응형 */
 @media (max-width: 767px) {
+    .form__row,
     .form-row {
         grid-template-columns: 1fr;
     }
 
+    .form__row--settings,
     .form-row--settings {
         grid-template-columns: 1fr;
     }
 
+    .form__option,
     .form-option {
         flex-direction: column;
         align-items: flex-start;

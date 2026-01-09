@@ -16,7 +16,7 @@
     <div class="page-title-row">
         <h1 class="page-title">법인 설정</h1>
         <div class="page-actions">
-            <a href="{{ url_for('corporate.dashboard') }}" class="btn btn-secondary">
+            <a href="{{ url_for('corporate.dashboard') }}" class="btn btn--secondary">
                 <i class="fas fa-arrow-left"></i>
                 <span>대시보드로</span>
             </a>
@@ -67,23 +67,23 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="form_type" value="basic">
 
-                <div class="form-section">
-                    <h2 class="form-section-title">
+                <div class="form__section">
+                    <h2 class="form__section-title">
                         <i class="fas fa-building"></i>
                         기본 정보
                     </h2>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">
+                    <div class="form__row">
+                        <div class="form__group">
+                            <label class="form__label">
                                 법인명 <span class="required">*</span>
                             </label>
-                            <input type="text" name="company_name" class="form-input"
+                            <input type="text" name="company_name" class="form__input"
                                    value="{{ company.name }}" required>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">사업자등록번호</label>
-                            <input type="text" class="form-input"
+                        <div class="form__group">
+                            <label class="form__label">사업자등록번호</label>
+                            <input type="text" class="form__input"
                                    value="{{ company.business_number_formatted }}" disabled>
                             <small class="form-hint">
                                 사업자등록번호는 변경할 수 없습니다.
@@ -91,93 +91,93 @@
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">
+                    <div class="form__row">
+                        <div class="form__group">
+                            <label class="form__label">
                                 대표자명 <span class="required">*</span>
                             </label>
-                            <input type="text" name="representative" class="form-input"
+                            <input type="text" name="representative" class="form__input"
                                    value="{{ company.representative }}" required>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">웹사이트</label>
-                            <input type="url" name="website" class="form-input"
+                        <div class="form__group">
+                            <label class="form__label">웹사이트</label>
+                            <input type="url" name="website" class="form__input"
                                    placeholder="https://example.com"
                                    value="{{ company.website or '' }}">
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">업태</label>
-                            <input type="text" name="business_type" class="form-input"
+                    <div class="form__row">
+                        <div class="form__group">
+                            <label class="form__label">업태</label>
+                            <input type="text" name="business_type" class="form__input"
                                    placeholder="서비스업"
                                    value="{{ company.business_type or '' }}">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">업종</label>
-                            <input type="text" name="business_category" class="form-input"
+                        <div class="form__group">
+                            <label class="form__label">업종</label>
+                            <input type="text" name="business_category" class="form__input"
                                    placeholder="소프트웨어 개발"
                                    value="{{ company.business_category or '' }}">
                         </div>
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <h2 class="form-section-title">
+                <div class="form__section">
+                    <h2 class="form__section-title">
                         <i class="fas fa-phone"></i>
                         연락처 정보
                     </h2>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">대표 전화번호</label>
-                            <input type="tel" name="phone" class="form-input"
+                    <div class="form__row">
+                        <div class="form__group">
+                            <label class="form__label">대표 전화번호</label>
+                            <input type="tel" name="phone" class="form__input"
                                    placeholder="02-0000-0000"
                                    value="{{ company.phone or '' }}">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">대표 이메일</label>
-                            <input type="email" name="company_email" class="form-input"
+                        <div class="form__group">
+                            <label class="form__label">대표 이메일</label>
+                            <input type="email" name="company_email" class="form__input"
                                    placeholder="info@company.com"
                                    value="{{ company.email or '' }}">
                         </div>
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <h2 class="form-section-title">
+                <div class="form__section">
+                    <h2 class="form__section-title">
                         <i class="fas fa-map-marker-alt"></i>
                         주소 정보
                     </h2>
 
-                    <div class="form-row">
+                    <div class="form__row">
                         <div class="form-group form-group--fixed-width">
-                            <label class="form-label">우편번호</label>
-                            <input type="text" name="postal_code" class="form-input"
+                            <label class="form__label">우편번호</label>
+                            <input type="text" name="postal_code" class="form__input"
                                    placeholder="00000"
                                    value="{{ company.postal_code or '' }}">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">주소</label>
-                            <input type="text" name="address" class="form-input"
+                        <div class="form__group">
+                            <label class="form__label">주소</label>
+                            <input type="text" name="address" class="form__input"
                                    placeholder="서울시 강남구"
                                    value="{{ company.address or '' }}">
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">상세주소</label>
-                            <input type="text" name="address_detail" class="form-input"
+                    <div class="form__row">
+                        <div class="form__group">
+                            <label class="form__label">상세주소</label>
+                            <input type="text" name="address_detail" class="form__input"
                                    placeholder="OO빌딩 O층"
                                    value="{{ company.address_detail or '' }}">
                         </div>
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <h2 class="form-section-title">
+                <div class="form__section">
+                    <h2 class="form__section-title">
                         <i class="fas fa-crown"></i>
                         플랜 정보
                     </h2>
@@ -196,13 +196,13 @@
                             </div>
                         </div>
                     </div>
-                    <small class="form-help mt-2">
+                    <small class="form__hint mt-2">
                         플랜 변경은 관리자에게 문의해주세요.
                     </small>
                 </div>
 
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
+                <div class="form__actions">
+                    <button type="submit" class="btn btn--primary">
                         <i class="fas fa-save"></i>
                         <span>저장하기</span>
                     </button>
@@ -230,48 +230,48 @@
 
         <div id="tab-patterns" class="tab-panel" role="tabpanel">
             <div id="patterns-content">
-                <div class="form-section form-section--card" data-section="employee_number">
-                    <div class="form-section-header">
-                        <h2 class="form-section-title">
+                <div class="form__section form__section--card" data-section="employee_number">
+                    <div class="form__section-header">
+                        <h2 class="form__section-title">
                             <i class="fas fa-id-badge"></i>
                             사번 규칙
                         </h2>
-                        <button type="button" class="btn btn-sm btn-primary section-save-btn" data-section="employee_number">
+                        <button type="button" class="btn btn--sm btn--primary section-save-btn" data-section="employee_number">
                             <i class="fas fa-save"></i>
                             <span>저장</span>
                         </button>
                     </div>
-                    <div class="form-row form-row--settings">
-                        <div class="form-group">
-                            <label class="form-label">회사 코드</label>
-                            <input type="text" class="form-input text-uppercase" id="company_code"
+                    <div class="form__row form__row--settings">
+                        <div class="form__group">
+                            <label class="form__label">회사 코드</label>
+                            <input type="text" class="form__input text-uppercase" id="company_code"
                                    maxlength="6" placeholder="ABC">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">사번 접두어</label>
-                            <input type="text" class="form-input" id="employee_number_prefix"
+                        <div class="form__group">
+                            <label class="form__label">사번 접두어</label>
+                            <input type="text" class="form__input" id="employee_number_prefix"
                                    maxlength="10" placeholder="EMP">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">구분자</label>
-                            <select class="form-select" id="employee_number_separator">
+                        <div class="form__group">
+                            <label class="form__label">구분자</label>
+                            <select class="form__select" id="employee_number_separator">
                                 <option value="-">- (하이픈)</option>
                                 <option value="_">_ (언더스코어)</option>
                                 <option value="/">/  (슬래시)</option>
                                 <option value="">없음</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">순번 자릿수</label>
-                            <select class="form-select" id="employee_number_digits">
+                        <div class="form__group">
+                            <label class="form__label">순번 자릿수</label>
+                            <select class="form__select" id="employee_number_digits">
                                 <option value="3">3자리</option>
                                 <option value="4">4자리</option>
                                 <option value="5">5자리</option>
                                 <option value="6">6자리</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">연도 포함</label>
+                        <div class="form__group">
+                            <label class="form__label">연도 포함</label>
                             <div class="form-toggle">
                                 <label class="toggle-switch">
                                     <input type="checkbox" id="employee_number_include_year">
@@ -280,8 +280,8 @@
                                 <span class="toggle-label">사번에 연도 포함 (예: 2025-EMP-0001)</span>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">미리보기</label>
+                        <div class="form__group">
+                            <label class="form__label">미리보기</label>
                             <div class="form-preview">
                                 <span class="form-preview-label">예시:</span>
                                 <span class="form-preview-value" id="employee_number_preview">ABC-EMP-000001</span>
@@ -290,25 +290,25 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card" data-section="email">
-                    <div class="form-section-header">
-                        <h2 class="form-section-title">
+                <div class="form__section form__section--card" data-section="email">
+                    <div class="form__section-header">
+                        <h2 class="form__section-title">
                             <i class="fas fa-envelope"></i>
                             이메일 설정
                         </h2>
-                        <button type="button" class="btn btn-sm btn-primary section-save-btn" data-section="email">
+                        <button type="button" class="btn btn--sm btn--primary section-save-btn" data-section="email">
                             <i class="fas fa-save"></i>
                             <span>저장</span>
                         </button>
                     </div>
-                    <div class="form-row form-row--settings">
-                        <div class="form-group">
-                            <label class="form-label">회사 이메일 도메인</label>
-                            <input type="text" class="form-input" id="email_domain"
+                    <div class="form__row form__row--settings">
+                        <div class="form__group">
+                            <label class="form__label">회사 이메일 도메인</label>
+                            <input type="text" class="form__input" id="email_domain"
                                    placeholder="company.co.kr">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">이메일 자동 생성</label>
+                        <div class="form__group">
+                            <label class="form__label">이메일 자동 생성</label>
                             <div class="form-toggle">
                                 <label class="toggle-switch">
                                     <input type="checkbox" id="auto_generate_email">
@@ -317,9 +317,9 @@
                                 <span class="toggle-label">직원 등록 시 이메일 자동 생성</span>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">이메일 포맷</label>
-                            <select class="form-select" id="email_format">
+                        <div class="form__group">
+                            <label class="form__label">이메일 포맷</label>
+                            <select class="form__select" id="email_format">
                                 <option value="first.last">이름.성 (hong.gildong)</option>
                                 <option value="last.first">성.이름 (gildong.hong)</option>
                                 <option value="firstlast">이름성 (honggildong)</option>
@@ -328,8 +328,8 @@
                                 <option value="first">이름만 (gildong)</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">미리보기</label>
+                        <div class="form__group">
+                            <label class="form__label">미리보기</label>
                             <div class="form-preview">
                                 <span class="form-preview-label">예시:</span>
                                 <span class="form-preview-value" id="email_preview">hong.gildong@company.co.kr</span>
@@ -338,38 +338,38 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card" data-section="internal_phone">
-                    <div class="form-section-header">
-                        <h2 class="form-section-title">
+                <div class="form__section form__section--card" data-section="internal_phone">
+                    <div class="form__section-header">
+                        <h2 class="form__section-title">
                             <i class="fas fa-phone-alt"></i>
                             내선번호 설정
                         </h2>
-                        <button type="button" class="btn btn-sm btn-primary section-save-btn" data-section="internal_phone">
+                        <button type="button" class="btn btn--sm btn--primary section-save-btn" data-section="internal_phone">
                             <i class="fas fa-save"></i>
                             <span>저장</span>
                         </button>
                     </div>
-                    <div class="form-row form-row--settings">
-                        <div class="form-group">
-                            <label class="form-label">내선번호 자릿수</label>
-                            <select class="form-select" id="internal_phone_digits">
+                    <div class="form__row form__row--settings">
+                        <div class="form__group">
+                            <label class="form__label">내선번호 자릿수</label>
+                            <select class="form__select" id="internal_phone_digits">
                                 <option value="3">3자리</option>
                                 <option value="4">4자리</option>
                                 <option value="5">5자리</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">내선번호 범위 시작</label>
-                            <input type="number" class="form-input" id="extension_range_start"
+                        <div class="form__group">
+                            <label class="form__label">내선번호 범위 시작</label>
+                            <input type="number" class="form__input" id="extension_range_start"
                                    min="100" max="99999" placeholder="100">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">내선번호 범위 종료</label>
-                            <input type="number" class="form-input" id="extension_range_end"
+                        <div class="form__group">
+                            <label class="form__label">내선번호 범위 종료</label>
+                            <input type="number" class="form__input" id="extension_range_end"
                                    min="100" max="99999" placeholder="999">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">할당 가능 범위</label>
+                        <div class="form__group">
+                            <label class="form__label">할당 가능 범위</label>
                             <div class="form-preview">
                                 <span class="form-preview-label">범위:</span>
                                 <span class="form-preview-value" id="extension_range_preview">100 ~ 999</span>
@@ -378,21 +378,21 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card" data-section="payroll">
-                    <div class="form-section-header">
-                        <h2 class="form-section-title">
+                <div class="form__section form__section--card" data-section="payroll">
+                    <div class="form__section-header">
+                        <h2 class="form__section-title">
                             <i class="fas fa-won-sign"></i>
                             급여 설정
                         </h2>
-                        <button type="button" class="btn btn-sm btn-primary section-save-btn" data-section="payroll">
+                        <button type="button" class="btn btn--sm btn--primary section-save-btn" data-section="payroll">
                             <i class="fas fa-save"></i>
                             <span>저장</span>
                         </button>
                     </div>
-                    <div class="form-row form-row--settings">
-                        <div class="form-group">
-                            <label class="form-label">급여 지급일</label>
-                            <select class="form-select" id="payment_day">
+                    <div class="form__row form__row--settings">
+                        <div class="form__group">
+                            <label class="form__label">급여 지급일</label>
+                            <select class="form__select" id="payment_day">
                                 {% for day in range(1, 29) %}
                                 <option value="{{ day }}">매월 {{ day }}일</option>
                                 {% endfor %}
@@ -401,20 +401,20 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card" data-section="ip">
-                    <div class="form-section-header">
-                        <h2 class="form-section-title">
+                <div class="form__section form__section--card" data-section="ip">
+                    <div class="form__section-header">
+                        <h2 class="form__section-title">
                             <i class="fas fa-network-wired"></i>
                             IP 주소 관리
                         </h2>
-                        <button type="button" class="btn btn-sm btn-primary section-save-btn" data-section="ip">
+                        <button type="button" class="btn btn--sm btn--primary section-save-btn" data-section="ip">
                             <i class="fas fa-save"></i>
                             <span>저장</span>
                         </button>
                     </div>
-                    <div class="form-row form-row--settings">
-                        <div class="form-group">
-                            <label class="form-label">IP 자동 할당</label>
+                    <div class="form__row form__row--settings">
+                        <div class="form__group">
+                            <label class="form__label">IP 자동 할당</label>
                             <div class="form-toggle">
                                 <label class="toggle-switch">
                                     <input type="checkbox" id="ip_auto_assign">
@@ -423,18 +423,18 @@
                                 <span class="toggle-label">직원에게 IP 자동 할당</span>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">IP 대역 시작</label>
-                            <input type="text" class="form-input" id="ip_range_start"
+                        <div class="form__group">
+                            <label class="form__label">IP 대역 시작</label>
+                            <input type="text" class="form__input" id="ip_range_start"
                                    placeholder="192.168.1.100" pattern="^(\d{1,3}\.){3}\d{1,3}$">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">IP 대역 종료</label>
-                            <input type="text" class="form-input" id="ip_range_end"
+                        <div class="form__group">
+                            <label class="form__label">IP 대역 종료</label>
+                            <input type="text" class="form__input" id="ip_range_end"
                                    placeholder="192.168.1.200" pattern="^(\d{1,3}\.){3}\d{1,3}$">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">할당 가능 범위</label>
+                        <div class="form__group">
+                            <label class="form__label">할당 가능 범위</label>
                             <div class="form-preview">
                                 <span class="form-preview-label">범위:</span>
                                 <span class="form-preview-value" id="ip_range_preview">192.168.1.100 ~ 192.168.1.200</span>
@@ -443,41 +443,41 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card" data-section="asset_number">
-                    <div class="form-section-header">
-                        <h2 class="form-section-title">
+                <div class="form__section form__section--card" data-section="asset_number">
+                    <div class="form__section-header">
+                        <h2 class="form__section-title">
                             <i class="fas fa-laptop"></i>
                             자산번호 설정
                         </h2>
-                        <button type="button" class="btn btn-sm btn-primary section-save-btn" data-section="asset_number">
+                        <button type="button" class="btn btn--sm btn--primary section-save-btn" data-section="asset_number">
                             <i class="fas fa-save"></i>
                             <span>저장</span>
                         </button>
                     </div>
-                    <div class="form-row form-row--settings">
-                        <div class="form-group">
-                            <label class="form-label">자산번호 접두어</label>
-                            <input type="text" class="form-input" id="asset_number_prefix"
+                    <div class="form__row form__row--settings">
+                        <div class="form__group">
+                            <label class="form__label">자산번호 접두어</label>
+                            <input type="text" class="form__input" id="asset_number_prefix"
                                    maxlength="10" placeholder="ASSET">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">자산번호 구분자</label>
-                            <select class="form-select" id="asset_number_separator">
+                        <div class="form__group">
+                            <label class="form__label">자산번호 구분자</label>
+                            <select class="form__select" id="asset_number_separator">
                                 <option value="-">- (하이픈)</option>
                                 <option value="_">_ (언더스코어)</option>
                                 <option value="">없음</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">순번 자릿수</label>
-                            <select class="form-select" id="asset_number_digits">
+                        <div class="form__group">
+                            <label class="form__label">순번 자릿수</label>
+                            <select class="form__select" id="asset_number_digits">
                                 <option value="4">4자리</option>
                                 <option value="5">5자리</option>
                                 <option value="6">6자리</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">미리보기</label>
+                        <div class="form__group">
+                            <label class="form__label">미리보기</label>
                             <div class="form-preview">
                                 <span class="form-preview-label">예시:</span>
                                 <span class="form-preview-value" id="asset_number_preview">ASSET-0001</span>
@@ -503,8 +503,8 @@
 
         <div id="tab-documents" class="tab-panel" role="tabpanel">
             <div id="documents-content">
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
+                <div class="form__section form__section--card">
+                    <h2 class="form__section-title">
                         <i class="fas fa-chart-bar"></i>
                         서류 현황
                     </h2>
@@ -524,8 +524,8 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
+                <div class="form__section form__section--card">
+                    <h2 class="form__section-title">
                         <i class="fas fa-file-upload"></i>
                         서류 업로드
                     </h2>
@@ -538,21 +538,21 @@
                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
                         </div>
                         <form class="upload-form d-none" id="document-upload-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">선택된 파일</label>
+                            <div class="form__row">
+                                <div class="form__group">
+                                    <label class="form__label">선택된 파일</label>
                                     <span id="selected-file-name" class="selected-file-name">-</span>
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">서류명 <span class="required">*</span></label>
-                                    <input type="text" class="form-input" name="title"
+                            <div class="form__row">
+                                <div class="form__group">
+                                    <label class="form__label">서류명 <span class="required">*</span></label>
+                                    <input type="text" class="form__input" name="title"
                                            placeholder="서류 제목을 입력하세요" required>
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-label">카테고리</label>
-                                    <select class="form-select" name="category">
+                                <div class="form__group">
+                                    <label class="form__label">카테고리</label>
+                                    <select class="form__select" name="category">
                                         <option value="required">필수 서류</option>
                                         <option value="payroll">급여 관련</option>
                                         <option value="welfare">복리후생</option>
@@ -562,37 +562,37 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">서류 유형</label>
-                                    <select class="form-select" name="documentType">
+                            <div class="form__row">
+                                <div class="form__group">
+                                    <label class="form__label">서류 유형</label>
+                                    <select class="form__select" name="documentType">
                                         <option value="business_registration">사업자등록증</option>
                                         <option value="corporate_seal">법인인감증명</option>
                                         <option value="certificate_of_incorporation">법인등기부등본</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-label">만료일</label>
-                                    <input type="date" class="form-input" name="expiresAt">
+                                <div class="form__group">
+                                    <label class="form__label">만료일</label>
+                                    <input type="date" class="form__input" name="expiresAt">
                                 </div>
                             </div>
-                            <div class="form-row">
+                            <div class="form__row">
                                 <div class="form-group flex-1">
-                                    <label class="form-label">설명</label>
-                                    <input type="text" class="form-input" name="description"
+                                    <label class="form__label">설명</label>
+                                    <input type="text" class="form__input" name="description"
                                            placeholder="서류에 대한 간단한 설명">
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-label">&nbsp;</label>
+                                <div class="form__group">
+                                    <label class="form__label">&nbsp;</label>
                                     <label class="checkbox-label">
                                         <input type="checkbox" name="isRequired">
                                         필수 서류
                                     </label>
                                 </div>
                             </div>
-                            <div class="form-actions">
-                                <button type="button" class="btn btn-secondary" data-action="cancel">취소</button>
-                                <button type="submit" class="btn btn-primary">
+                            <div class="form__actions">
+                                <button type="button" class="btn btn--secondary" data-action="cancel">취소</button>
+                                <button type="submit" class="btn btn--primary">
                                     <i class="fas fa-upload"></i> 업로드
                                 </button>
                             </div>
@@ -600,8 +600,8 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
+                <div class="form__section form__section--card">
+                    <h2 class="form__section-title">
                         <i class="fas fa-folder-open"></i>
                         필수 서류
                     </h2>
@@ -613,8 +613,8 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
+                <div class="form__section form__section--card">
+                    <h2 class="form__section-title">
                         <i class="fas fa-won-sign"></i>
                         급여 관련 서류
                     </h2>
@@ -626,8 +626,8 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
+                <div class="form__section form__section--card">
+                    <h2 class="form__section-title">
                         <i class="fas fa-gift"></i>
                         복리후생 서류
                     </h2>
@@ -639,8 +639,8 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
+                <div class="form__section form__section--card">
+                    <h2 class="form__section-title">
                         <i class="fas fa-shield-alt"></i>
                         보안 서류
                     </h2>
@@ -652,8 +652,8 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
+                <div class="form__section form__section--card">
+                    <h2 class="form__section-title">
                         <i class="fas fa-file-contract"></i>
                         계약 서류
                     </h2>
@@ -665,8 +665,8 @@
                     </div>
                 </div>
 
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
+                <div class="form__section form__section--card">
+                    <h2 class="form__section-title">
                         <i class="fas fa-file-alt"></i>
                         기타 서류
                     </h2>
@@ -682,8 +682,8 @@
 
         <div id="tab-visibility" class="tab-panel" role="tabpanel">
             <div id="visibility-content">
-                <div class="form-section form-section--card">
-                    <h2 class="form-section-title">
+                <div class="form__section form__section--card">
+                    <h2 class="form__section-title">
                         <i class="fas fa-eye"></i>
                         정보 공개 범위
                     </h2>
@@ -783,11 +783,11 @@
                     </div>
 
                     <div class="tab-actions">
-                        <button type="button" class="btn btn-secondary" id="reset-visibility">
+                        <button type="button" class="btn btn--secondary" id="reset-visibility">
                             <i class="fas fa-undo"></i>
                             <span>기본값으로</span>
                         </button>
-                        <button type="button" class="btn btn-primary" id="save-visibility">
+                        <button type="button" class="btn btn--primary" id="save-visibility">
                             <i class="fas fa-save"></i>
                             <span>저장</span>
                         </button>

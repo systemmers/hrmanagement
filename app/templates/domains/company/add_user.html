@@ -11,7 +11,7 @@
     <div class="page-title-row">
         <h1 class="page-title">사용자 추가</h1>
         <div class="page-actions">
-            <a href="{{ url_for('corporate.users') }}" class="btn btn-secondary">
+            <a href="{{ url_for('corporate.users') }}" class="btn btn--secondary">
                 <i class="fas fa-arrow-left"></i>
                 <span>사용자 목록으로</span>
             </a>
@@ -24,66 +24,66 @@
     <form method="POST" class="app-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <!-- 계정 정보 섹션 -->
-        <div class="form-section">
-            <h2 class="form-section-title">
+        <div class="form__section">
+            <h2 class="form__section-title">
                 <i class="fas fa-user"></i>
                 계정 정보
             </h2>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">
+            <div class="form__row">
+                <div class="form__group">
+                    <label class="form__label">
                         아이디 <span class="required">*</span>
                     </label>
-                    <input type="text" name="username" class="form-input"
+                    <input type="text" name="username" class="form__input"
                            placeholder="영문, 숫자 조합"
                            value="{{ username or '' }}" required>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">
+                <div class="form__group">
+                    <label class="form__label">
                         이메일 <span class="required">*</span>
                     </label>
-                    <input type="email" name="email" class="form-input"
+                    <input type="email" name="email" class="form__input"
                            placeholder="user@example.com"
                            value="{{ email or '' }}" required>
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">
+            <div class="form__row">
+                <div class="form__group">
+                    <label class="form__label">
                         비밀번호 <span class="required">*</span>
                     </label>
-                    <input type="password" name="password" class="form-input"
+                    <input type="password" name="password" class="form__input"
                            placeholder="8자 이상" required minlength="8">
                 </div>
-                <div class="form-group">
-                    <label class="form-label">
+                <div class="form__group">
+                    <label class="form__label">
                         비밀번호 확인 <span class="required">*</span>
                     </label>
-                    <input type="password" name="password_confirm" class="form-input"
+                    <input type="password" name="password_confirm" class="form__input"
                            placeholder="비밀번호 재입력" required minlength="8">
                 </div>
             </div>
         </div>
 
         <!-- 권한 설정 섹션 -->
-        <div class="form-section">
-            <h2 class="form-section-title">
+        <div class="form__section">
+            <h2 class="form__section-title">
                 <i class="fas fa-user-shield"></i>
                 권한 설정
             </h2>
 
-            <div class="form-group">
-                <label class="form-label">
+            <div class="form__group">
+                <label class="form__label">
                     역할 <span class="required">*</span>
                 </label>
-                <select name="role" class="form-select" required>
+                <select name="role" class="form__select" required>
                     <option value="employee" {% if role == 'employee' %}selected{% endif %}>직원</option>
                     <option value="manager" {% if role == 'manager' %}selected{% endif %}>매니저</option>
                     <option value="admin" {% if role == 'admin' %}selected{% endif %}>관리자</option>
                 </select>
-                <small class="form-help mt-1">
+                <small class="form__hint mt-1">
                     <strong>직원:</strong> 기본 조회 권한 |
                     <strong>매니저:</strong> 직원 관리 권한 |
                     <strong>관리자:</strong> 모든 권한
@@ -92,7 +92,7 @@
         </div>
 
         <!-- 플랜 제한 안내 -->
-        <div class="form-section">
+        <div class="form__section">
             <div class="plan-limit-info">
                 <div class="plan-limit-icon">
                     <i class="fas fa-info-circle"></i>
@@ -104,9 +104,9 @@
             </div>
         </div>
 
-        <div class="form-actions">
-            <a href="{{ url_for('corporate.users') }}" class="btn btn-secondary">취소</a>
-            <button type="submit" class="btn btn-primary">
+        <div class="form__actions">
+            <a href="{{ url_for('corporate.users') }}" class="btn btn--secondary">취소</a>
+            <button type="submit" class="btn btn--primary">
                 <i class="fas fa-user-plus"></i>
                 <span>사용자 추가</span>
             </button>

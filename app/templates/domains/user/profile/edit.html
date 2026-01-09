@@ -65,12 +65,12 @@
             <div class="form-page-actions">
                 {# 취소 링크: 신규 등록은 목록으로, 수정은 프로필로 #}
                 {% if is_create_mode %}
-                <a href="{{ url_for('employees.employee_list') }}" class="btn btn-secondary">
+                <a href="{{ url_for('employees.employee_list') }}" class="btn btn--secondary">
                     <i class="fas fa-arrow-left"></i>
                     <span>취소</span>
                 </a>
                 {% else %}
-                <a href="{{ url_for('profile.view') }}" class="btn btn-secondary">
+                <a href="{{ url_for('profile.view') }}" class="btn btn--secondary">
                     <i class="fas fa-arrow-left"></i>
                     <span>취소</span>
                 </a>
@@ -80,7 +80,7 @@
 
         {# 권한 안내 (법인 직원용) #}
         {% if is_employee_role %}
-        <div class="alert alert-info alert-info-box">
+        <div class="alert alert--info alert-info-box">
             <i class="fas fa-info-circle"></i>
             <span>연락처, 주소, 이력 정보 등 일부 항목만 수정 가능합니다. 소속정보, 급여 등은 인사담당자에게 문의하세요.</span>
         </div>
@@ -88,7 +88,7 @@
 
         {# 개인계약 연동 안내 (법인 관리자용) #}
         {% if has_person_contract %}
-        <div class="alert alert-warning alert-info-box">
+        <div class="alert alert--warning alert-info-box">
             <i class="fas fa-link"></i>
             <span>이 직원은 개인 계정과 연동되어 있습니다. 개인 기본정보, 학력, 경력 등은 개인 계정에서 관리되며, 동기화를 통해 업데이트됩니다.</span>
         </div>
@@ -172,23 +172,23 @@
             {# 수정 페이지에서는 노출하지 않음 - 2024-12 정책 변경 #}
 
             {# 폼 제출 버튼 #}
-            <section class="form-section form-submit-section">
+            <section class="form__section form-submit-section">
                 <div class="form-submit-info">
                     <span class="required">*</span> 표시는 필수 입력 항목입니다.
                 </div>
                 <div class="form-submit-actions">
                     {% if is_create_mode %}
-                    <a href="{{ url_for('employees.employee_list') }}" class="btn btn-secondary btn-lg">
+                    <a href="{{ url_for('employees.employee_list') }}" class="btn btn--secondary btn--lg">
                         <i class="fas fa-times"></i>
                         <span>취소</span>
                     </a>
                     {% else %}
-                    <a href="{{ url_for('profile.view') }}" class="btn btn-secondary btn-lg">
+                    <a href="{{ url_for('profile.view') }}" class="btn btn--secondary btn--lg">
                         <i class="fas fa-times"></i>
                         <span>취소</span>
                     </a>
                     {% endif %}
-                    <button type="submit" class="btn btn-primary btn-lg">
+                    <button type="submit" class="btn btn--primary btn--lg">
                         <i class="fas fa-save"></i>
                         <span>{% if is_create_mode %}등록 완료{% else %}수정 완료{% endif %}</span>
                     </button>

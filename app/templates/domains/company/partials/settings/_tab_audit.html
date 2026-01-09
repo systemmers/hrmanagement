@@ -105,11 +105,11 @@
             </div>
 
             <div class="audit-filter-actions">
-                <button class="btn btn-secondary" data-action="audit-reset-filters">
+                <button class="btn btn--secondary" data-action="audit-reset-filters">
                     <i class="fas fa-undo"></i>
                     초기화
                 </button>
-                <button class="btn btn-primary" data-action="audit-apply-filters">
+                <button class="btn btn--primary" data-action="audit-apply-filters">
                     <i class="fas fa-search"></i>
                     검색
                 </button>
@@ -160,20 +160,20 @@
 <div class="modal" id="auditDetailModal">
     <div class="modal-backdrop" data-action="close-audit-modal"></div>
     <div class="modal-container modal-md">
-        <div class="modal-header">
-            <h3 class="modal-title">
+        <div class="modal__header">
+            <h3 class="modal__title">
                 <i class="fas fa-info-circle"></i>
                 로그 상세 정보
             </h3>
             <button class="modal-close" data-action="close-audit-modal">&times;</button>
         </div>
-        <div class="modal-body">
+        <div class="modal__body">
             <div class="audit-detail-content" id="auditDetailContent">
                 <!-- 동적으로 로드됨 -->
             </div>
         </div>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" data-action="close-audit-modal">닫기</button>
+        <div class="modal__footer">
+            <button class="btn btn--secondary" data-action="close-audit-modal">닫기</button>
         </div>
     </div>
 </div>

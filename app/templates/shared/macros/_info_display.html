@@ -3,6 +3,9 @@
     - info_item: 정보 항목 표시
     - table_empty: 빈 테이블 메시지
     - badge: 배지 표시
+
+    BEM 네이밍 전환 (2026-01-09)
+    표준: .badge--{type}, .card__header, .card__title
 #}
 
 {# 정보 항목 표시 #}
@@ -29,18 +32,18 @@
 
 {# 배지 표시 #}
 {% macro badge(text, type='primary') %}
-<span class="badge badge-{{ type }}">{{ text }}</span>
+<span class="badge badge--{{ type }}">{{ text }}</span>
 {% endmacro %}
 
 {# 상태 배지 #}
 {% macro status_badge(status, text) %}
-<span class="badge {{ status }}">{{ text }}</span>
+<span class="badge badge--{{ status }}">{{ text }}</span>
 {% endmacro %}
 
 {# 카드 헤더 #}
 {% macro card_header(title, icon) %}
-<div class="card-header">
-    <h3 class="card-title">
+<div class="card__header">
+    <h3 class="card__title">
         <i class="{{ icon }}"></i>
         {{ title }}
     </h3>

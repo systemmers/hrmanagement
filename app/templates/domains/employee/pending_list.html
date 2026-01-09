@@ -7,11 +7,11 @@
     <div class="page-title-row">
         <h1 class="page-title">계약대기 목록</h1>
         <div class="page-actions">
-            <a href="{{ url_for('employees.employee_list') }}" class="btn btn-secondary">
+            <a href="{{ url_for('employees.employee_list') }}" class="btn btn--secondary">
                 <i class="fas fa-users"></i>
                 <span>직원 목록</span>
             </a>
-            <a href="{{ url_for('employees.employee_new') }}" class="btn btn-primary">
+            <a href="{{ url_for('employees.employee_new') }}" class="btn btn--primary">
                 <i class="fas fa-plus"></i>
                 <span>직원 등록</span>
             </a>
@@ -22,7 +22,7 @@
 
 {% if employees %}
 <div class="card">
-    <div class="card-body">
+    <div class="card__body">
         <table class="table table-hover">
             <thead>
                 <tr>
@@ -47,18 +47,18 @@
                     <td>{{ emp.position or '-' }}</td>
                     <td>
                         {% if emp.contract_status == 'none' %}
-                        <span class="badge badge-secondary">계약 없음</span>
+                        <span class="badge badge--secondary">계약 없음</span>
                         {% elif emp.contract_status == 'requested' %}
-                        <span class="badge badge-warning">계약진행중</span>
+                        <span class="badge badge--warning">계약진행중</span>
                         {% elif emp.contract_status == 'pending' %}
-                        <span class="badge badge-warning">계약진행중</span>
+                        <span class="badge badge--warning">계약진행중</span>
                         {% else %}
-                        <span class="badge badge-secondary">{{ emp.contract_status }}</span>
+                        <span class="badge badge--secondary">{{ emp.contract_status }}</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if emp.user_id and emp.contract_status == 'none' %}
-                        <button class="btn btn-sm btn-primary btn-contract-request"
+                        <button class="btn btn--sm btn--primary btn-contract-request"
                                 data-user-id="{{ emp.user_id }}"
                                 data-employee-name="{{ emp.name }}">
                             <i class="fas fa-file-contract"></i> 계약 요청

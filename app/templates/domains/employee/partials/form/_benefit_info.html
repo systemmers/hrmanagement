@@ -6,56 +6,56 @@
     action: 'create' 또는 'update' (신규 등록 시 숨김)
 #}
 {% if action != 'create' %}
-<section class="form-section" id="benefit-info">
+<section class="form__section" id="benefit-info">
     <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">
+        <div class="card__header">
+            <h2 class="card__title">
                 <i class="fas fa-umbrella-beach"></i>
                 연차 및 복리후생
-                <span class="badge badge-secondary">읽기 전용</span>
+                <span class="badge badge--secondary">읽기 전용</span>
             </h2>
         </div>
-        <div class="card-body">
-            <div class="alert alert-info alert-info-box mb-4">
+        <div class="card__body">
+            <div class="alert alert--info alert--info-box mb-4">
                 <i class="fas fa-info-circle"></i>
                 <span>복리후생 정보는 인사담당자가 관리합니다. 수정이 필요한 경우 인사담당자에게 문의하세요.</span>
             </div>
 
             <div class="form-grid">
-                <div class="form-group">
-                    <label class="form-label">연차 발생일수</label>
-                    <input type="text" class="form-input"
+                <div class="form__group">
+                    <label class="form__label">연차 발생일수</label>
+                    <input type="text" class="form__input"
                            value="{{ benefit.annual_leave_granted if benefit else '-' }}일" readonly disabled>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">연차 사용일수</label>
-                    <input type="text" class="form-input"
+                <div class="form__group">
+                    <label class="form__label">연차 사용일수</label>
+                    <input type="text" class="form__input"
                            value="{{ benefit.annual_leave_used if benefit else '-' }}일" readonly disabled>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">연차 잔여일수</label>
-                    <input type="text" class="form-input form-input-highlight"
+                <div class="form__group">
+                    <label class="form__label">연차 잔여일수</label>
+                    <input type="text" class="form__input form__input-highlight"
                            value="{{ benefit.annual_leave_remaining if benefit else '-' }}일" readonly disabled>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">퇴직금 유형</label>
-                    <input type="text" class="form-input"
+                <div class="form__group">
+                    <label class="form__label">퇴직금 유형</label>
+                    <input type="text" class="form__input"
                            value="{{ benefit.severance_type if benefit else '-' }}" readonly disabled>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">퇴직금 적립방법</label>
-                    <input type="text" class="form-input"
+                <div class="form__group">
+                    <label class="form__label">퇴직금 적립방법</label>
+                    <input type="text" class="form__input"
                            value="{{ benefit.severance_method if benefit else '-' }}" readonly disabled>
                 </div>
 
                 {% if benefit and benefit.year %}
-                <div class="form-group">
-                    <label class="form-label">기준년도</label>
-                    <input type="text" class="form-input"
+                <div class="form__group">
+                    <label class="form__label">기준년도</label>
+                    <input type="text" class="form__input"
                            value="{{ benefit.year }}년" readonly disabled>
                 </div>
                 {% endif %}

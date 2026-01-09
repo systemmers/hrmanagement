@@ -7,11 +7,11 @@
         <span class="required">*</span> 표시는 필수 입력 항목입니다.
     </div>
     <div class="form-submit-actions">
-        <a href="{% if employee %}{{ url_for('employees.employee_detail', employee_id=employee.id) }}{% else %}{{ url_for('main.index') }}{% endif %}" class="btn btn-secondary btn-lg">
+        <a href="{% if employee %}{{ url_for('employees.employee_detail', employee_id=employee.id) }}{% else %}{{ url_for('main.index') }}{% endif %}" class="btn btn--secondary btn--lg">
             <i class="fas fa-times"></i>
             <span>취소</span>
         </a>
-        <button type="submit" class="btn btn-primary btn-lg">
+        <button type="submit" class="btn btn--primary btn--lg">
             <i class="fas fa-save"></i>
             <span>{% if employee %}수정 완료{% else %}등록 완료{% endif %}</span>
         </button>

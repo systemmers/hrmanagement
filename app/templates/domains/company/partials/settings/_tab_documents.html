@@ -4,8 +4,8 @@
 <div id="tab-documents" class="tab-panel" role="tabpanel">
     <div id="documents-content">
         {# 서류 현황 #}
-        <div class="form-section form-section--card">
-            <h2 class="form-section-title">
+        <div class="form__section form__section--card">
+            <h2 class="form__section-title">
                 <i class="fas fa-chart-bar"></i>
                 서류 현황
             </h2>
@@ -26,8 +26,8 @@
         </div>
 
         {# 서류 업로드 #}
-        <div class="form-section form-section--card">
-            <h2 class="form-section-title">
+        <div class="form__section form__section--card">
+            <h2 class="form__section-title">
                 <i class="fas fa-file-upload"></i>
                 서류 업로드
             </h2>
@@ -40,58 +40,58 @@
                            accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
                 </div>
                 <form class="upload-form d-none" id="document-upload-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">선택된 파일</label>
+                    <div class="form__row">
+                        <div class="form__group">
+                            <label class="form__label">선택된 파일</label>
                             <span id="selected-file-name" class="selected-file-name">-</span>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">서류명 <span class="required">*</span></label>
-                            <input type="text" class="form-input" name="title"
+                    <div class="form__row">
+                        <div class="form__group">
+                            <label class="form__label">서류명 <span class="required">*</span></label>
+                            <input type="text" class="form__input" name="title"
                                    placeholder="서류 제목을 입력하세요" required>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">카테고리</label>
-                            <select class="form-select" name="category">
+                        <div class="form__group">
+                            <label class="form__label">카테고리</label>
+                            <select class="form__select" name="category">
                                 {% for opt in DOCUMENT_CATEGORY_OPTIONS %}
                                 <option value="{{ opt.value }}">{{ opt.label }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">서류 유형</label>
-                            <select class="form-select" name="documentType">
+                    <div class="form__row">
+                        <div class="form__group">
+                            <label class="form__label">서류 유형</label>
+                            <select class="form__select" name="documentType">
                                 {% for opt in DOCUMENT_TYPE_OPTIONS %}
                                 <option value="{{ opt.value }}">{{ opt.label }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">만료일</label>
-                            <input type="date" class="form-input" name="expiresAt">
+                        <div class="form__group">
+                            <label class="form__label">만료일</label>
+                            <input type="date" class="form__input" name="expiresAt">
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="form__row">
                         <div class="form-group flex-1">
-                            <label class="form-label">설명</label>
-                            <input type="text" class="form-input" name="description"
+                            <label class="form__label">설명</label>
+                            <input type="text" class="form__input" name="description"
                                    placeholder="서류에 대한 간단한 설명">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">&nbsp;</label>
+                        <div class="form__group">
+                            <label class="form__label">&nbsp;</label>
                             <label class="checkbox-label">
                                 <input type="checkbox" name="isRequired">
                                 필수 서류
                             </label>
                         </div>
                     </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" data-action="cancel">취소</button>
-                        <button type="submit" class="btn btn-primary">
+                    <div class="form__actions">
+                        <button type="button" class="btn btn--secondary" data-action="cancel">취소</button>
+                        <button type="submit" class="btn btn--primary">
                             <i class="fas fa-upload"></i> 업로드
                         </button>
                     </div>

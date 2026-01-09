@@ -1,9 +1,15 @@
 /**
  * Table Component Styles
  * 테이블 컴포넌트 스타일 (인사카드 이력 테이블, 데이터 테이블 등)
+ *
+ * BEM 네이밍 전환 (2026-01-09)
+ * 표준: .table__{element}, .data-table__{element} (BEM 방식)
+ * @deprecated .table-{element} - 2026-12 이후 제거 예정
  */
 
-/* 테이블 컨테이너 */
+/* ========================================
+   Table Container
+   ======================================== */
 .table-container {
     overflow-x: auto;
     border-radius: var(--radius-md);
@@ -55,7 +61,13 @@ table .badge {
     font-size: var(--text-2xs);
 }
 
+/* Table Elements (BEM)
+ * 표준: .table__{element}
+ * @deprecated .table-{element} - 2026-12 이후 제거 예정
+ */
+
 /* 요약 영역 */
+.table__summary,
 .table-summary {
     margin-top: var(--space-4);
     padding: var(--space-3);
@@ -64,28 +76,52 @@ table .badge {
     font-size: var(--text-sm);
 }
 
+.table__summary strong,
 .table-summary strong {
     color: var(--color-gray-900);
 }
 
 /* 빈 테이블 상태 */
+.table__empty,
 .table-empty {
     text-align: center;
     padding: var(--space-8);
     color: var(--color-gray-500);
 }
 
+.table__empty i,
 .table-empty i {
     font-size: var(--text-2xl);
     margin-bottom: var(--space-2);
     opacity: 0.5;
 }
 
+.table__empty p,
 .table-empty p {
     font-size: var(--text-sm);
 }
 
-/* 데이터 테이블 (직원 목록 등) */
+/* 테이블 헤더 */
+.table__header,
+.table-header {
+    background: var(--color-gray-75);
+}
+
+/* 테이블 행 */
+.table__row,
+.table-row {
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+/* 테이블 셀 */
+.table__cell,
+.table-cell {
+    padding: var(--space-3) var(--space-4);
+}
+
+/* ========================================
+   Data Table (Block) - 직원 목록 등
+   ======================================== */
 .data-table {
     width: 100%;
     border-collapse: collapse;
@@ -117,7 +153,25 @@ table .badge {
     background-color: var(--color-gray-25);
 }
 
+/* Data Table Elements (BEM)
+ * 표준: .data-table__{element}
+ * @deprecated .data-table-{element} - 2026-12 이후 제거 예정
+ */
+.data-table__header,
+.data-table-header {
+    background-color: var(--color-gray-50);
+}
+
+.data-table__row,
+.data-table-row {
+    border-bottom: 1px solid var(--color-gray-100);
+}
+
+/* ========================================
+   Table Actions
+   ======================================== */
 /* 테이블 액션 버튼 컨테이너 (SSOT) */
+.table__actions,
 .table-actions,
 .action-buttons {
     display: flex;
@@ -125,7 +179,9 @@ table .badge {
     align-items: center;
 }
 
-/* 반응형 테이블 */
+/* ========================================
+   Responsive
+   ======================================== */
 @media (max-width: 768px) {
     .table-container {
         margin: 0 calc(-1 * var(--space-4));

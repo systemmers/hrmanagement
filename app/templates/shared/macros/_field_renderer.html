@@ -2,6 +2,9 @@
     FieldRegistry 기반 필드 렌더러 매크로
     Phase 8: FieldRegistry 통합 - SSOT 기반 폼 렌더링
 
+    BEM 네이밍 전환 (2026-01-09)
+    표준: .form__group, .form__label, .form__input, .form__help, .form__section, .card__body
+
     Usage:
         {% from 'shared/macros/_field_renderer.html' import render_field, render_section, render_dynamic_section %}
 
@@ -34,8 +37,8 @@
 {% set field_css = (field.cssClass or '') ~ ' ' ~ css_class %}
 {% set field_type = field.type | default('text') %}
 
-<div class="form-group {{ field_css }}">
-    <label for="{{ field_id }}" class="form-label">
+<div class="form__group {{ field_css }}">
+    <label for="{{ field_id }}" class="form__label">
         {{ field.label }}{% if field.required %} <span class="required" aria-hidden="true">*</span>{% endif %}
     </label>
 
@@ -43,7 +46,7 @@
     {% if field_type == 'textarea' %}
         <textarea id="{{ field_id }}"
                   name="{{ field_name }}"
-                  class="form-input"
+                  class="form__input"
                   rows="{{ field.rows | default(2) }}"
                   placeholder="{{ field.placeholder | default('') }}"
                   {% if field.required %}required aria-required="true"{% endif %}
@@ -53,7 +56,7 @@
     {% elif field_type == 'select' %}
         <select id="{{ field_id }}"
                 name="{{ field_name }}"
-                class="form-input"
+                class="form__input"
                 {% if field.required %}required aria-required="true"{% endif %}
                 {% if field.readonly %}disabled{% endif %}>
             <option value="">선택하세요</option>
@@ -70,7 +73,7 @@
         <input type="date"
                id="{{ field_id }}"
                name="{{ field_name }}"
-               class="form-input"
+               class="form__input"
                value="{{ value }}"
                {% if field.required %}required aria-required="true"{% endif %}
                {% if field.readonly %}readonly{% endif %}>
@@ -79,7 +82,7 @@
         <input type="number"
                id="{{ field_id }}"
                name="{{ field_name }}"
-               class="form-input"
+               class="form__input"
                value="{{ value }}"
                placeholder="{{ field.placeholder | default('') }}"
                {% if field.required %}required aria-required="true"{% endif %}
@@ -91,7 +94,7 @@
         <input type="tel"
                id="{{ field_id }}"
                name="{{ field_name }}"
-               class="form-input"
+               class="form__input"
                value="{{ value }}"
                placeholder="{{ field.placeholder | default('') }}"
                {% if field.required %}required aria-required="true"{% endif %}
@@ -102,7 +105,7 @@
         <input type="email"
                id="{{ field_id }}"
                name="{{ field_name }}"
-               class="form-input"
+               class="form__input"
                value="{{ value }}"
                placeholder="{{ field.placeholder | default('') }}"
                {% if field.required %}required aria-required="true"{% endif %}
@@ -126,7 +129,7 @@
         <input type="text"
                id="{{ field_id }}"
                name="{{ field_name }}"
-               class="form-input"
+               class="form__input"
                value="{{ value }}"
                placeholder="{{ field.placeholder | default('') }}"
                {% if field.required %}required aria-required="true"{% endif %}
@@ -137,7 +140,7 @@
 
     {# 도움말 텍스트 #}
     {% if field.helpText %}
-    <small class="form-help">{{ field.helpText }}</small>
+    <small class="form__help">{{ field.helpText }}</small>
     {% endif %}
 </div>
 {% endmacro %}
@@ -153,10 +156,10 @@
         prefix: 필드명 접두사
 #}
 {% macro render_section(section, data={}, account_type=None, prefix='') %}
-<section class="form-section{% if section.collapsed %} collapsed{% endif %}" id="{{ section.id }}">
+<section class="form__section{% if section.collapsed %} collapsed{% endif %}" id="{{ section.id }}">
     <div class="card">
         {{ form_card_header(section.title, section.icon) }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="form-grid">
                 {% for field in section.fields %}
                     {# 가시성 체크 #}
@@ -185,10 +188,10 @@
 {% set list_id = section.id ~ 'List' %}
 {% set prefix = section.id ~ '_' %}
 
-<section class="form-section{% if section.collapsed %} collapsed{% endif %}" id="{{ section.id }}">
+<section class="form__section{% if section.collapsed %} collapsed{% endif %}" id="{{ section.id }}">
     <div class="card">
         {{ form_card_header(section.title, section.icon, add_button_id=btn_id) }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="dynamic-list" id="{{ list_id }}">
                 {# 기존 항목 렌더링 #}
                 {% if items %}
@@ -203,7 +206,7 @@
 
             {# 최대/최소 항목 수 안내 #}
             {% if section.maxItems or section.minItems %}
-            <small class="form-help">
+            <small class="form__help">
                 {% if section.minItems %}최소 {{ section.minItems }}개{% endif %}
                 {% if section.minItems and section.maxItems %} ~ {% endif %}
                 {% if section.maxItems %}최대 {{ section.maxItems }}개{% endif %}

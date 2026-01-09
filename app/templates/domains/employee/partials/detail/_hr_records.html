@@ -11,7 +11,7 @@
     {# 근로계약 이력 #}
     <div class="card">
         {{ card_header('근로계약 이력', 'fas fa-file-signature') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>
@@ -29,7 +29,7 @@
                     <tbody>
                         <tr>
                             <td>{{ employee.hire_date }}</td>
-                            <td><span class="badge badge-success">정규직</span></td>
+                            <td><span class="badge badge--success">정규직</span></td>
                             <td>{{ employee.hire_date }}</td>
                             <td>-</td>
                             <td>{{ calculate_tenure(employee.hire_date) }}</td>
@@ -46,7 +46,7 @@
     {# 연봉계약 이력 #}
     <div class="card mt-4">
         {{ card_header('연봉계약 이력', 'fas fa-coins') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>
@@ -86,7 +86,7 @@
     {# 급여 지급 이력 #}
     <div class="card mt-4">
         {{ card_header('급여 지급 이력', 'fas fa-money-bill-wave') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>
@@ -141,7 +141,7 @@
     {# 인사이동 및 승진 #}
     <div class="card">
         {{ card_header('인사이동 및 승진', 'fas fa-arrow-up') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>
@@ -161,7 +161,7 @@
                         {% for promo in promotion_list|sort(attribute='effective_date', reverse=True) %}
                         <tr>
                             <td>{{ promo.effective_date }}</td>
-                            <td><span class="badge badge-{% if promo.promotion_type == '신규채용' %}info{% elif promo.promotion_type == '승진' %}success{% else %}secondary{% endif %}">{{ promo.promotion_type }}</span></td>
+                            <td><span class="badge badge--{% if promo.promotion_type == '신규채용' %}info{% elif promo.promotion_type == '승진' %}success{% else %}secondary{% endif %}">{{ promo.promotion_type }}</span></td>
                             <td>{{ promo.from_department or '-' }}</td>
                             <td>{{ promo.to_department }}</td>
                             <td>{{ promo.from_position or '-' }}</td>
@@ -187,7 +187,7 @@
     {# 인사고과 - 정기평가 #}
     <div class="card mt-4">
         {{ card_header('인사고과 - 정기평가', 'fas fa-chart-line') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>
@@ -207,11 +207,11 @@
                         {% for eval in evaluation_list|sort(attribute='year', reverse=True) %}
                         <tr>
                             <td>{{ eval.year }}년</td>
-                            <td>{% if eval.q1_grade %}<span class="badge badge-{% if eval.q1_grade in ['S', 'A'] %}success{% elif eval.q1_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q1_grade }}</span>{% else %}-{% endif %}</td>
-                            <td>{% if eval.q2_grade %}<span class="badge badge-{% if eval.q2_grade in ['S', 'A'] %}success{% elif eval.q2_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q2_grade }}</span>{% else %}-{% endif %}</td>
-                            <td>{% if eval.q3_grade %}<span class="badge badge-{% if eval.q3_grade in ['S', 'A'] %}success{% elif eval.q3_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q3_grade }}</span>{% else %}-{% endif %}</td>
-                            <td>{% if eval.q4_grade %}<span class="badge badge-{% if eval.q4_grade in ['S', 'A'] %}success{% elif eval.q4_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q4_grade }}</span>{% else %}-{% endif %}</td>
-                            <td>{% if eval.overall_grade %}<strong><span class="badge badge-{% if eval.overall_grade in ['S', 'A'] %}success{% elif eval.overall_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.overall_grade }}</span></strong>{% else %}-{% endif %}</td>
+                            <td>{% if eval.q1_grade %}<span class="badge badge--{% if eval.q1_grade in ['S', 'A'] %}success{% elif eval.q1_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q1_grade }}</span>{% else %}-{% endif %}</td>
+                            <td>{% if eval.q2_grade %}<span class="badge badge--{% if eval.q2_grade in ['S', 'A'] %}success{% elif eval.q2_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q2_grade }}</span>{% else %}-{% endif %}</td>
+                            <td>{% if eval.q3_grade %}<span class="badge badge--{% if eval.q3_grade in ['S', 'A'] %}success{% elif eval.q3_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q3_grade }}</span>{% else %}-{% endif %}</td>
+                            <td>{% if eval.q4_grade %}<span class="badge badge--{% if eval.q4_grade in ['S', 'A'] %}success{% elif eval.q4_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q4_grade }}</span>{% else %}-{% endif %}</td>
+                            <td>{% if eval.overall_grade %}<strong><span class="badge badge--{% if eval.overall_grade in ['S', 'A'] %}success{% elif eval.overall_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.overall_grade }}</span></strong>{% else %}-{% endif %}</td>
                             <td>{{ eval.salary_negotiation or '-' }}</td>
                             <td>{{ eval.note or '-' }}</td>
                         </tr>
@@ -233,7 +233,7 @@
     {# 교육훈련 #}
     <div class="card mt-4">
         {{ card_header('교육훈련', 'fas fa-book') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>
@@ -254,7 +254,7 @@
                             <td>{{ train.training_name }}</td>
                             <td>{{ train.institution }}</td>
                             <td>{{ train.hours }}시간</td>
-                            <td><span class="badge badge-{% if train.completion_status == '이수' %}success{% else %}danger{% endif %}">{{ train.completion_status }}</span></td>
+                            <td><span class="badge badge--{% if train.completion_status == '이수' %}success{% else %}danger{% endif %}">{{ train.completion_status }}</span></td>
                             <td>{{ train.note or '-' }}</td>
                         </tr>
                         {% endfor %}
@@ -278,7 +278,7 @@
     {{ section_title('프로젝트') }}
     <div class="card">
         {{ card_header('프로젝트', 'fas fa-project-diagram') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>
@@ -325,7 +325,7 @@
     {# 근태현황 #}
     <div class="card">
         {{ card_header('근태현황', 'fas fa-calendar-check') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-label">출근일수</div>
@@ -345,7 +345,7 @@
     {# 비품지급 #}
     <div class="card mt-4">
         {{ card_header('비품지급', 'fas fa-laptop') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>
@@ -366,7 +366,7 @@
                             <td>{{ asset.item_name }}</td>
                             <td>{{ asset.model }}</td>
                             <td>{{ asset.serial_number }}</td>
-                            <td><span class="badge badge-{% if asset.status == '사용중' %}success{% elif asset.status == '반납' %}secondary{% else %}danger{% endif %}">{{ asset.status }}</span></td>
+                            <td><span class="badge badge--{% if asset.status == '사용중' %}success{% elif asset.status == '반납' %}secondary{% else %}danger{% endif %}">{{ asset.status }}</span></td>
                             <td>{{ asset.note or '-' }}</td>
                         </tr>
                         {% endfor %}

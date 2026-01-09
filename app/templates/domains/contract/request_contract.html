@@ -14,7 +14,7 @@
     <div class="page-title-row">
         <h1 class="page-title">새 계약 요청</h1>
         <div class="page-actions">
-            <a href="{{ url_for('contracts.company_contracts') }}" class="btn btn-secondary">
+            <a href="{{ url_for('contracts.company_contracts') }}" class="btn btn--secondary">
                 <i class="fas fa-arrow-left"></i>
                 <span>목록으로</span>
             </a>
@@ -29,7 +29,7 @@
         <input type="hidden" name="target_user_id" id="target_user_id" value="">
 
         <!-- 대상 선택 -->
-        <div class="form-section">
+        <div class="form__section">
             <h2 class="section-title">
                 <i class="fas fa-user-check" aria-hidden="true"></i>
                 계약 대상 선택
@@ -67,15 +67,15 @@
                                 {% if emp.department and emp.position %} / {% endif %}
                                 {% if emp.position %}{{ emp.position }}{% endif %}
                                 {% if emp.status == 'pending_info' %}
-                                <span class="badge badge-danger">프로필 미완성</span>
+                                <span class="badge badge--danger">프로필 미완성</span>
                                 {% else %}
-                                <span class="badge badge-warning">계약 대기</span>
+                                <span class="badge badge--warning">계약 대기</span>
                                 {% endif %}
                             </div>
                         </div>
                         <div class="target-actions">
                             <a href="{{ url_for('employees.employee_edit', employee_id=emp.employee_id) }}"
-                               class="btn btn-sm btn-secondary btn-prevent-propagation"
+                               class="btn btn--sm btn--secondary btn-prevent-propagation"
                                title="직원 정보 입력">
                                 <i class="fas fa-edit"></i>
                             </a>
@@ -105,7 +105,7 @@
                             <div class="target-name">{{ person.name }}</div>
                             <div class="target-email">{{ person.email }}</div>
                             <div class="target-meta">
-                                <span class="badge badge-info">개인 계정</span>
+                                <span class="badge badge--info">개인 계정</span>
                             </div>
                         </div>
                     </label>
@@ -121,15 +121,15 @@
         </div>
 
         <!-- 계약 정보 -->
-        <div class="form-section">
+        <div class="form__section">
             <h2 class="section-title">
                 <i class="fas fa-file-contract" aria-hidden="true"></i>
                 계약 정보
             </h2>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="contract_type" class="form-label required">계약 유형</label>
-                    <select id="contract_type" name="contract_type" class="form-select"
+            <div class="form__row">
+                <div class="form__group">
+                    <label for="contract_type" class="form__label required">계약 유형</label>
+                    <select id="contract_type" name="contract_type" class="form__select"
                             required aria-required="true">
                         <option value="">선택하세요</option>
                         <option value="employment">정규직</option>
@@ -140,30 +140,30 @@
                 </div>
             </div>
             <div class="form-row two-col">
-                <div class="form-group">
-                    <label for="contract_start_date" class="form-label">계약 시작일</label>
-                    <input type="date" id="contract_start_date" name="contract_start_date" class="form-input">
+                <div class="form__group">
+                    <label for="contract_start_date" class="form__label">계약 시작일</label>
+                    <input type="date" id="contract_start_date" name="contract_start_date" class="form__input">
                 </div>
-                <div class="form-group">
-                    <label for="contract_end_date" class="form-label">계약 종료일</label>
-                    <input type="date" id="contract_end_date" name="contract_end_date" class="form-input">
+                <div class="form__group">
+                    <label for="contract_end_date" class="form__label">계약 종료일</label>
+                    <input type="date" id="contract_end_date" name="contract_end_date" class="form__input">
                 </div>
             </div>
             <div class="form-row two-col">
-                <div class="form-group">
-                    <label for="department" class="form-label">부서</label>
-                    <input type="text" id="department" name="department" class="form-input"
+                <div class="form__group">
+                    <label for="department" class="form__label">부서</label>
+                    <input type="text" id="department" name="department" class="form__input"
                            placeholder="배치될 부서">
                 </div>
-                <div class="form-group">
-                    <label for="position" class="form-label">직위</label>
-                    <input type="text" id="position" name="position" class="form-input"
+                <div class="form__group">
+                    <label for="position" class="form__label">직위</label>
+                    <input type="text" id="position" name="position" class="form__input"
                            placeholder="직위/직급">
                 </div>
             </div>
-            <div class="form-group">
-                <label for="notes" class="form-label">메모</label>
-                <textarea id="notes" name="notes" class="form-textarea" rows="4"
+            <div class="form__group">
+                <label for="notes" class="form__label">메모</label>
+                <textarea id="notes" name="notes" class="form__textarea" rows="4"
                           placeholder="계약 관련 추가 정보를 입력하세요."></textarea>
             </div>
         </div>
@@ -184,9 +184,9 @@
         </div>
 
         <!-- 제출 버튼 -->
-        <div class="form-actions">
+        <div class="form__actions">
             <a href="{{ url_for('contracts.company_contracts') }}" class="btn btn-secondary" aria-label="취소">취소</a>
-            <button type="submit" class="btn btn-primary" aria-label="계약 요청 전송" id="submitBtn">
+            <button type="submit" class="btn btn--primary" aria-label="계약 요청 전송" id="submitBtn">
                 <i class="fas fa-paper-plane" aria-hidden="true"></i>
                 <span>계약 요청 전송</span>
             </button>

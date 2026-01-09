@@ -6,18 +6,21 @@
     - form_section_card: 폼 섹션용 카드
     - info_card: 정보 표시용 카드 (대시보드)
     - stat_card: 통계 표시용 카드
+
+    BEM 네이밍 전환 (2026-01-09)
+    표준: .card__header, .card__title, .card__body, .btn--sm, .btn--secondary
 #}
 
-{# 기본 카드 - caller() 내용을 card-body에 렌더링 #}
+{# 기본 카드 - caller() 내용을 card__body에 렌더링 #}
 {% macro card(title, icon, id=None, css_class='') %}
 <div class="card {{ css_class }}" {% if id %}id="{{ id }}"{% endif %}>
-    <div class="card-header">
-        <h2 class="card-title">
+    <div class="card__header">
+        <h2 class="card__title">
             <i class="{{ icon }}"></i>
             {{ title }}
         </h2>
     </div>
-    <div class="card-body">
+    <div class="card__body">
         {{ caller() }}
     </div>
 </div>
@@ -26,16 +29,16 @@
 {# 헤더에 액션 버튼이 있는 카드 #}
 {% macro card_with_action(title, icon, action_id, action_text='추가', action_icon='fas fa-plus', id=None, css_class='') %}
 <div class="card {{ css_class }}" {% if id %}id="{{ id }}"{% endif %}>
-    <div class="card-header">
-        <h2 class="card-title">
+    <div class="card__header">
+        <h2 class="card__title">
             <i class="{{ icon }}"></i>
             {{ title }}
         </h2>
-        <button type="button" class="btn btn-sm btn-secondary" id="{{ action_id }}">
+        <button type="button" class="btn btn--sm btn--secondary" id="{{ action_id }}">
             <i class="{{ action_icon }}"></i> {{ action_text }}
         </button>
     </div>
-    <div class="card-body">
+    <div class="card__body">
         {{ caller() }}
     </div>
 </div>
@@ -43,15 +46,15 @@
 
 {# 폼 섹션용 카드 - section 태그로 감싸짐 #}
 {% macro form_section_card(title, icon, section_id, css_class='') %}
-<section class="form-section {{ css_class }}" id="{{ section_id }}">
+<section class="form__section {{ css_class }}" id="{{ section_id }}">
     <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">
+        <div class="card__header">
+            <h2 class="card__title">
                 <i class="{{ icon }}"></i>
                 {{ title }}
             </h2>
         </div>
-        <div class="card-body">
+        <div class="card__body">
             {{ caller() }}
         </div>
     </div>
@@ -60,18 +63,18 @@
 
 {# 폼 섹션용 카드 (동적 항목 추가 버튼 포함) #}
 {% macro form_section_card_dynamic(title, icon, section_id, add_btn_id, add_btn_text='추가', css_class='') %}
-<section class="form-section {{ css_class }}" id="{{ section_id }}">
+<section class="form__section {{ css_class }}" id="{{ section_id }}">
     <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">
+        <div class="card__header">
+            <h2 class="card__title">
                 <i class="{{ icon }}"></i>
                 {{ title }}
             </h2>
-            <button type="button" class="btn btn-sm btn-secondary" id="{{ add_btn_id }}">
+            <button type="button" class="btn btn--sm btn--secondary" id="{{ add_btn_id }}">
                 <i class="fas fa-plus"></i> {{ add_btn_text }}
             </button>
         </div>
-        <div class="card-body">
+        <div class="card__body">
             {{ caller() }}
         </div>
     </div>
@@ -147,7 +150,7 @@
 {# 빈 상태 카드 #}
 {% macro empty_card(message='등록된 정보가 없습니다.', icon='fas fa-inbox') %}
 <div class="card">
-    <div class="card-body">
+    <div class="card__body">
         <div class="empty-state">
             <i class="{{ icon }}"></i>
             <p>{{ message }}</p>

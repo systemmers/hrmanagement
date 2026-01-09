@@ -23,30 +23,30 @@
                         <td>홍길동</td>
                         <td>개발팀</td>
                         <td>선임연구원</td>
-                        <td><span class="badge badge-success">재직</span></td>
-                        <td class="table-actions">
-                            <button class="btn-icon"><i class="fas fa-edit"></i></button>
-                            <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                        <td><span class="badge badge--success">재직</span></td>
+                        <td class="table__actions">
+                            <button class="btn--icon"><i class="fas fa-edit"></i></button>
+                            <button class="btn--icon"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                     <tr>
                         <td>김철수</td>
                         <td>디자인팀</td>
                         <td>책임연구원</td>
-                        <td><span class="badge badge-success">재직</span></td>
-                        <td class="table-actions">
-                            <button class="btn-icon"><i class="fas fa-edit"></i></button>
-                            <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                        <td><span class="badge badge--success">재직</span></td>
+                        <td class="table__actions">
+                            <button class="btn--icon"><i class="fas fa-edit"></i></button>
+                            <button class="btn--icon"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                     <tr class="highlight-row">
                         <td>이영희</td>
                         <td>경영지원팀</td>
                         <td>팀장</td>
-                        <td><span class="badge badge-warning">휴직</span></td>
-                        <td class="table-actions">
-                            <button class="btn-icon"><i class="fas fa-edit"></i></button>
-                            <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                        <td><span class="badge badge--warning">휴직</span></td>
+                        <td class="table__actions">
+                            <button class="btn--icon"><i class="fas fa-edit"></i></button>
+                            <button class="btn--icon"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 </tbody>
@@ -122,17 +122,17 @@
 
     {% call subsection('테이블 액션') %}
     <div class="component-demo">
-        <div class="table-actions">
-            <button class="btn-icon" title="보기"><i class="fas fa-eye"></i></button>
-            <button class="btn-icon" title="수정"><i class="fas fa-edit"></i></button>
-            <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
-            <button class="btn-icon" title="더보기"><i class="fas fa-ellipsis-v"></i></button>
+        <div class="table__actions">
+            <button class="btn--icon" title="보기"><i class="fas fa-eye"></i></button>
+            <button class="btn--icon" title="수정"><i class="fas fa-edit"></i></button>
+            <button class="btn--icon" title="삭제"><i class="fas fa-trash"></i></button>
+            <button class="btn--icon" title="더보기"><i class="fas fa-ellipsis-v"></i></button>
         </div>
     </div>
     {% call code() %}
-&lt;td class="table-actions"&gt;
-    &lt;button class="btn-icon"&gt;&lt;i class="fas fa-edit"&gt;&lt;/i&gt;&lt;/button&gt;
-    &lt;button class="btn-icon"&gt;&lt;i class="fas fa-trash"&gt;&lt;/i&gt;&lt;/button&gt;
+&lt;td class="table__actions"&gt;
+    &lt;button class="btn--icon"&gt;&lt;i class="fas fa-edit"&gt;&lt;/i&gt;&lt;/button&gt;
+    &lt;button class="btn--icon"&gt;&lt;i class="fas fa-trash"&gt;&lt;/i&gt;&lt;/button&gt;
 &lt;/td&gt;
     {% endcall %}
     {% endcall %}

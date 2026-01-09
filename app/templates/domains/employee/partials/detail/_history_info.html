@@ -9,7 +9,7 @@
     {{ section_title('학력정보') }}
     <div class="card">
         {{ card_header('학력정보', 'fas fa-graduation-cap') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>
@@ -32,7 +32,7 @@
                             <td>{{ edu.graduation_year }}</td>
                             <td>{{ edu.major or '-' }}</td>
                             <td>{{ edu.gpa or '-' }}</td>
-                            <td><span class="badge badge-success">졸업</span></td>
+                            <td><span class="badge badge--success">졸업</span></td>
                             <td>{{ edu.note or '-' }}</td>
                         </tr>
                         {% endfor %}
@@ -55,13 +55,13 @@
 <section id="career-info" class="content-section">
     {{ section_title('경력정보') }}
     <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
+        <div class="card__header">
+            <h3 class="card__title">
                 <i class="fas fa-briefcase"></i>
                 경력정보 (입사 전)
             </h3>
         </div>
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>
@@ -123,7 +123,7 @@
     {{ section_title('자격증 및 면허') }}
     <div class="card">
         {{ card_header('자격증 및 면허', 'fas fa-certificate') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>
@@ -168,7 +168,7 @@
     {{ section_title('언어능력') }}
     <div class="card">
         {{ card_header('언어능력', 'fas fa-language') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>
@@ -213,7 +213,7 @@
     {# 병역정보 #}
     <div class="card">
         {{ card_header('병역정보', 'fas fa-medal') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="info-grid">
                 {% if military %}
                 {{ info_item('병역구분', get_military_status_label(military.status)) }}
@@ -248,7 +248,7 @@
     {{ section_title('수상내역') }}
     <div class="card">
         {{ card_header('수상내역', 'fas fa-trophy') }}
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>
@@ -290,13 +290,13 @@
 <section id="project-participation-info" class="content-section">
     {{ section_title('프로젝트 참여이력') }}
     <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
+        <div class="card__header">
+            <h3 class="card__title">
                 <i class="fas fa-briefcase"></i>
                 프로젝트 참여이력
             </h3>
         </div>
-        <div class="card-body">
+        <div class="card__body">
             <div class="table-container">
                 <table>
                     <thead>

@@ -6,40 +6,40 @@
 {% call section('alerts', '알림', '사용자에게 피드백을 제공하는 알림 컴포넌트') %}
 
     {% call subsection('알림 (Alert)') %}
-    <div class="alert alert-success" style="margin-bottom: var(--space-3);">
-        <i class="fas fa-check-circle alert-icon"></i>
-        <div class="alert-content">
-            <div class="alert-title">성공</div>
-            <div class="alert-message">데이터가 성공적으로 저장되었습니다.</div>
+    <div class="alert alert--success" style="margin-bottom: var(--space-3);">
+        <i class="fas fa-check-circle alert__icon"></i>
+        <div class="alert__content">
+            <div class="alert__title">성공</div>
+            <div class="alert__message">데이터가 성공적으로 저장되었습니다.</div>
         </div>
     </div>
-    <div class="alert alert-warning" style="margin-bottom: var(--space-3);">
-        <i class="fas fa-exclamation-triangle alert-icon"></i>
-        <div class="alert-content">
-            <div class="alert-title">경고</div>
-            <div class="alert-message">변경사항이 저장되지 않았습니다.</div>
+    <div class="alert alert--warning" style="margin-bottom: var(--space-3);">
+        <i class="fas fa-exclamation-triangle alert__icon"></i>
+        <div class="alert__content">
+            <div class="alert__title">경고</div>
+            <div class="alert__message">변경사항이 저장되지 않았습니다.</div>
         </div>
     </div>
-    <div class="alert alert-error" style="margin-bottom: var(--space-3);">
-        <i class="fas fa-exclamation-circle alert-icon"></i>
-        <div class="alert-content">
-            <div class="alert-title">오류</div>
-            <div class="alert-message">요청을 처리하는 중 오류가 발생했습니다.</div>
+    <div class="alert alert--error" style="margin-bottom: var(--space-3);">
+        <i class="fas fa-exclamation-circle alert__icon"></i>
+        <div class="alert__content">
+            <div class="alert__title">오류</div>
+            <div class="alert__message">요청을 처리하는 중 오류가 발생했습니다.</div>
         </div>
     </div>
-    <div class="alert alert-info">
-        <i class="fas fa-info-circle alert-icon"></i>
-        <div class="alert-content">
-            <div class="alert-title">안내</div>
-            <div class="alert-message">시스템 점검이 예정되어 있습니다.</div>
+    <div class="alert alert--info">
+        <i class="fas fa-info-circle alert__icon"></i>
+        <div class="alert__content">
+            <div class="alert__title">안내</div>
+            <div class="alert__message">시스템 점검이 예정되어 있습니다.</div>
         </div>
     </div>
     {% call code() %}
-&lt;div class="alert alert-success"&gt;
-    &lt;i class="fas fa-check-circle alert-icon"&gt;&lt;/i&gt;
-    &lt;div class="alert-content"&gt;
-        &lt;div class="alert-title"&gt;성공&lt;/div&gt;
-        &lt;div class="alert-message"&gt;메시지 내용&lt;/div&gt;
+&lt;div class="alert alert--success"&gt;
+    &lt;i class="fas fa-check-circle alert__icon"&gt;&lt;/i&gt;
+    &lt;div class="alert__content"&gt;
+        &lt;div class="alert__title"&gt;성공&lt;/div&gt;
+        &lt;div class="alert__message"&gt;메시지 내용&lt;/div&gt;
     &lt;/div&gt;
 &lt;/div&gt;
     {% endcall %}
@@ -48,22 +48,22 @@
     {% call subsection('인라인 알림') %}
     {% call demo() %}
         <div style="display: flex; flex-direction: column; gap: var(--space-2); width: 100%;">
-            <div class="inline-alert inline-alert-success">
+            <div class="inline-alert inline-alert--success">
                 <i class="fas fa-check"></i> 유효한 입력입니다.
             </div>
-            <div class="inline-alert inline-alert-error">
+            <div class="inline-alert inline-alert--error">
                 <i class="fas fa-times"></i> 필수 항목을 입력해주세요.
             </div>
-            <div class="inline-alert inline-alert-warning">
+            <div class="inline-alert inline-alert--warning">
                 <i class="fas fa-exclamation-triangle"></i> 주의가 필요합니다.
             </div>
-            <div class="inline-alert inline-alert-info">
+            <div class="inline-alert inline-alert--info">
                 <i class="fas fa-info-circle"></i> 참고 정보입니다.
             </div>
         </div>
     {% endcall %}
     {% call code() %}
-&lt;div class="inline-alert inline-alert-success"&gt;
+&lt;div class="inline-alert inline-alert--success"&gt;
     &lt;i class="fas fa-check"&gt;&lt;/i&gt; 유효한 입력입니다.
 &lt;/div&gt;
     {% endcall %}
@@ -71,16 +71,16 @@
 
     {% call subsection('토스트 메시지') %}
     {% call demo() %}
-        <button class="btn btn-primary" onclick="showDemoToast('success', '저장되었습니다.')">
+        <button class="btn btn--primary" onclick="showDemoToast('success', '저장되었습니다.')">
             Success 토스트
         </button>
-        <button class="btn btn-secondary" onclick="showDemoToast('error', '오류가 발생했습니다.')">
+        <button class="btn btn--secondary" onclick="showDemoToast('error', '오류가 발생했습니다.')">
             Error 토스트
         </button>
-        <button class="btn btn-secondary" onclick="showDemoToast('warning', '주의가 필요합니다.')">
+        <button class="btn btn--secondary" onclick="showDemoToast('warning', '주의가 필요합니다.')">
             Warning 토스트
         </button>
-        <button class="btn btn-secondary" onclick="showDemoToast('info', '정보를 확인하세요.')">
+        <button class="btn btn--secondary" onclick="showDemoToast('info', '정보를 확인하세요.')">
             Info 토스트
         </button>
     {% endcall %}
