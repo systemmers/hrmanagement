@@ -23,7 +23,7 @@
 
     <div class="form-group">
         <label for="status" class="form-label">재직 상태 {% if not is_contract_readonly %}<span class="required">*</span>{% endif %}</label>
-        <select id="status" name="status" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+        <select id="status" name="status" class="form-select{% if is_contract_readonly %} readonly-field{% endif %}"
                 {% if not is_contract_readonly %}required{% endif %}
                 {% if is_contract_readonly %}disabled{% endif %}>
             {% for opt in EMPLOYEE_STATUS_OPTIONS %}
@@ -34,7 +34,7 @@
 
     <div class="form-group">
         <label for="employment_type" class="form-label">고용형태</label>
-        <select id="employment_type" name="employment_type" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+        <select id="employment_type" name="employment_type" class="form-select{% if is_contract_readonly %} readonly-field{% endif %}"
                 {% if is_contract_readonly %}disabled{% endif %}>
             <option value="">선택하세요</option>
             {% for opt in EMPLOYMENT_TYPE_OPTIONS %}
@@ -73,7 +73,7 @@
 <div class="form-grid">
     <div class="form-group">
         <label for="national_pension" class="form-label">국민연금</label>
-        <select id="national_pension" name="national_pension" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+        <select id="national_pension" name="national_pension" class="form-select{% if is_contract_readonly %} readonly-field{% endif %}"
                 {% if is_contract_readonly %}disabled{% endif %}>
             <option value="true" {% if insurance and insurance.national_pension %}selected{% endif %}>가입</option>
             <option value="false" {% if insurance and not insurance.national_pension %}selected{% endif %}>미가입</option>
@@ -82,7 +82,7 @@
 
     <div class="form-group">
         <label for="health_insurance" class="form-label">건강보험</label>
-        <select id="health_insurance" name="health_insurance" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+        <select id="health_insurance" name="health_insurance" class="form-select{% if is_contract_readonly %} readonly-field{% endif %}"
                 {% if is_contract_readonly %}disabled{% endif %}>
             <option value="true" {% if insurance and insurance.health_insurance %}selected{% endif %}>가입</option>
             <option value="false" {% if insurance and not insurance.health_insurance %}selected{% endif %}>미가입</option>
@@ -91,7 +91,7 @@
 
     <div class="form-group">
         <label for="employment_insurance" class="form-label">고용보험</label>
-        <select id="employment_insurance" name="employment_insurance" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+        <select id="employment_insurance" name="employment_insurance" class="form-select{% if is_contract_readonly %} readonly-field{% endif %}"
                 {% if is_contract_readonly %}disabled{% endif %}>
             <option value="true" {% if insurance and insurance.employment_insurance %}selected{% endif %}>가입</option>
             <option value="false" {% if insurance and not insurance.employment_insurance %}selected{% endif %}>미가입</option>
@@ -100,7 +100,7 @@
 
     <div class="form-group">
         <label for="industrial_accident" class="form-label">산재보험</label>
-        <select id="industrial_accident" name="industrial_accident" class="form-input{% if is_contract_readonly %} readonly-field{% endif %}"
+        <select id="industrial_accident" name="industrial_accident" class="form-select{% if is_contract_readonly %} readonly-field{% endif %}"
                 {% if is_contract_readonly %}disabled{% endif %}>
             <option value="true" {% if insurance and insurance.industrial_accident %}selected{% endif %}>가입</option>
             <option value="false" {% if insurance and not insurance.industrial_accident %}selected{% endif %}>미가입</option>

@@ -78,7 +78,7 @@
                 <label class="form-label">
                     역할 <span class="required">*</span>
                 </label>
-                <select name="role" class="form-input" required>
+                <select name="role" class="form-select" required>
                     <option value="employee" {% if role == 'employee' %}selected{% endif %}>직원</option>
                     <option value="manager" {% if role == 'manager' %}selected{% endif %}>매니저</option>
                     <option value="admin" {% if role == 'admin' %}selected{% endif %}>관리자</option>

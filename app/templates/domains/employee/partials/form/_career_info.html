@@ -71,7 +71,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">급여유형</label>
-                                <select name="career_salary_type[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                                <select name="career_salary_type[]" class="form-select{% if is_personal_readonly %} readonly-field{% endif %}"
                                         {% if is_personal_readonly %}disabled{% endif %}>
                                     <option value="">선택</option>
                                     {% for opt in SALARY_TYPE_OPTIONS %}
@@ -157,7 +157,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">급여유형</label>
-                            <select name="career_salary_type[]" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                            <select name="career_salary_type[]" class="form-select{% if is_personal_readonly %} readonly-field{% endif %}"
                                     {% if is_personal_readonly %}disabled{% endif %}>
                                 <option value="">선택</option>
                                 {% for opt in SALARY_TYPE_OPTIONS %}

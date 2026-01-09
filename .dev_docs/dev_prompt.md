@@ -107,3 +107,4 @@ Debug
 
 --dependency
 
+/sc:improve @.dev_docs/dev_plans/style_refac.md --seq --think-hard --intention-feedback --verification @agent-frontend-architect @agent-refactoring-expert --dependency 

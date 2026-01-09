@@ -43,7 +43,7 @@
                     <label class="form-label">
                         소속 조직
                     </label>
-                    <select name="organization_id" id="organization_id" class="form-input">
+                    <select name="organization_id" id="organization_id" class="form-select">
                         <option value="">미지정 (직원이 입력)</option>
                         {% for org in organizations %}
                         <option value="{{ org.id }}">{{ org.path or org.name }}</option>
@@ -100,7 +100,7 @@
                     <label class="form-label">
                         권한
                     </label>
-                    <select name="role" id="role" class="form-input">
+                    <select name="role" id="role" class="form-select">
                         <option value="employee" selected>일반 직원</option>
                         <option value="manager">매니저</option>
                     </select>

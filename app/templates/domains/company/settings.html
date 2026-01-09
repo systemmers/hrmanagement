@@ -254,7 +254,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">구분자</label>
-                            <select class="form-input" id="employee_number_separator">
+                            <select class="form-select" id="employee_number_separator">
                                 <option value="-">- (하이픈)</option>
                                 <option value="_">_ (언더스코어)</option>
                                 <option value="/">/  (슬래시)</option>
@@ -263,7 +263,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">순번 자릿수</label>
-                            <select class="form-input" id="employee_number_digits">
+                            <select class="form-select" id="employee_number_digits">
                                 <option value="3">3자리</option>
                                 <option value="4">4자리</option>
                                 <option value="5">5자리</option>
@@ -319,7 +319,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">이메일 포맷</label>
-                            <select class="form-input" id="email_format">
+                            <select class="form-select" id="email_format">
                                 <option value="first.last">이름.성 (hong.gildong)</option>
                                 <option value="last.first">성.이름 (gildong.hong)</option>
                                 <option value="firstlast">이름성 (honggildong)</option>
@@ -352,7 +352,7 @@
                     <div class="form-row form-row--settings">
                         <div class="form-group">
                             <label class="form-label">내선번호 자릿수</label>
-                            <select class="form-input" id="internal_phone_digits">
+                            <select class="form-select" id="internal_phone_digits">
                                 <option value="3">3자리</option>
                                 <option value="4">4자리</option>
                                 <option value="5">5자리</option>
@@ -392,7 +392,7 @@
                     <div class="form-row form-row--settings">
                         <div class="form-group">
                             <label class="form-label">급여 지급일</label>
-                            <select class="form-input" id="payment_day">
+                            <select class="form-select" id="payment_day">
                                 {% for day in range(1, 29) %}
                                 <option value="{{ day }}">매월 {{ day }}일</option>
                                 {% endfor %}
@@ -462,7 +462,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">자산번호 구분자</label>
-                            <select class="form-input" id="asset_number_separator">
+                            <select class="form-select" id="asset_number_separator">
                                 <option value="-">- (하이픈)</option>
                                 <option value="_">_ (언더스코어)</option>
                                 <option value="">없음</option>
@@ -470,7 +470,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">순번 자릿수</label>
-                            <select class="form-input" id="asset_number_digits">
+                            <select class="form-select" id="asset_number_digits">
                                 <option value="4">4자리</option>
                                 <option value="5">5자리</option>
                                 <option value="6">6자리</option>
@@ -552,7 +552,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">카테고리</label>
-                                    <select class="form-input" name="category">
+                                    <select class="form-select" name="category">
                                         <option value="required">필수 서류</option>
                                         <option value="payroll">급여 관련</option>
                                         <option value="welfare">복리후생</option>
@@ -565,7 +565,7 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">서류 유형</label>
-                                    <select class="form-input" name="documentType">
+                                    <select class="form-select" name="documentType">
                                         <option value="business_registration">사업자등록증</option>
                                         <option value="corporate_seal">법인인감증명</option>
                                         <option value="certificate_of_incorporation">법인등기부등본</option>

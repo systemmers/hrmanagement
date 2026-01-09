@@ -218,7 +218,7 @@
 
                 <div class="form-group">
                     <label for="gender" class="form-label">성별</label>
-                    <select id="gender" name="gender" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                    <select id="gender" name="gender" class="form-select{% if is_personal_readonly %} readonly-field{% endif %}"
                             {% if is_personal_readonly %}disabled{% endif %}>
                         <option value="">선택하세요</option>
                         {% for opt in GENDER_OPTIONS %}
@@ -229,7 +229,7 @@
 
                 <div class="form-group">
                     <label for="marital_status" class="form-label">결혼여부</label>
-                    <select id="marital_status" name="marital_status" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                    <select id="marital_status" name="marital_status" class="form-select{% if is_personal_readonly %} readonly-field{% endif %}"
                             {% if is_personal_readonly %}disabled{% endif %}>
                         <option value="">선택하세요</option>
                         {% for opt in MARITAL_STATUS_OPTIONS %}
@@ -240,7 +240,7 @@
 
                 <div class="form-group">
                     <label for="nationality" class="form-label">국적</label>
-                    <select id="nationality" name="nationality" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                    <select id="nationality" name="nationality" class="form-select{% if is_personal_readonly %} readonly-field{% endif %}"
                             {% if is_personal_readonly %}disabled{% endif %}>
                         <option value="">선택하세요</option>
                         {% for opt in NATIONALITY_OPTIONS %}
@@ -373,7 +373,7 @@
 
                 <div class="form-group">
                     <label for="bank_name" class="form-label">은행명</label>
-                    <select id="bank_name" name="bank_name" class="form-input{% if is_personal_readonly %} readonly-field{% endif %}"
+                    <select id="bank_name" name="bank_name" class="form-select{% if is_personal_readonly %} readonly-field{% endif %}"
                             {% if is_personal_readonly %}disabled{% endif %}>
                         <option value="">선택하세요</option>
                         {% for opt in BANK_OPTIONS %}

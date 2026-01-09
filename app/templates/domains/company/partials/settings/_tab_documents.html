@@ -54,7 +54,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">카테고리</label>
-                            <select class="form-input" name="category">
+                            <select class="form-select" name="category">
                                 {% for opt in DOCUMENT_CATEGORY_OPTIONS %}
                                 <option value="{{ opt.value }}">{{ opt.label }}</option>
                                 {% endfor %}
@@ -64,7 +64,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">서류 유형</label>
-                            <select class="form-input" name="documentType">
+                            <select class="form-select" name="documentType">
                                 {% for opt in DOCUMENT_TYPE_OPTIONS %}
                                 <option value="{{ opt.value }}">{{ opt.label }}</option>
                                 {% endfor %}
