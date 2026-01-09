@@ -1,0 +1,576 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('icons', '아이콘', 'FontAwesome 5 Free 아이콘 시스템') %}
+
+    <div class="styleguide-intro">
+        <p>프로젝트에서 사용하는 FontAwesome 5 Free 아이콘 목록입니다. 총 <strong>143개</strong> 아이콘이 사용됩니다.</p>
+        <p><code>&lt;i class="fas fa-아이콘명"&gt;&lt;/i&gt;</code> 형식으로 사용합니다.</p>
+    </div>
+
+    <!-- 전체 아이콘 미리보기 (한눈에 보기) -->
+    <div class="icon-overview">
+        <h3 class="icon-section-title">전체 아이콘 미리보기</h3>
+        <div class="icon-grid-compact">
+            <div class="icon-mini" title="fa-user"><i class="fas fa-user"></i></div>
+            <div class="icon-mini" title="fa-times"><i class="fas fa-times"></i></div>
+            <div class="icon-mini" title="fa-users"><i class="fas fa-users"></i></div>
+            <div class="icon-mini" title="fa-check"><i class="fas fa-check"></i></div>
+            <div class="icon-mini" title="fa-building"><i class="fas fa-building"></i></div>
+            <div class="icon-mini" title="fa-file-contract"><i class="fas fa-file-contract"></i></div>
+            <div class="icon-mini" title="fa-plus"><i class="fas fa-plus"></i></div>
+            <div class="icon-mini" title="fa-search"><i class="fas fa-search"></i></div>
+            <div class="icon-mini" title="fa-arrow-left"><i class="fas fa-arrow-left"></i></div>
+            <div class="icon-mini" title="fa-arrow-right"><i class="fas fa-arrow-right"></i></div>
+            <div class="icon-mini" title="fa-arrow-up"><i class="fas fa-arrow-up"></i></div>
+            <div class="icon-mini" title="fa-arrow-down"><i class="fas fa-arrow-down"></i></div>
+            <div class="icon-mini" title="fa-chevron-left"><i class="fas fa-chevron-left"></i></div>
+            <div class="icon-mini" title="fa-chevron-right"><i class="fas fa-chevron-right"></i></div>
+            <div class="icon-mini" title="fa-chevron-down"><i class="fas fa-chevron-down"></i></div>
+            <div class="icon-mini" title="fa-angle-double-left"><i class="fas fa-angle-double-left"></i></div>
+            <div class="icon-mini" title="fa-angle-double-right"><i class="fas fa-angle-double-right"></i></div>
+            <div class="icon-mini" title="fa-bars"><i class="fas fa-bars"></i></div>
+            <div class="icon-mini" title="fa-ellipsis-v"><i class="fas fa-ellipsis-v"></i></div>
+            <div class="icon-mini" title="fa-home"><i class="fas fa-home"></i></div>
+            <div class="icon-mini" title="fa-external-link-alt"><i class="fas fa-external-link-alt"></i></div>
+            <div class="icon-mini" title="fa-info-circle"><i class="fas fa-info-circle"></i></div>
+            <div class="icon-mini" title="fa-trash"><i class="fas fa-trash"></i></div>
+            <div class="icon-mini" title="fa-edit"><i class="fas fa-edit"></i></div>
+            <div class="icon-mini" title="fa-cog"><i class="fas fa-cog"></i></div>
+            <div class="icon-mini" title="fa-briefcase"><i class="fas fa-briefcase"></i></div>
+            <div class="icon-mini" title="fa-save"><i class="fas fa-save"></i></div>
+            <div class="icon-mini" title="fa-graduation-cap"><i class="fas fa-graduation-cap"></i></div>
+            <div class="icon-mini" title="fa-id-card"><i class="fas fa-id-card"></i></div>
+            <div class="icon-mini" title="fa-folder-open"><i class="fas fa-folder-open"></i></div>
+            <div class="icon-mini" title="fa-eye"><i class="fas fa-eye"></i></div>
+            <div class="icon-mini" title="fa-filter"><i class="fas fa-filter"></i></div>
+            <div class="icon-mini" title="fa-sort"><i class="fas fa-sort"></i></div>
+            <div class="icon-mini" title="fa-download"><i class="fas fa-download"></i></div>
+            <div class="icon-mini" title="fa-upload"><i class="fas fa-upload"></i></div>
+            <div class="icon-mini" title="fa-sync-alt"><i class="fas fa-sync-alt"></i></div>
+            <div class="icon-mini" title="fa-undo"><i class="fas fa-undo"></i></div>
+            <div class="icon-mini" title="fa-redo"><i class="fas fa-redo"></i></div>
+            <div class="icon-mini" title="fa-copy"><i class="fas fa-copy"></i></div>
+            <div class="icon-mini" title="fa-link"><i class="fas fa-link"></i></div>
+            <div class="icon-mini" title="fa-share-alt"><i class="fas fa-share-alt"></i></div>
+            <div class="icon-mini" title="fa-print"><i class="fas fa-print"></i></div>
+            <div class="icon-mini" title="fa-check-circle"><i class="fas fa-check-circle"></i></div>
+            <div class="icon-mini" title="fa-check-square"><i class="fas fa-check-square"></i></div>
+            <div class="icon-mini" title="fa-times-circle"><i class="fas fa-times-circle"></i></div>
+            <div class="icon-mini" title="fa-exclamation-circle"><i class="fas fa-exclamation-circle"></i></div>
+            <div class="icon-mini" title="fa-exclamation-triangle"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="icon-mini" title="fa-question-circle"><i class="fas fa-question-circle"></i></div>
+            <div class="icon-mini" title="fa-ban"><i class="fas fa-ban"></i></div>
+            <div class="icon-mini" title="fa-spinner"><i class="fas fa-spinner"></i></div>
+            <div class="icon-mini" title="fa-hourglass-half"><i class="fas fa-hourglass-half"></i></div>
+            <div class="icon-mini" title="fa-user-circle"><i class="fas fa-user-circle"></i></div>
+            <div class="icon-mini" title="fa-user-plus"><i class="fas fa-user-plus"></i></div>
+            <div class="icon-mini" title="fa-user-minus"><i class="fas fa-user-minus"></i></div>
+            <div class="icon-mini" title="fa-user-times"><i class="fas fa-user-times"></i></div>
+            <div class="icon-mini" title="fa-user-check"><i class="fas fa-user-check"></i></div>
+            <div class="icon-mini" title="fa-user-edit"><i class="fas fa-user-edit"></i></div>
+            <div class="icon-mini" title="fa-user-shield"><i class="fas fa-user-shield"></i></div>
+            <div class="icon-mini" title="fa-user-tie"><i class="fas fa-user-tie"></i></div>
+            <div class="icon-mini" title="fa-user-cog"><i class="fas fa-user-cog"></i></div>
+            <div class="icon-mini" title="fa-key"><i class="fas fa-key"></i></div>
+            <div class="icon-mini" title="fa-lock"><i class="fas fa-lock"></i></div>
+            <div class="icon-mini" title="fa-shield-alt"><i class="fas fa-shield-alt"></i></div>
+            <div class="icon-mini" title="fa-sitemap"><i class="fas fa-sitemap"></i></div>
+            <div class="icon-mini" title="fa-id-badge"><i class="fas fa-id-badge"></i></div>
+            <div class="icon-mini" title="fa-address-card"><i class="fas fa-address-card"></i></div>
+            <div class="icon-mini" title="fa-crown"><i class="fas fa-crown"></i></div>
+            <div class="icon-mini" title="fa-handshake"><i class="fas fa-handshake"></i></div>
+            <div class="icon-mini" title="fa-book"><i class="fas fa-book"></i></div>
+            <div class="icon-mini" title="fa-certificate"><i class="fas fa-certificate"></i></div>
+            <div class="icon-mini" title="fa-medal"><i class="fas fa-medal"></i></div>
+            <div class="icon-mini" title="fa-trophy"><i class="fas fa-trophy"></i></div>
+            <div class="icon-mini" title="fa-globe"><i class="fas fa-globe"></i></div>
+            <div class="icon-mini" title="fa-language"><i class="fas fa-language"></i></div>
+            <div class="icon-mini" title="fa-wheelchair"><i class="fas fa-wheelchair"></i></div>
+            <div class="icon-mini" title="fa-baby"><i class="fas fa-baby"></i></div>
+            <div class="icon-mini" title="fa-heart"><i class="fas fa-heart"></i></div>
+            <div class="icon-mini" title="fa-file"><i class="fas fa-file"></i></div>
+            <div class="icon-mini" title="fa-file-alt"><i class="fas fa-file-alt"></i></div>
+            <div class="icon-mini" title="fa-file-pdf"><i class="fas fa-file-pdf"></i></div>
+            <div class="icon-mini" title="fa-file-word"><i class="fas fa-file-word"></i></div>
+            <div class="icon-mini" title="fa-file-excel"><i class="fas fa-file-excel"></i></div>
+            <div class="icon-mini" title="fa-file-powerpoint"><i class="fas fa-file-powerpoint"></i></div>
+            <div class="icon-mini" title="fa-file-archive"><i class="fas fa-file-archive"></i></div>
+            <div class="icon-mini" title="fa-file-signature"><i class="fas fa-file-signature"></i></div>
+            <div class="icon-mini" title="fa-file-upload"><i class="fas fa-file-upload"></i></div>
+            <div class="icon-mini" title="fa-folder"><i class="fas fa-folder"></i></div>
+            <div class="icon-mini" title="fa-cloud-upload-alt"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div class="icon-mini" title="fa-money-bill-wave"><i class="fas fa-money-bill-wave"></i></div>
+            <div class="icon-mini" title="fa-won-sign"><i class="fas fa-won-sign"></i></div>
+            <div class="icon-mini" title="fa-coins"><i class="fas fa-coins"></i></div>
+            <div class="icon-mini" title="fa-calculator"><i class="fas fa-calculator"></i></div>
+            <div class="icon-mini" title="fa-percent"><i class="fas fa-percent"></i></div>
+            <div class="icon-mini" title="fa-calendar"><i class="fas fa-calendar"></i></div>
+            <div class="icon-mini" title="fa-calendar-alt"><i class="fas fa-calendar-alt"></i></div>
+            <div class="icon-mini" title="fa-calendar-check"><i class="fas fa-calendar-check"></i></div>
+            <div class="icon-mini" title="fa-calendar-times"><i class="fas fa-calendar-times"></i></div>
+            <div class="icon-mini" title="fa-clock"><i class="fas fa-clock"></i></div>
+            <div class="icon-mini" title="fa-history"><i class="fas fa-history"></i></div>
+            <div class="icon-mini" title="fa-bolt"><i class="fas fa-bolt"></i></div>
+            <div class="icon-mini" title="fa-phone"><i class="fas fa-phone"></i></div>
+            <div class="icon-mini" title="fa-phone-alt"><i class="fas fa-phone-alt"></i></div>
+            <div class="icon-mini" title="fa-phone-square"><i class="fas fa-phone-square"></i></div>
+            <div class="icon-mini" title="fa-envelope"><i class="fas fa-envelope"></i></div>
+            <div class="icon-mini" title="fa-bell"><i class="fas fa-bell"></i></div>
+            <div class="icon-mini" title="fa-bell-slash"><i class="fas fa-bell-slash"></i></div>
+            <div class="icon-mini" title="fa-comment"><i class="fas fa-comment"></i></div>
+            <div class="icon-mini" title="fa-comments"><i class="fas fa-comments"></i></div>
+            <div class="icon-mini" title="fa-tachometer-alt"><i class="fas fa-tachometer-alt"></i></div>
+            <div class="icon-mini" title="fa-chart-bar"><i class="fas fa-chart-bar"></i></div>
+            <div class="icon-mini" title="fa-chart-line"><i class="fas fa-chart-line"></i></div>
+            <div class="icon-mini" title="fa-table"><i class="fas fa-table"></i></div>
+            <div class="icon-mini" title="fa-columns"><i class="fas fa-columns"></i></div>
+            <div class="icon-mini" title="fa-th"><i class="fas fa-th"></i></div>
+            <div class="icon-mini" title="fa-list"><i class="fas fa-list"></i></div>
+            <div class="icon-mini" title="fa-layer-group"><i class="fas fa-layer-group"></i></div>
+            <div class="icon-mini" title="fa-cogs"><i class="fas fa-cogs"></i></div>
+            <div class="icon-mini" title="fa-sliders-h"><i class="fas fa-sliders-h"></i></div>
+            <div class="icon-mini" title="fa-image"><i class="fas fa-image"></i></div>
+            <div class="icon-mini" title="fa-camera"><i class="fas fa-camera"></i></div>
+            <div class="icon-mini" title="fa-palette"><i class="fas fa-palette"></i></div>
+            <div class="icon-mini" title="fa-robot"><i class="fas fa-robot"></i></div>
+            <div class="icon-mini" title="fa-lightbulb"><i class="fas fa-lightbulb"></i></div>
+            <div class="icon-mini" title="fa-wand-magic-sparkles"><i class="fas fa-wand-magic-sparkles"></i></div>
+            <div class="icon-mini" title="fa-inbox"><i class="fas fa-inbox"></i></div>
+            <div class="icon-mini" title="fa-gift"><i class="fas fa-gift"></i></div>
+            <div class="icon-mini" title="fa-gem"><i class="fas fa-gem"></i></div>
+        </div>
+    </div>
+
+    <!-- 카테고리별 상세 아이콘 -->
+    <div class="icon-categories">
+        <!-- 사용 빈도 Top 20 -->
+        <div class="icon-category">
+            <h4 class="icon-category-title">사용 빈도 Top 20</h4>
+            <div class="icon-grid">
+                <div class="icon-item"><i class="fas fa-user"></i><span>fa-user</span><em>46</em></div>
+                <div class="icon-item"><i class="fas fa-times"></i><span>fa-times</span><em>45</em></div>
+                <div class="icon-item"><i class="fas fa-users"></i><span>fa-users</span><em>42</em></div>
+                <div class="icon-item"><i class="fas fa-check"></i><span>fa-check</span><em>42</em></div>
+                <div class="icon-item"><i class="fas fa-building"></i><span>fa-building</span><em>41</em></div>
+                <div class="icon-item"><i class="fas fa-file-contract"></i><span>fa-file-contract</span><em>34</em></div>
+                <div class="icon-item"><i class="fas fa-plus"></i><span>fa-plus</span><em>33</em></div>
+                <div class="icon-item"><i class="fas fa-search"></i><span>fa-search</span><em>27</em></div>
+                <div class="icon-item"><i class="fas fa-arrow-left"></i><span>fa-arrow-left</span><em>27</em></div>
+                <div class="icon-item"><i class="fas fa-info-circle"></i><span>fa-info-circle</span><em>25</em></div>
+                <div class="icon-item"><i class="fas fa-trash"></i><span>fa-trash</span><em>24</em></div>
+                <div class="icon-item"><i class="fas fa-edit"></i><span>fa-edit</span><em>21</em></div>
+                <div class="icon-item"><i class="fas fa-cog"></i><span>fa-cog</span><em>21</em></div>
+                <div class="icon-item"><i class="fas fa-briefcase"></i><span>fa-briefcase</span><em>21</em></div>
+                <div class="icon-item"><i class="fas fa-save"></i><span>fa-save</span><em>19</em></div>
+                <div class="icon-item"><i class="fas fa-graduation-cap"></i><span>fa-graduation-cap</span><em>18</em></div>
+                <div class="icon-item"><i class="fas fa-id-card"></i><span>fa-id-card</span><em>17</em></div>
+                <div class="icon-item"><i class="fas fa-folder-open"></i><span>fa-folder-open</span><em>17</em></div>
+                <div class="icon-item"><i class="fas fa-eye"></i><span>fa-eye</span><em>17</em></div>
+                <div class="icon-item"><i class="fas fa-chevron-right"></i><span>fa-chevron-right</span><em>17</em></div>
+            </div>
+        </div>
+
+        <!-- 네비게이션 -->
+        <div class="icon-category">
+            <h4 class="icon-category-title">네비게이션</h4>
+            <div class="icon-grid">
+                <div class="icon-item"><i class="fas fa-arrow-left"></i><span>fa-arrow-left</span></div>
+                <div class="icon-item"><i class="fas fa-arrow-right"></i><span>fa-arrow-right</span></div>
+                <div class="icon-item"><i class="fas fa-arrow-up"></i><span>fa-arrow-up</span></div>
+                <div class="icon-item"><i class="fas fa-arrow-down"></i><span>fa-arrow-down</span></div>
+                <div class="icon-item"><i class="fas fa-chevron-left"></i><span>fa-chevron-left</span></div>
+                <div class="icon-item"><i class="fas fa-chevron-right"></i><span>fa-chevron-right</span></div>
+                <div class="icon-item"><i class="fas fa-chevron-down"></i><span>fa-chevron-down</span></div>
+                <div class="icon-item"><i class="fas fa-angle-double-left"></i><span>fa-angle-double-left</span></div>
+                <div class="icon-item"><i class="fas fa-angle-double-right"></i><span>fa-angle-double-right</span></div>
+                <div class="icon-item"><i class="fas fa-bars"></i><span>fa-bars</span></div>
+                <div class="icon-item"><i class="fas fa-ellipsis-v"></i><span>fa-ellipsis-v</span></div>
+                <div class="icon-item"><i class="fas fa-home"></i><span>fa-home</span></div>
+                <div class="icon-item"><i class="fas fa-external-link-alt"></i><span>fa-external-link-alt</span></div>
+            </div>
+        </div>
+
+        <!-- 액션 -->
+        <div class="icon-category">
+            <h4 class="icon-category-title">액션</h4>
+            <div class="icon-grid">
+                <div class="icon-item"><i class="fas fa-plus"></i><span>fa-plus</span></div>
+                <div class="icon-item"><i class="fas fa-times"></i><span>fa-times</span></div>
+                <div class="icon-item"><i class="fas fa-edit"></i><span>fa-edit</span></div>
+                <div class="icon-item"><i class="fas fa-save"></i><span>fa-save</span></div>
+                <div class="icon-item"><i class="fas fa-trash"></i><span>fa-trash</span></div>
+                <div class="icon-item"><i class="fas fa-search"></i><span>fa-search</span></div>
+                <div class="icon-item"><i class="fas fa-filter"></i><span>fa-filter</span></div>
+                <div class="icon-item"><i class="fas fa-sort"></i><span>fa-sort</span></div>
+                <div class="icon-item"><i class="fas fa-download"></i><span>fa-download</span></div>
+                <div class="icon-item"><i class="fas fa-upload"></i><span>fa-upload</span></div>
+                <div class="icon-item"><i class="fas fa-sync-alt"></i><span>fa-sync-alt</span></div>
+                <div class="icon-item"><i class="fas fa-undo"></i><span>fa-undo</span></div>
+                <div class="icon-item"><i class="fas fa-redo"></i><span>fa-redo</span></div>
+                <div class="icon-item"><i class="fas fa-copy"></i><span>fa-copy</span></div>
+                <div class="icon-item"><i class="fas fa-link"></i><span>fa-link</span></div>
+                <div class="icon-item"><i class="fas fa-share-alt"></i><span>fa-share-alt</span></div>
+                <div class="icon-item"><i class="fas fa-print"></i><span>fa-print</span></div>
+                <div class="icon-item"><i class="fas fa-eye"></i><span>fa-eye</span></div>
+            </div>
+        </div>
+
+        <!-- 상태 -->
+        <div class="icon-category">
+            <h4 class="icon-category-title">상태</h4>
+            <div class="icon-grid">
+                <div class="icon-item"><i class="fas fa-check"></i><span>fa-check</span></div>
+                <div class="icon-item"><i class="fas fa-check-circle"></i><span>fa-check-circle</span></div>
+                <div class="icon-item"><i class="fas fa-check-square"></i><span>fa-check-square</span></div>
+                <div class="icon-item"><i class="fas fa-times-circle"></i><span>fa-times-circle</span></div>
+                <div class="icon-item"><i class="fas fa-exclamation-circle"></i><span>fa-exclamation-circle</span></div>
+                <div class="icon-item"><i class="fas fa-exclamation-triangle"></i><span>fa-exclamation-triangle</span></div>
+                <div class="icon-item"><i class="fas fa-info-circle"></i><span>fa-info-circle</span></div>
+                <div class="icon-item"><i class="fas fa-question-circle"></i><span>fa-question-circle</span></div>
+                <div class="icon-item"><i class="fas fa-ban"></i><span>fa-ban</span></div>
+                <div class="icon-item"><i class="fas fa-spinner fa-spin"></i><span>fa-spinner</span></div>
+                <div class="icon-item"><i class="fas fa-hourglass-half"></i><span>fa-hourglass-half</span></div>
+            </div>
+        </div>
+
+        <!-- 사용자 -->
+        <div class="icon-category">
+            <h4 class="icon-category-title">사용자</h4>
+            <div class="icon-grid">
+                <div class="icon-item"><i class="fas fa-user"></i><span>fa-user</span></div>
+                <div class="icon-item"><i class="fas fa-users"></i><span>fa-users</span></div>
+                <div class="icon-item"><i class="fas fa-user-circle"></i><span>fa-user-circle</span></div>
+                <div class="icon-item"><i class="fas fa-user-plus"></i><span>fa-user-plus</span></div>
+                <div class="icon-item"><i class="fas fa-user-minus"></i><span>fa-user-minus</span></div>
+                <div class="icon-item"><i class="fas fa-user-times"></i><span>fa-user-times</span></div>
+                <div class="icon-item"><i class="fas fa-user-check"></i><span>fa-user-check</span></div>
+                <div class="icon-item"><i class="fas fa-user-edit"></i><span>fa-user-edit</span></div>
+                <div class="icon-item"><i class="fas fa-user-shield"></i><span>fa-user-shield</span></div>
+                <div class="icon-item"><i class="fas fa-user-tie"></i><span>fa-user-tie</span></div>
+                <div class="icon-item"><i class="fas fa-user-cog"></i><span>fa-user-cog</span></div>
+                <div class="icon-item"><i class="fas fa-key"></i><span>fa-key</span></div>
+                <div class="icon-item"><i class="fas fa-lock"></i><span>fa-lock</span></div>
+                <div class="icon-item"><i class="fas fa-shield-alt"></i><span>fa-shield-alt</span></div>
+            </div>
+        </div>
+
+        <!-- 비즈니스/조직 -->
+        <div class="icon-category">
+            <h4 class="icon-category-title">비즈니스/조직</h4>
+            <div class="icon-grid">
+                <div class="icon-item"><i class="fas fa-building"></i><span>fa-building</span></div>
+                <div class="icon-item"><i class="fas fa-sitemap"></i><span>fa-sitemap</span></div>
+                <div class="icon-item"><i class="fas fa-briefcase"></i><span>fa-briefcase</span></div>
+                <div class="icon-item"><i class="fas fa-id-card"></i><span>fa-id-card</span></div>
+                <div class="icon-item"><i class="fas fa-id-badge"></i><span>fa-id-badge</span></div>
+                <div class="icon-item"><i class="fas fa-address-card"></i><span>fa-address-card</span></div>
+                <div class="icon-item"><i class="fas fa-crown"></i><span>fa-crown</span></div>
+                <div class="icon-item"><i class="fas fa-handshake"></i><span>fa-handshake</span></div>
+            </div>
+        </div>
+
+        <!-- 인사/HR -->
+        <div class="icon-category">
+            <h4 class="icon-category-title">인사/HR</h4>
+            <div class="icon-grid">
+                <div class="icon-item"><i class="fas fa-graduation-cap"></i><span>fa-graduation-cap</span></div>
+                <div class="icon-item"><i class="fas fa-book"></i><span>fa-book</span></div>
+                <div class="icon-item"><i class="fas fa-certificate"></i><span>fa-certificate</span></div>
+                <div class="icon-item"><i class="fas fa-medal"></i><span>fa-medal</span></div>
+                <div class="icon-item"><i class="fas fa-trophy"></i><span>fa-trophy</span></div>
+                <div class="icon-item"><i class="fas fa-globe"></i><span>fa-globe</span></div>
+                <div class="icon-item"><i class="fas fa-language"></i><span>fa-language</span></div>
+                <div class="icon-item"><i class="fas fa-wheelchair"></i><span>fa-wheelchair</span></div>
+                <div class="icon-item"><i class="fas fa-baby"></i><span>fa-baby</span></div>
+                <div class="icon-item"><i class="fas fa-heart"></i><span>fa-heart</span></div>
+            </div>
+        </div>
+
+        <!-- 파일/문서 -->
+        <div class="icon-category">
+            <h4 class="icon-category-title">파일/문서</h4>
+            <div class="icon-grid">
+                <div class="icon-item"><i class="fas fa-file"></i><span>fa-file</span></div>
+                <div class="icon-item"><i class="fas fa-file-alt"></i><span>fa-file-alt</span></div>
+                <div class="icon-item"><i class="fas fa-file-pdf"></i><span>fa-file-pdf</span></div>
+                <div class="icon-item"><i class="fas fa-file-word"></i><span>fa-file-word</span></div>
+                <div class="icon-item"><i class="fas fa-file-excel"></i><span>fa-file-excel</span></div>
+                <div class="icon-item"><i class="fas fa-file-powerpoint"></i><span>fa-file-powerpoint</span></div>
+                <div class="icon-item"><i class="fas fa-file-archive"></i><span>fa-file-archive</span></div>
+                <div class="icon-item"><i class="fas fa-file-contract"></i><span>fa-file-contract</span></div>
+                <div class="icon-item"><i class="fas fa-file-signature"></i><span>fa-file-signature</span></div>
+                <div class="icon-item"><i class="fas fa-file-upload"></i><span>fa-file-upload</span></div>
+                <div class="icon-item"><i class="fas fa-folder"></i><span>fa-folder</span></div>
+                <div class="icon-item"><i class="fas fa-folder-open"></i><span>fa-folder-open</span></div>
+                <div class="icon-item"><i class="fas fa-cloud-upload-alt"></i><span>fa-cloud-upload-alt</span></div>
+            </div>
+        </div>
+
+        <!-- 금융/급여 -->
+        <div class="icon-category">
+            <h4 class="icon-category-title">금융/급여</h4>
+            <div class="icon-grid">
+                <div class="icon-item"><i class="fas fa-money-bill-wave"></i><span>fa-money-bill-wave</span></div>
+                <div class="icon-item"><i class="fas fa-won-sign"></i><span>fa-won-sign</span></div>
+                <div class="icon-item"><i class="fas fa-coins"></i><span>fa-coins</span></div>
+                <div class="icon-item"><i class="fas fa-calculator"></i><span>fa-calculator</span></div>
+                <div class="icon-item"><i class="fas fa-percent"></i><span>fa-percent</span></div>
+            </div>
+        </div>
+
+        <!-- 시간/일정 -->
+        <div class="icon-category">
+            <h4 class="icon-category-title">시간/일정</h4>
+            <div class="icon-grid">
+                <div class="icon-item"><i class="fas fa-calendar"></i><span>fa-calendar</span></div>
+                <div class="icon-item"><i class="fas fa-calendar-alt"></i><span>fa-calendar-alt</span></div>
+                <div class="icon-item"><i class="fas fa-calendar-check"></i><span>fa-calendar-check</span></div>
+                <div class="icon-item"><i class="fas fa-calendar-times"></i><span>fa-calendar-times</span></div>
+                <div class="icon-item"><i class="fas fa-clock"></i><span>fa-clock</span></div>
+                <div class="icon-item"><i class="fas fa-history"></i><span>fa-history</span></div>
+                <div class="icon-item"><i class="fas fa-bolt"></i><span>fa-bolt</span></div>
+            </div>
+        </div>
+
+        <!-- 커뮤니케이션 -->
+        <div class="icon-category">
+            <h4 class="icon-category-title">커뮤니케이션</h4>
+            <div class="icon-grid">
+                <div class="icon-item"><i class="fas fa-phone"></i><span>fa-phone</span></div>
+                <div class="icon-item"><i class="fas fa-phone-alt"></i><span>fa-phone-alt</span></div>
+                <div class="icon-item"><i class="fas fa-phone-square"></i><span>fa-phone-square</span></div>
+                <div class="icon-item"><i class="fas fa-envelope"></i><span>fa-envelope</span></div>
+                <div class="icon-item"><i class="fas fa-bell"></i><span>fa-bell</span></div>
+                <div class="icon-item"><i class="fas fa-bell-slash"></i><span>fa-bell-slash</span></div>
+                <div class="icon-item"><i class="fas fa-comment"></i><span>fa-comment</span></div>
+                <div class="icon-item"><i class="fas fa-comments"></i><span>fa-comments</span></div>
+            </div>
+        </div>
+
+        <!-- 대시보드/차트 -->
+        <div class="icon-category">
+            <h4 class="icon-category-title">대시보드/차트</h4>
+            <div class="icon-grid">
+                <div class="icon-item"><i class="fas fa-tachometer-alt"></i><span>fa-tachometer-alt</span></div>
+                <div class="icon-item"><i class="fas fa-chart-bar"></i><span>fa-chart-bar</span></div>
+                <div class="icon-item"><i class="fas fa-chart-line"></i><span>fa-chart-line</span></div>
+                <div class="icon-item"><i class="fas fa-table"></i><span>fa-table</span></div>
+                <div class="icon-item"><i class="fas fa-columns"></i><span>fa-columns</span></div>
+                <div class="icon-item"><i class="fas fa-th"></i><span>fa-th</span></div>
+                <div class="icon-item"><i class="fas fa-list"></i><span>fa-list</span></div>
+                <div class="icon-item"><i class="fas fa-layer-group"></i><span>fa-layer-group</span></div>
+            </div>
+        </div>
+
+        <!-- 설정/기타 -->
+        <div class="icon-category">
+            <h4 class="icon-category-title">설정/기타</h4>
+            <div class="icon-grid">
+                <div class="icon-item"><i class="fas fa-cog"></i><span>fa-cog</span></div>
+                <div class="icon-item"><i class="fas fa-cogs"></i><span>fa-cogs</span></div>
+                <div class="icon-item"><i class="fas fa-sliders-h"></i><span>fa-sliders-h</span></div>
+                <div class="icon-item"><i class="fas fa-image"></i><span>fa-image</span></div>
+                <div class="icon-item"><i class="fas fa-camera"></i><span>fa-camera</span></div>
+                <div class="icon-item"><i class="fas fa-palette"></i><span>fa-palette</span></div>
+                <div class="icon-item"><i class="fas fa-robot"></i><span>fa-robot</span></div>
+                <div class="icon-item"><i class="fas fa-lightbulb"></i><span>fa-lightbulb</span></div>
+                <div class="icon-item"><i class="fas fa-wand-magic-sparkles"></i><span>fa-wand-magic-sparkles</span></div>
+                <div class="icon-item"><i class="fas fa-inbox"></i><span>fa-inbox</span></div>
+                <div class="icon-item"><i class="fas fa-gift"></i><span>fa-gift</span></div>
+                <div class="icon-item"><i class="fas fa-gem"></i><span>fa-gem</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 사용 예시 -->
+    {% call subsection('사용 예시') %}
+    {% call demo() %}
+    <div style="display: flex; gap: var(--space-4); align-items: center; flex-wrap: wrap;">
+        <button class="btn btn--primary"><i class="fas fa-plus"></i> 추가</button>
+        <button class="btn btn--secondary"><i class="fas fa-edit"></i> 수정</button>
+        <button class="btn btn--danger"><i class="fas fa-trash"></i> 삭제</button>
+        <button class="btn--icon"><i class="fas fa-search"></i></button>
+        <button class="btn--icon"><i class="fas fa-cog"></i></button>
+        <span class="badge badge--success"><i class="fas fa-check"></i> 완료</span>
+        <span class="badge badge--warning"><i class="fas fa-clock"></i> 대기</span>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- 버튼과 아이콘 --&gt;
+&lt;button class="btn btn--primary"&gt;
+    &lt;i class="fas fa-plus"&gt;&lt;/i&gt; 추가
+&lt;/button&gt;
+
+&lt;!-- 아이콘 버튼 --&gt;
+&lt;button class="btn--icon"&gt;
+    &lt;i class="fas fa-search"&gt;&lt;/i&gt;
+&lt;/button&gt;
+
+&lt;!-- 배지와 아이콘 --&gt;
+&lt;span class="badge badge--success"&gt;
+    &lt;i class="fas fa-check"&gt;&lt;/i&gt; 완료
+&lt;/span&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+
+<style>
+/* 소개 박스 */
+.styleguide-intro {
+    margin-bottom: var(--space-6);
+    padding: var(--space-4);
+    background: var(--color-blue-50);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--color-primary-500);
+}
+
+.styleguide-intro p {
+    margin: 0;
+    color: var(--color-gray-700);
+}
+
+.styleguide-intro p + p {
+    margin-top: var(--space-2);
+}
+
+.styleguide-intro code {
+    background: var(--color-pure-white);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+}
+
+/* 전체 미리보기 (컴팩트 그리드) */
+.icon-overview {
+    margin-bottom: var(--space-8);
+    padding: var(--space-5);
+    background: var(--color-pure-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+}
+
+.icon-section-title {
+    margin: 0 0 var(--space-4);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-gray-800);
+}
+
+.icon-grid-compact {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    gap: var(--space-2);
+}
+
+.icon-mini {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    color: var(--color-gray-600);
+    font-size: var(--text-lg);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.icon-mini:hover {
+    background: var(--color-primary-50);
+    color: var(--color-primary-600);
+    transform: scale(1.1);
+}
+
+/* 카테고리별 그리드 */
+.icon-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: var(--space-6);
+}
+
+.icon-category {
+    background: var(--color-pure-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+}
+
+.icon-category-title {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--space-2);
+}
+
+.icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: var(--space-2);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    cursor: default;
+}
+
+.icon-item:hover {
+    background: var(--color-gray-50);
+}
+
+.icon-item i {
+    font-size: var(--text-lg);
+    color: var(--color-gray-600);
+}
+
+.icon-item:hover i {
+    color: var(--color-primary-500);
+}
+
+.icon-item span {
+    font-size: 10px;
+    color: var(--color-gray-500);
+    text-align: center;
+    line-height: 1.2;
+    word-break: break-all;
+}
+
+.icon-item em {
+    font-style: normal;
+    font-size: 9px;
+    color: var(--color-primary-500);
+    background: var(--color-primary-50);
+    padding: 1px 4px;
+    border-radius: var(--radius-sm);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .icon-categories {
+        grid-template-columns: 1fr;
+    }
+
+    .icon-grid-compact {
+        grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+    }
+
+    .icon-mini {
+        width: 36px;
+        height: 36px;
+        font-size: var(--text-base);
+    }
+}
+</style>
+{% endblock %}

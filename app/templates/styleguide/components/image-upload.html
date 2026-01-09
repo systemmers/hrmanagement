@@ -124,16 +124,19 @@
                     <span>명함 앞면</span>
                 </div>
             </div>
-            <p style="font-size: var(--text-xs); margin-top: var(--space-1); color: var(--color-gray-500);">앞면 (가로)</p>
+            <p style="font-size: var(--text-xs); margin-top: var(--space-1); color: var(--color-gray-500);">앞면 (플레이스홀더)</p>
         </div>
         <div>
             <div class="card-preview card-preview--landscape">
-                <div class="image-placeholder">
-                    <i class="fas fa-id-card"></i>
-                    <span>명함 뒷면</span>
-                </div>
+                <img src="{{ url_for('static', filename='images/face/business_card/businesscard_front.jpg') }}" alt="명함 앞면">
             </div>
-            <p style="font-size: var(--text-xs); margin-top: var(--space-1); color: var(--color-gray-500);">뒷면 (가로)</p>
+            <p style="font-size: var(--text-xs); margin-top: var(--space-1); color: var(--color-gray-500);">앞면 (이미지)</p>
+        </div>
+        <div>
+            <div class="card-preview card-preview--landscape">
+                <img src="{{ url_for('static', filename='images/face/business_card/businesscard_back.jpg') }}" alt="명함 뒷면">
+            </div>
+            <p style="font-size: var(--text-xs); margin-top: var(--space-1); color: var(--color-gray-500);">뒷면 (이미지)</p>
         </div>
     </div>
     {% endcall %}
@@ -153,7 +156,7 @@
     <div class="image-upload-section">
         <div class="image-upload-preview">
             <div class="image-preview image-preview--lg">
-                <img src="{{ url_for('static', filename='images/placeholder-avatar.svg') }}" alt="프로필 사진">
+                <img src="{{ url_for('static', filename='images/face/face_01_m.png') }}" alt="프로필 사진">
             </div>
         </div>
         <div class="image-upload-controls">

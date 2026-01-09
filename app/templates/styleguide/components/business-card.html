@@ -1,0 +1,275 @@
+{% extends "styleguide/base.html" %}
+
+{% block extra_css %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/businesscard/card.css') }}">
+{% endblock %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('business-card', '명함 카드', '3D 플립 애니메이션 명함 컴포넌트 (Executive Dark)') %}
+
+    <div class="styleguide-intro">
+        <p>직원 목록의 명함형 보기에서 사용되는 프리미엄 명함 카드입니다.</p>
+        <p>호버 시 3D 플립 애니메이션으로 뒷면 정보를 표시합니다.</p>
+    </div>
+
+    {% call subsection('기본 명함') %}
+    {% call demo() %}
+    <div class="bc-grid-demo">
+        <div class="bc-wrapper" tabindex="0">
+            <div class="bc-card">
+                <!-- 앞면 -->
+                <div class="bc-face bc-front">
+                    <img src="{{ url_for('static', filename='images/face/face_01_m.png') }}" alt="홍길동" class="bc-photo">
+                    <h3 class="bc-name">홍길동</h3>
+                    <p class="bc-name-en">Gil-dong Hong</p>
+                    <p class="bc-position">선임연구원</p>
+                    <p class="bc-department">개발팀 | 테스트기업 A</p>
+                    <div class="bc-contact-row">
+                        <span><i class="fas fa-phone"></i>010-1234-5678</span>
+                        <span><i class="fas fa-envelope"></i>hong@test.co.kr</span>
+                    </div>
+                    <div class="bc-qr">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23fff' width='100' height='100'/%3E%3Cg fill='%23000'%3E%3Crect x='10' y='10' width='30' height='30'/%3E%3Crect x='15' y='15' width='20' height='20' fill='%23fff'/%3E%3Crect x='20' y='20' width='10' height='10'/%3E%3Crect x='60' y='10' width='30' height='30'/%3E%3Crect x='65' y='15' width='20' height='20' fill='%23fff'/%3E%3Crect x='70' y='20' width='10' height='10'/%3E%3Crect x='10' y='60' width='30' height='30'/%3E%3Crect x='15' y='65' width='20' height='20' fill='%23fff'/%3E%3Crect x='20' y='70' width='10' height='10'/%3E%3Crect x='45' y='10' width='5' height='5'/%3E%3Crect x='45' y='20' width='5' height='5'/%3E%3Crect x='50' y='15' width='5' height='5'/%3E%3Crect x='10' y='45' width='5' height='5'/%3E%3Crect x='20' y='45' width='5' height='5'/%3E%3Crect x='15' y='50' width='5' height='5'/%3E%3Crect x='45' y='45' width='10' height='10'/%3E%3Crect x='60' y='45' width='5' height='5'/%3E%3Crect x='70' y='50' width='5' height='5'/%3E%3Crect x='80' y='45' width='10' height='5'/%3E%3Crect x='60' y='60' width='5' height='5'/%3E%3Crect x='70' y='65' width='10' height='5'/%3E%3Crect x='65' y='75' width='5' height='5'/%3E%3Crect x='80' y='70' width='10' height='10'/%3E%3Crect x='60' y='85' width='30' height='5'/%3E%3C/g%3E%3C/svg%3E" alt="QR">
+                    </div>
+                </div>
+                <!-- 뒷면 -->
+                <div class="bc-face bc-back">
+                    <div class="bc-back-header">
+                        <div class="bc-back-logo">
+                            <i class="fas fa-crown"></i>
+                            <span>테스트기업 A</span>
+                        </div>
+                        <span class="bc-badge">재직중</span>
+                    </div>
+                    <div class="bc-back-content">
+                        <div class="bc-back-item">
+                            <i class="fas fa-id-badge"></i>
+                            <span class="bc-back-item-label">사번</span>
+                            <span class="bc-back-item-value">EMP-0001</span>
+                        </div>
+                        <div class="bc-back-item">
+                            <i class="fas fa-phone-square"></i>
+                            <span class="bc-back-item-label">내선</span>
+                            <span class="bc-back-item-value">1234</span>
+                        </div>
+                        <div class="bc-back-item">
+                            <i class="fas fa-sitemap"></i>
+                            <span class="bc-back-item-label">소속</span>
+                            <span class="bc-back-item-value">개발팀</span>
+                        </div>
+                    </div>
+                    <div class="bc-back-footer">
+                        <span class="bc-website">www.testcorp.co.kr</span>
+                        <span class="bc-verified">
+                            <i class="fas fa-shield-alt"></i>
+                            VIP
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bc-wrapper" tabindex="0">
+            <div class="bc-card">
+                <!-- 앞면 -->
+                <div class="bc-face bc-front">
+                    <div class="bc-avatar">김</div>
+                    <h3 class="bc-name">김영희</h3>
+                    <p class="bc-position">대리</p>
+                    <p class="bc-department">인사팀 | 테스트기업 A</p>
+                    <div class="bc-contact-row">
+                        <span><i class="fas fa-phone"></i>010-9876-5432</span>
+                        <span><i class="fas fa-envelope"></i>kim@test.co.kr</span>
+                    </div>
+                    <div class="bc-qr">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23fff' width='100' height='100'/%3E%3Cg fill='%23000'%3E%3Crect x='10' y='10' width='30' height='30'/%3E%3Crect x='15' y='15' width='20' height='20' fill='%23fff'/%3E%3Crect x='20' y='20' width='10' height='10'/%3E%3Crect x='60' y='10' width='30' height='30'/%3E%3Crect x='65' y='15' width='20' height='20' fill='%23fff'/%3E%3Crect x='70' y='20' width='10' height='10'/%3E%3Crect x='10' y='60' width='30' height='30'/%3E%3Crect x='15' y='65' width='20' height='20' fill='%23fff'/%3E%3Crect x='20' y='70' width='10' height='10'/%3E%3Crect x='45' y='10' width='5' height='5'/%3E%3Crect x='45' y='20' width='5' height='5'/%3E%3Crect x='50' y='15' width='5' height='5'/%3E%3Crect x='10' y='45' width='5' height='5'/%3E%3Crect x='20' y='45' width='5' height='5'/%3E%3Crect x='15' y='50' width='5' height='5'/%3E%3Crect x='45' y='45' width='10' height='10'/%3E%3Crect x='60' y='45' width='5' height='5'/%3E%3Crect x='70' y='50' width='5' height='5'/%3E%3Crect x='80' y='45' width='10' height='5'/%3E%3Crect x='60' y='60' width='5' height='5'/%3E%3Crect x='70' y='65' width='10' height='5'/%3E%3Crect x='65' y='75' width='5' height='5'/%3E%3Crect x='80' y='70' width='10' height='10'/%3E%3Crect x='60' y='85' width='30' height='5'/%3E%3C/g%3E%3C/svg%3E" alt="QR">
+                    </div>
+                </div>
+                <!-- 뒷면 -->
+                <div class="bc-face bc-back">
+                    <div class="bc-back-header">
+                        <div class="bc-back-logo">
+                            <i class="fas fa-crown"></i>
+                            <span>테스트기업 A</span>
+                        </div>
+                        <span class="bc-badge">재직중</span>
+                    </div>
+                    <div class="bc-back-content">
+                        <div class="bc-back-item">
+                            <i class="fas fa-id-badge"></i>
+                            <span class="bc-back-item-label">사번</span>
+                            <span class="bc-back-item-value">EMP-0002</span>
+                        </div>
+                        <div class="bc-back-item">
+                            <i class="fas fa-phone-square"></i>
+                            <span class="bc-back-item-label">내선</span>
+                            <span class="bc-back-item-value">1235</span>
+                        </div>
+                        <div class="bc-back-item">
+                            <i class="fas fa-sitemap"></i>
+                            <span class="bc-back-item-label">소속</span>
+                            <span class="bc-back-item-value">인사팀</span>
+                        </div>
+                    </div>
+                    <div class="bc-back-footer">
+                        <span class="bc-website">www.testcorp.co.kr</span>
+                        <span class="bc-verified">
+                            <i class="fas fa-shield-alt"></i>
+                            VIP
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="bc-wrapper" tabindex="0"&gt;
+    &lt;div class="bc-card"&gt;
+        &lt;!-- 앞면 --&gt;
+        &lt;div class="bc-face bc-front"&gt;
+            &lt;img src="..." alt="이름" class="bc-photo"&gt;
+            &lt;h3 class="bc-name"&gt;홍길동&lt;/h3&gt;
+            &lt;p class="bc-name-en"&gt;Gil-dong Hong&lt;/p&gt;
+            &lt;p class="bc-position"&gt;선임연구원&lt;/p&gt;
+            &lt;p class="bc-department"&gt;개발팀 | 회사명&lt;/p&gt;
+            &lt;div class="bc-contact-row"&gt;
+                &lt;span&gt;&lt;i class="fas fa-phone"&gt;&lt;/i&gt;010-1234-5678&lt;/span&gt;
+                &lt;span&gt;&lt;i class="fas fa-envelope"&gt;&lt;/i&gt;email@company.com&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div class="bc-qr"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 뒷면 --&gt;
+        &lt;div class="bc-face bc-back"&gt;
+            &lt;div class="bc-back-header"&gt;
+                &lt;div class="bc-back-logo"&gt;...&lt;/div&gt;
+                &lt;span class="bc-badge"&gt;재직중&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div class="bc-back-content"&gt;...&lt;/div&gt;
+            &lt;div class="bc-back-footer"&gt;...&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('상태 배지') %}
+    {% call demo() %}
+    <div style="display: flex; gap: var(--space-4); flex-wrap: wrap;">
+        <span class="bc-badge">재직중</span>
+        <span class="bc-badge bc-badge-inactive">휴직</span>
+        <span class="bc-badge bc-badge-inactive">퇴직</span>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;span class="bc-badge"&gt;재직중&lt;/span&gt;
+&lt;span class="bc-badge bc-badge-inactive"&gt;휴직&lt;/span&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('그리드 레이아웃') %}
+    {% call demo() %}
+    <p style="color: var(--color-gray-600); margin-bottom: var(--space-4);">
+        <code>.bc-grid</code> 클래스로 명함을 그리드 배치합니다.
+    </p>
+    <div style="background: var(--color-gray-100); padding: var(--space-4); border-radius: var(--radius-md);">
+        <pre style="margin: 0; font-size: var(--text-sm);">.bc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, var(--bc-width));
+    justify-content: center;
+    gap: var(--space-6);
+}</pre>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- 명함형 뷰 그리드 --&gt;
+&lt;div class="bc-grid"&gt;
+    {% raw %}{% for employee in employees %}{% endraw %}
+        {% raw %}{% include 'domains/businesscard/partials/_card.html' %}{% endraw %}
+    {% raw %}{% endfor %}{% endraw %}
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('CSS 변수') %}
+    {% call demo() %}
+    <div class="css-vars-table">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>변수명</th>
+                    <th>값</th>
+                    <th>설명</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>--bc-width</code></td>
+                    <td>320px</td>
+                    <td>명함 너비</td>
+                </tr>
+                <tr>
+                    <td><code>--bc-height</code></td>
+                    <td>400px</td>
+                    <td>명함 높이</td>
+                </tr>
+                <tr>
+                    <td><code>--bc-flip-duration</code></td>
+                    <td>0.8s</td>
+                    <td>플립 애니메이션 시간</td>
+                </tr>
+                <tr>
+                    <td><code>--bc-bg-front</code></td>
+                    <td>linear-gradient(...)</td>
+                    <td>앞면 배경 그라데이션</td>
+                </tr>
+                <tr>
+                    <td><code>--bc-bg-back</code></td>
+                    <td>linear-gradient(...)</td>
+                    <td>뒷면 배경 그라데이션</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+
+<style>
+.styleguide-intro {
+    margin-bottom: var(--space-6);
+    padding: var(--space-4);
+    background: var(--color-blue-50);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--color-primary-500);
+}
+
+.styleguide-intro p {
+    margin: 0;
+    color: var(--color-gray-700);
+}
+
+.styleguide-intro p + p {
+    margin-top: var(--space-2);
+}
+
+.bc-grid-demo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    justify-content: center;
+}
+
+.css-vars-table code {
+    background: var(--color-gray-100);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+}
+</style>
+{% endblock %}

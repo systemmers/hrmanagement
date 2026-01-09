@@ -12,6 +12,7 @@ NAVIGATION = {
             {'id': 'typography', 'label': '타이포그래피', 'icon': 'fa-font', 'description': '폰트 크기 및 스타일'},
             {'id': 'spacing', 'label': '간격', 'icon': 'fa-arrows-alt', 'description': '간격 시스템'},
             {'id': 'shadows', 'label': '그림자/반경', 'icon': 'fa-clone', 'description': '그림자 및 모서리 반경'},
+            {'id': 'icons', 'label': '아이콘', 'icon': 'fa-icons', 'description': 'FontAwesome 아이콘 시스템'},
         ]
     },
     'components': {
@@ -43,6 +44,10 @@ NAVIGATION = {
             {'id': 'image-upload', 'label': '이미지 업로드', 'icon': 'fa-image', 'description': '사진 업로드'},
             {'id': 'tree-selector', 'label': '트리 선택', 'icon': 'fa-sitemap', 'description': '조직 트리 선택'},
             {'id': 'data-table-advanced', 'label': '고급 테이블', 'icon': 'fa-table', 'description': '고급 데이터 테이블'},
+            # 4순위 - 도메인 특화 컴포넌트 (3개)
+            {'id': 'employee-card', 'label': '직원 카드', 'icon': 'fa-address-card', 'description': '직원 카드형 표시'},
+            {'id': 'business-card', 'label': '명함', 'icon': 'fa-id-card-alt', 'description': '3D 플립 명함 카드'},
+            {'id': 'attachment', 'label': '첨부서류', 'icon': 'fa-paperclip', 'description': '파일 업로드 및 목록'},
         ]
     }
 }

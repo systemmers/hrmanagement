@@ -1,0 +1,320 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('employee-card', '직원 카드', '직원 목록의 카드형 표시 컴포넌트') %}
+
+    {% call subsection('기본 카드') %}
+    {% call demo() %}
+    <div class="employee-grid-demo">
+        <div class="employee-card">
+            <div class="employee-status active"></div>
+            <div class="avatar avatar--lg">
+                <img src="{{ url_for('static', filename='images/face/face_01_m.png') }}" alt="직원 사진">
+            </div>
+            <h3 class="employee-name">홍길동</h3>
+            <p class="employee-position">개발팀 / 선임연구원</p>
+            <div class="employee-meta">
+                <div class="employee-meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>입사일: 2023-03-15</span>
+                </div>
+                <div class="employee-meta-item">
+                    <i class="fas fa-phone"></i>
+                    <span>010-1234-5678</span>
+                </div>
+                <div class="employee-meta-item">
+                    <i class="fas fa-file-contract"></i>
+                    <span class="text-success">계약 완료</span>
+                </div>
+            </div>
+            <div class="employee-actions">
+                <button class="btn btn--secondary btn--sm">
+                    <i class="fas fa-eye"></i>
+                    <span>보기</span>
+                </button>
+                <button class="btn btn--secondary btn--sm">
+                    <i class="fas fa-edit"></i>
+                    <span>수정</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="employee-card">
+            <div class="employee-status resigned"></div>
+            <div class="avatar avatar--lg">
+                <div class="avatar__placeholder">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+            <h3 class="employee-name">김영희</h3>
+            <p class="employee-position">인사팀 / 대리</p>
+            <div class="employee-meta">
+                <div class="employee-meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>입사일: 2022-01-10</span>
+                </div>
+                <div class="employee-meta-item">
+                    <i class="fas fa-phone"></i>
+                    <span>010-9876-5432</span>
+                </div>
+                <div class="employee-meta-item">
+                    <i class="fas fa-file-contract"></i>
+                    <span class="text-secondary">계약 종료</span>
+                </div>
+            </div>
+            <div class="employee-actions">
+                <button class="btn btn--secondary btn--sm">
+                    <i class="fas fa-eye"></i>
+                    <span>보기</span>
+                </button>
+                <button class="btn btn--secondary btn--sm">
+                    <i class="fas fa-edit"></i>
+                    <span>수정</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="employee-card"&gt;
+    &lt;!-- 상태 표시 (active, resigned 등) --&gt;
+    &lt;div class="employee-status active"&gt;&lt;/div&gt;
+
+    &lt;!-- 아바타 --&gt;
+    &lt;div class="avatar avatar--lg"&gt;
+        &lt;img src="..." alt="직원 사진"&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 이름 및 직책 --&gt;
+    &lt;h3 class="employee-name"&gt;홍길동&lt;/h3&gt;
+    &lt;p class="employee-position"&gt;개발팀 / 선임연구원&lt;/p&gt;
+
+    &lt;!-- 메타 정보 --&gt;
+    &lt;div class="employee-meta"&gt;
+        &lt;div class="employee-meta-item"&gt;
+            &lt;i class="fas fa-calendar"&gt;&lt;/i&gt;
+            &lt;span&gt;입사일: 2023-03-15&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;!-- ... --&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 액션 버튼 --&gt;
+    &lt;div class="employee-actions"&gt;
+        &lt;button class="btn btn--secondary btn--sm"&gt;보기&lt;/button&gt;
+        &lt;button class="btn btn--secondary btn--sm"&gt;수정&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('상태 표시') %}
+    {% call demo() %}
+    <div style="display: flex; gap: var(--space-4); align-items: center;">
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <div class="employee-status-demo active"></div>
+            <span>active (재직)</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <div class="employee-status-demo leave"></div>
+            <span>leave (휴직)</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <div class="employee-status-demo resigned"></div>
+            <span>resigned (퇴직)</span>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- 상태별 클래스 --&gt;
+&lt;div class="employee-status active"&gt;&lt;/div&gt;   &lt;!-- 재직: 녹색 --&gt;
+&lt;div class="employee-status leave"&gt;&lt;/div&gt;    &lt;!-- 휴직: 노란색 --&gt;
+&lt;div class="employee-status resigned"&gt;&lt;/div&gt; &lt;!-- 퇴직: 회색 --&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('그리드 레이아웃') %}
+    {% call demo() %}
+    <div class="employee-grid-demo">
+        <div class="employee-card employee-card--compact">
+            <div class="employee-status active"></div>
+            <div class="avatar avatar--md">
+                <img src="{{ url_for('static', filename='images/face/face_02_m.png') }}" alt="직원">
+            </div>
+            <h3 class="employee-name">이철수</h3>
+            <p class="employee-position">기획팀 / 과장</p>
+        </div>
+        <div class="employee-card employee-card--compact">
+            <div class="employee-status active"></div>
+            <div class="avatar avatar--md">
+                <img src="{{ url_for('static', filename='images/face/face_01_f.png') }}" alt="직원">
+            </div>
+            <h3 class="employee-name">박지은</h3>
+            <p class="employee-position">마케팅팀 / 차장</p>
+        </div>
+        <div class="employee-card employee-card--compact">
+            <div class="employee-status leave"></div>
+            <div class="avatar avatar--md">
+                <img src="{{ url_for('static', filename='images/face/face_03_m.png') }}" alt="직원">
+            </div>
+            <h3 class="employee-name">최민수</h3>
+            <p class="employee-position">영업팀 / 부장</p>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- 그리드 컨테이너 --&gt;
+&lt;div class="employee-grid"&gt;
+    &lt;div class="employee-card"&gt;...&lt;/div&gt;
+    &lt;div class="employee-card"&gt;...&lt;/div&gt;
+    &lt;div class="employee-card"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- CSS: employee-grid --&gt;
+.employee-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-4);
+}
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('계약 상태 표시') %}
+    {% call demo() %}
+    <div style="display: flex; flex-wrap: wrap; gap: var(--space-3);">
+        <div class="employee-meta-item">
+            <i class="fas fa-file-contract"></i>
+            <span class="text-muted">계정 없음</span>
+        </div>
+        <div class="employee-meta-item">
+            <i class="fas fa-file-contract"></i>
+            <span class="text-info">계약 미요청</span>
+        </div>
+        <div class="employee-meta-item">
+            <i class="fas fa-file-contract"></i>
+            <span class="text-warning">계약 대기중</span>
+        </div>
+        <div class="employee-meta-item">
+            <i class="fas fa-file-contract"></i>
+            <span class="text-success">계약 완료</span>
+        </div>
+        <div class="employee-meta-item">
+            <i class="fas fa-file-contract"></i>
+            <span class="text-danger">계약 거절</span>
+        </div>
+        <div class="employee-meta-item">
+            <i class="fas fa-file-contract"></i>
+            <span class="text-secondary">계약 종료</span>
+        </div>
+    </div>
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+
+<style>
+.employee-grid-demo {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-4);
+}
+
+.employee-card {
+    position: relative;
+    background: var(--color-pure-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    text-align: center;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.employee-card:hover {
+    border-color: var(--color-primary-300);
+    box-shadow: var(--shadow-md);
+}
+
+.employee-status {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.employee-status.active { background: var(--color-success-500); }
+.employee-status.leave { background: var(--color-warning-500); }
+.employee-status.resigned { background: var(--color-gray-400); }
+
+.employee-status-demo {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+.employee-status-demo.active { background: var(--color-success-500); }
+.employee-status-demo.leave { background: var(--color-warning-500); }
+.employee-status-demo.resigned { background: var(--color-gray-400); }
+
+.employee-card .avatar {
+    margin: 0 auto var(--space-3);
+}
+
+.employee-name {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-gray-900);
+    margin: 0 0 var(--space-1);
+}
+
+.employee-position {
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+    margin: 0 0 var(--space-4);
+}
+
+.employee-meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+    text-align: left;
+}
+
+.employee-meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-gray-600);
+}
+
+.employee-meta-item i {
+    width: 16px;
+    color: var(--color-gray-400);
+}
+
+.employee-actions {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: center;
+}
+
+.employee-card--compact {
+    padding: var(--space-4);
+}
+
+.employee-card--compact .employee-name {
+    font-size: var(--text-base);
+}
+
+.text-success { color: var(--color-success-600); }
+.text-warning { color: var(--color-warning-600); }
+.text-danger { color: var(--color-danger-600); }
+.text-info { color: var(--color-blue-600); }
+.text-secondary { color: var(--color-gray-500); }
+.text-muted { color: var(--color-gray-400); }
+</style>
+{% endblock %}

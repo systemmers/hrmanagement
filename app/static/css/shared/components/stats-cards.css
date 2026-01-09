@@ -91,6 +91,7 @@
 .stat-card .stat-label {
     font-size: var(--text-sm);
     color: var(--color-gray-500);
+    white-space: nowrap;
 }
 
 .stats-grid .stat-label {

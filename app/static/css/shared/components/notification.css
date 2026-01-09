@@ -190,17 +190,22 @@
 }
 
 /* 텍스트 버튼 */
-.notification-dropdown .btn-text {
+.notification-dropdown .btn-text,
+.notification-panel .btn-text {
     background: transparent;
     border: none;
     color: var(--color-primary-500);
     font-size: var(--text-sm);
     cursor: pointer;
-    padding: 4px 8px;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
 }
 
-.notification-dropdown .btn-text:hover {
-    text-decoration: underline;
+.notification-dropdown .btn-text:hover,
+.notification-panel .btn-text:hover {
+    background: var(--color-blue-50);
+    text-decoration: none;
 }
 
 /* 반응형 */

@@ -274,6 +274,32 @@
     --color-danger: var(--color-error-500);
     --color-danger-dark: var(--color-error-600);
     --color-danger-bg: var(--color-error-50);
+    --color-danger-500: var(--color-error-500);
+
+    /* ========================================
+       Missing Variables - 누락 변수 추가
+       ======================================== */
+
+    /* Green Colors - Stats Cards용 */
+    --color-green-100: #DCFCE7;
+    --color-green-600: #16A34A;
+
+    /* Purple Colors - Stats Cards용 */
+    --color-purple-100: #F3E8FF;
+    --color-purple-600: #9333EA;
+
+    /* Red Colors - Stats Cards용 (Error 별칭) */
+    --color-red-100: var(--color-error-100);
+    --color-red-600: var(--color-error-600);
+
+    /* Spacing - 누락된 간격 변수 */
+    --space-3-5: 0.875rem;  /* 14px - space-3(12px)과 space-4(16px) 사이 */
+
+    /* Transition - 누락된 전환 변수 */
+    --transition-base: var(--transition-normal);
+
+    /* Theme - 동적 테마 색상 (계정 타입별로 덮어씀) */
+    --theme-primary: var(--color-primary-500);
 
     /* Layout Constants */
     --header-height: 64px;

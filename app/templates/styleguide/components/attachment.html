@@ -1,0 +1,423 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('attachment', '첨부서류', '파일 업로드 및 첨부파일 목록 컴포넌트') %}
+
+    {% call subsection('업로드 영역') %}
+    {% call demo() %}
+    <div class="file-upload-area-demo">
+        <div class="file-upload-icon">
+            <i class="fas fa-cloud-upload-alt"></i>
+        </div>
+        <div class="file-upload-text">파일을 드래그하거나 클릭</div>
+        <div class="file-upload-hint">PDF, JPG, PNG (최대 10MB)</div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="file-upload-area" id="fileUploadArea"&gt;
+    &lt;div class="file-upload-icon"&gt;
+        &lt;i class="fas fa-cloud-upload-alt"&gt;&lt;/i&gt;
+    &lt;/div&gt;
+    &lt;div class="file-upload-text"&gt;파일을 드래그하거나 클릭&lt;/div&gt;
+    &lt;div class="file-upload-hint"&gt;PDF, JPG, PNG (최대 10MB)&lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('파일 카드') %}
+    {% call demo() %}
+    <div class="file-list-demo">
+        <!-- 이미지 파일 (썸네일) -->
+        <div class="file-card">
+            <div class="file-icon file-thumbnail">
+                <img src="{{ url_for('static', filename='images/face/face_01_m.png') }}"
+                     alt="증명사진" class="thumbnail-img">
+            </div>
+            <div class="file-info">
+                <div class="file-name">증명사진.jpg</div>
+                <div class="file-meta">
+                    <span class="file-category">증명사진</span>
+                    <span class="file-size">256KB</span>
+                </div>
+            </div>
+            <div class="file-actions">
+                <button class="btn-icon" title="보기"><i class="fas fa-eye"></i></button>
+                <button class="btn-icon" title="다운로드"><i class="fas fa-download"></i></button>
+                <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+
+        <!-- PDF 파일 -->
+        <div class="file-card">
+            <div class="file-icon">
+                <i class="fas fa-file-pdf"></i>
+            </div>
+            <div class="file-info">
+                <div class="file-name">재직증명서.pdf</div>
+                <div class="file-meta">
+                    <span class="file-category">증명서류</span>
+                    <span class="file-size">1.2MB</span>
+                </div>
+            </div>
+            <div class="file-actions">
+                <button class="btn-icon" title="보기"><i class="fas fa-eye"></i></button>
+                <button class="btn-icon" title="다운로드"><i class="fas fa-download"></i></button>
+                <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+
+        <!-- Word 파일 -->
+        <div class="file-card">
+            <div class="file-icon">
+                <i class="fas fa-file-word"></i>
+            </div>
+            <div class="file-info">
+                <div class="file-name">이력서.docx</div>
+                <div class="file-meta">
+                    <span class="file-category">기타</span>
+                    <span class="file-size">89KB</span>
+                </div>
+            </div>
+            <div class="file-actions">
+                <button class="btn-icon" title="보기"><i class="fas fa-eye"></i></button>
+                <button class="btn-icon" title="다운로드"><i class="fas fa-download"></i></button>
+                <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+
+        <!-- Excel 파일 -->
+        <div class="file-card">
+            <div class="file-icon">
+                <i class="fas fa-file-excel"></i>
+            </div>
+            <div class="file-info">
+                <div class="file-name">급여명세서.xlsx</div>
+                <div class="file-meta">
+                    <span class="file-category">급여</span>
+                    <span class="file-size">45KB</span>
+                </div>
+            </div>
+            <div class="file-actions">
+                <button class="btn-icon" title="보기"><i class="fas fa-eye"></i></button>
+                <button class="btn-icon" title="다운로드"><i class="fas fa-download"></i></button>
+                <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="file-card" data-attachment-id="123"&gt;
+    &lt;!-- 파일 아이콘 (이미지면 썸네일) --&gt;
+    &lt;div class="file-icon file-thumbnail"&gt;
+        &lt;img src="..." class="thumbnail-img"&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 파일 정보 --&gt;
+    &lt;div class="file-info"&gt;
+        &lt;div class="file-name"&gt;파일명.jpg&lt;/div&gt;
+        &lt;div class="file-meta"&gt;
+            &lt;span class="file-category"&gt;카테고리&lt;/span&gt;
+            &lt;span class="file-size"&gt;256KB&lt;/span&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 액션 버튼 --&gt;
+    &lt;div class="file-actions"&gt;
+        &lt;button class="btn-icon"&gt;&lt;i class="fas fa-eye"&gt;&lt;/i&gt;&lt;/button&gt;
+        &lt;button class="btn-icon"&gt;&lt;i class="fas fa-download"&gt;&lt;/i&gt;&lt;/button&gt;
+        &lt;button class="btn-icon"&gt;&lt;i class="fas fa-trash"&gt;&lt;/i&gt;&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('파일 타입별 아이콘') %}
+    {% call demo() %}
+    <div class="file-icon-grid">
+        <div class="file-icon-item">
+            <div class="file-icon"><i class="fas fa-file-pdf"></i></div>
+            <span>PDF</span>
+        </div>
+        <div class="file-icon-item">
+            <div class="file-icon"><i class="fas fa-file-word"></i></div>
+            <span>Word</span>
+        </div>
+        <div class="file-icon-item">
+            <div class="file-icon"><i class="fas fa-file-excel"></i></div>
+            <span>Excel</span>
+        </div>
+        <div class="file-icon-item">
+            <div class="file-icon"><i class="fas fa-file-powerpoint"></i></div>
+            <span>PPT</span>
+        </div>
+        <div class="file-icon-item">
+            <div class="file-icon"><i class="fas fa-file-archive"></i></div>
+            <span>ZIP</span>
+        </div>
+        <div class="file-icon-item">
+            <div class="file-icon"><i class="fas fa-file"></i></div>
+            <span>기타</span>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- 파일 타입별 아이콘 --&gt;
+&lt;i class="fas fa-file-pdf"&gt;&lt;/i&gt;        &lt;!-- PDF --&gt;
+&lt;i class="fas fa-file-word"&gt;&lt;/i&gt;       &lt;!-- Word (.doc, .docx) --&gt;
+&lt;i class="fas fa-file-excel"&gt;&lt;/i&gt;      &lt;!-- Excel (.xls, .xlsx) --&gt;
+&lt;i class="fas fa-file-powerpoint"&gt;&lt;/i&gt; &lt;!-- PowerPoint --&gt;
+&lt;i class="fas fa-file-archive"&gt;&lt;/i&gt;    &lt;!-- ZIP --&gt;
+&lt;i class="fas fa-file"&gt;&lt;/i&gt;            &lt;!-- 기타 --&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('빈 상태') %}
+    {% call demo() %}
+    <div class="empty-state-small-demo">
+        <i class="fas fa-folder-open"></i>
+        <p>등록된 첨부파일이 없습니다</p>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="empty-state-small"&gt;
+    &lt;i class="fas fa-folder-open"&gt;&lt;/i&gt;
+    &lt;p&gt;등록된 첨부파일이 없습니다&lt;/p&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('AI 분석 버튼') %}
+    {% call demo() %}
+    <button type="button" class="btn-ai-analyze-demo">
+        <i class="fas fa-wand-magic-sparkles"></i>
+        <span>AI 분석</span>
+    </button>
+    {% endcall %}
+    {% call code() %}
+&lt;button type="button" class="btn-ai-analyze" id="btnAiAnalyze"&gt;
+    &lt;i class="fas fa-wand-magic-sparkles"&gt;&lt;/i&gt;
+    &lt;span&gt;AI 분석&lt;/span&gt;
+&lt;/button&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('사이드바 통합') %}
+    {% call demo() %}
+    <p style="color: var(--color-gray-600); margin-bottom: var(--space-4);">
+        첨부서류 컴포넌트는 <code>_attachment_sidebar.html</code> 템플릿에서 통합 사용됩니다.
+    </p>
+    <div style="background: var(--color-gray-100); padding: var(--space-4); border-radius: var(--radius-md);">
+        <pre style="margin: 0; font-size: var(--text-sm);">{% raw %}{% include 'shared/partials/_attachment_sidebar.html' %}{% endraw %}
+
+&lt;!-- 필요 변수 --&gt;
+attachment_list: 첨부파일 목록
+is_readonly: 읽기 전용 모드 (True면 버튼 숨김)</pre>
+    </div>
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+
+<style>
+.file-upload-area-demo {
+    border: 2px dashed var(--color-gray-300);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    text-align: center;
+    background: var(--color-gray-50);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.file-upload-area-demo:hover {
+    border-color: var(--color-primary-400);
+    background: var(--color-blue-50);
+}
+
+.file-upload-icon {
+    font-size: var(--text-3xl);
+    color: var(--color-gray-400);
+    margin-bottom: var(--space-3);
+}
+
+.file-upload-text {
+    font-size: var(--text-base);
+    color: var(--color-gray-700);
+    margin-bottom: var(--space-1);
+}
+
+.file-upload-hint {
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+}
+
+.file-list-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-width: 400px;
+}
+
+.file-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: var(--color-pure-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.file-card:hover {
+    border-color: var(--color-primary-300);
+    box-shadow: var(--shadow-sm);
+}
+
+.file-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-gray-100);
+    border-radius: var(--radius-md);
+    color: var(--color-gray-500);
+    font-size: var(--text-xl);
+    flex-shrink: 0;
+}
+
+.file-icon.file-thumbnail {
+    background: transparent;
+    overflow: hidden;
+}
+
+.file-icon .thumbnail-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+}
+
+.file-icon .fa-file-pdf { color: var(--color-danger-500); }
+.file-icon .fa-file-word { color: var(--color-blue-500); }
+.file-icon .fa-file-excel { color: var(--color-success-500); }
+.file-icon .fa-file-powerpoint { color: var(--color-warning-500); }
+.file-icon .fa-file-archive { color: var(--color-gray-600); }
+
+.file-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-gray-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-meta {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-1);
+}
+
+.file-category {
+    font-size: var(--text-xs);
+    color: var(--color-primary-600);
+    background: var(--color-primary-50);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+}
+
+.file-size {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+}
+
+.file-actions {
+    display: flex;
+    gap: var(--space-1);
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-gray-500);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-icon:hover {
+    background: var(--color-gray-100);
+    color: var(--color-gray-700);
+}
+
+.file-icon-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--space-4);
+}
+
+.file-icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.file-icon-item span {
+    font-size: var(--text-xs);
+    color: var(--color-gray-600);
+}
+
+.empty-state-small-demo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-6);
+    color: var(--color-gray-400);
+}
+
+.empty-state-small-demo i {
+    font-size: var(--text-3xl);
+}
+
+.empty-state-small-demo p {
+    margin: 0;
+    font-size: var(--text-sm);
+}
+
+.btn-ai-analyze-demo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
+    color: var(--color-pure-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-ai-analyze-demo:hover {
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+    box-shadow: var(--shadow-md);
+}
+</style>
+{% endblock %}
