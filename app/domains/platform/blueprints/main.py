@@ -69,11 +69,12 @@ def data_table_demo():
 @main_bp.route('/examples/styleguide')
 @login_required
 def styleguide():
-    """스타일 가이드 페이지
+    """스타일 가이드 페이지 (리다이렉트)
 
-    프로젝트의 모든 UI 컴포넌트와 디자인 시스템을 문서화합니다.
+    새로운 스타일가이드 모듈로 리다이렉트합니다.
+    기존 URL 호환성 유지를 위해 남겨둡니다.
     """
-    return render_template('examples/styleguide.html')
+    return redirect(url_for('styleguide.index'))
 
 
 @main_bp.route('/search')

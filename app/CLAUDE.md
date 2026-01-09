@@ -6,13 +6,14 @@ Flask 애플리케이션의 핵심 모듈들이 위치한 디렉토리입니다.
 
 ```
 app/
-├── domains/              # 도메인별 패키지 (6개)
+├── domains/              # 도메인별 패키지 (7개)
 │   ├── employee/         # 직원 도메인 (~65개 파일)
 │   ├── contract/         # 계약 도메인
 │   ├── company/          # 법인 도메인
 │   ├── user/             # 사용자 도메인
 │   ├── platform/         # 플랫폼 도메인
-│   └── sync/             # 동기화 도메인
+│   ├── sync/             # 동기화 도메인
+│   └── businesscard/     # 명함 도메인 (2026-01-09 신규)
 ├── shared/               # 공유 자원
 │   ├── base/             # 기반 클래스
 │   ├── constants/        # 상수 (SSOT)
@@ -119,6 +120,25 @@ Blueprint -> Service -> Repository -> Model
 | Service | `sync_basic_service.py` | 기본 동기화 |
 | Service | `sync_relation_service.py` | 관계형 동기화 |
 | Service | `termination_service.py` | 퇴사 처리 |
+
+### businesscard/ (명함 도메인) - 2026-01-09 신규
+| 구분 | 파일 | 역할 |
+|------|------|------|
+| Model | `Attachment` 재사용 | 명함 첨부파일 (category 기반) |
+| Repository | `businesscard_repository.py` | 명함 첨부파일 조회/삭제 |
+| Service | `businesscard_service.py` | 명함 업로드/삭제 비즈니스 로직 |
+| Blueprint | `routes.py` | `/api/businesscard/*` API |
+
+**API 엔드포인트**:
+- `POST /api/businesscard/employee/<id>` - 명함 업로드
+- `DELETE /api/businesscard/employee/<id>/<side>` - 명함 삭제
+- `GET /api/businesscard/employee/<id>` - 명함 조회
+
+**Import 패턴**:
+```python
+from app.domains.businesscard.services import businesscard_service
+from app.domains.businesscard.repositories import businesscard_repository
+```
 
 ## 공유 자원 (shared/)
 

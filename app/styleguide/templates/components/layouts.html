@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block styleguide_content %}
+{% from "partials/_component_demo.html" import section, subsection, code %}
+
+{% call section('layouts', '레이아웃', '페이지 구조를 구성하는 레이아웃 컴포넌트') %}
+
+    {% call subsection('레이아웃 구조') %}
+    <div style="background: var(--color-gray-100); padding: var(--space-4); border-radius: var(--radius-lg);">
+        <div style="background: var(--color-gray-300); padding: var(--space-3); margin-bottom: var(--space-2); text-align: center; border-radius: var(--radius-md);">
+            .app-header (64px)
+        </div>
+        <div style="display: flex; gap: var(--space-2);">
+            <div style="width: 200px; background: var(--color-gray-300); padding: var(--space-4); border-radius: var(--radius-md); text-align: center;">
+                .sidebar (280px)
+            </div>
+            <div style="flex: 1; background: var(--color-gray-200); padding: var(--space-4); border-radius: var(--radius-md); text-align: center;">
+                .main-content
+            </div>
+            <div style="width: 200px; background: var(--color-gray-300); padding: var(--space-4); border-radius: var(--radius-md); text-align: center;">
+                .right-sidebar (320px)
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+
+    {% call subsection('네비게이션 아이템') %}
+    <div style="width: 280px; background: var(--color-pure-white); border: 1px solid var(--color-gray-200); border-radius: var(--radius-lg); padding: var(--space-4);">
+        <div class="nav-section">
+            <h2 class="nav-section-title">섹션 제목</h2>
+            <a href="#" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>일반 아이템</span>
+            </a>
+            <a href="#" class="nav-item active">
+                <i class="fas fa-users"></i>
+                <span>활성 아이템</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>일반 아이템</span>
+            </a>
+        </div>
+    </div>
+    {% call code() %}
+&lt;div class="nav-section"&gt;
+    &lt;h2 class="nav-section-title"&gt;섹션 제목&lt;/h2&gt;
+    &lt;a href="#" class="nav-item"&gt;
+        &lt;i class="fas fa-home"&gt;&lt;/i&gt;
+        &lt;span&gt;메뉴 이름&lt;/span&gt;
+    &lt;/a&gt;
+    &lt;a href="#" class="nav-item active"&gt;...&lt;/a&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('브레이크포인트') %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>디바이스</th>
+                    <th>범위</th>
+                    <th>미디어 쿼리</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>모바일</td>
+                    <td>&lt; 768px</td>
+                    <td><code>@media (max-width: 767px)</code></td>
+                </tr>
+                <tr>
+                    <td>태블릿</td>
+                    <td>768px - 1023px</td>
+                    <td><code>@media (min-width: 768px) and (max-width: 1023px)</code></td>
+                </tr>
+                <tr>
+                    <td>데스크톱</td>
+                    <td>&gt;= 1024px</td>
+                    <td><code>@media (min-width: 1024px)</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endcall %}
+
+    {% call subsection('반응형 동작') %}
+    <ul style="list-style: disc; padding-left: var(--space-6); color: var(--color-gray-700);">
+        <li style="margin-bottom: var(--space-2);"><strong>모바일:</strong> 사이드바 숨김, 단일 컬럼 레이아웃, 터치 친화적 UI</li>
+        <li style="margin-bottom: var(--space-2);"><strong>태블릿:</strong> 접이식 사이드바, 2컬럼 그리드</li>
+        <li><strong>데스크톱:</strong> 전체 레이아웃 표시, 3컬럼 그리드</li>
+    </ul>
+    {% endcall %}
+
+    {% call subsection('그리드 시스템') %}
+    <div style="background: var(--color-gray-100); padding: var(--space-4); border-radius: var(--radius-lg);">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4);">
+            <div style="background: var(--color-primary-100); padding: var(--space-4); border-radius: var(--radius-md); text-align: center;">1/3</div>
+            <div style="background: var(--color-primary-100); padding: var(--space-4); border-radius: var(--radius-md); text-align: center;">1/3</div>
+            <div style="background: var(--color-primary-100); padding: var(--space-4); border-radius: var(--radius-md); text-align: center;">1/3</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); margin-top: var(--space-4);">
+            <div style="background: var(--color-success-100); padding: var(--space-4); border-radius: var(--radius-md); text-align: center;">1/2</div>
+            <div style="background: var(--color-success-100); padding: var(--space-4); border-radius: var(--radius-md); text-align: center;">1/2</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: var(--space-4); margin-top: var(--space-4);">
+            <div style="background: var(--color-warning-100); padding: var(--space-4); border-radius: var(--radius-md); text-align: center;">1/3</div>
+            <div style="background: var(--color-warning-100); padding: var(--space-4); border-radius: var(--radius-md); text-align: center;">2/3</div>
+        </div>
+    </div>
+    {% call code() %}
+/* 3컬럼 그리드 */
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: var(--space-4);
+
+/* 2컬럼 그리드 */
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: var(--space-4);
+
+/* 비대칭 그리드 */
+display: grid;
+grid-template-columns: 1fr 2fr;
+gap: var(--space-4);
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

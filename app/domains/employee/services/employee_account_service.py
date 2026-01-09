@@ -141,13 +141,18 @@ class EmployeeAccountService:
 
             with atomic_transaction():
                 # 3. 최소 Employee 생성 (Phase 30: Repository 사용)
-                employee = self.employee_repo.create({
+                # organization_id가 명시되어 있으면 사용, 아니면 root_organization_id 사용
+                org_id = minimal_employee_data.get('organization_id') or company.root_organization_id
+
+                from app.domains.employee.models import Employee
+                employee_model = Employee.from_dict({
                     'name': minimal_employee_data.get('name', ''),
                     'email': account_data.get('email', ''),
                     'company_id': company_id,  # 법인 소속 설정
-                    'organization_id': company.root_organization_id,  # 조직 트리 연결
+                    'organization_id': org_id,  # 조직 트리 연결
                     'status': EmployeeStatus.PENDING_INFO  # 정보 입력 대기 상태
-                }, commit=False)
+                })
+                employee = self.employee_repo.create_from_model(employee_model, flush=True)
 
                 # 4. User 생성
                 user = self._create_user(

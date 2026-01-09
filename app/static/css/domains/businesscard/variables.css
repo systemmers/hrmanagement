@@ -1,0 +1,90 @@
+/**
+ * BusinessCard CSS Variables
+ * 명함 전용 CSS 변수 - Executive Dark 테마
+ *
+ * 디자인: Design 2 - Executive Dark
+ * - 다크 그라데이션 배경
+ * - 상단 중앙 사진 레이아웃
+ * - 프리미엄 그림자 효과
+ * - 임원/금융/법률 업종 최적화
+ *
+ * Used by:
+ * - css/domains/businesscard/card.css
+ */
+
+:root {
+    /* ========================================
+       크기 (ISO 7810 ID-1 비율 85.6mm x 54mm)
+       ======================================== */
+    --bc-width: 380px;
+    --bc-height: 240px;
+
+    /* Tablet (768px 이하) */
+    --bc-width-tablet: 340px;
+    --bc-height-tablet: 214px;
+
+    /* Mobile (480px 이하) */
+    --bc-width-mobile: 300px;
+    --bc-height-mobile: 189px;
+
+    /* ========================================
+       플립 애니메이션
+       ======================================== */
+    --bc-flip-duration: 0.6s;
+    --bc-flip-timing: cubic-bezier(0.4, 0, 0.2, 1);
+    --bc-perspective: 1200px;
+
+    /* ========================================
+       간격
+       ======================================== */
+    --bc-padding: var(--space-4);
+    --bc-padding-tablet: var(--space-3);
+    --bc-padding-mobile: var(--space-2);
+    --bc-gap: var(--space-2);
+
+    /* ========================================
+       사진/QR 크기 - Executive Dark
+       ======================================== */
+    --bc-photo-size: 72px;
+    --bc-photo-size-tablet: 64px;
+    --bc-photo-size-mobile: 56px;
+
+    --bc-qr-size: 44px;
+    --bc-qr-size-tablet: 40px;
+    --bc-qr-size-mobile: 36px;
+
+    /* ========================================
+       Executive Dark 색상
+       ======================================== */
+    /* 다크 테마 기본 색상 */
+    --bc-dark-900: #1a202c;
+    --bc-dark-800: #2d3748;
+    --bc-dark-700: #4a5568;
+    --bc-dark-600: #718096;
+    --bc-dark-500: #a0aec0;
+    --bc-dark-400: #cbd5e0;
+    --bc-dark-300: #e2e8f0;
+
+    /* 포인트 색상 */
+    --bc-accent: #63b3ed;
+    --bc-accent-light: rgba(99, 179, 237, 0.2);
+
+    /* 테두리 */
+    --bc-border-color: var(--bc-dark-800);
+    --bc-border-hover: var(--bc-dark-700);
+    --bc-border-focus: var(--bc-accent);
+
+    /* 배경 그라데이션 */
+    --bc-bg-front: linear-gradient(135deg, var(--bc-dark-900) 0%, var(--bc-dark-800) 100%);
+    --bc-bg-back: linear-gradient(135deg, var(--bc-dark-800) 0%, var(--bc-dark-900) 100%);
+
+    /* 그림자 */
+    --bc-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --bc-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
+
+    /* 텍스트 색상 */
+    --bc-text-primary: #ffffff;
+    --bc-text-secondary: var(--bc-dark-400);
+    --bc-text-muted: var(--bc-dark-600);
+    --bc-text-accent: var(--bc-accent);
+}

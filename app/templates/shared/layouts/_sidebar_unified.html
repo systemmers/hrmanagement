@@ -183,10 +183,7 @@
         <i class="fas fa-user-plus"></i>
         <span>직원 등록</span>
     </a>
-    <a href="{{ url_for('employees.employee_account_provision') }}" class="nav-item {% if request.endpoint == 'employees.employee_account_provision' %}active{% endif %}">
-        <i class="fas fa-id-card"></i>
-        <span>계정 발급</span>
-    </a>
+    {# 계정 발급은 직원 목록/등록 페이지의 버튼 또는 계정관리 페이지에서 접근 가능 #}
 </div>
 
 <!-- 계약 관리 섹션 (법인) -->
@@ -198,16 +195,7 @@
         <i class="fas fa-file-contract"></i>
         <span>계약 목록</span>
     </a>
-    <a href="{{ url_for('contracts.request_contract') }}"
-       class="nav-item {% if request.endpoint == 'contracts.request_contract' %}active{% endif %}">
-        <i class="fas fa-paper-plane"></i>
-        <span>계약 요청</span>
-    </a>
-    <a href="{{ url_for('contracts.company_pending') }}"
-       class="nav-item {% if request.endpoint == 'contracts.company_pending' %}active{% endif %}">
-        <i class="fas fa-clock"></i>
-        <span>대기 중</span>
-    </a>
+    {# 계약 요청, 대기 중 메뉴는 계약 목록 페이지의 모달/필터로 통합됨 #}
 </div>
 {% endif %}
 

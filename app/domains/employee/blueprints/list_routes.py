@@ -18,6 +18,7 @@ from app.shared.utils.tenant import get_current_organization_id
 from app.domains.employee.services import employee_service
 from app.domains.contract.services.contract_service import contract_service
 from app.domains.user.services.user_service import user_service
+from app.domains.company.services.company_service import company_service
 
 
 def register_list_routes(bp: Blueprint):
@@ -99,9 +100,14 @@ def register_list_routes(bp: Blueprint):
 
         # Phase 31: 카테고리별 분류 옵션 반환 (departments, positions, statuses)
         classification_options = employee_service.get_all_classification_options(company_id)
+
+        # 명함 컴포넌트용 회사 정보 조회
+        company = company_service.get_by_id(company_id) if company_id else None
+
         return render_template('domains/employee/list.html',
                                employees=employees_with_contract,
-                               classification_options=classification_options)
+                               classification_options=classification_options,
+                               company=company)
 
     @bp.route('/employees/pending')
     @manager_or_admin_required

@@ -22,6 +22,7 @@ from app.domains.employee.models import Employee
 
 from .employee_core_service import EmployeeCoreService, employee_core_service
 from .employee_relation_service import EmployeeRelationService, employee_relation_service
+from .employee_account_service import EmployeeAccountService, employee_account_service
 
 
 class EmployeeService:
@@ -415,7 +416,9 @@ __all__ = [
     'EmployeeService',
     'EmployeeCoreService',
     'EmployeeRelationService',
+    'EmployeeAccountService',
     'employee_service',
     'employee_core_service',
     'employee_relation_service',
+    'employee_account_service',
 ]

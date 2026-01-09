@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}{{ meta.title }}{% endblock %}</title>
+
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Core CSS (프로젝트 CSS 변수 및 기본 스타일) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/core/variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/core/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/core/theme.css') }}">
+
+    <!-- Components CSS (컴포넌트 데모용) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/button.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/badge.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/alert.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/forms.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/table.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/modal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/card.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/info-grid.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/sidebar.css') }}">
+
+    <!-- Styleguide 전용 CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleguide/styleguide.css') }}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- 스타일가이드 헤더 -->
+    <header class="styleguide-header" style="height: 64px; background: var(--color-pure-white); border-bottom: 1px solid var(--color-gray-200); display: flex; align-items: center; padding: 0 var(--space-6); position: sticky; top: 0; z-index: 100;">
+        <a href="{{ url_for('styleguide.index') }}" style="display: flex; align-items: center; gap: var(--space-2); text-decoration: none; color: var(--color-gray-900);">
+            <i class="fas fa-palette" style="color: var(--color-primary-500); font-size: var(--text-xl);"></i>
+            <span style="font-weight: 600; font-size: var(--text-lg);">HR Management Styleguide</span>
+        </a>
+        <span style="margin-left: auto; font-size: var(--text-sm); color: var(--color-gray-500);">v{{ meta.version }}</span>
+    </header>
+
+    <!-- 메인 레이아웃 -->
+    <div class="styleguide-container">
+        {% include 'partials/_navigation.html' %}
+
+        <div class="styleguide-content">
+            {% block styleguide_content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- 토스트 알림 컨테이너 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JavaScript -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 스크롤 시 네비게이션 활성화
+        const sections = document.querySelectorAll('.styleguide-section[id]');
+        const navItems = document.querySelectorAll('.styleguide-nav-item');
+
+        window.addEventListener('scroll', function() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === `#${current}`) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

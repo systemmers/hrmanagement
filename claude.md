@@ -28,7 +28,7 @@ alembic revision --autogenerate -m "migration message"
 
 ### Domain Structure (도메인 중심 구조)
 ```
-app/domains/                    # 도메인별 패키지 (Phase 1 마이그레이션 완료)
+app/domains/                    # 도메인별 패키지 (7개 도메인)
 ├── employee/                   # 직원 도메인 (~65개 파일)
 │   ├── __init__.py             # Repository 초기화 + 외부 인터페이스
 │   ├── models/                 # Employee, Education, Career 등 20개 모델
@@ -55,10 +55,15 @@ app/domains/                    # 도메인별 패키지 (Phase 1 마이그레�
 │   ├── repositories/           # SystemSettingRepository
 │   ├── services/               # platform_service, system_setting_service
 │   └── blueprints/             # platform_bp
-└── sync/                       # 동기화 도메인 (Phase 6 완료)
-    ├── models/                 # SyncLog
-    ├── services/               # sync_service (Facade), sync_basic, sync_relation
-    └── blueprints/             # sync_bp
+├── sync/                       # 동기화 도메인 (Phase 6 완료)
+│   ├── models/                 # SyncLog
+│   ├── services/               # sync_service (Facade), sync_basic, sync_relation
+│   └── blueprints/             # sync_bp
+└── businesscard/               # 명함 도메인 (2026-01-09 신규)
+    ├── models/                 # Attachment 재사용 (category 기반)
+    ├── repositories/           # businesscard_repository
+    ├── services/               # businesscard_service
+    └── blueprints/             # businesscard_bp (/api/businesscard/*)
 ```
 
 **도메인 Import 패턴:**
@@ -70,6 +75,7 @@ from app.domains.company.models import Company, Organization
 from app.domains.contract.services import contract_service
 from app.domains.user.models import User
 from app.domains.platform.services import platform_service
+from app.domains.businesscard.services import businesscard_service  # 신규
 
 # 공유 자원 import
 from app.shared.repositories import BaseRepository

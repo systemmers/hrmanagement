@@ -1,0 +1,97 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('badges', '배지/태그', '상태 표시 및 라벨링 컴포넌트') %}
+
+    {% call subsection('기본 배지') %}
+    {% call demo() %}
+        <span class="badge badge-primary">Primary</span>
+        <span class="badge badge-secondary">Secondary</span>
+        <span class="badge badge-success">Success</span>
+        <span class="badge badge-warning">Warning</span>
+        <span class="badge badge-error">Error</span>
+        <span class="badge badge-info">Info</span>
+    {% endcall %}
+    {% call code() %}
+&lt;span class="badge badge-success"&gt;Success&lt;/span&gt;
+&lt;span class="badge badge-warning"&gt;Warning&lt;/span&gt;
+&lt;span class="badge badge-error"&gt;Error&lt;/span&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('상태 배지') %}
+    {% call demo() %}
+        <span class="status-badge active">재직</span>
+        <span class="status-badge pending">휴직</span>
+        <span class="status-badge inactive">퇴직</span>
+        <span class="status-badge expired">만료</span>
+    {% endcall %}
+    {% call code() %}
+&lt;span class="status-badge active"&gt;재직&lt;/span&gt;
+&lt;span class="status-badge pending"&gt;휴직&lt;/span&gt;
+&lt;span class="status-badge inactive"&gt;퇴직&lt;/span&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('카운트 배지') %}
+    {% call demo() %}
+        <span class="count-badge">5</span>
+        <span class="count-badge">12</span>
+        <span class="count-badge">99+</span>
+    {% endcall %}
+    {% call code() %}
+&lt;span class="count-badge"&gt;5&lt;/span&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('태그') %}
+    {% call demo() %}
+        <span class="tag">기본 태그</span>
+        <span class="tag tag-removable">제거 가능<button class="tag-remove">&times;</button></span>
+    {% endcall %}
+    {% call code() %}
+&lt;span class="tag"&gt;기본 태그&lt;/span&gt;
+&lt;span class="tag tag-removable"&gt;제거 가능&lt;button class="tag-remove"&gt;&times;&lt;/button&gt;&lt;/span&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('사용 가이드') %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>컴포넌트</th>
+                    <th>용도</th>
+                    <th>예시</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>.badge</code></td>
+                    <td>일반 라벨링, 카테고리</td>
+                    <td>버전, 타입, 카테고리</td>
+                </tr>
+                <tr>
+                    <td><code>.status-badge</code></td>
+                    <td>상태 표시</td>
+                    <td>재직/퇴직, 승인/대기</td>
+                </tr>
+                <tr>
+                    <td><code>.count-badge</code></td>
+                    <td>숫자 카운트</td>
+                    <td>알림 수, 메시지 수</td>
+                </tr>
+                <tr>
+                    <td><code>.tag</code></td>
+                    <td>선택 가능한 항목</td>
+                    <td>필터, 검색 조건</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

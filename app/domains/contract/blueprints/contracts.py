@@ -338,6 +338,61 @@ def api_company_stats():
     return api_success(stats)
 
 
+@contracts_bp.route('/api/eligible-targets')
+@login_required
+@corporate_account_required
+def api_eligible_targets():
+    """계약 요청 가능한 대상 목록 API
+
+    계약 요청 모달에서 사용하는 대상 목록을 반환합니다.
+    - employee_accounts: 직원 계정 (employee_sub)
+    - personal_accounts: 개인 계정 (personal)
+    """
+    company_id = session.get(SessionKeys.COMPANY_ID)
+    if not company_id:
+        return api_error('법인 정보가 없습니다.')
+
+    targets = contract_service.get_contract_eligible_targets(company_id)
+    return api_success(targets)
+
+
+@contracts_bp.route('/api/create', methods=['POST'])
+@login_required
+@corporate_account_required
+def api_create_contract():
+    """계약 요청 생성 API
+
+    계약 요청 모달에서 사용하는 JSON API입니다.
+    """
+    company_id = session.get(SessionKeys.COMPANY_ID)
+    if not company_id:
+        return api_error('법인 정보가 없습니다.')
+
+    data = request.get_json() or {}
+    target_user_id = data.get('target_user_id')
+
+    if not target_user_id:
+        return api_error('계약 대상을 선택해주세요.')
+
+    result = contract_service.create_employee_contract_request(
+        company_id=company_id,
+        target_user_id=target_user_id,
+        contract_type=data.get('contract_type', 'employment'),
+        department=data.get('department'),
+        position=data.get('position'),
+        notes=data.get('notes'),
+        contract_start_date=data.get('contract_start_date'),
+        contract_end_date=data.get('contract_end_date')
+    )
+
+    if result.success:
+        return api_success({
+            'message': '계약 요청이 전송되었습니다.',
+            'contract_id': result.data.get('contract_id') if result.data else None
+        })
+    return api_error(result.message)
+
+
 @contracts_bp.route('/api/stats/personal')
 @login_required
 @personal_or_employee_account_required

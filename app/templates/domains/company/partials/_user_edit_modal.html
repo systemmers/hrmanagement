@@ -1,0 +1,112 @@
+{#
+    사용자 정보 수정 모달
+    - 역할 변경
+    - 이메일 변경
+    - 비밀번호 초기화
+#}
+
+<div class="modal" id="userEditModal" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-container modal-md">
+        <div class="modal-header">
+            <h2 class="modal-title">사용자 정보 수정</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="닫기">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <form id="userEditForm" class="modal-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="user_id" id="editUserId">
+
+            <div class="modal-body">
+                <!-- 기본 정보 (읽기전용) -->
+                <div class="form-section-title">
+                    <i class="fas fa-user"></i>
+                    기본 정보
+                </div>
+
+                <div class="form-row two-col">
+                    <div class="form-group">
+                        <label class="form-label">사용자명</label>
+                        <input type="text" id="editUsername" class="form-input" readonly disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">이름</label>
+                        <input type="text" id="editName" class="form-input" readonly disabled>
+                    </div>
+                </div>
+
+                <div class="form-row two-col">
+                    <div class="form-group">
+                        <label class="form-label">계정 상태</label>
+                        <input type="text" id="editStatus" class="form-input" readonly disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">계약 상태</label>
+                        <input type="text" id="editContractStatus" class="form-input" readonly disabled>
+                    </div>
+                </div>
+
+                <!-- 수정 가능 정보 -->
+                <div class="form-section-title mt-4">
+                    <i class="fas fa-edit"></i>
+                    수정 정보
+                </div>
+
+                <div class="form-row two-col">
+                    <div class="form-group">
+                        <label for="editEmail" class="form-label required">이메일</label>
+                        <input type="email" id="editEmail" name="email" class="form-input"
+                               placeholder="user@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editRole" class="form-label required">권한</label>
+                        <select id="editRole" name="role" class="form-select" required>
+                            <option value="employee">일반 직원</option>
+                            <option value="manager">매니저</option>
+                            <option value="admin">관리자</option>
+                        </select>
+                        <small class="form-help" id="roleHelpText"></small>
+                    </div>
+                </div>
+
+                <!-- 비밀번호 초기화 -->
+                <div class="form-section-title mt-4">
+                    <i class="fas fa-key"></i>
+                    비밀번호
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="resetPassword" name="reset_password" value="1">
+                            <span class="checkbox-text">비밀번호 초기화</span>
+                        </label>
+                        <small class="form-help">체크 시 임시 비밀번호가 생성됩니다.</small>
+                    </div>
+                </div>
+
+                <div class="form-group" id="newPasswordGroup" style="display: none;">
+                    <label for="editNewPassword" class="form-label">새 비밀번호</label>
+                    <div class="input-with-icon">
+                        <input type="text" id="editNewPassword" name="new_password" class="form-input"
+                               placeholder="미입력 시 자동 생성">
+                        <button type="button" class="btn-icon-inside" id="generateEditPasswordBtn" title="비밀번호 자동 생성">
+                            <i class="fas fa-random"></i>
+                        </button>
+                    </div>
+                    <small class="form-help">미입력 시 안전한 비밀번호가 자동 생성됩니다.</small>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-modal-close>취소</button>
+                <button type="submit" class="btn btn-primary" id="submitEditBtn">
+                    <i class="fas fa-save"></i>
+                    저장
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

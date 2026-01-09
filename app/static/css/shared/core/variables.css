@@ -225,6 +225,26 @@
     --color-accent-opacity-40: rgba(102, 126, 234, 0.4);
     --color-accent-opacity-50: rgba(102, 126, 234, 0.5);
 
+    /* ========================================
+       Semantic Colors - Styleguide 동기화 (SSOT)
+       ======================================== */
+
+    /* Success Semantic (styleguide: #166534, bg: #dcfce7) */
+    --color-semantic-success: #166534;
+    --color-semantic-success-bg: #dcfce7;
+
+    /* Error Semantic (styleguide: #991b1b, bg: #fee2e2) */
+    --color-semantic-error: #991b1b;
+    --color-semantic-error-bg: #fee2e2;
+
+    /* Warning Semantic (styleguide: #92400e, bg: #fef3c7) */
+    --color-semantic-warning: #92400e;
+    --color-semantic-warning-bg: #fef3c7;
+
+    /* Info Semantic (styleguide: #1e40af, bg: #dbeafe) */
+    --color-semantic-info: #1e40af;
+    --color-semantic-info-bg: #dbeafe;
+
     /* Semantic Colors - 의미별 색상 */
     --color-link: var(--color-blue-600);
     --color-link-hover: var(--color-blue-700);

@@ -1,12 +1,16 @@
 /**
  * Employee List Page JavaScript
- * - 뷰 토글 (목록형/카드형)
+ * - 뷰 토글 (목록형/카드형/명함형)
  * - 정렬
  * - 계약 요청 (21번 원칙)
  *
  * 필터링: FilterBar (filter-bar.js) + URL 모드로 처리
- * Last Updated: 2026-01-06 (Phase 31 필터 통합)
+ * 명함형 뷰: BusinessCard 도메인 모듈 사용
+ * Last Updated: 2026-01-09 (BusinessCard 도메인 통합)
  */
+
+// BusinessCard 도메인 모듈 import
+import { initBusinessCardView, businessCard } from '../../businesscard/index.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initViewToggle();
@@ -17,25 +21,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /**
  * 뷰 토글 초기화 (목록형/카드형)
+ * - URL 파라미터 우선, localStorage 백업
  */
 function initViewToggle() {
     const toggleButtons = document.querySelectorAll('.view-toggle-btn');
 
+    // URL 파라미터에서 뷰모드 확인 (우선순위 1)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlView = urlParams.get('view');
+
+    // localStorage에서 저장된 선호도 확인 (우선순위 2)
+    const savedView = urlView || localStorage.getItem('employeeViewPreference') || 'list';
+
+    // 초기 뷰 설정
+    toggleEmployeeView(savedView, false);
+
     toggleButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             const view = btn.dataset.view;
-            toggleEmployeeView(view);
+            toggleEmployeeView(view, true);
         });
     });
 }
 
 /**
  * 뷰 전환 처리
- * @param {string} view - 'list' 또는 'card'
+ * @param {string} view - 'list', 'card', 또는 'namecard'
+ * @param {boolean} updateUrl - URL 파라미터 업데이트 여부 (기본: true)
  */
-function toggleEmployeeView(view) {
+function toggleEmployeeView(view, updateUrl = true) {
     const listView = document.getElementById('list-view');
     const cardView = document.getElementById('card-view');
+    const namecardView = document.getElementById('namecard-view');
     const buttons = document.querySelectorAll('.view-toggle-btn');
 
     if (!listView || !cardView) return;
@@ -44,16 +61,50 @@ function toggleEmployeeView(view) {
         btn.classList.toggle('active', btn.dataset.view === view);
     });
 
+    // 모든 뷰 숨기기
+    listView.classList.add('d-none');
+    cardView.classList.add('d-none');
+    if (namecardView) namecardView.classList.add('d-none');
+
+    // 선택된 뷰만 표시
     if (view === 'list') {
         listView.classList.remove('d-none');
-        cardView.classList.add('d-none');
-    } else {
-        listView.classList.add('d-none');
+    } else if (view === 'card') {
         cardView.classList.remove('d-none');
+    } else if (view === 'namecard' && namecardView) {
+        namecardView.classList.remove('d-none');
+        // BusinessCard 도메인 모듈로 초기화 (최초 1회)
+        initBusinessCards();
     }
 
     // 사용자 선호 저장
     localStorage.setItem('employeeViewPreference', view);
+
+    // URL 파라미터 업데이트 (리로드 없이)
+    if (updateUrl) {
+        const url = new URL(window.location);
+        url.searchParams.set('view', view);
+        window.history.replaceState({}, '', url);
+    }
+}
+
+/**
+ * 명함형 뷰 초기화 (BusinessCard 도메인 모듈 사용)
+ * - 명함 카드 컴포넌트 및 QR 코드 초기화
+ */
+let businessCardsInitialized = false;
+
+function initBusinessCards() {
+    // 이미 초기화된 경우 스킵
+    if (businessCardsInitialized) return;
+
+    // BusinessCard 도메인 모듈로 초기화
+    const namecardView = document.getElementById('namecard-view');
+    if (namecardView) {
+        initBusinessCardView(namecardView);
+    }
+
+    businessCardsInitialized = true;
 }
 
 /**
@@ -68,6 +119,7 @@ function initSorting() {
 
 /**
  * 정렬 적용
+ * - 현재 뷰모드(view) 파라미터 유지
  */
 function applySorting() {
     const sortSelect = document.getElementById('sortSelect');
@@ -75,6 +127,12 @@ function applySorting() {
 
     const value = sortSelect.value;
     const url = new URL(window.location.href);
+
+    // 현재 뷰모드 유지 (URL 또는 localStorage에서)
+    const currentView = url.searchParams.get('view') || localStorage.getItem('employeeViewPreference');
+    if (currentView) {
+        url.searchParams.set('view', currentView);
+    }
 
     if (!value) {
         url.searchParams.delete('sort');

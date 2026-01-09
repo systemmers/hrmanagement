@@ -20,6 +20,7 @@ from app.shared.utils.corporate_helpers import (
     create_company_entities
 )
 from app.domains.company.services.company_service import company_service
+from app.domains.company.services.organization_service import organization_service
 from app.domains.user.services.user_service import user_service
 
 corporate_bp = Blueprint('corporate', __name__, url_prefix='/corporate')
@@ -138,11 +139,19 @@ def users():
     # 계약 상태 및 직원 이름 추가를 Service에서 처리
     users = user_service.get_users_with_contract_and_employee_details(users, company_id)
 
+    # 조직 목록 조회 (계정 발급 모달용)
+    organizations = []
+    if company.root_organization_id:
+        organizations = organization_service.get_flat_list(
+            root_organization_id=company.root_organization_id
+        )
+
     return render_template(
         'domains/company/users.html',
         company=company,
         users=users,
-        pagination=pagination
+        pagination=pagination,
+        organizations=organizations
     )
 
 
@@ -183,3 +192,128 @@ def get_company(company_id):
         return api_not_found('법인 정보')
 
     return api_success(company)
+
+
+@corporate_bp.route('/api/users/<int:user_id>/status', methods=['POST'])
+@corporate_admin_required
+def change_user_status(user_id):
+    """계정 상태 변경 API
+
+    계정관리에서 사용자 상태를 변경합니다.
+    - active: 계정 활성화
+    - dormant: 계정 휴면 처리
+    - withdrawn: 계정 탈퇴 처리
+
+    자기 자신의 상태는 변경할 수 없습니다.
+    """
+    # 자기 자신의 상태 변경 방지
+    current_user_id = session.get(SessionKeys.USER_ID)
+    if user_id == current_user_id:
+        return api_error('자신의 계정 상태는 변경할 수 없습니다.')
+
+    # 법인 계정 확인 (같은 법인의 계정만 변경 가능)
+    company_id = session.get(SessionKeys.COMPANY_ID)
+    target_user = user_service.get_model_by_id(user_id)
+
+    if not target_user:
+        return api_not_found('사용자')
+
+    if target_user.company_id != company_id:
+        return api_forbidden('다른 법인의 계정 상태는 변경할 수 없습니다.')
+
+    # 상태 변경
+    data = request.get_json() or {}
+    new_status = data.get('status')
+
+    if not new_status:
+        return api_error('상태를 입력해주세요.')
+
+    if new_status not in ['active', 'dormant', 'withdrawn']:
+        return api_error('유효하지 않은 상태입니다.')
+
+    result = user_service.change_status(user_id, new_status)
+
+    if result['success']:
+        return api_success({'message': result['message']})
+    else:
+        return api_error(result['message'])
+
+
+@corporate_bp.route('/api/users/<int:user_id>', methods=['GET'])
+@corporate_admin_required
+def get_user_detail(user_id):
+    """사용자 상세 정보 조회 API
+
+    사용자 수정 모달에서 사용됩니다.
+    계약 상태, 직원 정보 등을 함께 반환합니다.
+    """
+    company_id = session.get(SessionKeys.COMPANY_ID)
+    target_user = user_service.get_model_by_id(user_id)
+
+    if not target_user:
+        return api_not_found('사용자')
+
+    if target_user.company_id != company_id:
+        return api_forbidden('다른 법인의 계정 정보를 조회할 수 없습니다.')
+
+    # 기본 사용자 정보
+    user_data = target_user.to_dict()
+
+    # 직원 정보 추가 (이름, 전화번호)
+    if target_user.employee:
+        user_data['name'] = target_user.employee.name or '-'
+        user_data['phone'] = target_user.employee.phone or target_user.employee.mobile_phone or '-'
+    else:
+        user_data['name'] = '-'
+        user_data['phone'] = '-'
+
+    # 계약 상태 추가
+    from app.domains.user.services.user_employee_link_service import user_employee_link_service
+    contract_map = user_employee_link_service.get_users_with_contract_status_bulk(
+        [user_id], company_id
+    )
+    contract_info = contract_map.get(user_id, {})
+    user_data['contract_status'] = contract_info.get('status', 'none')
+
+    return api_success(user_data)
+
+
+@corporate_bp.route('/api/users/<int:user_id>', methods=['PUT'])
+@corporate_admin_required
+def update_user(user_id):
+    """사용자 정보 수정 API
+
+    수정 가능한 필드:
+    - email: 이메일 주소
+    - role: 권한 (admin, manager, employee)
+    - reset_password: 비밀번호 초기화 여부
+    - new_password: 새 비밀번호 (reset_password=True일 때)
+    """
+    # 자기 자신의 정보는 마이페이지에서 수정
+    current_user_id = session.get(SessionKeys.USER_ID)
+    if user_id == current_user_id:
+        return api_error('자신의 계정 정보는 마이페이지에서 수정해주세요.')
+
+    # 법인 계정 확인
+    company_id = session.get(SessionKeys.COMPANY_ID)
+    target_user = user_service.get_model_by_id(user_id)
+
+    if not target_user:
+        return api_not_found('사용자')
+
+    if target_user.company_id != company_id:
+        return api_forbidden('다른 법인의 계정 정보를 수정할 수 없습니다.')
+
+    # 요청 데이터 파싱
+    data = request.get_json() or {}
+
+    # 수정 처리
+    result = user_service.update_user_by_admin(user_id, data)
+
+    if result['success']:
+        return api_success({
+            'message': result['message'],
+            'new_password': result.get('new_password')  # 비밀번호 초기화 시 반환
+        })
+    else:
+        return api_error(result['message'])

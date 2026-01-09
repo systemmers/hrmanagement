@@ -6,6 +6,9 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/filter.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/modal.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/tabs.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/contract/request-modal.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -13,14 +16,16 @@
     <div class="page-title-row">
         <h1 class="page-title">기업 계약 관리</h1>
         <div class="page-actions">
-            <a href="{{ url_for('contracts.company_pending') }}" class="btn btn-secondary">
+            {% if stats.pending > 0 %}
+            <button type="button" class="btn btn-secondary" id="filterPendingBtn">
                 <i class="fas fa-clock"></i>
-                <span>대기 중 ({{ stats.pending or 0 }})</span>
-            </a>
-            <a href="{{ url_for('contracts.request_contract') }}" class="btn btn-primary">
+                <span>대기 중 ({{ stats.pending }})</span>
+            </button>
+            {% endif %}
+            <button type="button" class="btn btn-primary" id="openContractRequestModal">
                 <i class="fas fa-plus"></i>
                 <span>계약 요청</span>
-            </a>
+            </button>
         </div>
     </div>
     <p class="page-description">개인 회원과의 계약 관계를 관리합니다.</p>
@@ -74,9 +79,13 @@
     </table>
 </div>
 
+<!-- 계약 요청 모달 -->
+{% include 'domains/contract/partials/_contract_request_modal.html' %}
+
 <!-- CSS: components/stats-cards.css, contract.css, badge.css, info-grid.css, empty-state.css -->
-<!-- JS: filter-bar.js (SSOT), contract-service.js, contracts.js -->
+<!-- JS: filter-bar.js (SSOT), contract-service.js, contracts.js, request-modal.js -->
 <script type="module" src="{{ url_for('static', filename='js/shared/components/filter-bar.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/domains/contract/services/contract-service.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/domains/contract/pages/list.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/domains/contract/pages/request-modal.js') }}"></script>
 {% endblock %}

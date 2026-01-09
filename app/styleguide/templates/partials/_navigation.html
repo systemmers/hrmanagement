@@ -1,0 +1,25 @@
+<nav class="styleguide-nav">
+    <div class="styleguide-nav-header">
+        <a href="{{ url_for('styleguide.index') }}" class="styleguide-nav-logo">
+            <i class="fas fa-palette"></i>
+            <span>Styleguide</span>
+        </a>
+    </div>
+
+    {% for section_key, section in navigation.items() %}
+    <div class="styleguide-nav-section">
+        <div class="styleguide-nav-title">{{ section.label }}</div>
+        {% for item in section.items %}
+        <a href="{{ url_for('styleguide.' ~ ('foundation' if section_key == 'foundation' else 'component'), **{('page' if section_key == 'foundation' else 'component'): item.id}) }}"
+           class="styleguide-nav-item {{ 'active' if active == (section_key ~ '-' ~ item.id) or active == ('foundation-' ~ item.id) or active == ('component-' ~ item.id) else '' }}">
+            <i class="fas {{ item.icon }}"></i>
+            <span>{{ item.label }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+    <div class="styleguide-nav-footer">
+        <div class="styleguide-version">v{{ meta.version }}</div>
+    </div>
+</nav>

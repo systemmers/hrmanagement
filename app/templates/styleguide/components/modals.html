@@ -1,0 +1,136 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, code %}
+
+{% call section('modals', '모달', '오버레이 대화상자 컴포넌트') %}
+
+    {% call subsection('모달 구조') %}
+    <div style="background: var(--color-gray-100); padding: var(--space-6); border-radius: var(--radius-lg);">
+        <div class="modal-content" style="position: relative; max-width: 100%;">
+            <div class="modal-header">
+                <h3 class="modal-title">모달 제목</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>모달 본문 내용입니다. 여기에 폼이나 정보를 표시할 수 있습니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary">취소</button>
+                <button class="btn btn-primary">확인</button>
+            </div>
+        </div>
+    </div>
+    {% call code() %}
+&lt;div class="modal"&gt;
+    &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+            &lt;h3 class="modal-title"&gt;모달 제목&lt;/h3&gt;
+            &lt;button class="modal-close"&gt;&times;&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;...&lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+            &lt;button class="btn btn-secondary"&gt;취소&lt;/button&gt;
+            &lt;button class="btn btn-primary"&gt;확인&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('모달 크기') %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>크기</th>
+                    <th>클래스</th>
+                    <th>너비</th>
+                    <th>용도</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Small</td>
+                    <td><code>.modal-sm</code></td>
+                    <td>400px</td>
+                    <td>확인/취소 다이얼로그</td>
+                </tr>
+                <tr>
+                    <td>Default</td>
+                    <td>-</td>
+                    <td>600px</td>
+                    <td>일반 폼, 정보 표시</td>
+                </tr>
+                <tr>
+                    <td>Large</td>
+                    <td><code>.modal-lg</code></td>
+                    <td>800px</td>
+                    <td>복잡한 폼, 테이블</td>
+                </tr>
+                <tr>
+                    <td>Full</td>
+                    <td><code>.modal-full</code></td>
+                    <td>90%</td>
+                    <td>전체 화면 콘텐츠</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endcall %}
+
+    {% call subsection('모달 데모') %}
+    <button class="btn btn-primary" onclick="document.getElementById('demoModal').style.display='flex'">
+        모달 열기
+    </button>
+    {% call code() %}
+// JavaScript로 모달 열기
+document.getElementById('demoModal').style.display = 'flex';
+
+// 모달 닫기
+document.getElementById('demoModal').style.display = 'none';
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('확인 모달') %}
+    <div style="background: var(--color-gray-100); padding: var(--space-6); border-radius: var(--radius-lg);">
+        <div class="modal-content modal-sm" style="position: relative; max-width: 100%;">
+            <div class="modal-header">
+                <h3 class="modal-title">삭제 확인</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>정말 삭제하시겠습니까?</p>
+                <p style="color: var(--color-gray-500); font-size: var(--text-sm);">이 작업은 되돌릴 수 없습니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary">취소</button>
+                <button class="btn btn-danger">삭제</button>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+
+{% endcall %}
+
+<!-- 데모 모달 -->
+<div id="demoModal" class="modal" style="display: none;" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">데모 모달</h3>
+            <button class="modal-close" onclick="document.getElementById('demoModal').style.display='none'">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>이것은 데모 모달입니다. 실제 애플리케이션에서는 다양한 내용을 표시할 수 있습니다.</p>
+            <div class="form-group" style="margin-top: var(--space-4);">
+                <label class="form-label">샘플 입력</label>
+                <input type="text" class="form-input" placeholder="텍스트를 입력하세요">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="document.getElementById('demoModal').style.display='none'">취소</button>
+            <button class="btn btn-primary" onclick="document.getElementById('demoModal').style.display='none'">확인</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

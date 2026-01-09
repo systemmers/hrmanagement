@@ -276,6 +276,7 @@ if (typeof window !== 'undefined') {
                 case 'reject-contract':
                     await rejectContract(contractId);
                     break;
+                case 'cancel-contract':
                 case 'cancel-contract-request':
                     await cancelContractRequest(contractId);
                     break;

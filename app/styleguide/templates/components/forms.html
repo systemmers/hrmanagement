@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block styleguide_content %}
+{% from "partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('forms', '폼 요소', '입력 필드, 선택 박스, 체크박스 등 폼 컴포넌트') %}
+
+    {% call subsection('입력 필드') %}
+    {% call demo() %}
+        <div style="display: flex; flex-direction: column; gap: var(--space-4); width: 100%;">
+            <div class="form-group">
+                <label class="form-label">이름 <span class="required">*</span></label>
+                <input type="text" class="form-input" placeholder="이름을 입력하세요">
+            </div>
+            <div class="form-group">
+                <label class="form-label">이메일</label>
+                <input type="email" class="form-input" placeholder="example@company.com">
+            </div>
+        </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="form-group"&gt;
+    &lt;label class="form-label"&gt;이름 &lt;span class="required"&gt;*&lt;/span&gt;&lt;/label&gt;
+    &lt;input type="text" class="form-input" placeholder="이름을 입력하세요"&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('폼 레이아웃 (2열)') %}
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">성</label>
+            <input type="text" class="form-input" placeholder="성">
+        </div>
+        <div class="form-group">
+            <label class="form-label">이름</label>
+            <input type="text" class="form-input" placeholder="이름">
+        </div>
+    </div>
+    {% call code() %}
+&lt;div class="form-row"&gt;
+    &lt;div class="form-group"&gt;...&lt;/div&gt;
+    &lt;div class="form-group"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('선택 박스') %}
+    {% call demo() %}
+        <div class="form-group" style="width: 200px;">
+            <label class="form-label">부서</label>
+            <select class="form-input">
+                <option value="">선택하세요</option>
+                <option value="dev">개발팀</option>
+                <option value="design">디자인팀</option>
+                <option value="hr">인사팀</option>
+            </select>
+        </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="form-group"&gt;
+    &lt;label class="form-label"&gt;부서&lt;/label&gt;
+    &lt;select class="form-input"&gt;
+        &lt;option value=""&gt;선택하세요&lt;/option&gt;
+        &lt;option value="dev"&gt;개발팀&lt;/option&gt;
+    &lt;/select&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('텍스트 영역') %}
+    {% call demo() %}
+        <div class="form-group" style="width: 100%;">
+            <label class="form-label">비고</label>
+            <textarea class="form-input" rows="3" placeholder="내용을 입력하세요"></textarea>
+        </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="form-group"&gt;
+    &lt;label class="form-label"&gt;비고&lt;/label&gt;
+    &lt;textarea class="form-input" rows="3"&gt;&lt;/textarea&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('폼 액션') %}
+    <div class="form-actions" style="border-top: none; padding-top: 0; margin-top: 0;">
+        <button class="btn btn-secondary">취소</button>
+        <button class="btn btn-primary">저장</button>
+    </div>
+    {% call code() %}
+&lt;div class="form-actions"&gt;
+    &lt;button class="btn btn-secondary"&gt;취소&lt;/button&gt;
+    &lt;button class="btn btn-primary"&gt;저장&lt;/button&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

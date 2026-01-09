@@ -4,7 +4,6 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: var(--color-black-opacity-50);
             display: none;
             align-items: center;
             justify-content: center;
@@ -15,6 +14,48 @@
             display: flex;
         }
 
+        /* Modal Backdrop - 반투명 배경 오버레이 */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1;
+        }
+
+        /* Modal Container - 모달 컨테이너 (backdrop 사용 시) */
+        .modal-container {
+            position: relative;
+            background-color: var(--color-pure-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            width: 95%;
+            z-index: 2;
+        }
+
+        .modal-container.modal-sm {
+            max-width: 400px;
+        }
+
+        .modal-container.modal-md {
+            max-width: 640px;
+        }
+
+        .modal-container.modal-lg {
+            max-width: 800px;
+        }
+
+        .modal-container.modal-xl {
+            max-width: 1000px;
+        }
+
+        /* Modal Content - 레거시 지원 (backdrop 없이 직접 배경 사용) */
         .modal-content {
             background-color: var(--color-pure-white);
             border-radius: var(--radius-lg);

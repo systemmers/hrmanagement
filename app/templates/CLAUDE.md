@@ -6,7 +6,7 @@ Jinja2 템플릿 파일 - 도메인 중심 아키텍처
 
 ```
 templates/
-├── domains/                    # 도메인별 템플릿 (5개 도메인)
+├── domains/                    # 도메인별 템플릿 (6개 도메인)
 │   ├── company/                # 법인 도메인
 │   │   ├── corporate/          # 법인 관리 페이지
 │   │   ├── organization/       # 조직 관리
@@ -21,12 +21,15 @@ templates/
 │   ├── platform/               # 플랫폼 도메인
 │   │   ├── admin/              # 관리자 페이지
 │   │   └── ai/                 # AI 테스트
-│   └── user/                   # 사용자 도메인
-│       ├── auth/               # 인증 (로그인, 회원가입)
-│       ├── dashboard/          # 대시보드
-│       ├── mypage/             # 마이페이지
-│       ├── personal/           # 개인 프로필
-│       └── profile/            # 프로필 관리
+│   ├── user/                   # 사용자 도메인
+│   │   ├── auth/               # 인증 (로그인, 회원가입)
+│   │   ├── dashboard/          # 대시보드
+│   │   ├── mypage/             # 마이페이지
+│   │   ├── personal/           # 개인 프로필
+│   │   └── profile/            # 프로필 관리
+│   └── businesscard/           # 명함 도메인 (2026-01-09 신규)
+│       └── partials/
+│           └── _card.html      # 명함 카드 컴포넌트
 ├── errors/                     # 에러 페이지 (400, 403, 404, 500)
 ├── examples/                   # 예제 페이지
 ├── shared/                     # 공유 템플릿
@@ -50,6 +53,7 @@ templates/
 | employee | `domains/employee/` | 직원 목록, 상세, 등록/수정 |
 | platform | `domains/platform/` | 관리자 페이지, AI 테스트 |
 | user | `domains/user/` | 인증, 대시보드, 마이페이지, 프로필 |
+| businesscard | `domains/businesscard/` | 명함 카드 컴포넌트 (partials) |
 
 ## 공유 자원 (shared/)
 

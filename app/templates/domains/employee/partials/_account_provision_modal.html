@@ -1,0 +1,172 @@
+{#
+    계정 발급 모달 (2-Step)
+    Step 1: 계정 정보 입력
+    Step 2: 확인 및 제출
+#}
+
+<div class="modal" id="accountProvisionModal" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-container modal-md">
+        <div class="modal-header">
+            <h2 class="modal-title">직원 계정 발급</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="닫기">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- 스텝 인디케이터 -->
+        <div class="modal-steps">
+            <div class="step active" data-step="1">
+                <span class="step-number">1</span>
+                <span class="step-label">정보 입력</span>
+            </div>
+            <div class="step" data-step="2">
+                <span class="step-number">2</span>
+                <span class="step-label">확인</span>
+            </div>
+        </div>
+
+        <form id="accountProvisionForm" class="modal-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <!-- Step 1: 정보 입력 -->
+            <div class="modal-step-content active" data-step-content="1">
+                <div class="modal-body">
+                    <!-- 직원 기본 정보 -->
+                    <div class="form-section-title">
+                        <i class="fas fa-user"></i>
+                        직원 기본 정보
+                    </div>
+
+                    <div class="form-row two-col">
+                        <div class="form-group">
+                            <label for="modalName" class="form-label required">이름</label>
+                            <input type="text" id="modalName" name="name" class="form-input"
+                                   placeholder="직원 이름" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="modalOrganizationId" class="form-label">소속 조직</label>
+                            <select id="modalOrganizationId" name="organization_id" class="form-select">
+                                <option value="">미지정 (직원이 입력)</option>
+                                {% for org in organizations %}
+                                <option value="{{ org.id }}">{{ org.path or org.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 계정 정보 -->
+                    <div class="form-section-title mt-4">
+                        <i class="fas fa-id-card"></i>
+                        계정 정보
+                    </div>
+
+                    <div class="form-row two-col">
+                        <div class="form-group">
+                            <label for="modalUsername" class="form-label required">사용자명</label>
+                            <input type="text" id="modalUsername" name="username" class="form-input"
+                                   placeholder="영문, 숫자 (4자 이상)"
+                                   pattern="[a-zA-Z0-9_]+" minlength="4" required>
+                            <small class="form-help">영문, 숫자, 밑줄(_)만 사용 가능</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="modalEmail" class="form-label required">이메일</label>
+                            <input type="email" id="modalEmail" name="email" class="form-input"
+                                   placeholder="user@example.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row two-col">
+                        <div class="form-group">
+                            <label for="modalPassword" class="form-label">초기 비밀번호</label>
+                            <div class="input-with-icon">
+                                <input type="text" id="modalPassword" name="password" class="form-input"
+                                       placeholder="미입력 시 자동 생성">
+                                <button type="button" class="btn-icon-inside" id="generatePasswordBtn" title="비밀번호 자동 생성">
+                                    <i class="fas fa-random"></i>
+                                </button>
+                            </div>
+                            <small class="form-help">미입력 시 안전한 비밀번호 자동 생성</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="modalRole" class="form-label">권한</label>
+                            <select id="modalRole" name="role" class="form-select">
+                                <option value="employee" selected>일반 직원</option>
+                                <option value="manager">매니저</option>
+                                <option value="admin">관리자</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-modal-close>취소</button>
+                    <button type="button" class="btn btn-primary" data-step-next="2" id="step1NextBtn">
+                        다음
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: 확인 -->
+            <div class="modal-step-content" data-step-content="2">
+                <div class="modal-body">
+                    <div class="confirm-section">
+                        <h3 class="confirm-title">계정 발급 정보 확인</h3>
+
+                        <div class="confirm-grid">
+                            <div class="confirm-item">
+                                <span class="confirm-label">이름</span>
+                                <span class="confirm-value" id="confirmName">-</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">소속 조직</span>
+                                <span class="confirm-value" id="confirmOrganization">-</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">사용자명</span>
+                                <span class="confirm-value" id="confirmUsername">-</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">이메일</span>
+                                <span class="confirm-value" id="confirmEmail">-</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">초기 비밀번호</span>
+                                <span class="confirm-value" id="confirmPassword">-</span>
+                            </div>
+                            <div class="confirm-item">
+                                <span class="confirm-label">권한</span>
+                                <span class="confirm-value" id="confirmRole">-</span>
+                            </div>
+                        </div>
+
+                        <div class="notice-section">
+                            <div class="notice-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="notice-content">
+                                <ul>
+                                    <li>계정 발급 후 직원에게 계정 정보를 전달해주세요.</li>
+                                    <li>직원이 로그인하면 프로필 완성 페이지로 이동합니다.</li>
+                                    <li>직원이 개인정보, 학력, 경력 등을 입력합니다.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-step-prev="1">
+                        <i class="fas fa-arrow-left"></i>
+                        이전
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitProvisionBtn">
+                        <i class="fas fa-id-card"></i>
+                        계정 발급
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,8 +1,16 @@
 /**
- * 명함 업로드/삭제 컴포넌트
+ * @deprecated 2026-01-09
+ * 명함 컴포넌트는 BusinessCard 도메인으로 이동되었습니다.
+ * 새로운 위치: js/domains/businesscard/components/BusinessCard.js
+ *
+ * 명함 업로드/삭제 컴포넌트 (레거시)
  * - 앞면/뒷면 이미지 업로드
  * - 드래그앤드롭 지원
  * - 미리보기 기능
+ *
+ * Migration:
+ * - js/domains/businesscard/index.js를 import하여 사용
+ * - import { businessCard, BusinessCard } from '../businesscard/index.js';
  */
 
 // 업로드할 파일 임시 저장

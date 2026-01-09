@@ -1,0 +1,124 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, code %}
+
+{% call section('cards', '카드', '정보를 그룹화하여 표시하는 카드 컴포넌트') %}
+
+    {% call subsection('기본 카드') %}
+    <div class="card" style="margin-bottom: var(--space-4);">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-user"></i> 기본정보</h3>
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">이름</span>
+                    <span class="info-value">홍길동</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">부서</span>
+                    <span class="info-value">개발팀</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">직급</span>
+                    <span class="info-value highlight">선임연구원</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">연락처</span>
+                    <span class="info-value empty">미등록</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% call code() %}
+&lt;div class="card"&gt;
+    &lt;div class="card-header"&gt;
+        &lt;h3 class="card-title"&gt;&lt;i class="fas fa-user"&gt;&lt;/i&gt; 기본정보&lt;/h3&gt;
+    &lt;/div&gt;
+    &lt;div class="card-body"&gt;
+        &lt;div class="info-grid"&gt;
+            &lt;div class="info-item"&gt;
+                &lt;span class="info-label"&gt;이름&lt;/span&gt;
+                &lt;span class="info-value"&gt;홍길동&lt;/span&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('카드 헤더 액션') %}
+    <div class="card" style="margin-bottom: var(--space-4);">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-list"></i> 목록</h3>
+            <div class="card-actions">
+                <button class="btn btn-sm btn-secondary"><i class="fas fa-plus"></i> 추가</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p>카드 콘텐츠 영역입니다.</p>
+        </div>
+    </div>
+    {% call code() %}
+&lt;div class="card"&gt;
+    &lt;div class="card-header"&gt;
+        &lt;h3 class="card-title"&gt;목록&lt;/h3&gt;
+        &lt;div class="card-actions"&gt;
+            &lt;button class="btn btn-sm btn-secondary"&gt;추가&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="card-body"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('플레이스홀더 카드') %}
+    <div class="card placeholder-card" style="margin-bottom: var(--space-4);">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-file-alt"></i> 첨부파일</h3>
+        </div>
+        <div class="card-body">
+            <div class="placeholder-content">
+                <i class="fas fa-folder-open"></i>
+                <p>등록된 첨부파일이 없습니다.</p>
+                <small>파일을 업로드하려면 수정 모드로 전환하세요.</small>
+            </div>
+        </div>
+    </div>
+    {% call code() %}
+&lt;div class="card placeholder-card"&gt;
+    &lt;div class="card-body"&gt;
+        &lt;div class="placeholder-content"&gt;
+            &lt;i class="fas fa-folder-open"&gt;&lt;/i&gt;
+            &lt;p&gt;등록된 첨부파일이 없습니다.&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('info-value 스타일') %}
+    <div class="component-demo" style="flex-direction: column; align-items: flex-start; gap: var(--space-3);">
+        <div class="info-item">
+            <span class="info-label">기본값</span>
+            <span class="info-value">일반 텍스트</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">강조값</span>
+            <span class="info-value highlight">강조 텍스트</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">빈 값</span>
+            <span class="info-value empty">미등록</span>
+        </div>
+    </div>
+    {% call code() %}
+&lt;span class="info-value"&gt;일반 텍스트&lt;/span&gt;
+&lt;span class="info-value highlight"&gt;강조 텍스트&lt;/span&gt;
+&lt;span class="info-value empty"&gt;미등록&lt;/span&gt;
+    {% endcall %}
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

@@ -96,6 +96,116 @@ class UserService:
         """
         return self.user_repo.deactivate(user_id)
 
+    def activate(self, user_id: int) -> bool:
+        """계정 활성화
+
+        Args:
+            user_id: 사용자 ID
+
+        Returns:
+            성공 여부
+        """
+        return self.user_repo.activate(user_id)
+
+    def change_status(self, user_id: int, new_status: str) -> Dict:
+        """계정 상태 변경
+
+        Args:
+            user_id: 사용자 ID
+            new_status: 새 상태 ('active', 'dormant', 'withdrawn')
+
+        Returns:
+            결과 Dict {'success': bool, 'message': str}
+        """
+        user = self.user_repo.find_by_id(user_id)
+        if not user:
+            return {'success': False, 'message': '사용자를 찾을 수 없습니다.'}
+
+        if new_status == 'active':
+            success = self.user_repo.activate(user_id)
+            message = '계정이 활성화되었습니다.' if success else '활성화에 실패했습니다.'
+        elif new_status == 'dormant':
+            success = self.user_repo.deactivate(user_id)
+            message = '계정이 휴면 처리되었습니다.' if success else '휴면 처리에 실패했습니다.'
+        elif new_status == 'withdrawn':
+            success = self.user_repo.deactivate(user_id)
+            message = '계정이 탈퇴 처리되었습니다.' if success else '탈퇴 처리에 실패했습니다.'
+        else:
+            return {'success': False, 'message': '유효하지 않은 상태입니다.'}
+
+        return {'success': success, 'message': message}
+
+    def update_user_by_admin(self, user_id: int, data: Dict) -> Dict:
+        """관리자에 의한 사용자 정보 수정
+
+        수정 가능 필드:
+        - email: 이메일 주소
+        - role: 권한 (admin, manager, employee)
+        - reset_password: 비밀번호 초기화 여부
+        - new_password: 새 비밀번호 (reset_password=True일 때)
+
+        Args:
+            user_id: 수정할 사용자 ID
+            data: 수정할 데이터 Dict
+
+        Returns:
+            결과 Dict {'success': bool, 'message': str, 'new_password': str (optional)}
+        """
+        from app.domains.user.models import User
+
+        user = self.user_repo.find_by_id(user_id)
+        if not user:
+            return {'success': False, 'message': '사용자를 찾을 수 없습니다.'}
+
+        try:
+            # 이메일 수정
+            if 'email' in data and data['email']:
+                new_email = data['email'].strip()
+                if new_email != user.email:
+                    # 이메일 중복 확인
+                    existing = self.user_repo.find_by_email(new_email)
+                    if existing and existing.id != user_id:
+                        return {'success': False, 'message': '이미 사용 중인 이메일입니다.'}
+                    user.email = new_email
+
+            # 역할 수정
+            if 'role' in data and data['role']:
+                new_role = data['role']
+                if new_role in User.VALID_ROLES:
+                    user.role = new_role
+                else:
+                    return {'success': False, 'message': '유효하지 않은 권한입니다.'}
+
+            # 비밀번호 초기화
+            new_password = None
+            if data.get('reset_password'):
+                new_password = data.get('new_password', '').strip()
+                if not new_password:
+                    # 비밀번호 자동 생성
+                    import secrets
+                    import string
+                    alphabet = string.ascii_letters + string.digits
+                    new_password = ''.join(secrets.choice(alphabet) for _ in range(12))
+
+                user.set_password(new_password)
+
+            from app.database import db
+            db.session.commit()
+
+            result = {
+                'success': True,
+                'message': '사용자 정보가 수정되었습니다.'
+            }
+            if new_password:
+                result['new_password'] = new_password
+
+            return result
+
+        except Exception as e:
+            from app.database import db
+            db.session.rollback()
+            return {'success': False, 'message': f'수정 중 오류가 발생했습니다: {str(e)}'}
+
     def get_by_id(self, user_id: int) -> Optional[Dict]:
         """사용자 ID로 조회 (Dict 반환)
 
@@ -222,17 +332,20 @@ class UserService:
             employees = employee_service.get_employees_by_ids(employee_ids)
             employee_map = {emp.get('id'): emp for emp in employees}
 
-        # contract_status, name 추가
+        # contract_status, name, phone 추가
         for user in users:
             contract_info = contract_map.get(user['id'], {})
             user['contract_status'] = contract_info.get('status', 'none')
 
-            # Employee에서 이름 조회
+            # Employee에서 이름, 전화번호 조회
             employee_id = user.get('employee_id')
             if employee_id and employee_id in employee_map:
-                user['name'] = employee_map[employee_id].get('name', '-')
+                emp_data = employee_map[employee_id]
+                user['name'] = emp_data.get('name', '-')
+                user['phone'] = emp_data.get('phone') or emp_data.get('mobile_phone') or '-'
             else:
                 user['name'] = '-'
+                user['phone'] = '-'
 
         return users
 

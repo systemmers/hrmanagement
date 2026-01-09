@@ -258,7 +258,6 @@
 <div class="pending-card">
     <div class="pending-header">
         <div class="person-info">
-            <div class="person-avatar">{{ contract.person_name[:1] if contract.person_name else 'U' }}</div>
             <div class="person-details">
                 <h3 class="person-name">{{ contract.person_name or '이름 없음' }}</h3>
                 <span class="person-email">{{ contract.person_email or '' }}</span>
@@ -368,10 +367,7 @@
     <td>{{ contract.account_type_label or '-' }}</td>
     <td>{{ contract.username or '-' }}</td>
     <td>
-        <div class="person-info">
-            <div class="person-avatar">{{ contract.person_name[:1] if contract.person_name else 'U' }}</div>
-            <span class="person-name">{{ contract.person_name or '이름 없음' }}</span>
-        </div>
+        <span class="person-name">{{ contract.person_name or '이름 없음' }}</span>
     </td>
     <td>{{ contract.person_phone or '-' }}</td>
     <td>{{ contract.person_email or '-' }}</td>
@@ -385,7 +381,11 @@
             <a href="{{ url_for('contracts.contract_detail', contract_id=contract.id) }}" class="btn-icon" title="상세보기">
                 <i class="fas fa-eye"></i>
             </a>
-            {% if contract.status == 'approved' %}
+            {% if contract.status == 'requested' and contract.requested_by == 'company' %}
+            <button type="button" class="btn-icon btn-icon-danger" data-action="cancel-contract" data-contract-id="{{ contract.id }}" title="요청 취소">
+                <i class="fas fa-times-circle"></i>
+            </button>
+            {% elif contract.status == 'approved' %}
             <button type="button" class="btn-icon btn-icon-warning" data-action="terminate-contract" data-contract-id="{{ contract.id }}" title="종료 요청">
                 <i class="fas fa-hand-paper"></i>
             </button>

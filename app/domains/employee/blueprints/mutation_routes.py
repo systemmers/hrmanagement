@@ -29,6 +29,7 @@ from .helpers import (
     get_business_card_folder, generate_unique_filename
 )
 from app.domains.company.services.organization_service import organization_service
+from app.shared.utils.api_helpers import api_success, api_error
 
 
 # ========================================
@@ -265,6 +266,68 @@ def register_mutation_routes(bp: Blueprint):
         except Exception as e:
             flash(f'계정 발급 중 오류가 발생했습니다: {str(e)}', 'error')
             return redirect(url_for('employees.employee_account_provision'))
+
+    @bp.route('/employees/api/provision', methods=['POST'])
+    @manager_or_admin_required
+    def api_employee_provision():
+        """계정 발급 API: JSON 요청/응답
+
+        모달 UX를 위한 API 엔드포인트
+        기존 create_account_only() 서비스 메서드 활용
+        """
+        company_id = session.get(SessionKeys.COMPANY_ID)
+        admin_user_id = session.get(SessionKeys.USER_ID)
+
+        try:
+            data = request.get_json()
+            if not data:
+                return api_error('요청 데이터가 없습니다.', status_code=400)
+
+            # 필수 필드 검증
+            name = data.get('name', '').strip()
+            username = data.get('username', '').strip()
+            email = data.get('email', '').strip()
+
+            if not name:
+                return api_error('이름을 입력해주세요.', status_code=400)
+            if not username or len(username) < 4:
+                return api_error('사용자명은 4자 이상이어야 합니다.', status_code=400)
+            if not email or '@' not in email:
+                return api_error('올바른 이메일 형식이 아닙니다.', status_code=400)
+
+            account_data = {
+                'username': username,
+                'email': email,
+                'password': (data.get('password') or '').strip() or None,
+                'role': data.get('role', 'employee')
+            }
+
+            minimal_employee_data = {
+                'name': name
+            }
+
+            # 선택적 조직 ID
+            org_id = data.get('organization_id')
+            if org_id:
+                minimal_employee_data['organization_id'] = int(org_id)
+
+            success, result, error = employee_account_service.create_account_only(
+                account_data=account_data,
+                minimal_employee_data=minimal_employee_data,
+                company_id=company_id,
+                admin_user_id=admin_user_id
+            )
+
+            if success:
+                message = f'계정이 발급되었습니다. (사용자명: {result["username"]})'
+                if result.get('status') == EmployeeStatus.PENDING_INFO:
+                    message += ' 직원이 로그인하여 정보를 입력해야 합니다.'
+                return api_success(message=message, data=result)
+            else:
+                return api_error(error, status_code=400)
+
+        except Exception as e:
+            return api_error(f'계정 발급 중 오류가 발생했습니다: {str(e)}', status_code=500)
 
     # ========================================
     # 직원 수정

@@ -1,0 +1,73 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, color_grid, color_swatch %}
+
+{% call section('colors', '색상', '프로젝트에서 사용하는 모든 색상 팔레트') %}
+
+    {% call subsection('Gray 팔레트 (15단계)') %}
+    {% call color_grid() %}
+        {{ color_swatch('pure-black', '#000000') }}
+        {{ color_swatch('gray-900', '#1a1a1a') }}
+        {{ color_swatch('gray-800', '#343434') }}
+        {{ color_swatch('gray-700', '#515151') }}
+        {{ color_swatch('gray-600', '#6b6b6b') }}
+        {{ color_swatch('gray-500', '#888888') }}
+        {{ color_swatch('gray-400', '#b4b4b4') }}
+        {{ color_swatch('gray-300', '#d1d1d1') }}
+        {{ color_swatch('gray-200', '#e4e4e4') }}
+        {{ color_swatch('gray-100', '#f1f1f1') }}
+        {{ color_swatch('gray-75', '#f6f6f6') }}
+        {{ color_swatch('gray-50', '#f9f9f9') }}
+        {{ color_swatch('gray-25', '#fcfcfc') }}
+        {{ color_swatch('pure-white', '#ffffff', border=true) }}
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('시맨틱 색상') %}
+    {% call color_grid() %}
+        {{ color_swatch('Success', '#166534') }}
+        {{ color_swatch('Success BG', '#dcfce7') }}
+        {{ color_swatch('Error', '#991b1b') }}
+        {{ color_swatch('Error BG', '#fee2e2') }}
+        {{ color_swatch('Warning', '#92400e') }}
+        {{ color_swatch('Warning BG', '#fef3c7') }}
+        {{ color_swatch('Info', '#1e40af') }}
+        {{ color_swatch('Info BG', '#dbeafe') }}
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('Primary 색상') %}
+    {% call color_grid() %}
+        {{ color_swatch('primary-50', 'var(--color-primary-50)') }}
+        {{ color_swatch('primary-100', 'var(--color-primary-100)') }}
+        {{ color_swatch('primary-200', 'var(--color-primary-200)') }}
+        {{ color_swatch('primary-300', 'var(--color-primary-300)') }}
+        {{ color_swatch('primary-400', 'var(--color-primary-400)') }}
+        {{ color_swatch('primary-500', 'var(--color-primary-500)') }}
+        {{ color_swatch('primary-600', 'var(--color-primary-600)') }}
+        {{ color_swatch('primary-700', 'var(--color-primary-700)') }}
+        {{ color_swatch('primary-800', 'var(--color-primary-800)') }}
+        {{ color_swatch('primary-900', 'var(--color-primary-900)') }}
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('CSS 변수 사용법') %}
+    <div class="code-block">
+<code>/* 색상 변수 사용 */
+.element {
+    color: var(--color-gray-900);
+    background: var(--color-gray-50);
+    border-color: var(--color-gray-200);
+}
+
+/* 시맨틱 색상 */
+.success { color: var(--color-semantic-success); }
+.error { color: var(--color-semantic-error); }
+.warning { color: var(--color-semantic-warning); }
+.info { color: var(--color-semantic-info); }</code>
+    </div>
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}
