@@ -53,7 +53,7 @@ function initUserEditModal() {
     });
 
     // Backdrop click
-    const backdrop = modal.querySelector('.modal-backdrop');
+    const backdrop = modal.querySelector('.modal__backdrop');
     if (backdrop) {
         backdrop.addEventListener('click', closeModal);
     }

@@ -57,7 +57,7 @@ function initContractRequestModal() {
     });
 
     // Backdrop click
-    modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
+    modal.querySelector('.modal__backdrop').addEventListener('click', closeModal);
 
     // Tab navigation
     initTabNavigation();

@@ -79,14 +79,14 @@
      * @param {string} message
      */
     function showError(input, message) {
-        const formGroup = input.closest('.form-group');
-        const existingError = formGroup.querySelector('.form-error');
+        const formGroup = input.closest('.form__group');
+        const existingError = formGroup.querySelector('.form__error');
 
         if (existingError) {
             existingError.textContent = message;
         } else {
             const errorEl = document.createElement('small');
-            errorEl.className = 'form-error text-danger mt-1';
+            errorEl.className = 'form__error text-danger mt-1';
             errorEl.textContent = message;
             input.parentNode.insertBefore(errorEl, input.nextSibling);
         }
@@ -98,8 +98,8 @@
      * @param {HTMLElement} input
      */
     function clearError(input) {
-        const formGroup = input.closest('.form-group');
-        const existingError = formGroup.querySelector('.form-error');
+        const formGroup = input.closest('.form__group');
+        const existingError = formGroup.querySelector('.form__error');
         if (existingError) {
             existingError.remove();
         }

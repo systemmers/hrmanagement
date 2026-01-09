@@ -25,7 +25,7 @@ function addBusinessCardDeleteButton(side, employeeId) {
     const item = document.querySelector(`.business-card-item[data-side="${side}"]`);
     if (!item) return;
 
-    const actionsContainer = item.querySelector('.card-actions');
+    const actionsContainer = item.querySelector('.card__actions');
     if (!actionsContainer) return;
 
     // 이미 삭제 버튼이 있으면 무시

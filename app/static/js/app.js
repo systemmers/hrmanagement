@@ -203,9 +203,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const message = messageSpan ? messageSpan.textContent : '';
 
         let type = 'info';
-        if (alert.classList.contains('alert-success')) type = 'success';
-        else if (alert.classList.contains('alert-error')) type = 'error';
-        else if (alert.classList.contains('alert-warning')) type = 'warning';
+        if (alert.classList.contains('alert--success')) type = 'success';
+        else if (alert.classList.contains('alert--error')) type = 'error';
+        else if (alert.classList.contains('alert--warning')) type = 'warning';
 
         if (message) {
             showToast(message, type);

@@ -47,7 +47,7 @@ function initAccountProvisionModal() {
     });
 
     // Backdrop click
-    const backdrop = modal.querySelector('.modal-backdrop');
+    const backdrop = modal.querySelector('.modal__backdrop');
     if (backdrop) {
         backdrop.addEventListener('click', closeModal);
     }
@@ -322,12 +322,12 @@ function showFieldError(fieldId, message) {
     const input = document.getElementById(fieldId);
     if (!input) return;
 
-    const formGroup = input.closest('.form-group');
-    let errorEl = formGroup.querySelector('.form-error');
+    const formGroup = input.closest('.form__group');
+    let errorEl = formGroup.querySelector('.form__error');
 
     if (!errorEl) {
         errorEl = document.createElement('small');
-        errorEl.className = 'form-error text-danger';
+        errorEl.className = 'form__error text-danger';
         formGroup.appendChild(errorEl);
     }
 
@@ -342,8 +342,8 @@ function clearFieldError(fieldId) {
     const input = document.getElementById(fieldId);
     if (!input) return;
 
-    const formGroup = input.closest('.form-group');
-    const errorEl = formGroup.querySelector('.form-error');
+    const formGroup = input.closest('.form__group');
+    const errorEl = formGroup.querySelector('.form__error');
 
     if (errorEl) {
         errorEl.remove();
