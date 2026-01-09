@@ -49,7 +49,7 @@
     {% call demo() %}
         <div class="form-group" style="width: 200px;">
             <label class="form-label">부서</label>
-            <select class="form-input">
+            <select class="form-select">
                 <option value="">선택하세요</option>
                 <option value="dev">개발팀</option>
                 <option value="design">디자인팀</option>
@@ -60,7 +60,7 @@
     {% call code() %}
 &lt;div class="form-group"&gt;
     &lt;label class="form-label"&gt;부서&lt;/label&gt;
-    &lt;select class="form-input"&gt;
+    &lt;select class="form-select"&gt;
         &lt;option value=""&gt;선택하세요&lt;/option&gt;
         &lt;option value="dev"&gt;개발팀&lt;/option&gt;
     &lt;/select&gt;
@@ -72,13 +72,13 @@
     {% call demo() %}
         <div class="form-group" style="width: 100%;">
             <label class="form-label">비고</label>
-            <textarea class="form-input" rows="3" placeholder="내용을 입력하세요"></textarea>
+            <textarea class="form-textarea" rows="3" placeholder="내용을 입력하세요"></textarea>
         </div>
     {% endcall %}
     {% call code() %}
 &lt;div class="form-group"&gt;
     &lt;label class="form-label"&gt;비고&lt;/label&gt;
-    &lt;textarea class="form-input" rows="3"&gt;&lt;/textarea&gt;
+    &lt;textarea class="form-textarea" rows="3"&gt;&lt;/textarea&gt;
 &lt;/div&gt;
     {% endcall %}
     {% endcall %}
