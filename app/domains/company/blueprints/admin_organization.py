@@ -11,6 +11,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from app.shared.constants.session_keys import SessionKeys
 from app.domains.company.services.organization_service import organization_service
 from app.domains.company.services.company_service import company_service
+from app.domains.employee.services import employee_service
 from app.shared.utils.decorators import admin_required, login_required
 from app.shared.utils.api_helpers import api_success, api_error, api_not_found, api_server_error
 
@@ -33,17 +34,9 @@ def get_current_root_organization_id():
 @admin_bp.route('/organizations')
 @admin_required
 def organization_list():
-    """조직 관리 페이지 (멀티테넌시 적용)"""
-    root_org_id = get_current_root_organization_id()
-
-    tree = organization_service.get_tree(root_organization_id=root_org_id)
-    flat_list = organization_service.get_flat_list(root_organization_id=root_org_id)
-    stats = organization_service.get_organization_statistics(root_organization_id=root_org_id)
-
-    return render_template('domains/company/organization.html',
-                           tree=tree,
-                           organizations=flat_list,
-                           stats=stats)
+    """조직 관리 페이지 - 법인설정 조직관리 탭으로 리다이렉트"""
+    # Phase 6: 독립 페이지 제거 - 법인설정 조직관리 탭으로 통합
+    return redirect(url_for('corporate.settings') + '#org-management')
 
 
 @admin_bp.route('/api/organizations', methods=['GET'])
@@ -54,11 +47,11 @@ def api_get_organizations():
     format_type = request.args.get('format', 'tree')
 
     if format_type == 'tree':
-        data = organization_service.get_tree(root_organization_id=root_org_id)
+        data = organization_service.get_tree_with_member_count(root_organization_id=root_org_id)
     elif format_type == 'flat':
         data = organization_service.get_flat_list(root_organization_id=root_org_id)
     else:
-        data = organization_service.get_tree(root_organization_id=root_org_id)
+        data = organization_service.get_tree_with_member_count(root_organization_id=root_org_id)
 
     return api_success(data)
 
@@ -66,10 +59,30 @@ def api_get_organizations():
 @admin_bp.route('/api/organizations/stats', methods=['GET'])
 @login_required
 def api_get_organization_stats():
-    """조직 통계 API (멀티테넌시 적용)"""
+    """조직 통계 API (멀티테넌시 적용, 동적 유형 포함)"""
+    from app.domains.company.services import organization_type_config_service
+
     root_org_id = get_current_root_organization_id()
+    company_id = session.get(SessionKeys.COMPANY_ID)
     stats = organization_service.get_organization_statistics(root_organization_id=root_org_id)
-    return api_success(stats)
+
+    # 활성화된 조직유형 정보 포함
+    active_types = []
+    if company_id:
+        type_configs = organization_type_config_service.get_active_type_models(company_id)
+        for config in type_configs:
+            active_types.append({
+                'code': config.type_code,
+                'label': config.type_label_ko,
+                'icon': config.icon,
+                'count': stats.get('by_type', {}).get(config.type_code, 0)
+            })
+
+    return api_success({
+        'total': stats.get('total', 0),
+        'by_type': stats.get('by_type', {}),
+        'active_types': active_types
+    })
 
 
 @admin_bp.route('/api/organizations/<int:org_id>', methods=['GET'])
@@ -85,6 +98,9 @@ def api_get_organization(org_id):
     org = organization_service.get_by_id(org_id)
     if not org:
         return api_not_found('조직')
+
+    # 소속인원 추가
+    org['member_count'] = organization_service.get_member_count(org_id, root_org_id)
 
     return api_success(org)
 
@@ -102,6 +118,8 @@ def api_create_organization():
     code = data.get('code', '').strip() or None
     manager_id = data.get('manager_id')
     description = data.get('description', '').strip() or None
+    department_phone = data.get('department_phone', '').strip() or None
+    department_email = data.get('department_email', '').strip() or None
 
     # 필수 값 검증
     if not name:
@@ -123,7 +141,9 @@ def api_create_organization():
             code=code,
             manager_id=manager_id,
             description=description,
-            root_organization_id=root_org_id
+            root_organization_id=root_org_id,
+            department_phone=department_phone,
+            department_email=department_email
         )
         return api_success({'data': org.to_dict()}, status_code=201)
 
@@ -206,6 +226,27 @@ def api_get_children(org_id):
     return api_success(children)
 
 
+@admin_bp.route('/api/organizations/reorder', methods=['POST'])
+@admin_required
+def api_reorder_children():
+    """하위 조직 순서 변경 API (멀티테넌시 적용)"""
+    root_org_id = get_current_root_organization_id()
+    data = request.get_json()
+    parent_id = data.get('parent_id')
+    org_ids = data.get('org_ids', [])
+
+    if not org_ids or not isinstance(org_ids, list):
+        return api_error('유효한 조직 ID 목록이 필요합니다.')
+
+    try:
+        if organization_service.reorder_children(parent_id, org_ids, root_organization_id=root_org_id):
+            return api_success(message='순서가 저장되었습니다.')
+        else:
+            return api_error('순서 변경에 실패했습니다.')
+    except Exception as e:
+        return api_server_error(str(e))
+
+
 @admin_bp.route('/api/organizations/search', methods=['GET'])
 @login_required
 def api_search_organizations():
@@ -217,6 +258,29 @@ def api_search_organizations():
 
     results = organization_service.search(query, root_organization_id=root_org_id)
     return api_success(results)
+
+
+@admin_bp.route('/api/organizations/employees', methods=['GET'])
+@login_required
+def api_get_employees_for_org():
+    """조직장 선택을 위한 직원 목록 API (멀티테넌시 적용)"""
+    company_id = session.get(SessionKeys.COMPANY_ID)
+
+    if not company_id:
+        return api_success([])
+
+    # employee_repo.find_by_company_id는 Employee 모델 리스트 반환
+    employees = employee_service.employee_repo.find_by_company_id(company_id)
+    # 직원 정보를 select 옵션용으로 변환
+    data = [
+        {
+            'id': emp.id,
+            'name': emp.name,
+            'position': emp.position
+        }
+        for emp in employees
+    ]
+    return api_success(data)
 
 
 # ===== 감사 대시보드 (UI) =====

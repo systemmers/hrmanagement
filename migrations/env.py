@@ -28,7 +28,6 @@ from app.database import db
 from app.domains.company.models import ClassificationOption, Company, Organization
 from app.domains.employee.models import (
     Asset,
-    Attachment,
     Attendance,
     Award,
     Benefit,
@@ -50,6 +49,7 @@ from app.domains.employee.models import (
     SalaryPayment,
     Training,
 )
+from app.domains.attachment.models import Attachment
 from app.domains.platform.models import SystemSetting
 from app.domains.user.models import User
 

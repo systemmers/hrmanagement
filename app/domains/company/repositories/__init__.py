@@ -14,6 +14,7 @@ from .organization_repository import OrganizationRepository, organization_reposi
 from .classification_repository import ClassificationOptionsRepository, classification_repository
 from .number_category_repository import NumberCategoryRepository, number_category_repository
 from .data_sharing_settings_repository import DataSharingSettingsRepository, data_sharing_settings_repository
+from .organization_type_config_repository import OrganizationTypeConfigRepository, organization_type_config_repository
 
 __all__ = [
     # Classes
@@ -25,6 +26,7 @@ __all__ = [
     'ClassificationOptionsRepository',
     'NumberCategoryRepository',
     'DataSharingSettingsRepository',
+    'OrganizationTypeConfigRepository',
     # Singleton instances
     'company_repository',
     'company_settings_repository',
@@ -34,4 +36,5 @@ __all__ = [
     'classification_repository',
     'number_category_repository',
     'data_sharing_settings_repository',
+    'organization_type_config_repository',
 ]

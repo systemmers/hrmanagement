@@ -9,6 +9,7 @@ import { MAX_FILE_SIZE, MAX_FILE_SIZE_MB, FILE_UPLOAD_MESSAGES } from '../../../
 const state = {
     activeTab: 'basic',
     loadedTabs: new Set(['basic']),
+    treeExpanded: false,  // 조직 트리 펼침 상태
     // 감사 로그 상태
     audit: {
         currentPage: 1,
@@ -141,14 +142,21 @@ async function loadOrgManagementData() {
     const content = document.getElementById('org-management-content');
 
     try {
-        // 조직 트리 데이터 로드
-        const [treeResponse, statsResponse] = await Promise.all([
+        // 조직 트리, 통계, 조직유형 설정 데이터 병렬 로드
+        const [treeResponse, statsResponse, typesResponse] = await Promise.all([
             fetch('/admin/api/organizations?format=tree'),
-            fetch('/admin/api/organizations/stats')
+            fetch('/admin/api/organizations/stats'),
+            fetch('/api/corporate/organization-types')
         ]);
 
         const treeResult = await treeResponse.json();
         const statsResult = await statsResponse.json();
+        const typesResult = await typesResponse.json();
+
+        // 조직유형 설정 렌더링
+        if (typesResult.success) {
+            renderOrgTypeSettings(typesResult.data);
+        }
 
         // 통계 업데이트
         if (statsResult.success) {
@@ -171,14 +179,477 @@ async function loadOrgManagementData() {
 }
 
 /**
- * 조직 통계 업데이트
+ * 조직 통계 업데이트 (동적 렌더링)
  */
 function updateOrgStats(stats) {
-    document.getElementById('stat-total').textContent = stats.total || 0;
-    document.getElementById('stat-company').textContent = stats.by_type?.company || 0;
-    document.getElementById('stat-division').textContent = stats.by_type?.division || 0;
-    document.getElementById('stat-department').textContent = stats.by_type?.department || 0;
-    document.getElementById('stat-team').textContent = stats.by_type?.team || 0;
+    const container = document.getElementById('org-stats-row');
+    if (!container) return;
+
+    // 전체 조직 통계 업데이트
+    const totalEl = document.getElementById('stat-total');
+    if (totalEl) {
+        totalEl.textContent = stats.total || 0;
+    }
+
+    // 기존 동적 카드 제거 (전체 조직 카드 유지)
+    const dynamicCards = container.querySelectorAll('.stat-card.dynamic');
+    dynamicCards.forEach(card => card.remove());
+
+    // 활성화된 조직유형별 통계 카드 동적 생성
+    if (stats.active_types && stats.active_types.length > 0) {
+        stats.active_types.forEach(type => {
+            const card = createStatCard(type.label, type.count, type.icon || 'fa-folder');
+            container.appendChild(card);
+        });
+    }
+}
+
+/**
+ * 통계 카드 HTML 요소 생성
+ */
+function createStatCard(label, count, icon) {
+    const card = document.createElement('div');
+    card.className = 'stat-card dynamic';
+    card.innerHTML = `
+        <div class="stat-icon"><i class="fas ${icon}"></i></div>
+        <div class="stat-content">
+            <div class="stat-value">${count}</div>
+            <div class="stat-label">${escapeHtml(label)}</div>
+        </div>
+    `;
+    return card;
+}
+
+// ========================================
+// 조직유형 설정 관련 함수
+// ========================================
+
+/**
+ * 조직유형 설정 렌더링
+ */
+function renderOrgTypeSettings(types) {
+    const container = document.getElementById('orgTypeList');
+    if (!container) return;
+
+    if (!types || types.length === 0) {
+        container.innerHTML = '<p class="text-muted">조직유형이 없습니다.</p>';
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="org-type-table" id="orgTypeTable">
+            <div class="org-type-header">
+                <span class="org-type-col org-type-col--drag"></span>
+                <span class="org-type-col org-type-col--order">순번</span>
+                <span class="org-type-col org-type-col--icon">아이콘</span>
+                <span class="org-type-col org-type-col--label-ko">한글명</span>
+                <span class="org-type-col org-type-col--label-en">영문명</span>
+                <span class="org-type-col org-type-col--delete"></span>
+            </div>
+            ${types.map((type, index) => renderOrgTypeRow(type, index)).join('')}
+        </div>
+        <div class="org-type-add-row">
+            <button type="button" class="btn btn--sm btn--secondary" data-action="add-org-type">
+                <i class="fas fa-plus"></i> 조직유형 추가
+            </button>
+        </div>
+    `;
+
+    // 드래그 앤 드롭 초기화
+    initOrgTypeSortable();
+}
+
+/**
+ * 조직유형 행 렌더링
+ */
+function renderOrgTypeRow(type, index) {
+    return `
+        <div class="org-type-row" data-id="${type.id}" data-sort-order="${type.sort_order}" draggable="true">
+            <span class="org-type-col org-type-col--drag">
+                <i class="fas fa-grip-vertical drag-handle" title="드래그하여 순서 변경"></i>
+            </span>
+            <span class="org-type-col org-type-col--order">${index + 1}</span>
+            <span class="org-type-col org-type-col--icon">
+                <button type="button" class="btn btn--icon btn--sm" data-action="select-icon" data-id="${type.id}" title="아이콘 선택">
+                    <i class="fas ${type.icon || 'fa-folder'}"></i>
+                </button>
+            </span>
+            <span class="org-type-col org-type-col--label-ko">
+                <input type="text" class="form__input form__input--sm org-type-label-input"
+                       value="${escapeHtml(type.type_label_ko || type.type_label || '')}"
+                       data-id="${type.id}"
+                       data-field="type_label_ko"
+                       data-original="${escapeHtml(type.type_label_ko || type.type_label || '')}"
+                       placeholder="한글명">
+            </span>
+            <span class="org-type-col org-type-col--label-en">
+                <input type="text" class="form__input form__input--sm org-type-label-input"
+                       value="${escapeHtml(type.type_label_en || '')}"
+                       data-id="${type.id}"
+                       data-field="type_label_en"
+                       data-original="${escapeHtml(type.type_label_en || '')}"
+                       placeholder="English">
+            </span>
+            <span class="org-type-col org-type-col--delete">
+                <button type="button" class="btn btn--icon btn--sm btn--ghost"
+                        data-action="delete-org-type" data-id="${type.id}"
+                        data-type-code="${escapeHtml(type.type_code)}" title="삭제">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </span>
+        </div>
+    `;
+}
+
+/**
+ * 조직유형 순서 드래그 앤 드롭 초기화
+ */
+function initOrgTypeSortable() {
+    const table = document.getElementById('orgTypeTable');
+    if (!table) return;
+
+    let draggedItem = null;
+
+    table.addEventListener('dragstart', (e) => {
+        const row = e.target.closest('.org-type-row');
+        if (row) {
+            draggedItem = row;
+            row.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+    });
+
+    table.addEventListener('dragend', (e) => {
+        const row = e.target.closest('.org-type-row');
+        if (row) {
+            row.classList.remove('dragging');
+            draggedItem = null;
+            // 순서 저장
+            saveOrgTypeOrder();
+        }
+    });
+
+    table.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const row = e.target.closest('.org-type-row');
+        if (row && row !== draggedItem) {
+            const rect = row.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            if (e.clientY < midY) {
+                row.parentNode.insertBefore(draggedItem, row);
+            } else {
+                row.parentNode.insertBefore(draggedItem, row.nextSibling);
+            }
+        }
+    });
+}
+
+/**
+ * 조직유형 순서 저장
+ */
+async function saveOrgTypeOrder() {
+    const table = document.getElementById('orgTypeTable');
+    if (!table) return;
+
+    const rows = table.querySelectorAll('.org-type-row');
+    const typeIds = Array.from(rows).map(row => parseInt(row.dataset.id));
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    try {
+        const response = await fetch('/api/corporate/organization-types/reorder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ type_ids: typeIds })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('순서가 저장되었습니다', 'success');
+            // 순번 UI 즉시 업데이트
+            updateOrgTypeOrderNumbers();
+        } else {
+            showToast(result.error || '순서 저장에 실패했습니다', 'error');
+        }
+    } catch (error) {
+        console.error('조직유형 순서 저장 오류:', error);
+        showToast('순서 저장 중 오류가 발생했습니다', 'error');
+    }
+}
+
+/**
+ * 조직유형 순번 UI 업데이트
+ */
+function updateOrgTypeOrderNumbers() {
+    const table = document.getElementById('orgTypeTable');
+    if (!table) return;
+
+    const rows = table.querySelectorAll('.org-type-row');
+    rows.forEach((row, index) => {
+        const orderCol = row.querySelector('.org-type-col--order');
+        if (orderCol) {
+            orderCol.textContent = index + 1;
+        }
+    });
+}
+
+/**
+ * 조직유형 라벨 저장 (한글명/영문명)
+ * @param {number} configId - 설정 ID
+ * @param {string} field - 필드명 (type_label_ko 또는 type_label_en)
+ * @param {string} value - 새 값
+ */
+async function saveOrgTypeLabel(configId, field, value) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    const data = {};
+    data[field] = value;
+
+    try {
+        const response = await fetch(`/api/corporate/organization-types/${configId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('저장되었습니다', 'success');
+            // 입력 필드의 original 값 업데이트
+            const input = document.querySelector(`.org-type-label-input[data-id="${configId}"][data-field="${field}"]`);
+            if (input) {
+                input.dataset.original = value;
+            }
+        } else {
+            showToast(result.error || '저장에 실패했습니다', 'error');
+        }
+    } catch (error) {
+        console.error('조직유형 라벨 저장 오류:', error);
+        showToast('저장 중 오류가 발생했습니다', 'error');
+    }
+}
+
+/**
+ * 조직유형 삭제
+ * @param {number} configId - 설정 ID
+ * @param {string} typeCode - 유형 코드
+ */
+async function deleteOrgType(configId, typeCode) {
+    const confirmed = confirm(`이 조직유형을 삭제하시겠습니까?\n\n사용 중인 조직이 있으면 삭제할 수 없습니다.`);
+    if (!confirmed) return;
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    try {
+        const response = await fetch(`/api/corporate/organization-types/${configId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('조직유형이 삭제되었습니다', 'success');
+            // 해당 행 제거 및 순번 재정렬
+            const row = document.querySelector(`.org-type-row[data-id="${configId}"]`);
+            if (row) {
+                row.remove();
+                updateOrgTypeOrderNumbers();
+            }
+        } else {
+            showToast(result.error || '삭제에 실패했습니다', 'error');
+        }
+    } catch (error) {
+        console.error('조직유형 삭제 오류:', error);
+        showToast('삭제 중 오류가 발생했습니다', 'error');
+    }
+}
+
+/**
+ * 조직유형 추가
+ */
+async function addOrgType() {
+    const labelKo = prompt('새 조직유형의 한글명을 입력하세요:');
+    if (!labelKo || !labelKo.trim()) return;
+
+    const labelEn = prompt('영문명을 입력하세요 (선택사항):');
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    try {
+        const response = await fetch('/api/corporate/organization-types', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                type_label_ko: labelKo.trim(),
+                type_label_en: labelEn ? labelEn.trim() : null,
+                icon: 'fa-folder'
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('조직유형이 추가되었습니다', 'success');
+            // 새 행 추가
+            const table = document.getElementById('orgTypeTable');
+            if (table && result.data) {
+                const rowCount = table.querySelectorAll('.org-type-row').length;
+                const newRowHtml = renderOrgTypeRow(result.data, rowCount);
+                table.insertAdjacentHTML('beforeend', newRowHtml);
+            }
+        } else {
+            showToast(result.error || '추가에 실패했습니다', 'error');
+        }
+    } catch (error) {
+        console.error('조직유형 추가 오류:', error);
+        showToast('추가 중 오류가 발생했습니다', 'error');
+    }
+}
+
+/**
+ * 조직유형 아이콘 저장
+ * @param {number} configId - 설정 ID
+ * @param {string} icon - 아이콘 클래스
+ */
+async function saveOrgTypeIcon(configId, icon) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    try {
+        const response = await fetch(`/api/corporate/organization-types/${configId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ icon: icon })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('아이콘이 저장되었습니다', 'success');
+            // 아이콘 버튼 업데이트
+            const btn = document.querySelector(`.org-type-row[data-id="${configId}"] [data-action="select-icon"] i`);
+            if (btn) {
+                btn.className = `fas ${icon}`;
+            }
+        } else {
+            showToast(result.error || '저장에 실패했습니다', 'error');
+        }
+    } catch (error) {
+        console.error('조직유형 아이콘 저장 오류:', error);
+        showToast('저장 중 오류가 발생했습니다', 'error');
+    }
+}
+
+/**
+ * 아이콘 선택 모달 표시
+ * @param {number} configId - 설정 ID
+ */
+function showIconSelector(configId) {
+    const icons = [
+        'fa-building', 'fa-layer-group', 'fa-users', 'fa-user-friends',
+        'fa-sitemap', 'fa-door-open', 'fa-puzzle-piece', 'fa-folder',
+        'fa-briefcase', 'fa-cog', 'fa-chart-line', 'fa-code-branch',
+        'fa-cube', 'fa-cubes', 'fa-database', 'fa-globe',
+        'fa-landmark', 'fa-network-wired', 'fa-project-diagram', 'fa-server'
+    ];
+
+    // 기존 모달 제거
+    const existingModal = document.getElementById('iconSelectorModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    const modalHtml = `
+        <div class="modal show" id="iconSelectorModal">
+            <div class="modal__content modal__content--sm">
+                <div class="modal__header">
+                    <h3 class="modal__title">아이콘 선택</h3>
+                    <button class="modal__close" data-action="close-icon-modal">&times;</button>
+                </div>
+                <div class="modal__body">
+                    <div class="icon-grid">
+                        ${icons.map(icon => `
+                            <button type="button" class="icon-grid__item" data-icon="${icon}" data-config-id="${configId}">
+                                <i class="fas ${icon}"></i>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    const modal = document.getElementById('iconSelectorModal');
+
+    // 이벤트 리스너
+    modal.addEventListener('click', (e) => {
+        const closeBtn = e.target.closest('[data-action="close-icon-modal"]');
+        if (closeBtn || e.target === modal) {
+            modal.remove();
+            return;
+        }
+
+        const iconBtn = e.target.closest('.icon-grid__item');
+        if (iconBtn) {
+            const icon = iconBtn.dataset.icon;
+            const cId = parseInt(iconBtn.dataset.configId);
+            saveOrgTypeIcon(cId, icon);
+            modal.remove();
+        }
+    });
+}
+
+/**
+ * 조직유형 초기화
+ */
+async function resetOrgTypes() {
+    if (!confirm('조직유형 설정을 기본값으로 초기화하시겠습니까?')) {
+        return;
+    }
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    try {
+        const response = await fetch('/api/corporate/organization-types/reset', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('기본값으로 초기화되었습니다', 'success');
+            // 데이터 새로고침
+            state.loadedTabs.delete('org-management');
+            await loadOrgManagementData();
+        } else {
+            showToast(result.error || '초기화에 실패했습니다', 'error');
+        }
+    } catch (error) {
+        console.error('조직유형 초기화 오류:', error);
+        showToast('초기화 중 오류가 발생했습니다', 'error');
+    }
 }
 
 /**
@@ -201,7 +672,7 @@ function renderOrgTree(tree) {
         return;
     }
 
-    treeContainer.innerHTML = tree.map(org => renderTreeNode(org)).join('');
+    treeContainer.innerHTML = tree.map(org => renderTreeNode(org, null)).join('');
 
     // 첫 번째 레벨 펼치기
     document.querySelectorAll('#orgTree > .tree-node > .tree-children').forEach(el => {
@@ -211,24 +682,207 @@ function renderOrgTree(tree) {
         el.classList.remove('fa-chevron-right');
         el.classList.add('fa-chevron-down');
     });
+
+    // 드래그앤드롭 초기화
+    initOrgTreeDragDrop();
+}
+
+// 트리 드래그 상태
+let treeDraggedNode = null;
+let treeDraggedParentId = null;
+
+/**
+ * 조직 트리 드래그앤드롭 초기화
+ */
+function initOrgTreeDragDrop() {
+    const treeContainer = document.getElementById('orgTree');
+    if (!treeContainer || treeContainer.dataset.dragInitialized) return;
+
+    // 드래그 시작
+    treeContainer.addEventListener('dragstart', (e) => {
+        const node = e.target.closest('.tree-node[draggable="true"]');
+        if (!node) return;
+
+        // 드래그 핸들에서만 드래그 시작 허용 (아이콘 포함)
+        const handle = e.target.closest('.tree-drag-handle');
+        if (!handle) {
+            e.preventDefault();
+            return;
+        }
+
+        treeDraggedNode = node;
+        treeDraggedParentId = node.dataset.parentId || '';
+        node.classList.add('dragging');
+
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', node.dataset.id);
+    });
+
+    // 드래그 종료
+    treeContainer.addEventListener('dragend', (e) => {
+        if (treeDraggedNode) {
+            treeDraggedNode.classList.remove('dragging');
+        }
+        // 모든 드롭 표시 제거
+        treeContainer.querySelectorAll('.tree-node.drag-over, .tree-node.drag-over-above, .tree-node.drag-over-below').forEach(el => {
+            el.classList.remove('drag-over', 'drag-over-above', 'drag-over-below');
+        });
+        treeDraggedNode = null;
+        treeDraggedParentId = null;
+    });
+
+    // 드래그 오버
+    treeContainer.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (!treeDraggedNode) return;
+
+        const targetNode = e.target.closest('.tree-node[draggable="true"]');
+        if (!targetNode || targetNode === treeDraggedNode) return;
+
+        // 같은 부모의 자식만 허용 (빈 문자열도 동일 취급)
+        const targetParentId = targetNode.dataset.parentId || '';
+        if (targetParentId !== treeDraggedParentId) {
+            e.dataTransfer.dropEffect = 'none';
+            return;
+        }
+
+        e.dataTransfer.dropEffect = 'move';
+
+        // 드롭 위치 표시 (위/아래)
+        const rect = targetNode.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+
+        // 기존 표시 제거
+        treeContainer.querySelectorAll('.tree-node.drag-over-above, .tree-node.drag-over-below').forEach(el => {
+            el.classList.remove('drag-over-above', 'drag-over-below');
+        });
+
+        if (e.clientY < midY) {
+            targetNode.classList.add('drag-over-above');
+        } else {
+            targetNode.classList.add('drag-over-below');
+        }
+    });
+
+    // 드래그 리브
+    treeContainer.addEventListener('dragleave', (e) => {
+        const targetNode = e.target.closest('.tree-node');
+        if (targetNode) {
+            targetNode.classList.remove('drag-over', 'drag-over-above', 'drag-over-below');
+        }
+    });
+
+    // 드롭
+    treeContainer.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        if (!treeDraggedNode) return;
+
+        const targetNode = e.target.closest('.tree-node[draggable="true"]');
+        if (!targetNode || targetNode === treeDraggedNode) return;
+
+        // 같은 부모의 자식만 허용
+        const targetParentId = targetNode.dataset.parentId || '';
+        if (targetParentId !== treeDraggedParentId) return;
+
+        const rect = targetNode.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        const insertBefore = e.clientY < midY;
+
+        // DOM 업데이트
+        const parent = targetNode.parentNode;
+        if (insertBefore) {
+            parent.insertBefore(treeDraggedNode, targetNode);
+        } else {
+            parent.insertBefore(treeDraggedNode, targetNode.nextSibling);
+        }
+
+        // 표시 제거
+        targetNode.classList.remove('drag-over-above', 'drag-over-below');
+
+        // 서버에 순서 저장 (부모 ID가 있는 경우만)
+        if (treeDraggedParentId) {
+            await saveOrgTreeOrder(treeDraggedParentId);
+        }
+    });
+
+    treeContainer.dataset.dragInitialized = 'true';
+}
+
+/**
+ * 조직 트리 순서 저장
+ */
+async function saveOrgTreeOrder(parentId) {
+    if (!parentId) return;
+
+    // 해당 부모의 자식 노드들 순서 수집
+    const parent = document.querySelector(`.tree-node[data-id="${parentId}"]`);
+    if (!parent) return;
+
+    const childrenContainer = parent.querySelector('.tree-children');
+    if (!childrenContainer) return;
+
+    const children = childrenContainer.querySelectorAll(':scope > .tree-node');
+    const orgIds = Array.from(children).map(node => parseInt(node.dataset.id));
+
+    if (orgIds.length === 0) return;
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    try {
+        const response = await fetch('/admin/api/organizations/reorder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                parent_id: parseInt(parentId),
+                org_ids: orgIds
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('순서가 저장되었습니다', 'success');
+        } else {
+            showToast(result.error || '순서 저장에 실패했습니다', 'error');
+            // 실패 시 데이터 다시 로드
+            await loadOrgManagementTab();
+        }
+    } catch (error) {
+        console.error('순서 저장 오류:', error);
+        showToast('순서 저장 중 오류가 발생했습니다', 'error');
+        await loadOrgManagementTab();
+    }
 }
 
 /**
  * 트리 노드 렌더링
  */
-function renderTreeNode(org) {
+function renderTreeNode(org, parentId = null) {
     const typeIcons = {
         'company': 'fa-building',
         'division': 'fa-layer-group',
         'department': 'fa-users',
-        'team': 'fa-user-friends'
+        'team': 'fa-user-friends',
+        'headquarters': 'fa-building',
+        'section': 'fa-user-friends',
+        'office': 'fa-door-open',
+        'part': 'fa-puzzle-piece'
     };
     const icon = typeIcons[org.org_type] || 'fa-folder';
     const hasChildren = org.children && org.children.length > 0;
+    const isRoot = org.org_type === 'company';
 
     return `
-        <div class="tree-node" data-id="${org.id}" data-type="${org.org_type}">
+        <div class="tree-node" data-id="${org.id}" data-type="${org.org_type}" data-parent-id="${parentId || ''}" draggable="${!isRoot}">
             <div class="tree-node-content" data-action="select-org" data-org-id="${org.id}">
+                ${!isRoot ? `
+                    <span class="tree-drag-handle" title="드래그하여 순서 변경">
+                        <i class="fas fa-grip-vertical"></i>
+                    </span>
+                ` : ''}
                 ${hasChildren ? `
                     <span class="tree-toggle" data-action="toggle-node">
                         <i class="fas fa-chevron-right"></i>
@@ -238,11 +892,12 @@ function renderTreeNode(org) {
                     <i class="fas ${icon}"></i>
                 </span>
                 <span class="tree-label">${escapeHtml(org.name)}</span>
+                ${org.total_member_count > 0 ? `<span class="tree-member-count">(${org.total_member_count}명)</span>` : ''}
                 ${org.code ? `<span class="tree-code">${escapeHtml(org.code)}</span>` : ''}
             </div>
             ${hasChildren ? `
                 <div class="tree-children collapsed">
-                    ${org.children.map(child => renderTreeNode(child)).join('')}
+                    ${org.children.map(child => renderTreeNode(child, org.id)).join('')}
                 </div>
             ` : ''}
         </div>
@@ -311,6 +966,66 @@ function collapseAllTree() {
 }
 
 /**
+ * 트리 펼치기/접기 토글
+ */
+function toggleTreeExpand() {
+    if (state.treeExpanded) {
+        collapseAllTree();
+        updateToggleButton(false);
+    } else {
+        expandAllTree();
+        updateToggleButton(true);
+    }
+    state.treeExpanded = !state.treeExpanded;
+}
+
+/**
+ * 토글 버튼 상태 업데이트
+ */
+function updateToggleButton(expanded) {
+    const btn = document.getElementById('toggleTreeBtn');
+    if (!btn) return;
+
+    const icon = btn.querySelector('i');
+    const srText = btn.querySelector('.sr-only');
+
+    if (expanded) {
+        icon.className = 'fas fa-compress-alt';
+        btn.title = '전체 접기';
+        if (srText) srText.textContent = '전체 접기';
+    } else {
+        icon.className = 'fas fa-expand-alt';
+        btn.title = '전체 펼치기';
+        if (srText) srText.textContent = '전체 펼치기';
+    }
+}
+
+/**
+ * 조직유형 설정 모달 열기
+ */
+function toggleOrgTypeSettings() {
+    const modal = document.getElementById('orgTypeModal');
+    if (!modal) return;
+
+    modal.classList.add('show');
+
+    // 드래그 앤 드롭 재초기화 (모달 내 테이블용)
+    setTimeout(() => {
+        initOrgTypeSortable();
+    }, 100);
+}
+
+/**
+ * 조직유형 설정 모달 닫기
+ */
+function closeOrgTypeModal() {
+    const modal = document.getElementById('orgTypeModal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+}
+
+/**
  * 조직 선택
  */
 async function selectOrganization(orgId) {
@@ -352,8 +1067,36 @@ function renderOrgDetail(org) {
         'division': '본부',
         'department': '부서',
         'team': '팀',
-        'unit': '파트'
+        'unit': '파트',
+        'headquarters': '본부',
+        'section': '소',
+        'office': '실',
+        'part': '파트'
     };
+
+    // 소속인원 표시 (직접 + 하위 조직 합계)
+    const memberCountHtml = org.total_member_count !== undefined
+        ? `<div class="info-row">
+               <span class="info-label">소속인원</span>
+               <span class="info-value">${org.total_member_count}명${org.direct_member_count !== undefined && org.direct_member_count !== org.total_member_count ? ` (직접: ${org.direct_member_count}명)` : ''}</span>
+           </div>`
+        : '';
+
+    // 대표 내선번호 표시
+    const deptPhoneHtml = org.department_phone
+        ? `<div class="info-row">
+               <span class="info-label">대표 내선번호</span>
+               <span class="info-value">${escapeHtml(org.department_phone)}</span>
+           </div>`
+        : '';
+
+    // 조직 이메일 표시
+    const deptEmailHtml = org.department_email
+        ? `<div class="info-row">
+               <span class="info-label">조직 이메일</span>
+               <span class="info-value">${escapeHtml(org.department_email)}</span>
+           </div>`
+        : '';
 
     panel.querySelector('.panel-body').innerHTML = `
         <div class="org-detail">
@@ -367,10 +1110,13 @@ function renderOrgDetail(org) {
                     <span class="info-label">조직 코드</span>
                     <span class="info-value">${org.code || '-'}</span>
                 </div>
+                ${memberCountHtml}
                 <div class="info-row">
                     <span class="info-label">조직 경로</span>
                     <span class="info-value">${org.path || org.name}</span>
                 </div>
+                ${deptPhoneHtml}
+                ${deptEmailHtml}
                 <div class="info-row">
                     <span class="info-label">설명</span>
                     <span class="info-value">${org.description || '-'}</span>
@@ -399,11 +1145,78 @@ function renderOrgDetail(org) {
 /**
  * 조직 추가 모달 표시
  */
-function showAddOrgModal() {
+async function showAddOrgModal() {
     document.getElementById('orgModalTitle').textContent = '조직 추가';
     document.getElementById('orgForm').reset();
     document.getElementById('orgId').value = '';
+    // 조직유형 옵션 및 직원 목록 동적 로드
+    await Promise.all([
+        loadOrgTypeOptions(),
+        loadEmployeesForManager()
+    ]);
     document.getElementById('orgModal').classList.add('show');
+}
+
+/**
+ * 조직장 선택을 위한 직원 목록 로드
+ */
+async function loadEmployeesForManager() {
+    const select = document.getElementById('orgManager');
+    if (!select) return;
+
+    try {
+        const response = await fetch('/admin/api/organizations/employees');
+        const result = await response.json();
+
+        if (result.success && result.data) {
+            select.innerHTML = '<option value="">선택하세요</option>' +
+                result.data.map(emp =>
+                    `<option value="${emp.id}">${emp.name}${emp.position ? ` (${emp.position})` : ''}</option>`
+                ).join('');
+        }
+    } catch (error) {
+        console.error('직원 목록 로드 실패:', error);
+        select.innerHTML = '<option value="">선택하세요</option>';
+    }
+}
+
+/**
+ * 조직유형 옵션 동적 로드
+ */
+async function loadOrgTypeOptions() {
+    const select = document.getElementById('orgType');
+    if (!select) return;
+
+    try {
+        const response = await fetch('/api/corporate/organization-types/active');
+        const result = await response.json();
+
+        if (result.success && result.data) {
+            select.innerHTML = result.data.map(type =>
+                `<option value="${type.value}">${type.label}</option>`
+            ).join('');
+
+            // 기본값 선택 (팀 또는 첫 번째 옵션)
+            const defaultOption = select.querySelector('option[value="team"]') ||
+                                  select.querySelector('option[value="department"]') ||
+                                  select.querySelector('option');
+            if (defaultOption) {
+                defaultOption.selected = true;
+            }
+        }
+    } catch (error) {
+        console.error('조직유형 옵션 로드 실패:', error);
+        // 폴백: 기본 옵션
+        select.innerHTML = `
+            <option value="headquarters">본부</option>
+            <option value="division">부</option>
+            <option value="team" selected>팀</option>
+            <option value="section">소</option>
+            <option value="department">과</option>
+            <option value="office">실</option>
+            <option value="part">파트</option>
+        `;
+    }
 }
 
 /**
@@ -419,6 +1232,12 @@ function showAddChildModal(parentId) {
  */
 async function showEditOrgModal(orgId) {
     try {
+        // 조직유형 옵션 및 직원 목록 먼저 로드
+        await Promise.all([
+            loadOrgTypeOptions(),
+            loadEmployeesForManager()
+        ]);
+
         const response = await fetch(`/admin/api/organizations/${orgId}`);
         const result = await response.json();
 
@@ -431,6 +1250,10 @@ async function showEditOrgModal(orgId) {
             document.getElementById('orgType').value = org.org_type;
             document.getElementById('orgParent').value = org.parent_id || '';
             document.getElementById('orgDescription').value = org.description || '';
+            // 조직장/연락처 필드
+            document.getElementById('orgManager').value = org.manager_id || '';
+            document.getElementById('deptPhone').value = org.department_phone || '';
+            document.getElementById('deptEmail').value = org.department_email || '';
             document.getElementById('orgModal').classList.add('show');
         }
     } catch (error) {
@@ -446,12 +1269,16 @@ async function saveOrganization(event) {
 
     const orgId = document.getElementById('orgId').value;
     const parentIdValue = document.getElementById('orgParent').value;
+    const managerIdValue = document.getElementById('orgManager').value;
     const data = {
         name: document.getElementById('orgName').value,
         code: document.getElementById('orgCode').value || null,
         org_type: document.getElementById('orgType').value,
         parent_id: parentIdValue ? parseInt(parentIdValue, 10) : null,
-        description: document.getElementById('orgDescription').value || null
+        description: document.getElementById('orgDescription').value || null,
+        manager_id: managerIdValue ? parseInt(managerIdValue, 10) : null,
+        department_phone: document.getElementById('deptPhone').value || null,
+        department_email: document.getElementById('deptEmail').value || null
     };
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
@@ -552,47 +1379,127 @@ function initOrgManagementHandlers() {
     const container = document.getElementById('tab-org-management');
     if (!container || container.dataset.handlersInitialized) return;
 
+    // 공통 액션 핸들러
+    function handleAction(action, target) {
+        switch (action) {
+            case 'toggle-node':
+                toggleTreeNode(target);
+                return true;
+            case 'select-org':
+                selectOrganization(parseInt(target.dataset.orgId));
+                return true;
+            case 'add-org':
+                showAddOrgModal();
+                return true;
+            case 'toggle-tree':
+                toggleTreeExpand();
+                return true;
+            case 'toggle-org-type-settings':
+                toggleOrgTypeSettings();
+                return true;
+            case 'close-org-type-modal':
+                closeOrgTypeModal();
+                return true;
+            case 'close-org-modal':
+                closeOrgModal();
+                return true;
+            case 'close-delete-modal':
+                closeDeleteModal();
+                return true;
+            case 'confirm-delete':
+                confirmDeleteOrg();
+                return true;
+            case 'edit-org':
+                showEditOrgModal(parseInt(target.dataset.orgId));
+                return true;
+            case 'add-child':
+                showAddChildModal(parseInt(target.dataset.parentId));
+                return true;
+            case 'delete-org':
+                showDeleteModal(parseInt(target.dataset.orgId), target.dataset.orgName);
+                return true;
+            case 'reset-org-types':
+                resetOrgTypes();
+                return true;
+            case 'select-icon':
+                showIconSelector(parseInt(target.dataset.id));
+                return true;
+            case 'delete-org-type':
+                deleteOrgType(parseInt(target.dataset.id), target.dataset.typeCode);
+                return true;
+            case 'add-org-type':
+                addOrgType();
+                return true;
+        }
+        return false;
+    }
+
     container.addEventListener('click', function(e) {
         const target = e.target.closest('[data-action]');
         if (!target) return;
 
         const action = target.dataset.action;
+        if (action === 'toggle-node') {
+            e.stopPropagation();
+        }
+        handleAction(action, target);
+    });
 
-        switch (action) {
-            case 'toggle-node':
-                e.stopPropagation();
-                toggleTreeNode(target);
-                break;
-            case 'select-org':
-                selectOrganization(parseInt(target.dataset.orgId));
-                break;
-            case 'add-org':
-                showAddOrgModal();
-                break;
-            case 'expand-all':
-                expandAllTree();
-                break;
-            case 'collapse-all':
-                collapseAllTree();
-                break;
-            case 'close-org-modal':
-                closeOrgModal();
-                break;
-            case 'close-delete-modal':
-                closeDeleteModal();
-                break;
-            case 'confirm-delete':
-                confirmDeleteOrg();
-                break;
-            case 'edit-org':
-                showEditOrgModal(parseInt(target.dataset.orgId));
-                break;
-            case 'add-child':
-                showAddChildModal(parseInt(target.dataset.parentId));
-                break;
-            case 'delete-org':
-                showDeleteModal(parseInt(target.dataset.orgId), target.dataset.orgName);
-                break;
+    // 조직유형 모달 이벤트 핸들러 (모달은 container 외부에 있음)
+    const orgTypeModal = document.getElementById('orgTypeModal');
+    if (orgTypeModal && !orgTypeModal.dataset.handlersInitialized) {
+        orgTypeModal.addEventListener('click', function(e) {
+            const target = e.target.closest('[data-action]');
+            if (!target) {
+                // 모달 배경 클릭 시 닫기
+                if (e.target === orgTypeModal) {
+                    closeOrgTypeModal();
+                }
+                return;
+            }
+            handleAction(target.dataset.action, target);
+        });
+
+        // 조직유형 라벨 입력 이벤트 (blur 시 저장)
+        orgTypeModal.addEventListener('blur', function(e) {
+            const input = e.target.closest('.org-type-label-input');
+            if (input && input.value !== input.dataset.original) {
+                const field = input.dataset.field || 'type_label_ko';
+                saveOrgTypeLabel(parseInt(input.dataset.id), field, input.value.trim());
+            }
+        }, true);
+
+        // 조직유형 라벨 입력 이벤트 (Enter 키)
+        orgTypeModal.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const input = e.target.closest('.org-type-label-input');
+                if (input) {
+                    e.preventDefault();
+                    input.blur();
+                }
+            }
+        });
+
+        orgTypeModal.dataset.handlersInitialized = 'true';
+    }
+
+    // 조직유형 라벨 입력 이벤트 (blur 시 저장)
+    container.addEventListener('blur', function(e) {
+        const input = e.target.closest('.org-type-label-input');
+        if (input && input.value !== input.dataset.original) {
+            const field = input.dataset.field || 'type_label_ko';
+            saveOrgTypeLabel(parseInt(input.dataset.id), field, input.value.trim());
+        }
+    }, true);
+
+    // 조직유형 라벨 입력 이벤트 (Enter 키)
+    container.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const input = e.target.closest('.org-type-label-input');
+            if (input) {
+                e.preventDefault();
+                input.blur();
+            }
         }
     });
 

@@ -31,12 +31,28 @@ class PersonContractRepository(BaseRepository[PersonCorporateContract]):
         ).order_by(PersonCorporateContract.created_at.desc()).all()
         return [c.to_dict(include_relations=True) for c in contracts]
 
-    def get_by_company_id(self, company_id: int) -> List[Dict]:
-        """기업의 모든 계약 조회"""
-        contracts = PersonCorporateContract.query.filter_by(
+    def get_by_company_id(self, company_id: int, page: int = None, per_page: int = None):
+        """기업의 모든 계약 조회 (페이지네이션 옵션)
+
+        Args:
+            company_id: 기업 ID
+            page: 페이지 번호 (None이면 전체 조회)
+            per_page: 페이지당 항목 수 (None이면 전체 조회)
+
+        Returns:
+            page/per_page가 None이면 List[Dict] 반환 (하위 호환성)
+            page/per_page가 지정되면 Pagination 객체 반환 (items는 Model)
+        """
+        query = PersonCorporateContract.query.filter_by(
             company_id=company_id
-        ).order_by(PersonCorporateContract.created_at.desc()).all()
-        return [c.to_dict(include_relations=True) for c in contracts]
+        ).order_by(PersonCorporateContract.created_at.desc())
+
+        # 페이지네이션 분기 (Phase 32)
+        if page is not None and per_page is not None:
+            return query.paginate(page=page, per_page=per_page, error_out=False)
+        else:
+            contracts = query.all()
+            return [c.to_dict(include_relations=True) for c in contracts]
 
     def get_active_contracts_by_person(self, person_user_id: int) -> List[Dict]:
         """개인의 활성 계약 조회"""

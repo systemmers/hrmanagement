@@ -1,6 +1,7 @@
 {% extends "shared/base.html" %}
 {% from 'shared/macros/_contracts.html' import contract_stats_row_company, contract_table_row %}
 {% from 'shared/macros/_filters.html' import filter_bar, search_box, filter_select %}
+{% from 'shared/macros/_pagination.html' import render_pagination %}
 
 {% block title %}기업 계약 관리 - 인사카드 관리 시스템{% endblock %}
 
@@ -78,6 +79,9 @@
         </tbody>
     </table>
 </div>
+
+<!-- 페이지네이션 (Phase 32) -->
+{{ render_pagination(pagination, per_page=per_page) }}
 
 <!-- 계약 요청 모달 -->
 {% include 'domains/contract/partials/_contract_request_modal.html' %}

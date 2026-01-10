@@ -26,6 +26,10 @@ class Organization(db.Model):
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     description = db.Column(db.Text, nullable=True)
 
+    # 연락처 필드
+    department_phone = db.Column(db.String(20), nullable=True)   # 대표 내선번호
+    department_email = db.Column(db.String(100), nullable=True)  # 조직 이메일
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -123,6 +127,8 @@ class Organization(db.Model):
             'sort_order': self.sort_order,
             'is_active': self.is_active,
             'description': self.description,
+            'department_phone': self.department_phone,
+            'department_email': self.department_email,
             'level': self.get_level(),
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
@@ -174,6 +180,8 @@ class Organization(db.Model):
             sort_order=data.get('sort_order', 0),
             is_active=data.get('is_active', True),
             description=data.get('description'),
+            department_phone=data.get('department_phone'),
+            department_email=data.get('department_email'),
         )
 
     def __repr__(self):

@@ -102,16 +102,13 @@ def settings():
 @corporate_bp.route('/users')
 @corporate_admin_required
 def users():
-    """법인 계정관리 (employee_sub만 표시, 페이지네이션 지원)
+    """법인 계정관리 (employee_sub만 표시, 페이지네이션/필터 지원)
 
     21번 원칙: 법인 계정(employee_sub)만 표시
     personal 계정은 외부 사용자이므로 제외
 
-    BUG-1 수정: 계약 상태 표시 추가
-    - N+1 방지: 벌크 조회 사용
-
     Phase 28: 페이지네이션 + ROW_NUMBER() 적용
-    - company_sequence: 법인 내 가입 순서 표시
+    Phase 33: 필터/검색/정렬 기능 추가
     """
     company_id = session.get(SessionKeys.COMPANY_ID)
     if not company_id:
@@ -127,17 +124,29 @@ def users():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
 
-    # 법인 계정 목록 조회 (페이지네이션 + 법인 내 시퀀스)
-    users, pagination = user_service.get_by_company_and_account_type_paginated(
+    # 필터 파라미터 (Phase 33)
+    search = request.args.get('search', '').strip()
+    role = request.args.get('role', None)
+    status = request.args.get('status', None)
+    contract_status = request.args.get('contract_status', None)
+
+    # 정렬 파라미터 (Phase 33)
+    sort_by = request.args.get('sort', None)
+    sort_order = request.args.get('order', 'asc')
+
+    # 필터링된 사용자 목록 조회 (Phase 33)
+    users, pagination = user_service.filter_users(
         company_id=company_id,
         account_type=User.ACCOUNT_EMPLOYEE_SUB,
+        search=search if search else None,
+        role=role,
+        status=status,
+        contract_status=contract_status,
+        sort_by=sort_by,
+        sort_order=sort_order,
         page=page,
         per_page=per_page
     )
-
-    # Phase 24: 데이터 변환 로직을 Service 레이어로 이동
-    # 계약 상태 및 직원 이름 추가를 Service에서 처리
-    users = user_service.get_users_with_contract_and_employee_details(users, company_id)
 
     # 조직 목록 조회 (계정 발급 모달용)
     organizations = []
@@ -146,12 +155,36 @@ def users():
             root_organization_id=company.root_organization_id
         )
 
+    # 필터 옵션 정의 (Phase 33)
+    filter_options = {
+        'roles': [
+            {'value': 'admin', 'label': '관리자'},
+            {'value': 'manager', 'label': '매니저'},
+            {'value': 'employee', 'label': '직원'},
+        ],
+        'statuses': [
+            {'value': 'active', 'label': '활성'},
+            {'value': 'dormant', 'label': '휴면'},
+            {'value': 'withdrawn', 'label': '탈퇴'},
+        ],
+        'contract_statuses': [
+            {'value': 'none', 'label': '계약없음'},
+            {'value': 'requested', 'label': '대기중'},
+            {'value': 'approved', 'label': '승인됨'},
+            {'value': 'rejected', 'label': '거절됨'},
+            {'value': 'terminated', 'label': '종료'},
+            {'value': 'termination_requested', 'label': '종료대기'},
+        ],
+    }
+
     return render_template(
         'domains/company/users.html',
         company=company,
         users=users,
         pagination=pagination,
-        organizations=organizations
+        per_page=per_page,
+        organizations=organizations,
+        filter_options=filter_options
     )
 
 

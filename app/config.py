@@ -94,6 +94,7 @@ class Config:
 class DevelopmentConfig(Config):
     """개발 환경 설정"""
     DEBUG = True
+    SEND_FILE_MAX_AGE_DEFAULT = 0  # 정적 파일 캐싱 비활성화 (개발 중 CSS/JS 변경 즉시 반영)
 
 
 class ProductionConfig(Config):

@@ -82,8 +82,19 @@ class ContractService:
     def get_personal_statistics(self, user_id: int) -> Dict:
         return self._core.get_personal_statistics(user_id)
 
-    def get_company_contracts(self, company_id: int) -> List[Dict]:
-        return self._core.get_company_contracts(company_id)
+    def get_company_contracts(self, company_id: int, page: int = None, per_page: int = None):
+        """법인 계약 목록 조회 (페이지네이션 옵션)
+
+        Args:
+            company_id: 법인 ID
+            page: 페이지 번호 (None이면 전체 조회)
+            per_page: 페이지당 항목 수 (None이면 전체 조회)
+
+        Returns:
+            page/per_page가 None이면 List[Dict] 반환
+            page/per_page가 지정되면 Pagination 객체 반환
+        """
+        return self._core.get_company_contracts(company_id, page=page, per_page=per_page)
 
     def get_company_pending_contracts(self, company_id: int) -> List[Dict]:
         return self._core.get_company_pending_contracts(company_id)

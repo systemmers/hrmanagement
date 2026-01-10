@@ -297,6 +297,49 @@ class UserService:
         """
         return self.user_repo.find_by_employee_id(employee_id)
 
+    def filter_users(
+        self,
+        company_id: int,
+        account_type: str,
+        search: str = None,
+        role: str = None,
+        status: str = None,
+        contract_status: str = None,
+        sort_by: str = None,
+        sort_order: str = 'asc',
+        page: int = 1,
+        per_page: int = 20
+    ) -> Tuple[List[Dict], Any]:
+        """필터링된 사용자 목록 조회 (페이지네이션 포함)
+
+        Args:
+            company_id: 법인 ID
+            account_type: 계정 유형
+            search: 검색어 (이름, 아이디, 이메일)
+            role: 역할 필터 (admin, manager, employee)
+            status: 상태 필터 (active, dormant, withdrawn)
+            contract_status: 계약상태 필터 (none, requested, approved, rejected, terminated)
+            sort_by: 정렬 기준 (name, username, created_at, role)
+            sort_order: 정렬 순서 (asc, desc)
+            page: 페이지 번호
+            per_page: 페이지당 항목 수
+
+        Returns:
+            Tuple[사용자 목록 (Dict), 페이지네이션 객체]
+        """
+        return self.user_repo.filter_users_paginated(
+            company_id=company_id,
+            account_type=account_type,
+            search=search,
+            role=role,
+            status=status,
+            contract_status=contract_status,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            per_page=per_page
+        )
+
     def get_users_with_contract_and_employee_details(
         self,
         users: List[Dict],

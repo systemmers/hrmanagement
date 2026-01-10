@@ -110,12 +110,19 @@ def company_contracts():
         flash('법인 정보가 없습니다.', 'error')
         return redirect(url_for('main.index'))
 
-    contracts = contract_service.get_company_contracts(company_id)
+    # 페이지네이션 파라미터 (Phase 32)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+
+    pagination = contract_service.get_company_contracts(company_id, page=page, per_page=per_page)
+    contracts = [c.to_dict(include_relations=True) for c in pagination.items]
     stats = contract_service.get_company_statistics(company_id)
 
     return render_template(
         'domains/contract/company_contracts.html',
         contracts=contracts,
+        pagination=pagination,
+        per_page=per_page,
         stats=stats,
         field_options=FieldOptions
     )

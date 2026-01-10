@@ -10,6 +10,9 @@
 
 let selectedOrgId = null;
 let deleteOrgId = null;
+let treeExpanded = false;
+let draggedNode = null;
+let draggedOrgId = null;
 
 /**
  * 트리 노드 토글
@@ -50,6 +53,41 @@ function collapseAll() {
         el.classList.add('fa-chevron-right');
         el.classList.remove('fa-chevron-down');
     });
+}
+
+/**
+ * 트리 펼치기/접기 토글
+ */
+function toggleTreeExpand() {
+    if (treeExpanded) {
+        collapseAll();
+        updateToggleButton(false);
+    } else {
+        expandAll();
+        updateToggleButton(true);
+    }
+    treeExpanded = !treeExpanded;
+}
+
+/**
+ * 토글 버튼 상태 업데이트
+ */
+function updateToggleButton(expanded) {
+    const btn = document.getElementById('toggleTreeBtn');
+    if (!btn) return;
+
+    const icon = btn.querySelector('i');
+    const srText = btn.querySelector('.sr-only');
+
+    if (expanded) {
+        icon.className = 'fas fa-compress-alt';
+        btn.title = '전체 접기';
+        if (srText) srText.textContent = '전체 접기';
+    } else {
+        icon.className = 'fas fa-expand-alt';
+        btn.title = '전체 펼치기';
+        if (srText) srText.textContent = '전체 펼치기';
+    }
 }
 
 /**
@@ -171,6 +209,10 @@ async function showEditOrgModal(orgId) {
             document.getElementById('orgType').value = org.org_type;
             document.getElementById('orgParent').value = org.parent_id || '';
             document.getElementById('orgDescription').value = org.description || '';
+            // 조직장 및 내선번호 필드
+            document.getElementById('orgManager').value = org.manager_id || '';
+            document.getElementById('leaderPhone').value = org.leader_phone || '';
+            document.getElementById('deptPhone').value = org.department_phone || '';
             document.getElementById('orgModal').classList.add('show');
         }
     } catch (error) {
@@ -186,12 +228,17 @@ async function saveOrganization(event) {
 
     const orgId = document.getElementById('orgId').value;
     const parentIdValue = document.getElementById('orgParent').value;
+    const managerIdValue = document.getElementById('orgManager').value;
     const data = {
         name: document.getElementById('orgName').value,
         code: document.getElementById('orgCode').value || null,
         org_type: document.getElementById('orgType').value,
         parent_id: parentIdValue ? parseInt(parentIdValue, 10) : null,
-        description: document.getElementById('orgDescription').value || null
+        description: document.getElementById('orgDescription').value || null,
+        // 조직장 및 내선번호 필드
+        manager_id: managerIdValue ? parseInt(managerIdValue, 10) : null,
+        leader_phone: document.getElementById('leaderPhone').value || null,
+        department_phone: document.getElementById('deptPhone').value || null
     };
 
     // CSRF 토큰 가져오기
@@ -281,6 +328,173 @@ async function confirmDelete() {
 }
 
 /**
+ * 노드가 다른 노드의 자손인지 확인
+ * @param {Element} parent - 부모 노드
+ * @param {Element} child - 자식 노드
+ * @returns {boolean} 자손 여부
+ */
+function isDescendant(parent, child) {
+    let node = child.parentElement;
+    while (node) {
+        if (node === parent) return true;
+        node = node.parentElement;
+    }
+    return false;
+}
+
+/**
+ * 드래그앤드롭 초기화
+ */
+function initTreeDragDrop() {
+    const treeContainer = document.querySelector('.org-tree');
+    if (!treeContainer) return;
+
+    // 드래그 시작
+    treeContainer.addEventListener('dragstart', (e) => {
+        const node = e.target.closest('.tree-node');
+        if (!node || node.dataset.type === 'company') {
+            e.preventDefault();
+            return;
+        }
+
+        draggedNode = node;
+        draggedOrgId = node.dataset.id;
+        node.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', draggedOrgId);
+    });
+
+    // 드래그 오버
+    treeContainer.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const nodeContent = e.target.closest('.tree-node-content');
+        if (!nodeContent) return;
+
+        const targetNode = nodeContent.closest('.tree-node');
+        if (!targetNode || targetNode === draggedNode) return;
+
+        // 자손으로 이동 방지 (순환 참조)
+        if (isDescendant(draggedNode, targetNode)) {
+            e.dataTransfer.dropEffect = 'none';
+            return;
+        }
+
+        e.dataTransfer.dropEffect = 'move';
+
+        // 기존 드롭 표시 제거
+        treeContainer.querySelectorAll('.drag-over').forEach(el => {
+            el.classList.remove('drag-over');
+        });
+
+        // 새 드롭 표시
+        nodeContent.classList.add('drag-over');
+    });
+
+    // 드래그 리브
+    treeContainer.addEventListener('dragleave', (e) => {
+        const nodeContent = e.target.closest('.tree-node-content');
+        if (nodeContent) {
+            nodeContent.classList.remove('drag-over');
+        }
+    });
+
+    // 드롭
+    treeContainer.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        const nodeContent = e.target.closest('.tree-node-content');
+        if (!nodeContent || !draggedOrgId) return;
+
+        const targetNode = nodeContent.closest('.tree-node');
+        const targetOrgId = targetNode.dataset.id;
+
+        // 자기 자신으로 이동 방지
+        if (draggedOrgId === targetOrgId) {
+            cleanupDragState();
+            return;
+        }
+
+        // 순환 참조 검증
+        if (isDescendant(draggedNode, targetNode)) {
+            showToast('하위 조직으로 이동할 수 없습니다.', 'error');
+            cleanupDragState();
+            return;
+        }
+
+        // API 호출
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+        try {
+            const response = await fetch(`/admin/api/organizations/${draggedOrgId}/move`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ new_parent_id: parseInt(targetOrgId, 10) })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                showToast('조직이 이동되었습니다.', 'success');
+                location.reload();
+            } else {
+                showToast(result.error || '이동에 실패했습니다.', 'error');
+            }
+        } catch (error) {
+            console.error('조직 이동 오류:', error);
+            showToast('이동 중 오류가 발생했습니다.', 'error');
+        }
+
+        cleanupDragState();
+    });
+
+    // 드래그 종료
+    treeContainer.addEventListener('dragend', () => {
+        cleanupDragState();
+    });
+}
+
+/**
+ * 드래그 상태 정리
+ */
+function cleanupDragState() {
+    if (draggedNode) {
+        draggedNode.classList.remove('dragging');
+    }
+    document.querySelectorAll('.drag-over').forEach(el => {
+        el.classList.remove('drag-over');
+    });
+    draggedNode = null;
+    draggedOrgId = null;
+}
+
+/**
+ * 토스트 메시지 표시
+ */
+function showToast(message, type = 'info') {
+    // 기존 토스트 컨테이너 사용 또는 생성
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast--${type}`;
+    toast.innerHTML = `
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+        <span>${message}</span>
+    `;
+    container.appendChild(toast);
+
+    // 애니메이션 후 제거
+    setTimeout(() => {
+        toast.classList.add('toast--fade-out');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+/**
  * 페이지 초기화
  */
 function initOrganizationPage() {
@@ -292,6 +506,9 @@ function initOrganizationPage() {
         el.classList.remove('fa-chevron-right');
         el.classList.add('fa-chevron-down');
     });
+
+    // 드래그앤드롭 초기화
+    initTreeDragDrop();
 
     // 이벤트 위임 - 클릭 이벤트
     document.addEventListener('click', function(e) {
@@ -311,11 +528,8 @@ function initOrganizationPage() {
             case 'add-org':
                 showAddOrgModal();
                 break;
-            case 'expand-all':
-                expandAll();
-                break;
-            case 'collapse-all':
-                collapseAll();
+            case 'toggle-tree':
+                toggleTreeExpand();
                 break;
             case 'close-org-modal':
                 closeOrgModal();

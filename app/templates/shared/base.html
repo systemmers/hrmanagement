@@ -54,6 +54,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/filter.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/tree-selector.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/data-table-advanced.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/pagination.css') }}">
 
     <!-- Domain Pages (user) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/user/profile.css') }}">
@@ -163,6 +164,7 @@
     <!-- JavaScript -->
     <script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/shared/components/notification-dropdown.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/utils/pagination.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

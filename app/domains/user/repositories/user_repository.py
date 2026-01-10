@@ -424,6 +424,151 @@ class UserRepository(BaseRepository[User]):
             User.is_active == True
         ).all()
 
+    def filter_users_paginated(
+        self,
+        company_id: int,
+        account_type: str,
+        search: str = None,
+        role: str = None,
+        status: str = None,
+        contract_status: str = None,
+        sort_by: str = None,
+        sort_order: str = 'asc',
+        page: int = 1,
+        per_page: int = 20
+    ) -> Tuple[List[Dict], object]:
+        """필터링된 사용자 목록 조회 (페이지네이션 + 법인 내 시퀀스)
+
+        Phase 33: 계정관리 필터 기능
+
+        Args:
+            company_id: 법인 ID
+            account_type: 계정 타입
+            search: 검색어 (이름, 아이디, 이메일)
+            role: 역할 필터
+            status: 상태 필터 (active, dormant, withdrawn)
+            contract_status: 계약상태 필터
+            sort_by: 정렬 기준
+            sort_order: 정렬 순서
+            page: 페이지 번호
+            per_page: 페이지당 항목 수
+
+        Returns:
+            Tuple[사용자 목록 (Dict with company_sequence), 페이지네이션 객체]
+        """
+        from sqlalchemy import or_, and_, case
+        from app.domains.employee.models import Employee
+        from app.domains.contract.models import PersonCorporateContract
+
+        # 1. 기본 쿼리 + 법인 내 시퀀스 서브쿼리
+        subquery = db.session.query(
+            User.id,
+            func.row_number().over(
+                partition_by=User.company_id,
+                order_by=User.id.asc()
+            ).label('company_sequence')
+        ).filter_by(
+            company_id=company_id,
+            account_type=account_type
+        ).subquery()
+
+        # 2. 메인 쿼리 (Employee, Contract LEFT JOIN)
+        query = db.session.query(
+            User,
+            subquery.c.company_sequence,
+            Employee.name.label('employee_name'),
+            PersonCorporateContract.status.label('contract_status_value')
+        ).join(
+            subquery, User.id == subquery.c.id
+        ).outerjoin(
+            Employee, User.employee_id == Employee.id
+        ).outerjoin(
+            PersonCorporateContract,
+            and_(
+                PersonCorporateContract.person_user_id == User.id,
+                PersonCorporateContract.company_id == company_id
+            )
+        )
+
+        # 3. 검색 필터 (이름, 아이디, 이메일)
+        if search:
+            search_pattern = f'%{search}%'
+            query = query.filter(
+                or_(
+                    Employee.name.ilike(search_pattern),
+                    User.username.ilike(search_pattern),
+                    User.email.ilike(search_pattern)
+                )
+            )
+
+        # 4. 역할 필터
+        if role:
+            query = query.filter(User.role == role)
+
+        # 5. 상태 필터 (is_active 기반)
+        if status:
+            if status == 'active':
+                query = query.filter(User.is_active == True)
+            elif status in ['dormant', 'withdrawn']:
+                query = query.filter(User.is_active == False)
+
+        # 6. 계약상태 필터
+        if contract_status:
+            if contract_status == 'none':
+                query = query.filter(PersonCorporateContract.id.is_(None))
+            else:
+                query = query.filter(PersonCorporateContract.status == contract_status)
+
+        # 7. 정렬
+        if sort_by:
+            sort_column = None
+            if sort_by == 'name':
+                sort_column = Employee.name
+            elif sort_by == 'username':
+                sort_column = User.username
+            elif sort_by == 'created_at':
+                sort_column = User.created_at
+            elif sort_by == 'role':
+                sort_column = User.role
+            elif sort_by == 'status':
+                sort_column = User.is_active
+
+            if sort_column is not None:
+                if sort_order == 'desc':
+                    query = query.order_by(sort_column.desc().nullslast())
+                else:
+                    query = query.order_by(sort_column.asc().nullsfirst())
+        else:
+            query = query.order_by(User.id.asc())
+
+        # 8. 페이지네이션
+        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+
+        # 9. 결과 변환
+        users = []
+        for row in pagination.items:
+            user = row[0]  # User 객체
+            company_sequence = row[1]
+            employee_name = row[2]
+            contract_status_value = row[3]
+
+            user_dict = user.to_dict() if hasattr(user, 'to_dict') else {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'role': user.role,
+                'is_active': user.is_active,
+                'created_at': str(user.created_at) if user.created_at else None,
+                'employee_id': user.employee_id,
+            }
+            user_dict['company_sequence'] = company_sequence
+            user_dict['name'] = employee_name or '-'
+            user_dict['contract_status'] = contract_status_value or 'none'
+
+            users.append(user_dict)
+
+        return users, pagination
+
 
 # 싱글톤 인스턴스
 user_repository = UserRepository()

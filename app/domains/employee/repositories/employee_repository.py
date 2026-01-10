@@ -348,8 +348,9 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
     def filter_employees(self, department: str = None, position: str = None, status: str = None,
                          departments: List[str] = None, positions: List[str] = None, statuses: List[str] = None,
                          search: str = None, sort_by: str = None, sort_order: str = 'asc',
-                         organization_id: int = None) -> List[Dict]:
-        """다중 필터링 및 정렬
+                         organization_id: int = None,
+                         page: int = None, per_page: int = None):
+        """다중 필터링 및 정렬 (페이지네이션 옵션)
 
         Args:
             department: 단일 부서 필터
@@ -362,6 +363,12 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
             sort_by: 정렬 기준 컬럼
             sort_order: 정렬 순서 (asc/desc)
             organization_id: 조직 ID (None이면 전체 조회)
+            page: 페이지 번호 (None이면 전체 조회)
+            per_page: 페이지당 항목 수 (None이면 전체 조회)
+
+        Returns:
+            page/per_page가 None이면 List[Dict] 반환 (하위 호환성)
+            page/per_page가 지정되면 Pagination 객체 반환
         """
         from sqlalchemy import or_
         query = self._build_query(organization_id)
@@ -404,8 +411,12 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
         else:
             query = query.order_by(Employee.id)
 
-        employees = query.all()
-        return [emp.to_dict() for emp in employees]
+        # 페이지네이션 분기 (Phase 32)
+        if page is not None and per_page is not None:
+            return query.paginate(page=page, per_page=per_page, error_out=False)
+        else:
+            employees = query.all()
+            return [emp.to_dict() for emp in employees]
 
     def _generate_new_id(self) -> int:
         """새 직원 ID 생성 (Integer 자동 증가)"""

@@ -1,6 +1,7 @@
 {% extends "shared/base.html" %}
 {% from 'shared/macros/_avatar.html' import avatar_image %}
 {% from 'shared/macros/_filters.html' import filter_bar, search_box, filter_select, sort_select %}
+{% from 'shared/macros/_pagination.html' import render_pagination %}
 
 {% block title %}직원 목록 - 인사카드 관리 시스템{% endblock %}
 
@@ -38,7 +39,7 @@
             </a>
         </div>
     </div>
-    <p class="page-description">총 {{ employees|length }}명의 직원이 있습니다.</p>
+    <p class="page-description">총 {{ pagination.total }}명의 직원이 있습니다.</p>
 </div>
 
 <!-- 필터 바 (매크로 기반) - 정렬 포함 -->
@@ -208,6 +209,9 @@
         {% include 'domains/businesscard/partials/_card.html' %}
     {% endfor %}
 </div>
+
+<!-- 페이지네이션 (Phase 32) -->
+{{ render_pagination(pagination, per_page=per_page) }}
 
 {% if employees|length == 0 %}
 <div class="empty-state empty-state-large">

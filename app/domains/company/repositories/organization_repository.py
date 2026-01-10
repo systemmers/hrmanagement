@@ -153,7 +153,8 @@ class OrganizationRepository(BaseRepository[Organization], TenantFilterMixin):
     def create_organization(self, name: str, org_type: str,
                             parent_id: int = None, code: str = None,
                             manager_id: int = None, description: str = None,
-                            root_organization_id: int = None) -> Organization:
+                            root_organization_id: int = None,
+                            department_phone: str = None, department_email: str = None) -> Organization:
         """새 조직 생성 (멀티테넌시: parent_id가 해당 테넌트 소속인지 검증)"""
         # 멀티테넌시 검증: parent_id가 지정된 경우 해당 테넌트 소속인지 확인
         if root_organization_id and parent_id:
@@ -173,6 +174,8 @@ class OrganizationRepository(BaseRepository[Organization], TenantFilterMixin):
             manager_id=manager_id,
             sort_order=max_order + 1,
             description=description,
+            department_phone=department_phone,
+            department_email=department_email,
         )
         db.session.add(org)
         db.session.commit()
@@ -210,6 +213,10 @@ class OrganizationRepository(BaseRepository[Organization], TenantFilterMixin):
             org.description = data['description']
         if 'is_active' in data:
             org.is_active = data['is_active']
+        if 'department_phone' in data:
+            org.department_phone = data['department_phone']
+        if 'department_email' in data:
+            org.department_email = data['department_email']
 
         db.session.commit()
         return org
@@ -362,6 +369,34 @@ class OrganizationRepository(BaseRepository[Organization], TenantFilterMixin):
                 return False
 
         return query.first() is not None
+
+    def get_member_counts(self, root_organization_id: int = None) -> Dict[int, int]:
+        """조직별 소속인원 수 집계 (멀티테넌시 적용)
+
+        Args:
+            root_organization_id: 루트 조직 ID
+
+        Returns:
+            Dict[org_id, member_count]
+        """
+        from sqlalchemy import func
+        from app.domains.employee.models import Employee
+
+        # 서브쿼리로 조직별 직원 수 집계 (status가 resigned가 아닌 직원만)
+        query = db.session.query(
+            Employee.organization_id,
+            func.count(Employee.id).label('member_count')
+        ).filter(
+            db.or_(Employee.status != 'resigned', Employee.status.is_(None))
+        )
+
+        if root_organization_id:
+            allowed_ids = self._get_descendant_ids(root_organization_id)
+            if allowed_ids:
+                query = query.filter(Employee.organization_id.in_(allowed_ids))
+
+        counts = query.group_by(Employee.organization_id).all()
+        return {org_id: count for org_id, count in counts if org_id is not None}
 
 
 # 싱글톤 인스턴스

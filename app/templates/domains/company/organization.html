@@ -7,7 +7,8 @@
 {% endblock %}
 
 {% macro render_tree_node(org) %}
-<div class="tree-node" data-id="{{ org.id }}" data-type="{{ org.org_type }}">
+<div class="tree-node" data-id="{{ org.id }}" data-type="{{ org.org_type }}"
+     {% if org.org_type != 'company' %}draggable="true"{% endif %}>
     <div class="tree-node-content" data-action="select-org" data-org-id="{{ org.id }}">
         {% if org.children and org.children|length > 0 %}
         <span class="tree-toggle" data-action="toggle-node">
@@ -30,6 +31,9 @@
             {% endif %}
         </span>
         <span class="tree-label">{{ org.name }}</span>
+        {% if org.total_member_count is defined and org.total_member_count > 0 %}
+        <span class="tree-member-count">({{ org.total_member_count }}명)</span>
+        {% endif %}
         {% if org.code %}
         <span class="tree-code">{{ org.code }}</span>
         {% endif %}
@@ -107,11 +111,9 @@
         <div class="panel-header">
             <h3><i class="fas fa-folder-tree"></i> 조직 구조</h3>
             <div class="panel-actions">
-                <button class="btn btn--icon" data-action="expand-all" title="전체 펼치기">
+                <button class="btn btn--icon" id="toggleTreeBtn" data-action="toggle-tree" title="전체 펼치기">
                     <i class="fas fa-expand-alt"></i>
-                </button>
-                <button class="btn btn--icon" data-action="collapse-all" title="전체 접기">
-                    <i class="fas fa-compress-alt"></i>
+                    <span class="sr-only">전체 펼치기</span>
                 </button>
             </div>
         </div>
@@ -194,6 +196,29 @@
                     <label for="orgDescription" class="form__label">설명</label>
                     <textarea id="orgDescription" name="description" class="form__textarea" rows="3"></textarea>
                 </div>
+
+                <div class="form__group">
+                    <label for="orgManager" class="form__label">조직장</label>
+                    <select id="orgManager" name="manager_id" class="form__select">
+                        <option value="">선택하세요</option>
+                        {% for emp in employees %}
+                        <option value="{{ emp.id }}">{{ emp.name }}{% if emp.position %} ({{ emp.position }}){% endif %}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form__row">
+                    <div class="form__group form__group--half">
+                        <label for="leaderPhone" class="form__label">조직장 내선번호</label>
+                        <input type="text" id="leaderPhone" name="leader_phone"
+                               class="form__input" placeholder="예: 1234" maxlength="20">
+                    </div>
+                    <div class="form__group form__group--half">
+                        <label for="deptPhone" class="form__label">부서 내선번호</label>
+                        <input type="text" id="deptPhone" name="department_phone"
+                               class="form__input" placeholder="예: 1200" maxlength="20">
+                    </div>
+                </div>
             </div>
             <div class="modal__footer">
                 <button type="button" class="btn btn--secondary" data-action="close-org-modal">취소</button>
@@ -205,10 +230,10 @@
 
 <!-- 삭제 확인 모달 -->
 <div class="modal" id="deleteModal">
-    <div class="modal-content modal-sm">
+    <div class="modal__content modal__content--sm">
         <div class="modal__header">
             <h3 class="modal__title">조직 삭제</h3>
-            <button class="modal-close" data-action="close-delete-modal">&times;</button>
+            <button class="modal__close" data-action="close-delete-modal">&times;</button>
         </div>
         <div class="modal__body">
             <p id="deleteMessage">이 조직을 삭제하시겠습니까?</p>

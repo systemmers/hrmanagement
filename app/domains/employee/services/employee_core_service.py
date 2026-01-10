@@ -72,7 +72,7 @@ class EmployeeCoreService:
         org_id = org_id or self.get_current_org_id()
         if not org_id:
             return []
-        return self.employee_repo.get_by_company_id(org_id)
+        return self.employee_repo.get_by_company(org_id)
 
     def get_employee_by_id(self, employee_id: int) -> Optional[Dict]:
         """직원 ID로 조회 (Dict 반환)"""

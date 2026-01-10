@@ -16,6 +16,7 @@ from .number_category import NumberCategory
 from .number_registry import NumberRegistry
 from .ip_range import IpRange
 from .ip_assignment import IpAssignment
+from .organization_type_config import OrganizationTypeConfig
 
 __all__ = [
     'Company',
@@ -28,4 +29,5 @@ __all__ = [
     'NumberRegistry',
     'IpRange',
     'IpAssignment',
+    'OrganizationTypeConfig',
 ]

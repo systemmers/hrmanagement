@@ -11,14 +11,17 @@ Note: CorporateAdminProfileService는 User 도메인으로 이동됨
 from .company_service import CompanyService, company_service
 from .organization_service import OrganizationService, organization_service
 from .corporate_settings_service import CorporateSettingsService, corporate_settings_service
+from .organization_type_config_service import OrganizationTypeConfigService, organization_type_config_service
 
 __all__ = [
     # Classes
     'CompanyService',
     'OrganizationService',
     'CorporateSettingsService',
+    'OrganizationTypeConfigService',
     # Singleton instances
     'company_service',
     'organization_service',
     'corporate_settings_service',
+    'organization_type_config_service',
 ]

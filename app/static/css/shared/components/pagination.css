@@ -1,0 +1,63 @@
+/* ========================================
+   Pagination Component (추가 스타일)
+   스타일가이드: styleguide/components/data-table-advanced.html 준수
+
+   기존 스타일 재사용 (data-table-advanced.css):
+   - .data-table-footer
+   - .data-table-info
+   - .data-table-pagination
+   - .pagination-btn, .pagination-btn.active, .pagination-btn:disabled
+
+   추가 스타일:
+   - .pagination-per-page (줄 수 선택 영역)
+   - .form__select--sm (작은 select 변형)
+   ======================================== */
+
+/* 줄 수 선택 영역 */
+.pagination-per-page {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.pagination-per-page label {
+    font-size: var(--text-sm);
+    color: var(--color-gray-600);
+    white-space: nowrap;
+}
+
+/* 작은 select 변형 (스타일가이드: forms.html의 .form__select 기반) */
+.form__select--sm {
+    width: auto;
+    min-width: 80px;
+    padding: var(--space-1-5) var(--space-2);
+    padding-right: var(--space-6);
+    font-size: var(--text-sm);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    background: var(--color-pure-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b6b' d='M6 8L2 4h8z'/%3E%3C/svg%3E") no-repeat right var(--space-2) center;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color var(--transition-fast);
+}
+
+.form__select--sm:focus {
+    border-color: var(--color-blue-600);
+    outline: none;
+}
+
+.form__select--sm:hover {
+    border-color: var(--color-gray-400);
+}
+
+/* data-table-footer 확장 (3열 레이아웃 지원) */
+.data-table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--color-gray-200);
+    background: var(--color-pure-white);
+}

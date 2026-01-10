@@ -1,0 +1,64 @@
+{#
+  페이지네이션 매크로 (스타일가이드: data-table-advanced.html 준수)
+  - pagination: Flask-SQLAlchemy Pagination 객체
+  - per_page: 현재 페이지당 표시 수 (default: 20)
+  - per_page_options: 선택 가능한 옵션 목록
+
+  사용법:
+  {% from "shared/macros/_pagination.html" import render_pagination %}
+  {{ render_pagination(pagination, per_page=per_page) }}
+#}
+
+{# 기존 URL 파라미터를 유지하면서 page/per_page만 변경하는 헬퍼 #}
+{% macro build_page_url(page, per_page) %}
+{%- set args = request.args.to_dict(flat=False) -%}
+{%- set _ = args.update({'page': [page|string], 'per_page': [per_page|string]}) -%}
+?{% for key, values in args.items() %}{% for value in values %}{{ key }}={{ value }}{% if not loop.last %}&{% endif %}{% endfor %}{% if not loop.last %}&{% endif %}{% endfor %}
+{%- endmacro %}
+
+{% macro render_pagination(pagination, per_page=20, per_page_options=[10, 20, 50, 100]) %}
+{% if pagination and pagination.total > 0 %}
+<div class="data-table-footer">
+    <!-- 줄 수 선택 -->
+    <div class="pagination-per-page">
+        <label for="perPageSelect">표시:</label>
+        <select id="perPageSelect" class="form__select form__select--sm" onchange="updatePerPage(this.value)">
+            {% for option in per_page_options %}
+            <option value="{{ option }}" {{ 'selected' if option == per_page else '' }}>{{ option }}개</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- 페이지 정보 (스타일가이드: data-table-info) -->
+    <div class="data-table-info">
+        {% set start_item = (pagination.page - 1) * per_page + 1 %}
+        {% set end_item = [pagination.page * per_page, pagination.total]|min %}
+        <strong>{{ pagination.total }}</strong>건 중 <strong>{{ start_item }}-{{ end_item }}</strong> 표시
+    </div>
+
+    <!-- 페이지 네비게이션 (스타일가이드: data-table-pagination, pagination-btn) -->
+    {% if pagination.pages > 1 %}
+    <div class="data-table-pagination">
+        <button class="pagination-btn" {{ 'disabled' if not pagination.has_prev else '' }}
+                onclick="location.href='{{ build_page_url(pagination.prev_num, per_page) }}'">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if p %}
+            <button class="pagination-btn {{ 'active' if p == pagination.page else '' }}"
+                    onclick="location.href='{{ build_page_url(p, per_page) }}'">{{ p }}</button>
+            {% else %}
+            <button class="pagination-btn" disabled>...</button>
+            {% endif %}
+        {% endfor %}
+
+        <button class="pagination-btn" {{ 'disabled' if not pagination.has_next else '' }}
+                onclick="location.href='{{ build_page_url(pagination.next_num, per_page) }}'">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endmacro %}

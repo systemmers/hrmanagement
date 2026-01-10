@@ -30,6 +30,10 @@ def register_list_routes(bp: Blueprint):
         """직원 목록 - 매니저/관리자만 접근 가능 (멀티테넌시 적용)"""
         org_id = get_current_organization_id()
 
+        # 페이지네이션 파라미터 (Phase 32)
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 20, type=int)
+
         # 필터 파라미터 추출
         search = request.args.get('search', '').strip()
         departments = request.args.getlist('department')
@@ -56,34 +60,31 @@ def register_list_routes(bp: Blueprint):
         position = request.args.get('position', None) if not positions else None
         status = request.args.get('status', None) if not statuses else None
 
-        # 다중 필터 적용 (organization_id 필터 추가)
-        if search or departments or positions or statuses or sort_column:
-            employees = employee_service.filter_employees(
-                search=search if search else None,
-                departments=departments if departments else None,
-                positions=positions if positions else None,
-                statuses=statuses if statuses else None,
-                sort_by=sort_column,
-                sort_order=sort_order,
-                organization_id=org_id
-            )
+        # 다중 필터 적용 + 페이지네이션 (Phase 32)
+        filter_params = {
+            'search': search if search else None,
+            'sort_by': sort_column,
+            'sort_order': sort_order,
+            'organization_id': org_id,
+            'page': page,
+            'per_page': per_page,
+        }
+
+        if departments or positions or statuses:
+            filter_params.update({
+                'departments': departments if departments else None,
+                'positions': positions if positions else None,
+                'statuses': statuses if statuses else None,
+            })
         elif department or position or status:
-            employees = employee_service.filter_employees(
-                search=search if search else None,
-                department=department,
-                position=position,
-                status=status,
-                sort_by=sort_column,
-                sort_order=sort_order,
-                organization_id=org_id
-            )
-        else:
-            employees = employee_service.filter_employees(
-                search=search if search else None,
-                sort_by=sort_column,
-                sort_order=sort_order,
-                organization_id=org_id
-            )
+            filter_params.update({
+                'department': department,
+                'position': position,
+                'status': status,
+            })
+
+        pagination = employee_service.filter_employees(**filter_params)
+        employees = [emp.to_dict() for emp in pagination.items]
 
         # 21번 원칙: 계약 approved인 직원만 표시
         # Phase 9: 벌크 조회로 N+1 쿼리 제거
@@ -109,6 +110,8 @@ def register_list_routes(bp: Blueprint):
 
         return render_template('domains/employee/list.html',
                                employees=employees_with_contract,
+                               pagination=pagination,
+                               per_page=per_page,
                                classification_options=classification_options,
                                company=company,
                                view_mode=view_mode)

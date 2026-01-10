@@ -1,4 +1,6 @@
 {% extends "shared/base.html" %}
+{% from 'shared/macros/_pagination.html' import render_pagination %}
+{% from 'shared/macros/_filters.html' import filter_bar, search_box, filter_select %}
 
 {% block title %}계정관리 - {{ company.name }}{% endblock %}
 
@@ -6,6 +8,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/company/users.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/modal.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/account-provision-modal.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/filter.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -25,6 +28,28 @@
     </div>
     <p class="page-description">{{ company.name }} 법인 계정 목록입니다. (총 {{ pagination.total }}명{% if pagination.pages > 1 %}, {{ pagination.page }}/{{ pagination.pages }} 페이지{% endif %})</p>
 </div>
+
+<!-- 필터 바 (Phase 33) -->
+{% call filter_bar(mode='url', css_class='filter-bar--simple') %}
+    {{ search_box(
+        placeholder='이름, 아이디, 이메일 검색...',
+        value=request.args.get('search', '')
+    ) }}
+    {{ filter_select('filter-role', 'role', filter_options.roles,
+        request.args.get('role', ''), '전체 역할') }}
+    {{ filter_select('filter-status', 'status', filter_options.statuses,
+        request.args.get('status', ''), '전체 상태') }}
+    {{ filter_select('filter-contract', 'contract_status', filter_options.contract_statuses,
+        request.args.get('contract_status', ''), '전체 계약상태') }}
+
+    <select id="sortSelect" class="filter-select filter-sort" data-filter-exclude>
+        <option value="">정렬</option>
+        <option value="name" {% if request.args.get('sort') == 'name' and request.args.get('order', 'asc') == 'asc' %}selected{% endif %}>이름 (오름차순)</option>
+        <option value="name-desc" {% if request.args.get('sort') == 'name' and request.args.get('order') == 'desc' %}selected{% endif %}>이름 (내림차순)</option>
+        <option value="username" {% if request.args.get('sort') == 'username' and request.args.get('order', 'asc') == 'asc' %}selected{% endif %}>아이디 (오름차순)</option>
+        <option value="created_at-desc" {% if request.args.get('sort') == 'created_at' and request.args.get('order') == 'desc' %}selected{% endif %}>최신순</option>
+    </select>
+{% endcall %}
 
 <!-- 사용자 목록 테이블 -->
 <div class="table-container">
@@ -124,38 +149,25 @@
     </table>
 </div>
 
-{% if pagination.pages > 1 %}
-<div class="pagination">
-    {% if pagination.has_prev %}
-    <a href="?page={{ pagination.prev_num }}" class="page-link">
-        <i class="fas fa-chevron-left"></i>
-    </a>
-    {% endif %}
-
-    {% for p in pagination.iter_pages() %}
-        {% if p %}
-        <a href="?page={{ p }}" class="page-link {{ 'active' if p == pagination.page else '' }}">{{ p }}</a>
-        {% else %}
-        <span class="page-ellipsis">...</span>
-        {% endif %}
-    {% endfor %}
-
-    {% if pagination.has_next %}
-    <a href="?page={{ pagination.next_num }}" class="page-link">
-        <i class="fas fa-chevron-right"></i>
-    </a>
-    {% endif %}
-</div>
-{% endif %}
+<!-- 페이지네이션 (Phase 32) -->
+{{ render_pagination(pagination, per_page=per_page) }}
 
 {% if users|length == 0 %}
 <div class="empty-state-large">
     <i class="fas fa-users"></i>
+    {% if request.args.get('search') or request.args.get('role') or request.args.get('status') or request.args.get('contract_status') %}
+    <p>검색 조건에 맞는 사용자가 없습니다.</p>
+    <a href="{{ url_for('corporate.users') }}" class="btn btn--secondary">
+        <i class="fas fa-undo"></i>
+        필터 초기화
+    </a>
+    {% else %}
     <p>등록된 사용자가 없습니다.</p>
     <button type="button" class="btn btn--primary" id="openAccountProvisionModalEmpty">
         <i class="fas fa-id-card"></i>
         계정 발급
     </button>
+    {% endif %}
 </div>
 {% endif %}
 
@@ -167,6 +179,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script type="module" src="{{ url_for('static', filename='js/shared/components/filter-bar.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/domains/company/pages/users.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/domains/employee/pages/account-provision-modal.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/domains/company/pages/user-edit-modal.js') }}"></script>

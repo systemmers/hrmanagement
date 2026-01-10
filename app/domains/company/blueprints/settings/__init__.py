@@ -18,3 +18,4 @@ from app.domains.company.blueprints.settings import settings_api
 from app.domains.company.blueprints.settings import number_categories_api
 from app.domains.company.blueprints.settings import visibility_api
 from app.domains.company.blueprints.settings import documents_api
+from app.domains.company.blueprints.settings import organization_types_api
