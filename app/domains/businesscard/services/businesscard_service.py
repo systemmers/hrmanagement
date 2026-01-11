@@ -3,6 +3,7 @@ BusinessCard Service
 
 명함 업로드/삭제 비즈니스 로직을 제공합니다.
 FileStorageService를 활용하여 파일 관리를 수행합니다.
+Phase 33: employee_service 의존성 제거, employee_repository 직접 사용
 """
 import os
 from datetime import datetime
@@ -10,7 +11,6 @@ from typing import Dict, Optional, Tuple
 from flask import current_app
 
 from app.domains.businesscard.repositories.businesscard_repository import BusinessCardRepository
-from app.domains.employee.services import employee_service
 from app.shared.services.file_storage_service import file_storage
 from app.shared.base.service_result import ServiceResult
 
@@ -25,6 +25,14 @@ class BusinessCardService:
 
     def __init__(self, repository: BusinessCardRepository = None):
         self.repository = repository or BusinessCardRepository()
+
+    @property
+    def _employee_repo(self):
+        """지연 초기화된 EmployeeRepository"""
+        if not hasattr(self, '_employee_repository_instance'):
+            from app.domains.employee.repositories import EmployeeRepository
+            self._employee_repository_instance = EmployeeRepository()
+        return self._employee_repository_instance
 
     def _get_upload_folder(self) -> str:
         """명함 업로드 폴더 경로 반환 및 생성"""
@@ -87,7 +95,7 @@ class BusinessCardService:
         """
         try:
             # 직원 존재 확인
-            employee = employee_service.get_employee_by_id(employee_id)
+            employee = self._employee_repo.find_by_id(employee_id)
             if not employee:
                 return ServiceResult.failure('직원을 찾을 수 없습니다.')
 
@@ -141,7 +149,7 @@ class BusinessCardService:
                 return ServiceResult.failure('side는 front 또는 back이어야 합니다.')
 
             # 직원 존재 확인
-            employee = employee_service.get_employee_by_id(employee_id)
+            employee = self._employee_repo.find_by_id(employee_id)
             if not employee:
                 return ServiceResult.failure('직원을 찾을 수 없습니다.')
 

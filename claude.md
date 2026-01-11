@@ -28,7 +28,7 @@ alembic revision --autogenerate -m "migration message"
 
 ### Domain Structure (도메인 중심 구조)
 ```
-app/domains/                    # 도메인별 패키지 (7개 도메인)
+app/domains/                    # 도메인별 패키지 (8개 도메인)
 ├── employee/                   # 직원 도메인 (~65개 파일)
 │   ├── __init__.py             # Repository 초기화 + 외부 인터페이스
 │   ├── models/                 # Employee, Education, Career 등 20개 모델
@@ -59,6 +59,11 @@ app/domains/                    # 도메인별 패키지 (7개 도메인)
 │   ├── models/                 # SyncLog
 │   ├── services/               # sync_service (Facade), sync_basic, sync_relation
 │   └── blueprints/             # sync_bp
+├── attachment/                 # 첨부파일 도메인 (Phase 33 완료)
+│   ├── models/                 # Attachment (다형성: owner_type/owner_id)
+│   ├── repositories/           # attachment_repository
+│   ├── services/               # attachment_service (SSOT)
+│   └── blueprints/             # attachment_bp (/api/attachments/*)
 └── businesscard/               # 명함 도메인 (2026-01-09 신규)
     ├── models/                 # Attachment 재사용 (category 기반)
     ├── repositories/           # businesscard_repository
@@ -75,7 +80,8 @@ from app.domains.company.models import Company, Organization
 from app.domains.contract.services import contract_service
 from app.domains.user.models import User
 from app.domains.platform.services import platform_service
-from app.domains.businesscard.services import businesscard_service  # 신규
+from app.domains.attachment.services import attachment_service  # 첨부파일 SSOT
+from app.domains.businesscard.services import businesscard_service
 
 # 공유 자원 import
 from app.shared.repositories import BaseRepository
@@ -389,6 +395,7 @@ static/css/
 | 사용자 관리 | `app/domains/user/services/` |
 | 플랫폼 관리 | `app/domains/platform/services/platform_service.py` |
 | 동기화 관리 | `app/domains/sync/services/` (Facade 패턴) |
+| 첨부파일 관리 | `app/domains/attachment/services/attachment_service.py` (Phase 33) |
 
 **SRP (Single Responsibility Principle)**
 | 모듈 | 책임 |

@@ -18,6 +18,7 @@ from flask import Blueprint
 
 from .routes import register_routes
 from .files import register_file_routes
+from .mutation_routes import register_order_routes
 
 # Blueprint 생성
 employees_bp = Blueprint('employees', __name__)
@@ -25,6 +26,7 @@ employees_bp = Blueprint('employees', __name__)
 # 라우트 등록
 register_routes(employees_bp)
 register_file_routes(employees_bp)
+register_order_routes(employees_bp)
 
 # 외부에서 사용할 수 있도록 export
 __all__ = ['employees_bp']

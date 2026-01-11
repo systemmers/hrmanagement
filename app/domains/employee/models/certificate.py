@@ -41,5 +41,8 @@ class Certificate(DictSerializableMixin, db.Model):
     grade = db.Column(db.String(50), nullable=True)
     note = db.Column(db.Text, nullable=True)
 
+    # 순서 정렬
+    display_order = db.Column(db.Integer, default=0, nullable=False)
+
     def __repr__(self):
         return f'<Certificate {self.id}: {self.certificate_name}>'

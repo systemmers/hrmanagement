@@ -5,6 +5,7 @@ EmployeeService Facade를 제공하여 기존 API 100% 호환성을 유지합니
 내부적으로 EmployeeCoreService와 EmployeeRelationService에 위임합니다.
 
 Phase 3: EmployeeService 분리 - Facade 패턴
+Phase 33: attachment 메서드 attachment_service로 위임 (도메인 통합)
 
 사용법:
     # 기존과 동일한 방식으로 사용
@@ -15,6 +16,10 @@ Phase 3: EmployeeService 분리 - Facade 패턴
     from . import employee_core_service, employee_relation_service
     employee_core_service.get_employee(1)
     employee_relation_service.get_education_list(1)
+
+    # 첨부파일은 attachment_service 직접 사용 권장
+    from app.domains.attachment.services import attachment_service
+    attachment_service.get_by_employee_id(1)
 """
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -309,10 +314,12 @@ class EmployeeService:
         return self.relation.get_salary_payment_list(employee_id)
 
     def get_attachment_list(self, employee_id: int) -> List[Dict]:
-        return self.relation.get_attachment_list(employee_id)
+        """첨부파일 목록 조회 (레거시 호환 - attachment_service 사용 권장)"""
+        return self._attachment_service.get_by_employee_id(employee_id)
 
     def get_attachment_by_category(self, employee_id: int, category: str) -> Optional[Dict]:
-        return self.relation.get_attachment_by_category(employee_id, category)
+        """카테고리별 첨부파일 조회 (레거시 호환 - attachment_service 사용 권장)"""
+        return self._attachment_service.get_one_by_category(employee_id, category)
 
     def get_classification_options(self) -> List[Dict]:
         return self.relation.get_classification_options()
@@ -321,20 +328,44 @@ class EmployeeService:
         return self.relation.get_all_classification_options(company_id)
 
     # ========================================
-    # 첨부파일 관리 (Relation에 위임)
+    # 첨부파일 관리 (attachment_service로 위임)
+    # Phase 33: 레거시 호환성 유지, attachment 도메인으로 통합
     # ========================================
 
+    @property
+    def _attachment_service(self):
+        """지연 초기화된 attachment_service"""
+        from app.domains.attachment.services import attachment_service
+        return attachment_service
+
     def create_attachment(self, attachment_data: Dict) -> Dict:
-        return self.relation.create_attachment(attachment_data)
+        """첨부파일 생성 (레거시 호환 - attachment_service 사용 권장)"""
+        # camelCase → snake_case 변환
+        normalized_data = {
+            'owner_type': 'employee',
+            'owner_id': attachment_data.get('employeeId') or attachment_data.get('employee_id'),
+            'employee_id': attachment_data.get('employeeId') or attachment_data.get('employee_id'),
+            'file_name': attachment_data.get('fileName') or attachment_data.get('file_name'),
+            'file_path': attachment_data.get('filePath') or attachment_data.get('file_path'),
+            'file_type': attachment_data.get('fileType') or attachment_data.get('file_type'),
+            'file_size': attachment_data.get('fileSize') or attachment_data.get('file_size', 0),
+            'category': attachment_data.get('category'),
+            'upload_date': attachment_data.get('uploadDate') or attachment_data.get('upload_date'),
+        }
+        return self._attachment_service.create(normalized_data)
 
     def get_attachment_by_id(self, attachment_id: int) -> Optional[Dict]:
-        return self.relation.get_attachment_by_id(attachment_id)
+        """첨부파일 ID로 조회 (레거시 호환 - attachment_service 사용 권장)"""
+        return self._attachment_service.get_by_id(attachment_id)
 
     def delete_attachment(self, attachment_id: int) -> bool:
-        return self.relation.delete_attachment(attachment_id)
+        """첨부파일 삭제 (레거시 호환 - attachment_service 사용 권장)"""
+        return self._attachment_service.delete(attachment_id)
 
     def delete_attachment_by_category(self, employee_id: int, category: str) -> bool:
-        return self.relation.delete_attachment_by_category(employee_id, category)
+        """카테고리별 첨부파일 삭제 (레거시 호환 - attachment_service 사용 권장)"""
+        result = self._attachment_service.delete_by_category(employee_id, category)
+        return result > 0 if isinstance(result, int) else bool(result)
 
     # ========================================
     # 병역 정보 관리 (Relation에 위임)

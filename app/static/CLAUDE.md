@@ -29,7 +29,10 @@ css/
 │   ├── company/                # 법인 도메인
 │   │   ├── add-user.css
 │   │   ├── organization.css
+│   │   ├── settings.css
 │   │   └── users.css
+│   ├── attachment/             # 첨부파일 도메인 (2026-01-10 신규)
+│   │   └── attachment.css      # 첨부파일 스타일
 │   ├── user/                   # 사용자 도메인
 │   │   ├── account.css
 │   │   ├── company-card-detail.css
@@ -117,10 +120,24 @@ js/
 │   │   ├── services/
 │   │   │   └── settings-api.js
 │   │   └── pages/
-│   │       ├── settings.js
+│   │       ├── settings/           # 법인설정 모듈화 (2026-01-10)
+│   │       │   ├── settings.js     # 메인 컨트롤러 (116 lines)
+│   │       │   ├── shared/
+│   │       │   │   └── constants.js
+│   │       │   └── tabs/
+│   │       │       ├── org-management.js      # 조직 관리 (656 lines)
+│   │       │       ├── documents.js           # 문서 관리 (469 lines)
+│   │       │       ├── org-type-settings.js   # 조직유형 설정 (448 lines)
+│   │       │       ├── patterns-visibility.js # 패턴/가시성 (433 lines)
+│   │       │       ├── audit-logs.js          # 감사 로그 (429 lines)
+│   │       │       ├── classifications.js     # 분류체계 (355 lines)
+│   │       │       └── org-tree.js            # 조직트리 (363 lines)
 │   │       ├── users.js
-│   │       ├── register.js
-│   │       └── organization.js
+│   │       └── register.js
+│   ├── attachment/             # 첨부파일 도메인 (2026-01-10 신규)
+│   │   ├── index.js
+│   │   └── services/
+│   │       └── attachment-api.js
 │   ├── user/                   # 사용자 도메인
 │   │   ├── index.js
 │   │   └── pages/
@@ -176,6 +193,7 @@ js/
 | company | `js/domains/company/` | `css/domains/company/` | `templates/domains/company/` |
 | user | `js/domains/user/` | `css/domains/user/` | `templates/domains/user/` |
 | platform | `js/domains/platform/` | `css/domains/platform/` | `templates/domains/platform/` |
+| attachment | `js/domains/attachment/` | `css/domains/attachment/` | `templates/domains/attachment/` |
 | businesscard | `js/domains/businesscard/` | `css/domains/businesscard/` | `templates/domains/businesscard/` |
 
 ### 공유 자원 배치
@@ -297,3 +315,15 @@ export * from './pages/form.js';
 - 도메인 중심 구조로 전환: employee, contract, company, user, platform
 - 공유 자원 분리: shared/components, shared/utils, shared/core, shared/constants
 - 레거시 폴더 정리: pages/, services/, components/, utils/, core/, constants/ 삭제
+
+**BusinessCard 도메인 추가 (2026-01-09)**
+- 명함 카드 컴포넌트 추가
+- 프리미엄 3D 플립 CSS 스타일
+
+**Attachment 도메인 추가 (2026-01-10)**
+- 첨부파일 관리 JS/CSS 추가
+
+**Company Settings 모듈화 (2026-01-10)**
+- settings.js 분리: 3,094 라인 → 9개 모듈
+- 메인 컨트롤러: 116 라인
+- 탭별 모듈: org-management, documents, org-type-settings, patterns-visibility, audit-logs, classifications, org-tree

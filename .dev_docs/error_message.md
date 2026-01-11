@@ -1,22 +1,27 @@
-승인일, 계약일, 고용일, 
-직원 재계약 > 퇴사하지 않고 연속성을 가지는 모든 펼징을 
-퇴사, > 신규입사 
-
-
-계약 재갱신은 시스템에서 어떻게 처리하면 좋을 까
-1년 연봉계약에 대하여 재생신 기능은 언재 활성화 하는 것으로 하나나
-
-
-자동연장: 별도 승인 없이 기간 만료 시 자동으로 연장하려면, 계약에 "자동연장" 옵션을 추가하고 만료 시점에 상태를 approved로 유지해야 함.
-자동종료: 재계약 승인 없을 시 만료일에 상태를 terminated로 전환.
-종료(terminated) 후 재계약은 "신규계약(새 ID, 새 이력)" 생성이 원칙.
-거절(rejected) 시에는 재계약 또는 재요청을 통해 다시 신청 가능.
-두 경우 모두 기존 계약과는 별개로 새 계약 절차가 필요.
-
-
-계약 현황 상태, 계약종료 1달전, 상태표시
-일반적으로 계약자동 계약또는 계약 협상을 통해 결정을 하고 협상된 계약내용을 다시 근로자에게 요청하여 승인을 받음
-계약종료전까지 추가적인 액션이 없다면 그대로 조건으로 기간만 1년 연장됨
-그리고 계약중이라도 법인에 변경된 계약서를 작성하여 계약 요청을 하면 해당 기간만큼 적용됨.
-
---test-browser
+1.230.216.14 - - [11/Jan/2026 19:59:05] "GET /my/company HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "D:\projects\hrmanagement\venv\Lib\site-packages\flask\app.py", line 2213, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\projects\hrmanagement\venv\Lib\site-packages\flask\app.py", line 2193, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\projects\hrmanagement\venv\Lib\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\projects\hrmanagement\venv\Lib\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\projects\hrmanagement\venv\Lib\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\projects\hrmanagement\venv\Lib\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\projects\hrmanagement\app\shared\utils\decorators.py", line 146, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\projects\hrmanagement\app\domains\user\blueprints\mypage.py", line 75, in company_info
+    return render_template('domains/user/mypage/company_info.html',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: flask.templating.render_template() got multiple values for keyword argument 'attachment_list'

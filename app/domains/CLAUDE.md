@@ -2,7 +2,7 @@
 
 도메인 중심 아키텍처(Domain-Driven Design)를 적용한 비즈니스 로직 패키지
 
-## 도메인 목록
+## 도메인 목록 (8개)
 
 | 도메인 | 역할 | 핵심 모델 |
 |--------|------|-----------|
@@ -12,6 +12,8 @@
 | `user/` | 사용자 관리 | User, PersonalProfile |
 | `platform/` | 플랫폼 관리 | SystemSetting, AuditLog |
 | `sync/` | 동기화 관리 | SyncLog |
+| `attachment/` | 첨부파일 관리 (2026-01-10) | Attachment |
+| `businesscard/` | 명함 관리 (2026-01-09) | Attachment 재사용 |
 
 ## 도메인 구조 (공통 패턴)
 
@@ -229,6 +231,54 @@ sync/
     └── termination_routes.py
 ```
 
+### attachment/ (첨부파일 도메인) - 2026-01-10 신규
+```
+attachment/
+├── __init__.py
+├── models/
+│   └── attachment.py                 # Attachment 모델 (독립 도메인)
+├── repositories/
+│   └── attachment_repository.py      # 첨부파일 CRUD
+├── services/
+│   └── attachment_service.py         # 파일 업로드/삭제/조회
+└── blueprints/
+    └── routes.py                     # /api/attachments/* API
+```
+
+**API 엔드포인트**:
+- `POST /api/attachments` - 파일 업로드
+- `DELETE /api/attachments/<id>` - 파일 삭제
+- `GET /api/attachments/<owner_type>/<owner_id>` - 파일 목록 조회
+
+**Attachment 모델 특징**:
+- `owner_type`: 소유자 타입 (employee, profile, contract 등)
+- `owner_id`: 소유자 ID
+- `category`: 카테고리 (document, photo, businesscard 등)
+- 다형성(Polymorphic) 관계 지원
+
+### businesscard/ (명함 도메인) - 2026-01-09 신규
+```
+businesscard/
+├── __init__.py
+├── models/
+│   └── (attachment 도메인의 Attachment 재사용)
+├── repositories/
+│   └── businesscard_repository.py    # 명함 조회/삭제
+├── services/
+│   └── businesscard_service.py       # 명함 업로드/삭제
+└── blueprints/
+    └── routes.py                     # /api/businesscard/* API
+```
+
+**API 엔드포인트**:
+- `POST /api/businesscard/employee/<id>` - 명함 업로드
+- `DELETE /api/businesscard/employee/<id>/<side>` - 명함 삭제
+- `GET /api/businesscard/employee/<id>` - 명함 조회
+
+**특징**:
+- Attachment 모델 재사용 (category='businesscard')
+- 앞면(front)/뒷면(back) 구분
+
 ## Import 패턴
 
 ```python
@@ -237,11 +287,15 @@ from app.domains.employee import Employee, employee_service
 from app.domains.company import Company, Organization
 from app.domains.contract import contract_service
 from app.domains.user import User, user_service
+from app.domains.attachment import Attachment, attachment_service
+from app.domains.businesscard import businesscard_service
 
 # 하위 모듈 직접 import
 from app.domains.employee.models import Employee, Education
 from app.domains.employee.services import employee_service, profile_relation_service
 from app.domains.employee.repositories import employee_repository
+from app.domains.attachment.models import Attachment
+from app.domains.attachment.services import attachment_service
 ```
 
 ## Facade 패턴 도메인
@@ -271,6 +325,10 @@ from app.domains.contract.services.contract_core_service import contract_core_se
 | company -> organization | O | 조직 구조 |
 | sync -> employee, contract | O | 동기화 대상 |
 | platform -> all | O | 관리 기능 |
+| attachment -> (독립) | - | 다형성 관계로 독립적 |
+| businesscard -> attachment | O | Attachment 모델 재사용 |
+| employee -> attachment | O | 직원 첨부파일 |
+| user -> attachment | O | 프로필 첨부파일 |
 
 **순환 참조 주의**: Service 간 참조 시 import 순서 고려
 
@@ -280,3 +338,18 @@ from app.domains.contract.services.contract_core_service import contract_core_se
 2. **Service 레이어 경유**: 도메인 간 통신은 Service를 통해
 3. **Model 공유 허용**: Model은 도메인 간 직접 import 가능
 4. **Blueprint 독립성**: 각 도메인의 Blueprint는 독립적으로 동작
+5. **Attachment 다형성**: owner_type/owner_id로 소유자 참조
+
+## Migration History
+
+**Phase 1 완료 (2026-01-07)**
+- 도메인 중심 아키텍처 마이그레이션
+- 레거시 래퍼 파일 제거
+
+**Phase 31 완료 (2026-01-10)**
+- Attachment 독립 도메인 생성
+- owner_type/owner_id 다형성 관계 적용
+
+**BusinessCard 도메인 추가 (2026-01-09)**
+- 명함 관리 기능 추가
+- Attachment 모델 재사용 (category='businesscard')

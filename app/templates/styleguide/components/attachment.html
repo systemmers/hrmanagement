@@ -7,102 +7,125 @@
 
     {% call subsection('업로드 영역') %}
     {% call demo() %}
-    <div class="file-upload-area-demo">
-        <div class="file-upload-icon">
+    <div class="file-upload-area">
+        <div class="file-upload-area__icon">
             <i class="fas fa-cloud-upload-alt"></i>
         </div>
-        <div class="file-upload-text">파일을 드래그하거나 클릭</div>
-        <div class="file-upload-hint">PDF, JPG, PNG (최대 10MB)</div>
+        <div class="file-upload-area__text">파일을 드래그하거나 클릭</div>
+        <div class="file-upload-area__hint">PDF, JPG, PNG (최대 10MB)</div>
     </div>
     {% endcall %}
     {% call code() %}
 &lt;div class="file-upload-area" id="fileUploadArea"&gt;
-    &lt;div class="file-upload-icon"&gt;
+    &lt;div class="file-upload-area__icon"&gt;
         &lt;i class="fas fa-cloud-upload-alt"&gt;&lt;/i&gt;
     &lt;/div&gt;
-    &lt;div class="file-upload-text"&gt;파일을 드래그하거나 클릭&lt;/div&gt;
-    &lt;div class="file-upload-hint"&gt;PDF, JPG, PNG (최대 10MB)&lt;/div&gt;
+    &lt;div class="file-upload-area__text"&gt;파일을 드래그하거나 클릭&lt;/div&gt;
+    &lt;div class="file-upload-area__hint"&gt;PDF, JPG, PNG (최대 10MB)&lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('업로드 영역 - 컴팩트') %}
+    {% call demo() %}
+    <div style="max-width: 300px;">
+        <div class="file-upload-area file-upload-area--compact">
+            <div class="file-upload-area__icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <div class="file-upload-area__text">파일 업로드</div>
+            <div class="file-upload-area__hint">최대 10MB</div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="file-upload-area file-upload-area--compact"&gt;
+    &lt;div class="file-upload-area__icon"&gt;
+        &lt;i class="fas fa-cloud-upload-alt"&gt;&lt;/i&gt;
+    &lt;/div&gt;
+    &lt;div class="file-upload-area__text"&gt;파일 업로드&lt;/div&gt;
+    &lt;div class="file-upload-area__hint"&gt;최대 10MB&lt;/div&gt;
 &lt;/div&gt;
     {% endcall %}
     {% endcall %}
 
     {% call subsection('파일 카드') %}
     {% call demo() %}
-    <div class="file-list-demo">
+    <div class="file-list" style="max-width: 400px;">
         <!-- 이미지 파일 (썸네일) -->
         <div class="file-card">
-            <div class="file-icon file-thumbnail">
-                <img src="{{ url_for('static', filename='images/face/face_01_m.png') }}"
-                     alt="증명사진" class="thumbnail-img">
+            <div class="file-card__icon file-card__icon--thumbnail">
+                <img src="https://picsum.photos/seed/photo1/100/100"
+                     alt="증명사진">
             </div>
-            <div class="file-info">
-                <div class="file-name">증명사진.jpg</div>
-                <div class="file-meta">
-                    <span class="file-category">증명사진</span>
-                    <span class="file-size">256KB</span>
+            <div class="file-card__info">
+                <div class="file-card__name">증명사진.jpg</div>
+                <div class="file-card__meta">
+                    <span class="file-card__category">증명사진</span>
+                    <span class="file-card__size">256KB</span>
                 </div>
             </div>
-            <div class="file-actions">
-                <button class="btn-icon" title="보기"><i class="fas fa-eye"></i></button>
-                <button class="btn-icon" title="다운로드"><i class="fas fa-download"></i></button>
-                <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
+            <div class="file-card__actions">
+                <button class="file-card__btn" title="보기"><i class="fas fa-eye"></i></button>
+                <button class="file-card__btn" title="다운로드"><i class="fas fa-download"></i></button>
+                <button class="file-card__btn file-card__btn--danger" title="삭제"><i class="fas fa-trash"></i></button>
             </div>
         </div>
 
         <!-- PDF 파일 -->
         <div class="file-card">
-            <div class="file-icon">
+            <div class="file-card__icon">
                 <i class="fas fa-file-pdf"></i>
             </div>
-            <div class="file-info">
-                <div class="file-name">재직증명서.pdf</div>
-                <div class="file-meta">
-                    <span class="file-category">증명서류</span>
-                    <span class="file-size">1.2MB</span>
+            <div class="file-card__info">
+                <div class="file-card__name">재직증명서.pdf</div>
+                <div class="file-card__meta">
+                    <span class="file-card__category">증명서류</span>
+                    <span class="file-card__size">1.2MB</span>
                 </div>
             </div>
-            <div class="file-actions">
-                <button class="btn-icon" title="보기"><i class="fas fa-eye"></i></button>
-                <button class="btn-icon" title="다운로드"><i class="fas fa-download"></i></button>
-                <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
+            <div class="file-card__actions">
+                <button class="file-card__btn" title="보기"><i class="fas fa-eye"></i></button>
+                <button class="file-card__btn" title="다운로드"><i class="fas fa-download"></i></button>
+                <button class="file-card__btn file-card__btn--danger" title="삭제"><i class="fas fa-trash"></i></button>
             </div>
         </div>
 
         <!-- Word 파일 -->
         <div class="file-card">
-            <div class="file-icon">
+            <div class="file-card__icon">
                 <i class="fas fa-file-word"></i>
             </div>
-            <div class="file-info">
-                <div class="file-name">이력서.docx</div>
-                <div class="file-meta">
-                    <span class="file-category">기타</span>
-                    <span class="file-size">89KB</span>
+            <div class="file-card__info">
+                <div class="file-card__name">이력서.docx</div>
+                <div class="file-card__meta">
+                    <span class="file-card__category">기타</span>
+                    <span class="file-card__size">89KB</span>
                 </div>
             </div>
-            <div class="file-actions">
-                <button class="btn-icon" title="보기"><i class="fas fa-eye"></i></button>
-                <button class="btn-icon" title="다운로드"><i class="fas fa-download"></i></button>
-                <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
+            <div class="file-card__actions">
+                <button class="file-card__btn" title="보기"><i class="fas fa-eye"></i></button>
+                <button class="file-card__btn" title="다운로드"><i class="fas fa-download"></i></button>
+                <button class="file-card__btn file-card__btn--danger" title="삭제"><i class="fas fa-trash"></i></button>
             </div>
         </div>
 
         <!-- Excel 파일 -->
         <div class="file-card">
-            <div class="file-icon">
+            <div class="file-card__icon">
                 <i class="fas fa-file-excel"></i>
             </div>
-            <div class="file-info">
-                <div class="file-name">급여명세서.xlsx</div>
-                <div class="file-meta">
-                    <span class="file-category">급여</span>
-                    <span class="file-size">45KB</span>
+            <div class="file-card__info">
+                <div class="file-card__name">급여명세서.xlsx</div>
+                <div class="file-card__meta">
+                    <span class="file-card__category">급여</span>
+                    <span class="file-card__size">45KB</span>
                 </div>
             </div>
-            <div class="file-actions">
-                <button class="btn-icon" title="보기"><i class="fas fa-eye"></i></button>
-                <button class="btn-icon" title="다운로드"><i class="fas fa-download"></i></button>
-                <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
+            <div class="file-card__actions">
+                <button class="file-card__btn" title="보기"><i class="fas fa-eye"></i></button>
+                <button class="file-card__btn" title="다운로드"><i class="fas fa-download"></i></button>
+                <button class="file-card__btn file-card__btn--danger" title="삭제"><i class="fas fa-trash"></i></button>
             </div>
         </div>
     </div>
@@ -110,25 +133,251 @@
     {% call code() %}
 &lt;div class="file-card" data-attachment-id="123"&gt;
     &lt;!-- 파일 아이콘 (이미지면 썸네일) --&gt;
-    &lt;div class="file-icon file-thumbnail"&gt;
-        &lt;img src="..." class="thumbnail-img"&gt;
+    &lt;div class="file-card__icon file-card__icon--thumbnail"&gt;
+        &lt;img src="..." alt="썸네일"&gt;
     &lt;/div&gt;
 
     &lt;!-- 파일 정보 --&gt;
-    &lt;div class="file-info"&gt;
-        &lt;div class="file-name"&gt;파일명.jpg&lt;/div&gt;
-        &lt;div class="file-meta"&gt;
-            &lt;span class="file-category"&gt;카테고리&lt;/span&gt;
-            &lt;span class="file-size"&gt;256KB&lt;/span&gt;
+    &lt;div class="file-card__info"&gt;
+        &lt;div class="file-card__name"&gt;파일명.jpg&lt;/div&gt;
+        &lt;div class="file-card__meta"&gt;
+            &lt;span class="file-card__category"&gt;카테고리&lt;/span&gt;
+            &lt;span class="file-card__size"&gt;256KB&lt;/span&gt;
         &lt;/div&gt;
     &lt;/div&gt;
 
     &lt;!-- 액션 버튼 --&gt;
-    &lt;div class="file-actions"&gt;
-        &lt;button class="btn-icon"&gt;&lt;i class="fas fa-eye"&gt;&lt;/i&gt;&lt;/button&gt;
-        &lt;button class="btn-icon"&gt;&lt;i class="fas fa-download"&gt;&lt;/i&gt;&lt;/button&gt;
-        &lt;button class="btn-icon"&gt;&lt;i class="fas fa-trash"&gt;&lt;/i&gt;&lt;/button&gt;
+    &lt;div class="file-card__actions"&gt;
+        &lt;button class="file-card__btn"&gt;&lt;i class="fas fa-eye"&gt;&lt;/i&gt;&lt;/button&gt;
+        &lt;button class="file-card__btn"&gt;&lt;i class="fas fa-download"&gt;&lt;/i&gt;&lt;/button&gt;
+        &lt;button class="file-card__btn file-card__btn--danger"&gt;&lt;i class="fas fa-trash"&gt;&lt;/i&gt;&lt;/button&gt;
     &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('파일 카드 - 세로 레이아웃') %}
+    {% call demo() %}
+    <div class="file-list--cards file-list--cols-4">
+        <!-- 이미지 파일 (썸네일) -->
+        <div class="file-card file-card--vertical">
+            <div class="file-card__icon file-card__icon--thumbnail">
+                <img src="https://picsum.photos/seed/photo2/160/120" alt="증명사진">
+            </div>
+            <div class="file-card__info">
+                <div class="file-card__name">증명사진.jpg</div>
+                <div class="file-card__meta">
+                    <span class="file-card__size">256KB</span>
+                </div>
+            </div>
+            <div class="file-card__actions">
+                <button class="file-card__btn"><i class="fas fa-eye"></i></button>
+                <button class="file-card__btn file-card__btn--danger"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+
+        <!-- PDF 문서 -->
+        <div class="file-card file-card--vertical">
+            <div class="file-card__icon">
+                <i class="fas fa-file-pdf"></i>
+            </div>
+            <div class="file-card__info">
+                <div class="file-card__name">재직증명서.pdf</div>
+                <div class="file-card__meta">
+                    <span class="file-card__size">1.2MB</span>
+                </div>
+            </div>
+            <div class="file-card__actions">
+                <button class="file-card__btn"><i class="fas fa-eye"></i></button>
+                <button class="file-card__btn file-card__btn--danger"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+
+        <!-- Word 문서 -->
+        <div class="file-card file-card--vertical">
+            <div class="file-card__icon">
+                <i class="fas fa-file-word"></i>
+            </div>
+            <div class="file-card__info">
+                <div class="file-card__name">입사지원서_홍길동.docx</div>
+                <div class="file-card__meta">
+                    <span class="file-card__size">89KB</span>
+                </div>
+            </div>
+            <div class="file-card__actions">
+                <button class="file-card__btn"><i class="fas fa-eye"></i></button>
+                <button class="file-card__btn file-card__btn--danger"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+
+        <!-- Excel 문서 -->
+        <div class="file-card file-card--vertical">
+            <div class="file-card__icon">
+                <i class="fas fa-file-excel"></i>
+            </div>
+            <div class="file-card__info">
+                <div class="file-card__name">급여명세서.xlsx</div>
+                <div class="file-card__meta">
+                    <span class="file-card__size">45KB</span>
+                </div>
+            </div>
+            <div class="file-card__actions">
+                <button class="file-card__btn"><i class="fas fa-eye"></i></button>
+                <button class="file-card__btn file-card__btn--danger"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="file-list--cards file-list--cols-4"&gt;
+    &lt;div class="file-card file-card--vertical"&gt;
+        &lt;div class="file-card__icon file-card__icon--thumbnail"&gt;
+            &lt;img src="..." alt="썸네일"&gt;
+        &lt;/div&gt;
+        &lt;div class="file-card__info"&gt;
+            &lt;div class="file-card__name"&gt;파일명.jpg&lt;/div&gt;
+            &lt;div class="file-card__meta"&gt;
+                &lt;span class="file-card__size"&gt;256KB&lt;/span&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="file-card__actions"&gt;
+            &lt;button class="file-card__btn"&gt;&lt;i class="fas fa-eye"&gt;&lt;/i&gt;&lt;/button&gt;
+            &lt;button class="file-card__btn file-card__btn--danger"&gt;&lt;i class="fas fa-trash"&gt;&lt;/i&gt;&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('세로 카드 - 사이즈 변형') %}
+    {% call demo() %}
+    <div style="display: flex; gap: var(--space-4); flex-wrap: wrap;">
+        <!-- Large 카드 -->
+        <div style="width: 200px;">
+            <p style="font-size: var(--text-sm); color: var(--color-gray-500); margin-bottom: var(--space-2);">Large</p>
+            <div class="file-card file-card--vertical file-card--large">
+                <div class="file-card__icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="file-card__info">
+                    <div class="file-card__name">계약서.pdf</div>
+                    <div class="file-card__meta">
+                        <span class="file-card__size">2.4MB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 기본 카드 -->
+        <div style="width: 160px;">
+            <p style="font-size: var(--text-sm); color: var(--color-gray-500); margin-bottom: var(--space-2);">Default</p>
+            <div class="file-card file-card--vertical">
+                <div class="file-card__icon">
+                    <i class="fas fa-file-word"></i>
+                </div>
+                <div class="file-card__info">
+                    <div class="file-card__name">이력서.docx</div>
+                    <div class="file-card__meta">
+                        <span class="file-card__size">89KB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Small 카드 -->
+        <div style="width: 120px;">
+            <p style="font-size: var(--text-sm); color: var(--color-gray-500); margin-bottom: var(--space-2);">Small</p>
+            <div class="file-card file-card--vertical file-card--small">
+                <div class="file-card__icon">
+                    <i class="fas fa-file-excel"></i>
+                </div>
+                <div class="file-card__info">
+                    <div class="file-card__name">데이터.xlsx</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- Large --&gt;
+&lt;div class="file-card file-card--vertical file-card--large"&gt;...&lt;/div&gt;
+
+&lt;!-- Default --&gt;
+&lt;div class="file-card file-card--vertical"&gt;...&lt;/div&gt;
+
+&lt;!-- Small --&gt;
+&lt;div class="file-card file-card--vertical file-card--small"&gt;...&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('이미지 갤러리 레이아웃') %}
+    {% call demo() %}
+    <div class="file-list--cards">
+        <div class="file-card file-card--vertical">
+            <div class="file-card__icon file-card__icon--thumbnail">
+                <img src="https://picsum.photos/seed/gallery1/160/120" alt="이미지1">
+            </div>
+            <div class="file-card__info">
+                <div class="file-card__name">증명사진_정면.jpg</div>
+                <div class="file-card__meta">
+                    <span class="file-card__category">증명사진</span>
+                    <span class="file-card__size">256KB</span>
+                </div>
+            </div>
+        </div>
+        <div class="file-card file-card--vertical">
+            <div class="file-card__icon file-card__icon--thumbnail">
+                <img src="https://picsum.photos/seed/gallery2/160/120" alt="이미지2">
+            </div>
+            <div class="file-card__info">
+                <div class="file-card__name">신분증_사본.png</div>
+                <div class="file-card__meta">
+                    <span class="file-card__category">신분증</span>
+                    <span class="file-card__size">512KB</span>
+                </div>
+            </div>
+        </div>
+        <div class="file-card file-card--vertical">
+            <div class="file-card__icon file-card__icon--thumbnail">
+                <img src="https://picsum.photos/seed/gallery3/160/120" alt="이미지3">
+            </div>
+            <div class="file-card__info">
+                <div class="file-card__name">졸업사진.jpg</div>
+                <div class="file-card__meta">
+                    <span class="file-card__category">기타</span>
+                    <span class="file-card__size">384KB</span>
+                </div>
+            </div>
+        </div>
+        <div class="file-card file-card--vertical">
+            <div class="file-card__icon file-card__icon--thumbnail">
+                <img src="https://picsum.photos/seed/gallery4/160/120" alt="이미지4">
+            </div>
+            <div class="file-card__info">
+                <div class="file-card__name">프로필_업무용.png</div>
+                <div class="file-card__meta">
+                    <span class="file-card__category">프로필</span>
+                    <span class="file-card__size">128KB</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="file-list--cards"&gt;
+    &lt;div class="file-card file-card--vertical"&gt;
+        &lt;div class="file-card__icon file-card__icon--thumbnail"&gt;
+            &lt;img src="..." alt="이미지"&gt;
+        &lt;/div&gt;
+        &lt;div class="file-card__info"&gt;
+            &lt;div class="file-card__name"&gt;파일명.jpg&lt;/div&gt;
+            &lt;div class="file-card__meta"&gt;
+                &lt;span class="file-card__category"&gt;카테고리&lt;/span&gt;
+                &lt;span class="file-card__size"&gt;256KB&lt;/span&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;!-- 더 많은 카드... --&gt;
 &lt;/div&gt;
     {% endcall %}
     {% endcall %}
@@ -136,61 +385,60 @@
     {% call subsection('파일 타입별 아이콘') %}
     {% call demo() %}
     <div class="file-icon-grid">
-        <div class="file-icon-item">
-            <div class="file-icon"><i class="fas fa-file-pdf"></i></div>
-            <span>PDF</span>
+        <div class="file-icon-grid__item">
+            <div class="file-icon-grid__icon file-card__icon--pdf"><i class="fas fa-file-pdf"></i></div>
+            <span class="file-icon-grid__label">PDF</span>
         </div>
-        <div class="file-icon-item">
-            <div class="file-icon"><i class="fas fa-file-word"></i></div>
-            <span>Word</span>
+        <div class="file-icon-grid__item">
+            <div class="file-icon-grid__icon file-card__icon--word"><i class="fas fa-file-word"></i></div>
+            <span class="file-icon-grid__label">Word</span>
         </div>
-        <div class="file-icon-item">
-            <div class="file-icon"><i class="fas fa-file-excel"></i></div>
-            <span>Excel</span>
+        <div class="file-icon-grid__item">
+            <div class="file-icon-grid__icon file-card__icon--excel"><i class="fas fa-file-excel"></i></div>
+            <span class="file-icon-grid__label">Excel</span>
         </div>
-        <div class="file-icon-item">
-            <div class="file-icon"><i class="fas fa-file-powerpoint"></i></div>
-            <span>PPT</span>
+        <div class="file-icon-grid__item">
+            <div class="file-icon-grid__icon file-card__icon--ppt"><i class="fas fa-file-powerpoint"></i></div>
+            <span class="file-icon-grid__label">PPT</span>
         </div>
-        <div class="file-icon-item">
-            <div class="file-icon"><i class="fas fa-file-archive"></i></div>
-            <span>ZIP</span>
+        <div class="file-icon-grid__item">
+            <div class="file-icon-grid__icon file-card__icon--zip"><i class="fas fa-file-archive"></i></div>
+            <span class="file-icon-grid__label">ZIP</span>
         </div>
-        <div class="file-icon-item">
-            <div class="file-icon"><i class="fas fa-file"></i></div>
-            <span>기타</span>
+        <div class="file-icon-grid__item">
+            <div class="file-icon-grid__icon"><i class="fas fa-file"></i></div>
+            <span class="file-icon-grid__label">기타</span>
         </div>
     </div>
     {% endcall %}
     {% call code() %}
-&lt;!-- 파일 타입별 아이콘 --&gt;
-&lt;i class="fas fa-file-pdf"&gt;&lt;/i&gt;        &lt;!-- PDF --&gt;
-&lt;i class="fas fa-file-word"&gt;&lt;/i&gt;       &lt;!-- Word (.doc, .docx) --&gt;
-&lt;i class="fas fa-file-excel"&gt;&lt;/i&gt;      &lt;!-- Excel (.xls, .xlsx) --&gt;
-&lt;i class="fas fa-file-powerpoint"&gt;&lt;/i&gt; &lt;!-- PowerPoint --&gt;
-&lt;i class="fas fa-file-archive"&gt;&lt;/i&gt;    &lt;!-- ZIP --&gt;
-&lt;i class="fas fa-file"&gt;&lt;/i&gt;            &lt;!-- 기타 --&gt;
+&lt;!-- 파일 타입별 아이콘 클래스 --&gt;
+&lt;div class="file-card__icon file-card__icon--pdf"&gt;&lt;i class="fas fa-file-pdf"&gt;&lt;/i&gt;&lt;/div&gt;
+&lt;div class="file-card__icon file-card__icon--word"&gt;&lt;i class="fas fa-file-word"&gt;&lt;/i&gt;&lt;/div&gt;
+&lt;div class="file-card__icon file-card__icon--excel"&gt;&lt;i class="fas fa-file-excel"&gt;&lt;/i&gt;&lt;/div&gt;
+&lt;div class="file-card__icon file-card__icon--ppt"&gt;&lt;i class="fas fa-file-powerpoint"&gt;&lt;/i&gt;&lt;/div&gt;
+&lt;div class="file-card__icon file-card__icon--zip"&gt;&lt;i class="fas fa-file-archive"&gt;&lt;/i&gt;&lt;/div&gt;
     {% endcall %}
     {% endcall %}
 
     {% call subsection('빈 상태') %}
     {% call demo() %}
-    <div class="empty-state-small-demo">
-        <i class="fas fa-folder-open"></i>
-        <p>등록된 첨부파일이 없습니다</p>
+    <div class="file-empty-state">
+        <i class="file-empty-state__icon fas fa-folder-open"></i>
+        <p class="file-empty-state__text">등록된 첨부파일이 없습니다</p>
     </div>
     {% endcall %}
     {% call code() %}
-&lt;div class="empty-state-small"&gt;
-    &lt;i class="fas fa-folder-open"&gt;&lt;/i&gt;
-    &lt;p&gt;등록된 첨부파일이 없습니다&lt;/p&gt;
+&lt;div class="file-empty-state"&gt;
+    &lt;i class="file-empty-state__icon fas fa-folder-open"&gt;&lt;/i&gt;
+    &lt;p class="file-empty-state__text"&gt;등록된 첨부파일이 없습니다&lt;/p&gt;
 &lt;/div&gt;
     {% endcall %}
     {% endcall %}
 
     {% call subsection('AI 분석 버튼') %}
     {% call demo() %}
-    <button type="button" class="btn-ai-analyze-demo">
+    <button type="button" class="btn-ai-analyze">
         <i class="fas fa-wand-magic-sparkles"></i>
         <span>AI 분석</span>
     </button>
@@ -203,221 +451,200 @@
     {% endcall %}
     {% endcall %}
 
-    {% call subsection('사이드바 통합') %}
+    {% call subsection('필수 파일 체크리스트') %}
     {% call demo() %}
-    <p style="color: var(--color-gray-600); margin-bottom: var(--space-4);">
-        첨부서류 컴포넌트는 <code>_attachment_sidebar.html</code> 템플릿에서 통합 사용됩니다.
-    </p>
-    <div style="background: var(--color-gray-100); padding: var(--space-4); border-radius: var(--radius-md);">
-        <pre style="margin: 0; font-size: var(--text-sm);">{% raw %}{% include 'shared/partials/_attachment_sidebar.html' %}{% endraw %}
-
-&lt;!-- 필요 변수 --&gt;
-attachment_list: 첨부파일 목록
-is_readonly: 읽기 전용 모드 (True면 버튼 숨김)</pre>
+    <div class="required-files" style="max-width: 300px;">
+        <div class="required-files__title">필수 서류</div>
+        <div class="required-files__list">
+            <div class="required-file required-file--complete">
+                <div class="required-file__icon"><i class="fas fa-check"></i></div>
+                <span class="required-file__name">증명사진</span>
+            </div>
+            <div class="required-file required-file--complete">
+                <div class="required-file__icon"><i class="fas fa-check"></i></div>
+                <span class="required-file__name">주민등록등본</span>
+            </div>
+            <div class="required-file required-file--missing">
+                <div class="required-file__icon"><i class="fas fa-exclamation"></i></div>
+                <span class="required-file__name">졸업증명서</span>
+            </div>
+            <div class="required-file required-file--missing">
+                <div class="required-file__icon"><i class="fas fa-exclamation"></i></div>
+                <span class="required-file__name">경력증명서</span>
+            </div>
+        </div>
     </div>
     {% endcall %}
+    {% call code() %}
+&lt;div class="required-files"&gt;
+    &lt;div class="required-files__title"&gt;필수 서류&lt;/div&gt;
+    &lt;div class="required-files__list"&gt;
+        &lt;div class="required-file required-file--complete"&gt;
+            &lt;div class="required-file__icon"&gt;&lt;i class="fas fa-check"&gt;&lt;/i&gt;&lt;/div&gt;
+            &lt;span class="required-file__name"&gt;증명사진&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class="required-file required-file--missing"&gt;
+            &lt;div class="required-file__icon"&gt;&lt;i class="fas fa-exclamation"&gt;&lt;/i&gt;&lt;/div&gt;
+            &lt;span class="required-file__name"&gt;졸업증명서&lt;/span&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('첨부파일 패널') %}
+    {% call demo() %}
+    <div class="attachment-panel" style="max-width: 320px;">
+        <div class="attachment-panel__header">
+            <div class="attachment-panel__title">
+                <i class="fas fa-paperclip"></i> 첨부서류
+            </div>
+            <span class="attachment-panel__count">4</span>
+        </div>
+        <div class="attachment-panel__body">
+            <div class="attachment-panel__upload">
+                <div class="file-upload-area file-upload-area--compact">
+                    <div class="file-upload-area__icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="file-upload-area__text">파일 업로드</div>
+                </div>
+            </div>
+            <div class="attachment-panel__list">
+                <div class="file-card">
+                    <div class="file-card__icon file-card__icon--thumbnail">
+                        <img src="https://picsum.photos/seed/panel1/80/80" alt="증명사진">
+                    </div>
+                    <div class="file-card__info">
+                        <div class="file-card__name">증명사진.jpg</div>
+                        <div class="file-card__meta">
+                            <span class="file-card__size">256KB</span>
+                        </div>
+                    </div>
+                    <div class="file-card__actions">
+                        <button class="file-card__btn"><i class="fas fa-eye"></i></button>
+                        <button class="file-card__btn file-card__btn--danger"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="file-card">
+                    <div class="file-card__icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="file-card__info">
+                        <div class="file-card__name">재직증명서.pdf</div>
+                        <div class="file-card__meta">
+                            <span class="file-card__size">1.2MB</span>
+                        </div>
+                    </div>
+                    <div class="file-card__actions">
+                        <button class="file-card__btn"><i class="fas fa-eye"></i></button>
+                        <button class="file-card__btn file-card__btn--danger"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="attachment-panel"&gt;
+    &lt;div class="attachment-panel__header"&gt;
+        &lt;div class="attachment-panel__title"&gt;
+            &lt;i class="fas fa-paperclip"&gt;&lt;/i&gt; 첨부서류
+        &lt;/div&gt;
+        &lt;span class="attachment-panel__count"&gt;4&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="attachment-panel__body"&gt;
+        &lt;div class="attachment-panel__upload"&gt;
+            &lt;div class="file-upload-area file-upload-area--compact"&gt;...&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="attachment-panel__list"&gt;
+            &lt;div class="file-card"&gt;...&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('사용 가이드') %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>클래스</th>
+                    <th>용도</th>
+                    <th>설명</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>.file-upload-area</code></td>
+                    <td>블록</td>
+                    <td>드래그앤드롭 업로드 영역</td>
+                </tr>
+                <tr>
+                    <td><code>.file-upload-area--compact</code></td>
+                    <td>수정자</td>
+                    <td>컴팩트 버전 (사이드바용)</td>
+                </tr>
+                <tr>
+                    <td><code>.file-card</code></td>
+                    <td>블록</td>
+                    <td>개별 파일 카드</td>
+                </tr>
+                <tr>
+                    <td><code>.file-card__icon--thumbnail</code></td>
+                    <td>수정자</td>
+                    <td>이미지 썸네일 표시</td>
+                </tr>
+                <tr>
+                    <td><code>.file-card__icon--pdf</code></td>
+                    <td>수정자</td>
+                    <td>PDF 아이콘 색상 (빨강)</td>
+                </tr>
+                <tr>
+                    <td><code>.file-card__btn--danger</code></td>
+                    <td>수정자</td>
+                    <td>위험 액션 버튼 (삭제)</td>
+                </tr>
+                <tr>
+                    <td><code>.attachment-panel</code></td>
+                    <td>블록</td>
+                    <td>사이드바 첨부파일 패널</td>
+                </tr>
+                <tr>
+                    <td><code>.btn-ai-analyze</code></td>
+                    <td>블록</td>
+                    <td>AI 분석 버튼</td>
+                </tr>
+                <tr>
+                    <td><code>.file-card--vertical</code></td>
+                    <td>수정자</td>
+                    <td>세로 레이아웃 파일 카드</td>
+                </tr>
+                <tr>
+                    <td><code>.file-card--large</code></td>
+                    <td>수정자</td>
+                    <td>큰 세로 카드 (문서 미리보기용)</td>
+                </tr>
+                <tr>
+                    <td><code>.file-card--small</code></td>
+                    <td>수정자</td>
+                    <td>작은 세로 카드 (컴팩트 그리드용)</td>
+                </tr>
+                <tr>
+                    <td><code>.file-list--cards</code></td>
+                    <td>컨테이너</td>
+                    <td>카드형 그리드 레이아웃 (auto-fill)</td>
+                </tr>
+                <tr>
+                    <td><code>.file-list--cols-2/3/4</code></td>
+                    <td>수정자</td>
+                    <td>고정 열 수 그리드 (2/3/4열)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     {% endcall %}
 
 {% endcall %}
-
-<style>
-.file-upload-area-demo {
-    border: 2px dashed var(--color-gray-300);
-    border-radius: var(--radius-lg);
-    padding: var(--space-8);
-    text-align: center;
-    background: var(--color-gray-50);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.file-upload-area-demo:hover {
-    border-color: var(--color-primary-400);
-    background: var(--color-blue-50);
-}
-
-.file-upload-icon {
-    font-size: var(--text-3xl);
-    color: var(--color-gray-400);
-    margin-bottom: var(--space-3);
-}
-
-.file-upload-text {
-    font-size: var(--text-base);
-    color: var(--color-gray-700);
-    margin-bottom: var(--space-1);
-}
-
-.file-upload-hint {
-    font-size: var(--text-sm);
-    color: var(--color-gray-500);
-}
-
-.file-list-demo {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    max-width: 400px;
-}
-
-.file-card {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-3);
-    background: var(--color-pure-white);
-    border: 1px solid var(--color-gray-200);
-    border-radius: var(--radius-md);
-    transition: all var(--transition-fast);
-}
-
-.file-card:hover {
-    border-color: var(--color-primary-300);
-    box-shadow: var(--shadow-sm);
-}
-
-.file-icon {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--color-gray-100);
-    border-radius: var(--radius-md);
-    color: var(--color-gray-500);
-    font-size: var(--text-xl);
-    flex-shrink: 0;
-}
-
-.file-icon.file-thumbnail {
-    background: transparent;
-    overflow: hidden;
-}
-
-.file-icon .thumbnail-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: var(--radius-md);
-}
-
-.file-icon .fa-file-pdf { color: var(--color-danger-500); }
-.file-icon .fa-file-word { color: var(--color-blue-500); }
-.file-icon .fa-file-excel { color: var(--color-success-500); }
-.file-icon .fa-file-powerpoint { color: var(--color-warning-500); }
-.file-icon .fa-file-archive { color: var(--color-gray-600); }
-
-.file-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.file-name {
-    font-size: var(--text-sm);
-    font-weight: 500;
-    color: var(--color-gray-900);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.file-meta {
-    display: flex;
-    gap: var(--space-2);
-    margin-top: var(--space-1);
-}
-
-.file-category {
-    font-size: var(--text-xs);
-    color: var(--color-primary-600);
-    background: var(--color-primary-50);
-    padding: 2px 6px;
-    border-radius: var(--radius-sm);
-}
-
-.file-size {
-    font-size: var(--text-xs);
-    color: var(--color-gray-500);
-}
-
-.file-actions {
-    display: flex;
-    gap: var(--space-1);
-}
-
-.btn-icon {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-    border-radius: var(--radius-sm);
-    color: var(--color-gray-500);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.btn-icon:hover {
-    background: var(--color-gray-100);
-    color: var(--color-gray-700);
-}
-
-.file-icon-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: var(--space-4);
-}
-
-.file-icon-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
-}
-
-.file-icon-item span {
-    font-size: var(--text-xs);
-    color: var(--color-gray-600);
-}
-
-.empty-state-small-demo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-6);
-    color: var(--color-gray-400);
-}
-
-.empty-state-small-demo i {
-    font-size: var(--text-3xl);
-}
-
-.empty-state-small-demo p {
-    margin: 0;
-    font-size: var(--text-sm);
-}
-
-.btn-ai-analyze-demo {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2) var(--space-3);
-    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
-    color: var(--color-pure-white);
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: var(--text-sm);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.btn-ai-analyze-demo:hover {
-    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
-    box-shadow: var(--shadow-md);
-}
-</style>
 {% endblock %}

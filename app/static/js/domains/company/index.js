@@ -12,4 +12,3 @@ export { CorporateSettingsAPI } from './services/settings-api.js';
 // export * from './pages/settings.js';
 // export * from './pages/users.js';
 // export * from './pages/register.js';
-// export * from './pages/organization.js';

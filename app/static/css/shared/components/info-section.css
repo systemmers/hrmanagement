@@ -1,0 +1,167 @@
+/**
+ * Info Section Component
+ * HR Card 섹션 카드 스타일 (BEM)
+ *
+ * 사용: 직원 상세, 계약 상세 등 정보 섹션 표시
+ * 참조: .dev_docs/screenshot/image.png
+ */
+
+/* ========================================
+   Block - 섹션 컨테이너
+   ======================================== */
+
+.info-section {
+    background: var(--color-pure-white);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-gray-200);
+    margin-bottom: var(--space-6);
+    overflow: hidden;
+}
+
+/* ========================================
+   Elements - 구성 요소
+   ======================================== */
+
+/* 섹션 헤더 */
+.info-section__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+}
+
+/* 제목 영역 (아이콘 + 텍스트) */
+.info-section__title-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+/* 아이콘 배지 */
+.info-section__icon {
+    width: 28px;
+    height: 28px;
+    background: var(--color-primary-50);
+    color: var(--color-primary-600);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-base);
+}
+
+/* 제목 텍스트 */
+.info-section__title {
+    font-size: var(--text-md);
+    font-weight: 600;
+    color: var(--color-gray-800);
+    margin: 0;
+}
+
+/* 액션 버튼 영역 */
+.info-section__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+/* 수정하기 링크 */
+.info-section__edit-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1-5);
+    font-size: var(--text-sm);
+    color: var(--color-blue-600);
+    text-decoration: none;
+    padding: var(--space-1-5) var(--space-3);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.info-section__edit-link:hover {
+    background: var(--color-blue-50);
+    color: var(--color-blue-700);
+}
+
+/* 편집 모드 배지 */
+.info-section__edit-badge {
+    display: none;
+    font-size: var(--text-xs);
+    padding: var(--space-1) var(--space-2);
+    background: var(--color-primary-600);
+    color: var(--color-pure-white);
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    margin-left: var(--space-2);
+}
+
+/* 섹션 본문 */
+.info-section__body {
+    padding: 0;
+}
+
+/* 섹션 본문 - 패딩 있는 버전 */
+.info-section__body--padded {
+    padding: var(--space-6);
+}
+
+/* ========================================
+   Modifiers - 상태 변형
+   ======================================== */
+
+/* 편집 모드 */
+.info-section--editing .info-section__header {
+    background: var(--color-edit-bg);
+    border-bottom-color: var(--color-edit-border);
+}
+
+.info-section--editing .info-section__icon {
+    background: var(--color-primary-100);
+}
+
+.info-section--editing .info-section__title {
+    color: var(--color-primary-700);
+}
+
+.info-section--editing .info-section__edit-badge {
+    display: inline-flex;
+}
+
+.info-section--editing .info-section__edit-link {
+    display: none;
+}
+
+/* 축소 상태 */
+.info-section--collapsed .info-section__body {
+    display: none;
+}
+
+.info-section--collapsed .info-section__header {
+    border-bottom: none;
+}
+
+/* 경계선 없는 버전 */
+.info-section--borderless {
+    border: none;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ========================================
+   Responsive - 반응형
+   ======================================== */
+
+@media (max-width: 768px) {
+    .info-section__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+        padding: var(--space-4);
+    }
+
+    .info-section__actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

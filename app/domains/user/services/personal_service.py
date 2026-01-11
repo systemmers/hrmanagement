@@ -78,8 +78,8 @@ class PersonalService:
     def employee_repo(self):
         """지연 초기화된 직원 Repository"""
         if self._employee_repo is None:
-            from app.domains.employee.repositories import employee_repository
-            self._employee_repo = employee_repository
+            from app.domains.employee.repositories import EmployeeRepository
+            self._employee_repo = EmployeeRepository()
         return self._employee_repo
 
     # ========================================
@@ -479,8 +479,7 @@ class PersonalService:
                 'nationality': employee.nationality,
                 'emergency_contact': employee.emergency_contact,
                 'emergency_relation': employee.emergency_relation,
-                'blood_type': employee.blood_type,
-                'religion': employee.religion,
+                # blood_type, religion 삭제됨 (Phase 28 마이그레이션)
                 'hobby': employee.hobby,
                 'specialty': employee.specialty,
                 'disability_info': employee.disability_info,

@@ -3,8 +3,9 @@
 본 문서는 HR Management 시스템의 모든 API 엔드포인트를 정리한 문서입니다.
 
 **생성일**: 2025-12-16
+**최종 업데이트**: 2026-01-11
 **프로젝트**: D:/projects/hrmanagement
-**Python**: Flask Blueprint 기반
+**Python**: Flask Blueprint 기반 (도메인 중심 아키텍처)
 
 ---
 
@@ -22,7 +23,9 @@
 10. [감사 로그](#10-감사-로그)
 11. [동기화](#11-동기화)
 12. [계정 설정](#12-계정-설정)
-13. [기타](#13-기타)
+13. [첨부파일 관리](#13-첨부파일-관리)
+14. [명함 관리](#14-명함-관리)
+15. [기타](#15-기타)
 
 ---
 
@@ -714,7 +717,105 @@ show_profile_photo: "on"
 
 ---
 
-## 13. 기타
+## 13. 첨부파일 관리
+
+### Blueprint: `attachment_bp` (prefix: `/api/attachments`)
+
+> **도메인**: `app/domains/attachment/` (2026-01-10 신규)
+
+#### 13.1 첨부파일 CRUD
+
+| HTTP | 엔드포인트 | 인증 | 역할 | 설명 |
+|------|-----------|------|------|------|
+| POST | `/api/attachments` | 필수 | - | 파일 업로드 |
+| DELETE | `/api/attachments/<int:id>` | 필수 | - | 파일 삭제 |
+| GET | `/api/attachments/<owner_type>/<int:owner_id>` | 필수 | - | 파일 목록 조회 |
+
+**Request 예시** (POST `/api/attachments`):
+```form-data
+file: [binary]
+owner_type: "employee"
+owner_id: 1
+category: "document"
+```
+
+**Response 예시**:
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "file_name": "resume.pdf",
+    "file_path": "/uploads/attachments/2026/01/resume.pdf",
+    "file_type": "application/pdf",
+    "file_size": 102400,
+    "owner_type": "employee",
+    "owner_id": 1,
+    "category": "document",
+    "upload_date": "2026-01-10"
+  }
+}
+```
+
+**owner_type 값**:
+- `employee`: 직원 첨부파일
+- `profile`: 개인 프로필 첨부파일
+- `contract`: 계약 첨부파일
+
+**category 값**:
+- `document`: 문서
+- `photo`: 사진
+- `businesscard`: 명함
+- `certificate`: 증빙 서류
+
+---
+
+## 14. 명함 관리
+
+### Blueprint: `businesscard_bp` (prefix: `/api/businesscard`)
+
+> **도메인**: `app/domains/businesscard/` (2026-01-09 신규)
+
+#### 14.1 명함 CRUD
+
+| HTTP | 엔드포인트 | 인증 | 역할 | 설명 |
+|------|-----------|------|------|------|
+| POST | `/api/businesscard/employee/<int:employee_id>` | 필수 | corporate | 명함 업로드 |
+| DELETE | `/api/businesscard/employee/<int:employee_id>/<side>` | 필수 | corporate | 명함 삭제 |
+| GET | `/api/businesscard/employee/<int:employee_id>` | 필수 | - | 명함 조회 |
+
+**Request 예시** (POST `/api/businesscard/employee/<int:employee_id>`):
+```form-data
+file: [binary]
+side: "front"  # front 또는 back
+```
+
+**Response 예시**:
+```json
+{
+  "success": true,
+  "data": {
+    "front": {
+      "id": 1,
+      "file_path": "/uploads/businesscards/emp_1_front.jpg",
+      "upload_date": "2026-01-09"
+    },
+    "back": {
+      "id": 2,
+      "file_path": "/uploads/businesscards/emp_1_back.jpg",
+      "upload_date": "2026-01-09"
+    }
+  }
+}
+```
+
+**side 값**:
+- `front`: 명함 앞면
+- `back`: 명함 뒷면
+
+---
+
+## 15. 기타
 
 ### Blueprint: `main_bp` (no prefix)
 
@@ -812,6 +913,12 @@ show_profile_photo: "on"
 
 ## 문서 버전
 
-- **Version**: 1.0
-- **Last Updated**: 2025-12-16
+- **Version**: 1.1
+- **Last Updated**: 2026-01-11
 - **Contributors**: Backend Architect (AI)
+
+### 변경 이력
+| 버전 | 날짜 | 변경 내용 |
+|------|------|----------|
+| 1.1 | 2026-01-11 | 첨부파일/명함 API 추가 |
+| 1.0 | 2025-12-16 | 초기 문서 작성 |

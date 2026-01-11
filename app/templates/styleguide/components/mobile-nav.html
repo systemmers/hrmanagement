@@ -1,0 +1,192 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('mobile-nav', '모바일 네비게이션', '모바일 하단 탭 네비게이션 (1024px 이하 표시)') %}
+
+    {% call subsection('기본 모바일 네비게이션') %}
+    {% call demo() %}
+        <div style="width: 100%; max-width: 375px; margin: 0 auto; position: relative; height: 80px; background: #f8fafc; border-radius: 12px; overflow: hidden;">
+            <nav class="mobile-nav" style="position: absolute !important; display: flex !important; bottom: 0; left: 0; right: 0;">
+                <div class="mobile-nav__item">
+                    <a href="#" class="mobile-nav__btn active">
+                        <i class="mobile-nav__icon fas fa-home"></i>
+                        <span class="mobile-nav__label">홈</span>
+                    </a>
+                </div>
+                <div class="mobile-nav__item">
+                    <a href="#" class="mobile-nav__btn">
+                        <i class="mobile-nav__icon fas fa-users"></i>
+                        <span class="mobile-nav__label">직원</span>
+                    </a>
+                </div>
+                <div class="mobile-nav__item">
+                    <a href="#" class="mobile-nav__btn">
+                        <i class="mobile-nav__icon fas fa-file-contract"></i>
+                        <span class="mobile-nav__label">계약</span>
+                    </a>
+                </div>
+                <div class="mobile-nav__item">
+                    <a href="#" class="mobile-nav__btn">
+                        <i class="mobile-nav__icon fas fa-user"></i>
+                        <span class="mobile-nav__label">마이</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    {% endcall %}
+    {% call code() %}
+&lt;nav class="mobile-nav"&gt;
+    &lt;div class="mobile-nav__item"&gt;
+        &lt;a href="#" class="mobile-nav__btn active"&gt;
+            &lt;i class="mobile-nav__icon fas fa-home"&gt;&lt;/i&gt;
+            &lt;span class="mobile-nav__label"&gt;홈&lt;/span&gt;
+        &lt;/a&gt;
+    &lt;/div&gt;
+    &lt;div class="mobile-nav__item"&gt;
+        &lt;a href="#" class="mobile-nav__btn"&gt;
+            &lt;i class="mobile-nav__icon fas fa-users"&gt;&lt;/i&gt;
+            &lt;span class="mobile-nav__label"&gt;직원&lt;/span&gt;
+        &lt;/a&gt;
+    &lt;/div&gt;
+    &lt;!-- ... --&gt;
+&lt;/nav&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('배지 포함') %}
+    {% call demo() %}
+        <div style="width: 100%; max-width: 375px; margin: 0 auto; position: relative; height: 80px; background: #f8fafc; border-radius: 12px; overflow: hidden;">
+            <nav class="mobile-nav" style="position: absolute !important; display: flex !important; bottom: 0; left: 0; right: 0;">
+                <div class="mobile-nav__item">
+                    <a href="#" class="mobile-nav__btn">
+                        <i class="mobile-nav__icon fas fa-home"></i>
+                        <span class="mobile-nav__label">홈</span>
+                    </a>
+                </div>
+                <div class="mobile-nav__item">
+                    <a href="#" class="mobile-nav__btn">
+                        <i class="mobile-nav__icon fas fa-bell"></i>
+                        <span class="mobile-nav__label">알림</span>
+                        <span class="mobile-nav__badge">5</span>
+                    </a>
+                </div>
+                <div class="mobile-nav__item">
+                    <a href="#" class="mobile-nav__btn active">
+                        <i class="mobile-nav__icon fas fa-envelope"></i>
+                        <span class="mobile-nav__label">메시지</span>
+                        <span class="mobile-nav__badge">12</span>
+                    </a>
+                </div>
+                <div class="mobile-nav__item">
+                    <a href="#" class="mobile-nav__btn">
+                        <i class="mobile-nav__icon fas fa-user"></i>
+                        <span class="mobile-nav__label">마이</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="mobile-nav__item"&gt;
+    &lt;a href="#" class="mobile-nav__btn"&gt;
+        &lt;i class="mobile-nav__icon fas fa-bell"&gt;&lt;/i&gt;
+        &lt;span class="mobile-nav__label"&gt;알림&lt;/span&gt;
+        &lt;span class="mobile-nav__badge"&gt;5&lt;/span&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('다크 테마') %}
+    {% call demo() %}
+        <div style="width: 100%; max-width: 375px; margin: 0 auto; position: relative; height: 80px; background: #0f172a; border-radius: 12px; overflow: hidden;">
+            <nav class="mobile-nav mobile-nav--dark" style="position: absolute !important; display: flex !important; bottom: 0; left: 0; right: 0;">
+                <div class="mobile-nav__item">
+                    <a href="#" class="mobile-nav__btn active">
+                        <i class="mobile-nav__icon fas fa-home"></i>
+                        <span class="mobile-nav__label">홈</span>
+                    </a>
+                </div>
+                <div class="mobile-nav__item">
+                    <a href="#" class="mobile-nav__btn">
+                        <i class="mobile-nav__icon fas fa-users"></i>
+                        <span class="mobile-nav__label">직원</span>
+                    </a>
+                </div>
+                <div class="mobile-nav__item">
+                    <a href="#" class="mobile-nav__btn">
+                        <i class="mobile-nav__icon fas fa-file-contract"></i>
+                        <span class="mobile-nav__label">계약</span>
+                    </a>
+                </div>
+                <div class="mobile-nav__item">
+                    <a href="#" class="mobile-nav__btn">
+                        <i class="mobile-nav__icon fas fa-user"></i>
+                        <span class="mobile-nav__label">마이</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    {% endcall %}
+    {% call code() %}
+&lt;nav class="mobile-nav mobile-nav--dark"&gt;
+    &lt;!-- 다크 테마 모바일 네비게이션 --&gt;
+&lt;/nav&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('사용 가이드') %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>클래스</th>
+                    <th>용도</th>
+                    <th>설명</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>.mobile-nav</code></td>
+                    <td>블록</td>
+                    <td>하단 고정 네비게이션</td>
+                </tr>
+                <tr>
+                    <td><code>.mobile-nav__item</code></td>
+                    <td>요소</td>
+                    <td>네비 아이템 래퍼</td>
+                </tr>
+                <tr>
+                    <td><code>.mobile-nav__btn</code></td>
+                    <td>요소</td>
+                    <td>네비게이션 버튼</td>
+                </tr>
+                <tr>
+                    <td><code>.mobile-nav__btn.active</code></td>
+                    <td>수정자</td>
+                    <td>활성 상태</td>
+                </tr>
+                <tr>
+                    <td><code>.mobile-nav__badge</code></td>
+                    <td>요소</td>
+                    <td>알림 배지</td>
+                </tr>
+                <tr>
+                    <td><code>.mobile-nav--dark</code></td>
+                    <td>수정자</td>
+                    <td>다크 테마</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="alert alert--info" style="margin-top: var(--space-4);">
+        <strong>참고:</strong> 모바일 네비게이션은 화면 너비 1024px 이하에서만 표시됩니다.
+        데스크톱에서는 사이드바 네비게이션을 사용합니다.
+    </div>
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

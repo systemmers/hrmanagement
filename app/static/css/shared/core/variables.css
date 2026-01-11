@@ -303,4 +303,26 @@
 
     /* Layout Constants */
     --header-height: 64px;
+
+    /* ========================================
+       HR Card 마이그레이션 호환 변수
+       ======================================== */
+
+    /* Info Section/Table - 레이아웃 */
+    --info-label-width: 140px;
+    --info-label-width-sm: 120px;
+    --info-cell-min-height: 48px;
+
+    /* Edit Mode - 편집 모드 색상 */
+    --color-edit-bg: var(--color-primary-50);
+    --color-edit-border: var(--color-primary-200);
+
+    /* Sidebar Layout - 사이드바 레이아웃 */
+    --sidebar-width: 280px;
+    --sidebar-width-collapsed: 72px;
+    --right-panel-width: 260px;
+
+    /* Transition - 3D 플립 애니메이션 */
+    --transition-flip: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-collapse: 0.3s ease-out;
 }

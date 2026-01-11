@@ -24,6 +24,7 @@ shared/
 | `relation_updater.py` | RelationUpdater 기반 | Blueprint 관계 업데이트 |
 | `relation_configs.py` | 관계형 설정 | RelationUpdater 설정 |
 | `history_service.py` | 히스토리 서비스 | 변경 이력 추적 |
+| `dict_serializable_mixin.py` | 직렬화 믹스인 (2026-01-10) | 모델 to_dict/from_dict |
 
 **ServiceResult 패턴**:
 ```python
@@ -269,3 +270,23 @@ from app.shared.services.file_storage_service import file_storage_service
 2. **트랜잭션**: `atomic_transaction()` 사용 필수
 3. **데코레이터**: 인증은 `decorators.py` 사용
 4. **도메인 독립**: shared는 특정 도메인에 의존하지 않음
+5. **직렬화**: `DictSerializableMixin` 사용 권장
+
+**DictSerializableMixin 사용**:
+```python
+from app.shared.base.dict_serializable_mixin import DictSerializableMixin
+
+class Attachment(db.Model, DictSerializableMixin):
+    # to_dict(), from_dict() 자동 제공
+    pass
+```
+
+## Migration History
+
+**Phase 1 완료 (2026-01-07)**
+- 공유 자원 구조화
+- base/, constants/, repositories/, services/, utils/ 분리
+
+**Phase 2 완료 (2026-01-10)**
+- DictSerializableMixin을 shared/base로 이동
+- 도메인 간 공유 믹스인 중앙화

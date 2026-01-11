@@ -176,45 +176,16 @@
 }
 
 /* ========================================
-   File Card (Block)
+   File Card for Modal Context
+   Note: Modal-specific file card styles.
+   Generic file-card is in attachment.css (SSOT)
    ======================================== */
-.file-card {
+.modal-content .file-card {
     background-color: var(--color-gray-50);
-    border: 1px solid var(--color-gray-200);
-    border-radius: var(--radius-md);
-    padding: var(--space-3);
-    margin-bottom: var(--space-3);
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
     cursor: pointer;
-    transition: all var(--transition-fast);
 }
 
-.file-card:hover {
+.modal-content .file-card:hover {
     background-color: var(--color-gray-100);
     border-color: var(--color-gray-300);
-}
-
-.file-icon {
-    width: 40px;
-    height: 40px;
-    background-color: var(--color-pure-white);
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--text-xl);
-    color: var(--color-gray-600);
-}
-
-.file-info {
-    flex: 1;
-}
-
-.file-name {
-    font-size: var(--text-sm);
-    font-weight: 500;
-    color: var(--color-gray-900);
-    margin-bottom: var(--space-0-5);
 }

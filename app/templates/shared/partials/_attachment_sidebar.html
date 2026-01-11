@@ -3,6 +3,7 @@
    - 필요 변수: attachment_list
    - 선택 변수: is_readonly (True일 경우 업로드/삭제 버튼 숨김)
    - 사용처: employee_detail.html, employee_form.html, profile, mypage
+   - Phase 33: BEM 클래스 적용
    ======================================== #}
 <aside class="right-sidebar">
     <div class="right-sidebar-header">
@@ -19,24 +20,23 @@
     <div class="right-sidebar-content">
         {# 조회 전용 모드가 아닐 때만 업로드 영역 표시 #}
         {% if not is_readonly %}
-        <div class="file-upload-area" id="fileUploadArea">
-            <div class="file-upload-icon">
+        <div class="file-upload-area file-upload-area--compact" id="fileUploadArea">
+            <div class="file-upload-area__icon">
                 <i class="fas fa-cloud-upload-alt"></i>
             </div>
-            <div class="file-upload-text">파일을 드래그하거나 클릭</div>
-            <div class="file-upload-hint">PDF, JPG, PNG (최대 10MB)</div>
+            <div class="file-upload-area__text">파일을 드래그하거나 클릭</div>
+            <div class="file-upload-area__hint">PDF, JPG, PNG (최대 10MB)</div>
         </div>
         {% endif %}
 
-        <div id="fileList">
+        <div id="fileList" class="attachment-panel__list">
             {% if attachment_list %}
                 {% for attachment in attachment_list|sort(attribute='category') %}
                 <div class="file-card" data-attachment-id="{{ attachment.id }}">
-                    <div class="file-icon {% if attachment.file_type in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'] %}file-thumbnail{% endif %}">
+                    <div class="file-card__icon {% if attachment.file_type in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'] %}file-card__icon--thumbnail{% endif %}">
                         {% if attachment.file_type in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'] %}
                             <img src="{{ attachment.file_path }}"
                                  alt="{{ attachment.file_name }}"
-                                 class="thumbnail-img"
                                  loading="lazy">
                         {% elif attachment.file_type == 'pdf' %}
                             <i class="fas fa-file-pdf"></i>
@@ -52,23 +52,23 @@
                             <i class="fas fa-file"></i>
                         {% endif %}
                     </div>
-                    <div class="file-info">
-                        <div class="file-name">{{ attachment.file_name }}</div>
-                        <div class="file-meta">
-                            <span class="file-category">{{ attachment.category }}</span>
-                            <span class="file-size">{{ (attachment.file_size / 1024)|round(1) }}KB</span>
+                    <div class="file-card__info">
+                        <div class="file-card__name">{{ attachment.file_name }}</div>
+                        <div class="file-card__meta">
+                            <span class="file-card__category">{{ attachment.category }}</span>
+                            <span class="file-card__size">{{ (attachment.file_size / 1024)|round(1) }}KB</span>
                         </div>
                     </div>
-                    <div class="file-actions">
-                        <a href="{{ attachment.file_path }}" target="_blank" class="btn-icon" title="보기">
+                    <div class="file-card__actions">
+                        <a href="{{ attachment.file_path }}" target="_blank" class="file-card__btn" title="보기">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <a href="{{ attachment.file_path }}" download class="btn-icon" title="다운로드">
+                        <a href="{{ attachment.file_path }}" download class="file-card__btn" title="다운로드">
                             <i class="fas fa-download"></i>
                         </a>
                         {# 조회 전용 모드가 아닐 때만 삭제 버튼 표시 #}
                         {% if not is_readonly %}
-                        <button type="button" class="btn-icon btn-delete-attachment" data-id="{{ attachment.id }}" title="삭제">
+                        <button type="button" class="file-card__btn file-card__btn--danger btn-delete-attachment" data-id="{{ attachment.id }}" title="삭제">
                             <i class="fas fa-trash"></i>
                         </button>
                         {% endif %}
@@ -76,9 +76,9 @@
                 </div>
                 {% endfor %}
             {% else %}
-                <div class="empty-state-small">
-                    <i class="fas fa-folder-open"></i>
-                    <p>등록된 첨부파일이 없습니다</p>
+                <div class="file-empty-state">
+                    <i class="file-empty-state__icon fas fa-folder-open"></i>
+                    <p class="file-empty-state__text">등록된 첨부파일이 없습니다</p>
                 </div>
             {% endif %}
         </div>

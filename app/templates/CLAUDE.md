@@ -6,7 +6,7 @@ Jinja2 템플릿 파일 - 도메인 중심 아키텍처
 
 ```
 templates/
-├── domains/                    # 도메인별 템플릿 (6개 도메인)
+├── domains/                    # 도메인별 템플릿 (7개 도메인)
 │   ├── company/                # 법인 도메인
 │   │   ├── corporate/          # 법인 관리 페이지
 │   │   ├── organization/       # 조직 관리
@@ -27,6 +27,8 @@ templates/
 │   │   ├── mypage/             # 마이페이지
 │   │   ├── personal/           # 개인 프로필
 │   │   └── profile/            # 프로필 관리
+│   ├── attachment/             # 첨부파일 도메인 (2026-01-10 신규)
+│   │   └── partials/           # 첨부파일 관련 부분 템플릿
 │   └── businesscard/           # 명함 도메인 (2026-01-09 신규)
 │       └── partials/
 │           └── _card.html      # 명함 카드 컴포넌트
@@ -53,6 +55,7 @@ templates/
 | employee | `domains/employee/` | 직원 목록, 상세, 등록/수정 |
 | platform | `domains/platform/` | 관리자 페이지, AI 테스트 |
 | user | `domains/user/` | 인증, 대시보드, 마이페이지, 프로필 |
+| attachment | `domains/attachment/` | 첨부파일 관련 부분 템플릿 |
 | businesscard | `domains/businesscard/` | 명함 카드 컴포넌트 (partials) |
 
 ## 공유 자원 (shared/)
@@ -241,3 +244,9 @@ shared/base.html (또는 shared/base_public.html, shared/base_error.html)
 - 매크로 이동: macros/ → shared/macros/
 - 부분 템플릿 이동: partials/ → shared/partials/
 - 직원 부분 템플릿 이동: partials/employee_* → domains/employee/partials/
+
+**BusinessCard 도메인 추가 (2026-01-09)**
+- 명함 카드 컴포넌트 추가 (partials/_card.html)
+
+**Attachment 도메인 추가 (2026-01-10)**
+- 첨부파일 관련 부분 템플릿 추가
