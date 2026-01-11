@@ -3,8 +3,11 @@
 
 첨부파일 관리 비즈니스 로직을 제공합니다.
 Phase 31: 독립 도메인으로 분리 + owner_type/owner_id 범용화
+Phase 32: blueprints 추가 및 서비스 확장 (create, update_order, get_by_id, delete)
 """
 from typing import List, Dict, Optional
+
+from app.database import db
 
 
 class AttachmentService:
@@ -106,6 +109,90 @@ class AttachmentService:
             삭제된 첨부파일 개수
         """
         return self.attachment_repo.delete_by_owner(owner_type, owner_id, commit)
+
+    # ===== CRUD 메서드 =====
+
+    def get_by_id(self, attachment_id: int) -> Optional[Dict]:
+        """
+        첨부파일 ID로 조회
+
+        Args:
+            attachment_id: 첨부파일 ID
+
+        Returns:
+            첨부파일 정보 또는 None
+        """
+        model = self.attachment_repo.find_by_id(attachment_id)
+        return model.to_dict() if model else None
+
+    def create(self, data: Dict, commit: bool = True) -> Dict:
+        """
+        첨부파일 생성
+
+        Args:
+            data: 첨부파일 데이터
+            commit: DB 커밋 여부
+
+        Returns:
+            생성된 첨부파일 정보
+        """
+        from app.domains.attachment.models import Attachment
+
+        attachment = Attachment(
+            owner_type=data.get('owner_type'),
+            owner_id=data.get('owner_id'),
+            file_name=data.get('file_name'),
+            file_path=data.get('file_path'),
+            file_type=data.get('file_type'),
+            file_size=data.get('file_size', 0),
+            category=data.get('category'),
+            upload_date=data.get('upload_date'),
+            note=data.get('note'),
+            display_order=data.get('display_order', 0),
+            # 레거시 호환
+            employee_id=data.get('employee_id')
+        )
+
+        db.session.add(attachment)
+        if commit:
+            db.session.commit()
+
+        return attachment.to_dict()
+
+    def delete(self, attachment_id: int, commit: bool = True) -> bool:
+        """
+        첨부파일 삭제
+
+        Args:
+            attachment_id: 첨부파일 ID
+            commit: DB 커밋 여부
+
+        Returns:
+            삭제 성공 여부
+        """
+        return self.attachment_repo.delete(attachment_id, commit)
+
+    def update_order(
+        self, owner_type: str, owner_id: int, order: List[int], commit: bool = True
+    ) -> None:
+        """
+        첨부파일 순서 변경
+
+        Args:
+            owner_type: 소유자 타입
+            owner_id: 소유자 ID
+            order: 첨부파일 ID 순서 배열
+            commit: DB 커밋 여부
+        """
+        from app.domains.attachment.models import Attachment
+
+        for index, attachment_id in enumerate(order):
+            attachment = Attachment.query.get(attachment_id)
+            if attachment and attachment.owner_type == owner_type and attachment.owner_id == owner_id:
+                attachment.display_order = index
+
+        if commit:
+            db.session.commit()
 
     # ===== 레거시 호환 메서드 (employee_id) =====
 

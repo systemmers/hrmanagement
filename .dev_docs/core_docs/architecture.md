@@ -1,5 +1,8 @@
 # HR Management System - 아키텍처 문서
 
+> **최종 업데이트**: 2026-01-11
+> **Phase**: 도메인 마이그레이션 Phase 31 완료, Attachment 독립 도메인
+
 ## 목차
 1. [개요](#개요)
 2. [전체 디렉토리 구조](#전체-디렉토리-구조)
@@ -39,110 +42,30 @@ D:/projects/hrmanagement/
 │   ├── extensions.py            # Flask 확장 초기화
 │   ├── forms.py                 # WTForms 폼 정의
 │   │
-│   ├── domains/                 # 도메인 패키지 (Phase 1 완료)
-│   │   ├── employee/            # 직원 도메인 (models, repos, services, blueprints)
-│   │   ├── contract/            # 계약 도메인 (Phase 2 완료)
+│   ├── domains/                 # 도메인 패키지 (8개 도메인)
+│   │   ├── employee/            # 직원 도메인 (~65개 파일)
+│   │   ├── contract/            # 계약 도메인 (Facade 패턴)
 │   │   ├── company/             # 법인 도메인
 │   │   ├── user/                # 사용자 도메인
 │   │   ├── platform/            # 플랫폼 도메인
-│   │   └── sync/                # 동기화 도메인 (Phase 6 완료)
+│   │   ├── sync/                # 동기화 도메인 (Facade 패턴)
+│   │   ├── attachment/          # 첨부파일 도메인 (2026-01-10 신규)
+│   │   └── businesscard/        # 명함 도메인 (2026-01-09 신규)
 │   │
-│   ├── blueprints/              # Flask Blueprints (라우팅 레이어)
-│   │   ├── __init__.py          # Blueprint 등록
-│   │   ├── main.py              # 메인 페이지, 검색
-│   │   ├── auth.py              # 인증 (로그인, 로그아웃)
-│   │   ├── admin.py             # 관리자 기능
-│   │   ├── employees/           # 직원 CRUD (모듈 분할)
-│   │   ├── corporate.py         # 법인 계정 기능
-│   │   ├── personal.py          # 개인 계정 기능
-│   │   ├── contracts.py         # 계약 관리
-│   │   ├── profile.py           # 통합 프로필 (법인/개인)
-│   │   ├── account.py           # 계정 관리
-│   │   ├── mypage.py            # 마이페이지 (일반 직원)
-│   │   ├── classification.py   # 분류 옵션 관리
-│   │   ├── api.py               # REST API
-│   │   ├── sync.py              # 데이터 동기화
-│   │   ├── audit.py             # 감사 로그
-│   │   ├── notifications.py    # 알림 시스템
-│   │   └── ai_test.py           # AI 테스트 (프로토타입)
+│   ├── shared/                  # 공유 자원
+│   │   ├── base/                # 기반 클래스 (ServiceResult, GenericRelationCRUD)
+│   │   ├── constants/           # 상수 (field_options, status, field_registry)
+│   │   ├── repositories/        # BaseRepository, 믹스인
+│   │   ├── services/            # AI 서비스, 파일 저장 서비스
+│   │   ├── utils/               # 데코레이터, 트랜잭션, 헬퍼
+│   │   └── adapters/            # 외부 서비스 어댑터
 │   │
-│   ├── services/                # 서비스 레이어 (비즈니스 로직)
-│   │   ├── __init__.py
-│   │   ├── employee_service.py           # 직원 관리 로직
-│   │   ├── employee_account_service.py   # 직원 계정 관리
-│   │   ├── contract_service.py           # 계약 관리 로직
-│   │   ├── personal_service.py           # 개인 계정 로직
-│   │   ├── corporate_admin_profile_service.py  # 법인 관리자 프로필
-│   │   ├── sync_service.py               # 데이터 동기화 로직
-│   │   ├── sync_basic_service.py         # 기본 동기화
-│   │   ├── sync_relation_service.py      # 관계형 동기화
-│   │   ├── sync_snapshot_service.py      # 스냅샷 동기화
-│   │   ├── termination_service.py        # 퇴직 처리
-│   │   ├── audit_service.py              # 감사 로그
-│   │   ├── notification_service.py       # 알림 발송
-│   │   ├── file_storage_service.py       # 파일 저장
-│   │   ├── event_listeners.py            # 이벤트 리스너
-│   │   ├── ai_service.py                 # AI 서비스 (Gemini API)
-│   │   └── ai/                           # AI 서비스 모듈
-│   │
-│   ├── repositories/            # 레포지토리 레이어 (데이터 접근)
-│   │   ├── __init__.py
-│   │   ├── base_repository.py            # 공통 CRUD 기본 클래스
-│   │   ├── employee_repository.py        # 직원 데이터 접근
-│   │   ├── classification_repository.py  # 분류 옵션
-│   │   ├── user_repository.py            # 사용자 계정
-│   │   ├── company_repository.py         # 법인 정보
-│   │   ├── organization_repository.py    # 조직 구조
-│   │   ├── person_contract_repository.py # 개인-법인 계약
-│   │   ├── personal_profile_repository.py # 개인 프로필
-│   │   ├── corporate_admin_profile_repository.py # 법인 관리자 프로필
-│   │   └── [기타 도메인 레포지토리...]
-│   │
-│   ├── models/                  # SQLAlchemy 모델 (도메인 엔티티)
-│   │   ├── __init__.py          # 모든 모델 export
-│   │   ├── employee.py          # 직원 모델
-│   │   ├── user.py              # 사용자 계정 모델
-│   │   ├── company.py           # 법인 모델
-│   │   ├── organization.py      # 조직 구조 모델
-│   │   ├── person_contract.py   # 개인-법인 계약
-│   │   ├── personal_profile.py  # 개인 프로필
-│   │   ├── corporate_admin_profile.py # 법인 관리자 프로필
-│   │   ├── contract.py          # 근로계약
-│   │   ├── salary.py, benefit.py, insurance.py
-│   │   ├── education.py, career.py, certificate.py
-│   │   ├── family_member.py, language.py, military_service.py
-│   │   ├── promotion.py, evaluation.py, training.py
-│   │   ├── attendance.py, asset.py, award.py
-│   │   ├── hr_project.py, project_participation.py
-│   │   ├── salary_history.py, salary_payment.py
-│   │   ├── attachment.py
-│   │   ├── notification.py
-│   │   ├── audit_log.py
-│   │   ├── classification_option.py
-│   │   ├── system_setting.py
-│   │   ├── domains/             # 도메인별 모델 그룹
-│   │   └── personal/            # 개인 계정 전용 모델
-│   │
-│   ├── utils/                   # 유틸리티 모듈
-│   │   ├── decorators.py        # 인증/권한 데코레이터
-│   │   ├── context_processors.py # 템플릿 컨텍스트
-│   │   ├── template_helpers.py  # 템플릿 헬퍼 함수
-│   │   ├── transaction.py       # 트랜잭션 관리 (SSOT)
-│   │   ├── employee_number.py   # 사번 생성
-│   │   ├── tenant.py            # 멀티테넌시 유틸
-│   │   ├── api_helpers.py       # API 헬퍼
-│   │   ├── contract_helpers.py  # 계약 관련 헬퍼
-│   │   ├── corporate_helpers.py # 법인 관련 헬퍼
-│   │   └── personal_helpers.py  # 개인 계정 헬퍼
-│   │   # Phase 31 삭제: data_validator.py, init_system_settings.py
-│   │
-│   ├── adapters/                # 어댑터 레이어 (프로필 통합)
-│   │   ├── __init__.py
-│   │   └── profile_adapter.py   # 법인/개인 프로필 통합 어댑터
-│   │
-│   ├── components/              # 재사용 가능한 컴포넌트
-│   │
-│   ├── profile_config/          # 프로필 설정
+│   │   # 도메인별 구조 (각 도메인 공통 패턴)
+│   │   # domains/{domain}/
+│   │   # ├── models/           # SQLAlchemy 모델
+│   │   # ├── repositories/     # 데이터 접근 계층
+│   │   # ├── services/         # 비즈니스 로직
+│   │   # └── blueprints/       # URL 라우팅
 │   │
 │   ├── templates/               # Jinja2 템플릿 (뷰 레이어)
 │   │   ├── base.html            # 기본 레이아웃
@@ -344,105 +267,139 @@ def create_app(config_name=None):
 - 테스트 용이성 (TestingConfig)
 - 순환 의존성 해결
 
-#### 1.2 Blueprint 구조
-프로젝트는 **기능별 Blueprint 분리** 전략을 사용합니다.
+#### 1.2 Blueprint 구조 (도메인 중심)
+프로젝트는 **도메인별 Blueprint 분리** 전략을 사용합니다.
 
-| Blueprint | URL Prefix | 역할 |
-|-----------|-----------|------|
-| `auth_bp` | `/auth/*` | 인증 (로그인/로그아웃) |
-| `admin_bp` | `/admin/*` | 관리자 기능 |
-| `corporate_bp` | `/corporate/*` | 법인 계정 기능 |
-| `personal_bp` | `/personal/*` | 개인 계정 기능 |
-| `contracts_bp` | `/contracts/*` | 계약 관리 |
-| `profile_bp` | `/profile/*` | 통합 프로필 |
-| `account_bp` | `/account/*` | 계정 설정 |
-| `mypage_bp` | `/my/*` | 마이페이지 (일반 직원) |
-| `employees_bp` | `/employees/*` | 직원 CRUD |
-| `main_bp` | `/`, `/search` | 메인 페이지, 검색 |
-| `api_bp` | `/api/*` | REST API |
-| `sync_bp` | `/api/sync/*` | 데이터 동기화 |
-| `audit_bp` | `/api/audit/*` | 감사 로그 |
-| `notifications_bp` | `/api/notifications/*` | 알림 시스템 |
-| `classification_bp` | `/classification-options` | 분류 옵션 관리 |
-| `ai_test_bp` | `/ai-test/*` | AI 테스트 (프로토타입) |
+| 도메인 | Blueprint | URL Prefix | 역할 |
+|--------|-----------|-----------|------|
+| **user** | `auth_bp` | `/auth/*` | 인증 (로그인/로그아웃) |
+| **user** | `mypage_bp` | `/my/*` | 마이페이지 (일반 직원) |
+| **user** | `account_bp` | `/account/*` | 계정 설정 |
+| **employee** | `employees_bp` | `/employees/*` | 직원 CRUD |
+| **employee** | `profile_bp` | `/profile/*` | 통합 프로필 |
+| **company** | `corporate_bp` | `/corporate/*`, `/admin/*` | 법인 계정/관리자 기능 |
+| **company** | `corporate_settings_api_bp` | `/api/settings/*` | 법인 설정 API |
+| **contract** | `contracts_bp` | `/contracts/*` | 계약 관리 |
+| **platform** | `main_bp` | `/`, `/search` | 메인 페이지, 검색 |
+| **platform** | `audit_bp` | `/api/audit/*` | 감사 로그 |
+| **platform** | `ai_test_bp` | `/ai-test/*` | AI 테스트 |
+| **sync** | `sync_bp` | `/api/sync/*` | 데이터 동기화 |
+| **attachment** | `attachment_bp` | `/api/attachments/*` | 첨부파일 관리 (2026-01-10) |
+| **businesscard** | `businesscard_bp` | `/api/businesscard/*` | 명함 관리 (2026-01-09) |
 
-**모듈 분할 사례: employees Blueprint**
+**모듈 분할 사례: employees Blueprint (도메인 구조)**
 ```
-app/blueprints/employees/
+app/domains/employee/blueprints/
 ├── __init__.py           # Blueprint 정의 및 라우터 통합
+├── routes.py             # 공통 라우트
 ├── list_routes.py        # 목록 조회 라우트
-└── mutation_routes.py    # 생성/수정/삭제 라우트
+├── mutation_routes.py    # 생성/수정/삭제 라우트
+├── detail_routes.py      # 상세 조회 라우트
+├── files.py              # 파일 업로드 API
+├── form_extractors.py    # 폼 데이터 추출
+├── relation_updaters.py  # 관계 데이터 업데이트
+└── helpers.py            # 헬퍼 함수
 ```
 
-#### 1.3 Service Layer Pattern
-비즈니스 로직을 서비스 레이어로 분리하여 관리합니다.
+#### 1.3 Service Layer Pattern (도메인 중심)
+비즈니스 로직을 도메인별 서비스 레이어로 분리하여 관리합니다.
 
-**주요 서비스:**
-- `EmployeeService`: 직원 관리 (생성, 수정, 삭제, 조회)
-- `EmployeeAccountService`: 직원 계정 관리
-- `ContractService`: 계약 관리 로직
-- `PersonalService`: 개인 계정 로직
-- `CorporateAdminProfileService`: 법인 관리자 프로필
-- `SyncService`: 데이터 동기화 (개인↔법인)
-- `TerminationService`: 퇴직 처리
-- `AuditService`: 감사 로그 기록
-- `NotificationService`: 알림 발송
-- `FileStorageService`: 파일 업로드/다운로드
-- `AIService`: AI 기능 (Gemini API)
+**도메인별 주요 서비스:**
+
+| 도메인 | 서비스 | 역할 |
+|--------|--------|------|
+| **employee** | `EmployeeService` | 직원 관리 (CRUD) |
+| **employee** | `EmployeeAccountService` | 직원 계정 관리 |
+| **employee** | `ProfileRelationService` | 관계형 데이터 SSOT |
+| **contract** | `ContractService` (Facade) | 계약 관리 통합 인터페이스 |
+| **contract** | `ContractCoreService` | 계약 조회/검색 |
+| **contract** | `ContractWorkflowService` | 계약 승인/거절/종료 |
+| **company** | `CompanyService` | 법인 관리 |
+| **company** | `OrganizationService` | 조직 구조 관리 |
+| **company** | `CorporateSettingsService` | 법인 설정 관리 |
+| **user** | `UserService` | 사용자 관리 |
+| **user** | `PersonalService` | 개인 계정 로직 |
+| **user** | `NotificationService` | 알림 발송 |
+| **platform** | `PlatformService` | 플랫폼 관리 |
+| **platform** | `AuditService` | 감사 로그 기록 |
+| **sync** | `SyncService` (Facade) | 데이터 동기화 통합 인터페이스 |
+| **sync** | `SyncBasicService` | 기본 동기화 |
+| **sync** | `SyncRelationService` | 관계형 동기화 |
+| **sync** | `TerminationService` | 퇴직 처리 |
+| **attachment** | `AttachmentService` | 첨부파일 관리 (2026-01-10) |
+| **businesscard** | `BusinessCardService` | 명함 관리 (2026-01-09) |
+| **shared** | `AIService` | AI 기능 (Gemini API) |
+| **shared** | `FileStorageService` | 파일 저장 |
 
 **서비스 레이어 패턴 예시:**
 ```python
-# app/services/employee_service.py
+# app/domains/employee/services/employee_service.py
+from app.shared.utils.transaction import atomic_transaction
+
 class EmployeeService:
     def __init__(self):
         self.employee_repo = EmployeeRepository()
         self.education_repo = EducationRepository()
-        # ... 다른 레포지토리들
 
     def create_employee(self, data: dict) -> Employee:
-        """직원 생성 (트랜잭션 관리)"""
-        # 1. 비즈니스 검증
-        # 2. 레포지토리를 통한 데이터 생성
-        # 3. 연관 데이터 처리
-        # 4. 이벤트 발행
-        # 5. 트랜잭션 커밋
+        """직원 생성 (atomic_transaction 사용)"""
+        with atomic_transaction():
+            employee = self.employee_repo.create(data, commit=False)
+            for edu_data in data.get('educations', []):
+                self.education_repo.create({**edu_data, 'employee_id': employee.id}, commit=False)
+            return employee
 ```
 
-#### 1.4 Repository Pattern
-모든 데이터 접근은 레포지토리를 통해 추상화됩니다.
-
-**BaseRepository:**
+**Facade 패턴 예시 (Contract 도메인):**
 ```python
-# app/repositories/base_repository.py
-class BaseRepository:
-    """공통 CRUD 메서드를 제공하는 기본 레포지토리"""
-    def __init__(self, model_class):
+# app/domains/contract/services/contract_service.py
+class ContractService:
+    """계약 도메인 통합 인터페이스 (Facade)"""
+    def __init__(self):
+        self.core = ContractCoreService()
+        self.workflow = ContractWorkflowService()
+        self.settings = ContractSettingsService()
+
+    def get_contract(self, contract_id):
+        return self.core.get_contract(contract_id)
+
+    def approve_contract(self, contract_id, approver_id):
+        return self.workflow.approve(contract_id, approver_id)
+```
+
+#### 1.4 Repository Pattern (Generic Type 지원)
+모든 데이터 접근은 레포지토리를 통해 추상화됩니다. Generic Type을 사용하여 IDE 자동완성을 지원합니다.
+
+**BaseRepository (Generic Type):**
+```python
+# app/shared/repositories/base_repository.py
+from typing import TypeVar, Generic
+
+T = TypeVar('T')
+
+class BaseRepository(Generic[T]):
+    """공통 CRUD 메서드를 제공하는 기본 레포지토리 (Generic Type 지원)"""
+    def __init__(self, model_class: type[T]):
         self.model = model_class
 
-    def find_all(self):
-        """모든 레코드 조회"""
-
-    def find_by_id(self, id):
-        """ID로 단일 레코드 조회"""
-
-    def create(self, data):
-        """레코드 생성"""
-
-    def update(self, id, data):
-        """레코드 수정"""
-
-    def delete(self, id):
-        """레코드 삭제"""
+    def find_all(self) -> list[T]: ...
+    def find_by_id(self, id: int) -> T | None: ...
+    def create(self, data: dict, commit: bool = True) -> T: ...
+    def update(self, id: int, data: dict, commit: bool = True) -> T: ...
+    def delete(self, id: int, commit: bool = True) -> bool: ...
 ```
 
 **도메인별 레포지토리 확장:**
 ```python
-# app/repositories/employee_repository.py
-class EmployeeRepository(BaseRepository):
+# app/domains/employee/repositories/employee_repository.py
+from app.shared.repositories import BaseRepository
+from app.domains.employee.models import Employee
+
+class EmployeeRepository(BaseRepository[Employee]):
     def __init__(self):
         super().__init__(Employee)
 
-    def find_by_department(self, department):
+    def find_by_department(self, department: str) -> list[Employee]:
         """부서별 직원 조회 (커스텀 쿼리)"""
         return self.model.query.filter_by(department=department).all()
 ```
@@ -474,7 +431,7 @@ salary = db.relationship('Salary', backref='employee', uselist=False, cascade='a
 root_organization = db.relationship('Organization', foreign_keys=[root_organization_id], backref=db.backref('company', uselist=False))
 ```
 
-### 2. Frontend 구조
+### 2. Frontend 구조 (도메인 중심)
 
 #### 2.1 템플릿 구조 (Jinja2)
 ```
@@ -484,7 +441,7 @@ templates/
 │   └── _navigation.html
 ├── partials/                   # 부분 템플릿
 ├── components/                 # UI 컴포넌트
-└── [기능별 디렉토리]/
+└── [도메인별 디렉토리]/
     ├── list.html               # 목록 페이지
     ├── form.html               # 생성/수정 폼
     └── detail.html             # 상세 페이지
@@ -500,61 +457,93 @@ macros/_navigation.html
 partials/employee_form/_basic_info.html
 ```
 
-#### 2.2 JavaScript 컴포넌트 아키텍처
-Vanilla JavaScript 기반 모듈화된 컴포넌트 구조.
+#### 2.2 JavaScript 컴포넌트 아키텍처 (도메인 중심)
+Vanilla JavaScript 기반 도메인 중심 모듈화 구조.
 
 **디렉토리 구조:**
 ```
 static/js/
-├── app.js                      # 앱 초기화 및 전역 설정
-├── components/                 # 재사용 가능한 UI 컴포넌트
-│   ├── data-table/             # 고급 데이터 테이블
-│   │   ├── index.js            # 메인 모듈
-│   │   ├── column-manager.js   # 컬럼 관리
-│   │   ├── filter-manager.js   # 필터링
-│   │   ├── pagination-manager.js # 페이지네이션
-│   │   ├── selection-manager.js  # 선택 관리
-│   │   ├── cell-renderer.js    # 셀 렌더링
-│   │   ├── excel-exporter.js   # 엑셀 내보내기
-│   │   └── storage-manager.js  # 로컬 스토리지
-│   ├── salary/                 # 급여 계산기
-│   ├── file-upload.js
-│   ├── filter.js
-│   ├── section-nav.js
-│   ├── toast.js                # 토스트 알림
-│   ├── tree-selector.js        # 트리 선택기 (조직도)
-│   ├── form-validator.js       # 폼 검증
-│   ├── business-card.js        # 명함 관리
-│   └── notification-dropdown.js # 알림 드롭다운
-├── pages/                      # 페이지별 진입점 스크립트
-│   ├── employee/               # 직원 관리 페이지
-│   │   ├── index.js            # 메인 진입점
-│   │   ├── validators.js       # 검증 로직
-│   │   ├── section-nav-init.js # 섹션 내비게이션
-│   │   ├── file-upload-init.js # 파일 업로드 초기화
-│   │   ├── dynamic-sections.js # 동적 섹션 관리
-│   │   ├── address-search.js   # 주소 검색
-│   │   ├── helpers.js          # 헬퍼 함수
-│   │   ├── templates.js        # HTML 템플릿
-│   │   ├── photo-upload.js     # 사진 업로드
-│   │   ├── business-card.js    # 명함 관리
-│   │   └── account-section.js  # 계정 섹션
-│   ├── profile/                # 프로필 페이지
-│   ├── employee-list.js
-│   ├── employee-form.js
-│   ├── employee-detail.js
-│   ├── contract-detail.js
-│   └── [기타 페이지...]
-├── services/                   # 프론트엔드 서비스 레이어
-│   ├── employee-service.js     # 직원 관련 API 호출
-│   └── contract-service.js     # 계약 관련 API 호출
-└── utils/                      # 유틸리티
-    ├── api.js                  # API 통신 헬퍼
-    ├── dom.js                  # DOM 조작
-    ├── events.js               # 이벤트 핸들링
-    ├── validation.js           # 클라이언트 검증
-    ├── formatting.js           # 데이터 포맷팅
-    └── index.js                # 유틸 통합 export
+├── app.js                              # 앱 초기화 및 전역 설정
+│
+├── shared/                             # 공유 모듈
+│   ├── components/                     # 재사용 가능한 UI 컴포넌트
+│   │   ├── data-table/                 # 고급 데이터 테이블
+│   │   │   ├── index.js                # 메인 모듈
+│   │   │   ├── column-manager.js       # 컬럼 관리
+│   │   │   ├── filter-manager.js       # 필터링
+│   │   │   ├── pagination-manager.js   # 페이지네이션
+│   │   │   └── ...
+│   │   ├── salary/                     # 급여 계산기
+│   │   ├── toast.js                    # 토스트 알림
+│   │   ├── tree-selector.js            # 트리 선택기 (조직도)
+│   │   ├── form-validator.js           # 폼 검증
+│   │   └── notification-dropdown.js    # 알림 드롭다운
+│   ├── utils/                          # 유틸리티
+│   │   ├── api.js                      # API 통신 헬퍼
+│   │   ├── dom.js                      # DOM 조작
+│   │   ├── events.js                   # 이벤트 핸들링
+│   │   ├── validation.js               # 클라이언트 검증
+│   │   └── formatting.js               # 데이터 포맷팅
+│   ├── core/                           # 핵심 모듈
+│   │   ├── field-registry.js           # 필드 메타데이터
+│   │   └── template-generator.js       # 템플릿 생성
+│   └── constants/                      # 상수
+│
+└── domains/                            # 도메인별 모듈 (7개 도메인)
+    ├── employee/                       # 직원 도메인
+    │   ├── pages/
+    │   │   ├── employee-list.js
+    │   │   ├── employee-form.js
+    │   │   ├── employee-detail.js
+    │   │   └── profile/
+    │   ├── components/
+    │   │   ├── business-card.js        # 명함 컴포넌트
+    │   │   └── photo-upload.js
+    │   └── services/
+    │       └── employee-service.js
+    │
+    ├── contract/                       # 계약 도메인
+    │   ├── pages/
+    │   │   ├── contract-list.js
+    │   │   └── contract-detail.js
+    │   └── services/
+    │       └── contract-service.js
+    │
+    ├── company/                        # 법인 도메인
+    │   ├── pages/
+    │   │   ├── corporate-users.js
+    │   │   ├── organization.js
+    │   │   └── settings/               # 법인설정 모듈화 (2026-01-10)
+    │   │       ├── settings.js         # 메인 컨트롤러 (116줄)
+    │   │       └── tabs/
+    │   │           ├── org-management.js       # 조직 관리 (656줄)
+    │   │           ├── documents.js            # 문서 관리 (469줄)
+    │   │           ├── org-type-settings.js    # 조직유형 설정 (448줄)
+    │   │           └── ...
+    │   └── components/
+    │       └── org-tree.js
+    │
+    ├── user/                           # 사용자 도메인
+    │   └── pages/
+    │       ├── auth.js
+    │       └── mypage.js
+    │
+    ├── platform/                       # 플랫폼 도메인
+    │   └── pages/
+    │       ├── dashboard.js
+    │       └── ai-test.js
+    │
+    ├── attachment/                     # 첨부파일 도메인 (2026-01-10)
+    │   ├── components/
+    │   │   └── file-upload.js
+    │   └── services/
+    │       └── attachment-service.js
+    │
+    └── businesscard/                   # 명함 도메인 (2026-01-09)
+        ├── components/
+        │   └── businesscard-flip.js    # 3D 플립 컴포넌트
+        └── services/
+            └── businesscard-service.js
 ```
 
 **컴포넌트 패턴 예시:**
@@ -1603,7 +1592,24 @@ def create_employee(self, data: dict) -> Employee:
 
 ---
 
-**문서 버전:** 1.2
+**문서 버전:** 1.3
 **작성일:** 2025-12-16
-**최종 수정일:** 2026-01-07
-**Phase:** 도메인 마이그레이션 Phase 1 완료
+**최종 수정일:** 2026-01-11
+**Phase:** 도메인 마이그레이션 Phase 31 완료, Attachment 독립 도메인
+
+---
+
+## 변경 이력
+
+| 버전 | 날짜 | 변경 내용 |
+|------|------|----------|
+| 1.0 | 2025-12-16 | 초기 아키텍처 문서 작성 |
+| 1.1 | 2026-01-07 | 도메인 마이그레이션 Phase 1 반영 |
+| 1.2 | 2026-01-07 | 레거시 래퍼 파일 제거, Import 경로 정리 |
+| 1.3 | 2026-01-11 | Phase 31 완료 반영 |
+|  |  | - 8개 도메인 구조 반영 (attachment, businesscard 추가) |
+|  |  | - 도메인 중심 Blueprint 구조 업데이트 |
+|  |  | - 도메인별 서비스 테이블 추가 (Facade 패턴 명시) |
+|  |  | - Repository Pattern Generic Type 지원 명시 |
+|  |  | - Frontend 도메인 중심 구조로 전면 개편 |
+|  |  | - Company Settings JS 모듈화 반영 (3,094줄 → 9개 모듈) |

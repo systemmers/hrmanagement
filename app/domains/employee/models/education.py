@@ -58,6 +58,9 @@ class Education(DictSerializableMixin, db.Model):
     location = db.Column(db.String(200), nullable=True)
     note = db.Column(db.Text, nullable=True)
 
+    # 순서 정렬
+    display_order = db.Column(db.Integer, default=0, nullable=False)
+
     # to_dict, from_dict는 DictSerializableMixin에서 자동 제공
 
     def __repr__(self):

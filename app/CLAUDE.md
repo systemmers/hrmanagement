@@ -6,13 +6,14 @@ Flask 애플리케이션의 핵심 모듈들이 위치한 디렉토리입니다.
 
 ```
 app/
-├── domains/              # 도메인별 패키지 (7개)
+├── domains/              # 도메인별 패키지 (8개)
 │   ├── employee/         # 직원 도메인 (~65개 파일)
 │   ├── contract/         # 계약 도메인
 │   ├── company/          # 법인 도메인
 │   ├── user/             # 사용자 도메인
 │   ├── platform/         # 플랫폼 도메인
 │   ├── sync/             # 동기화 도메인
+│   ├── attachment/       # 첨부파일 도메인 (2026-01-10 신규)
 │   └── businesscard/     # 명함 도메인 (2026-01-09 신규)
 ├── shared/               # 공유 자원
 │   ├── base/             # 기반 클래스
@@ -121,6 +122,25 @@ Blueprint -> Service -> Repository -> Model
 | Service | `sync_relation_service.py` | 관계형 동기화 |
 | Service | `termination_service.py` | 퇴사 처리 |
 
+### attachment/ (첨부파일 도메인) - 2026-01-10 신규
+| 구분 | 파일 | 역할 |
+|------|------|------|
+| Model | `attachment.py` | Attachment 모델 (다형성) |
+| Repository | `attachment_repository.py` | 첨부파일 CRUD |
+| Service | `attachment_service.py` | 파일 업로드/삭제/조회 |
+| Blueprint | `routes.py` | `/api/attachments/*` API |
+
+**API 엔드포인트**:
+- `POST /api/attachments` - 파일 업로드
+- `DELETE /api/attachments/<id>` - 파일 삭제
+- `GET /api/attachments/<owner_type>/<owner_id>` - 파일 목록 조회
+
+**Import 패턴**:
+```python
+from app.domains.attachment.models import Attachment
+from app.domains.attachment.services import attachment_service
+```
+
 ### businesscard/ (명함 도메인) - 2026-01-09 신규
 | 구분 | 파일 | 역할 |
 |------|------|------|
@@ -149,7 +169,8 @@ shared/
 │   ├── generic_relation_crud.py   # Generic CRUD
 │   ├── relation_updater.py        # RelationUpdater 기반
 │   ├── relation_configs.py        # 관계형 설정
-│   └── history_service.py         # 히스토리 서비스
+│   ├── history_service.py         # 히스토리 서비스
+│   └── dict_serializable_mixin.py # 직렬화 믹스인 (2026-01-10)
 ├── constants/                     # 상수 (SSOT)
 │   ├── field_options.py           # 폼 선택 옵션
 │   ├── field_registry/            # 필드 메타데이터
@@ -240,3 +261,12 @@ from app.shared.constants.status import ContractStatus
 - Blueprint 도메인 이동: admin, profile, personal 등
 - 공유 자원 구조화: `app/shared/` 생성
 - Import 경로 정규화: 167개 파일 업데이트
+
+**BusinessCard 도메인 추가 (2026-01-09)**
+- 명함 관리 기능 추가
+- Attachment 모델 재사용 (category='businesscard')
+
+**Phase 31 완료 (2026-01-10)**
+- Attachment 독립 도메인 생성
+- owner_type/owner_id 다형성 관계 적용
+- DictSerializableMixin을 shared/base로 이동

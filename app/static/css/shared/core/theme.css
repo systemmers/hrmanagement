@@ -155,3 +155,111 @@
     background-color: var(--theme-primary-light);
     color: var(--theme-primary-dark);
 }
+
+/* ========================================
+   Dark Sidebar Theme (HR Card)
+   참조: .dev_docs/screenshot/image.png
+   ======================================== */
+
+.sidebar--dark {
+    background: linear-gradient(180deg, var(--color-gray-900) 0%, #1a1f2e 100%);
+    color: var(--color-gray-300);
+    border-right: none;
+}
+
+/* 다크 사이드바 - 로고/브랜드 영역 */
+.sidebar--dark .sidebar-brand {
+    border-bottom-color: var(--color-white-opacity-10);
+}
+
+.sidebar--dark .sidebar-brand-text {
+    color: var(--color-pure-white);
+}
+
+/* 다크 사이드바 - 네비게이션 아이템 */
+.sidebar--dark .nav-item {
+    color: var(--color-gray-400);
+}
+
+.sidebar--dark .nav-item:hover {
+    color: var(--color-pure-white);
+    background: var(--color-white-opacity-05);
+}
+
+.sidebar--dark .nav-item.active {
+    color: var(--color-pure-white);
+    background: var(--color-primary-opacity-20);
+}
+
+/* 다크 사이드바 - 섹션 헤더 */
+.sidebar--dark .nav-section-title {
+    color: var(--color-gray-500);
+}
+
+/* 다크 사이드바 - 구분선 */
+.sidebar--dark .nav-divider {
+    border-color: var(--color-white-opacity-10);
+}
+
+/* 다크 사이드바 - 사용자 프로필 */
+.sidebar--dark .sidebar-user {
+    background: var(--color-white-opacity-05);
+    border-top-color: var(--color-white-opacity-10);
+}
+
+.sidebar--dark .sidebar-user-name {
+    color: var(--color-pure-white);
+}
+
+.sidebar--dark .sidebar-user-role {
+    color: var(--color-gray-400);
+}
+
+/* 다크 사이드바 - 아바타 */
+.sidebar--dark .sidebar-user-avatar {
+    border-color: var(--color-white-opacity-20);
+}
+
+/* ========================================
+   Dark Sidebar - 스크롤바 스타일
+   ======================================== */
+
+.sidebar--dark::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar--dark::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar--dark::-webkit-scrollbar-thumb {
+    background: var(--color-white-opacity-20);
+    border-radius: var(--radius-full);
+}
+
+.sidebar--dark::-webkit-scrollbar-thumb:hover {
+    background: var(--color-white-opacity-30);
+}
+
+/* ========================================
+   Dark Sidebar - 축소 상태
+   ======================================== */
+
+.sidebar--dark.collapsed {
+    width: var(--sidebar-width-collapsed);
+}
+
+.sidebar--dark.collapsed .nav-item-text,
+.sidebar--dark.collapsed .sidebar-brand-text,
+.sidebar--dark.collapsed .nav-section-title {
+    display: none;
+}
+
+.sidebar--dark.collapsed .nav-item {
+    justify-content: center;
+    padding: var(--space-3);
+}
+
+.sidebar--dark.collapsed .nav-item i {
+    margin: 0;
+}

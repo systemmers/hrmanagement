@@ -1,0 +1,151 @@
+{% extends "styleguide/base.html" %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, demo, code %}
+
+{% call section('sidebar-search', '사이드바 검색', '사이드바 내 검색 박스 (다크/라이트 테마)') %}
+
+    {% call subsection('기본 사이드바 검색 (다크 테마)') %}
+    {% call demo() %}
+        <div style="max-width: 260px; background: #1e293b; padding: 16px; border-radius: 12px;">
+            <div class="sidebar-search">
+                <svg class="sidebar-search__icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+                </svg>
+                <input type="text" class="sidebar-search__input" placeholder="직원 검색...">
+                <button class="sidebar-search__btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="sidebar-search"&gt;
+    &lt;svg class="sidebar-search__icon"&gt;...&lt;/svg&gt;
+    &lt;input type="text" class="sidebar-search__input" placeholder="직원 검색..."&gt;
+    &lt;button class="sidebar-search__btn"&gt;
+        &lt;i class="fas fa-search"&gt;&lt;/i&gt;
+    &lt;/button&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('입력값 있는 상태') %}
+    {% call demo() %}
+        <div style="max-width: 260px; background: #1e293b; padding: 16px; border-radius: 12px;">
+            <div class="sidebar-search sidebar-search--has-value">
+                <svg class="sidebar-search__icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+                </svg>
+                <input type="text" class="sidebar-search__input" placeholder="직원 검색..." value="홍길동">
+                <button class="sidebar-search__clear">
+                    <i class="fas fa-times"></i>
+                </button>
+                <button class="sidebar-search__btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    {% endcall %}
+    {% call code() %}
+&lt;!-- 입력값이 있을 때 clear 버튼 표시 --&gt;
+&lt;div class="sidebar-search sidebar-search--has-value"&gt;
+    &lt;input type="text" class="sidebar-search__input" value="홍길동"&gt;
+    &lt;button class="sidebar-search__clear"&gt;
+        &lt;i class="fas fa-times"&gt;&lt;/i&gt;
+    &lt;/button&gt;
+    &lt;button class="sidebar-search__btn"&gt;...&lt;/button&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('라이트 테마') %}
+    {% call demo() %}
+        <div style="max-width: 260px; background: #f8fafc; padding: 16px; border-radius: 12px;">
+            <div class="sidebar-search sidebar-search--light">
+                <svg class="sidebar-search__icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+                </svg>
+                <input type="text" class="sidebar-search__input" placeholder="직원 검색...">
+                <button class="sidebar-search__btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="sidebar-search sidebar-search--light"&gt;
+    &lt;!-- 라이트 배경 사이드바용 --&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('컴팩트 버전') %}
+    {% call demo() %}
+        <div style="max-width: 260px; background: #1e293b; padding: 16px; border-radius: 12px;">
+            <div class="sidebar-search sidebar-search--compact">
+                <svg class="sidebar-search__icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+                </svg>
+                <input type="text" class="sidebar-search__input" placeholder="검색">
+                <button class="sidebar-search__btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    {% endcall %}
+    {% call code() %}
+&lt;div class="sidebar-search sidebar-search--compact"&gt;
+    &lt;!-- 작은 사이드바용 컴팩트 버전 --&gt;
+&lt;/div&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('사용 가이드') %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>클래스</th>
+                    <th>용도</th>
+                    <th>설명</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>.sidebar-search</code></td>
+                    <td>블록</td>
+                    <td>검색 컨테이너 (다크 기본)</td>
+                </tr>
+                <tr>
+                    <td><code>.sidebar-search__input</code></td>
+                    <td>요소</td>
+                    <td>검색 입력 필드</td>
+                </tr>
+                <tr>
+                    <td><code>.sidebar-search__btn</code></td>
+                    <td>요소</td>
+                    <td>검색 버튼</td>
+                </tr>
+                <tr>
+                    <td><code>.sidebar-search--has-value</code></td>
+                    <td>수정자</td>
+                    <td>입력값 있음 (clear 표시)</td>
+                </tr>
+                <tr>
+                    <td><code>.sidebar-search--light</code></td>
+                    <td>수정자</td>
+                    <td>라이트 테마</td>
+                </tr>
+                <tr>
+                    <td><code>.sidebar-search--compact</code></td>
+                    <td>수정자</td>
+                    <td>컴팩트 버전</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

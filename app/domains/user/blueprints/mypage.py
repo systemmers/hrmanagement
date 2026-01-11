@@ -81,4 +81,5 @@ def company_info():
                            business_card_front=business_card_front,
                            business_card_back=business_card_back,
                            can_edit_business_card=False,
+                           # Note: attachment_list is included in full_view_data
                            **full_view_data)

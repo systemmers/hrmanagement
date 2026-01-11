@@ -1,6 +1,8 @@
 /* ========================================
-   우측 사이드바 스타일
-   - 첨부파일 및 문서 관리 영역
+   우측 사이드바 레이아웃 스타일
+   - 레이아웃 전용 (위치, 크기, 배치)
+   - 컴포넌트 스타일은 attachment.css 참조
+   - Phase 33: 레이아웃/컴포넌트 분리
    ======================================== */
 
 .right-sidebar {
@@ -19,6 +21,12 @@
     border-bottom: 1px solid var(--color-gray-200);
 }
 
+.right-sidebar-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .right-sidebar-title {
     font-size: var(--text-lg);
     font-weight: 600;
@@ -30,222 +38,10 @@
     padding: var(--space-4);
 }
 
-/* 파일 카드 */
-.file-card {
-    background-color: var(--color-gray-50);
-    border: 1px solid var(--color-gray-200);
-    border-radius: var(--radius-md);
-    padding: var(--space-3);
-    margin-bottom: var(--space-3);
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
+/* ========================================
+   반응형
+   ======================================== */
 
-.file-card:hover {
-    background-color: var(--color-gray-100);
-    border-color: var(--color-gray-300);
-}
-
-.file-icon {
-    width: 40px;
-    height: 40px;
-    background-color: var(--color-pure-white);
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--text-xl);
-    color: var(--color-gray-600);
-    flex-shrink: 0;
-}
-
-/* 썸네일 이미지 스타일 */
-.file-icon.file-thumbnail {
-    overflow: hidden;
-    padding: 0;
-}
-
-.file-icon .thumbnail-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: var(--radius-md);
-}
-
-.file-icon.pdf { color: var(--color-error-500); }
-.file-icon.doc { color: var(--color-blue-600); }
-.file-icon.xls { color: var(--color-success-500); }
-.file-icon.img { color: var(--color-warning-500); }
-
-/* 파일 타입별 아이콘 색상 (FontAwesome 아이콘용) */
-.file-icon .fa-file-pdf { color: var(--color-error-600); }
-.file-icon .fa-file-image { color: var(--color-success-600); }
-.file-icon .fa-file-word { color: var(--color-blue-600); }
-.file-icon .fa-file-excel { color: var(--color-success-700); }
-.file-icon .fa-file { color: var(--color-gray-500); }
-
-.file-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.file-name {
-    font-size: var(--text-sm);
-    font-weight: 500;
-    color: var(--color-gray-900);
-    margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.file-meta {
-    font-size: var(--text-xs);
-    color: var(--color-gray-500);
-    display: flex;
-    gap: var(--space-2);
-    align-items: center;
-}
-
-.file-category {
-    background: var(--color-blue-opacity-10);
-    color: var(--color-blue-600);
-    padding: 2px 6px;
-    border-radius: var(--radius-sm);
-    font-weight: 500;
-}
-
-.file-size {
-    color: var(--color-gray-500);
-}
-
-.file-actions {
-    display: flex;
-    gap: var(--space-1);
-}
-
-.file-action-btn {
-    width: 28px;
-    height: 28px;
-    border: none;
-    background: transparent;
-    color: var(--color-gray-500);
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition-fast);
-}
-
-.file-action-btn:hover {
-    background: var(--color-gray-200);
-    color: var(--color-gray-700);
-}
-
-/* 파일 액션 버튼 (링크용) */
-.btn-icon {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-sm);
-    color: var(--color-gray-500);
-    transition: all var(--transition-fast);
-    text-decoration: none;
-}
-
-.btn-icon:hover {
-    background: var(--color-blue-opacity-10);
-    color: var(--color-blue-600);
-}
-
-.btn-icon.btn-delete-attachment {
-    border: none;
-    background: transparent;
-    cursor: pointer;
-}
-
-.btn-icon.btn-delete-attachment:hover {
-    background: var(--color-error-opacity-10);
-    color: var(--color-error-600);
-}
-
-/* 파일 업로드 영역 */
-.file-upload-area {
-    border: 2px dashed var(--color-gray-300);
-    border-radius: var(--radius-lg);
-    padding: var(--space-6);
-    text-align: center;
-    margin-bottom: var(--space-4);
-    transition: all var(--transition-fast);
-    cursor: pointer;
-}
-
-.file-upload-area:hover {
-    border-color: var(--color-blue-600);
-    background: var(--color-blue-opacity-05);
-}
-
-.file-upload-area.dragover,
-.file-upload-area.drag-over {
-    border-color: var(--color-blue-600);
-    background: var(--color-blue-opacity-05);
-}
-
-/* 업로드 중 카드 */
-.file-card.uploading {
-    opacity: 0.7;
-}
-
-.file-card.uploading .file-icon {
-    color: var(--color-blue-600);
-}
-
-.file-status {
-    color: var(--color-blue-600);
-    font-weight: 500;
-}
-
-.file-upload-icon {
-    font-size: var(--text-3xl);
-    color: var(--color-gray-400);
-    margin-bottom: var(--space-2);
-}
-
-.file-upload-text {
-    font-size: var(--text-sm);
-    color: var(--color-gray-600);
-}
-
-.file-upload-hint {
-    font-size: var(--text-xs);
-    color: var(--color-gray-500);
-    margin-top: var(--space-1);
-}
-
-/* 빈 상태 */
-.empty-state-small {
-    text-align: center;
-    padding: var(--space-8) var(--space-4);
-    color: var(--color-gray-500);
-}
-
-.empty-state-small i {
-    font-size: var(--text-3xl);
-    margin-bottom: var(--space-3);
-    opacity: 0.5;
-}
-
-.empty-state-small p {
-    font-size: var(--text-sm);
-}
-
-/* 반응형 */
 @media (max-width: 1400px) {
     .right-sidebar {
         width: 280px;
@@ -256,42 +52,4 @@
     .right-sidebar {
         display: none;
     }
-}
-
-/* AI 분석 버튼 */
-.right-sidebar-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.btn-ai-analyze {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    padding: var(--space-2) var(--space-3);
-    background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-500) 100%);
-    color: var(--color-pure-white);
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: var(--text-xs);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.btn-ai-analyze:hover {
-    background: linear-gradient(135deg, var(--color-employee-500) 0%, var(--color-primary-600) 100%);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-lg);
-}
-
-.btn-ai-analyze:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.btn-ai-analyze i {
-    font-size: var(--text-sm);
 }

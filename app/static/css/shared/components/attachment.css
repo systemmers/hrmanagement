@@ -1,0 +1,723 @@
+/**
+ * Attachment Component
+ * 첨부파일 업로드 및 파일 카드 스타일 (BEM)
+ *
+ * 사용: 첨부파일 패널, 파일 업로드 영역
+ * 참조: HR Card 마이그레이션 - file-panel
+ */
+
+/* ========================================
+   File Upload Area - 드래그앤드롭 영역
+   ======================================== */
+
+.file-upload-area {
+    border: 2px dashed var(--color-gray-300);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    text-align: center;
+    background: var(--color-gray-50);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.file-upload-area:hover {
+    border-color: var(--color-primary-400);
+    background: var(--color-blue-50);
+}
+
+.file-upload-area--dragover {
+    border-color: var(--color-primary-500);
+    background: var(--color-primary-50);
+    border-style: solid;
+}
+
+.file-upload-area--disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.file-upload-area__icon {
+    font-size: var(--text-3xl);
+    color: var(--color-gray-400);
+    margin-bottom: var(--space-3);
+}
+
+.file-upload-area:hover .file-upload-area__icon {
+    color: var(--color-primary-500);
+}
+
+.file-upload-area__text {
+    font-size: var(--text-base);
+    color: var(--color-gray-700);
+    margin-bottom: var(--space-1);
+}
+
+.file-upload-area__hint {
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+}
+
+/* Compact version for sidebars */
+.file-upload-area--compact {
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.file-upload-area--compact .file-upload-area__icon {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-2);
+}
+
+.file-upload-area--compact .file-upload-area__text {
+    font-size: var(--text-sm);
+}
+
+.file-upload-area--compact .file-upload-area__hint {
+    font-size: var(--text-xs);
+}
+
+/* ========================================
+   File List - 파일 목록 컨테이너
+   ======================================== */
+
+.file-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.file-list--grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-3);
+}
+
+/* ========================================
+   File Card - 개별 파일 카드
+   ======================================== */
+
+.file-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: var(--color-pure-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.file-card:hover {
+    border-color: var(--color-primary-300);
+    box-shadow: var(--shadow-sm);
+}
+
+.file-card--selected {
+    border-color: var(--color-primary-500);
+    background: var(--color-primary-50);
+}
+
+.file-card--uploading {
+    opacity: 0.7;
+}
+
+.file-card--error {
+    border-color: var(--color-error-300);
+    background: var(--color-error-50);
+}
+
+/* File Icon */
+.file-card__icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-gray-100);
+    border-radius: var(--radius-md);
+    color: var(--color-gray-500);
+    font-size: var(--text-xl);
+    flex-shrink: 0;
+}
+
+.file-card__icon--thumbnail {
+    background: transparent;
+    overflow: hidden;
+}
+
+.file-card__icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+}
+
+/* File type specific colors */
+.file-card__icon--pdf { color: var(--color-error-500); }
+.file-card__icon--word { color: var(--color-blue-500); }
+.file-card__icon--excel { color: var(--color-success-500); }
+.file-card__icon--ppt { color: var(--color-warning-500); }
+.file-card__icon--zip { color: var(--color-gray-600); }
+.file-card__icon--image { color: var(--color-primary-500); }
+
+/* Also support Font Awesome icon coloring */
+.file-card__icon .fa-file-pdf { color: var(--color-error-500); }
+.file-card__icon .fa-file-word { color: var(--color-blue-500); }
+.file-card__icon .fa-file-excel { color: var(--color-success-500); }
+.file-card__icon .fa-file-powerpoint { color: var(--color-warning-500); }
+.file-card__icon .fa-file-archive { color: var(--color-gray-600); }
+.file-card__icon .fa-file-image { color: var(--color-primary-500); }
+
+/* File Info */
+.file-card__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-card__name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-gray-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-1);
+}
+
+.file-card__category {
+    font-size: var(--text-xs);
+    color: var(--color-primary-600);
+    background: var(--color-primary-50);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+}
+
+.file-card__size {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+}
+
+.file-card__date {
+    font-size: var(--text-xs);
+    color: var(--color-gray-400);
+}
+
+/* File Actions */
+.file-card__actions {
+    display: flex;
+    gap: var(--space-1);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.file-card:hover .file-card__actions {
+    opacity: 1;
+}
+
+.file-card__btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-gray-500);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.file-card__btn:hover {
+    background: var(--color-gray-100);
+    color: var(--color-gray-700);
+}
+
+.file-card__btn--danger:hover {
+    background: var(--color-error-50);
+    color: var(--color-error-600);
+}
+
+/* Upload Progress */
+.file-card__progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--color-gray-200);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    overflow: hidden;
+}
+
+.file-card__progress-bar {
+    height: 100%;
+    background: var(--color-primary-500);
+    transition: width var(--transition-normal);
+}
+
+/* ========================================
+   File Card Vertical - 세로 레이아웃 (문서/이미지)
+   ======================================== */
+
+.file-card--vertical {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.file-card--vertical .file-card__icon {
+    width: 100%;
+    height: 120px;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    font-size: var(--text-3xl);
+}
+
+.file-card--vertical .file-card__icon--thumbnail {
+    height: 140px;
+}
+
+.file-card--vertical .file-card__icon img {
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.file-card--vertical .file-card__info {
+    padding: var(--space-3);
+    text-align: center;
+}
+
+.file-card--vertical .file-card__name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.4;
+    max-height: 2.8em;
+}
+
+.file-card--vertical .file-card__meta {
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.file-card--vertical .file-card__actions {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    opacity: 0;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: var(--radius-sm);
+    padding: var(--space-1);
+}
+
+.file-card--vertical:hover .file-card__actions {
+    opacity: 1;
+}
+
+/* Large variant for document preview */
+.file-card--vertical.file-card--large .file-card__icon {
+    height: 180px;
+    font-size: var(--text-4xl);
+}
+
+.file-card--vertical.file-card--large .file-card__icon--thumbnail {
+    height: 200px;
+}
+
+/* Small variant for compact grids */
+.file-card--vertical.file-card--small .file-card__icon {
+    height: 80px;
+    font-size: var(--text-xl);
+}
+
+.file-card--vertical.file-card--small .file-card__info {
+    padding: var(--space-2);
+}
+
+.file-card--vertical.file-card--small .file-card__name {
+    font-size: var(--text-xs);
+}
+
+.file-card--vertical.file-card--small .file-card__meta {
+    display: none;
+}
+
+/* ========================================
+   File List Cards - 카드형 그리드 레이아웃
+   ======================================== */
+
+.file-list--cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--space-4);
+}
+
+.file-list--cards-lg {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.file-list--cards-sm {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+
+/* Fixed column variants */
+.file-list--cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.file-list--cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.file-list--cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* ========================================
+   File Icon Grid - 아이콘 그리드 표시
+   ======================================== */
+
+.file-icon-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--space-4);
+}
+
+.file-icon-grid__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.file-icon-grid__icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-gray-100);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xl);
+}
+
+.file-icon-grid__label {
+    font-size: var(--text-xs);
+    color: var(--color-gray-600);
+}
+
+/* ========================================
+   Empty State - 빈 상태
+   ======================================== */
+
+.file-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-6);
+    color: var(--color-gray-400);
+}
+
+.file-empty-state__icon {
+    font-size: var(--text-3xl);
+}
+
+.file-empty-state__text {
+    margin: 0;
+    font-size: var(--text-sm);
+}
+
+/* ========================================
+   AI Analyze Button - AI 분석 버튼
+   ======================================== */
+
+.btn-ai-analyze {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
+    color: var(--color-pure-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-ai-analyze:hover {
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+    box-shadow: var(--shadow-md);
+}
+
+.btn-ai-analyze:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-ai-analyze--loading {
+    pointer-events: none;
+}
+
+.btn-ai-analyze--loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   Attachment Panel - 사이드바 패널
+   ======================================== */
+
+.attachment-panel {
+    background: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-gray-200);
+    overflow: hidden;
+}
+
+.attachment-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+}
+
+.attachment-panel__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-gray-900);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.attachment-panel__count {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+    background: var(--color-gray-200);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+}
+
+.attachment-panel__body {
+    padding: var(--space-4);
+}
+
+.attachment-panel__upload {
+    margin-bottom: var(--space-4);
+}
+
+.attachment-panel__list,
+.right-sidebar .attachment-panel__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+/* Compact file card for sidebar */
+.attachment-panel .file-card,
+.right-sidebar .file-card {
+    padding: var(--space-2);
+    gap: var(--space-2);
+}
+
+.attachment-panel .file-card__icon,
+.right-sidebar .file-card__icon {
+    width: 36px;
+    height: 36px;
+    font-size: var(--text-base);
+}
+
+.attachment-panel .file-card__name,
+.right-sidebar .file-card__name {
+    font-size: var(--text-xs);
+}
+
+.attachment-panel .file-card__btn,
+.right-sidebar .file-card__btn {
+    width: 28px;
+    height: 28px;
+}
+
+/* ========================================
+   Required Files Section - 필수 파일 영역
+   ======================================== */
+
+.required-files {
+    margin-bottom: var(--space-4);
+}
+
+.required-files__title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-gray-700);
+    margin-bottom: var(--space-2);
+}
+
+.required-files__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.required-file {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+}
+
+.required-file--complete {
+    background: var(--color-success-50);
+}
+
+.required-file--missing {
+    background: var(--color-warning-50);
+}
+
+.required-file__icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+}
+
+.required-file--complete .required-file__icon {
+    background: var(--color-success-500);
+    color: var(--color-pure-white);
+}
+
+.required-file--missing .required-file__icon {
+    background: var(--color-warning-500);
+    color: var(--color-pure-white);
+}
+
+.required-file__name {
+    flex: 1;
+    color: var(--color-gray-700);
+}
+
+/* ========================================
+   Responsive - 반응형
+   ======================================== */
+
+@media (max-width: 768px) {
+    .file-icon-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .file-card__actions {
+        opacity: 1;
+    }
+
+    .attachment-panel__header {
+        padding: var(--space-3);
+    }
+
+    .attachment-panel__body {
+        padding: var(--space-3);
+    }
+
+    /* Vertical card responsive */
+    .file-list--cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .file-list--cards-lg {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .file-list--cols-3,
+    .file-list--cols-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .file-card--vertical .file-card__actions {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .file-list--cards,
+    .file-list--cards-lg,
+    .file-list--cards-sm {
+        grid-template-columns: 1fr;
+    }
+
+    .file-list--cols-2,
+    .file-list--cols-3,
+    .file-list--cols-4 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   Legacy Class Compatibility
+   Note: JS 파일에서 동적 생성시 사용하는 레거시 클래스
+   TODO: JS 파일을 BEM 클래스로 마이그레이션 후 제거
+   ======================================== */
+
+/* file-icon: 레거시 (-> file-card__icon) */
+.file-icon {
+    width: 40px;
+    height: 40px;
+    background-color: var(--color-gray-100);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xl);
+    color: var(--color-gray-500);
+    flex-shrink: 0;
+}
+
+/* file-info: 레거시 (-> file-card__info) */
+.file-info {
+    flex: 1;
+    min-width: 0;
+}
+
+/* file-name: 레거시 (-> file-card__name) */
+.file-name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-gray-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Compact legacy styles for sidebar */
+.right-sidebar .file-icon {
+    width: 36px;
+    height: 36px;
+    font-size: var(--text-base);
+}
+
+.right-sidebar .file-name {
+    font-size: var(--text-xs);
+}

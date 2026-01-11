@@ -34,6 +34,7 @@ def get_attachment_repo() -> 'AttachmentRepository':
 from .models import Attachment
 from .services import attachment_service
 from .constants import AttachmentCategory, OwnerType
+from .blueprints import attachment_bp
 
 __all__ = [
     # 초기화
@@ -46,4 +47,6 @@ __all__ = [
     # 상수
     'AttachmentCategory',
     'OwnerType',
+    # Blueprint
+    'attachment_bp',
 ]

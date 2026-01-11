@@ -1,0 +1,175 @@
+/**
+ * Inline Edit Component
+ * 인라인 편집 모드 스타일 (BEM)
+ *
+ * 사용: Info Section 내 필드 편집
+ * 참조: .dev_docs/screenshot/image copy 2.png
+ */
+
+/* ========================================
+   Block - 인라인 편집 컨테이너
+   ======================================== */
+
+.inline-edit {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: var(--info-cell-min-height);
+}
+
+/* ========================================
+   Elements - 구성 요소
+   ======================================== */
+
+/* 보기 모드 */
+.inline-edit__view {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-height: inherit;
+}
+
+/* 편집 모드 */
+.inline-edit__edit {
+    display: none;
+    flex: 1;
+    gap: var(--space-2);
+}
+
+/* 입력 필드 */
+.inline-edit__input {
+    width: 100%;
+    padding: var(--space-2-5) var(--space-3);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    color: var(--color-gray-800);
+    background: var(--color-pure-white);
+    transition: all var(--transition-fast);
+}
+
+.inline-edit__input:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-blue-opacity-10);
+}
+
+.inline-edit__input::placeholder {
+    color: var(--color-gray-400);
+}
+
+/* Select 필드 */
+.inline-edit__select {
+    width: 100%;
+    padding: var(--space-2-5) var(--space-3);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    color: var(--color-gray-800);
+    background: var(--color-pure-white);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.inline-edit__select:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-blue-opacity-10);
+}
+
+/* 액션 버튼 영역 */
+.inline-edit__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-left: var(--space-2);
+}
+
+/* 저장/취소 버튼 */
+.inline-edit__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.inline-edit__btn--save {
+    background: var(--color-success-500);
+    color: var(--color-pure-white);
+}
+
+.inline-edit__btn--save:hover {
+    background: var(--color-success-600);
+}
+
+.inline-edit__btn--cancel {
+    background: var(--color-gray-200);
+    color: var(--color-gray-600);
+}
+
+.inline-edit__btn--cancel:hover {
+    background: var(--color-gray-300);
+}
+
+/* ========================================
+   Modifiers - 상태 변형
+   ======================================== */
+
+/* 활성 (편집) 상태 */
+.inline-edit--active .inline-edit__view {
+    display: none;
+}
+
+.inline-edit--active .inline-edit__edit {
+    display: flex;
+}
+
+/* 로딩 상태 */
+.inline-edit--loading .inline-edit__input,
+.inline-edit--loading .inline-edit__select {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.inline-edit--loading .inline-edit__btn {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* 에러 상태 */
+.inline-edit--error .inline-edit__input,
+.inline-edit--error .inline-edit__select {
+    border-color: var(--color-error-500);
+}
+
+.inline-edit--error .inline-edit__input:focus,
+.inline-edit--error .inline-edit__select:focus {
+    box-shadow: 0 0 0 3px var(--color-error-opacity-10);
+}
+
+/* 성공 상태 */
+.inline-edit--success .inline-edit__input,
+.inline-edit--success .inline-edit__select {
+    border-color: var(--color-success-500);
+}
+
+/* ========================================
+   Responsive - 반응형
+   ======================================== */
+
+@media (max-width: 768px) {
+    .inline-edit__edit {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .inline-edit__actions {
+        margin-left: 0;
+        justify-content: flex-end;
+    }
+}

@@ -1,0 +1,161 @@
+/**
+ * Sidebar Search Component
+ * 사이드바 내 검색 박스 (BEM)
+ *
+ * 사용: 다크/라이트 사이드바 내 검색
+ * 참조: .dev_docs/screenshot/image.png
+ */
+
+/* ========================================
+   Block - 검색 컨테이너
+   ======================================== */
+
+.sidebar-search {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: var(--space-2) var(--space-3) var(--space-4);
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-white-opacity-10);
+    border: 1px solid var(--color-white-opacity-10);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-fast);
+}
+
+.sidebar-search:focus-within {
+    background: var(--color-white-opacity-15);
+    border-color: var(--color-primary-500);
+}
+
+/* ========================================
+   Elements - 구성 요소
+   ======================================== */
+
+/* 검색 아이콘 */
+.sidebar-search__icon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    color: var(--color-gray-400);
+}
+
+/* 검색 입력 필드 */
+.sidebar-search__input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: var(--text-sm);
+    color: var(--color-pure-white);
+    min-width: 0;
+}
+
+.sidebar-search__input::placeholder {
+    color: var(--color-gray-500);
+}
+
+/* 검색 버튼 */
+.sidebar-search__btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    background: var(--color-primary-600);
+    color: var(--color-pure-white);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.sidebar-search__btn:hover {
+    background: var(--color-primary-500);
+}
+
+.sidebar-search__btn:active {
+    transform: scale(0.95);
+}
+
+/* 클리어 버튼 */
+.sidebar-search__clear {
+    display: none;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-gray-400);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.sidebar-search__clear:hover {
+    color: var(--color-gray-300);
+}
+
+/* 입력이 있을 때 클리어 버튼 표시 */
+.sidebar-search--has-value .sidebar-search__clear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ========================================
+   Modifiers - 테마 변형
+   ======================================== */
+
+/* 라이트 테마 */
+.sidebar-search--light {
+    background: var(--color-gray-100);
+    border-color: var(--color-gray-200);
+}
+
+.sidebar-search--light:focus-within {
+    background: var(--color-pure-white);
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-blue-opacity-10);
+}
+
+.sidebar-search--light .sidebar-search__input {
+    color: var(--color-gray-800);
+}
+
+.sidebar-search--light .sidebar-search__input::placeholder {
+    color: var(--color-gray-400);
+}
+
+.sidebar-search--light .sidebar-search__icon {
+    color: var(--color-gray-500);
+}
+
+.sidebar-search--light .sidebar-search__clear {
+    color: var(--color-gray-500);
+}
+
+.sidebar-search--light .sidebar-search__clear:hover {
+    color: var(--color-gray-700);
+}
+
+/* 컴팩트 버전 */
+.sidebar-search--compact {
+    padding: var(--space-1-5) var(--space-2-5);
+}
+
+.sidebar-search--compact .sidebar-search__btn {
+    width: 24px;
+    height: 24px;
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+
+@media (max-width: 1024px) {
+    .sidebar-search {
+        margin: var(--space-2);
+    }
+}

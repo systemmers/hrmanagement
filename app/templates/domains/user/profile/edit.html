@@ -29,6 +29,7 @@
 {# 첨부파일 사이드바는 법인관리자 외 모든 계정에서 표시되므로 CSS도 동일하게 로드 #}
 {% if account_type != 'corporate_admin' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/right-sidebar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/attachment.css') }}">
 {% endif %}
 {% if is_corporate %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/tree-selector.css') }}">

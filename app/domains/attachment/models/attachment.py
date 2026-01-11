@@ -30,6 +30,9 @@ class Attachment(DictSerializableMixin, db.Model):
     upload_date = db.Column(db.String(20), nullable=True)
     note = db.Column(db.Text, nullable=True)
 
+    # 순서 정렬
+    display_order = db.Column(db.Integer, default=0, nullable=False)
+
     # 복합 인덱스는 마이그레이션에서 정의됨
     # ix_attachments_owner, ix_attachments_owner_category
 

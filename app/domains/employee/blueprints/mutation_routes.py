@@ -700,3 +700,90 @@ def _extract_account_data(form):
         'password': form.get('account_password', ''),
         'role': form.get('account_role', 'employee'),
     }
+
+
+# ========================================
+# 관계형 데이터 순서 변경 API
+# ========================================
+
+def register_order_routes(bp: Blueprint):
+    """관계형 데이터 순서 변경 라우트를 Blueprint에 등록"""
+
+    from flask import request
+    from app.shared.utils.decorators import api_login_required
+    from app.shared.utils.transaction import atomic_transaction
+    from app.shared.utils.api_helpers import api_success, api_error, api_server_error
+    from app.database import db
+    from app.domains.employee.models import Education, Career, Certificate
+
+    @bp.route('/api/employees/<int:employee_id>/educations/order', methods=['PATCH'])
+    @api_login_required
+    def update_education_order(employee_id):
+        """학력 순서 변경 API"""
+        try:
+            data = request.get_json()
+            if not data or 'order' not in data:
+                return api_error('order 배열이 필요합니다.')
+
+            order = data['order']
+            if not isinstance(order, list):
+                return api_error('order는 배열이어야 합니다.')
+
+            with atomic_transaction():
+                for index, edu_id in enumerate(order):
+                    edu = Education.query.get(edu_id)
+                    if edu and edu.employee_id == employee_id:
+                        edu.display_order = index
+
+            return api_success(message='학력 순서가 변경되었습니다.')
+
+        except Exception as e:
+            return api_server_error(str(e))
+
+    @bp.route('/api/employees/<int:employee_id>/careers/order', methods=['PATCH'])
+    @api_login_required
+    def update_career_order(employee_id):
+        """경력 순서 변경 API"""
+        try:
+            data = request.get_json()
+            if not data or 'order' not in data:
+                return api_error('order 배열이 필요합니다.')
+
+            order = data['order']
+            if not isinstance(order, list):
+                return api_error('order는 배열이어야 합니다.')
+
+            with atomic_transaction():
+                for index, career_id in enumerate(order):
+                    career = Career.query.get(career_id)
+                    if career and career.employee_id == employee_id:
+                        career.display_order = index
+
+            return api_success(message='경력 순서가 변경되었습니다.')
+
+        except Exception as e:
+            return api_server_error(str(e))
+
+    @bp.route('/api/employees/<int:employee_id>/certificates/order', methods=['PATCH'])
+    @api_login_required
+    def update_certificate_order(employee_id):
+        """자격증 순서 변경 API"""
+        try:
+            data = request.get_json()
+            if not data or 'order' not in data:
+                return api_error('order 배열이 필요합니다.')
+
+            order = data['order']
+            if not isinstance(order, list):
+                return api_error('order는 배열이어야 합니다.')
+
+            with atomic_transaction():
+                for index, cert_id in enumerate(order):
+                    cert = Certificate.query.get(cert_id)
+                    if cert and cert.employee_id == employee_id:
+                        cert.display_order = index
+
+            return api_success(message='자격증 순서가 변경되었습니다.')
+
+        except Exception as e:
+            return api_server_error(str(e))

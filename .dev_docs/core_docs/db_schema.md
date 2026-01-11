@@ -2,7 +2,8 @@
 
 프로젝트: HR Management System
 작성일: 2025-12-16
-데이터베이스: SQLite (SQLAlchemy ORM)
+최종 업데이트: 2026-01-11
+데이터베이스: PostgreSQL / SQLite (SQLAlchemy ORM)
 
 ## 목차
 1. [개요](#개요)
@@ -26,8 +27,9 @@
 - 인사평가: 평가, 승진, 교육 이력
 - 알림 시스템: 계약, 동기화, 시스템 알림
 - 감사 로그: 모든 중요 작업의 이력 추적
+- 첨부파일 관리: 다형성 기반 첨부파일 시스템 (2026-01-10)
 
-**총 테이블 수**: 33개
+**총 테이블 수**: 34개
 
 ---
 
@@ -734,22 +736,30 @@
 
 ---
 
-#### attachments
-첨부파일 정보
+#### attachments (다형성 관계 - 2026-01-10 업데이트)
+첨부파일 정보 - 다형성(Polymorphic) 관계 지원
 
 | 컬럼명 | 타입 | 제약조건 | 설명 |
 |--------|------|----------|------|
 | id | Integer | PK, Auto | 첨부파일 ID |
-| employee_id | Integer | FK(employees.id), Not Null, Index | 직원 ID |
+| owner_type | String(50) | Not Null, Index | 소유자 타입 (employee, profile, contract) |
+| owner_id | Integer | Not Null, Index | 소유자 ID |
 | file_name | String(500) | Nullable | 파일명 |
 | file_path | String(1000) | Nullable | 파일경로 |
 | file_type | String(100) | Nullable | 파일형식 |
 | file_size | Integer | Default=0 | 파일크기 |
-| category | String(100) | Nullable | 분류 |
+| category | String(100) | Nullable, Index | 분류 (document, photo, businesscard) |
 | upload_date | String(20) | Nullable | 업로드일 |
 | note | Text | Nullable | 비고 |
+| employee_id | Integer | FK(employees.id), Nullable, Index | 직원 ID (레거시 호환) |
 
-**관계**: N:1 → Employee
+**상수 정의**:
+- OWNER_TYPE: employee, profile, contract
+- CATEGORY: document, photo, businesscard, certificate
+
+**관계**:
+- 다형성 관계 (owner_type + owner_id)
+- N:1 → Employee (레거시 호환)
 
 ---
 
@@ -1096,6 +1106,7 @@
 4. Phase 4: HrProject, ProjectParticipation 분리 (프로젝트 이력)
 5. Phase 5: Notification, NotificationPreference 추가 (알림 시스템)
 6. Phase 6: AuditLog 추가 (감사 로그)
+7. Phase 31: Attachments 테이블 다형성 관계 적용 (owner_type/owner_id 추가, 2026-01-10)
 
 ---
 
@@ -1140,5 +1151,11 @@
 
 ---
 
-**문서 버전**: 1.0
-**마지막 업데이트**: 2025-12-16
+**문서 버전**: 1.1
+**마지막 업데이트**: 2026-01-11
+
+### 변경 이력
+| 버전 | 날짜 | 변경 내용 |
+|------|------|----------|
+| 1.1 | 2026-01-11 | attachments 테이블 다형성 관계 업데이트 |
+| 1.0 | 2025-12-16 | 초기 문서 작성 |

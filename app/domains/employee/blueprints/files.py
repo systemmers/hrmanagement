@@ -4,6 +4,7 @@
 첨부파일, 프로필 사진, 명함 이미지 업로드/다운로드 기능을 제공합니다.
 Phase 8: 상수 모듈 적용
 Phase 27.2: API 응답 표준화 (api_helpers 사용)
+Phase 33: attachment_service 직접 사용으로 리팩토링
 """
 import os
 from datetime import datetime
@@ -16,6 +17,7 @@ from app.shared.utils.api_helpers import (
     api_success, api_error, api_not_found, api_forbidden, api_server_error
 )
 from app.domains.employee.services import employee_service
+from app.domains.attachment.services import attachment_service
 from .helpers import (
     allowed_file, allowed_image_file, get_file_extension,
     get_upload_folder, get_profile_photo_folder, get_business_card_folder,
@@ -39,7 +41,7 @@ def register_file_routes(bp: Blueprint):
     def get_attachments(employee_id):
         """직원 첨부파일 목록 조회 API"""
         try:
-            attachments = employee_service.get_attachment_list(employee_id)
+            attachments = attachment_service.get_by_employee_id(employee_id)
             return api_success({'attachments': attachments})
         except Exception as e:
             return api_server_error(str(e))
@@ -87,48 +89,29 @@ def register_file_routes(bp: Blueprint):
             # 카테고리 (폼에서 전달)
             category = request.form.get('category', '기타')
 
-            # DB 저장
+            # DB 저장 (attachment_service는 snake_case 사용)
             attachment_data = {
-                'employeeId': employee_id,
-                'fileName': file.filename,
-                'filePath': web_path,
-                'fileType': ext,
-                'fileSize': file_size,
+                'owner_type': 'employee',
+                'owner_id': employee_id,
+                'employee_id': employee_id,  # 레거시 호환
+                'file_name': file.filename,
+                'file_path': web_path,
+                'file_type': ext,
+                'file_size': file_size,
                 'category': category,
-                'uploadDate': datetime.now().strftime('%Y-%m-%d')
+                'upload_date': datetime.now().strftime('%Y-%m-%d')
             }
-            created = employee_service.create_attachment(attachment_data)
+            created = attachment_service.create(attachment_data)
 
             return api_success({
-                'attachment': created.to_dict() if hasattr(created, 'to_dict') else created
+                'attachment': created
             })
 
         except Exception as e:
             return api_server_error(str(e))
 
-    @bp.route('/api/attachments/<int:attachment_id>', methods=['DELETE'])
-    @manager_or_admin_required
-    def delete_attachment(attachment_id):
-        """첨부파일 삭제 API"""
-        try:
-            # 첨부파일 조회
-            attachment = employee_service.get_attachment_by_id(attachment_id)
-            if not attachment:
-                return api_not_found('첨부파일')
-
-            # 파일 경로 추출
-            file_path = safe_get(attachment, 'file_path')
-
-            # 실제 파일 삭제
-            delete_file_if_exists(file_path)
-
-            # DB에서 삭제
-            employee_service.delete_attachment(attachment_id)
-
-            return api_success(message='첨부파일이 삭제되었습니다.')
-
-        except Exception as e:
-            return api_server_error(str(e))
+    # DELETE /api/attachments/<id>는 attachment 도메인으로 이동됨
+    # app/domains/attachment/blueprints/routes.py 참조
 
     # ========================================
     # 프로필 사진 API
@@ -173,11 +156,11 @@ def register_file_routes(bp: Blueprint):
             category = 'profile_photo'
 
             # 기존 프로필 사진 삭제
-            old_photo = employee_service.get_attachment_by_category(employee_id, category)
+            old_photo = attachment_service.get_one_by_category(employee_id, category)
             if old_photo:
                 old_path = safe_get(old_photo, 'file_path')
                 delete_file_if_exists(old_path)
-                employee_service.delete_attachment_by_category(employee_id, category)
+                attachment_service.delete_by_category(employee_id, category)
 
             # 파일 저장
             ext = get_file_extension(file.filename)
@@ -190,21 +173,23 @@ def register_file_routes(bp: Blueprint):
             # 웹 접근 경로
             web_path = f"/static/uploads/profile_photos/{unique_filename}"
 
-            # DB 저장
+            # DB 저장 (attachment_service는 snake_case 사용)
             attachment_data = {
-                'employeeId': employee_id,
-                'fileName': file.filename,
-                'filePath': web_path,
-                'fileType': ext,
-                'fileSize': file_size,
+                'owner_type': 'employee',
+                'owner_id': employee_id,
+                'employee_id': employee_id,  # 레거시 호환
+                'file_name': file.filename,
+                'file_path': web_path,
+                'file_type': ext,
+                'file_size': file_size,
                 'category': category,
-                'uploadDate': datetime.now().strftime('%Y-%m-%d')
+                'upload_date': datetime.now().strftime('%Y-%m-%d')
             }
-            created = employee_service.create_attachment(attachment_data)
+            created = attachment_service.create(attachment_data)
 
             return api_success({
                 'file_path': web_path,
-                'attachment': created.to_dict() if hasattr(created, 'to_dict') else created
+                'attachment': created
             })
 
         except Exception as e:
@@ -215,7 +200,7 @@ def register_file_routes(bp: Blueprint):
     def get_profile_photo(employee_id):
         """프로필 사진 조회 API"""
         try:
-            photo = employee_service.get_attachment_by_category(employee_id, 'profile_photo')
+            photo = attachment_service.get_one_by_category(employee_id, 'profile_photo')
             return api_success({
                 'file_path': safe_get(photo, 'file_path') if photo else None,
                 'attachment': photo
@@ -239,11 +224,11 @@ def register_file_routes(bp: Blueprint):
             category = 'profile_photo'
 
             # 기존 프로필 사진 삭제
-            old_photo = employee_service.get_attachment_by_category(employee_id, category)
+            old_photo = attachment_service.get_one_by_category(employee_id, category)
             if old_photo:
                 old_path = safe_get(old_photo, 'file_path')
                 delete_file_if_exists(old_path)
-                employee_service.delete_attachment_by_category(employee_id, category)
+                attachment_service.delete_by_category(employee_id, category)
                 return api_success(message='프로필 사진이 삭제되었습니다.')
             else:
                 return api_not_found('프로필 사진')
@@ -298,11 +283,11 @@ def register_file_routes(bp: Blueprint):
                 return api_error('파일 크기가 5MB를 초과합니다.')
 
             # 기존 명함 이미지 삭제
-            old_card = employee_service.get_attachment_by_category(employee_id, category)
+            old_card = attachment_service.get_one_by_category(employee_id, category)
             if old_card:
                 old_path = safe_get(old_card, 'file_path')
                 delete_file_if_exists(old_path)
-                employee_service.delete_attachment_by_category(employee_id, category)
+                attachment_service.delete_by_category(employee_id, category)
 
             # 파일 저장
             ext = get_file_extension(file.filename)
@@ -315,22 +300,24 @@ def register_file_routes(bp: Blueprint):
             # 웹 접근 경로
             web_path = f"/static/uploads/business_cards/{unique_filename}"
 
-            # DB 저장
+            # DB 저장 (attachment_service는 snake_case 사용)
             attachment_data = {
-                'employeeId': employee_id,
-                'fileName': file.filename,
-                'filePath': web_path,
-                'fileType': ext,
-                'fileSize': file_size,
+                'owner_type': 'employee',
+                'owner_id': employee_id,
+                'employee_id': employee_id,  # 레거시 호환
+                'file_name': file.filename,
+                'file_path': web_path,
+                'file_type': ext,
+                'file_size': file_size,
                 'category': category,
-                'uploadDate': datetime.now().strftime('%Y-%m-%d')
+                'upload_date': datetime.now().strftime('%Y-%m-%d')
             }
-            created = employee_service.create_attachment(attachment_data)
+            created = attachment_service.create(attachment_data)
 
             return api_success({
                 'side': side,
                 'file_path': web_path,
-                'attachment': created.to_dict() if hasattr(created, 'to_dict') else created
+                'attachment': created
             })
 
         except Exception as e:
@@ -354,11 +341,11 @@ def register_file_routes(bp: Blueprint):
             category = f'business_card_{side}'
 
             # 기존 명함 이미지 삭제
-            old_card = employee_service.get_attachment_by_category(employee_id, category)
+            old_card = attachment_service.get_one_by_category(employee_id, category)
             if old_card:
                 old_path = safe_get(old_card, 'file_path')
                 delete_file_if_exists(old_path)
-                employee_service.delete_attachment_by_category(employee_id, category)
+                attachment_service.delete_by_category(employee_id, category)
                 return api_success(message=f'명함 {side} 이미지가 삭제되었습니다.')
             else:
                 return api_not_found('명함 이미지')

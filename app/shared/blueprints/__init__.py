@@ -41,6 +41,9 @@ def register_blueprints(app):
     # BusinessCard 도메인
     from app.domains.businesscard.blueprints import businesscard_bp
 
+    # Attachment 도메인
+    from app.domains.attachment.blueprints import attachment_bp
+
     # Styleguide 모듈 (독립)
     from app.styleguide import styleguide_bp
 
@@ -99,6 +102,9 @@ def register_blueprints(app):
 
     # 명함 API (/api/businesscard/*)
     app.register_blueprint(businesscard_bp)
+
+    # 첨부파일 API (/api/attachments/*)
+    app.register_blueprint(attachment_bp)
 
     # 스타일가이드 (/styleguide/*)
     app.register_blueprint(styleguide_bp)

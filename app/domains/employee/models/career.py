@@ -60,5 +60,8 @@ class Career(DictSerializableMixin, db.Model):
     is_current = db.Column(db.Boolean, default=False)
     note = db.Column(db.Text, nullable=True)
 
+    # 순서 정렬
+    display_order = db.Column(db.Integer, default=0, nullable=False)
+
     def __repr__(self):
         return f'<Career {self.id}: {self.company_name}>'

@@ -18,21 +18,21 @@ class AttachmentRepository(BaseRelationRepository[Attachment]):
     # ===== 범용 메서드 (owner_type + owner_id) =====
 
     def get_by_owner(self, owner_type: str, owner_id: int) -> List[Attachment]:
-        """소유자별 첨부파일 조회"""
+        """소유자별 첨부파일 조회 (display_order 순 정렬)"""
         return Attachment.query.filter_by(
             owner_type=owner_type,
             owner_id=owner_id
-        ).all()
+        ).order_by(Attachment.display_order.asc()).all()
 
     def get_by_owner_and_category(
         self, owner_type: str, owner_id: int, category: str
     ) -> List[Attachment]:
-        """소유자 및 카테고리별 첨부파일 조회"""
+        """소유자 및 카테고리별 첨부파일 조회 (display_order 순 정렬)"""
         return Attachment.query.filter_by(
             owner_type=owner_type,
             owner_id=owner_id,
             category=category
-        ).all()
+        ).order_by(Attachment.display_order.asc()).all()
 
     def get_one_by_owner_and_category(
         self, owner_type: str, owner_id: int, category: str

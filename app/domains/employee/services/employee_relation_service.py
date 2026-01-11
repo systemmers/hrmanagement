@@ -255,13 +255,14 @@ class EmployeeRelationService:
         return [m.to_dict() for m in models]
 
     def get_attachment_list(self, employee_id: int) -> List[Dict]:
-        """첨부파일 목록 조회"""
-        models = self.attachment_repo.find_by_employee_id(employee_id)
-        return [m.to_dict() for m in models]
+        """첨부파일 목록 조회 (deprecated - attachment_service 사용 권장)"""
+        from app.domains.attachment.services import attachment_service
+        return attachment_service.get_by_employee_id(employee_id)
 
     def get_attachment_by_category(self, employee_id: int, category: str) -> Optional[Dict]:
-        """카테고리별 첨부파일 조회"""
-        return self.attachment_repo.get_one_by_category(employee_id, category)
+        """카테고리별 첨부파일 조회 (deprecated - attachment_service 사용 권장)"""
+        from app.domains.attachment.services import attachment_service
+        return attachment_service.get_one_by_category(employee_id, category)
 
     def get_classification_options(self) -> List[Dict]:
         """분류 옵션 조회"""
@@ -273,25 +274,42 @@ class EmployeeRelationService:
         return self.classification_repo.get_all_options(company_id)
 
     # ========================================
-    # 첨부파일 관리
+    # 첨부파일 관리 (deprecated - attachment_service 사용 권장)
+    # Phase 33: attachment 도메인으로 통합
     # ========================================
 
     def create_attachment(self, attachment_data: Dict) -> Dict:
-        """첨부파일 생성"""
-        return self.attachment_repo.create(attachment_data)
+        """첨부파일 생성 (deprecated - attachment_service 사용 권장)"""
+        from app.domains.attachment.services import attachment_service
+        # camelCase → snake_case 변환
+        normalized_data = {
+            'owner_type': 'employee',
+            'owner_id': attachment_data.get('employeeId') or attachment_data.get('employee_id'),
+            'employee_id': attachment_data.get('employeeId') or attachment_data.get('employee_id'),
+            'file_name': attachment_data.get('fileName') or attachment_data.get('file_name'),
+            'file_path': attachment_data.get('filePath') or attachment_data.get('file_path'),
+            'file_type': attachment_data.get('fileType') or attachment_data.get('file_type'),
+            'file_size': attachment_data.get('fileSize') or attachment_data.get('file_size', 0),
+            'category': attachment_data.get('category'),
+            'upload_date': attachment_data.get('uploadDate') or attachment_data.get('upload_date'),
+        }
+        return attachment_service.create(normalized_data)
 
     def get_attachment_by_id(self, attachment_id: int) -> Optional[Dict]:
-        """첨부파일 ID로 조회"""
-        model = self.attachment_repo.find_by_id(attachment_id)
-        return model.to_dict() if model else None
+        """첨부파일 ID로 조회 (deprecated - attachment_service 사용 권장)"""
+        from app.domains.attachment.services import attachment_service
+        return attachment_service.get_by_id(attachment_id)
 
     def delete_attachment(self, attachment_id: int) -> bool:
-        """첨부파일 삭제"""
-        return self.attachment_repo.delete(attachment_id)
+        """첨부파일 삭제 (deprecated - attachment_service 사용 권장)"""
+        from app.domains.attachment.services import attachment_service
+        return attachment_service.delete(attachment_id)
 
     def delete_attachment_by_category(self, employee_id: int, category: str) -> bool:
-        """카테고리별 첨부파일 삭제"""
-        return self.attachment_repo.delete_by_category(employee_id, category)
+        """카테고리별 첨부파일 삭제 (deprecated - attachment_service 사용 권장)"""
+        from app.domains.attachment.services import attachment_service
+        result = attachment_service.delete_by_category(employee_id, category)
+        return result > 0 if isinstance(result, int) else bool(result)
 
     # ========================================
     # 병역 정보 관리
