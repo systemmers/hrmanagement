@@ -1,10 +1,11 @@
 /**
  * Employee Detail Page JavaScript
  * - 섹션 네비게이션 (SectionNav 컴포넌트 사용)
- * - 파일 업로드 UI
+ * - 파일 업로드 UI (FileUpload 컴포넌트 사용)
  */
 
 import { SectionNav } from '../../../shared/components/section-nav.js';
+import { FileUpload } from '../../../shared/components/file-upload.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initSectionNavigation();
@@ -50,54 +51,53 @@ function initSectionNavigation() {
 }
 
 /**
- * 파일 업로드 UI
+ * 파일 업로드 초기화 (FileUpload 컴포넌트 사용)
+ * - 템플릿의 data-owner-type/data-owner-id 속성 우선 사용
+ * - Fallback: URL 패턴 및 data-employee-id에서 추출
  */
 function initFileUpload() {
     const uploadArea = document.getElementById('fileUploadArea');
-
     if (!uploadArea) return;
 
-    uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.classList.add('dragover');
-    });
+    // 1. 템플릿에서 설정한 owner_type/owner_id 속성 확인 (SSOT)
+    let ownerType = uploadArea.dataset.ownerType;
+    let ownerId = uploadArea.dataset.ownerId;
 
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('dragover');
-    });
+    // 2. Fallback: data-employee-id 속성 또는 URL에서 추출
+    if (!ownerId) {
+        const employeeIdEl = document.querySelector('[data-employee-id]');
+        ownerId = employeeIdEl?.dataset.employeeId;
 
-    uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
+        if (!ownerId) {
+            // URL에서 추출 시도: /employees/123 또는 /employees/123/...
+            const match = window.location.pathname.match(/\/employees\/(\d+)/);
+            ownerId = match?.[1];
+        }
 
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            handleFileUpload(files);
+        // fallback인 경우 ownerType도 'employee'로 설정
+        if (ownerId && !ownerType) {
+            ownerType = 'employee';
+        }
+    }
+
+    if (!ownerId) {
+        console.warn('FileUpload: owner ID를 찾을 수 없습니다.');
+        return;
+    }
+
+    // FileUpload 컴포넌트 초기화
+    new FileUpload({
+        uploadAreaId: 'fileUploadArea',
+        fileListId: 'fileList',
+        ownerType: ownerType || 'employee',
+        ownerId: parseInt(ownerId, 10),
+        onUploadComplete: (attachment) => {
+            console.log('파일 업로드 완료:', attachment);
+        },
+        onDeleteComplete: (attachmentId) => {
+            console.log('파일 삭제 완료:', attachmentId);
         }
     });
-
-    uploadArea.addEventListener('click', () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.multiple = true;
-        input.accept = '.pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png';
-
-        input.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFileUpload(e.target.files);
-            }
-        });
-
-        input.click();
-    });
-}
-
-/**
- * 파일 업로드 처리
- * @param {FileList} files - 업로드할 파일 목록
- */
-function handleFileUpload(files) {
-    alert(`${files.length}개의 파일이 선택되었습니다.\n파일 업로드 기능은 향후 구현 예정입니다.`);
 }
 
 /**

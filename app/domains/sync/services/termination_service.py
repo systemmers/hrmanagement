@@ -73,6 +73,12 @@ class TerminationService:
         from app.domains.sync import get_sync_log_repo
         return get_sync_log_repo()
 
+    @property
+    def attachment_repo(self):
+        """첨부파일 Repository (Phase 33: 계약 해지 시 첨부파일 분리)"""
+        from app.domains.attachment.repositories import attachment_repository
+        return attachment_repository
+
     # ===== 계약 종료 처리 =====
 
     def terminate_contract(
@@ -259,7 +265,7 @@ class TerminationService:
             employee = self.employee_repo.find_by_employee_number(contract.employee_number)
 
             if employee:
-                self._anonymize_employee(employee)
+                self._anonymize_employee(employee, contract_id)
 
         # 동기화 로그 정리 (개인정보 제거)
         self._clean_sync_logs(contract_id)
@@ -286,13 +292,23 @@ class TerminationService:
             'archived_at': datetime.utcnow().isoformat(),
         }
 
-    def _anonymize_employee(self, employee):
+    def _anonymize_employee(self, employee, contract_id: int = None):
         """
         직원 데이터 익명화
 
         법적 보관 의무가 있는 최소 데이터만 유지하고
         나머지 개인정보는 익명화합니다.
+
+        Phase 33: 동기화된 첨부파일 분리 추가
+
+        Args:
+            employee: 익명화할 직원 객체
+            contract_id: 종료되는 계약 ID (첨부파일 분리에 사용)
         """
+        # Phase 33: 동기화된 첨부파일 분리
+        if contract_id:
+            self._separate_synced_attachments(employee.id, contract_id)
+
         # 익명화 마킹
         anonymized_prefix = f"[ANONYMIZED-{employee.id}]"
 
@@ -356,6 +372,80 @@ class TerminationService:
             return '[MASKED-DATA]'
 
         return value
+
+    def _separate_synced_attachments(self, employee_id: int, contract_id: int):
+        """
+        계약 해지 시 동기화된 첨부파일 분리 처리
+
+        Phase 33: 계약 기반 첨부파일 분리
+
+        - is_deletable_on_termination=True인 파일: 삭제
+        - is_deletable_on_termination=False인 파일: source 정보 제거 (법인 보관)
+
+        Args:
+            employee_id: 직원 ID
+            contract_id: 종료되는 계약 ID
+        """
+        import os
+        from flask import current_app
+        from app.domains.attachment.models.attachment import SourceType
+        from app.domains.attachment.constants import OwnerType
+
+        # 해당 계약에서 동기화된 직원의 첨부파일 조회
+        synced_attachments = self.attachment_repo.find_synced_by_contract(
+            owner_type=OwnerType.EMPLOYEE,
+            owner_id=employee_id,
+            contract_id=contract_id
+        )
+
+        deleted_count = 0
+        preserved_count = 0
+
+        for attachment in synced_attachments:
+            if attachment.can_delete_on_termination():
+                # 삭제 대상: 파일 시스템에서 삭제 후 DB 레코드 삭제
+                if attachment.file_path:
+                    try:
+                        # 파일 경로 처리
+                        if attachment.file_path.startswith('/'):
+                            file_path = attachment.file_path[1:]
+                        else:
+                            file_path = attachment.file_path
+
+                        # 전체 경로 생성
+                        upload_folder = current_app.config.get('UPLOAD_FOLDER', 'app/static/uploads')
+                        full_path = os.path.join(upload_folder, file_path)
+
+                        if os.path.exists(full_path):
+                            os.remove(full_path)
+                    except Exception as e:
+                        # 파일 삭제 실패는 로깅하고 계속 진행
+                        current_app.logger.warning(
+                            f"Failed to delete attachment file: {attachment.file_path}, error: {e}"
+                        )
+
+                # DB 레코드 삭제
+                self.attachment_repo.delete(attachment.id, commit=False)
+                deleted_count += 1
+            else:
+                # 보존 대상: source 정보만 제거 (법인 자체 생성 파일로 전환)
+                attachment.source_type = SourceType.CORPORATE
+                attachment.source_contract_id = None
+                preserved_count += 1
+
+        # 로깅
+        if deleted_count > 0 or preserved_count > 0:
+            self.sync_log_repo.create_log(
+                contract_id=contract_id,
+                sync_type='attachment_separation',
+                entity_type='attachment',
+                field_name='synced_files',
+                old_value=f"synced:{deleted_count + preserved_count}",
+                new_value=f"deleted:{deleted_count},preserved:{preserved_count}",
+                direction='termination',
+                user_id=self._current_user_id,
+                commit=False
+            )
 
     # ===== 정리 스케줄러 =====
 

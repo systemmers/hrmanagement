@@ -6,6 +6,7 @@ Attachment 모델을 재사용하며, category 기반으로 명함 데이터를 
 """
 from typing import Dict, Optional, List
 from app.domains.attachment.models import Attachment
+from app.domains.attachment.constants import AttachmentCategory
 from app.shared.repositories.base_repository import BaseRepository
 from app.database import db
 
@@ -13,9 +14,9 @@ from app.database import db
 class BusinessCardRepository(BaseRepository[Attachment]):
     """명함 첨부파일 저장소"""
 
-    # 명함 카테고리 상수
-    CATEGORY_FRONT = 'business_card_front'
-    CATEGORY_BACK = 'business_card_back'
+    # 명함 카테고리 상수 (AttachmentCategory에서 참조)
+    CATEGORY_FRONT = AttachmentCategory.BUSINESS_CARD_FRONT
+    CATEGORY_BACK = AttachmentCategory.BUSINESS_CARD_BACK
     VALID_SIDES = ['front', 'back']
 
     def __init__(self):

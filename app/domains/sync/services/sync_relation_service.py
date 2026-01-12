@@ -4,9 +4,13 @@
 학력, 경력, 자격증, 어학, 병역 등 관계형 데이터의 동기화를 담당합니다.
 
 Phase 30: 레이어 분리 - db.session 제거, Repository 패턴 적용
+Phase 33: 첨부파일 동기화 추가
 """
-from typing import Dict, Any
+from typing import Dict, Any, List
 import json
+import os
+import shutil
+from datetime import datetime
 
 from app.domains.employee.models import Employee
 from app.domains.employee.models import Profile
@@ -17,6 +21,7 @@ class SyncRelationService:
     """관계형 데이터 동기화 처리
 
     Phase 30: Repository DI 패턴 적용
+    Phase 33: 첨부파일 동기화 추가
     """
 
     def __init__(self, current_user_id: int = None):
@@ -29,6 +34,7 @@ class SyncRelationService:
         self._language_repo = None
         self._military_repo = None
         self._family_repo = None
+        self._attachment_repo = None
 
     # ========================================
     # Repository Properties (지연 초기화)
@@ -89,6 +95,14 @@ class SyncRelationService:
             from app.domains.employee.repositories import FamilyMemberRepository
             self._family_repo = FamilyMemberRepository()
         return self._family_repo
+
+    @property
+    def attachment_repo(self):
+        """지연 초기화된 Attachment Repository"""
+        if self._attachment_repo is None:
+            from app.domains.attachment.repositories import attachment_repository
+            self._attachment_repo = attachment_repository
+        return self._attachment_repo
 
     def set_current_user(self, user_id: int):
         """현재 작업 사용자 설정"""
@@ -164,6 +178,14 @@ class SyncRelationService:
             result = self._sync_family_members(contract_id, profile, employee, sync_type)
             if result['synced']:
                 synced_relations.append('family')
+                changes.extend(result.get('changes', []))
+                log_ids.extend(result.get('log_ids', []))
+
+        # Phase 33: 첨부파일 동기화 (DataSharingSettings 기반)
+        if syncable.get('attachments', True):  # 기본값 True
+            result = self._sync_attachments(contract_id, profile, employee, sync_type)
+            if result['synced']:
+                synced_relations.append('attachments')
                 changes.extend(result.get('changes', []))
                 log_ids.extend(result.get('log_ids', []))
 
@@ -491,3 +513,209 @@ class SyncRelationService:
             'changes': [{'entity': 'family_member', 'count': len(personal_family)}],
             'log_ids': [log.id]
         }
+
+    def _sync_attachments(
+        self,
+        contract_id: int,
+        profile: Profile,
+        employee: Employee,
+        sync_type: str
+    ) -> Dict[str, Any]:
+        """첨부파일 동기화 (Phase 33)
+
+        DataSharingSettings에 따라 개인 프로필 첨부파일을 직원으로 동기화합니다.
+        파일은 복제되고 source 추적 정보가 설정됩니다.
+
+        Args:
+            contract_id: 계약 ID
+            profile: 개인 프로필
+            employee: 직원 객체
+            sync_type: 동기화 유형
+
+        Returns:
+            동기화 결과
+        """
+        from flask import current_app
+        from app.domains.attachment.models import Attachment, SourceType
+        from app.domains.attachment.constants import AttachmentCategory, OwnerType
+        from app.domains.attachment.services import attachment_service
+        from app.domains.contract.services import contract_service
+
+        # DataSharingSettings 조회
+        data_sharing = contract_service.get_data_sharing_settings(contract_id)
+        if not data_sharing:
+            return {'synced': False}
+
+        # 동기화 대상 카테고리 결정
+        sync_categories = []
+        if data_sharing.share_profile_photo:
+            sync_categories.append(AttachmentCategory.PROFILE_PHOTO)
+        if data_sharing.share_documents:
+            sync_categories.append(AttachmentCategory.DOCUMENT)
+
+        if not sync_categories:
+            return {'synced': False}
+
+        # 프로필 첨부파일 조회
+        profile_attachments = self.attachment_repo.get_by_owner(
+            OwnerType.PROFILE, profile.id
+        )
+
+        if not profile_attachments:
+            return {'synced': False}
+
+        synced_count = 0
+        log_ids = []
+
+        for pa in profile_attachments:
+            # 카테고리 필터링
+            if pa.category not in sync_categories:
+                continue
+
+            # 기존 동기화된 파일 삭제 (같은 계약에서 동기화된 것만)
+            self._delete_synced_attachments_by_category(
+                employee.id, pa.category, contract_id
+            )
+
+            # 파일 복제 (실제 파일 복사)
+            new_file_path = self._copy_attachment_file(
+                pa.file_path,
+                OwnerType.EMPLOYEE,
+                employee.id,
+                pa.category
+            )
+
+            if not new_file_path:
+                continue
+
+            # 새 Attachment 레코드 생성 (source 추적 정보 포함)
+            new_attachment = Attachment(
+                owner_type=OwnerType.EMPLOYEE,
+                owner_id=employee.id,
+                employee_id=employee.id,  # 레거시 호환
+                file_name=pa.file_name,
+                file_path=new_file_path,
+                file_type=pa.file_type,
+                file_size=pa.file_size,
+                category=pa.category,
+                upload_date=datetime.now().strftime('%Y-%m-%d'),
+                note=pa.note,
+                display_order=pa.display_order,
+                # Phase 33: source 추적
+                source_type=SourceType.SYNCED,
+                source_contract_id=contract_id,
+                is_deletable_on_termination=True,
+            )
+            self.attachment_repo.create_model(new_attachment, commit=False)
+            synced_count += 1
+
+        if synced_count > 0:
+            log = self.sync_log_repo.create_log(
+                contract_id=contract_id,
+                sync_type=sync_type,
+                entity_type='attachment',
+                field_name=None,
+                old_value=None,
+                new_value=json.dumps({'count': synced_count, 'categories': sync_categories}),
+                direction='personal_to_employee',
+                user_id=self._current_user_id,
+                commit=False
+            )
+            log_ids.append(log.id)
+
+        return {
+            'synced': synced_count > 0,
+            'changes': [{'entity': 'attachment', 'count': synced_count}] if synced_count > 0 else [],
+            'log_ids': log_ids
+        }
+
+    def _delete_synced_attachments_by_category(
+        self,
+        employee_id: int,
+        category: str,
+        contract_id: int
+    ) -> int:
+        """특정 계약에서 동기화된 특정 카테고리 첨부파일 삭제
+
+        Args:
+            employee_id: 직원 ID
+            category: 카테고리
+            contract_id: 계약 ID
+
+        Returns:
+            삭제된 개수
+        """
+        from app.domains.attachment.models import Attachment, SourceType
+        from app.domains.attachment.constants import OwnerType
+
+        attachments = Attachment.query.filter(
+            Attachment.owner_type == OwnerType.EMPLOYEE,
+            Attachment.owner_id == employee_id,
+            Attachment.category == category,
+            Attachment.source_type == SourceType.SYNCED,
+            Attachment.source_contract_id == contract_id
+        ).all()
+
+        count = 0
+        for att in attachments:
+            # 파일 삭제는 선택사항 (파일 시스템 정리는 별도 처리)
+            self.attachment_repo.delete(att.id, commit=False)
+            count += 1
+
+        return count
+
+    def _copy_attachment_file(
+        self,
+        source_path: str,
+        target_owner_type: str,
+        target_owner_id: int,
+        category: str
+    ) -> str:
+        """첨부파일 복제
+
+        Args:
+            source_path: 원본 파일 경로 (웹 경로)
+            target_owner_type: 대상 소유자 타입
+            target_owner_id: 대상 소유자 ID
+            category: 카테고리
+
+        Returns:
+            새 파일 웹 경로 (실패 시 None)
+        """
+        from flask import current_app
+        import uuid
+
+        if not source_path:
+            return None
+
+        # 웹 경로 → 파일 시스템 경로 변환
+        # /static/uploads/... → {static_folder}/uploads/...
+        if source_path.startswith('/static/'):
+            relative_path = source_path[8:]  # '/static/' 제거
+            source_file_path = os.path.join(current_app.static_folder, relative_path)
+        else:
+            return None
+
+        if not os.path.exists(source_file_path):
+            return None
+
+        # 대상 폴더 생성
+        target_folder = os.path.join(
+            current_app.static_folder,
+            'uploads',
+            'attachments'
+        )
+        os.makedirs(target_folder, exist_ok=True)
+
+        # 새 파일명 생성
+        _, ext = os.path.splitext(source_path)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        unique_id = uuid.uuid4().hex[:6]
+        new_filename = f"{target_owner_type}_{target_owner_id}_{timestamp}_{unique_id}{ext}"
+        target_file_path = os.path.join(target_folder, new_filename)
+
+        try:
+            shutil.copy2(source_file_path, target_file_path)
+            return f"/static/uploads/attachments/{new_filename}"
+        except Exception:
+            return None

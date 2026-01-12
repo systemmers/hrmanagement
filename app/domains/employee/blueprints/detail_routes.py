@@ -12,6 +12,7 @@ from app.shared.utils.decorators import login_required, manager_or_admin_require
 from app.shared.utils.object_helpers import safe_get
 from app.domains.employee.services import employee_service
 from app.domains.contract.services.contract_service import contract_service
+from app.domains.attachment.constants import AttachmentCategory
 from .helpers import verify_employee_access
 
 
@@ -91,8 +92,8 @@ def register_detail_routes(bp: Blueprint):
             return redirect(url_for('main.index'))
 
         attachment_list = employee_service.get_attachment_list(employee_id)
-        business_card_front = employee_service.get_attachment_by_category(employee_id, 'business_card_front')
-        business_card_back = employee_service.get_attachment_by_category(employee_id, 'business_card_back')
+        business_card_front = employee_service.get_attachment_by_category(employee_id, AttachmentCategory.BUSINESS_CARD_FRONT)
+        business_card_back = employee_service.get_attachment_by_category(employee_id, AttachmentCategory.BUSINESS_CARD_BACK)
         classification_options = employee_service.get_all_classification_options()
 
         from app.domains.user.services.user_service import user_service
@@ -188,8 +189,8 @@ def _render_employee_full_view(employee_id, employee):
     full_view_data = employee_service.get_employee_full_view_data(employee_id)
 
     # 명함 이미지 조회 (별도 조회 필요)
-    business_card_front = employee_service.get_attachment_by_category(employee_id, 'business_card_front')
-    business_card_back = employee_service.get_attachment_by_category(employee_id, 'business_card_back')
+    business_card_front = employee_service.get_attachment_by_category(employee_id, AttachmentCategory.BUSINESS_CARD_FRONT)
+    business_card_back = employee_service.get_attachment_by_category(employee_id, AttachmentCategory.BUSINESS_CARD_BACK)
 
     # 명함 편집 권한 체크
     can_edit_business_card = (

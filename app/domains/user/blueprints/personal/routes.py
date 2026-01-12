@@ -7,6 +7,7 @@ SRP principle applied:
 - Relation data updates delegated to relation_updaters.py
 
 Phase 1 Migration: domains/user/blueprints/personal/routes.py
+Phase 1.3: attachment_service 통합 - 프로필 사진 Attachment 레코드 생성
 """
 import os
 import uuid
@@ -61,17 +62,26 @@ def save_personal_photo(file, user_id):
     return f"/static/uploads/personal_photos/{unique_filename}"
 
 
-def handle_photo_upload(request_files, user_id, existing_photo_path):
+def handle_photo_upload(request_files, user_id, profile_id, existing_photo_path):
     """Handle photo upload (SRP: photo upload logic separated)
+
+    Phase 1.3: attachment_service 통합 - profile.photo + Attachment 이중 저장
+    - profile.photo 필드 업데이트 (하위 호환성)
+    - Attachment 레코드 생성 (SSOT 첨부파일 시스템)
 
     Args:
         request_files: request.files object
         user_id: User ID
+        profile_id: Profile ID (for attachment owner)
         existing_photo_path: Existing photo path
 
     Returns:
         tuple: (photo_path, error_message)
     """
+    from app.domains.attachment.services import attachment_service
+    from app.domains.attachment.constants import AttachmentCategory, OwnerType
+    from app.shared.utils.file_helpers import get_file_extension
+
     photo_path = existing_photo_path
 
     if 'photoFile' not in request_files:
@@ -92,7 +102,32 @@ def handle_photo_upload(request_files, user_id, existing_photo_path):
     if file_size > MAX_IMAGE_SIZE:
         return photo_path, '사진 파일 크기는 5MB 이하여야 합니다.'
 
+    # 1. 파일 저장 (기존 방식 - profile.photo 호환성 유지)
     photo_path = save_personal_photo(photo_file, user_id)
+
+    # 2. 기존 프로필 사진 Attachment 삭제 (있는 경우)
+    if profile_id:
+        attachment_service.delete_by_owner_and_category(
+            OwnerType.PROFILE,
+            profile_id,
+            AttachmentCategory.PROFILE_PHOTO,
+            commit=False
+        )
+
+    # 3. 새 Attachment 레코드 생성
+    if profile_id:
+        ext = get_file_extension(photo_file.filename)
+        attachment_service.create({
+            'owner_type': OwnerType.PROFILE,
+            'owner_id': profile_id,
+            'file_name': photo_file.filename,
+            'file_path': photo_path,
+            'file_type': ext,
+            'file_size': file_size,
+            'category': AttachmentCategory.PROFILE_PHOTO,
+            'upload_date': datetime.now(),
+        }, commit=False)
+
     return photo_path, None
 
 
@@ -217,8 +252,9 @@ def register_routes(bp):
             profile_obj = personal_service.ensure_profile_exists(user_id, user.username)
 
         # Handle photo upload (using helper)
+        # Phase 1.3: profile_id 파라미터 추가 - Attachment 레코드 생성용
         photo_path, photo_error = handle_photo_upload(
-            request.files, user_id, profile_obj.photo
+            request.files, user_id, profile_obj.id, profile_obj.photo
         )
         if photo_error:
             flash(photo_error, 'warning')

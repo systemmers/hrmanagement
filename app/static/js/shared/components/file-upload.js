@@ -19,18 +19,31 @@ export class FileUpload {
      * @param {Object} options
      * @param {string} options.uploadAreaId - 업로드 영역 ID
      * @param {string} options.fileListId - 파일 목록 ID
-     * @param {number} options.employeeId - 직원 ID
+     * @param {string} options.ownerType - 소유자 타입 (employee, profile, company)
+     * @param {number} options.ownerId - 소유자 ID
      * @param {Function} options.onUploadComplete - 업로드 완료 콜백
+     * @param {Function} options.onDeleteComplete - 삭제 완료 콜백
      */
     constructor(options) {
         this.uploadArea = document.getElementById(options.uploadAreaId);
         this.fileList = document.getElementById(options.fileListId);
-        this.employeeId = options.employeeId;
+        this.ownerType = options.ownerType || 'employee';
+        this.ownerId = options.ownerId || options.employeeId; // 하위 호환
         this.onUploadComplete = options.onUploadComplete || (() => {});
+        this.onDeleteComplete = options.onDeleteComplete || (() => {});
 
         if (this.uploadArea) {
             this.init();
         }
+    }
+
+    /**
+     * CSRF 토큰 가져오기
+     */
+    getCsrfToken() {
+        return document.querySelector('meta[name="csrf-token"]')?.content
+            || document.querySelector('input[name="csrf_token"]')?.value
+            || '';
     }
 
     init() {
@@ -116,12 +129,14 @@ export class FileUpload {
     async uploadFile(file) {
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('owner_type', this.ownerType);
+        formData.append('owner_id', this.ownerId);
         formData.append('category', this.detectCategory(file.name));
 
         // 업로드 상태 표시
         const uploadingCard = this.createUploadingCard(file.name);
         if (this.fileList) {
-            const emptyState = this.fileList.querySelector('.empty-state-small');
+            const emptyState = this.fileList.querySelector('.file-empty-state, .empty-state-small');
             if (emptyState) {
                 emptyState.remove();
             }
@@ -129,19 +144,26 @@ export class FileUpload {
         }
 
         try {
-            const response = await fetch(`/api/employees/${this.employeeId}/attachments`, {
+            const csrfToken = this.getCsrfToken();
+            const headers = {};
+            if (csrfToken) {
+                headers['X-CSRFToken'] = csrfToken;
+            }
+
+            const response = await fetch('/api/attachments', {
                 method: 'POST',
+                headers: headers,
                 body: formData
             });
 
             const result = await response.json();
 
-            if (result.success) {
+            if (result.success && result.data?.attachment) {
                 // 업로드 중 카드를 실제 파일 카드로 교체
-                const fileCard = this.createFileCard(result.attachment);
+                const fileCard = this.createFileCard(result.data.attachment);
                 uploadingCard.replaceWith(fileCard);
                 showToast(`${file.name} 업로드 완료`, 'success');
-                this.onUploadComplete(result.attachment);
+                this.onUploadComplete(result.data.attachment);
             } else {
                 uploadingCard.remove();
                 showToast(`업로드 실패: ${result.error}`, 'error');
@@ -158,8 +180,17 @@ export class FileUpload {
         }
 
         try {
+            const csrfToken = this.getCsrfToken();
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (csrfToken) {
+                headers['X-CSRFToken'] = csrfToken;
+            }
+
             const response = await fetch(`/api/attachments/${attachmentId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: headers
             });
 
             const result = await response.json();
@@ -170,13 +201,14 @@ export class FileUpload {
                     card.remove();
                 }
                 showToast('파일이 삭제되었습니다.', 'success');
+                this.onDeleteComplete(attachmentId);
 
                 // 파일 목록이 비었는지 확인
                 if (this.fileList && !this.fileList.querySelector('.file-card')) {
                     this.fileList.innerHTML = `
-                        <div class="empty-state-small">
-                            <i class="fas fa-folder-open"></i>
-                            <p>등록된 첨부파일이 없습니다</p>
+                        <div class="file-empty-state">
+                            <i class="file-empty-state__icon fas fa-folder-open"></i>
+                            <p class="file-empty-state__text">등록된 첨부파일이 없습니다</p>
                         </div>
                     `;
                 }
@@ -210,15 +242,15 @@ export class FileUpload {
 
     createUploadingCard(fileName) {
         const card = document.createElement('div');
-        card.className = 'file-card uploading';
+        card.className = 'file-card file-card--vertical file-card--compact file-card--uploading';
         card.innerHTML = `
-            <div class="file-icon">
+            <div class="file-card__icon">
                 <i class="fas fa-spinner fa-spin"></i>
             </div>
-            <div class="file-info">
-                <div class="file-name">${fileName}</div>
-                <div class="file-meta">
-                    <span class="file-status">업로드 중...</span>
+            <div class="file-card__info">
+                <div class="file-card__name">${fileName}</div>
+                <div class="file-card__meta">
+                    <span class="file-card__status">업로드 중...</span>
                 </div>
             </div>
         `;
@@ -227,31 +259,40 @@ export class FileUpload {
 
     createFileCard(attachment) {
         const card = document.createElement('div');
-        card.className = 'file-card';
+        card.className = 'file-card file-card--vertical file-card--compact file-card--uploaded';
         card.dataset.attachmentId = attachment.id;
 
         const iconClass = this.getFileIcon(attachment.file_type);
         const fileSizeKB = (attachment.file_size / 1024).toFixed(1);
+        const fileUrl = attachment.file_path?.startsWith('/static/')
+            ? attachment.file_path
+            : `/static/uploads/${attachment.file_path}`;
+        const uploadDate = attachment.upload_date?.substring(0, 10) || '';
+        const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(attachment.file_type);
 
         card.innerHTML = `
-            <div class="file-icon">
-                <i class="${iconClass}"></i>
+            <div class="file-card__icon ${isImage ? 'file-card__icon--thumbnail' : ''}">
+                ${isImage
+                    ? `<img src="${fileUrl}" alt="${attachment.file_name}" loading="lazy">`
+                    : `<i class="${iconClass}"></i>`
+                }
             </div>
-            <div class="file-info">
-                <div class="file-name">${attachment.file_name}</div>
-                <div class="file-meta">
-                    <span class="file-category">${attachment.category || '기타'}</span>
-                    <span class="file-size">${fileSizeKB}KB</span>
+            <div class="file-card__info">
+                <div class="file-card__label">${attachment.category || '기타'}</div>
+                <div class="file-card__name">${attachment.file_name}</div>
+                <div class="file-card__meta">
+                    <span class="file-card__date">${uploadDate}</span>
+                    <span class="file-card__size">${fileSizeKB}KB</span>
                 </div>
             </div>
-            <div class="file-actions">
-                <a href="${attachment.file_path}" target="_blank" class="btn-icon" title="보기">
+            <div class="file-card__actions file-card__actions--bottom">
+                <a href="${fileUrl}" target="_blank" class="file-card__btn" title="보기">
                     <i class="fas fa-eye"></i>
                 </a>
-                <a href="${attachment.file_path}" download class="btn-icon" title="다운로드">
+                <a href="${fileUrl}" download class="file-card__btn" title="다운로드">
                     <i class="fas fa-download"></i>
                 </a>
-                <button type="button" class="btn-icon btn-delete-attachment" data-id="${attachment.id}" title="삭제">
+                <button type="button" class="file-card__btn file-card__btn--danger btn-delete-attachment" data-id="${attachment.id}" title="삭제">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>

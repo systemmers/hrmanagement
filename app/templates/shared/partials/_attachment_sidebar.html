@@ -22,7 +22,15 @@
     <div class="right-sidebar-content">
         {# 조회 전용 모드가 아닐 때만 업로드 영역 표시 #}
         {% if not is_readonly %}
-        <div class="file-upload-area file-upload-area--compact" id="fileUploadArea">
+        {# owner_type/owner_id 결정: page_mode와 account_type 기반 #}
+        {# page_mode='hr_card' (직원 상세/수정) → owner_type='employee' #}
+        {# account_type='personal' (개인 프로필) → owner_type='profile' #}
+        {# account_type='corporate' (법인 직원 본인 프로필) → owner_type='employee' #}
+        {% set owner_type = 'employee' if page_mode == 'hr_card' or account_type == 'corporate' else 'profile' %}
+        {% set owner_id = (employee.id if employee is defined else profile.id) if (employee is defined or profile is defined) else profile_data.id %}
+        <div class="file-upload-area file-upload-area--compact" id="fileUploadArea"
+             data-owner-type="{{ owner_type }}"
+             data-owner-id="{{ owner_id }}">
             <div class="file-upload-area__icon">
                 <i class="fas fa-cloud-upload-alt"></i>
             </div>

@@ -99,9 +99,13 @@ def view():
     context['page_mode'] = 'profile'
 
     # 첨부파일 목록 조회 (프로필에서는 수정/삭제 가능)
+    # owner_type: 법인 직원은 'employee', 개인은 'profile'
     profile_id = adapter.get_profile_id()
+    account_type = adapter.get_account_type()
+    owner_type = 'employee' if account_type == AccountType.CORPORATE else 'profile'
+
     if profile_id:
-        context['attachment_list'] = attachment_service.get_by_employee_id(profile_id)
+        context['attachment_list'] = attachment_service.get_by_owner(owner_type, profile_id)
     else:
         context['attachment_list'] = []
     context['is_readonly'] = False  # 프로필에서는 수정 가능
@@ -145,9 +149,13 @@ def edit():
     context['page_mode'] = 'profile'
 
     # 첨부파일 목록 조회 (프로필 수정에서도 수정/삭제 가능)
+    # owner_type: 법인 직원은 'employee', 개인은 'profile'
     profile_id = adapter.get_profile_id()
+    account_type = adapter.get_account_type()
+    owner_type = 'employee' if account_type == AccountType.CORPORATE else 'profile'
+
     if profile_id:
-        context['attachment_list'] = attachment_service.get_by_employee_id(profile_id)
+        context['attachment_list'] = attachment_service.get_by_owner(owner_type, profile_id)
     else:
         context['attachment_list'] = []
     context['is_readonly'] = False  # 프로필에서는 수정 가능
@@ -530,9 +538,13 @@ def complete_profile():
     context['completion_message'] = '프로필 정보를 완성해주세요. 기본정보, 학력, 경력 등을 입력할 수 있습니다.'
 
     # 첨부파일 목록 조회
+    # owner_type: 법인 직원은 'employee', 개인은 'profile'
     profile_id = adapter.get_profile_id()
+    account_type = adapter.get_account_type()
+    owner_type = 'employee' if account_type == AccountType.CORPORATE else 'profile'
+
     if profile_id:
-        context['attachment_list'] = attachment_service.get_by_employee_id(profile_id)
+        context['attachment_list'] = attachment_service.get_by_owner(owner_type, profile_id)
     else:
         context['attachment_list'] = []
     context['is_readonly'] = False

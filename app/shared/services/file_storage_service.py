@@ -14,6 +14,7 @@ from werkzeug.utils import secure_filename
 from flask import current_app
 
 from app.shared.constants.session_keys import AccountType
+from app.domains.attachment.constants import AttachmentCategory
 
 
 # ========================================
@@ -25,13 +26,13 @@ ALLOWED_IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
 
-# 파일 카테고리
-CATEGORY_ATTACHMENT = 'attachments'
-CATEGORY_PROFILE_PHOTO = 'profile_photo'
-CATEGORY_BUSINESS_CARD_FRONT = 'business_card_front'
-CATEGORY_BUSINESS_CARD_BACK = 'business_card_back'
-CATEGORY_COMPANY_DOCUMENT = 'documents'
-CATEGORY_ADMIN_PHOTO = 'admin_photos'
+# 파일 카테고리 (AttachmentCategory에서 참조)
+CATEGORY_ATTACHMENT = AttachmentCategory.ATTACHMENT
+CATEGORY_PROFILE_PHOTO = AttachmentCategory.PROFILE_PHOTO
+CATEGORY_BUSINESS_CARD_FRONT = AttachmentCategory.BUSINESS_CARD_FRONT
+CATEGORY_BUSINESS_CARD_BACK = AttachmentCategory.BUSINESS_CARD_BACK
+CATEGORY_COMPANY_DOCUMENT = AttachmentCategory.COMPANY_DOCUMENT
+CATEGORY_ADMIN_PHOTO = AttachmentCategory.ADMIN_PHOTO
 
 # 법인 서류 허용 확장자
 ALLOWED_DOCUMENT_EXTENSIONS = {'pdf', 'doc', 'docx', 'xls', 'xlsx', 'hwp', 'jpg', 'jpeg', 'png'}

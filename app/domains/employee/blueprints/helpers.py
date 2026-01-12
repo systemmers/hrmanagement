@@ -23,6 +23,7 @@ from flask import request
 
 from app.shared.utils.tenant import get_current_organization_id
 from app.domains.employee.services import employee_service
+from app.domains.attachment.constants import AttachmentCategory
 
 
 # ========================================
@@ -117,8 +118,8 @@ def get_employee_detail_data(employee_id: int) -> Dict[str, Any]:
         'asset_list': employee_service.get_asset_list(employee_id),
         # 첨부파일
         'attachment_list': employee_service.get_attachment_list(employee_id),
-        'business_card_front': employee_service.get_attachment_by_category(employee_id, 'business_card_front'),
-        'business_card_back': employee_service.get_attachment_by_category(employee_id, 'business_card_back'),
+        'business_card_front': employee_service.get_attachment_by_category(employee_id, AttachmentCategory.BUSINESS_CARD_FRONT),
+        'business_card_back': employee_service.get_attachment_by_category(employee_id, AttachmentCategory.BUSINESS_CARD_BACK),
     }
 
 

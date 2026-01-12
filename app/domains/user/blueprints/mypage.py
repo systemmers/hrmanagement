@@ -13,6 +13,7 @@ from app.shared.utils.decorators import login_required
 from app.domains.employee.services import employee_service
 from app.domains.platform.services.system_setting_service import system_setting_service
 from app.domains.contract.services import contract_service
+from app.domains.attachment.constants import AttachmentCategory
 
 mypage_bp = Blueprint('mypage', __name__, url_prefix='/my')
 
@@ -69,8 +70,8 @@ def company_info():
     full_view_data = employee_service.get_employee_full_view_data(employee_id)
 
     # Business card data (not included in unified method)
-    business_card_front = employee_service.get_attachment_by_category(employee_id, 'business_card_front')
-    business_card_back = employee_service.get_attachment_by_category(employee_id, 'business_card_back')
+    business_card_front = employee_service.get_attachment_by_category(employee_id, AttachmentCategory.BUSINESS_CARD_FRONT)
+    business_card_back = employee_service.get_attachment_by_category(employee_id, AttachmentCategory.BUSINESS_CARD_BACK)
 
     return render_template('domains/user/mypage/company_info.html',
                            employee=employee,
