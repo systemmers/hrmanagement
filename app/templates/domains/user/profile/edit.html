@@ -40,15 +40,8 @@
 {# Employee role 여부 플래그 (법인에서만 사용) #}
 {% set is_employee_role = is_corporate and current_user and current_user.role == 'employee' %}
 
-{% from 'shared/macros/_navigation.html' import section_nav %}
-<div class="form-page-layout-with-sidebar">
-    {# 좌측: 섹션 네비게이션 #}
-    {% if page_mode == 'hr_card' %}
-        {{ section_nav('인사정보 ' ~ ('등록' if is_create_mode else '수정'), profile_name, variant='form', employee=profile_data, is_employee_role=is_employee_role, is_create_mode=is_create_mode) }}
-    {% else %}
-        {{ section_nav('프로필 수정', profile_name, variant='profile') }}
-    {% endif %}
-
+{# 내부 섹션 네비게이션 제거 - 사이드바로 통합 (2026-01-12) #}
+<div class="form-page-layout-with-sidebar form-page-layout--no-sidebar-nav">
     {# 메인 콘텐츠: 폼 #}
     <main class="form-main-content">
         {# 페이지 헤더 #}

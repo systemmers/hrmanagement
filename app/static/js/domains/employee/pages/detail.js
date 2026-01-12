@@ -15,18 +15,38 @@ document.addEventListener('DOMContentLoaded', () => {
  * 섹션 네비게이션 초기화
  */
 function initSectionNavigation() {
-    const sectionNav = new SectionNav({
-        sectionSelector: '.content-section',
-        navItemSelector: '.section-nav-item',
-        scrollContainerSelector: '.detail-main-content',
-        navId: 'sectionNav',
-        overlayId: 'sectionNavOverlay',
-        toggleBtnId: 'mobileNavToggle',
-        scrollOffset: 80,
-        rootMargin: '-100px 0px -50% 0px'
-    });
+    // 사이드바 섹션 네비게이션 초기화 (hr_card 모드)
+    const sidebarNav = document.querySelector('.sub-nav');
+    if (sidebarNav) {
+        const sectionNav = new SectionNav({
+            sectionSelector: '.content-section',
+            navItemSelector: '.sub-nav__item',  // 사이드바 네비 아이템
+            scrollContainerSelector: '.detail-main-content',
+            navId: 'sectionNav',
+            overlayId: 'sectionNavOverlay',
+            toggleBtnId: 'mobileNavToggle',
+            scrollOffset: 80,
+            rootMargin: '-100px 0px -50% 0px'
+        });
+        sectionNav.init();
+        return;
+    }
 
-    sectionNav.init();
+    // 내부 섹션 네비게이션 초기화 (프로필 모드)
+    const internalNav = document.querySelector('.section-nav');
+    if (internalNav) {
+        const sectionNav = new SectionNav({
+            sectionSelector: '.content-section',
+            navItemSelector: '.section-nav-item',  // 내부 네비 아이템
+            scrollContainerSelector: '.detail-main-content',
+            navId: 'sectionNav',
+            overlayId: 'sectionNavOverlay',
+            toggleBtnId: 'mobileNavToggle',
+            scrollOffset: 80,
+            rootMargin: '-100px 0px -50% 0px'
+        });
+        sectionNav.init();
+    }
 }
 
 /**

@@ -30,12 +30,9 @@
 {% endblock %}
 
 {% block content %}
-{% from 'shared/macros/_navigation.html' import section_nav %}
+{# 내부 섹션 네비게이션 제거 - 사이드바로 통합 (2026-01-12) #}
 
-<div class="detail-page-layout" data-account-type="{{ account_type|default('personal') }}">
-    {# 좌측 섹션 네비게이션 - 법인 직원과 동일한 full variant 사용 #}
-    {{ section_nav('회사 인사카드', employee.name if employee else company.name, variant='full', employee=employee) }}
-
+<div class="detail-page-layout detail-page-layout--no-sidebar-nav" data-account-type="{{ account_type|default('personal') }}">
     {# 메인 콘텐츠 #}
     <div class="detail-main-content">
         {# 종료된 계약 안내 배너 #}

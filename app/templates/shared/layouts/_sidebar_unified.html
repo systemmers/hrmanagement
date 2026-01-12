@@ -4,7 +4,13 @@
     - 개인(personal), 법인 직원(employee), 법인 관리자(corporate) 통합
     - 플랫폼 관리자(superadmin) 전용 메뉴 포함
     Phase 3: 템플릿 통합 작업
+    Phase 4: 사이드바 검색 컴포넌트 추가 (2026-01-11)
+    Phase 5: 직원 프로필 카드 추가 (2026-01-11)
 #}
+
+{# ========================================
+   검색 컴포넌트와 직원 프로필 카드는 직원 관리 섹션으로 이동됨 (2026-01-12)
+   ======================================== #}
 
 {# ========================================
    플랫폼 관리자 (Superadmin) 메뉴
@@ -175,6 +181,28 @@
 <!-- 직원 관리 섹션 -->
 <div class="nav-section">
     <h2 class="nav-section-title">직원 관리</h2>
+
+    {# 검색 컴포넌트 - 직원 관리 섹션 내부 (2026-01-12 이동) #}
+    <div class="sidebar-search">
+        <svg class="sidebar-search__icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+        </svg>
+        <input type="text" class="sidebar-search__input"
+               placeholder="직원 검색..."
+               aria-label="직원 검색">
+        <button type="button" class="sidebar-search__clear" aria-label="검색어 지우기">
+            <i class="fas fa-times"></i>
+        </button>
+        <button type="button" class="sidebar-search__btn" aria-label="검색">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+
+    {# 직원 프로필 카드 (직원 상세/수정 페이지에서만) #}
+    {% if employee and request.endpoint in ['employees.employee_detail', 'employees.employee_edit'] %}
+    {% include 'shared/partials/_employee_card_nav.html' %}
+    {% endif %}
+
     <a href="{{ url_for('employees.employee_list') }}" class="nav-item {% if request.endpoint == 'employees.employee_list' %}active{% endif %}">
         <i class="fas fa-users"></i>
         <span>직원 목록</span>

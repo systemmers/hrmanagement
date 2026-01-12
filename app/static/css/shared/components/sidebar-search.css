@@ -7,24 +7,26 @@
  */
 
 /* ========================================
-   Block - 검색 컨테이너
+   Block - 검색 컴포넌트
+   스타일가이드: styleguide/components/sidebar-search.html 참조
    ======================================== */
 
 .sidebar-search {
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    margin: var(--space-2) var(--space-3) var(--space-4);
+    margin: 0 0 var(--space-4) 0;
     padding: var(--space-2) var(--space-3);
-    background: var(--color-white-opacity-10);
-    border: 1px solid var(--color-white-opacity-10);
+    background: var(--color-gray-100);
+    border: 1px solid var(--color-gray-200);
     border-radius: var(--radius-lg);
     transition: all var(--transition-fast);
 }
 
 .sidebar-search:focus-within {
-    background: var(--color-white-opacity-15);
+    background: var(--color-pure-white);
     border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-blue-opacity-10);
 }
 
 /* ========================================
@@ -36,7 +38,7 @@
     flex-shrink: 0;
     width: 16px;
     height: 16px;
-    color: var(--color-gray-400);
+    color: var(--color-gray-500);
 }
 
 /* 검색 입력 필드 */
@@ -46,12 +48,12 @@
     background: transparent;
     outline: none;
     font-size: var(--text-sm);
-    color: var(--color-pure-white);
+    color: var(--color-gray-800);
     min-width: 0;
 }
 
 .sidebar-search__input::placeholder {
-    color: var(--color-gray-500);
+    color: var(--color-gray-400);
 }
 
 /* 검색 버튼 */
@@ -151,11 +153,103 @@
 }
 
 /* ========================================
+   Search Results (모달 내 결과 목록)
+   ======================================== */
+
+.search-results {
+    padding: var(--space-2) 0;
+}
+
+.search-results__count {
+    margin: 0 0 var(--space-3);
+    padding: 0 var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+}
+
+.search-results__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.search-results__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.search-results__item:hover {
+    background: var(--color-gray-50);
+}
+
+.search-results__avatar {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--color-gray-200);
+}
+
+.search-results__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.search-results__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-results__name {
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--color-gray-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-results__meta {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-0-5);
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+}
+
+.search-results__meta span:not(:last-child)::after {
+    content: '·';
+    margin-left: var(--space-2);
+}
+
+.search-results__action {
+    flex-shrink: 0;
+    color: var(--color-gray-400);
+    transition: color var(--transition-fast);
+}
+
+.search-results__item:hover .search-results__action {
+    color: var(--color-primary-500);
+}
+
+/* ========================================
    Responsive
    ======================================== */
 
 @media (max-width: 1024px) {
     .sidebar-search {
         margin: var(--space-2);
+    }
+
+    .search-results__list {
+        max-height: 300px;
     }
 }

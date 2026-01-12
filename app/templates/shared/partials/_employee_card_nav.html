@@ -1,0 +1,90 @@
+{#
+    직원 프로필 카드 (사이드바용)
+    - 직원 상세 페이지에서 표시
+    - 사진, 이름, 부서, 직책 정보 표시
+    Phase 3: HR Card Migration - Employee Card Nav
+    Phase 4: 아바타 매크로 사용으로 변경 (2026-01-12)
+#}
+
+{% from 'shared/macros/_avatar.html' import avatar_image %}
+
+{% if employee %}
+<div class="section-nav-card employee-card-nav expanded">
+    <div class="section-nav-card__header">
+        {{ avatar_image(employee.photo, employee.name, size='sm', fallback='initial', theme='corporate', extra_class='section-nav-card__avatar') }}
+        <div class="section-nav-card__info">
+            <div class="section-nav-card__name">{{ employee.name }}</div>
+            <div class="section-nav-card__role">
+                {% if employee.organization_name %}{{ employee.organization_name }}{% endif %}
+                {% if employee.organization_name and employee.position %} &middot; {% endif %}
+                {% if employee.position %}{{ employee.position }}{% endif %}
+            </div>
+        </div>
+        <div class="section-nav-card__toggle" aria-hidden="true">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </div>
+
+    {# 섹션 네비게이션 - 확장/축소 #}
+    <nav class="sub-nav" aria-label="섹션 네비게이션">
+        {# 인사정보 그룹 #}
+        <div class="sub-nav__group">
+            <div class="sub-nav__group-title">인사정보</div>
+            <a href="#personal-info" class="sub-nav__item" data-section="personal-info">
+                <i class="fas fa-user"></i>
+                <span>개인 기본정보</span>
+            </a>
+            <a href="#organization-info" class="sub-nav__item" data-section="organization-info">
+                <i class="fas fa-sitemap"></i>
+                <span>소속정보</span>
+            </a>
+            <a href="#contract-info" class="sub-nav__item" data-section="contract-info">
+                <i class="fas fa-file-contract"></i>
+                <span>계약정보</span>
+            </a>
+            <a href="#salary-info" class="sub-nav__item" data-section="salary-info">
+                <i class="fas fa-won-sign"></i>
+                <span>급여정보</span>
+            </a>
+        </div>
+
+        {# 이력 및 경력 그룹 #}
+        <div class="sub-nav__group">
+            <div class="sub-nav__group-title">이력 및 경력</div>
+            <a href="#education-info" class="sub-nav__item" data-section="education-info">
+                <i class="fas fa-graduation-cap"></i>
+                <span>학력정보</span>
+            </a>
+            <a href="#career-info" class="sub-nav__item" data-section="career-info">
+                <i class="fas fa-briefcase"></i>
+                <span>경력정보</span>
+            </a>
+            <a href="#certificate-info" class="sub-nav__item" data-section="certificate-info">
+                <i class="fas fa-certificate"></i>
+                <span>자격증 및 면허</span>
+            </a>
+            <a href="#language-info" class="sub-nav__item" data-section="language-info">
+                <i class="fas fa-language"></i>
+                <span>언어능력</span>
+            </a>
+            <a href="#military-info" class="sub-nav__item" data-section="military-info">
+                <i class="fas fa-shield-alt"></i>
+                <span>병역/보훈/장애/수상</span>
+            </a>
+        </div>
+
+        {# 근무현황 및 인사기록 그룹 #}
+        <div class="sub-nav__group">
+            <div class="sub-nav__group-title">근무현황 및 인사기록</div>
+            <a href="#personnel-movement" class="sub-nav__item" data-section="personnel-movement">
+                <i class="fas fa-history"></i>
+                <span>인사이동 및 고과</span>
+            </a>
+            <a href="#attendance-assets" class="sub-nav__item" data-section="attendance-assets">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>교육 및 비용</span>
+            </a>
+        </div>
+    </nav>
+</div>
+{% endif %}

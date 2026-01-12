@@ -2,6 +2,7 @@
 
 > 분할 계획 1/3: 사이드바 검색 및 섹션 네비게이션
 > 생성일: 2026-01-11
+> 업데이트: 2026-01-11 (Phase 04, 08 구현 완료)
 > 우선순위: **2순위** (메인 영역 완료 후)
 
 ---
@@ -16,7 +17,7 @@
 **총 1.1일** (잔여 작업)
 
 ### 1.3 진행률
-**약 50%** (CSS 완료, JS 미완료)
+**100%** (Phase 04, 08 완료)
 
 ---
 
@@ -24,110 +25,48 @@
 
 | Phase | 내용 | 기간 | 진행률 | 상태 |
 |-------|------|------|--------|------|
-| **04** | Sidebar Search - 검색 기능 | 0.6일 | 60% | 진행중 |
-| **08** | Section Nav → Sidebar Migration | 0.5일 | 0% | 미완료 |
+| **04** | Sidebar Search - 검색 기능 | 0.6일 | 100% | 완료 |
+| **08** | Section Nav → Sidebar Migration | 0.5일 | 100% | 완료 |
 
 ---
 
 ## 3. 상세 작업
 
-### 3.1 Phase 04: Sidebar Search (0.6일)
+### 3.1 Phase 04: Sidebar Search (0.6일) - 완료
 
 **완료 항목**:
 - [x] sidebar-search.css 작성 (`css/shared/components/`)
 - [x] 검색 API 구현 (`GET /api/employees?search=`)
 - [x] styleguide 템플릿 (`sidebar-search.html`)
+- [x] sidebar-search.js 컴포넌트 생성
+- [x] 검색 결과 CSS 추가 (`.search-results__*`)
 
-**잔여 항목**:
-- [ ] sidebar-search.js 컴포넌트 생성
-
-**JavaScript 구현 사항**:
-```javascript
-// js/domains/employee/components/sidebar-search.js
-class SidebarSearch {
-    constructor(inputElement, options) {
-        this.options = {
-            debounceMs: 300,
-            minChars: 2,
-            maxResults: 10,
-            apiUrl: '/api/employees'
-        };
-    }
-
-    _search() { }           // API 검색
-    _renderResults() { }    // 결과 렌더링
-    _openModal() { }        // 모달 열기
-    _closeModal() { }       // 모달 닫기
-}
-
-// 화면 연결
-function selectEmployee(empId) {
-    closeModal('search-result-modal');
-    window.location.href = `/employees/${empId}`;
-}
+**검색 결과 처리 로직**:
+```
+검색 실행 → API 응답
+    │
+    ├─ results.length === 0 → 토스트 메시지 "검색 결과가 없습니다"
+    │
+    ├─ results.length === 1 → 바로 `/employees/<id>` 이동
+    │
+    └─ results.length > 1  → 모달로 선택 UI 표시
 ```
 
-### 3.2 Phase 08: Section Nav Migration (0.5일)
+**생성 파일**: `js/domains/employee/components/sidebar-search.js`
 
-**현재 상태**:
-- `.section-nav` (250px)가 메인 콘텐츠 내부에 위치
-- CSS: `css/shared/layouts/section-nav.css`
+### 3.2 Phase 08: Section Nav Migration (0.5일) - 완료
 
-**목표 상태**:
-- `.employee-card-nav` + `.sub-nav`가 메인 사이드바 내부에 위치
+**완료 항목**:
+- [x] section-nav.css (이미 `.section-nav-card`, `.sub-nav` 스타일 포함)
+- [x] sidebar-nav.js 생성 (확장/축소 토글, 섹션 스크롤, ScrollSpy)
 
-**작업 항목**:
-- [ ] section-nav.css 확장 (employee-card-nav, sub-nav 스타일)
-- [ ] sidebar-nav.js 생성 (확장/축소 토글, 섹션 스크롤)
-- [ ] 사이드바 템플릿에 마크업 추가
+**생성 파일**: `js/shared/components/sidebar-nav.js`
 
-**CSS 구현**:
-```css
-/* employee-card-nav 스타일 */
-.employee-card-nav {
-    margin: 8px 12px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-/* sub-nav 확장/축소 */
-.sub-nav {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-}
-
-.employee-card-nav.expanded .sub-nav {
-    max-height: 800px;
-}
-```
-
-**JavaScript 구현**:
-```javascript
-// js/shared/components/sidebar-nav.js
-document.querySelectorAll('.employee-card-header').forEach(header => {
-    header.addEventListener('click', () => {
-        const card = header.closest('.employee-card-nav');
-        card.classList.toggle('expanded');
-    });
-});
-
-document.querySelectorAll('.sub-nav-item').forEach(item => {
-    item.addEventListener('click', () => {
-        // active 상태 관리
-        document.querySelectorAll('.sub-nav-item').forEach(i =>
-            i.classList.remove('active'));
-        item.classList.add('active');
-
-        // 해당 섹션으로 스크롤
-        const targetId = item.dataset.section;
-        document.getElementById(targetId)?.scrollIntoView({
-            behavior: 'smooth'
-        });
-    });
-});
-```
+**기능**:
+- section-nav-card 확장/축소 토글
+- sub-nav 아이템 클릭 시 섹션 스크롤
+- active 상태 관리
+- ScrollSpy (IntersectionObserver)
 
 ---
 

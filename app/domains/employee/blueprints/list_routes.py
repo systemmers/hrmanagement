@@ -153,10 +153,21 @@ def register_list_routes(bp: Blueprint):
     @bp.route('/api/employees')
     @manager_or_admin_required
     def api_employee_list():
-        """직원 목록 API - 내보내기 등에서 사용"""
+        """직원 목록 API - 내보내기 및 검색에서 사용"""
         try:
             org_id = get_current_organization_id()
-            employees = employee_service.get_all_employees(organization_id=org_id)
+            search = request.args.get('search', '').strip()
+            limit = request.args.get('limit', None, type=int)
+
+            # 검색어가 있으면 검색, 없으면 전체 조회
+            if search:
+                employees = employee_service.search_employees(search, organization_id=org_id)
+            else:
+                employees = employee_service.get_all_employees(organization_id=org_id)
+
+            # 결과 수 제한 적용
+            if limit and limit > 0:
+                employees = employees[:limit]
 
             # 직원 데이터를 딕셔너리로 변환
             employee_list = []
@@ -171,7 +182,8 @@ def register_list_routes(bp: Blueprint):
                     'email': emp_dict.get('email', ''),
                     'phone': emp_dict.get('phone', ''),
                     'hire_date': str(emp_dict.get('hire_date', '')) if emp_dict.get('hire_date') else '',
-                    'status': emp_dict.get('status', '')
+                    'status': emp_dict.get('status', ''),
+                    'photo_url': emp_dict.get('photo_url', '')
                 })
 
             return api_success({

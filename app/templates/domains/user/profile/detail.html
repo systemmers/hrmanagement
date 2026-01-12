@@ -33,17 +33,10 @@
 {% endblock %}
 
 {% block content %}
-{% from 'shared/macros/_navigation.html' import section_nav %}
+{# 내부 섹션 네비게이션 제거 - 사이드바로 통합 (2026-01-12) #}
 
 {# 계정 타입에 따른 body 클래스 #}
-<div class="detail-page-layout" data-account-type="{{ account_type }}">
-    {# 좌측 섹션 네비게이션 #}
-    {% if page_mode == 'hr_card' %}
-        {{ section_nav('인사카드', profile_name, variant='full', employee=profile_data) }}
-    {% else %}
-        {{ section_nav('프로필', profile_name, variant='profile') }}
-    {% endif %}
-
+<div class="detail-page-layout detail-page-layout--no-sidebar-nav" data-account-type="{{ account_type }}">
     {# 메인 콘텐츠 #}
     <div class="detail-main-content">
         {# 페이지 헤더 #}

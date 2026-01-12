@@ -55,6 +55,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/tree-selector.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/data-table-advanced.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/pagination.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/sidebar-search.css') }}">
 
     <!-- Domain Pages (user) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/user/profile.css') }}">
@@ -77,15 +78,21 @@
             <h1 class="header-title">인사카드 관리 시스템</h1>
         </div>
 
-        <div class="header-search" role="search">
-            <i class="fas fa-search header-search-icon" aria-hidden="true"></i>
-            <form action="{{ url_for('main.search') }}" method="get" aria-label="직원 검색">
-                <input type="text" name="q" class="header-search-input"
+        {# 법인 관리자/매니저는 사이드바에 검색이 있으므로 헤더 검색 숨김 #}
+        {% if not (current_user and current_user.account_type == 'corporate' and current_user.role in ['admin', 'manager']) %}
+        <div class="header-search sidebar-search" role="search">
+            <i class="fas fa-search header-search-icon sidebar-search__icon" aria-hidden="true"></i>
+            <form action="{{ url_for('main.search') }}" method="get" aria-label="직원 검색" class="sidebar-search__form">
+                <input type="text" name="q" class="header-search-input sidebar-search__input"
                        placeholder="직원 검색 (이름, 부서, 직급)"
                        value="{{ search_query or '' }}"
                        aria-label="검색어 입력">
             </form>
+            <button type="button" class="sidebar-search__clear" aria-label="검색어 지우기" style="display: none;">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
+        {% endif %}
 
         <div class="header-actions">
             {% if is_authenticated and current_user %}
@@ -163,6 +170,8 @@
 
     <!-- JavaScript -->
     <script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/domains/employee/components/sidebar-search.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/shared/components/sidebar-nav.js') }}"></script>
     <script src="{{ url_for('static', filename='js/shared/components/notification-dropdown.js') }}"></script>
     <script src="{{ url_for('static', filename='js/shared/utils/pagination.js') }}"></script>
     {% block extra_js %}{% endblock %}

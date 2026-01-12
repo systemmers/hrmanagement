@@ -228,7 +228,7 @@ class EmployeeRepository(BaseRepository[Employee], TenantFilterMixin):
                 Employee.name.ilike(search_term),
                 Employee.department.ilike(search_term),
                 Employee.position.ilike(search_term),
-                Employee.id.ilike(search_term)
+                Employee.employee_number.ilike(search_term)
             )
         ).order_by(Employee.id).all()
 
