@@ -4,6 +4,8 @@
    - 선택 변수: is_readonly (True일 경우 업로드/삭제 버튼 숨김)
    - 사용처: employee_detail.html, employee_form.html, profile, mypage
    - Phase 33: BEM 클래스 적용
+   - 2026-01-12: 세로형 컴팩트 카드 적용 (1열 그리드)
+   - 2026-01-12: MIME 타입(image/png) 및 확장자(png) 모두 지원
    ======================================== #}
 <aside class="right-sidebar">
     <div class="right-sidebar-header">
@@ -29,41 +31,51 @@
         </div>
         {% endif %}
 
-        <div id="fileList" class="attachment-panel__list">
+        <div id="fileList" class="file-list file-list--cards">
             {% if attachment_list %}
                 {% for attachment in attachment_list|sort(attribute='category') %}
-                <div class="file-card" data-attachment-id="{{ attachment.id }}">
-                    <div class="file-card__icon {% if attachment.file_type in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'] %}file-card__icon--thumbnail{% endif %}">
-                        {% if attachment.file_type in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'] %}
-                            <img src="{{ attachment.file_path }}"
+                {# file_path 정규화: /static/으로 시작하지 않으면 /static/uploads/ 접두사 추가 #}
+                {% set file_url = attachment.file_path if attachment.file_path.startswith('/static/') else '/static/uploads/' ~ attachment.file_path %}
+                {# file_type: MIME 타입(image/png) 또는 확장자(png) 모두 지원 #}
+                {% set is_image = attachment.file_type.startswith('image/') or attachment.file_type in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'] %}
+                {% set is_pdf = attachment.file_type == 'application/pdf' or attachment.file_type == 'pdf' %}
+                {% set is_word = attachment.file_type in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'doc', 'docx'] %}
+                {% set is_excel = attachment.file_type in ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xls', 'xlsx'] %}
+                {% set is_ppt = attachment.file_type in ['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'ppt', 'pptx'] %}
+                {% set is_archive = attachment.file_type in ['application/zip', 'application/x-zip-compressed', 'zip'] %}
+                <div class="file-card file-card--vertical file-card--compact file-card--uploaded" data-attachment-id="{{ attachment.id }}">
+                    <div class="file-card__icon {% if is_image %}file-card__icon--thumbnail{% endif %}">
+                        {% if is_image %}
+                            <img src="{{ file_url }}"
                                  alt="{{ attachment.file_name }}"
                                  loading="lazy">
-                        {% elif attachment.file_type == 'pdf' %}
+                        {% elif is_pdf %}
                             <i class="fas fa-file-pdf"></i>
-                        {% elif attachment.file_type in ['doc', 'docx'] %}
+                        {% elif is_word %}
                             <i class="fas fa-file-word"></i>
-                        {% elif attachment.file_type in ['xls', 'xlsx'] %}
+                        {% elif is_excel %}
                             <i class="fas fa-file-excel"></i>
-                        {% elif attachment.file_type in ['ppt', 'pptx'] %}
+                        {% elif is_ppt %}
                             <i class="fas fa-file-powerpoint"></i>
-                        {% elif attachment.file_type == 'zip' %}
+                        {% elif is_archive %}
                             <i class="fas fa-file-archive"></i>
                         {% else %}
                             <i class="fas fa-file"></i>
                         {% endif %}
                     </div>
                     <div class="file-card__info">
+                        <div class="file-card__label">{{ attachment.category }}</div>
                         <div class="file-card__name">{{ attachment.file_name }}</div>
                         <div class="file-card__meta">
-                            <span class="file-card__category">{{ attachment.category }}</span>
+                            <span class="file-card__date">{{ attachment.upload_date[:10] if attachment.upload_date else '' }}</span>
                             <span class="file-card__size">{{ (attachment.file_size / 1024)|round(1) }}KB</span>
                         </div>
                     </div>
-                    <div class="file-card__actions">
-                        <a href="{{ attachment.file_path }}" target="_blank" class="file-card__btn" title="보기">
+                    <div class="file-card__actions file-card__actions--bottom">
+                        <a href="{{ file_url }}" target="_blank" class="file-card__btn" title="보기">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <a href="{{ attachment.file_path }}" download class="file-card__btn" title="다운로드">
+                        <a href="{{ file_url }}" download class="file-card__btn" title="다운로드">
                             <i class="fas fa-download"></i>
                         </a>
                         {# 조회 전용 모드가 아닐 때만 삭제 버튼 표시 #}

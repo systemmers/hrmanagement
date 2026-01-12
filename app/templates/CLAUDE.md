@@ -40,7 +40,7 @@ templates/
 │   ├── base_public.html        # 공개 페이지 레이아웃
 │   ├── layouts/                # 레이아웃 부분 템플릿
 │   │   └── _sidebar_unified.html
-│   ├── macros/                 # Jinja2 매크로 (11개)
+│   ├── macros/                 # Jinja2 매크로 (10개)
 │   └── partials/               # 공유 부분 템플릿 (6개)
 ├── index.html
 └── landing.html
@@ -76,7 +76,6 @@ templates/
 | `pagination` | `_pagination.html` | 페이지네이션 |
 | `avatar` | `_avatar.html` | 아바타 이미지 |
 | `contracts_table` | `_contracts.html` | 계약 테이블 |
-| `navigation` | `_navigation.html` | 네비게이션 |
 | `filters` | `_filters.html` | 필터 컴포넌트 |
 | `settings` | `_settings.html` | 설정 컴포넌트 |
 | `field_renderer` | `_field_renderer.html` | 필드 렌더러 |
@@ -127,7 +126,6 @@ domains/employee/partials/
     ├── _personal_info.html
     ├── _photo_upload.html
     ├── _position_history_info.html
-    ├── _section_nav.html
     ├── _training_info.html
     └── _veteran_info.html
 ```
