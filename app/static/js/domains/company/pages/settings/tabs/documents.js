@@ -465,5 +465,409 @@ export function initDocumentsHandlers() {
  */
 export async function initDocumentsTab() {
     initDocumentsHandlers();
-    await loadDocumentsData();
+    initRequiredDocsHandlers();
+    await Promise.all([
+        loadDocumentsData(),
+        loadRequiredDocuments()
+    ]);
+}
+
+// ============================================================
+// 필수 제출 서류 관리 (Phase 5.1)
+// ============================================================
+
+/**
+ * CSRF 토큰 가져오기
+ * @returns {string} CSRF 토큰
+ */
+function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.content
+        || document.querySelector('input[name="csrf_token"]')?.value
+        || '';
+}
+
+/**
+ * 필수 서류 목록 로드
+ */
+async function loadRequiredDocuments() {
+    const container = document.getElementById('requiredDocsManager');
+    const listEl = document.getElementById('requiredDocsList');
+    if (!container || !listEl) return;
+
+    const companyId = container.dataset.companyId;
+    if (!companyId) return;
+
+    try {
+        const response = await fetch(`/api/required-documents/${companyId}?active_only=false`);
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.error || '필수 서류 목록을 불러오는데 실패했습니다');
+        }
+
+        // API 응답: { success: true, data: { documents: [...] } }
+        const documents = result.data?.documents || result.data || [];
+        renderRequiredDocsList(documents, listEl);
+    } catch (error) {
+        console.error('필수 서류 로드 실패:', error);
+        listEl.innerHTML = `
+            <div class="required-docs-manager__error">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>데이터를 불러오는데 실패했습니다</p>
+            </div>
+        `;
+    }
+}
+
+/**
+ * 필수 서류 목록 렌더링
+ * @param {Array} documents - 필수 서류 목록
+ * @param {HTMLElement} listEl - 목록 컨테이너
+ */
+function renderRequiredDocsList(documents, listEl) {
+    if (documents.length === 0) {
+        listEl.innerHTML = `
+            <div class="required-docs-manager__empty">
+                <i class="fas fa-folder-open"></i>
+                <p>등록된 필수 서류가 없습니다</p>
+                <small>위의 "서류 추가" 버튼을 클릭하여 필수 서류를 등록하세요</small>
+            </div>
+        `;
+        return;
+    }
+
+    const categoryLabels = {
+        identification: '신분증명',
+        education: '학력증명',
+        career: '경력증명',
+        certificate: '자격증',
+        health: '건강/보험',
+        tax: '세금/재정',
+        other: '기타'
+    };
+
+    const linkedEntityLabels = {
+        education: '학력',
+        career: '경력',
+        certificate: '자격증',
+        language: '어학',
+        training: '교육/연수',
+        military: '병역'
+    };
+
+    listEl.innerHTML = documents.map((doc, index) => `
+        <div class="required-docs-manager__item ${doc.isRequired ? '' : 'required-docs-manager__item--optional'}"
+             data-id="${doc.id}" data-order="${doc.displayOrder}">
+            <div class="required-docs-manager__drag-handle" title="드래그하여 순서 변경">
+                <i class="fas fa-grip-vertical"></i>
+            </div>
+            <div class="required-docs-manager__content">
+                <span class="required-docs-manager__name">${escapeHtml(doc.name)}</span>
+                <span class="required-docs-manager__meta">
+                    ${doc.category ? `<span class="badge badge--secondary">${categoryLabels[doc.category] || doc.category}</span>` : ''}
+                    ${doc.linkedEntityType ? `<span class="badge badge--info">${linkedEntityLabels[doc.linkedEntityType] || doc.linkedEntityType} 연결</span>` : ''}
+                    ${doc.isRequired ? '<span class="badge badge--danger">필수</span>' : '<span class="badge badge--light">선택</span>'}
+                </span>
+                ${doc.description ? `<small class="required-docs-manager__desc">${escapeHtml(doc.description)}</small>` : ''}
+            </div>
+            <div class="required-docs-manager__actions">
+                <button class="btn-icon" data-action="edit" title="수정">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-icon" data-action="delete" title="삭제">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+
+    // 드래그앤드롭 순서 변경 초기화
+    initDragAndDrop(listEl);
+}
+
+/**
+ * 드래그앤드롭 순서 변경 초기화
+ * @param {HTMLElement} listEl - 목록 컨테이너
+ */
+function initDragAndDrop(listEl) {
+    const items = listEl.querySelectorAll('.required-docs-manager__item');
+    let draggedItem = null;
+
+    items.forEach(item => {
+        const handle = item.querySelector('.required-docs-manager__drag-handle');
+        if (!handle) return;
+
+        handle.addEventListener('mousedown', () => {
+            item.draggable = true;
+        });
+
+        item.addEventListener('dragstart', (e) => {
+            draggedItem = item;
+            item.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+
+        item.addEventListener('dragend', async () => {
+            item.classList.remove('dragging');
+            item.draggable = false;
+            draggedItem = null;
+
+            // 새 순서 저장
+            await saveNewOrder(listEl);
+        });
+
+        item.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            if (!draggedItem || draggedItem === item) return;
+
+            const rect = item.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+
+            if (e.clientY < midY) {
+                listEl.insertBefore(draggedItem, item);
+            } else {
+                listEl.insertBefore(draggedItem, item.nextSibling);
+            }
+        });
+    });
+}
+
+/**
+ * 새 순서 저장
+ * @param {HTMLElement} listEl - 목록 컨테이너
+ */
+async function saveNewOrder(listEl) {
+    const items = listEl.querySelectorAll('.required-docs-manager__item');
+    const orders = [];
+
+    items.forEach((item, index) => {
+        const id = parseInt(item.dataset.id);
+        if (id) {
+            orders.push({ id, order: index + 1 });
+        }
+    });
+
+    if (orders.length === 0) return;
+
+    try {
+        const response = await fetch('/api/required-documents/reorder', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ orders })
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            throw new Error(result.error || '순서 변경 실패');
+        }
+
+        showToast('순서가 변경되었습니다', 'success');
+    } catch (error) {
+        console.error('순서 저장 실패:', error);
+        showToast('순서 저장에 실패했습니다', 'error');
+        // 목록 새로고침으로 원복
+        await loadRequiredDocuments();
+    }
+}
+
+/**
+ * 필수 서류 모달 열기
+ * @param {Object|null} doc - 수정할 서류 데이터 (null이면 추가)
+ */
+function openRequiredDocModal(doc = null) {
+    const modal = document.getElementById('requiredDocModal');
+    const form = document.getElementById('requiredDocForm');
+    const title = document.getElementById('requiredDocModalTitle');
+
+    if (!modal || !form) return;
+
+    // 폼 초기화
+    form.reset();
+    document.getElementById('requiredDocId').value = '';
+
+    if (doc) {
+        // 수정 모드
+        title.textContent = '필수 서류 수정';
+        document.getElementById('requiredDocId').value = doc.id;
+        document.getElementById('requiredDocName').value = doc.name || '';
+        document.getElementById('requiredDocCategory').value = doc.category || '';
+        document.getElementById('requiredDocLinkedType').value = doc.linkedEntityType || '';
+        document.getElementById('requiredDocDescription').value = doc.description || '';
+        document.getElementById('requiredDocIsRequired').checked = doc.isRequired !== false;
+    } else {
+        // 추가 모드
+        title.textContent = '필수 서류 추가';
+        document.getElementById('requiredDocIsRequired').checked = true;
+    }
+
+    modal.classList.add('is-open');
+}
+
+/**
+ * 필수 서류 모달 닫기
+ */
+function closeRequiredDocModal() {
+    const modal = document.getElementById('requiredDocModal');
+    if (modal) {
+        modal.classList.remove('is-open');
+    }
+}
+
+/**
+ * 필수 서류 저장 (추가/수정)
+ * @param {Event} e - submit 이벤트
+ */
+async function saveRequiredDocument(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const id = document.getElementById('requiredDocId').value;
+    const companyId = document.getElementById('requiredDocsManager')?.dataset.companyId;
+
+    const data = {
+        company_id: parseInt(companyId),
+        name: document.getElementById('requiredDocName').value.trim(),
+        category: document.getElementById('requiredDocCategory').value || null,
+        linked_entity_type: document.getElementById('requiredDocLinkedType').value || null,
+        description: document.getElementById('requiredDocDescription').value.trim() || null,
+        is_required: document.getElementById('requiredDocIsRequired').checked
+    };
+
+    if (!data.name) {
+        showToast('서류명을 입력해주세요', 'warning');
+        return;
+    }
+
+    try {
+        let response;
+        if (id) {
+            // 수정
+            response = await fetch(`/api/required-documents/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify(data)
+            });
+        } else {
+            // 추가
+            response = await fetch('/api/required-documents', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify(data)
+            });
+        }
+
+        const result = await response.json();
+        if (!result.success) {
+            throw new Error(result.error || '저장에 실패했습니다');
+        }
+
+        showToast(id ? '수정되었습니다' : '추가되었습니다', 'success');
+        closeRequiredDocModal();
+        await loadRequiredDocuments();
+    } catch (error) {
+        console.error('필수 서류 저장 실패:', error);
+        showToast(error.message || '저장에 실패했습니다', 'error');
+    }
+}
+
+/**
+ * 필수 서류 삭제
+ * @param {number} id - 서류 ID
+ */
+async function deleteRequiredDocument(id) {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+
+    try {
+        const response = await fetch(`/api/required-documents/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCsrfToken()
+            }
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+            throw new Error(result.error || '삭제에 실패했습니다');
+        }
+
+        showToast('삭제되었습니다', 'success');
+        await loadRequiredDocuments();
+    } catch (error) {
+        console.error('필수 서류 삭제 실패:', error);
+        showToast(error.message || '삭제에 실패했습니다', 'error');
+    }
+}
+
+/**
+ * 필수 서류 핸들러 초기화
+ */
+function initRequiredDocsHandlers() {
+    const container = document.getElementById('requiredDocsManager');
+    if (!container || container.dataset.requiredHandlersInitialized) return;
+
+    // 추가 버튼
+    const addBtn = document.getElementById('addRequiredDocBtn');
+    if (addBtn) {
+        addBtn.addEventListener('click', () => openRequiredDocModal());
+    }
+
+    // 목록 액션 이벤트 위임
+    const listEl = document.getElementById('requiredDocsList');
+    if (listEl) {
+        listEl.addEventListener('click', async (e) => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+
+            const item = btn.closest('.required-docs-manager__item');
+            const id = parseInt(item?.dataset.id);
+
+            switch (btn.dataset.action) {
+                case 'edit':
+                    // 서류 정보 가져와서 모달 열기
+                    const response = await fetch(`/api/required-documents/detail/${id}`);
+                    const result = await response.json();
+                    if (result.success) {
+                        openRequiredDocModal(result.data);
+                    }
+                    break;
+                case 'delete':
+                    await deleteRequiredDocument(id);
+                    break;
+            }
+        });
+    }
+
+    // 모달 이벤트
+    const modal = document.getElementById('requiredDocModal');
+    const form = document.getElementById('requiredDocForm');
+
+    if (modal) {
+        // 배경 클릭 닫기
+        modal.querySelector('.modal__backdrop')?.addEventListener('click', closeRequiredDocModal);
+
+        // 닫기 버튼
+        modal.querySelectorAll('[data-action="close"]').forEach(btn => {
+            btn.addEventListener('click', closeRequiredDocModal);
+        });
+
+        // ESC 키 닫기
+        modal.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeRequiredDocModal();
+        });
+    }
+
+    if (form) {
+        form.addEventListener('submit', saveRequiredDocument);
+    }
+
+    container.dataset.requiredHandlersInitialized = 'true';
 }

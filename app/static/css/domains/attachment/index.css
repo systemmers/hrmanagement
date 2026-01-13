@@ -1,0 +1,28 @@
+/**
+ * Attachment Domain - 첨부파일 도메인 스타일 통합
+ *
+ * 이 파일을 import하면 모든 첨부파일 도메인 스타일이 적용됩니다.
+ * 기본 스타일(shared/components/attachment.css)은 별도로 import 필요
+ *
+ * 구조:
+ * - shared/components/attachment.css: 기본 컴포넌트 (~600 라인)
+ * - domains/attachment/*.css: 도메인 특화 스타일
+ *
+ * 파일별 역할:
+ * - panel.css: 사이드바 패널, AI 분석 버튼
+ * - preview.css: 파일 미리보기 모달
+ * - progress.css: 업로드 진행률
+ * - required-docs.css: 필수 서류 관리
+ * - evidence.css: 증빙 첨부
+ * - filter.css: 파일 검색/필터
+ *
+ * 분리 일자: 2026-01-13
+ * 분리 전: 1,771 라인 → 분리 후: ~600 + 6 파일
+ */
+
+@import url('./panel.css');
+@import url('./preview.css');
+@import url('./progress.css');
+@import url('./required-docs.css');
+@import url('./evidence.css');
+@import url('./filter.css');

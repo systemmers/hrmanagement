@@ -119,10 +119,13 @@ def extract_family_list(form_data: FormData) -> List[Dict[str, Any]]:
 
 
 def extract_education_list(form_data: FormData) -> List[Dict[str, Any]]:
-    """학력정보 리스트 추출"""
+    """학력정보 리스트 추출
+
+    Note: First field must exist in HTML form (determines record count)
+    """
     return extract_relation_list(form_data, 'education_', {
+        'school_name': 'school_name',  # First: exists in HTML form
         'school_type': 'school_type',
-        'school_name': 'school_name',
         'graduation_year': 'graduation_date',
         'major': 'major',
         'degree': 'degree',

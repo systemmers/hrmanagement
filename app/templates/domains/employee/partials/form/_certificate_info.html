@@ -3,7 +3,9 @@
     Phase 9: FieldRegistry 필드명 동기화
     employee: 직원 객체 (수정 모드일 때)
     has_person_contract: 개인계약 연동 여부 (법인에서 개인정보 수정 제한)
+    Phase 5.2: 항목별 증빙 서류 연동 UI 추가
 #}
+{% from "shared/macros/_evidence_attachment.html" import evidence_attachment %}
 {# 개인정보 읽기 전용 플래그: 법인 계정 + 개인계약 연동 시 #}
 {% set is_personal_readonly = is_corporate and has_person_contract %}
 <section class="form__section" id="certificate-info">
@@ -26,7 +28,8 @@
                 {% set certificates = certificate_list | default([]) %}
                 {% if certificates and certificates|length > 0 %}
                     {% for cert in certificates %}
-                    <div class="dynamic-item" data-index="{{ loop.index0 }}">
+                    <div class="dynamic-item" data-index="{{ loop.index0 }}" data-entity-id="{{ cert.id or '' }}">
+                        <input type="hidden" name="certificate_id[]" value="{{ cert.id or '' }}">
                         <div class="form-grid">
                             <div class="form__group">
                                 <label class="form__label">자격증명</label>
@@ -69,6 +72,10 @@
                         <button type="button" class="btn-remove" title="삭제">
                             <i class="fas fa-times"></i>
                         </button>
+                        {% endif %}
+                        {# Phase 5.2: 증빙 서류 첨부 영역 #}
+                        {% if cert.id %}
+                        {{ evidence_attachment('certificate', cert.id, owner_type='employee', owner_id=employee.id if employee else None, readonly=is_personal_readonly) }}
                         {% endif %}
                     </div>
                     {% endfor %}

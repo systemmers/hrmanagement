@@ -44,3 +44,45 @@ class OwnerType:
         COMPANY,
         USER,
     ]
+
+
+class LinkedEntityType:
+    """
+    연결 엔티티 타입 상수 (Phase 4.2)
+
+    학력/경력/자격증 등의 항목에 증빙 서류를 연결할 때 사용
+    """
+    EDUCATION = 'education'      # 학력 증빙 (졸업증명서 등)
+    CAREER = 'career'            # 경력 증빙 (경력증명서 등)
+    CERTIFICATE = 'certificate'  # 자격증 증빙 (자격증 사본 등)
+    LANGUAGE = 'language'        # 어학 증빙 (성적표 등)
+    TRAINING = 'training'        # 교육 증빙 (수료증 등)
+    AWARD = 'award'              # 수상 증빙 (상장 사본 등)
+    MILITARY = 'military'        # 병역 증빙 (병역증명서 등)
+
+    # 연결 엔티티 타입 목록
+    ALL_TYPES = [
+        EDUCATION,
+        CAREER,
+        CERTIFICATE,
+        LANGUAGE,
+        TRAINING,
+        AWARD,
+        MILITARY,
+    ]
+
+    # 한글 레이블
+    LABELS = {
+        EDUCATION: '학력',
+        CAREER: '경력',
+        CERTIFICATE: '자격증',
+        LANGUAGE: '어학',
+        TRAINING: '교육/연수',
+        AWARD: '수상/표창',
+        MILITARY: '병역',
+    }
+
+    @classmethod
+    def get_label(cls, entity_type: str) -> str:
+        """연결 엔티티 타입의 한글 레이블 반환"""
+        return cls.LABELS.get(entity_type, entity_type)

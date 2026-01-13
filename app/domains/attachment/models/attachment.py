@@ -41,6 +41,20 @@ class Attachment(DictSerializableMixin, db.Model):
     # 순서 정렬
     display_order = db.Column(db.Integer, default=0, nullable=False)
 
+    # Phase 4.2: 항목별 증빙 서류 연동
+    linked_entity_type = db.Column(
+        db.String(50),
+        nullable=True,
+        index=True,
+        comment='연결된 엔티티 타입: education, career, certificate 등'
+    )
+    linked_entity_id = db.Column(
+        db.Integer,
+        nullable=True,
+        index=True,
+        comment='연결된 엔티티 ID'
+    )
+
     # Phase 33: 계약 기반 동기화/분리 추적
     source_type = db.Column(
         db.String(20),

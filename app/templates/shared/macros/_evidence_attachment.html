@@ -1,0 +1,61 @@
+{#
+    증빙 서류 첨부 매크로
+    Phase 5.2: 항목별 증빙 서류 연동 UI
+
+    사용 예시:
+    {% from "shared/macros/_evidence_attachment.html" import evidence_attachment %}
+    {{ evidence_attachment('education', edu.id, owner_type='employee', owner_id=employee.id) }}
+#}
+
+{# 증빙 서류 첨부 영역 #}
+{% macro evidence_attachment(linked_entity_type, linked_entity_id, owner_type='employee', owner_id=None, readonly=False) %}
+<div class="evidence-attachment"
+     data-linked-type="{{ linked_entity_type }}"
+     data-linked-id="{{ linked_entity_id or '' }}"
+     data-owner-type="{{ owner_type }}"
+     data-owner-id="{{ owner_id or '' }}">
+    <div class="evidence-attachment__label">
+        <i class="fas fa-paperclip evidence-attachment__label-icon"></i>
+        <span>증빙 서류</span>
+    </div>
+    <div class="evidence-attachment__files">
+        {# JavaScript로 동적 로드 #}
+    </div>
+    {% if not readonly %}
+    <button type="button" class="evidence-attachment__add" data-action="add-evidence">
+        <i class="fas fa-plus"></i>
+        <span>파일 첨부</span>
+    </button>
+    {% endif %}
+    <input type="file" class="evidence-attachment__input" hidden
+           accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+</div>
+{% endmacro %}
+
+{# 증빙 상태 표시 인디케이터 (목록에서 사용) #}
+{% macro evidence_indicator(count=0, attached=False) %}
+{% if attached or count > 0 %}
+<span class="evidence-indicator evidence-indicator--attached">
+    <i class="fas fa-check-circle evidence-indicator__icon"></i>
+    <span class="evidence-indicator__count">{{ count }}</span>
+</span>
+{% else %}
+<span class="evidence-indicator evidence-indicator--missing">
+    <i class="fas fa-exclamation-circle evidence-indicator__icon"></i>
+    <span>미첨부</span>
+</span>
+{% endif %}
+{% endmacro %}
+
+{# 컴팩트 증빙 파일 아이템 (동적 렌더링용 템플릿) #}
+{% macro evidence_file_item(file_name='', file_id='', readonly=False) %}
+<div class="evidence-attachment__file" data-file-id="{{ file_id }}">
+    <i class="fas fa-file evidence-attachment__file-icon"></i>
+    <span class="evidence-attachment__file-name">{{ file_name }}</span>
+    {% if not readonly %}
+    <button type="button" class="evidence-attachment__file-remove" data-action="remove-evidence" title="삭제">
+        <i class="fas fa-times"></i>
+    </button>
+    {% endif %}
+</div>
+{% endmacro %}

@@ -1,0 +1,155 @@
+/**
+ * File Preview Modal - 파일 미리보기 모달
+ * 이미지/PDF 미리보기 및 갤러리 네비게이션
+ *
+ * 의존성: shared/components/modal.css (기본 모달)
+ * 사용처: 첨부파일 미리보기 기능
+ */
+
+/* ========================================
+   파일 미리보기 모달 (File Preview Modal)
+   SSOT: modal.css 클래스 사용
+   사용법: class="modal modal--file-preview"
+   ======================================== */
+
+/* 파일 미리보기 모달 확장 - 기본 .modal 에 추가 */
+.modal--file-preview {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.modal--file-preview .modal__container {
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+.modal--file-preview .modal__header {
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-gray-50);
+}
+
+.modal--file-preview .modal__title {
+    font-size: var(--text-base);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 400px;
+}
+
+.modal--file-preview .modal__body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    max-height: 70vh;
+    background: var(--color-gray-100);
+}
+
+.modal--file-preview .modal__footer {
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+}
+
+/* ========================================
+   파일 미리보기 전용 컴포넌트
+   ======================================== */
+
+.file-preview__image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.file-preview__image img {
+    max-width: 100%;
+    max-height: 65vh;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+}
+
+.file-preview__pdf {
+    width: 100%;
+    height: 65vh;
+}
+
+.file-preview__pdf iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: var(--radius-sm);
+}
+
+/* 미지원 파일 안내 */
+.file-preview__unsupported {
+    text-align: center;
+    padding: var(--space-8);
+}
+
+.file-preview__unsupported-icon {
+    font-size: var(--text-5xl);
+    color: var(--color-gray-400);
+    margin-bottom: var(--space-4);
+}
+
+.file-preview__unsupported-text {
+    font-size: var(--text-base);
+    color: var(--color-gray-600);
+    margin-bottom: var(--space-2);
+}
+
+.file-preview__unsupported-hint {
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+}
+
+/* 파일 정보 */
+.file-preview__info {
+    font-size: var(--text-sm);
+    color: var(--color-gray-600);
+}
+
+.file-preview__actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+/* ========================================
+   갤러리 네비게이션 (다중 파일 시)
+   ======================================== */
+
+.file-preview__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.file-preview__nav:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.file-preview__nav--prev {
+    left: var(--space-4);
+}
+
+.file-preview__nav--next {
+    right: var(--space-4);
+}
+
+.file-preview__nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}

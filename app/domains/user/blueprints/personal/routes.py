@@ -43,23 +43,36 @@ def allowed_image_file(filename):
 
 
 def get_personal_photo_folder():
-    """Get personal profile photo folder"""
+    """Get personal profile photo folder (legacy - for backward compatibility)"""
     folder = os.path.join(current_app.static_folder, 'uploads', 'personal_photos')
     os.makedirs(folder, exist_ok=True)
     return folder
 
 
 def save_personal_photo(file, user_id):
-    """Save personal profile photo"""
-    from app.shared.utils.file_helpers import get_file_extension
-    ext = get_file_extension(file.filename)
-    unique_filename = f"personal_{user_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:8]}.{ext}"
+    """Save personal profile photo using FileStorageService
 
-    folder = get_personal_photo_folder()
-    file_path = os.path.join(folder, unique_filename)
-    file.save(file_path)
+    Phase 1.3: FileStorageService 활성화
+    - 구조화된 경로 사용: personal/{user_id}/attachments/profile_photo/
+    """
+    from app.shared.services.file_storage_service import file_storage
 
-    return f"/static/uploads/personal_photos/{unique_filename}"
+    try:
+        # FileStorageService를 사용하여 구조화된 경로에 저장
+        _, web_path, _ = file_storage.save_personal_file(
+            file, user_id, 'attachments/profile_photo'
+        )
+        return web_path
+    except Exception as e:
+        current_app.logger.error(f'프로필 사진 저장 실패: {e}')
+        # Fallback: 레거시 방식 사용
+        from app.shared.utils.file_helpers import get_file_extension
+        ext = get_file_extension(file.filename)
+        unique_filename = f"personal_{user_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:8]}.{ext}"
+        folder = get_personal_photo_folder()
+        file_path = os.path.join(folder, unique_filename)
+        file.save(file_path)
+        return f"/static/uploads/personal_photos/{unique_filename}"
 
 
 def handle_photo_upload(request_files, user_id, profile_id, existing_photo_path):
@@ -125,7 +138,7 @@ def handle_photo_upload(request_files, user_id, profile_id, existing_photo_path)
             'file_type': ext,
             'file_size': file_size,
             'category': AttachmentCategory.PROFILE_PHOTO,
-            'upload_date': datetime.now(),
+            'upload_date': datetime.now().strftime('%Y-%m-%d'),
         }, commit=False)
 
     return photo_path, None

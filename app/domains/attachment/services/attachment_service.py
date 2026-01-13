@@ -149,6 +149,9 @@ class AttachmentService:
             upload_date=data.get('upload_date'),
             note=data.get('note'),
             display_order=data.get('display_order', 0),
+            # Phase 4.2: 항목별 증빙 서류 연동
+            linked_entity_type=data.get('linked_entity_type'),
+            linked_entity_id=data.get('linked_entity_id'),
             # 레거시 호환
             employee_id=data.get('employee_id')
         )
@@ -193,6 +196,182 @@ class AttachmentService:
 
         if commit:
             db.session.commit()
+
+    # ===== 항목별 증빙 서류 연동 메서드 (Phase 4.2) =====
+
+    def get_by_linked_entity(
+        self, owner_type: str, owner_id: int,
+        linked_entity_type: str, linked_entity_id: int
+    ) -> List[Dict]:
+        """
+        연결된 엔티티별 첨부파일 조회
+
+        Args:
+            owner_type: 소유자 타입 (employee, profile)
+            owner_id: 소유자 ID
+            linked_entity_type: 연결 엔티티 타입 (education, career, certificate)
+            linked_entity_id: 연결 엔티티 ID
+
+        Returns:
+            해당 엔티티에 연결된 첨부파일 목록
+        """
+        from app.domains.attachment.models import Attachment
+
+        models = Attachment.query.filter_by(
+            owner_type=owner_type,
+            owner_id=owner_id,
+            linked_entity_type=linked_entity_type,
+            linked_entity_id=linked_entity_id
+        ).order_by(Attachment.display_order.asc()).all()
+
+        return [m.to_dict() for m in models]
+
+    def get_all_by_linked_entity_type(
+        self, owner_type: str, owner_id: int, linked_entity_type: str
+    ) -> List[Dict]:
+        """
+        연결 엔티티 타입별 모든 첨부파일 조회
+
+        Args:
+            owner_type: 소유자 타입 (employee, profile)
+            owner_id: 소유자 ID
+            linked_entity_type: 연결 엔티티 타입 (education, career, certificate)
+
+        Returns:
+            해당 타입의 모든 첨부파일 목록
+        """
+        from app.domains.attachment.models import Attachment
+
+        models = Attachment.query.filter_by(
+            owner_type=owner_type,
+            owner_id=owner_id,
+            linked_entity_type=linked_entity_type
+        ).order_by(Attachment.linked_entity_id, Attachment.display_order.asc()).all()
+
+        return [m.to_dict() for m in models]
+
+    def delete_by_linked_entity(
+        self, owner_type: str, owner_id: int,
+        linked_entity_type: str, linked_entity_id: int,
+        commit: bool = True
+    ) -> int:
+        """
+        연결된 엔티티의 모든 첨부파일 삭제
+
+        Args:
+            owner_type: 소유자 타입
+            owner_id: 소유자 ID
+            linked_entity_type: 연결 엔티티 타입
+            linked_entity_id: 연결 엔티티 ID
+            commit: DB 커밋 여부
+
+        Returns:
+            삭제된 첨부파일 개수
+        """
+        from app.domains.attachment.models import Attachment
+
+        result = Attachment.query.filter_by(
+            owner_type=owner_type,
+            owner_id=owner_id,
+            linked_entity_type=linked_entity_type,
+            linked_entity_id=linked_entity_id
+        ).delete()
+
+        if commit:
+            db.session.commit()
+
+        return result
+
+    def link_attachment_to_entity(
+        self, attachment_id: int,
+        linked_entity_type: str, linked_entity_id: int,
+        commit: bool = True
+    ) -> Optional[Dict]:
+        """
+        기존 첨부파일을 엔티티에 연결
+
+        Args:
+            attachment_id: 첨부파일 ID
+            linked_entity_type: 연결할 엔티티 타입
+            linked_entity_id: 연결할 엔티티 ID
+            commit: DB 커밋 여부
+
+        Returns:
+            수정된 첨부파일 정보 또는 None
+        """
+        from app.domains.attachment.models import Attachment
+
+        attachment = Attachment.query.get(attachment_id)
+        if not attachment:
+            return None
+
+        attachment.linked_entity_type = linked_entity_type
+        attachment.linked_entity_id = linked_entity_id
+
+        if commit:
+            db.session.commit()
+
+        return attachment.to_dict()
+
+    def unlink_attachment_from_entity(
+        self, attachment_id: int, commit: bool = True
+    ) -> Optional[Dict]:
+        """
+        첨부파일의 엔티티 연결 해제
+
+        Args:
+            attachment_id: 첨부파일 ID
+            commit: DB 커밋 여부
+
+        Returns:
+            수정된 첨부파일 정보 또는 None
+        """
+        from app.domains.attachment.models import Attachment
+
+        attachment = Attachment.query.get(attachment_id)
+        if not attachment:
+            return None
+
+        attachment.linked_entity_type = None
+        attachment.linked_entity_id = None
+
+        if commit:
+            db.session.commit()
+
+        return attachment.to_dict()
+
+    def get_evidence_status(
+        self, owner_type: str, owner_id: int, linked_entity_type: str
+    ) -> Dict:
+        """
+        특정 엔티티 타입의 증빙 서류 현황 조회
+
+        Args:
+            owner_type: 소유자 타입
+            owner_id: 소유자 ID
+            linked_entity_type: 연결 엔티티 타입
+
+        Returns:
+            {
+                'entity_ids_with_evidence': [1, 3, 5],  # 증빙 파일이 있는 엔티티 ID 목록
+                'total_evidence_count': 8  # 총 증빙 파일 수
+            }
+        """
+        from app.domains.attachment.models import Attachment
+        from sqlalchemy import func
+
+        attachments = Attachment.query.filter_by(
+            owner_type=owner_type,
+            owner_id=owner_id,
+            linked_entity_type=linked_entity_type
+        ).all()
+
+        entity_ids = set(a.linked_entity_id for a in attachments if a.linked_entity_id)
+
+        return {
+            'entity_ids_with_evidence': list(entity_ids),
+            'total_evidence_count': len(attachments)
+        }
 
     # ===== 레거시 호환 메서드 (employee_id) =====
 

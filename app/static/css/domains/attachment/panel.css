@@ -1,0 +1,153 @@
+/**
+ * Attachment Panel - 사이드바 패널 스타일
+ * 첨부파일 사이드바 및 AI 분석 버튼
+ *
+ * 의존성: shared/components/attachment.css (기본 스타일)
+ * 사용처: 직원 상세/수정, 프로필 페이지의 첨부파일 사이드바
+ */
+
+/* ========================================
+   AI Analyze Button - AI 분석 버튼
+   ======================================== */
+
+.btn-ai-analyze {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
+    color: var(--color-pure-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-ai-analyze:hover {
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+    box-shadow: var(--shadow-md);
+}
+
+.btn-ai-analyze:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-ai-analyze--loading {
+    pointer-events: none;
+}
+
+.btn-ai-analyze--loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   Attachment Panel - 사이드바 패널
+   ======================================== */
+
+.attachment-panel {
+    background: var(--color-pure-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-gray-200);
+    overflow: hidden;
+}
+
+.attachment-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--color-gray-200);
+    background: var(--color-gray-50);
+}
+
+.attachment-panel__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-gray-900);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.attachment-panel__count {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+    background: var(--color-gray-200);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+}
+
+.attachment-panel__body {
+    padding: var(--space-4);
+}
+
+.attachment-panel__upload {
+    margin-bottom: var(--space-4);
+}
+
+.attachment-panel__list,
+.right-sidebar .attachment-panel__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+/* Compact file card for sidebar - 가로형 카드만 */
+.attachment-panel .file-card:not(.file-card--vertical),
+.right-sidebar .file-card:not(.file-card--vertical) {
+    padding: var(--space-2);
+    gap: var(--space-2);
+}
+
+/* 가로형 카드 아이콘만 - 세로형은 attachment.css에서 정의 */
+.attachment-panel .file-card:not(.file-card--vertical) .file-card__icon,
+.right-sidebar .file-card:not(.file-card--vertical) .file-card__icon {
+    width: 36px;
+    height: 36px;
+    font-size: var(--text-base);
+}
+
+/* 가로형 카드 이름만 - 세로형은 attachment.css에서 정의 */
+.attachment-panel .file-card:not(.file-card--vertical) .file-card__name,
+.right-sidebar .file-card:not(.file-card--vertical) .file-card__name {
+    font-size: var(--text-xs);
+}
+
+.attachment-panel .file-card__btn,
+.right-sidebar .file-card__btn {
+    width: 28px;
+    height: 28px;
+}
+
+/* Compact legacy styles for sidebar */
+.right-sidebar .file-icon {
+    width: 36px;
+    height: 36px;
+    font-size: var(--text-base);
+}
+
+.right-sidebar .file-name {
+    font-size: var(--text-xs);
+}
+
+/* ========================================
+   Responsive - 반응형
+   ======================================== */
+
+@media (max-width: 768px) {
+    .attachment-panel__header {
+        padding: var(--space-3);
+    }
+
+    .attachment-panel__body {
+        padding: var(--space-3);
+    }
+}

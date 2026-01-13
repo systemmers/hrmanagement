@@ -61,7 +61,7 @@ class ProfileRelationUpdater:
             items = extract_certificate_list(form_data)
             self.service.delete_all_certificates(owner_id, self.owner_type, commit=False)
             for item in items:
-                if item.get('name'):
+                if item.get('certificate_name'):  # Model field name
                     self.service.add_certificate(owner_id, item, self.owner_type, commit=False)
         return True
 
@@ -71,7 +71,7 @@ class ProfileRelationUpdater:
             items = extract_language_list(form_data)
             self.service.delete_all_languages(owner_id, self.owner_type, commit=False)
             for item in items:
-                if item.get('language'):
+                if item.get('language_name'):  # Model field name
                     self.service.add_language(owner_id, item, self.owner_type, commit=False)
         return True
 
@@ -107,14 +107,14 @@ class ProfileRelationUpdater:
             items = extract_certificate_list(form_data)
             self.service.delete_all_certificates(owner_id, self.owner_type, commit=False)
             for item in items:
-                if item.get('name'):
+                if item.get('certificate_name'):  # Model field name
                     self.service.add_certificate(owner_id, item, self.owner_type, commit=False)
 
             # Languages
             items = extract_language_list(form_data)
             self.service.delete_all_languages(owner_id, self.owner_type, commit=False)
             for item in items:
-                if item.get('language'):
+                if item.get('language_name'):  # Model field name
                     self.service.add_language(owner_id, item, self.owner_type, commit=False)
 
             # Military

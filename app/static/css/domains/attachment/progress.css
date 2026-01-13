@@ -1,0 +1,270 @@
+/**
+ * Upload Progress - 업로드 진행률 표시
+ * 파일 업로드 진행 상태 및 큐 관리
+ *
+ * 의존성: shared/components/attachment.css (기본 스타일)
+ * 사용처: 파일 업로드 시 진행률 표시
+ */
+
+/* ========================================
+   업로드 진행률 표시 (Upload Progress)
+   ======================================== */
+
+/* 진행률 컨테이너 */
+.upload-progress {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-gray-200);
+}
+
+.upload-progress__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.upload-progress__filename {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-gray-900);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}
+
+.upload-progress__percentage {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-primary-600);
+}
+
+/* 진행률 바 */
+.upload-progress__bar {
+    height: 6px;
+    background: var(--color-gray-200);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.upload-progress__fill {
+    height: 100%;
+    background: var(--color-primary-500);
+    border-radius: var(--radius-full);
+    transition: width var(--transition-normal);
+    width: 0%;
+}
+
+/* 진행률 상태 */
+.upload-progress__status {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+}
+
+/* 진행률 변형 - 성공 */
+.upload-progress--success .upload-progress__fill {
+    background: var(--color-success-500);
+}
+
+.upload-progress--success .upload-progress__percentage {
+    color: var(--color-success-600);
+}
+
+/* 진행률 변형 - 에러 */
+.upload-progress--error .upload-progress__fill {
+    background: var(--color-error-500);
+}
+
+.upload-progress--error .upload-progress__percentage {
+    color: var(--color-error-600);
+}
+
+/* ========================================
+   파일 카드 업로드 상태
+   ======================================== */
+
+.file-card--uploading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.file-card--uploading .file-card__icon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-card--upload-success {
+    border-color: var(--color-success-300);
+    background: var(--color-success-50);
+}
+
+.file-card--upload-error {
+    border-color: var(--color-error-300);
+    background: var(--color-error-50);
+}
+
+/* Upload Progress in card */
+.file-card__progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--color-gray-200);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    overflow: hidden;
+}
+
+.file-card__progress-bar {
+    height: 100%;
+    background: var(--color-primary-500);
+    transition: width var(--transition-normal);
+}
+
+/* ========================================
+   업로드 큐
+   ======================================== */
+
+.upload-queue {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+}
+
+.upload-queue__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    background: white;
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+}
+
+.upload-queue__item-icon {
+    font-size: var(--text-lg);
+    color: var(--color-gray-400);
+}
+
+.upload-queue__item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.upload-queue__item-name {
+    font-size: var(--text-sm);
+    color: var(--color-gray-900);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.upload-queue__item-size {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+}
+
+.upload-queue__item-cancel {
+    padding: var(--space-1);
+    border: none;
+    background: transparent;
+    color: var(--color-gray-400);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.upload-queue__item-cancel:hover {
+    color: var(--color-error-500);
+    background: var(--color-error-50);
+}
+
+/* ========================================
+   업로드 UI 변형 (Upload Area Variations)
+   ======================================== */
+
+/* 사이드바용 컴팩트 업로드 영역 */
+.file-upload-area--sidebar {
+    padding: var(--space-3);
+    min-height: auto;
+}
+
+.file-upload-area--sidebar .file-upload-area__icon {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-2);
+}
+
+.file-upload-area--sidebar .file-upload-area__text {
+    font-size: var(--text-sm);
+}
+
+.file-upload-area--sidebar .file-upload-area__hint {
+    font-size: var(--text-xs);
+}
+
+.file-upload-area--sidebar .file-upload-area__button {
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-xs);
+}
+
+/* 전체 너비 업로드 영역 */
+.file-upload-area--full {
+    width: 100%;
+    min-height: 200px;
+}
+
+/* 인라인 업로드 영역 (텍스트 옆 배치) */
+.file-upload-area--inline {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    min-height: auto;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.file-upload-area--inline .file-upload-area__icon {
+    font-size: var(--text-xl);
+    margin-bottom: 0;
+}
+
+.file-upload-area--inline .file-upload-area__content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.file-upload-area--inline .file-upload-area__text {
+    font-size: var(--text-sm);
+    margin-bottom: 0;
+}
+
+.file-upload-area--inline .file-upload-area__hint {
+    display: none;
+}
+
+/* 버튼 전용 업로드 (드래그 영역 없음) */
+.file-upload-area--button-only {
+    border: none;
+    background: transparent;
+    padding: 0;
+    min-height: auto;
+}
+
+.file-upload-area--button-only .file-upload-area__icon,
+.file-upload-area--button-only .file-upload-area__text,
+.file-upload-area--button-only .file-upload-area__hint {
+    display: none;
+}

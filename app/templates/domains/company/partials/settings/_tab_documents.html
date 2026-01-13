@@ -3,6 +3,34 @@
 
 <div id="tab-documents" class="tab-panel" role="tabpanel">
     <div id="documents-content">
+        {# 필수 제출 서류 설정 (Phase 5.1) #}
+        <div class="form__section form__section--card">
+            <h2 class="form__section-title">
+                <i class="fas fa-clipboard-list"></i>
+                필수 제출 서류 설정
+            </h2>
+            <div class="required-docs-manager" id="requiredDocsManager" data-company-id="{{ company.id }}">
+                <div class="required-docs-manager__header">
+                    <span class="required-docs-manager__title">직원 입사 시 제출해야 할 서류를 관리합니다</span>
+                    <button class="required-docs-manager__add-btn" type="button" id="addRequiredDocBtn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        서류 추가
+                    </button>
+                </div>
+                <div class="required-docs-manager__list" id="requiredDocsList">
+                    {# 서류 목록은 JavaScript로 동적 로드 #}
+                    <div class="required-docs-manager__empty">
+                        <i class="fas fa-folder-open"></i>
+                        <p>등록된 필수 서류가 없습니다</p>
+                        <small>위의 "서류 추가" 버튼을 클릭하여 필수 서류를 등록하세요</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {# 서류 현황 #}
         <div class="form__section form__section--card">
             <h2 class="form__section-title">
@@ -106,5 +134,75 @@
         {{ document_category('security', '보안 서류', 'shield-alt') }}
         {{ document_category('contract', '계약 서류', 'file-contract') }}
         {{ document_category('other', '기타 서류', 'file-alt') }}
+    </div>
+
+    {# 필수 서류 추가/수정 모달 #}
+    <div class="modal" id="requiredDocModal">
+        <div class="modal__backdrop"></div>
+        <div class="modal__container modal__container--sm">
+            <div class="modal__header">
+                <h3 class="modal__title" id="requiredDocModalTitle">필수 서류 추가</h3>
+                <button class="modal__close" type="button" data-action="close">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6 6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <form id="requiredDocForm">
+                <input type="hidden" name="id" id="requiredDocId">
+                <input type="hidden" name="company_id" value="{{ company.id }}">
+                <div class="modal__body">
+                    <div class="form__group">
+                        <label class="form__label">서류명 <span class="required">*</span></label>
+                        <input type="text" class="form__input" name="name" id="requiredDocName"
+                               placeholder="예: 주민등록등본" required>
+                    </div>
+                    <div class="form__group">
+                        <label class="form__label">카테고리</label>
+                        <select class="form__select" name="category" id="requiredDocCategory">
+                            <option value="">선택 안함</option>
+                            <option value="identification">신분증명</option>
+                            <option value="education">학력증명</option>
+                            <option value="career">경력증명</option>
+                            <option value="certificate">자격증</option>
+                            <option value="health">건강/보험</option>
+                            <option value="tax">세금/재정</option>
+                            <option value="other">기타</option>
+                        </select>
+                    </div>
+                    <div class="form__group">
+                        <label class="form__label">연결 항목</label>
+                        <select class="form__select" name="linked_entity_type" id="requiredDocLinkedType">
+                            <option value="">연결 안함</option>
+                            <option value="education">학력</option>
+                            <option value="career">경력</option>
+                            <option value="certificate">자격증</option>
+                            <option value="language">어학</option>
+                            <option value="training">교육/연수</option>
+                            <option value="military">병역</option>
+                        </select>
+                        <small class="form__help">특정 항목에 증빙 서류로 연결됩니다</small>
+                    </div>
+                    <div class="form__group">
+                        <label class="form__label">설명</label>
+                        <input type="text" class="form__input" name="description" id="requiredDocDescription"
+                               placeholder="예: 3개월 이내 발급분">
+                    </div>
+                    <div class="form__group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="is_required" id="requiredDocIsRequired" checked>
+                            필수 제출 서류
+                        </label>
+                        <small class="form__help">체크 해제 시 선택 제출 서류로 분류됩니다</small>
+                    </div>
+                </div>
+                <div class="modal__footer">
+                    <button type="button" class="btn btn--secondary" data-action="close">취소</button>
+                    <button type="submit" class="btn btn--primary" id="requiredDocSubmitBtn">
+                        <i class="fas fa-save"></i> 저장
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

@@ -6,6 +6,8 @@
    - Phase 33: BEM 클래스 적용
    - 2026-01-12: 세로형 컴팩트 카드 적용 (1열 그리드)
    - 2026-01-12: MIME 타입(image/png) 및 확장자(png) 모두 지원
+   - Phase 5.3: 파일 검색/필터링 기능 추가
+   - Phase 5.4: 파일 미리보기 모달 추가
    ======================================== #}
 <aside class="right-sidebar">
     <div class="right-sidebar-header">
@@ -20,6 +22,36 @@
         </div>
     </div>
     <div class="right-sidebar-content">
+        {# Phase 5.3: 파일 검색/필터링 바 #}
+        {% if attachment_list and attachment_list|length > 0 %}
+        <div class="filter-bar filter-bar--file" id="fileFilterBar">
+            <div class="filter-search">
+                <span class="filter-search__icon">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                </span>
+                <input type="text" class="filter-search__input" id="fileSearchInput" placeholder="파일명 검색...">
+            </div>
+            <select class="filter-select" id="fileTypeFilter">
+                <option value="">모든 유형</option>
+                <option value="image">이미지</option>
+                <option value="pdf">PDF</option>
+                <option value="document">문서</option>
+                <option value="other">기타</option>
+            </select>
+            <select class="filter-select" id="fileSortSelect">
+                <option value="date-desc">최신순</option>
+                <option value="date-asc">오래된순</option>
+                <option value="name-asc">이름순</option>
+                <option value="size-desc">크기순</option>
+            </select>
+            <span class="filter-result-count" id="fileResultCount">
+                <span class="filter-result-count__number">{{ attachment_list|length }}</span>개 파일
+            </span>
+        </div>
+        {% endif %}
         {# 조회 전용 모드가 아닐 때만 업로드 영역 표시 #}
         {% if not is_readonly %}
         {# owner_type/owner_id 결정: page_mode와 account_type 기반 #}
@@ -80,9 +112,15 @@
                         </div>
                     </div>
                     <div class="file-card__actions file-card__actions--bottom">
-                        <a href="{{ file_url }}" target="_blank" class="file-card__btn" title="보기">
+                        <button type="button" class="file-card__btn btn-preview-attachment"
+                                data-file-url="{{ file_url }}"
+                                data-file-name="{{ attachment.file_name }}"
+                                data-file-type="{{ attachment.file_type }}"
+                                data-file-size="{{ (attachment.file_size / 1024)|round(1) }}"
+                                data-attachment-id="{{ attachment.id }}"
+                                title="미리보기">
                             <i class="fas fa-eye"></i>
-                        </a>
+                        </button>
                         <a href="{{ file_url }}" download class="file-card__btn" title="다운로드">
                             <i class="fas fa-download"></i>
                         </a>
@@ -104,3 +142,43 @@
         </div>
     </div>
 </aside>
+
+{# Phase 5.4: 파일 미리보기 모달 #}
+<div class="modal modal--file-preview" id="filePreviewModal">
+    <div class="modal__backdrop"></div>
+    <div class="modal__container">
+        <div class="modal__header">
+            <span class="modal__title" id="previewFileName">파일명</span>
+            <button class="btn btn--icon modal__close" type="button" data-modal-close title="닫기">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="modal__body" id="previewContent">
+            {# 이미지/PDF/미지원 파일이 동적으로 렌더링됨 #}
+        </div>
+        <div class="modal__footer">
+            <span class="file-preview__info" id="previewFileInfo">- KB | -</span>
+            <div class="file-preview__actions">
+                <a href="#" class="btn btn--secondary btn--sm" id="previewDownloadBtn" download>
+                    <i class="fas fa-download"></i> 다운로드
+                </a>
+                <a href="#" class="btn btn--outline btn--sm" id="previewNewTabBtn" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> 새 탭에서 열기
+                </a>
+            </div>
+        </div>
+        {# 갤러리 네비게이션 버튼 #}
+        <button type="button" class="file-preview__nav file-preview__nav--prev" id="previewPrevBtn" title="이전 파일">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>
+        </button>
+        <button type="button" class="file-preview__nav file-preview__nav--next" id="previewNextBtn" title="다음 파일">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"/>
+            </svg>
+        </button>
+    </div>
+</div>

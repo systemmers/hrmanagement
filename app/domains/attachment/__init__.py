@@ -31,9 +31,9 @@ def get_attachment_repo() -> 'AttachmentRepository':
 
 
 # 편의성 export
-from .models import Attachment
-from .services import attachment_service
-from .constants import AttachmentCategory, OwnerType
+from .models import Attachment, RequiredDocument, SourceType
+from .services import attachment_service, required_document_service
+from .constants import AttachmentCategory, OwnerType, LinkedEntityType
 from .blueprints import attachment_bp
 
 __all__ = [
@@ -42,11 +42,15 @@ __all__ = [
     'get_attachment_repo',
     # 모델
     'Attachment',
+    'RequiredDocument',
+    'SourceType',
     # 서비스
     'attachment_service',
+    'required_document_service',
     # 상수
     'AttachmentCategory',
     'OwnerType',
+    'LinkedEntityType',
     # Blueprint
     'attachment_bp',
 ]

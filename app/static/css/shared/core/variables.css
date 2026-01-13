@@ -87,6 +87,8 @@
     /* Success Colors - 성공 상태 */
     --color-success-50: #F0FDF4;
     --color-success-100: #DCFCE7;
+    --color-success-300: #86EFAC;
+    --color-success-400: #4ADE80;
     --color-success-500: #22C55E;
     --color-success-600: #16A34A;
     --color-success-700: #15803D;
@@ -102,6 +104,8 @@
     /* Warning Colors - 경고 상태 */
     --color-warning-50: #FFFBEB;
     --color-warning-100: #FEF3C7;
+    --color-warning-300: #FCD34D;
+    --color-warning-400: #FBBF24;
     --color-warning-500: #F59E0B;
     --color-warning-600: #D97706;
     --color-warning-700: #B45309;

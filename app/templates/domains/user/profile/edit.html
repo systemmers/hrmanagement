@@ -30,6 +30,7 @@
 {% if account_type != 'corporate_admin' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/right-sidebar.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/attachment.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/attachment/index.css') }}">
 {% endif %}
 {% if is_corporate %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/tree-selector.css') }}">
@@ -102,7 +103,7 @@
         {% endif %}
 
         <form method="POST" action="{{ form_action }}" class="app-form" id="profileEditForm" enctype="multipart/form-data"
-              {% if profile_data and profile_data.id %}data-employee-id="{{ profile_data.id }}"{% endif %}>
+              {% if is_corporate and profile_data and profile_data.id %}data-employee-id="{{ profile_data.id }}"{% endif %}>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             {# 섹션 1: 개인 기본정보 #}

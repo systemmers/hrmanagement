@@ -52,7 +52,8 @@ export {
     getProjectTemplate,
     getAwardTemplate,
     initAccountSection,
-    validateAccountFields
+    validateAccountFields,
+    initEvidenceAttachments
 } from './index.js';
 
 // 기본 export

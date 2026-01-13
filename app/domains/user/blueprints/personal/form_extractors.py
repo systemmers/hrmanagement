@@ -64,10 +64,13 @@ def extract_profile_data(form_data: FormData, existing_profile=None) -> Dict[str
 # ========================================
 
 def extract_education_list(form_data):
-    """Extract education info list"""
+    """Extract education info list
+
+    Note: First field must exist in HTML form (determines record count)
+    """
     return extract_relation_list(form_data, 'education_', {
+        'school_name': 'school_name',  # First: exists in HTML form
         'school_type': 'school_type',
-        'school_name': 'school_name',
         'degree': 'degree',
         'major': 'major',
         'graduation_year': 'graduation_date',
@@ -111,7 +114,7 @@ def extract_certificate_list(form_data):
     """Extract certificate info list"""
     return extract_relation_list(form_data, 'certificate_', {
         'name': 'certificate_name',
-        'issuer': 'issuing_organization',
+        'issuing_organization': 'issuing_organization',  # HTML: certificate_issuing_organization[]
         'acquisition_date': 'acquisition_date',
         'expiry_date': 'expiry_date',
         'number': 'certificate_number',

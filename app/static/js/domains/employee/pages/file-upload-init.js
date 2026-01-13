@@ -1,13 +1,15 @@
 /**
  * File Upload Initialization Module
  * Phase 7: 프론트엔드 리팩토링 - employee-form.js 분할
+ * Phase 5.3: 파일 필터링 기능 추가
+ * Phase 5.4: 파일 미리보기 기능 추가
  *
- * 첨부파일 업로드 초기화
+ * 첨부파일 업로드, 필터링, 미리보기 초기화
  * - 템플릿의 data-owner-type/data-owner-id 속성 우선 사용
  * - Fallback: URL 패턴에서 추출
  */
 
-import { FileUpload } from '../../../shared/components/file-upload.js';
+import { FileUpload, FileFilter, FilePreview } from '../../../shared/components/file-upload.js';
 
 /**
  * 파일 업로드 초기화
@@ -50,13 +52,36 @@ export function initFileUpload() {
         return;
     }
 
+    // 파일 필터/미리보기 인스턴스 (업로드 완료 시 새로고침 용도)
+    let fileFilter = null;
+    let filePreview = null;
+
+    // 필터 초기화 (파일이 있는 경우만)
+    const filterBar = document.getElementById('fileFilterBar');
+    if (filterBar) {
+        fileFilter = new FileFilter();
+    }
+
+    // 미리보기 초기화 (Phase 5.4)
+    const previewModal = document.getElementById('filePreviewModal');
+    if (previewModal) {
+        filePreview = new FilePreview();
+    }
+
     new FileUpload({
         uploadAreaId: 'fileUploadArea',
         fileListId: 'fileList',
         ownerType: ownerType || 'employee',
         ownerId: parseInt(ownerId, 10),
         onUploadComplete: (attachment) => {
-            // 업로드 완료 후 추가 처리가 필요하면 여기에 구현
+            // 업로드 완료 후 필터/미리보기 새로고침
+            if (fileFilter) fileFilter.refresh();
+            if (filePreview) filePreview.refresh();
+        },
+        onDeleteComplete: (attachmentId) => {
+            // 삭제 완료 후 필터/미리보기 새로고침
+            if (fileFilter) fileFilter.refresh();
+            if (filePreview) filePreview.refresh();
         }
     });
 }
@@ -75,6 +100,34 @@ function disableFileUpload(uploadArea) {
     }
 }
 
+/**
+ * 파일 필터만 초기화 (이미 파일이 로드된 경우)
+ * @returns {FileFilter|null}
+ */
+export function initFileFilter() {
+    const filterBar = document.getElementById('fileFilterBar');
+    const fileList = document.getElementById('fileList');
+
+    if (!filterBar || !fileList) return null;
+
+    return new FileFilter();
+}
+
+/**
+ * 파일 미리보기만 초기화 (Phase 5.4)
+ * @returns {FilePreview|null}
+ */
+export function initFilePreview() {
+    const previewModal = document.getElementById('filePreviewModal');
+    const fileList = document.getElementById('fileList');
+
+    if (!previewModal || !fileList) return null;
+
+    return new FilePreview();
+}
+
 export default {
-    initFileUpload
+    initFileUpload,
+    initFileFilter,
+    initFilePreview
 };

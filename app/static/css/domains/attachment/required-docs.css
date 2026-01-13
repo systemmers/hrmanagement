@@ -1,0 +1,331 @@
+/**
+ * Required Documents - 필수 서류 관리
+ * 필수 서류 목록 및 관리자 설정
+ *
+ * 의존성: shared/components/attachment.css (기본 스타일)
+ * 사용처: 법인 설정 > 필수 서류 관리, 첨부파일 패널
+ */
+
+/* ========================================
+   Required Files Section - 필수 파일 영역
+   ======================================== */
+
+.required-files {
+    margin-bottom: var(--space-4);
+}
+
+.required-files__title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-gray-700);
+    margin-bottom: var(--space-2);
+}
+
+.required-files__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.required-file {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+}
+
+.required-file--complete {
+    background: var(--color-success-50);
+}
+
+.required-file--missing {
+    background: var(--color-warning-50);
+}
+
+.required-file__icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+}
+
+.required-file--complete .required-file__icon {
+    background: var(--color-success-500);
+    color: var(--color-pure-white);
+}
+
+.required-file--missing .required-file__icon {
+    background: var(--color-warning-500);
+    color: var(--color-pure-white);
+}
+
+.required-file__name {
+    flex: 1;
+    color: var(--color-gray-700);
+}
+
+/* ========================================
+   필수 서류 관리 (Required Docs Manager)
+   ======================================== */
+
+/* 관리자용 필수 서류 관리 컨테이너 */
+.required-docs-manager {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: white;
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+}
+
+.required-docs-manager__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.required-docs-manager__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-gray-900);
+}
+
+.required-docs-manager__add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-primary-600);
+    background: var(--color-primary-50);
+    border: 1px solid var(--color-primary-200);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.required-docs-manager__add-btn:hover {
+    background: var(--color-primary-100);
+    border-color: var(--color-primary-300);
+}
+
+/* 필수 서류 목록 컨테이너 */
+.required-docs-manager__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-height: 100px;
+}
+
+/* 빈 상태 */
+.required-docs-manager__empty,
+.required-docs-manager__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-6);
+    text-align: center;
+    color: var(--color-gray-400);
+}
+
+.required-docs-manager__empty i,
+.required-docs-manager__error i {
+    font-size: var(--text-3xl);
+}
+
+.required-docs-manager__empty p,
+.required-docs-manager__error p {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+}
+
+.required-docs-manager__empty small {
+    font-size: var(--text-xs);
+    color: var(--color-gray-400);
+}
+
+.required-docs-manager__error {
+    color: var(--color-error-400);
+}
+
+.required-docs-manager__error p {
+    color: var(--color-error-500);
+}
+
+/* 개별 필수 서류 항목 */
+.required-docs-manager__item,
+.required-doc-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: var(--color-gray-50);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.required-docs-manager__item:hover,
+.required-doc-item:hover {
+    border-color: var(--color-gray-300);
+    box-shadow: var(--shadow-sm);
+}
+
+/* 선택 제출 서류 (필수 아님) */
+.required-docs-manager__item--optional {
+    background: white;
+    border-style: dashed;
+}
+
+/* 드래그 핸들 */
+.required-docs-manager__drag-handle,
+.required-doc-item__drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    color: var(--color-gray-400);
+    cursor: grab;
+    flex-shrink: 0;
+}
+
+.required-docs-manager__drag-handle:hover,
+.required-doc-item__drag-handle:hover {
+    color: var(--color-gray-600);
+}
+
+.required-docs-manager__drag-handle:active,
+.required-doc-item__drag-handle:active {
+    cursor: grabbing;
+}
+
+/* 드래그 중 상태 */
+.required-docs-manager__item.dragging,
+.required-doc-item--dragging {
+    opacity: 0.5;
+    border-style: dashed;
+    border-color: var(--color-primary-400);
+    background: var(--color-primary-50);
+}
+
+/* 드롭 대상 상태 */
+.required-doc-item--drop-target {
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 2px var(--color-primary-100);
+}
+
+/* 서류 내용 */
+.required-docs-manager__content,
+.required-doc-item__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.required-docs-manager__name,
+.required-doc-item__name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-gray-900);
+}
+
+.required-docs-manager__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.required-docs-manager__desc,
+.required-doc-item__description {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+    display: block;
+    margin-top: var(--space-1);
+}
+
+/* 필수 여부 토글 */
+.required-doc-item__toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.required-doc-item__toggle-label {
+    font-size: var(--text-xs);
+    color: var(--color-gray-600);
+}
+
+/* 액션 버튼들 */
+.required-docs-manager__actions,
+.required-doc-item__actions {
+    display: flex;
+    gap: var(--space-1);
+    flex-shrink: 0;
+}
+
+.required-docs-manager__actions .btn-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--color-gray-400);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.required-docs-manager__actions .btn-icon:hover {
+    color: var(--color-gray-600);
+    background: var(--color-gray-100);
+}
+
+.required-docs-manager__actions .btn-icon[data-action="delete"]:hover {
+    color: var(--color-error-500);
+    background: var(--color-error-50);
+}
+
+/* 뱃지 스타일 (인라인) */
+.required-docs-manager__meta .badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+}
+
+.required-docs-manager__meta .badge--secondary {
+    background: var(--color-gray-200);
+    color: var(--color-gray-700);
+}
+
+.required-docs-manager__meta .badge--info {
+    background: var(--color-blue-100);
+    color: var(--color-blue-700);
+}
+
+.required-docs-manager__meta .badge--danger {
+    background: var(--color-error-100);
+    color: var(--color-error-700);
+}
+
+.required-docs-manager__meta .badge--light {
+    background: var(--color-gray-100);
+    color: var(--color-gray-500);
+}

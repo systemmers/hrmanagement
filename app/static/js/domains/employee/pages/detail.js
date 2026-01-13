@@ -2,14 +2,22 @@
  * Employee Detail Page JavaScript
  * - 섹션 네비게이션 (SectionNav 컴포넌트 사용)
  * - 파일 업로드 UI (FileUpload 컴포넌트 사용)
+ * - Phase 5.3: 파일 필터링 (FileFilter 컴포넌트 사용)
+ * - Phase 5.4: 파일 미리보기 (FilePreview 컴포넌트 사용)
  */
 
 import { SectionNav } from '../../../shared/components/section-nav.js';
-import { FileUpload } from '../../../shared/components/file-upload.js';
+import { FileUpload, FileFilter, FilePreview } from '../../../shared/components/file-upload.js';
+
+// 전역 인스턴스 (업로드/삭제 후 새로고침용)
+let fileFilter = null;
+let filePreview = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     initSectionNavigation();
     initFileUpload();
+    initFileFilter();
+    initFilePreview();
 });
 
 /**
@@ -93,11 +101,41 @@ function initFileUpload() {
         ownerId: parseInt(ownerId, 10),
         onUploadComplete: (attachment) => {
             console.log('파일 업로드 완료:', attachment);
+            // 필터/미리보기 새로고침
+            if (fileFilter) fileFilter.refresh();
+            if (filePreview) filePreview.refresh();
         },
         onDeleteComplete: (attachmentId) => {
             console.log('파일 삭제 완료:', attachmentId);
+            // 필터/미리보기 새로고침
+            if (fileFilter) fileFilter.refresh();
+            if (filePreview) filePreview.refresh();
         }
     });
+}
+
+/**
+ * 파일 필터 초기화 (Phase 5.3)
+ */
+function initFileFilter() {
+    const filterBar = document.getElementById('fileFilterBar');
+    const fileList = document.getElementById('fileList');
+
+    if (!filterBar || !fileList) return;
+
+    fileFilter = new FileFilter();
+}
+
+/**
+ * 파일 미리보기 초기화 (Phase 5.4)
+ */
+function initFilePreview() {
+    const modal = document.getElementById('filePreviewModal');
+    const fileList = document.getElementById('fileList');
+
+    if (!modal || !fileList) return;
+
+    filePreview = new FilePreview();
 }
 
 /**

@@ -2,7 +2,9 @@
     직원 폼 - 경력정보 섹션 (동적 폼)
     employee: 직원 객체 (수정 모드일 때)
     has_person_contract: 개인계약 연동 여부 (법인에서 개인정보 수정 제한)
+    Phase 5.2: 항목별 증빙 서류 연동 UI 추가
 #}
+{% from "shared/macros/_evidence_attachment.html" import evidence_attachment %}
 {# 개인정보 읽기 전용 플래그: 법인 계정 + 개인계약 연동 시 #}
 {% set is_personal_readonly = is_corporate and has_person_contract %}
 <section class="form__section" id="career-info">
@@ -25,7 +27,8 @@
                 {% set careers = career_list | default([]) %}
                 {% if careers and careers|length > 0 %}
                     {% for career in careers %}
-                    <div class="dynamic-item" data-index="{{ loop.index0 }}">
+                    <div class="dynamic-item" data-index="{{ loop.index0 }}" data-entity-id="{{ career.id or '' }}">
+                        <input type="hidden" name="career_id[]" value="{{ career.id or '' }}">
                         <div class="form-grid">
                             <div class="form__group">
                                 <label class="form__label">회사명</label>
@@ -114,6 +117,10 @@
                         <button type="button" class="btn-remove" title="삭제">
                             <i class="fas fa-times"></i>
                         </button>
+                        {% endif %}
+                        {# Phase 5.2: 증빙 서류 첨부 영역 #}
+                        {% if career.id %}
+                        {{ evidence_attachment('career', career.id, owner_type='employee', owner_id=employee.id if employee else None, readonly=is_personal_readonly) }}
                         {% endif %}
                     </div>
                     {% endfor %}

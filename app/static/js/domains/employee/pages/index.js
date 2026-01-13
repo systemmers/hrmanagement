@@ -15,6 +15,7 @@ import { initAddressSearch } from './address-search.js';
 import { initFileUpload } from './file-upload-init.js';
 import { getEmployeeIdFromForm, showToast, validateImageFile } from './helpers.js';
 import { initAccountSection, validateAccountFields } from './account-section.js';
+import { EvidenceAttachmentManager } from '../../../shared/components/evidence-attachment.js';
 
 // 템플릿 re-export
 export {
@@ -86,6 +87,38 @@ export function initEmployeeForm() {
     initFileUpload();
     initTreeSelector();
     initAccountSection();  // 21번/22번 원칙: 계정 섹션 초기화
+    initEvidenceAttachments();  // Phase 5.2: 증빙 서류 연동
+}
+
+/**
+ * 증빙 서류 첨부 초기화
+ * Phase 5.2: 항목별 증빙 서류 연동 UI
+ */
+export function initEvidenceAttachments() {
+    const employeeForm = document.querySelector('form');
+    const employeeIdInput = document.querySelector('[name="employee_id"]') ||
+                            document.querySelector('[data-employee-id]');
+
+    if (!employeeForm) return;
+
+    const employeeId = employeeIdInput?.value ||
+                       employeeIdInput?.dataset?.employeeId ||
+                       getEmployeeIdFromForm();
+
+    if (!employeeId) {
+        // 신규 등록 모드 - 증빙 첨부는 저장 후 가능
+        return;
+    }
+
+    // 증빙 첨부 영역이 있는 컨테이너 초기화
+    new EvidenceAttachmentManager({
+        ownerType: 'employee',
+        ownerId: employeeId,
+        container: employeeForm,
+        onUpdate: () => {
+            console.log('증빙 파일 업데이트됨');
+        }
+    });
 }
 
 // DOMContentLoaded에서 자동 초기화
@@ -110,5 +143,6 @@ export default {
     showToast,
     validateImageFile,
     initAccountSection,
-    validateAccountFields
+    validateAccountFields,
+    initEvidenceAttachments
 };

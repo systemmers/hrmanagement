@@ -89,13 +89,14 @@ class ProfileRepository(BaseRepository[Profile]):
         db.session.commit()
         return profile
 
-    def update_by_user_id(self, user_id: int, data: Dict) -> Optional[Profile]:
+    def update_by_user_id(self, user_id: int, data: Dict, commit: bool = True) -> Optional[Profile]:
         """
         User ID로 프로필 업데이트
 
         Args:
             user_id: 사용자 ID
             data: 업데이트할 데이터
+            commit: True면 즉시 커밋
 
         Returns:
             업데이트된 Profile 모델 또는 None
@@ -105,7 +106,8 @@ class ProfileRepository(BaseRepository[Profile]):
             return None
 
         self._update_record_fields(profile, data)
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return profile
 
     def get_public_profiles(self, limit: int = 50) -> List[Dict]:
