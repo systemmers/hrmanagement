@@ -24,15 +24,10 @@ const ALLOWED_FILE_TYPES = [
 ];
 
 /**
- * HTML 이스케이프
- * @param {string} str - 문자열
- * @returns {string} 이스케이프된 문자열
+ * HTML 이스케이프 (SSOT: window.HRFormatters.escapeHtml)
  */
 function escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+    return window.HRFormatters?.escapeHtml?.(str) || '';
 }
 
 /**

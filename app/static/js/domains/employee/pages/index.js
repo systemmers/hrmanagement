@@ -65,9 +65,7 @@ export function initTreeSelector() {
         apiUrl: '/admin/api/organizations?format=tree',
         allowEmpty: true,
         onSelect: function(selected) {
-            if (selected) {
-                console.log('Selected organization:', selected);
-            }
+            // 선택 완료 - 필요시 추가 처리 가능
         }
     });
 }
@@ -116,7 +114,7 @@ export function initEvidenceAttachments() {
         ownerId: employeeId,
         container: employeeForm,
         onUpdate: () => {
-            console.log('증빙 파일 업데이트됨');
+            // 증빙 파일 업데이트 완료
         }
     });
 }

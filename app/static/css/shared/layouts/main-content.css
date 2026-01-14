@@ -92,11 +92,11 @@
 
         /* .dashboard-grid, .stat-card, .stat-label, .stat-value는 pages/dashboard.css 또는 components/stats-cards.css에서 정의 */
 
-        /* 직원 카드 그리드 */
+        /* 직원 카드 그리드 - 8pt 그리드 표준 (24px gap) */
         .employee-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: var(--space-4);
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--space-6);  /* 24px - 명함 그리드와 통일 */
         }
 
         .employee-card {

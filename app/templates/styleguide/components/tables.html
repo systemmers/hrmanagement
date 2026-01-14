@@ -137,5 +137,216 @@
     {% endcall %}
     {% endcall %}
 
+    {% call subsection('드래그 핸들 및 액션 버튼 (HR Card)') %}
+    <div class="demo-table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th class="data-table__th--drag"></th>
+                    <th>자격명</th>
+                    <th>발급기관</th>
+                    <th>취득일</th>
+                    <th class="data-table__th--attach">첨부</th>
+                    <th class="data-table__th--actions">작업</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="data-table__drag-handle">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                        </svg>
+                    </td>
+                    <td>정보처리기사</td>
+                    <td>한국산업인력공단</td>
+                    <td>2023-05-15</td>
+                    <td>
+                        <span class="data-table__attach-indicator data-table__attach-indicator--has-file" title="첨부파일 있음">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                            </svg>
+                        </span>
+                    </td>
+                    <td>
+                        <div class="data-table__actions">
+                            <button class="data-table__btn-icon data-table__btn-icon--edit" title="수정">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
+                            <button class="data-table__btn-icon data-table__btn-icon--attach" title="첨부파일">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                </svg>
+                            </button>
+                            <button class="data-table__btn-icon data-table__btn-icon--delete" title="삭제">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="data-table__drag-handle">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                        </svg>
+                    </td>
+                    <td>TOEIC</td>
+                    <td>ETS</td>
+                    <td>2024-01-20</td>
+                    <td>
+                        <span class="data-table__attach-indicator data-table__attach-indicator--empty">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                            </svg>
+                        </span>
+                    </td>
+                    <td>
+                        <div class="data-table__actions">
+                            <button class="data-table__btn-icon data-table__btn-icon--edit" title="수정">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
+                            <button class="data-table__btn-icon data-table__btn-icon--attach" title="첨부파일">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                </svg>
+                            </button>
+                            <button class="data-table__btn-icon data-table__btn-icon--delete" title="삭제">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% call code() %}
+&lt;table class="data-table"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th class="data-table__th--drag"&gt;&lt;/th&gt;
+            &lt;th&gt;자격명&lt;/th&gt;
+            &lt;th class="data-table__th--attach"&gt;첨부&lt;/th&gt;
+            &lt;th class="data-table__th--actions"&gt;작업&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td class="data-table__drag-handle"&gt;
+                &lt;svg&gt;...&lt;/svg&gt;
+            &lt;/td&gt;
+            &lt;td&gt;정보처리기사&lt;/td&gt;
+            &lt;td&gt;
+                &lt;span class="data-table__attach-indicator--has-file"&gt;...&lt;/span&gt;
+            &lt;/td&gt;
+            &lt;td&gt;
+                &lt;div class="data-table__actions"&gt;
+                    &lt;button class="data-table__btn-icon--edit"&gt;...&lt;/button&gt;
+                    &lt;button class="data-table__btn-icon--attach"&gt;...&lt;/button&gt;
+                    &lt;button class="data-table__btn-icon--delete"&gt;...&lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('액션 버튼 스타일') %}
+    <div class="component-demo" style="gap: var(--space-4);">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-2);">
+            <div class="data-table__actions">
+                <button class="data-table__btn-icon data-table__btn-icon--edit" title="수정">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </button>
+            </div>
+            <small style="color: var(--color-gray-500);">수정</small>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-2);">
+            <div class="data-table__actions">
+                <button class="data-table__btn-icon data-table__btn-icon--delete" title="삭제">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+            <small style="color: var(--color-gray-500);">삭제</small>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-2);">
+            <div class="data-table__actions">
+                <button class="data-table__btn-icon data-table__btn-icon--attach" title="첨부파일">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                </button>
+            </div>
+            <small style="color: var(--color-gray-500);">첨부파일 (없음)</small>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-2);">
+            <div class="data-table__actions">
+                <button class="data-table__btn-icon data-table__btn-icon--attach has-file" title="첨부파일 있음">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                </button>
+            </div>
+            <small style="color: var(--color-gray-500);">첨부파일 (있음)</small>
+        </div>
+    </div>
+    {% call code() %}
+&lt;!-- 수정 버튼 --&gt;
+&lt;button class="data-table__btn-icon data-table__btn-icon--edit"&gt;...&lt;/button&gt;
+
+&lt;!-- 삭제 버튼 --&gt;
+&lt;button class="data-table__btn-icon data-table__btn-icon--delete"&gt;...&lt;/button&gt;
+
+&lt;!-- 첨부파일 버튼 (파일 없음) --&gt;
+&lt;button class="data-table__btn-icon data-table__btn-icon--attach"&gt;...&lt;/button&gt;
+
+&lt;!-- 첨부파일 버튼 (파일 있음) --&gt;
+&lt;button class="data-table__btn-icon data-table__btn-icon--attach has-file"&gt;...&lt;/button&gt;
+    {% endcall %}
+    {% endcall %}
+
+    {% call subsection('첨부파일 인디케이터') %}
+    <div class="component-demo" style="gap: var(--space-6);">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-2);">
+            <span class="data-table__attach-indicator data-table__attach-indicator--has-file" title="첨부파일 있음">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+            </span>
+            <small style="color: var(--color-gray-500);">파일 있음</small>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-2);">
+            <span class="data-table__attach-indicator data-table__attach-indicator--empty">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                </svg>
+            </span>
+            <small style="color: var(--color-gray-500);">파일 없음</small>
+        </div>
+    </div>
+    {% call code() %}
+&lt;!-- 파일 있음 --&gt;
+&lt;span class="data-table__attach-indicator data-table__attach-indicator--has-file"&gt;
+    &lt;svg&gt;...&lt;/svg&gt;
+&lt;/span&gt;
+
+&lt;!-- 파일 없음 --&gt;
+&lt;span class="data-table__attach-indicator data-table__attach-indicator--empty"&gt;
+    &lt;svg&gt;...&lt;/svg&gt;
+&lt;/span&gt;
+    {% endcall %}
+    {% endcall %}
+
 {% endcall %}
 {% endblock %}

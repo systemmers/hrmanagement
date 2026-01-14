@@ -327,3 +327,9 @@ export * from './pages/form.js';
 - settings.js 분리: 3,094 라인 → 9개 모듈
 - 메인 컨트롤러: 116 라인
 - 탭별 모듈: org-management, documents, org-type-settings, patterns-visibility, audit-logs, classifications, org-tree
+
+**Profile Header v3.3 마이그레이션 (2026-01-14)**
+- 신규: `css/shared/components/profile-header.css` (2칼럼 레이아웃, 3개 테마)
+- 테마: Corporate (Blue), Personal (Emerald), Employee Sub (Indigo)
+- 사진: 원형 120x120 → 직사각형 100x130 (증명사진 비율 3:4)
+- Deprecated: `css/domains/employee/header.css`

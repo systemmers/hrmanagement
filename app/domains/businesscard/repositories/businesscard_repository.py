@@ -86,15 +86,19 @@ class BusinessCardRepository(BaseRepository[Attachment]):
         """
         side = data.pop('side', 'front')
         category = self._get_category(side)
+        employee_id = data.get('employee_id')
 
+        # Phase 31: owner_type/owner_id 범용화 적용 (snake_case 사용)
         attachment = Attachment.from_dict({
-            'employeeId': data.get('employee_id'),
-            'fileName': data.get('file_name'),
-            'filePath': data.get('file_path'),
-            'fileType': data.get('file_type'),
-            'fileSize': data.get('file_size'),
+            'owner_type': 'employee',
+            'owner_id': employee_id,
+            'employee_id': employee_id,  # 레거시 호환성
+            'file_name': data.get('file_name'),
+            'file_path': data.get('file_path'),
+            'file_type': data.get('file_type'),
+            'file_size': data.get('file_size'),
             'category': category,
-            'uploadDate': data.get('upload_date')
+            'upload_date': data.get('upload_date')
         })
 
         db.session.add(attachment)
@@ -146,3 +150,39 @@ class BusinessCardRepository(BaseRepository[Attachment]):
             db.session.commit()
 
         return count
+
+    def get_bulk_by_employee_ids(self, employee_ids: List[int]) -> Dict[int, Dict[str, Optional[Attachment]]]:
+        """
+        여러 직원의 명함 이미지 벌크 조회 (N+1 쿼리 방지)
+
+        Args:
+            employee_ids: 직원 ID 목록
+
+        Returns:
+            {employee_id: {'front': Attachment or None, 'back': Attachment or None}}
+        """
+        if not employee_ids:
+            return {}
+
+        # 모든 명함 카테고리 조회
+        categories = [self._get_category(side) for side in self.VALID_SIDES]
+
+        records = Attachment.query.filter(
+            Attachment.employee_id.in_(employee_ids),
+            Attachment.category.in_(categories)
+        ).order_by(Attachment.upload_date.desc()).all()
+
+        # 결과 구조화
+        result = {eid: {'front': None, 'back': None} for eid in employee_ids}
+
+        for record in records:
+            eid = record.employee_id
+            if eid not in result:
+                continue
+
+            # category에서 side 추출 (business_card_front -> front)
+            side = record.category.replace('business_card_', '')
+            if side in self.VALID_SIDES and result[eid][side] is None:
+                result[eid][side] = record
+
+        return result

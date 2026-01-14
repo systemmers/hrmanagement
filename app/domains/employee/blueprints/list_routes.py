@@ -19,6 +19,7 @@ from app.domains.employee.services import employee_service
 from app.domains.contract.services.contract_service import contract_service
 from app.domains.user.services.user_service import user_service
 from app.domains.company.services.company_service import company_service
+from app.domains.businesscard.repositories.businesscard_repository import BusinessCardRepository
 
 
 def register_list_routes(bp: Blueprint):
@@ -105,6 +106,11 @@ def register_list_routes(bp: Blueprint):
         # 명함 컴포넌트용 회사 정보 조회
         company = company_service.get_by_id(company_id) if company_id else None
 
+        # 명함 이미지 벌크 조회 (N+1 쿼리 방지)
+        employee_ids = [emp.get('id') for emp in employees_with_contract if emp.get('id')]
+        businesscard_repo = BusinessCardRepository()
+        business_cards_map = businesscard_repo.get_bulk_by_employee_ids(employee_ids) if employee_ids else {}
+
         # 뷰 모드 파라미터 (카드뷰/명함뷰 필터 적용 시 뷰 유지용)
         view_mode = request.args.get('view', 'list')
 
@@ -114,6 +120,7 @@ def register_list_routes(bp: Blueprint):
                                per_page=per_page,
                                classification_options=classification_options,
                                company=company,
+                               business_cards_map=business_cards_map,
                                view_mode=view_mode)
 
     @bp.route('/employees/pending')

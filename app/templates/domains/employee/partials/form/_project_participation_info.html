@@ -4,24 +4,33 @@
     employee: 직원 객체 (수정 모드일 때)
     project_participation_list: 프로젝트 참여이력 목록
     has_person_contract: 개인계약 연동 여부 (법인에서 개인정보 수정 제한)
+
+    Migration (2026-01-13): .card → .info-section
 #}
+{% from 'shared/macros/_info_display.html' import info_section_start, info_section_end, info_section_body_start, info_section_body_end, svg_icon_briefcase %}
 {# 개인정보 읽기 전용 플래그: 법인 계정 + 개인계약 연동 시 #}
 {% set is_personal_readonly = is_corporate and has_person_contract %}
 <section class="form__section" id="project-participation-info">
-    <div class="card">
-        <div class="card__header">
-            <h2 class="card__title">
-                <i class="fas fa-briefcase"></i>
-                프로젝트 참여이력
-                {% if is_personal_readonly %}<small class="text-muted">(동기화 전용)</small>{% endif %}
-            </h2>
+    {{ info_section_start() }}
+        <div class="info-section__header">
+            <div class="info-section__title">
+                <div class="info-section__icon">
+                    {{ svg_icon_briefcase() }}
+                </div>
+                프로젝트 참여이력{% if is_personal_readonly %} <small class="text-muted">(동기화 전용)</small>{% endif %}
+            </div>
             {% if not is_personal_readonly %}
-            <button type="button" class="btn btn--sm btn--secondary" id="addProjectParticipation">
-                <i class="fas fa-plus"></i> 추가
-            </button>
+            <div class="info-section__actions">
+                <button type="button" class="info-section__add-btn" id="addProjectParticipation">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    추가
+                </button>
+            </div>
             {% endif %}
         </div>
-        <div class="card__body">
+        {{ info_section_body_start() }}
             <div class="dynamic-list" id="projectParticipationList">
                 {# project_participation_list 우선 사용, 없으면 employee.project_participations 사용 #}
                 {# list()로 변환하여 빈 리스트 체크가 정확히 작동하도록 함 #}
@@ -121,6 +130,6 @@
                 {% endif %}
             </div>
             <p class="form__hint">과거 경력에서 참여했던 프로젝트/사업 이력을 입력해 주세요.</p>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>

@@ -23,25 +23,69 @@
 
 .bc-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, var(--bc-width));
-    justify-content: center;
-    gap: var(--space-6);
+    /* auto-fill + minmax: 최소 너비 유지하면서 컨테이너 전체 채움 */
+    grid-template-columns: repeat(auto-fill, minmax(var(--bc-min-width), 1fr));
+    /* 행 높이 균일화: 모든 카드 동일 높이 */
+    grid-auto-rows: 1fr;
+    /* justify-content 제거: 양쪽 여백 없이 전체 채움 */
+    gap: var(--bc-grid-gap);
     padding: var(--space-6) 0;
 }
 
 /* ========================================
-   명함 래퍼 (3D 컨테이너)
+   명함 래퍼 (3D 컨테이너) - 유동적 크기
    ======================================== */
 
 .bc-wrapper {
     perspective: var(--bc-perspective);
-    width: var(--bc-width);
-    height: var(--bc-height);
-    margin: 0 auto;
+    /* 그리드 셀 전체 채움 (셀 크기에 맞춤) */
+    width: 100%;
+    aspect-ratio: var(--bc-aspect-ratio);
+    /* Container Query 컨텍스트 */
+    container-type: inline-size;
 }
 
 /* ========================================
-   명함 카드 (플립 컨테이너)
+   크기 변형 (sm/md/lg) - 고정 크기 컨텍스트용
+   그리드 외부에서 사용 시 (헤더, 사이드바 등)
+   ======================================== */
+
+/* Large: 고정 크기 (400px 기준) - 그리드 외부용 */
+.bc-wrapper--lg {
+    width: 400px;
+    max-width: 400px;
+}
+
+/* Medium: 고정 크기 (340px 기준) - 그리드 외부용 */
+.bc-wrapper--md {
+    width: 340px;
+    max-width: 340px;
+}
+
+/* Small: 고정 크기 (280px 기준) - 그리드 외부용 */
+.bc-wrapper--sm {
+    width: 280px;
+    max-width: 280px;
+}
+
+.bc-wrapper--sm .bc-front,
+.bc-wrapper--sm .bc-back {
+    padding: var(--space-3);
+}
+
+/* ========================================
+   그리드 내부: modifier 무시 (유동 크기 강제)
+   ======================================== */
+.bc-grid .bc-wrapper,
+.bc-grid .bc-wrapper--lg,
+.bc-grid .bc-wrapper--md,
+.bc-grid .bc-wrapper--sm {
+    width: 100%;
+    max-width: none;
+}
+
+/* ========================================
+   명함 카드 (플립 컨테이너) - Container Query 지원
    ======================================== */
 
 .bc-card {
@@ -99,45 +143,67 @@
     text-align: center;
 }
 
-/* 사진 - 상단 중앙 */
+/* 사진 - 상단 중앙 (유동적 크기) */
 .bc-photo {
+    /* Fallback for browsers without container query support */
+    width: var(--bc-photo-size-fallback);
+    height: var(--bc-photo-size-fallback);
+    /* Container query units */
     width: var(--bc-photo-size);
     height: var(--bc-photo-size);
+    min-width: 44px;
+    min-height: 44px;
+    max-width: 90px;
+    max-height: 90px;
     border-radius: var(--radius-full);
     object-fit: cover;
     border: 2px solid var(--bc-dark-700);
     margin-bottom: var(--bc-gap);
+    flex-shrink: 0;
 }
 
-/* 아바타 (사진 없을 때) */
+/* 아바타 (사진 없을 때) - 유동적 크기 */
 .bc-avatar {
+    /* Fallback for browsers without container query support */
+    width: var(--bc-photo-size-fallback);
+    height: var(--bc-photo-size-fallback);
+    /* Container query units */
     width: var(--bc-photo-size);
     height: var(--bc-photo-size);
+    min-width: 44px;
+    min-height: 44px;
+    max-width: 90px;
+    max-height: 90px;
     border-radius: var(--radius-full);
     background: var(--bc-dark-700);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: clamp(0.875rem, 6cqw, 1.75rem);
     font-weight: 700;
     color: var(--bc-text-secondary);
     border: 2px solid var(--bc-dark-600);
     margin-bottom: var(--bc-gap);
+    flex-shrink: 0;
 }
 
-/* 이름 */
+/* 이름 - 유동적 크기 (cqw 배율 증가) */
 .bc-name {
-    font-size: 1.25rem;
+    font-size: clamp(0.9rem, 5cqw, 1.375rem);
     font-weight: 700;
     color: var(--bc-text-primary);
     letter-spacing: -0.01em;
     margin: 0 0 2px 0;
     line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
 }
 
 /* 영문 이름 */
 .bc-name-en {
-    font-size: 0.7rem;
+    font-size: clamp(0.5rem, 2.8cqw, 0.75rem);
     font-weight: 400;
     color: var(--bc-dark-500);
     letter-spacing: 0.02em;
@@ -147,7 +213,7 @@
 
 /* 직책 */
 .bc-position {
-    font-size: 0.85rem;
+    font-size: clamp(0.6rem, 3.5cqw, 0.9rem);
     font-weight: 500;
     color: var(--bc-text-secondary);
     margin: var(--space-1) 0 0 0;
@@ -155,22 +221,22 @@
 
 /* 부서 */
 .bc-department {
-    font-size: 0.75rem;
+    font-size: clamp(0.55rem, 3cqw, 0.8rem);
     color: var(--bc-dark-600);
     margin: 0 0 var(--bc-gap) 0;
 }
 
 /* 회사 정보 (앞면 헤더 대신 부서 옆에 표시) */
 .bc-company-info {
-    font-size: 0.75rem;
+    font-size: clamp(0.55rem, 3cqw, 0.8rem);
     color: var(--bc-dark-600);
 }
 
 /* 연락처 (가로 배치) */
 .bc-contact-row {
     display: flex;
-    gap: var(--space-4);
-    font-size: 0.7rem;
+    gap: var(--space-3);
+    font-size: clamp(0.5rem, 2.8cqw, 0.75rem);
     color: var(--bc-dark-500);
     flex-wrap: wrap;
     justify-content: center;
@@ -184,20 +250,28 @@
 
 .bc-contact-row i {
     color: var(--bc-accent);
-    font-size: 11px;
+    font-size: clamp(8px, 4cqw, 12px);
 }
 
-/* QR 코드 - 우측 하단 절대 위치 */
+/* QR 코드 - 우측 상단 절대 위치 (유동적 크기) */
 .bc-qr {
+    /* Fallback */
+    width: var(--bc-qr-size-fallback);
+    height: var(--bc-qr-size-fallback);
+    /* Container query units */
     width: var(--bc-qr-size);
     height: var(--bc-qr-size);
+    min-width: 32px;
+    min-height: 32px;
+    max-width: 48px;
+    max-height: 48px;
     background: var(--bc-dark-800);
     border: 1px solid var(--bc-dark-700);
     border-radius: var(--radius-sm);
-    padding: 3px;
+    padding: 2px;
     position: absolute;
-    bottom: var(--space-3);
-    right: var(--space-3);
+    top: var(--space-2);
+    right: var(--space-2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -243,34 +317,34 @@
     align-items: center;
     gap: var(--space-2);
     color: var(--bc-dark-300);
-    font-size: 0.875rem;
+    font-size: clamp(0.6rem, 3.5cqw, 0.9rem);
     font-weight: 500;
 }
 
 .bc-back-logo img {
-    width: 20px;
-    height: 20px;
+    width: clamp(14px, 6cqw, 24px);
+    height: clamp(14px, 6cqw, 24px);
     border-radius: var(--radius-sm);
 }
 
 .bc-back-logo i {
     color: var(--bc-accent);
-    font-size: 16px;
+    font-size: clamp(10px, 5cqw, 18px);
 }
 
 /* 상태 배지 */
 .bc-badge {
     background: var(--bc-accent-light);
     color: var(--bc-accent);
-    font-size: 11px;
-    padding: 3px 10px;
+    font-size: clamp(8px, 4cqw, 12px);
+    padding: 2px 8px;
     border-radius: var(--radius-full);
     font-weight: 500;
 }
 
 .bc-badge.bc-badge-warning {
-    background: rgba(246, 173, 85, 0.2);
-    color: #f6ad55;
+    background: var(--bc-warning-bg);
+    color: var(--bc-warning);
 }
 
 .bc-badge.bc-badge-inactive {
@@ -289,27 +363,28 @@
 .bc-back-item {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    font-size: 0.875rem;
+    gap: var(--space-2);
+    font-size: clamp(0.55rem, 3.5cqw, 0.875rem);
     padding: var(--space-1) 0;
 }
 
 .bc-back-item i {
-    width: 16px;
+    width: clamp(10px, 5cqw, 16px);
     color: var(--bc-accent);
     flex-shrink: 0;
-    font-size: 12px;
+    font-size: clamp(8px, 4cqw, 12px);
 }
 
 .bc-back-item-label {
     color: var(--bc-dark-500);
-    min-width: 48px;
-    font-size: 0.75rem;
+    min-width: clamp(32px, 14cqw, 48px);
+    font-size: clamp(0.5rem, 2.8cqw, 0.75rem);
 }
 
 .bc-back-item-value {
     color: var(--bc-dark-300);
     font-weight: 500;
+    font-size: clamp(0.5rem, 3cqw, 0.8rem);
 }
 
 /* 뒷면 푸터 */
@@ -317,13 +392,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: var(--space-3);
+    padding-top: var(--space-2);
     border-top: 1px solid var(--bc-dark-700);
     margin-top: auto;
 }
 
 .bc-website {
-    font-size: 0.75rem;
+    font-size: clamp(0.5rem, 2.8cqw, 0.75rem);
     color: var(--bc-dark-600);
 }
 
@@ -331,56 +406,44 @@
     display: flex;
     align-items: center;
     gap: var(--space-1);
-    font-size: 11px;
+    font-size: clamp(8px, 4cqw, 11px);
     color: var(--bc-accent);
     font-weight: 500;
 }
 
 .bc-verified i {
-    font-size: 10px;
+    font-size: clamp(7px, 3.5cqw, 10px);
 }
 
 /* ========================================
-   반응형 스타일
+   반응형 스타일 - Container Query 기반 자동 스케일링
+   그리드 레이아웃만 조정, 내부 요소는 cqw 단위로 자동 스케일
    ======================================== */
 
 @media (max-width: 768px) {
     .bc-grid {
-        grid-template-columns: 1fr;
-        justify-items: center;
-        gap: var(--space-6);
-    }
-
-    .bc-wrapper {
-        width: var(--bc-width-tablet);
-        height: var(--bc-height-tablet);
+        /* 태블릿: 최소 너비 축소 */
+        grid-template-columns: repeat(auto-fill, minmax(var(--bc-min-width-tablet), 1fr));
+        gap: var(--bc-grid-gap);
     }
 
     .bc-front,
     .bc-back {
         padding: var(--bc-padding-tablet);
     }
-
-    .bc-name {
-        font-size: 1.125rem;
-    }
-
-    .bc-photo,
-    .bc-avatar {
-        width: var(--bc-photo-size-tablet);
-        height: var(--bc-photo-size-tablet);
-    }
-
-    .bc-qr {
-        width: var(--bc-qr-size-tablet);
-        height: var(--bc-qr-size-tablet);
-    }
 }
 
 @media (max-width: 480px) {
+    .bc-grid {
+        /* 모바일: 단일 컬럼 */
+        grid-template-columns: 1fr;
+    }
+
     .bc-wrapper {
-        width: var(--bc-width-mobile);
-        height: var(--bc-height-mobile);
+        /* 모바일: 컨테이너 너비에 맞춤 */
+        width: min(var(--bc-width-default), 100%);
+        height: auto;
+        aspect-ratio: var(--bc-aspect-ratio);
     }
 
     .bc-front,
@@ -388,29 +451,47 @@
         padding: var(--bc-padding-mobile);
     }
 
-    .bc-name {
-        font-size: 1rem;
-    }
-
-    .bc-photo,
-    .bc-avatar {
-        width: var(--bc-photo-size-mobile);
-        height: var(--bc-photo-size-mobile);
-    }
-
-    .bc-qr {
-        width: var(--bc-qr-size-mobile);
-        height: var(--bc-qr-size-mobile);
-    }
-
     .bc-contact-row {
         flex-direction: column;
         gap: var(--space-1);
     }
+}
 
-    .bc-back-item {
-        font-size: 0.75rem;
-    }
+/* ========================================
+   이미지 모드
+   ======================================== */
+
+.bc-wrapper--image .bc-front--image,
+.bc-wrapper--image .bc-back--image {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bc-wrapper--image .bc-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+}
+
+.bc-wrapper--image .bc-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: var(--bc-bg-front);
+    color: var(--bc-dark-500);
+    font-size: 0.875rem;
+    gap: var(--space-2);
+}
+
+.bc-wrapper--image .bc-placeholder i {
+    font-size: 2rem;
+    color: var(--bc-dark-600);
 }
 
 /* ========================================

@@ -3,19 +3,29 @@
     현재 소속 회사에서의 프로젝트 이력
     employee: 직원 객체 (수정 모드일 때)
     hr_project_list: 프로젝트 목록
+
+    Migration (2026-01-13): .card → .info-section
 #}
+{% from 'shared/macros/_info_display.html' import info_section_start, info_section_end, info_section_body_start, info_section_body_end, svg_icon_clipboard %}
 <section class="form__section" id="hr-project-info">
-    <div class="card">
-        <div class="card__header">
-            <h2 class="card__title">
-                <i class="fas fa-project-diagram"></i>
+    {{ info_section_start() }}
+        <div class="info-section__header">
+            <div class="info-section__title">
+                <div class="info-section__icon">
+                    {{ svg_icon_clipboard() }}
+                </div>
                 프로젝트
-            </h2>
-            <button type="button" class="btn btn--sm btn--secondary" id="addHrProject">
-                <i class="fas fa-plus"></i> 추가
-            </button>
+            </div>
+            <div class="info-section__actions">
+                <button type="button" class="info-section__add-btn" id="addHrProject">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    추가
+                </button>
+            </div>
         </div>
-        <div class="card__body">
+        {{ info_section_body_start() }}
             <div class="dynamic-list" id="hrProjectList">
                 {% if hr_project_list and hr_project_list|length > 0 %}
                     {% for project in hr_project_list %}
@@ -96,6 +106,6 @@
                 {% endif %}
             </div>
             <p class="form__hint">현재 소속 회사에서 진행한 프로젝트 이력을 입력해 주세요.</p>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>

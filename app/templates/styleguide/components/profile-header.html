@@ -1,0 +1,691 @@
+{% extends "styleguide/base.html" %}
+
+{% block extra_css %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/profile-header.css') }}">
+<style>
+    .demo-section { margin-bottom: 3rem; }
+    .demo-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--color-gray-900);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .demo-title i { color: var(--color-primary-500); font-size: 0.875rem; }
+    .demo-desc {
+        color: var(--color-gray-600);
+        margin-bottom: 1.5rem;
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
+    .demo-badge {
+        display: inline-flex;
+        padding: 0.125rem 0.5rem;
+        border-radius: 1rem;
+        font-size: 0.6875rem;
+        font-weight: 500;
+    }
+    .demo-badge--blue { background: #dbeafe; color: #1e40af; }
+    .demo-badge--green { background: #d1fae5; color: #047857; }
+    .demo-badge--indigo { background: #e0e7ff; color: #4338ca; }
+    .demo-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+    .demo-item {
+        background: var(--color-gray-50);
+        padding: 1rem;
+        border-radius: 0.5rem;
+    }
+    .demo-item-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--color-gray-700);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .code-block {
+        background: #1e293b;
+        color: #e2e8f0;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        font-family: 'SF Mono', Monaco, monospace;
+        font-size: 0.75rem;
+        overflow-x: auto;
+        margin-top: 1rem;
+    }
+    .code-block code { white-space: pre; }
+    .ux-flow {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 0.75rem;
+        border: 1px solid var(--color-gray-200);
+        margin-bottom: 2rem;
+    }
+    .ux-flow-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--color-gray-800);
+        margin-bottom: 0.5rem;
+    }
+    .ux-flow-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8125rem;
+    }
+    .ux-flow-table th {
+        text-align: left;
+        padding: 0.5rem 0.75rem;
+        background: var(--color-gray-100);
+        font-weight: 600;
+        color: var(--color-gray-700);
+        border-bottom: 1px solid var(--color-gray-200);
+    }
+    .ux-flow-table td {
+        padding: 0.5rem 0.75rem;
+        border-bottom: 1px solid var(--color-gray-100);
+        color: var(--color-gray-600);
+    }
+    .ux-flow-table tr:last-child td { border-bottom: none; }
+    .ux-check { color: #10b981; }
+    .ux-cross { color: #94a3b8; }
+    @media (max-width: 1000px) {
+        .demo-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block styleguide_content %}
+{% from "styleguide/partials/_component_demo.html" import section, subsection, code %}
+
+{% call section('profile-header', 'Profile Header v3.3', '2칼럼 레이아웃 (정보 + 명함)') %}
+
+    {# UX/UI Flow Documentation #}
+    <div class="ux-flow">
+        <div class="ux-flow-title">테마 및 명함 표시 규칙</div>
+        <table class="ux-flow-table">
+            <thead>
+                <tr>
+                    <th>계정 타입</th>
+                    <th>테마</th>
+                    <th>모드</th>
+                    <th>명함</th>
+                    <th>클래스</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="demo-badge demo-badge--blue">Corporate</span></td>
+                    <td>Blue</td>
+                    <td>-</td>
+                    <td><i class="fas fa-check ux-check"></i> 선택</td>
+                    <td><code>.profile-header</code></td>
+                </tr>
+                <tr>
+                    <td rowspan="2"><span class="demo-badge demo-badge--green">Personal</span></td>
+                    <td rowspan="2">Emerald</td>
+                    <td>프로필</td>
+                    <td><i class="fas fa-minus ux-cross"></i> 없음</td>
+                    <td><code>--personal --no-card</code></td>
+                </tr>
+                <tr>
+                    <td>인사카드</td>
+                    <td><i class="fas fa-check ux-check"></i> 있음</td>
+                    <td><code>--personal</code></td>
+                </tr>
+                <tr>
+                    <td rowspan="2"><span class="demo-badge demo-badge--indigo">Employee Sub</span></td>
+                    <td rowspan="2">Indigo</td>
+                    <td>프로필</td>
+                    <td><i class="fas fa-minus ux-cross"></i> 없음</td>
+                    <td><code>--employee --no-card</code></td>
+                </tr>
+                <tr>
+                    <td>인사카드</td>
+                    <td><i class="fas fa-check ux-check"></i> 있음</td>
+                    <td><code>--employee</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    {# 1. Corporate Header #}
+    {% call subsection('Corporate - 법인 관리자') %}
+    <p class="demo-desc">법인 관리자 계정입니다. 명함은 선택적으로 등록할 수 있습니다.</p>
+
+    <div class="profile-header">
+        <div class="profile-header__content">
+            <!-- 정보 칼럼 -->
+            <div class="profile-header__column profile-header__column--info">
+                <!-- 1행: 사진 + 기본정보 -->
+                <div class="profile-header__row">
+                    <div class="profile-header__photo">
+                        <div class="profile-header__photo-initial">김</div>
+                    </div>
+                    <div class="profile-header__info">
+                        <div class="profile-header__name">김관리</div>
+                        <div class="profile-header__name-en">KIM GWANLI</div>
+                        <div class="profile-header__meta">
+                            <div class="profile-header__meta-item">
+                                <i class="fas fa-building"></i>
+                                <span>테스트기업</span>
+                            </div>
+                            <div class="profile-header__meta-item">
+                                <i class="fas fa-user-tie"></i>
+                                <span>관리자</span>
+                            </div>
+                        </div>
+                        <div class="profile-header__status">
+                            <span class="profile-header__status-dot"></span>
+                            Active
+                        </div>
+                    </div>
+                </div>
+                <!-- 2행: 통계 -->
+                <div class="profile-header__row profile-header__row--stats">
+                    <div class="profile-header__stats">
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">직원 수</div>
+                            <div class="profile-header__stat-value">128명</div>
+                        </div>
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">계약 수</div>
+                            <div class="profile-header__stat-value profile-header__stat-value--accent">45건</div>
+                        </div>
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">가입일</div>
+                            <div class="profile-header__stat-value">2023.01</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 명함 칼럼 -->
+            <div class="profile-header__column profile-header__column--card">
+                <span class="profile-header__card-label">Business Card</span>
+                <div class="profile-header__card-placeholder">
+                    <i class="fas fa-id-card"></i>
+                    <span>명함 미등록</span>
+                </div>
+                <div class="profile-header__card-actions">
+                    <button class="profile-header__card-btn">
+                        <i class="fas fa-upload"></i> 업로드
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+
+    {# 2. Personal - Profile Mode #}
+    {% call subsection('Personal - 프로필 모드') %}
+    <p class="demo-desc">개인 회원 프로필입니다. 프로필 모드에서는 명함이 없습니다.</p>
+
+    <div class="profile-header profile-header--personal profile-header--no-card">
+        <div class="profile-header__content">
+            <!-- 정보 칼럼 -->
+            <div class="profile-header__column profile-header__column--info">
+                <!-- 1행: 사진 + 기본정보 -->
+                <div class="profile-header__row">
+                    <div class="profile-header__photo">
+                        <div class="profile-header__photo-initial">이</div>
+                    </div>
+                    <div class="profile-header__info">
+                        <div class="profile-header__name">이영희</div>
+                        <div class="profile-header__name-en">LEE YOUNGHEE</div>
+                        <div class="profile-header__meta">
+                            <div class="profile-header__meta-item">
+                                <i class="fas fa-user"></i>
+                                <span>개인 회원</span>
+                            </div>
+                            <div class="profile-header__meta-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>younghee.lee@gmail.com</span>
+                            </div>
+                            <div class="profile-header__meta-item">
+                                <i class="fas fa-phone"></i>
+                                <span>010-1234-5678</span>
+                            </div>
+                        </div>
+                        <div class="profile-header__status">
+                            <span class="profile-header__status-dot"></span>
+                            Active
+                        </div>
+                    </div>
+                </div>
+                <!-- 2행: 통계 -->
+                <div class="profile-header__row profile-header__row--stats">
+                    <div class="profile-header__stats">
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">계약 수</div>
+                            <div class="profile-header__stat-value profile-header__stat-value--accent">3건</div>
+                        </div>
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">가입일</div>
+                            <div class="profile-header__stat-value">2024.01</div>
+                        </div>
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">회원번호</div>
+                            <div class="profile-header__stat-value">USR-042</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+
+    {# 3. Personal - HR Card Mode #}
+    {% call subsection('Personal - 인사카드 모드') %}
+    <p class="demo-desc">
+        개인 회원이 계약한 법인의 인사카드입니다.<br>
+        <strong>계약 후 법인에서 관리하는 인사정보와 명함이 표시됩니다.</strong>
+    </p>
+
+    <div class="profile-header profile-header--personal">
+        <div class="profile-header__content">
+            <!-- 정보 칼럼 -->
+            <div class="profile-header__column profile-header__column--info">
+                <!-- 1행: 사진 + 기본정보 -->
+                <div class="profile-header__row">
+                    <div class="profile-header__photo">
+                        <div class="profile-header__photo-initial">이</div>
+                    </div>
+                    <div class="profile-header__info">
+                        <div class="profile-header__name">이영희</div>
+                        <div class="profile-header__name-en">LEE YOUNGHEE</div>
+                        <div class="profile-header__meta">
+                            <div class="profile-header__meta-item">
+                                <i class="fas fa-sitemap"></i>
+                                <span>개발팀</span>
+                            </div>
+                            <div class="profile-header__meta-item">
+                                <i class="fas fa-user-tie"></i>
+                                <span>선임 개발자</span>
+                            </div>
+                        </div>
+                        <div class="profile-header__status">
+                            <span class="profile-header__status-dot"></span>
+                            재직중
+                        </div>
+                    </div>
+                </div>
+                <!-- 2행: 통계 -->
+                <div class="profile-header__row profile-header__row--stats">
+                    <div class="profile-header__stats">
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">입사일</div>
+                            <div class="profile-header__stat-value">2024.02.01</div>
+                        </div>
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">재직기간</div>
+                            <div class="profile-header__stat-value">11개월</div>
+                        </div>
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">연차 잔여</div>
+                            <div class="profile-header__stat-value profile-header__stat-value--accent">11일</div>
+                        </div>
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">사번</div>
+                            <div class="profile-header__stat-value">EMP-201</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 명함 칼럼 -->
+            <div class="profile-header__column profile-header__column--card">
+                <span class="profile-header__card-label">Business Card</span>
+                <div class="profile-header__card-placeholder">
+                    <i class="fas fa-id-card"></i>
+                    <span>명함 미등록</span>
+                </div>
+                <div class="profile-header__card-actions">
+                    <button class="profile-header__card-btn">
+                        <i class="fas fa-upload"></i> 업로드
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+
+    {# 4. Employee Sub - Profile Mode #}
+    {% call subsection('Employee Sub - 프로필 모드') %}
+    <p class="demo-desc">
+        법인 직원의 개인 프로필입니다. 프로필 모드에서는 명함이 없습니다.<br>
+        <strong>Personal 프로필과 동일한 구조입니다.</strong>
+    </p>
+
+    <div class="profile-header profile-header--employee profile-header--no-card">
+        <div class="profile-header__content">
+            <!-- 정보 칼럼 -->
+            <div class="profile-header__column profile-header__column--info">
+                <!-- 1행: 사진 + 기본정보 -->
+                <div class="profile-header__row">
+                    <div class="profile-header__photo">
+                        <div class="profile-header__photo-initial">박</div>
+                    </div>
+                    <div class="profile-header__info">
+                        <div class="profile-header__name">박지성</div>
+                        <div class="profile-header__name-en">PARK JISUNG</div>
+                        <div class="profile-header__meta">
+                            <div class="profile-header__meta-item">
+                                <i class="fas fa-user"></i>
+                                <span>개인 프로필</span>
+                            </div>
+                            <div class="profile-header__meta-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>jisung.park@email.com</span>
+                            </div>
+                            <div class="profile-header__meta-item">
+                                <i class="fas fa-phone"></i>
+                                <span>010-9876-5432</span>
+                            </div>
+                        </div>
+                        <div class="profile-header__status">
+                            <span class="profile-header__status-dot"></span>
+                            Active
+                        </div>
+                    </div>
+                </div>
+                <!-- 2행: 통계 -->
+                <div class="profile-header__row profile-header__row--stats">
+                    <div class="profile-header__stats">
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">생년월일</div>
+                            <div class="profile-header__stat-value">1992.05.15</div>
+                        </div>
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">계약 법인</div>
+                            <div class="profile-header__stat-value profile-header__stat-value--accent">1개</div>
+                        </div>
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">가입일</div>
+                            <div class="profile-header__stat-value">2022.03</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+
+    {# 5. Employee Sub - HR Card Mode #}
+    {% call subsection('Employee Sub - 인사카드 모드') %}
+    <p class="demo-desc">
+        계약 후 법인의 인사카드입니다. 법인에서 관리하는 직원 정보와 명함이 표시됩니다.
+    </p>
+
+    <div class="profile-header profile-header--employee">
+        <div class="profile-header__content">
+            <!-- 정보 칼럼 -->
+            <div class="profile-header__column profile-header__column--info">
+                <!-- 1행: 사진 + 기본정보 -->
+                <div class="profile-header__row">
+                    <div class="profile-header__photo">
+                        <div class="profile-header__photo-initial">박</div>
+                    </div>
+                    <div class="profile-header__info">
+                        <div class="profile-header__name">박지성</div>
+                        <div class="profile-header__name-en">PARK JISUNG</div>
+                        <div class="profile-header__meta">
+                            <div class="profile-header__meta-item">
+                                <i class="fas fa-sitemap"></i>
+                                <span>마케팅팀</span>
+                            </div>
+                            <div class="profile-header__meta-item">
+                                <i class="fas fa-user-tie"></i>
+                                <span>대리</span>
+                            </div>
+                        </div>
+                        <div class="profile-header__status">
+                            <span class="profile-header__status-dot"></span>
+                            재직중
+                        </div>
+                    </div>
+                </div>
+                <!-- 2행: 통계 -->
+                <div class="profile-header__row profile-header__row--stats">
+                    <div class="profile-header__stats">
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">입사일</div>
+                            <div class="profile-header__stat-value">2022.07.01</div>
+                        </div>
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">재직기간</div>
+                            <div class="profile-header__stat-value">2년 6개월</div>
+                        </div>
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">연차 잔여</div>
+                            <div class="profile-header__stat-value profile-header__stat-value--accent">8일</div>
+                        </div>
+                        <div class="profile-header__stat">
+                            <div class="profile-header__stat-label">사번</div>
+                            <div class="profile-header__stat-value">EMP-125</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 명함 칼럼 -->
+            <div class="profile-header__column profile-header__column--card">
+                <span class="profile-header__card-label">Business Card</span>
+                <div class="profile-header__card-placeholder">
+                    <i class="fas fa-id-card"></i>
+                    <span>명함 미등록</span>
+                </div>
+                <div class="profile-header__card-actions">
+                    <button class="profile-header__card-btn">
+                        <i class="fas fa-upload"></i> 업로드
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+
+    {# 6. Theme Comparison (Compact) #}
+    {% call subsection('3개 테마 비교 (Compact)') %}
+    <p class="demo-desc">계정별 3개 테마를 컴팩트 버전으로 비교합니다.</p>
+
+    <div class="demo-grid">
+        <div class="demo-item">
+            <div class="demo-item-label">
+                <span class="demo-badge demo-badge--blue">Corporate</span>
+                Blue
+            </div>
+            <div class="profile-header profile-header--compact profile-header--no-card">
+                <div class="profile-header__content">
+                    <div class="profile-header__column profile-header__column--info">
+                        <div class="profile-header__row">
+                            <div class="profile-header__photo">
+                                <div class="profile-header__photo-initial">C</div>
+                            </div>
+                            <div class="profile-header__info">
+                                <div class="profile-header__name">Corporate Admin</div>
+                                <div class="profile-header__meta">
+                                    <div class="profile-header__meta-item">
+                                        <span>법인 관리자</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-item">
+            <div class="demo-item-label">
+                <span class="demo-badge demo-badge--green">Personal</span>
+                Emerald
+            </div>
+            <div class="profile-header profile-header--personal profile-header--compact profile-header--no-card">
+                <div class="profile-header__content">
+                    <div class="profile-header__column profile-header__column--info">
+                        <div class="profile-header__row">
+                            <div class="profile-header__photo">
+                                <div class="profile-header__photo-initial">P</div>
+                            </div>
+                            <div class="profile-header__info">
+                                <div class="profile-header__name">Personal User</div>
+                                <div class="profile-header__meta">
+                                    <div class="profile-header__meta-item">
+                                        <span>개인 회원</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-item">
+            <div class="demo-item-label">
+                <span class="demo-badge demo-badge--indigo">Employee Sub</span>
+                Indigo
+            </div>
+            <div class="profile-header profile-header--employee profile-header--compact profile-header--no-card">
+                <div class="profile-header__content">
+                    <div class="profile-header__column profile-header__column--info">
+                        <div class="profile-header__row">
+                            <div class="profile-header__photo">
+                                <div class="profile-header__photo-initial">E</div>
+                            </div>
+                            <div class="profile-header__info">
+                                <div class="profile-header__name">Employee User</div>
+                                <div class="profile-header__meta">
+                                    <div class="profile-header__meta-item">
+                                        <span>법인 직원</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endcall %}
+
+    {# 7. CSS Classes #}
+    {% call subsection('CSS 클래스') %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>클래스</th>
+                    <th>유형</th>
+                    <th>설명</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>.profile-header</code></td>
+                    <td>Block</td>
+                    <td>메인 컨테이너 (기본: Corporate Blue)</td>
+                </tr>
+                <tr>
+                    <td><code>.profile-header--personal</code></td>
+                    <td>Theme</td>
+                    <td>Personal 테마 (Emerald)</td>
+                </tr>
+                <tr>
+                    <td><code>.profile-header--employee</code></td>
+                    <td>Theme</td>
+                    <td>Employee Sub 테마 (Indigo)</td>
+                </tr>
+                <tr>
+                    <td><code>.profile-header--no-card</code></td>
+                    <td>Modifier</td>
+                    <td>명함 칼럼 숨김 (프로필 모드)</td>
+                </tr>
+                <tr>
+                    <td><code>.profile-header--compact</code></td>
+                    <td>Modifier</td>
+                    <td>컴팩트 버전 (통계 숨김)</td>
+                </tr>
+                <tr>
+                    <td><code>.profile-header__column--info</code></td>
+                    <td>Element</td>
+                    <td>정보 칼럼 (2행: 기본정보 + 통계)</td>
+                </tr>
+                <tr>
+                    <td><code>.profile-header__column--card</code></td>
+                    <td>Element</td>
+                    <td>명함 칼럼 (2행: 명함 + 액션)</td>
+                </tr>
+                <tr>
+                    <td><code>.profile-header__photo</code></td>
+                    <td>Element</td>
+                    <td>프로필 사진 (100x130 증명사진 비율)</td>
+                </tr>
+                <tr>
+                    <td><code>.profile-header__row--stats</code></td>
+                    <td>Element</td>
+                    <td>통계 행 (border-top 구분)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endcall %}
+
+    {# 8. Usage Code #}
+    {% call subsection('사용 예시') %}
+    <div class="code-block">
+<code>&lt;!-- 2칼럼 레이아웃 구조 --&gt;
+&lt;div class="profile-header"&gt;
+    &lt;div class="profile-header__content"&gt;
+        &lt;!-- 정보 칼럼 --&gt;
+        &lt;div class="profile-header__column profile-header__column--info"&gt;
+            &lt;!-- 1행: 사진 + 기본정보 --&gt;
+            &lt;div class="profile-header__row"&gt;
+                &lt;div class="profile-header__photo"&gt;...&lt;/div&gt;
+                &lt;div class="profile-header__info"&gt;...&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;!-- 2행: 통계 --&gt;
+            &lt;div class="profile-header__row profile-header__row--stats"&gt;
+                &lt;div class="profile-header__stats"&gt;...&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;!-- 명함 칼럼 --&gt;
+        &lt;div class="profile-header__column profile-header__column--card"&gt;
+            &lt;span class="profile-header__card-label"&gt;...&lt;/span&gt;
+            &lt;div class="profile-header__card-placeholder"&gt;...&lt;/div&gt;
+            &lt;div class="profile-header__card-actions"&gt;...&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Personal - 프로필 모드 (명함 없음) --&gt;
+&lt;div class="profile-header profile-header--personal profile-header--no-card"&gt;
+    ...
+&lt;/div&gt;
+
+&lt;!-- Personal - 인사카드 모드 (명함 있음) --&gt;
+&lt;div class="profile-header profile-header--personal"&gt;
+    ...
+&lt;/div&gt;
+
+&lt;!-- Employee Sub - 프로필 모드 (명함 없음) --&gt;
+&lt;div class="profile-header profile-header--employee profile-header--no-card"&gt;
+    ...
+&lt;/div&gt;
+
+&lt;!-- Employee Sub - 인사카드 모드 (명함 있음) --&gt;
+&lt;div class="profile-header profile-header--employee"&gt;
+    ...
+&lt;/div&gt;</code>
+    </div>
+    {% endcall %}
+
+{% endcall %}
+{% endblock %}

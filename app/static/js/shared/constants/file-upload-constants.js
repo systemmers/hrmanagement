@@ -59,15 +59,12 @@ export function isAllowedFileSize(size, maxSize = MAX_FILE_SIZE) {
 
 /**
  * 파일 크기를 읽기 쉬운 형식으로 변환
+ * SSOT: shared/utils/formatting.js -> window.HRFormatters.formatFileSize
  * @param {number} bytes - 바이트 단위 크기
  * @returns {string}
  */
 export function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return window.HRFormatters?.formatFileSize?.(bytes) || '0 Bytes';
 }
 
 /**

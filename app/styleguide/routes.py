@@ -5,9 +5,11 @@ Styleguide Routes
 from flask import render_template, redirect, url_for
 from . import styleguide_bp
 from .config import NAVIGATION, STYLEGUIDE_META
+from app.shared.utils.decorators import login_required
 
 
 @styleguide_bp.route('/')
+@login_required
 def index():
     """스타일가이드 메인 페이지"""
     return render_template(
@@ -19,12 +21,14 @@ def index():
 
 
 @styleguide_bp.route('/foundation/')
+@login_required
 def foundation_index():
     """Foundation 섹션 인덱스 - 첫 번째 항목으로 리다이렉트"""
     return redirect(url_for('styleguide.foundation', page='colors'))
 
 
 @styleguide_bp.route('/foundation/<page>')
+@login_required
 def foundation(page):
     """Foundation 섹션 (colors, typography, spacing, shadows)"""
     valid_pages = [item['id'] for item in NAVIGATION['foundation']['items']]
@@ -41,12 +45,14 @@ def foundation(page):
 
 
 @styleguide_bp.route('/components/')
+@login_required
 def components_index():
     """Components 섹션 인덱스 - 첫 번째 항목으로 리다이렉트"""
     return redirect(url_for('styleguide.component', component='buttons'))
 
 
 @styleguide_bp.route('/components/<component>')
+@login_required
 def component(component):
     """컴포넌트 섹션"""
     valid_components = [item['id'] for item in NAVIGATION['components']['items']]

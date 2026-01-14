@@ -16,16 +16,17 @@
     /* ========================================
        크기 (ISO 7810 ID-1 비율 85.6mm x 54mm)
        ======================================== */
-    --bc-width: 380px;
-    --bc-height: 240px;
+    --bc-width-default: 320px;
+    --bc-width-min: 280px;
+    --bc-width-max: 400px;
+    --bc-aspect-ratio: 1.585;  /* ISO 7810 ID-1 비율 */
 
-    /* Tablet (768px 이하) */
-    --bc-width-tablet: 340px;
-    --bc-height-tablet: 214px;
+    /* 그리드 최소 너비 (minmax용) */
+    --bc-min-width: 280px;
+    --bc-min-width-tablet: 260px;
 
-    /* Mobile (480px 이하) */
-    --bc-width-mobile: 300px;
-    --bc-height-mobile: 189px;
+    /* 그리드 간격 */
+    --bc-grid-gap: var(--space-6);
 
     /* ========================================
        플립 애니메이션
@@ -35,23 +36,23 @@
     --bc-perspective: 1200px;
 
     /* ========================================
-       간격
+       간격 - 유동적 (컨테이너 기준)
        ======================================== */
-    --bc-padding: var(--space-4);
-    --bc-padding-tablet: var(--space-3);
-    --bc-padding-mobile: var(--space-2);
-    --bc-gap: var(--space-2);
+    --bc-padding: clamp(12px, 5cqw, 20px);
+    --bc-padding-tablet: clamp(10px, 4cqw, 16px);
+    --bc-padding-mobile: clamp(8px, 3cqw, 12px);
+    --bc-gap: clamp(6px, 2.5cqw, 12px);
 
     /* ========================================
-       사진/QR 크기 - Executive Dark
+       사진/QR 크기 - 상대 단위 (컨테이너 기준)
        ======================================== */
-    --bc-photo-size: 72px;
-    --bc-photo-size-tablet: 64px;
-    --bc-photo-size-mobile: 56px;
+    /* 사진: 컨테이너 너비의 약 22% */
+    --bc-photo-size: 22cqw;
+    --bc-photo-size-fallback: 64px;  /* cqw 미지원 브라우저용 */
 
-    --bc-qr-size: 44px;
-    --bc-qr-size-tablet: 40px;
-    --bc-qr-size-mobile: 36px;
+    /* QR: 컨테이너 너비의 약 14% */
+    --bc-qr-size: 14cqw;
+    --bc-qr-size-fallback: 40px;
 
     /* ========================================
        Executive Dark 색상
@@ -68,6 +69,10 @@
     /* 포인트 색상 */
     --bc-accent: #63b3ed;
     --bc-accent-light: rgba(99, 179, 237, 0.2);
+
+    /* 상태 색상 */
+    --bc-warning: #f6ad55;
+    --bc-warning-bg: rgba(246, 173, 85, 0.2);
 
     /* 테두리 */
     --bc-border-color: var(--bc-dark-800);

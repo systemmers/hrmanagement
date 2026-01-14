@@ -97,13 +97,13 @@ class BusinessCardService:
             # 직원 존재 확인
             employee = self._employee_repo.find_by_id(employee_id)
             if not employee:
-                return ServiceResult.failure('직원을 찾을 수 없습니다.')
+                return ServiceResult.fail('직원을 찾을 수 없습니다.')
 
             cards = self.repository.get_by_employee(employee_id)
-            return ServiceResult.success(data=cards)
+            return ServiceResult.ok(data=cards)
 
         except Exception as e:
-            return ServiceResult.failure(f'명함 조회 중 오류: {str(e)}')
+            return ServiceResult.fail(f'명함 조회 중 오류: {str(e)}')
 
     def get_business_card(self, employee_id: int, side: str) -> ServiceResult:
         """
@@ -115,16 +115,16 @@ class BusinessCardService:
         """
         try:
             if side not in ['front', 'back']:
-                return ServiceResult.failure('side는 front 또는 back이어야 합니다.')
+                return ServiceResult.fail('side는 front 또는 back이어야 합니다.')
 
             card = self.repository.get_one_by_side(employee_id, side)
             if not card:
-                return ServiceResult.failure(f'명함 {side} 이미지를 찾을 수 없습니다.', code='NOT_FOUND')
+                return ServiceResult.fail(f'명함 {side} 이미지를 찾을 수 없습니다.', error_code='NOT_FOUND')
 
-            return ServiceResult.success(data=card)
+            return ServiceResult.ok(data=card)
 
         except Exception as e:
-            return ServiceResult.failure(f'명함 조회 중 오류: {str(e)}')
+            return ServiceResult.fail(f'명함 조회 중 오류: {str(e)}')
 
     def upload_business_card(
         self,
@@ -146,19 +146,19 @@ class BusinessCardService:
         try:
             # side 검증
             if side not in ['front', 'back']:
-                return ServiceResult.failure('side는 front 또는 back이어야 합니다.')
+                return ServiceResult.fail('side는 front 또는 back이어야 합니다.')
 
             # 직원 존재 확인
             employee = self._employee_repo.find_by_id(employee_id)
             if not employee:
-                return ServiceResult.failure('직원을 찾을 수 없습니다.')
+                return ServiceResult.fail('직원을 찾을 수 없습니다.')
 
             # 파일 검증
             if not file or file.filename == '':
-                return ServiceResult.failure('파일이 선택되지 않았습니다.')
+                return ServiceResult.fail('파일이 선택되지 않았습니다.')
 
             if not self._allowed_image_file(file.filename):
-                return ServiceResult.failure(
+                return ServiceResult.fail(
                     '이미지 파일만 업로드 가능합니다. (jpg, png, gif, webp)'
                 )
 
@@ -168,7 +168,7 @@ class BusinessCardService:
             file.seek(0)
 
             if file_size > self.MAX_IMAGE_SIZE:
-                return ServiceResult.failure('파일 크기가 5MB를 초과합니다.')
+                return ServiceResult.fail('파일 크기가 5MB를 초과합니다.')
 
             # 기존 명함 이미지 삭제
             old_card = self.repository.get_one_by_side(employee_id, side)
@@ -197,7 +197,7 @@ class BusinessCardService:
                 'upload_date': datetime.now().strftime('%Y-%m-%d')
             })
 
-            return ServiceResult.success(
+            return ServiceResult.ok(
                 data={
                     'side': side,
                     'file_path': web_path,
@@ -207,7 +207,7 @@ class BusinessCardService:
             )
 
         except Exception as e:
-            return ServiceResult.failure(f'명함 업로드 중 오류: {str(e)}')
+            return ServiceResult.fail(f'명함 업로드 중 오류: {str(e)}')
 
     def delete_business_card(self, employee_id: int, side: str) -> ServiceResult:
         """
@@ -220,14 +220,14 @@ class BusinessCardService:
         try:
             # side 검증
             if side not in ['front', 'back']:
-                return ServiceResult.failure('side는 front 또는 back이어야 합니다.')
+                return ServiceResult.fail('side는 front 또는 back이어야 합니다.')
 
             # 기존 명함 이미지 확인 및 삭제
             old_card = self.repository.get_one_by_side(employee_id, side)
             if not old_card:
-                return ServiceResult.failure(
+                return ServiceResult.fail(
                     f'명함 {side} 이미지를 찾을 수 없습니다.',
-                    code='NOT_FOUND'
+                    error_code='NOT_FOUND'
                 )
 
             # 파일 삭제
@@ -237,12 +237,12 @@ class BusinessCardService:
             # DB 삭제
             self.repository.delete_by_side(employee_id, side)
 
-            return ServiceResult.success(
+            return ServiceResult.ok(
                 message=f'명함 {side} 이미지가 삭제되었습니다.'
             )
 
         except Exception as e:
-            return ServiceResult.failure(f'명함 삭제 중 오류: {str(e)}')
+            return ServiceResult.fail(f'명함 삭제 중 오류: {str(e)}')
 
 
 # 싱글톤 인스턴스

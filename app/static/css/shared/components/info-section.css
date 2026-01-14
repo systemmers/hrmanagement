@@ -14,6 +14,7 @@
     background: var(--color-pure-white);
     border-radius: var(--radius-xl);
     border: 1px solid var(--color-gray-200);
+    box-shadow: var(--shadow-sm);
     margin-bottom: var(--space-6);
     overflow: hidden;
 }
@@ -58,6 +59,10 @@
     font-weight: 600;
     color: var(--color-gray-800);
     margin: 0;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
 }
 
 /* 액션 버튼 영역 */
@@ -102,7 +107,12 @@
     padding: 0;
 }
 
-/* 섹션 본문 - 패딩 있는 버전 */
+/* 섹션 본문 - 패딩 없는 버전 (테이블용) */
+.info-section__body--no-padding {
+    padding: 0;
+}
+
+/* 섹션 본문 - 패딩 큰 버전 (styleguide 호환) */
 .info-section__body--padded {
     padding: var(--space-6);
 }
@@ -146,6 +156,72 @@
 .info-section--borderless {
     border: none;
     box-shadow: var(--shadow-sm);
+}
+
+/* ========================================
+   Elements - 추가 요소
+   ======================================== */
+
+/* 아이콘 SVG 크기 */
+.info-section__icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* 추가 버튼 */
+.info-section__add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1-5);
+    padding: var(--space-2) var(--space-3-5);
+    background: var(--color-primary-600);
+    color: var(--color-pure-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.info-section__add-btn:hover {
+    background: var(--color-primary-700);
+}
+
+.info-section__add-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* 섹션 본문 - 테이블용 (패딩 없음, 명시적) */
+.info-section__body--table {
+    padding: 0;
+}
+
+/* info-table 직접 포함 시 전체 너비 */
+.info-section__body > .info-table {
+    margin: 0;
+    width: 100%;
+}
+
+/* table-container 직접 포함 시 전체 너비 */
+.info-section__body > .table-container {
+    margin: 0;
+    width: 100%;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+}
+
+/* 편집 모드 버튼 가시성 */
+.info-section--editing .info-section__edit-btn {
+    display: none;
+}
+
+.info-section:not(.info-section--editing) .info-section__save-btn,
+.info-section:not(.info-section--editing) .info-section__cancel-btn {
+    display: none;
 }
 
 /* ========================================

@@ -1,95 +1,79 @@
 {#
     직원 상세 - 기본정보 섹션들
-    섹션 1-6: 개인정보, 소속정보, 계약정보, 급여정보, 복리후생, 4대보험
+    섹션 1-6: 개인정보, 소속정보, 계약정보, 급여정보, 복리후생, 가족정보
+
+    Migration (2026-01-13): .info-grid → .info-table (HR Card 스타일가이드)
 #}
-{% from 'shared/macros/_info_display.html' import info_item, card_header, section_title %}
+{% from 'shared/macros/_info_display.html' import section_title, info_section_start, info_section_end, info_section_header, info_section_header_with_action, info_section_body_start, info_section_body_end, info_table_start, info_table_end, info_table_row, info_table_row_start, info_table_row_end, info_table_cell, info_table_cell_custom, svg_icon_user, svg_icon_building, svg_icon_document, svg_icon_currency, svg_icon_heart, svg_icon_users, data_table_th_drag, data_table_td_drag, data_table_th_actions, data_table_actions_full %}
 
 {# 섹션 1: 개인 기본정보 #}
 <section id="personal-info" class="content-section">
     {{ section_title('개인 기본정보') }}
-    <div class="card">
-        {{ card_header('개인 기본정보', 'fas fa-user') }}
-        <div class="card__body">
-            <div class="info-grid">
-                {# FieldRegistry personal_basic 섹션 순서 적용 - Phase 28 라벨 통일 #}
-                {{ info_item('이름', employee.name) }}
-                {{ info_item('영문 이름', employee.english_name) }}
-                {{ info_item('한자 이름', employee.chinese_name) }}
-                {{ info_item('외국어 이름', employee.foreign_name) }}
-                <div class="info-item">
-                    <div class="info-label">생년월일</div>
-                    <div class="info-value{% if not employee.birth_date %} empty{% endif %}">
-                        {{ employee.birth_date or '정보 없음' }}{% if employee.lunar_birth %} <span class="badge badge--info">음력</span>{% endif %}
-                    </div>
-                </div>
-                {{ info_item('나이', (employee.age ~ '세') if employee.age else none) }}
-                {{ info_item('성별', get_gender_label(employee.gender)) }}
-                {{ info_item('국적', get_nationality_label(employee.nationality)) }}
-                {{ info_item('주민등록번호', employee.resident_number) }}
-                <div class="info-item">
-                    <div class="info-label">결혼여부</div>
-                    <div class="info-value{% if not employee.marital_status %} empty{% endif %}">
-                        {{ get_marital_status_label(employee.marital_status) or '정보 없음' }}
-                    </div>
-                </div>
-                {# FieldRegistry contact 섹션 순서 적용 #}
-                {{ info_item('휴대전화', format_phone(employee.phone)) }}
-                {{ info_item('자택전화', format_phone(employee.home_phone) if format_phone is defined and employee.home_phone else employee.home_phone) }}
-                {{ info_item('이메일', employee.email, highlight=true) }}
-                <div class="info-item">
-                    <div class="info-label">비상연락처</div>
-                    <div class="info-value{% if not employee.emergency_contact %} empty{% endif %}">
-                        {{ employee.emergency_contact or '정보 없음' }}{% if employee.emergency_relation %} ({{ employee.emergency_relation }}){% endif %}
-                    </div>
-                </div>
-                {# Phase 28: 계좌정보 (기본정보 섹션으로 이동) #}
-                {{ info_item('은행명', employee.bank_name) }}
-                {{ info_item('계좌번호', employee.account_number) }}
-                {{ info_item('예금주', employee.account_holder) }}
-                {# FieldRegistry personal_extended 섹션 - Phase 28: blood_type, religion 삭제 #}
-                {{ info_item('취미', employee.hobby) }}
-                {{ info_item('특기', employee.specialty) }}
-                {{ info_item('장애정보', employee.disability_info) }}
-            </div>
-            <div class="mt-5">
-                {{ info_item('주민등록상 주소', employee.address) }}
-                {{ info_item('상세주소', employee.detailed_address) }}
-            </div>
-            {# 실제 거주 주소 (항상 표시) #}
-            <div class="mt-4">
-                <h5 class="info-subsection-title">실제 거주 주소</h5>
-                {{ info_item('실제 거주지', employee.actual_address) }}
-                {{ info_item('실제 거주지 상세주소', employee.actual_detailed_address) }}
-            </div>
-        </div>
-    </div>
+    {{ info_section_start() }}
+        {{ info_section_header_with_action('개인 기본정보', svg_icon_user(), 'btn-edit-personal', '수정') }}
+        {{ info_section_body_start() }}
+            {{ info_table_start() }}
+                {# FieldRegistry personal_basic 섹션 순서 적용 #}
+                {{ info_table_row('이름', employee.name, '영문 이름', employee.english_name) }}
+                {{ info_table_row('한자 이름', employee.chinese_name, '외국어 이름', employee.foreign_name) }}
+
+                {# 생년월일 - 커스텀 값 (음력 배지) #}
+                {{ info_table_row_start() }}
+                    {% call info_table_cell_custom('생년월일') %}
+                        {% if employee.birth_date %}
+                            {{ employee.birth_date }}{% if employee.lunar_birth %} <span class="badge badge--info">음력</span>{% endif %}
+                        {% else %}
+                            <span class="info-table__value--empty">미등록</span>
+                        {% endif %}
+                    {% endcall %}
+                    {{ info_table_cell('나이', (employee.age ~ '세') if employee.age else none) }}
+                {{ info_table_row_end() }}
+
+                {{ info_table_row('성별', get_gender_label(employee.gender), '국적', get_nationality_label(employee.nationality)) }}
+                {{ info_table_row('주민등록번호', employee.resident_number, '우편번호', employee.postal_code, 'masked') }}
+
+                {# 결혼여부 - 커스텀 값 #}
+                {{ info_table_row_start() }}
+                    {% call info_table_cell_custom('결혼여부') %}
+                        {{ get_marital_status_label(employee.marital_status) or '미등록' }}
+                    {% endcall %}
+                    {{ info_table_cell('휴대전화', format_phone(employee.phone)) }}
+                {{ info_table_row_end() }}
+
+                {{ info_table_row('자택전화', format_phone(employee.home_phone) if format_phone is defined and employee.home_phone else employee.home_phone, '이메일', employee.email) }}
+
+                {# 비상연락처 - 2열 (연락처 / 관계) #}
+                {{ info_table_row('비상연락처', employee.emergency_contact, '비상연락처 관계', employee.emergency_relation) }}
+
+                {# 계좌정보 #}
+                {{ info_table_row('은행명', employee.bank_name, '계좌번호', employee.account_number) }}
+                {{ info_table_row('예금주', employee.account_holder, '취미', employee.hobby) }}
+                {{ info_table_row('특기', employee.specialty, '장애정보', employee.disability_info) }}
+
+                {# 주소 정보 - 2열 배치 #}
+                {{ info_table_row('주민등록상 주소', employee.address, '상세주소', employee.detailed_address) }}
+                {{ info_table_row('실제 거주지', employee.actual_address, '실제 거주지 상세', employee.actual_detailed_address) }}
+            {{ info_table_end() }}
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>
 
 {# 섹션 2: 소속정보 (인사카드 전용) #}
 {% if page_mode == 'hr_card' %}
 <section id="organization-info" class="content-section">
     {{ section_title('소속정보') }}
-    <div class="card">
-        {{ card_header('소속정보', 'fas fa-building') }}
-        <div class="card__body">
-            <div class="info-grid">
-                {# Phase 28: 소속 → 소속 조직, 부서 → 부서명 라벨 통일 #}
-                {{ info_item('소속 조직', employee.department, highlight=true) }}
-                {{ info_item('부서명', employee.team or employee.department, highlight=true) }}
-                {{ info_item('직위', employee.position) }}
-                {{ info_item('직급', employee.job_grade) }}
-                {{ info_item('직책', employee.job_title) }}
-                {{ info_item('직무', employee.job_role) }}
-                {# Phase 28: 사원번호 → 사번 라벨 통일 #}
-                {{ info_item('사번', employee.employee_number or 'EMP-%03d'|format(employee.id)) }}
-                {{ info_item('근무지', employee.work_location or '본사') }}
-                {# 내선번호/회사이메일 - 프로필에서 소속정보로 이동 #}
-                {{ info_item('내선번호', employee.internal_phone) }}
-                {{ info_item('회사 이메일', employee.company_email) }}
-                {# Phase 28: 입사일/재직상태/고용형태/재직기간 → 계약정보 섹션으로 이동 #}
-            </div>
-        </div>
-    </div>
+    {{ info_section_start() }}
+        {{ info_section_header_with_action('소속정보', svg_icon_building(), 'btn-edit-organization', '수정') }}
+        {{ info_section_body_start() }}
+            {{ info_table_start() }}
+                {{ info_table_row('소속 조직', employee.department, '부서명', employee.team or employee.department) }}
+                {{ info_table_row('직위', employee.position, '직급', employee.job_grade) }}
+                {{ info_table_row('직책', employee.job_title, '직무', employee.job_role) }}
+                {{ info_table_row('사번', employee.employee_number or 'EMP-%03d'|format(employee.id), '근무지', employee.work_location or '본사') }}
+                {{ info_table_row('내선번호', employee.internal_phone, '회사 이메일', employee.company_email) }}
+            {{ info_table_end() }}
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>
 {% endif %}
 
@@ -97,43 +81,35 @@
 {% if page_mode == 'hr_card' %}
 <section id="contract-info" class="content-section">
     {{ section_title('계약정보') }}
-    <div class="card">
-        {{ card_header('계약정보', 'fas fa-file-contract') }}
-        <div class="card__body">
-            <div class="info-grid">
-                {# Phase 28: 소속정보에서 이동된 필드들 #}
-                {{ info_item('입사일', employee.hire_date) }}
-                <div class="info-item">
-                    <div class="info-label">재직 상태</div>
-                    <div class="info-value">
+    {{ info_section_start() }}
+        {{ info_section_header_with_action('계약정보', svg_icon_document(), 'btn-edit-contract', '수정') }}
+        {{ info_section_body_start() }}
+            {{ info_table_start() }}
+                {# 입사일 및 재직 상태 #}
+                {{ info_table_row_start() }}
+                    {{ info_table_cell('입사일', employee.hire_date) }}
+                    {% call info_table_cell_custom('재직 상태') %}
                         <span class="badge {{ get_status_badge_class(employee.status) }}">
                             {{ get_status_text(employee.status) }}
                         </span>
-                    </div>
-                </div>
-                {{ info_item('고용형태', get_employment_type_label(employee.employment_type)) }}
-                {{ info_item('재직기간', calculate_tenure(employee.hire_date), highlight=true) }}
-                {# 기존 계약정보 필드들 #}
-                {{ info_item('계약형태', contract.contract_type if contract else (get_employment_type_label(employee.employment_type) if employee.employment_type else none)) }}
-                {{ info_item('계약기간', contract.contract_period if contract else (employee.contract_period or '무기한')) }}
-                {{ info_item('계약시작일', contract.contract_date if contract else employee.hire_date) }}
-                {{ info_item('직원유형', contract.employee_type if contract else none) }}
-                {{ info_item('근무형태', contract.work_type if contract else none) }}
-                {# Phase 28: 시용기간 종료 → 수습종료일 라벨 통일 #}
-                {{ info_item('수습종료일', employee.probation_end) }}
-                {{ info_item('근무시간', contract.work_hours if contract and contract.work_hours else '09:00 ~ 18:00') }}
-                {{ info_item('휴게시간', contract.break_hours if contract and contract.break_hours else '12:00 ~ 13:00') }}
+                    {% endcall %}
+                {{ info_table_row_end() }}
+
+                {{ info_table_row('고용형태', get_employment_type_label(employee.employment_type), '재직기간', calculate_tenure(employee.hire_date)) }}
+                {{ info_table_row('계약형태', contract.contract_type if contract else (get_employment_type_label(employee.employment_type) if employee.employment_type else none), '계약기간', contract.contract_period if contract else (employee.contract_period or '무기한')) }}
+                {{ info_table_row('계약시작일', contract.contract_date if contract else employee.hire_date, '직원유형', contract.employee_type if contract else none) }}
+                {{ info_table_row('근무형태', contract.work_type if contract else none, '수습종료일', employee.probation_end) }}
+                {{ info_table_row('근무시간', contract.work_hours if contract and contract.work_hours else '09:00 ~ 18:00', '휴게시간', contract.break_hours if contract and contract.break_hours else '12:00 ~ 13:00') }}
+
                 {% if employee.resignation_date %}
-                {{ info_item('퇴사일', employee.resignation_date) }}
+                {{ info_table_row('퇴사일', employee.resignation_date, none, none) }}
                 {% endif %}
                 {% if employee.data_retention_until %}
-                {{ info_item('데이터 보관 만료일', employee.data_retention_until) }}
+                {{ info_table_row('데이터 보관 만료일', employee.data_retention_until, none, none) }}
                 {% endif %}
-            </div>
-
-            {# 퇴직자 스냅샷 정보 표시 #}
-        </div>
-    </div>
+            {{ info_table_end() }}
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>
 {% endif %}
 
@@ -141,22 +117,17 @@
 {% if page_mode == 'hr_card' %}
 <section id="salary-info" class="content-section">
     {{ section_title('급여정보') }}
-    <div class="card">
-        {{ card_header('급여정보', 'fas fa-won-sign') }}
-        <div class="card__body">
-            <div class="info-grid">
-                {{ info_item('급여형태', salary.salary_type if salary else none) }}
-                {{ info_item('기본급', ('{:,}'.format(salary.base_salary) ~ '원') if salary else none) }}
-                {{ info_item('직책수당', ('{:,}'.format(salary.position_allowance) ~ '원') if salary else none) }}
-                {{ info_item('식대', ('{:,}'.format(salary.meal_allowance) ~ '원') if salary else none) }}
-                {{ info_item('교통비', ('{:,}'.format(salary.transportation_allowance) ~ '원') if salary else none) }}
-                {{ info_item('총 급여', ('{:,}'.format(salary.total_salary) ~ '원') if salary else none) }}
-                {{ info_item('급여지급일', ('매월 ' ~ salary.payment_day ~ '일') if salary else none) }}
-                {{ info_item('급여지급방법', salary.payment_method if salary else none) }}
-                {# Phase 28: 급여계좌는 기본정보 섹션으로 이동됨 #}
-            </div>
-        </div>
-    </div>
+    {{ info_section_start() }}
+        {{ info_section_header_with_action('급여정보', svg_icon_currency(), 'btn-edit-salary', '수정') }}
+        {{ info_section_body_start() }}
+            {{ info_table_start() }}
+                {{ info_table_row('급여형태', salary.salary_type if salary else none, '기본급', ('{:,}'.format(salary.base_salary) ~ '원') if salary else none) }}
+                {{ info_table_row('직책수당', ('{:,}'.format(salary.position_allowance) ~ '원') if salary else none, '식대', ('{:,}'.format(salary.meal_allowance) ~ '원') if salary else none) }}
+                {{ info_table_row('교통비', ('{:,}'.format(salary.transportation_allowance) ~ '원') if salary else none, '총 급여', ('{:,}'.format(salary.total_salary) ~ '원') if salary else none) }}
+                {{ info_table_row('급여지급일', ('매월 ' ~ salary.payment_day ~ '일') if salary else none, '급여지급방법', salary.payment_method if salary else none) }}
+            {{ info_table_end() }}
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>
 {% endif %}
 
@@ -164,67 +135,66 @@
 {% if page_mode == 'hr_card' %}
 <section id="benefit-info" class="content-section">
     {{ section_title('연차 및 복리후생') }}
-    <div class="card">
-        <div class="card__header">
-            <h3 class="card__title">
-                <i class="fas fa-umbrella-beach"></i>
-                연차 및 복리후생 {% if benefit %}({{ benefit.year }}년){% endif %}
-            </h3>
-        </div>
-        <div class="card__body">
-            <div class="info-grid">
-                {{ info_item('연차 발생일수', (benefit.annual_leave_granted|string ~ '일') if benefit else none) }}
-                {{ info_item('연차 사용일수', (benefit.annual_leave_used|string ~ '일') if benefit else none) }}
-                {{ info_item('연차 잔여일수', (benefit.annual_leave_remaining|string ~ '일') if benefit else none, highlight=true) }}
-                {{ info_item('퇴직금 유형', benefit.severance_type if benefit else none) }}
-                {{ info_item('퇴직금 적립방법', benefit.severance_method if benefit else none) }}
-            </div>
-        </div>
-    </div>
+    {{ info_section_start() }}
+        {{ info_section_header_with_action('연차 및 복리후생' ~ (' (' ~ benefit.year ~ '년)' if benefit else ''), svg_icon_heart(), 'btn-edit-benefit', '수정') }}
+        {{ info_section_body_start() }}
+            {{ info_table_start() }}
+                {{ info_table_row('연차 발생일수', (benefit.annual_leave_granted|string ~ '일') if benefit else none, '연차 사용일수', (benefit.annual_leave_used|string ~ '일') if benefit else none) }}
+                {{ info_table_row('연차 잔여일수', (benefit.annual_leave_remaining|string ~ '일') if benefit else none, '퇴직금 유형', benefit.severance_type if benefit else none) }}
+                {{ info_table_row('퇴직금 적립방법', benefit.severance_method if benefit else none, none, none) }}
+            {{ info_table_end() }}
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>
 {% endif %}
 
 {# 섹션 6: 가족정보 #}
 <section id="family-info" class="content-section">
     {{ section_title('가족정보') }}
-    <div class="card">
-        {{ card_header('가족정보', 'fas fa-users') }}
-        <div class="card__body">
+    {{ info_section_start() }}
+        {{ info_section_header_with_action('가족정보', svg_icon_users(), 'btn-add-family', '추가') }}
+        {{ info_section_body_start('info-section__body--no-padding') }}
             <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>관계</th>
-                            <th>성명</th>
-                            <th>생년월일</th>
-                            <th>직업</th>
-                            <th>연락처</th>
-                            <th>동거여부</th>
+                <table class="data-table" data-draggable="true" id="family-table">
+                    <thead class="data-table__head">
+                        <tr class="data-table__row">
+                            {{ data_table_th_drag() }}
+                            <th class="data-table__header">관계</th>
+                            <th class="data-table__header">성명</th>
+                            <th class="data-table__header">생년월일</th>
+                            <th class="data-table__header">직업</th>
+                            <th class="data-table__header">연락처</th>
+                            <th class="data-table__header">동거여부</th>
+                            {{ data_table_th_actions() }}
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="data-table__body">
                         {% if family_list %}
                         {% for family in family_list %}
-                        <tr>
-                            <td>{{ get_relation_label(family.relation) }}</td>
-                            <td>{{ family.name }}</td>
-                            <td>{{ family.birth_date or '-' }}</td>
-                            <td>{{ family.occupation or '-' }}</td>
-                            <td>{{ family.phone or '-' }}</td>
-                            <td>{% if family.living_together %}<span class="badge badge--success">동거</span>{% else %}<span class="badge badge--secondary">별거</span>{% endif %}</td>
+                        <tr class="data-table__row" data-id="{{ family.id }}">
+                            {{ data_table_td_drag() }}
+                            <td class="data-table__cell">{{ get_relation_label(family.relation) }}</td>
+                            <td class="data-table__cell">{{ family.name }}</td>
+                            <td class="data-table__cell">{{ family.birth_date or '-' }}</td>
+                            <td class="data-table__cell">{{ family.occupation or '-' }}</td>
+                            <td class="data-table__cell">{{ family.phone or '-' }}</td>
+                            <td class="data-table__cell">{% if family.living_together %}<span class="badge badge--success">동거</span>{% else %}<span class="badge badge--secondary">별거</span>{% endif %}</td>
+                            {{ data_table_actions_full(item_id=family.id, show_attach=false) }}
                         </tr>
                         {% endfor %}
                         {% else %}
-                        <tr>
-                            <td colspan="6" class="table-empty">
-                                <i class="fas fa-users"></i>
-                                <p>등록된 가족정보가 없습니다</p>
+                        <tr class="data-table__row">
+                            <td colspan="9" class="data-table__cell data-table__cell--empty">
+                                <div class="empty-state">
+                                    <i class="fas fa-users"></i>
+                                    <p>등록된 가족정보가 없습니다</p>
+                                </div>
                             </td>
                         </tr>
                         {% endif %}
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>

@@ -9,19 +9,17 @@
     - page_mode: 페이지 모드 ('hr_card' 등)
 
     위치: 기본정보 섹션과 소속정보 섹션 사이
+
+    Migration (2026-01-13): .card → .info-section
 #}
+{% from 'shared/macros/_info_display.html' import info_section_start, info_section_end, info_section_header, info_section_body_start, info_section_body_end, svg_icon_user_circle %}
 
 {# 신규 등록 모드에서만 계정 생성 옵션 표시 #}
 {% if action == 'create' %}
 <section class="form__section" id="account-info" aria-labelledby="account-info-title">
-    <div class="card">
-        <div class="card__header">
-            <h2 id="account-info-title" class="card__title">
-                <i class="fas fa-user-circle" aria-hidden="true"></i>
-                계정정보
-            </h2>
-        </div>
-        <div class="card__body" id="accountInfoBody">
+    {{ info_section_start() }}
+        {{ info_section_header('계정정보', svg_icon_user_circle()) }}
+        <div class="info-section__body" id="accountInfoBody">
             {# 계정 생성 필수 - 토글 제거, hidden input으로 항상 true #}
             <input type="hidden" name="create_account" value="true">
             <div id="accountFormFields">
@@ -94,23 +92,25 @@
                 </div>
             </div>
         </div>
-    </div>
+    {{ info_section_end() }}
 </section>
 
 {% elif (action == 'update' or action == 'view') and user %}
 {# 수정/상세 모드: 연결된 계정 정보 표시 (읽기 전용) #}
 <section class="form__section" id="account-info" aria-labelledby="account-info-title">
-    <div class="card">
-        <div class="card__header">
-            <h2 id="account-info-title" class="card__title">
-                <i class="fas fa-user-circle" aria-hidden="true"></i>
+    {{ info_section_start() }}
+        <div class="info-section__header">
+            <div class="info-section__title">
+                <div class="info-section__icon">
+                    {{ svg_icon_user_circle() }}
+                </div>
                 계정정보
-            </h2>
+            </div>
             <span class="badge badge--{{ 'success' if user.is_active else 'secondary' }}">
                 {{ '활성' if user.is_active else '비활성' }}
             </span>
         </div>
-        <div class="card__body">
+        {{ info_section_body_start() }}
             <div class="form-grid">
                 <div class="form__group">
                     <label class="form__label">아이디</label>
@@ -155,22 +155,24 @@
                     계정 정보 변경은 계정 관리 메뉴에서 가능합니다.
                 </small>
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>
 
 {% elif action == 'update' and not user %}
 {# 수정 모드: 계정이 없는 경우 #}
 <section class="form__section" id="account-info" aria-labelledby="account-info-title">
-    <div class="card">
-        <div class="card__header">
-            <h2 id="account-info-title" class="card__title">
-                <i class="fas fa-user-circle" aria-hidden="true"></i>
+    {{ info_section_start() }}
+        <div class="info-section__header">
+            <div class="info-section__title">
+                <div class="info-section__icon">
+                    {{ svg_icon_user_circle() }}
+                </div>
                 계정정보
-            </h2>
+            </div>
             <span class="badge badge--warning">미생성</span>
         </div>
-        <div class="card__body">
+        {{ info_section_body_start() }}
             <div class="alert alert--warning">
                 <i class="fas fa-exclamation-triangle"></i>
                 이 직원에게 연결된 계정이 없습니다.
@@ -179,7 +181,7 @@
                     data-employee-id="{{ employee.id if employee else '' }}">
                 <i class="fas fa-user-plus"></i> 계정 생성하기
             </button>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>
 {% endif %}

@@ -1,0 +1,14 @@
+[DEBUG] Starting update_profile_relations for profile_id=5
+[DEBUG] 관계형 데이터 저장 실패: AttributeError: module 'app.domains.employee.services.profile_relation_service' has no attribute 'delete_all_educations'
+[DEBUG] Traceback:
+Traceback (most recent call last):
+  File "D:\projects\hrmanagement\app\domains\user\blueprints\personal\routes.py", line 295, in profile_edit
+    update_profile_relations(profile_obj.id, request.form)
+  File "D:\projects\hrmanagement\app\domains\user\blueprints\personal\relation_updaters.py", line 149, in update_profile_relations
+    return profile_relation_updater.update_all_relations(profile_id, form_data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\projects\hrmanagement\app\domains\user\blueprints\personal\relation_updaters.py", line 94, in update_all_relations
+    self.service.delete_all_educations(owner_id, self.owner_type, commit=False)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'app.domains.employee.services.profile_relation_service' has no attribute 'delete_all_educations'
+

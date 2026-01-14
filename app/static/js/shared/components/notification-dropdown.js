@@ -233,12 +233,9 @@
     }
 
     /**
-     * HTML 이스케이프
+     * HTML 이스케이프 (SSOT: window.HRFormatters.escapeHtml)
      */
     function escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+        return window.HRFormatters?.escapeHtml?.(text) || '';
     }
 })();

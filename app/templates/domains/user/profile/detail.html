@@ -24,8 +24,9 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/right-sidebar.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/attachment.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/attachment/index.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/profile-header.css') }}">
 {% if page_mode == 'hr_card' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/businesscard/card.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/business-card.css') }}">
 {% endif %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/card.css') }}">
@@ -88,9 +89,9 @@
             </div>
         </div>
 
-        {# 직원/프로필 헤더 카드 #}
-        {# 개인/법인 모두 동일한 헤더 컴포넌트 사용, 개인은 그린 테마 적용 #}
-        {% include 'domains/employee/partials/detail/_employee_header.html' %}
+        {# 직원/프로필 헤더 카드 - Profile Header v3.3 #}
+        {# 개인/법인 모두 동일한 헤더 컴포넌트 사용, 테마는 account_type에 따라 자동 적용 #}
+        {% include 'shared/partials/_profile_header.html' %}
 
         {# 섹션 1-6: 기본정보 (개인정보, 소속정보, 계약정보, 급여정보, 복리후생, 4대보험) #}
         {% include 'domains/employee/partials/detail/_basic_info.html' %}
@@ -131,6 +132,8 @@
 {% endblock %}
 
 {% block extra_js %}
+{# QR코드 라이브러리 (명함 도메인) #}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module" src="{{ url_for('static', filename='js/domains/employee/pages/detail.js') }}"></script>
 {% if page_mode == 'hr_card' %}
 <script src="{{ url_for('static', filename='js/domains/employee/components/business-card.js') }}"></script>

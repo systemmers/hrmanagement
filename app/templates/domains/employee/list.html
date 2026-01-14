@@ -206,6 +206,10 @@
 <!-- 명함형 뷰 (BusinessCard 도메인) -->
 <div class="bc-grid {{ 'd-none' if view_mode != 'namecard' else '' }}" id="namecard-view">
     {% for employee in employees %}
+        {# 명함 데이터 조회 - business_cards_map에서 해당 직원의 명함 이미지 가져오기 #}
+        {% set emp_cards = business_cards_map.get(employee.id, {}) if business_cards_map else {} %}
+        {% set business_card_front = emp_cards.get('front') %}
+        {% set business_card_back = emp_cards.get('back') %}
         {% include 'domains/businesscard/partials/_card.html' %}
     {% endfor %}
 </div>

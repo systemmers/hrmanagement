@@ -1,137 +1,158 @@
 {#
     직원 상세 - 인사기록 섹션들
-    섹션 12-14: 근로계약 및 연봉, 인사이동 및 고과, 근태 및 비품
+    섹션 12-15: 근로계약 및 연봉, 인사이동 및 고과, 프로젝트, 근태 및 비품
+
+    Migration (2026-01-13):
+    - .card → .info-section
+    - table → .data-table BEM 클래스
+    - .info-grid → .info-table
 #}
-{% from 'shared/macros/_info_display.html' import card_header, section_title, info_item %}
+{% from 'shared/macros/_info_display.html' import section_title, info_section_start, info_section_end, info_section_header, info_section_header_with_action, info_section_body_start, info_section_body_end, info_table_start, info_table_end, info_table_row, info_table_row_start, info_table_row_end, info_table_cell, info_table_cell_custom, svg_icon_document, svg_icon_currency, svg_icon_chart, svg_icon_clipboard, svg_icon_calendar, svg_icon_desktop, data_table_th_drag, data_table_td_drag, data_table_th_actions, data_table_actions_full %}
 
 {# 섹션 12: 근로계약 및 연봉 #}
 <section id="employment-contract" class="content-section">
     {{ section_title('근로계약 및 연봉') }}
 
     {# 근로계약 이력 #}
-    <div class="card">
-        {{ card_header('근로계약 이력', 'fas fa-file-signature') }}
-        <div class="card__body">
+    {{ info_section_start() }}
+        {{ info_section_header_with_action('근로계약 이력', svg_icon_document(), 'btn-add-employment-contract', '추가') }}
+        {{ info_section_body_start('info-section__body--no-padding') }}
             <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>계약일</th>
-                            <th>계약구분</th>
-                            <th>계약기간 시작</th>
-                            <th>계약기간 종료</th>
-                            <th>계약기간</th>
-                            <th>직원구분</th>
-                            <th>근무형태</th>
-                            <th>비고</th>
+                <table class="data-table" data-draggable="true" id="employment-contract-table">
+                    <thead class="data-table__head">
+                        <tr class="data-table__row">
+                            {{ data_table_th_drag() }}
+                            <th class="data-table__header">계약일</th>
+                            <th class="data-table__header">계약구분</th>
+                            <th class="data-table__header">계약기간 시작</th>
+                            <th class="data-table__header">계약기간 종료</th>
+                            <th class="data-table__header">계약기간</th>
+                            <th class="data-table__header">직원구분</th>
+                            <th class="data-table__header">근무형태</th>
+                            <th class="data-table__header">비고</th>
+                            {{ data_table_th_actions() }}
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>{{ employee.hire_date }}</td>
-                            <td><span class="badge badge--success">정규직</span></td>
-                            <td>{{ employee.hire_date }}</td>
-                            <td>-</td>
-                            <td>{{ calculate_tenure(employee.hire_date) }}</td>
-                            <td>정규직</td>
-                            <td>전일제</td>
-                            <td>신규입사</td>
+                    <tbody class="data-table__body">
+                        <tr class="data-table__row" data-id="1">
+                            {{ data_table_td_drag() }}
+                            <td class="data-table__cell">{{ employee.hire_date }}</td>
+                            <td class="data-table__cell"><span class="badge badge--success">정규직</span></td>
+                            <td class="data-table__cell">{{ employee.hire_date }}</td>
+                            <td class="data-table__cell">-</td>
+                            <td class="data-table__cell">{{ calculate_tenure(employee.hire_date) }}</td>
+                            <td class="data-table__cell">정규직</td>
+                            <td class="data-table__cell">전일제</td>
+                            <td class="data-table__cell">신규입사</td>
+                            {{ data_table_actions_full(item_id=1, show_attach=true) }}
                         </tr>
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 
     {# 연봉계약 이력 #}
-    <div class="card mt-4">
-        {{ card_header('연봉계약 이력', 'fas fa-coins') }}
-        <div class="card__body">
+    {{ info_section_start(css_class='mt-4') }}
+        {{ info_section_header_with_action('연봉계약 이력', svg_icon_currency(), 'btn-add-salary-history', '추가') }}
+        {{ info_section_body_start('info-section__body--no-padding') }}
             <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>계약연도</th>
-                            <th>연봉</th>
-                            <th>상여금</th>
-                            <th>총액</th>
-                            <th>계약기간</th>
+                <table class="data-table" data-draggable="true" id="salary-history-table">
+                    <thead class="data-table__head">
+                        <tr class="data-table__row">
+                            {{ data_table_th_drag() }}
+                            <th class="data-table__header">계약연도</th>
+                            <th class="data-table__header">연봉</th>
+                            <th class="data-table__header">상여금</th>
+                            <th class="data-table__header">총액</th>
+                            <th class="data-table__header">계약기간</th>
+                            {{ data_table_th_actions() }}
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="data-table__body">
                         {% if salary_history_list %}
                         {% for history in salary_history_list|sort(attribute='contract_year', reverse=True) %}
-                        <tr>
-                            <td>{{ history.contract_year }}년</td>
-                            <td>{{ '{:,}'.format(history.annual_salary) }}원</td>
-                            <td>{{ '{:,}'.format(history.bonus) }}원</td>
-                            <td><strong>{{ '{:,}'.format(history.total_amount) }}원</strong></td>
-                            <td>{{ history.contract_period }}</td>
+                        <tr class="data-table__row" data-id="{{ history.id }}">
+                            {{ data_table_td_drag() }}
+                            <td class="data-table__cell">{{ history.contract_year }}년</td>
+                            <td class="data-table__cell">{{ '{:,}'.format(history.annual_salary) }}원</td>
+                            <td class="data-table__cell">{{ '{:,}'.format(history.bonus) }}원</td>
+                            <td class="data-table__cell"><strong>{{ '{:,}'.format(history.total_amount) }}원</strong></td>
+                            <td class="data-table__cell">{{ history.contract_period }}</td>
+                            {{ data_table_actions_full(item_id=history.id, show_attach=true) }}
                         </tr>
                         {% endfor %}
                         {% else %}
-                        <tr>
-                            <td colspan="5" class="table-empty">
-                                <i class="fas fa-coins"></i>
-                                <p>등록된 연봉계약 정보가 없습니다</p>
+                        <tr class="data-table__row">
+                            <td colspan="8" class="data-table__cell data-table__cell--empty">
+                                <div class="empty-state">
+                                    <i class="fas fa-coins"></i>
+                                    <p>등록된 연봉계약 정보가 없습니다</p>
+                                </div>
                             </td>
                         </tr>
                         {% endif %}
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 
     {# 급여 지급 이력 #}
-    <div class="card mt-4">
-        {{ card_header('급여 지급 이력', 'fas fa-money-bill-wave') }}
-        <div class="card__body">
+    {{ info_section_start(css_class='mt-4') }}
+        {{ info_section_header_with_action('급여 지급 이력', svg_icon_currency(), 'btn-add-salary-payment', '추가') }}
+        {{ info_section_body_start('info-section__body--no-padding') }}
             <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>지급일</th>
-                            <th>지급기간</th>
-                            <th>기본급</th>
-                            <th>수당</th>
-                            <th>총지급액</th>
-                            <th>4대보험</th>
-                            <th>소득세</th>
-                            <th>공제합계</th>
-                            <th>실지급액</th>
-                            <th>비고</th>
+                <table class="data-table" data-draggable="true" id="salary-payment-table">
+                    <thead class="data-table__head">
+                        <tr class="data-table__row">
+                            {{ data_table_th_drag() }}
+                            <th class="data-table__header">지급일</th>
+                            <th class="data-table__header">지급기간</th>
+                            <th class="data-table__header">기본급</th>
+                            <th class="data-table__header">수당</th>
+                            <th class="data-table__header">총지급액</th>
+                            <th class="data-table__header">4대보험</th>
+                            <th class="data-table__header">소득세</th>
+                            <th class="data-table__header">공제합계</th>
+                            <th class="data-table__header">실지급액</th>
+                            <th class="data-table__header">비고</th>
+                            {{ data_table_th_actions() }}
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="data-table__body">
                         {% if salary_payment_list %}
                         {% for payment in salary_payment_list|sort(attribute='payment_date', reverse=True) %}
-                        <tr>
-                            <td>{{ payment.payment_date }}</td>
-                            <td>{{ payment.payment_period }}</td>
-                            <td>{{ '{:,}'.format(payment.base_salary) }}원</td>
-                            <td>{{ '{:,}'.format(payment.allowances) }}원</td>
-                            <td>{{ '{:,}'.format(payment.gross_pay) }}원</td>
-                            <td>{{ '{:,}'.format(payment.insurance) }}원</td>
-                            <td>{{ '{:,}'.format(payment.income_tax) }}원</td>
-                            <td>{{ '{:,}'.format(payment.total_deduction) }}원</td>
-                            <td><strong>{{ '{:,}'.format(payment.net_pay) }}원</strong></td>
-                            <td>{{ payment.note or '-' }}</td>
+                        <tr class="data-table__row" data-id="{{ payment.id }}">
+                            {{ data_table_td_drag() }}
+                            <td class="data-table__cell">{{ payment.payment_date }}</td>
+                            <td class="data-table__cell">{{ payment.payment_period }}</td>
+                            <td class="data-table__cell">{{ '{:,}'.format(payment.base_salary) }}원</td>
+                            <td class="data-table__cell">{{ '{:,}'.format(payment.allowances) }}원</td>
+                            <td class="data-table__cell">{{ '{:,}'.format(payment.gross_pay) }}원</td>
+                            <td class="data-table__cell">{{ '{:,}'.format(payment.insurance) }}원</td>
+                            <td class="data-table__cell">{{ '{:,}'.format(payment.income_tax) }}원</td>
+                            <td class="data-table__cell">{{ '{:,}'.format(payment.total_deduction) }}원</td>
+                            <td class="data-table__cell"><strong>{{ '{:,}'.format(payment.net_pay) }}원</strong></td>
+                            <td class="data-table__cell">{{ payment.note or '-' }}</td>
+                            {{ data_table_actions_full(item_id=payment.id, show_attach=true) }}
                         </tr>
                         {% endfor %}
                         {% else %}
-                        <tr>
-                            <td colspan="10" class="table-empty">
-                                <i class="fas fa-money-bill-wave"></i>
-                                <p>등록된 급여 지급 정보가 없습니다</p>
+                        <tr class="data-table__row">
+                            <td colspan="13" class="data-table__cell data-table__cell--empty">
+                                <div class="empty-state">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <p>등록된 급여 지급 정보가 없습니다</p>
+                                </div>
                             </td>
                         </tr>
                         {% endif %}
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>
 
 {# 섹션 13: 인사이동 및 고과 #}
@@ -139,248 +160,281 @@
     {{ section_title('인사이동 및 고과') }}
 
     {# 인사이동 및 승진 #}
-    <div class="card">
-        {{ card_header('인사이동 및 승진', 'fas fa-arrow-up') }}
-        <div class="card__body">
+    {{ info_section_start() }}
+        {{ info_section_header_with_action('인사이동 및 승진', svg_icon_chart(), 'btn-add-promotion', '추가') }}
+        {{ info_section_body_start('info-section__body--no-padding') }}
             <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>발령일</th>
-                            <th>발령구분</th>
-                            <th>발령전</th>
-                            <th>발령후</th>
-                            <th>발령전 직급</th>
-                            <th>발령후 직급</th>
-                            <th>직무</th>
-                            <th>발령사유</th>
+                <table class="data-table" data-draggable="true" id="promotion-table">
+                    <thead class="data-table__head">
+                        <tr class="data-table__row">
+                            {{ data_table_th_drag() }}
+                            <th class="data-table__header">발령일</th>
+                            <th class="data-table__header">발령구분</th>
+                            <th class="data-table__header">발령전</th>
+                            <th class="data-table__header">발령후</th>
+                            <th class="data-table__header">발령전 직급</th>
+                            <th class="data-table__header">발령후 직급</th>
+                            <th class="data-table__header">직무</th>
+                            <th class="data-table__header">발령사유</th>
+                            {{ data_table_th_actions() }}
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="data-table__body">
                         {% if promotion_list %}
                         {% for promo in promotion_list|sort(attribute='effective_date', reverse=True) %}
-                        <tr>
-                            <td>{{ promo.effective_date }}</td>
-                            <td><span class="badge badge--{% if promo.promotion_type == '신규채용' %}info{% elif promo.promotion_type == '승진' %}success{% else %}secondary{% endif %}">{{ promo.promotion_type }}</span></td>
-                            <td>{{ promo.from_department or '-' }}</td>
-                            <td>{{ promo.to_department }}</td>
-                            <td>{{ promo.from_position or '-' }}</td>
-                            <td>{{ promo.to_position }}</td>
-                            <td>{{ promo.job_role or '-' }}</td>
-                            <td>{{ promo.reason or '-' }}</td>
+                        <tr class="data-table__row" data-id="{{ promo.id }}">
+                            {{ data_table_td_drag() }}
+                            <td class="data-table__cell">{{ promo.effective_date }}</td>
+                            <td class="data-table__cell"><span class="badge badge--{% if promo.promotion_type == '신규채용' %}info{% elif promo.promotion_type == '승진' %}success{% else %}secondary{% endif %}">{{ promo.promotion_type }}</span></td>
+                            <td class="data-table__cell">{{ promo.from_department or '-' }}</td>
+                            <td class="data-table__cell">{{ promo.to_department }}</td>
+                            <td class="data-table__cell">{{ promo.from_position or '-' }}</td>
+                            <td class="data-table__cell">{{ promo.to_position }}</td>
+                            <td class="data-table__cell">{{ promo.job_role or '-' }}</td>
+                            <td class="data-table__cell">{{ promo.reason or '-' }}</td>
+                            {{ data_table_actions_full(item_id=promo.id, show_attach=true) }}
                         </tr>
                         {% endfor %}
                         {% else %}
-                        <tr>
-                            <td colspan="8" class="table-empty">
-                                <i class="fas fa-arrow-up"></i>
-                                <p>등록된 인사이동 정보가 없습니다</p>
+                        <tr class="data-table__row">
+                            <td colspan="11" class="data-table__cell data-table__cell--empty">
+                                <div class="empty-state">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <p>등록된 인사이동 정보가 없습니다</p>
+                                </div>
                             </td>
                         </tr>
                         {% endif %}
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 
     {# 인사고과 - 정기평가 #}
-    <div class="card mt-4">
-        {{ card_header('인사고과 - 정기평가', 'fas fa-chart-line') }}
-        <div class="card__body">
+    {{ info_section_start(css_class='mt-4') }}
+        {{ info_section_header_with_action('인사고과 - 정기평가', svg_icon_chart(), 'btn-add-evaluation', '추가') }}
+        {{ info_section_body_start('info-section__body--no-padding') }}
             <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>연차</th>
-                            <th>1분기</th>
-                            <th>2분기</th>
-                            <th>3분기</th>
-                            <th>4분기</th>
-                            <th>종합평가</th>
-                            <th>연봉협상</th>
-                            <th>비고</th>
+                <table class="data-table" data-draggable="true" id="evaluation-table">
+                    <thead class="data-table__head">
+                        <tr class="data-table__row">
+                            {{ data_table_th_drag() }}
+                            <th class="data-table__header">연차</th>
+                            <th class="data-table__header">1분기</th>
+                            <th class="data-table__header">2분기</th>
+                            <th class="data-table__header">3분기</th>
+                            <th class="data-table__header">4분기</th>
+                            <th class="data-table__header">종합평가</th>
+                            <th class="data-table__header">연봉협상</th>
+                            <th class="data-table__header">비고</th>
+                            {{ data_table_th_actions() }}
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="data-table__body">
                         {% if evaluation_list %}
                         {% for eval in evaluation_list|sort(attribute='year', reverse=True) %}
-                        <tr>
-                            <td>{{ eval.year }}년</td>
-                            <td>{% if eval.q1_grade %}<span class="badge badge--{% if eval.q1_grade in ['S', 'A'] %}success{% elif eval.q1_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q1_grade }}</span>{% else %}-{% endif %}</td>
-                            <td>{% if eval.q2_grade %}<span class="badge badge--{% if eval.q2_grade in ['S', 'A'] %}success{% elif eval.q2_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q2_grade }}</span>{% else %}-{% endif %}</td>
-                            <td>{% if eval.q3_grade %}<span class="badge badge--{% if eval.q3_grade in ['S', 'A'] %}success{% elif eval.q3_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q3_grade }}</span>{% else %}-{% endif %}</td>
-                            <td>{% if eval.q4_grade %}<span class="badge badge--{% if eval.q4_grade in ['S', 'A'] %}success{% elif eval.q4_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q4_grade }}</span>{% else %}-{% endif %}</td>
-                            <td>{% if eval.overall_grade %}<strong><span class="badge badge--{% if eval.overall_grade in ['S', 'A'] %}success{% elif eval.overall_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.overall_grade }}</span></strong>{% else %}-{% endif %}</td>
-                            <td>{{ eval.salary_negotiation or '-' }}</td>
-                            <td>{{ eval.note or '-' }}</td>
+                        <tr class="data-table__row" data-id="{{ eval.id }}">
+                            {{ data_table_td_drag() }}
+                            <td class="data-table__cell">{{ eval.year }}년</td>
+                            <td class="data-table__cell">{% if eval.q1_grade %}<span class="badge badge--{% if eval.q1_grade in ['S', 'A'] %}success{% elif eval.q1_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q1_grade }}</span>{% else %}-{% endif %}</td>
+                            <td class="data-table__cell">{% if eval.q2_grade %}<span class="badge badge--{% if eval.q2_grade in ['S', 'A'] %}success{% elif eval.q2_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q2_grade }}</span>{% else %}-{% endif %}</td>
+                            <td class="data-table__cell">{% if eval.q3_grade %}<span class="badge badge--{% if eval.q3_grade in ['S', 'A'] %}success{% elif eval.q3_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q3_grade }}</span>{% else %}-{% endif %}</td>
+                            <td class="data-table__cell">{% if eval.q4_grade %}<span class="badge badge--{% if eval.q4_grade in ['S', 'A'] %}success{% elif eval.q4_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.q4_grade }}</span>{% else %}-{% endif %}</td>
+                            <td class="data-table__cell">{% if eval.overall_grade %}<strong><span class="badge badge--{% if eval.overall_grade in ['S', 'A'] %}success{% elif eval.overall_grade == 'B' %}primary{% else %}warning{% endif %}">{{ eval.overall_grade }}</span></strong>{% else %}-{% endif %}</td>
+                            <td class="data-table__cell">{{ eval.salary_negotiation or '-' }}</td>
+                            <td class="data-table__cell">{{ eval.note or '-' }}</td>
+                            {{ data_table_actions_full(item_id=eval.id, show_attach=false) }}
                         </tr>
                         {% endfor %}
                         {% else %}
-                        <tr>
-                            <td colspan="8" class="table-empty">
-                                <i class="fas fa-chart-line"></i>
-                                <p>등록된 인사고과 정보가 없습니다</p>
+                        <tr class="data-table__row">
+                            <td colspan="11" class="data-table__cell data-table__cell--empty">
+                                <div class="empty-state">
+                                    <i class="fas fa-chart-line"></i>
+                                    <p>등록된 인사고과 정보가 없습니다</p>
+                                </div>
                             </td>
                         </tr>
                         {% endif %}
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 
     {# 교육훈련 #}
-    <div class="card mt-4">
-        {{ card_header('교육훈련', 'fas fa-book') }}
-        <div class="card__body">
+    {{ info_section_start(css_class='mt-4') }}
+        {{ info_section_header_with_action('교육훈련', svg_icon_clipboard(), 'btn-add-training', '추가') }}
+        {{ info_section_body_start('info-section__body--no-padding') }}
             <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>교육일</th>
-                            <th>교육명</th>
-                            <th>교육기관</th>
-                            <th>교육시간</th>
-                            <th>이수여부</th>
-                            <th>비고</th>
+                <table class="data-table" data-draggable="true" id="training-table">
+                    <thead class="data-table__head">
+                        <tr class="data-table__row">
+                            {{ data_table_th_drag() }}
+                            <th class="data-table__header">교육일</th>
+                            <th class="data-table__header">교육명</th>
+                            <th class="data-table__header">교육기관</th>
+                            <th class="data-table__header">교육시간</th>
+                            <th class="data-table__header">이수여부</th>
+                            <th class="data-table__header">비고</th>
+                            {{ data_table_th_actions() }}
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="data-table__body">
                         {% if training_list %}
                         {% for train in training_list|sort(attribute='training_date', reverse=True) %}
-                        <tr>
-                            <td>{{ train.training_date }}</td>
-                            <td>{{ train.training_name }}</td>
-                            <td>{{ train.institution }}</td>
-                            <td>{{ train.hours }}시간</td>
-                            <td><span class="badge badge--{% if train.completion_status == '이수' %}success{% else %}danger{% endif %}">{{ train.completion_status }}</span></td>
-                            <td>{{ train.note or '-' }}</td>
+                        <tr class="data-table__row" data-id="{{ train.id }}">
+                            {{ data_table_td_drag() }}
+                            <td class="data-table__cell">{{ train.training_date }}</td>
+                            <td class="data-table__cell">{{ train.training_name }}</td>
+                            <td class="data-table__cell">{{ train.institution }}</td>
+                            <td class="data-table__cell">{{ train.hours }}시간</td>
+                            <td class="data-table__cell"><span class="badge badge--{% if train.completion_status == '이수' %}success{% else %}danger{% endif %}">{{ train.completion_status }}</span></td>
+                            <td class="data-table__cell">{{ train.note or '-' }}</td>
+                            {{ data_table_actions_full(item_id=train.id, show_attach=true) }}
                         </tr>
                         {% endfor %}
                         {% else %}
-                        <tr>
-                            <td colspan="6" class="table-empty">
-                                <i class="fas fa-book"></i>
-                                <p>등록된 교육훈련 정보가 없습니다</p>
+                        <tr class="data-table__row">
+                            <td colspan="9" class="data-table__cell data-table__cell--empty">
+                                <div class="empty-state">
+                                    <i class="fas fa-book"></i>
+                                    <p>등록된 교육훈련 정보가 없습니다</p>
+                                </div>
                             </td>
                         </tr>
                         {% endif %}
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>
 
 {# 섹션 14: 프로젝트 #}
 <section id="hr-project-info" class="content-section">
     {{ section_title('프로젝트') }}
-    <div class="card">
-        {{ card_header('프로젝트', 'fas fa-project-diagram') }}
-        <div class="card__body">
+    {{ info_section_start() }}
+        {{ info_section_header_with_action('프로젝트', svg_icon_clipboard(), 'btn-add-hr-project', '추가') }}
+        {{ info_section_body_start('info-section__body--no-padding') }}
             <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>프로젝트명</th>
-                            <th>참여기간</th>
-                            <th>기간</th>
-                            <th>담당업무</th>
-                            <th>역할/직책</th>
-                            <th>발주처</th>
+                <table class="data-table" data-draggable="true" id="hr-project-table">
+                    <thead class="data-table__head">
+                        <tr class="data-table__row">
+                            {{ data_table_th_drag() }}
+                            <th class="data-table__header">프로젝트명</th>
+                            <th class="data-table__header">참여기간</th>
+                            <th class="data-table__header">기간</th>
+                            <th class="data-table__header">담당업무</th>
+                            <th class="data-table__header">역할/직책</th>
+                            <th class="data-table__header">발주처</th>
+                            {{ data_table_th_actions() }}
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="data-table__body">
                         {% if hr_project_list %}
                         {% for project in hr_project_list %}
-                        <tr>
-                            <td>{{ project.project_name }}</td>
-                            <td>{{ project.start_date }} ~ {{ project.end_date }}</td>
-                            <td>{{ project.duration }}</td>
-                            <td>{{ project.duty }}</td>
-                            <td>{{ project.role }}</td>
-                            <td>{{ project.client }}</td>
+                        <tr class="data-table__row" data-id="{{ project.id }}">
+                            {{ data_table_td_drag() }}
+                            <td class="data-table__cell">{{ project.project_name }}</td>
+                            <td class="data-table__cell">{{ project.start_date }} ~ {{ project.end_date }}</td>
+                            <td class="data-table__cell">{{ project.duration }}</td>
+                            <td class="data-table__cell">{{ project.duty }}</td>
+                            <td class="data-table__cell">{{ project.role }}</td>
+                            <td class="data-table__cell">{{ project.client }}</td>
+                            {{ data_table_actions_full(item_id=project.id, show_attach=false) }}
                         </tr>
                         {% endfor %}
                         {% else %}
-                        <tr>
-                            <td colspan="6" class="table-empty">
-                                <i class="fas fa-project-diagram"></i>
-                                <p>등록된 프로젝트가 없습니다</p>
+                        <tr class="data-table__row">
+                            <td colspan="9" class="data-table__cell data-table__cell--empty">
+                                <div class="empty-state">
+                                    <i class="fas fa-project-diagram"></i>
+                                    <p>등록된 프로젝트가 없습니다</p>
+                                </div>
                             </td>
                         </tr>
                         {% endif %}
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>
 
 {# 섹션 15: 근태 및 비품 #}
 <section id="attendance-assets" class="content-section">
     {{ section_title('근태 및 비품') }}
 
-    {# 근태현황 #}
-    <div class="card">
-        {{ card_header('근태현황', 'fas fa-calendar-check') }}
-        <div class="card__body">
-            <div class="info-grid">
-                <div class="info-item">
-                    <div class="info-label">출근일수</div>
-                    <div class="info-value{% if not attendance_summary or attendance_summary.total_work_days == 0 %} empty{% endif %}">
-                        {{ attendance_summary.total_work_days if attendance_summary and attendance_summary.total_work_days > 0 else '정보 없음' }}{% if attendance_summary and attendance_summary.total_work_days > 0 %}일{% endif %}
-                    </div>
-                </div>
-                {{ info_item('결근일수', ((attendance_summary.total_absent_days if attendance_summary else 0)|string ~ '일')) }}
-                {{ info_item('지각횟수', ((attendance_summary.total_late_count if attendance_summary else 0)|string ~ '회')) }}
-                {{ info_item('조퇴횟수', ((attendance_summary.total_early_leave if attendance_summary else 0)|string ~ '회')) }}
-                {{ info_item('연차사용', ((attendance_summary.total_annual_used if attendance_summary else 0)|string ~ '일')) }}
-                {{ info_item('연차잔여', ((benefit.annual_leave_remaining if benefit else 15)|string ~ '일'), highlight=true) }}
-            </div>
-        </div>
-    </div>
+    {# 근태현황 - info-table 구조 적용 #}
+    {{ info_section_start() }}
+        {{ info_section_header_with_action('근태현황', svg_icon_calendar(), 'btn-edit-attendance', '수정') }}
+        {{ info_section_body_start() }}
+            {{ info_table_start() }}
+                {# 출근일수 - 커스텀 값 #}
+                {{ info_table_row_start() }}
+                    {% call info_table_cell_custom('출근일수') %}
+                        {% if attendance_summary and attendance_summary.total_work_days > 0 %}
+                            {{ attendance_summary.total_work_days }}일
+                        {% else %}
+                            <span class="info-table__value--empty">미등록</span>
+                        {% endif %}
+                    {% endcall %}
+                    {{ info_table_cell('결근일수', ((attendance_summary.total_absent_days if attendance_summary else 0)|string ~ '일')) }}
+                {{ info_table_row_end() }}
+
+                {{ info_table_row('지각횟수', ((attendance_summary.total_late_count if attendance_summary else 0)|string ~ '회'), '조퇴횟수', ((attendance_summary.total_early_leave if attendance_summary else 0)|string ~ '회')) }}
+                {{ info_table_row('연차사용', ((attendance_summary.total_annual_used if attendance_summary else 0)|string ~ '일'), '연차잔여', ((benefit.annual_leave_remaining if benefit else 15)|string ~ '일')) }}
+            {{ info_table_end() }}
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 
     {# 비품지급 #}
-    <div class="card mt-4">
-        {{ card_header('비품지급', 'fas fa-laptop') }}
-        <div class="card__body">
+    {{ info_section_start(css_class='mt-4') }}
+        {{ info_section_header_with_action('비품지급', svg_icon_desktop(), 'btn-add-asset', '추가') }}
+        {{ info_section_body_start('info-section__body--no-padding') }}
             <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>지급일</th>
-                            <th>품목</th>
-                            <th>모델/사양</th>
-                            <th>시리얼번호</th>
-                            <th>상태</th>
-                            <th>비고</th>
+                <table class="data-table" data-draggable="true" id="asset-table">
+                    <thead class="data-table__head">
+                        <tr class="data-table__row">
+                            {{ data_table_th_drag() }}
+                            <th class="data-table__header">지급일</th>
+                            <th class="data-table__header">품목</th>
+                            <th class="data-table__header">모델/사양</th>
+                            <th class="data-table__header">시리얼번호</th>
+                            <th class="data-table__header">상태</th>
+                            <th class="data-table__header">비고</th>
+                            {{ data_table_th_actions() }}
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="data-table__body">
                         {% if asset_list %}
                         {% for asset in asset_list|sort(attribute='issue_date', reverse=True) %}
-                        <tr>
-                            <td>{{ asset.issue_date }}</td>
-                            <td>{{ asset.item_name }}</td>
-                            <td>{{ asset.model }}</td>
-                            <td>{{ asset.serial_number }}</td>
-                            <td><span class="badge badge--{% if asset.status == '사용중' %}success{% elif asset.status == '반납' %}secondary{% else %}danger{% endif %}">{{ asset.status }}</span></td>
-                            <td>{{ asset.note or '-' }}</td>
+                        <tr class="data-table__row" data-id="{{ asset.id }}">
+                            {{ data_table_td_drag() }}
+                            <td class="data-table__cell">{{ asset.issue_date }}</td>
+                            <td class="data-table__cell">{{ asset.item_name }}</td>
+                            <td class="data-table__cell">{{ asset.model }}</td>
+                            <td class="data-table__cell">{{ asset.serial_number }}</td>
+                            <td class="data-table__cell"><span class="badge badge--{% if asset.status == '사용중' %}success{% elif asset.status == '반납' %}secondary{% else %}danger{% endif %}">{{ asset.status }}</span></td>
+                            <td class="data-table__cell">{{ asset.note or '-' }}</td>
+                            {{ data_table_actions_full(item_id=asset.id, show_attach=false) }}
                         </tr>
                         {% endfor %}
                         {% else %}
-                        <tr>
-                            <td colspan="6" class="table-empty">
-                                <i class="fas fa-laptop"></i>
-                                <p>등록된 비품 정보가 없습니다</p>
+                        <tr class="data-table__row">
+                            <td colspan="9" class="data-table__cell data-table__cell--empty">
+                                <div class="empty-state">
+                                    <i class="fas fa-laptop"></i>
+                                    <p>등록된 비품 정보가 없습니다</p>
+                                </div>
                             </td>
                         </tr>
                         {% endif %}
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>

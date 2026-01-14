@@ -4,10 +4,12 @@
  * - 파일 업로드 UI (FileUpload 컴포넌트 사용)
  * - Phase 5.3: 파일 필터링 (FileFilter 컴포넌트 사용)
  * - Phase 5.4: 파일 미리보기 (FilePreview 컴포넌트 사용)
+ * - 명함 QR 코드 (BusinessCard 도메인)
  */
 
 import { SectionNav } from '../../../shared/components/section-nav.js';
 import { FileUpload, FileFilter, FilePreview } from '../../../shared/components/file-upload.js';
+import { initBusinessCards } from '../../businesscard/index.js';
 
 // 전역 인스턴스 (업로드/삭제 후 새로고침용)
 let fileFilter = null;
@@ -18,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initFileUpload();
     initFileFilter();
     initFilePreview();
+    initBusinessCards();  // 명함 QR 코드 초기화
 });
 
 /**
@@ -100,13 +103,11 @@ function initFileUpload() {
         ownerType: ownerType || 'employee',
         ownerId: parseInt(ownerId, 10),
         onUploadComplete: (attachment) => {
-            console.log('파일 업로드 완료:', attachment);
             // 필터/미리보기 새로고침
             if (fileFilter) fileFilter.refresh();
             if (filePreview) filePreview.refresh();
         },
         onDeleteComplete: (attachmentId) => {
-            console.log('파일 삭제 완료:', attachmentId);
             // 필터/미리보기 새로고침
             if (fileFilter) fileFilter.refresh();
             if (filePreview) filePreview.refresh();
@@ -193,16 +194,10 @@ function renderFileCard(file) {
 }
 
 /**
- * 파일 크기 포맷
- * @param {number} bytes - 바이트 수
- * @returns {string} 포맷된 파일 크기 문자열
+ * 파일 크기 포맷 (SSOT: window.HRFormatters.formatFileSize)
  */
 function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return window.HRFormatters?.formatFileSize?.(bytes) || '0 Bytes';
 }
 
 /**
@@ -236,4 +231,159 @@ document.addEventListener('click', (e) => {
             deleteEmployee(parseInt(employeeId), employeeName);
             break;
     }
+});
+
+/**
+ * HR Card 액션 버튼 이벤트 핸들러
+ */
+
+// 섹션 설정 (23개 섹션)
+const SECTION_CONFIG = {
+    // info-table 섹션 (수정 버튼)
+    'btn-edit-personal': { name: '개인 기본정보', action: 'edit' },
+    'btn-edit-organization': { name: '소속정보', action: 'edit' },
+    'btn-edit-contract': { name: '계약정보', action: 'edit' },
+    'btn-edit-salary': { name: '급여정보', action: 'edit' },
+    'btn-edit-benefit': { name: '연차 및 복리후생', action: 'edit' },
+    'btn-edit-military': { name: '병역정보', action: 'edit' },
+    'btn-edit-attendance': { name: '근태현황', action: 'edit' },
+    'btn-edit-account': { name: '계정정보', action: 'edit' },
+    // data-table 섹션 (추가 버튼)
+    'btn-add-family': { name: '가족정보', action: 'add' },
+    'btn-add-education': { name: '학력정보', action: 'add' },
+    'btn-add-career': { name: '경력정보', action: 'add' },
+    'btn-add-certificate': { name: '자격증', action: 'add' },
+    'btn-add-language': { name: '언어능력', action: 'add' },
+    'btn-add-award': { name: '수상내역', action: 'add' },
+    'btn-add-project': { name: '프로젝트 참여', action: 'add' },
+    'btn-add-employment-contract': { name: '근로계약', action: 'add' },
+    'btn-add-salary-history': { name: '연봉계약', action: 'add' },
+    'btn-add-salary-payment': { name: '급여지급', action: 'add' },
+    'btn-add-promotion': { name: '인사이동', action: 'add' },
+    'btn-add-evaluation': { name: '인사고과', action: 'add' },
+    'btn-add-training': { name: '교육훈련', action: 'add' },
+    'btn-add-hr-project': { name: '프로젝트', action: 'add' },
+    'btn-add-asset': { name: '비품지급', action: 'add' }
+};
+
+// 테이블 설정 (15개 테이블)
+const TABLE_CONFIG = {
+    'family-table': { name: '가족정보', hasAttach: false },
+    'education-table': { name: '학력정보', hasAttach: true },
+    'career-table': { name: '경력정보', hasAttach: true },
+    'certificate-table': { name: '자격증', hasAttach: true },
+    'language-table': { name: '언어능력', hasAttach: true },
+    'award-table': { name: '수상내역', hasAttach: true },
+    'project-table': { name: '프로젝트 참여', hasAttach: false },
+    'employment-contract-table': { name: '근로계약', hasAttach: true },
+    'salary-history-table': { name: '연봉계약', hasAttach: true },
+    'salary-payment-table': { name: '급여지급', hasAttach: true },
+    'promotion-table': { name: '인사이동', hasAttach: true },
+    'evaluation-table': { name: '인사고과', hasAttach: false },
+    'training-table': { name: '교육훈련', hasAttach: true },
+    'hr-project-table': { name: '프로젝트', hasAttach: false },
+    'asset-table': { name: '비품지급', hasAttach: false }
+};
+
+/**
+ * 헤더 액션 버튼 초기화
+ */
+function initHeaderActions() {
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.info-section__add-btn');
+        if (!btn) return;
+
+        const config = SECTION_CONFIG[btn.id];
+        if (!config) return;
+
+        if (config.action === 'edit') {
+            handleSectionEdit(btn.id, config);
+        } else {
+            handleSectionAdd(btn.id, config);
+        }
+    });
+}
+
+/**
+ * 테이블 액션 버튼 초기화
+ */
+function initTableActions() {
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.data-table__btn-icon');
+        if (!btn) return;
+
+        const action = btn.dataset.action;
+        const id = btn.dataset.id;
+        const table = btn.closest('[data-draggable]');
+        const config = TABLE_CONFIG[table?.id];
+
+        if (!config) return;
+
+        switch (action) {
+            case 'edit':
+                handleRowEdit(id, config);
+                break;
+            case 'attach':
+                handleRowAttach(id, config);
+                break;
+            case 'delete':
+                handleRowDelete(id, config);
+                break;
+        }
+    });
+}
+
+/**
+ * 섹션 수정 핸들러
+ */
+function handleSectionEdit(btnId, config) {
+    showToast(`${config.name} 수정 기능 준비 중`, 'info');
+}
+
+/**
+ * 섹션 추가 핸들러
+ */
+function handleSectionAdd(btnId, config) {
+    showToast(`${config.name} 추가 기능 준비 중`, 'info');
+}
+
+/**
+ * 행 수정 핸들러
+ */
+function handleRowEdit(id, config) {
+    showToast(`${config.name} 항목 수정 준비 중`, 'info');
+}
+
+/**
+ * 행 첨부파일 핸들러
+ */
+function handleRowAttach(id, config) {
+    showToast(`${config.name} 첨부파일 기능 준비 중`, 'info');
+}
+
+/**
+ * 행 삭제 핸들러
+ */
+function handleRowDelete(id, config) {
+    if (!confirm(`${config.name} 항목을 삭제하시겠습니까?`)) return;
+    showToast(`${config.name} 삭제 기능 준비 중`, 'info');
+}
+
+/**
+ * 토스트 메시지 표시 헬퍼
+ */
+function showToast(message, type = 'info') {
+    if (window.Toast) {
+        window.Toast.show(message, type);
+    } else if (window.HRApp?.toast?.show) {
+        window.HRApp.toast.show(message, type);
+    } else {
+        console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+}
+
+// HR Card 액션 버튼 초기화
+document.addEventListener('DOMContentLoaded', () => {
+    initHeaderActions();
+    initTableActions();
 });

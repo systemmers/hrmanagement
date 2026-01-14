@@ -2,20 +2,18 @@
     직원 폼 - 소속정보 섹션
     employee: 직원 객체 (수정 모드일 때)
     has_person_contract: 승인된 개인계약 존재 여부 (계약 후 수정 불가용)
+
+    Migration (2026-01-13): .card → .info-section
 #}
+{% from 'shared/macros/_info_display.html' import info_section_start, info_section_end, info_section_header, info_section_body_start, info_section_body_end, svg_icon_building %}
+
 {# 계약 후 수정 불가 플래그: 승인된 개인계약이 있을 때 #}
 {% set is_contract_readonly = has_person_contract %}
 
 <section class="form__section" id="organization-info">
-    <div class="card">
-        <div class="card__header">
-            <h2 class="card__title">
-                <i class="fas fa-building"></i>
-                소속정보
-                {% if is_contract_readonly %}<small class="text-muted">(계약 확정)</small>{% endif %}
-            </h2>
-        </div>
-        <div class="card__body">
+    {{ info_section_start() }}
+        {{ info_section_header('소속정보' ~ (' (계약 확정)' if is_contract_readonly else ''), svg_icon_building()) }}
+        {{ info_section_body_start() }}
             <div class="form-grid">
                 <div class="form__group">
                     <label for="employee_number" class="form__label">사번</label>
@@ -134,6 +132,6 @@
                            {% if is_contract_readonly %}readonly disabled{% endif %}>
                 </div>
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>

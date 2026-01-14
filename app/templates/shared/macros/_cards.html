@@ -158,3 +158,138 @@
     </div>
 </div>
 {% endmacro %}
+
+{# ========================================
+   Info Section 카드 (HR Card 스타일)
+   참조: styleguide/components/cards.html
+   ======================================== #}
+
+{# Info Section 카드 - caller() 내용을 body에 렌더링 #}
+{% macro info_section_card(title, icon_svg, id=None, css_class='', editing=false) %}
+<div class="info-section{% if editing %} info-section--editing{% endif %}{% if css_class %} {{ css_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    <div class="info-section__header">
+        <div class="info-section__title">
+            {% if icon_svg %}
+            <div class="info-section__icon">
+                {{ icon_svg|safe }}
+            </div>
+            {% endif %}
+            {{ title }}
+            {% if editing %}
+            <span class="info-section__edit-badge">편집 중</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="info-section__body">
+        {{ caller() }}
+    </div>
+</div>
+{% endmacro %}
+
+{# Info Section 카드 (액션 버튼 포함) #}
+{% macro info_section_card_with_action(title, icon_svg, action_id, action_text='추가', action_icon_svg=None, id=None, css_class='', editing=false) %}
+<div class="info-section{% if editing %} info-section--editing{% endif %}{% if css_class %} {{ css_class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+    <div class="info-section__header">
+        <div class="info-section__title">
+            {% if icon_svg %}
+            <div class="info-section__icon">
+                {{ icon_svg|safe }}
+            </div>
+            {% endif %}
+            {{ title }}
+            {% if editing %}
+            <span class="info-section__edit-badge">편집 중</span>
+            {% endif %}
+        </div>
+        <div class="info-section__actions">
+            <button type="button" class="info-section__add-btn" id="{{ action_id }}">
+                {% if action_icon_svg %}
+                {{ action_icon_svg|safe }}
+                {% else %}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                {% endif %}
+                {{ action_text }}
+            </button>
+        </div>
+    </div>
+    <div class="info-section__body">
+        {{ caller() }}
+    </div>
+</div>
+{% endmacro %}
+
+{# 폼 섹션용 Info Section 카드 - section 태그로 감싸짐 #}
+{% macro form_info_section_card(title, icon_svg, section_id, css_class='', editing=false) %}
+<section class="form__section {{ css_class }}" id="{{ section_id }}">
+    <div class="info-section{% if editing %} info-section--editing{% endif %}">
+        <div class="info-section__header">
+            <div class="info-section__title">
+                {% if icon_svg %}
+                <div class="info-section__icon">
+                    {{ icon_svg|safe }}
+                </div>
+                {% endif %}
+                {{ title }}
+                {% if editing %}
+                <span class="info-section__edit-badge">편집 중</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="info-section__body">
+            {{ caller() }}
+        </div>
+    </div>
+</section>
+{% endmacro %}
+
+{# 폼 섹션용 Info Section 카드 (동적 항목 추가 버튼 포함) #}
+{% macro form_info_section_card_dynamic(title, icon_svg, section_id, add_btn_id, add_btn_text='추가', css_class='', editing=false) %}
+<section class="form__section {{ css_class }}" id="{{ section_id }}">
+    <div class="info-section{% if editing %} info-section--editing{% endif %}">
+        <div class="info-section__header">
+            <div class="info-section__title">
+                {% if icon_svg %}
+                <div class="info-section__icon">
+                    {{ icon_svg|safe }}
+                </div>
+                {% endif %}
+                {{ title }}
+                {% if editing %}
+                <span class="info-section__edit-badge">편집 중</span>
+                {% endif %}
+            </div>
+            <div class="info-section__actions">
+                <button type="button" class="info-section__add-btn" id="{{ add_btn_id }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    {{ add_btn_text }}
+                </button>
+            </div>
+        </div>
+        <div class="info-section__body">
+            {{ caller() }}
+        </div>
+    </div>
+</section>
+{% endmacro %}
+
+{# 빈 상태 Info Section #}
+{% macro empty_info_section(message='등록된 정보가 없습니다.', icon_svg=None) %}
+<div class="info-section placeholder-card">
+    <div class="info-section__body">
+        <div class="placeholder-content">
+            {% if icon_svg %}
+            {{ icon_svg|safe }}
+            {% else %}
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="48" height="48">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
+            {% endif %}
+            <p>{{ message }}</p>
+        </div>
+    </div>
+</div>
+{% endmacro %}

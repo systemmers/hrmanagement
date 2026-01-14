@@ -4,18 +4,24 @@
     employee: 직원 객체 (수정 모드일 때)
     benefit: 복리후생 객체
     action: 'create' 또는 'update' (신규 등록 시 숨김)
+
+    Migration (2026-01-13): .card → .info-section
 #}
+{% from 'shared/macros/_info_display.html' import info_section_start, info_section_end, info_section_header, info_section_body_start, info_section_body_end, svg_icon_heart %}
+
 {% if action != 'create' %}
 <section class="form__section" id="benefit-info">
-    <div class="card">
-        <div class="card__header">
-            <h2 class="card__title">
-                <i class="fas fa-umbrella-beach"></i>
+    {{ info_section_start() }}
+        <div class="info-section__header">
+            <div class="info-section__title">
+                <div class="info-section__icon">
+                    {{ svg_icon_heart() }}
+                </div>
                 연차 및 복리후생
-                <span class="badge badge--secondary">읽기 전용</span>
-            </h2>
+            </div>
+            <span class="badge badge--secondary">읽기 전용</span>
         </div>
-        <div class="card__body">
+        {{ info_section_body_start() }}
             <div class="alert alert--info alert--info-box mb-4">
                 <i class="fas fa-info-circle"></i>
                 <span>복리후생 정보는 인사담당자가 관리합니다. 수정이 필요한 경우 인사담당자에게 문의하세요.</span>
@@ -60,7 +66,7 @@
                 </div>
                 {% endif %}
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>
 {% endif %}

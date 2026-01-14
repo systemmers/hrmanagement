@@ -3,24 +3,33 @@
     Phase 9: FieldRegistry 필드명 동기화
     employee: 직원 객체 (수정 모드일 때)
     has_person_contract: 개인계약 연동 여부 (법인에서 개인정보 수정 제한)
+
+    Migration (2026-01-13): .card → .info-section
 #}
+{% from 'shared/macros/_info_display.html' import info_section_start, info_section_end, info_section_body_start, info_section_body_end, svg_icon_users %}
 {# 개인정보 읽기 전용 플래그: 법인 계정 + 개인계약 연동 시 #}
 {% set is_personal_readonly = is_corporate and has_person_contract %}
 <section class="form__section" id="family-info">
-    <div class="card">
-        <div class="card__header">
-            <h2 class="card__title">
-                <i class="fas fa-users"></i>
-                가족사항
-                {% if is_personal_readonly %}<small class="text-muted">(동기화 전용)</small>{% endif %}
-            </h2>
+    {{ info_section_start() }}
+        <div class="info-section__header">
+            <div class="info-section__title">
+                <div class="info-section__icon">
+                    {{ svg_icon_users() }}
+                </div>
+                가족사항{% if is_personal_readonly %} <small class="text-muted">(동기화 전용)</small>{% endif %}
+            </div>
             {% if not is_personal_readonly %}
-            <button type="button" class="btn btn--sm btn--secondary" id="addFamily">
-                <i class="fas fa-plus"></i> 추가
-            </button>
+            <div class="info-section__actions">
+                <button type="button" class="info-section__add-btn" id="addFamily">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    추가
+                </button>
+            </div>
             {% endif %}
         </div>
-        <div class="card__body">
+        {{ info_section_body_start() }}
             <div class="dynamic-list" id="familyList">
                 {# SSOT: Blueprint에서 family_list 전달 필수 (N+1 쿼리 방지) #}
                 {% set family_members = family_list | default([]) %}
@@ -132,6 +141,6 @@
                 </div>
                 {% endif %}
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>

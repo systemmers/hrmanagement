@@ -98,13 +98,10 @@ function showContentError(contentEl) {
 }
 
 /**
- * HTML 이스케이프
+ * HTML 이스케이프 (SSOT: window.HRFormatters.escapeHtml)
  */
 function escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+    return window.HRFormatters?.escapeHtml?.(str) || '';
 }
 
 /**

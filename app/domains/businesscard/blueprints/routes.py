@@ -87,7 +87,7 @@ def get_business_card(employee_id, side):
 
         if result.success:
             return api_success(result.data)
-        elif result.code == 'NOT_FOUND':
+        elif result.error_code == 'NOT_FOUND':
             return api_not_found('명함 이미지')
         else:
             return api_error(result.message)
@@ -163,7 +163,7 @@ def delete_business_card(employee_id, side):
 
         if result.success:
             return api_success(message=result.message)
-        elif result.code == 'NOT_FOUND':
+        elif result.error_code == 'NOT_FOUND':
             return api_not_found('명함 이미지')
         else:
             return api_error(result.message)

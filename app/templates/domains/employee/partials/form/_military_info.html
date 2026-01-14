@@ -2,7 +2,11 @@
     직원 폼 - 병역정보 섹션
     employee: 직원 객체 (수정 모드일 때)
     has_person_contract: 개인계약 연동 여부 (법인에서 개인정보 수정 제한)
+
+    Migration (2026-01-13): .card → .info-section
 #}
+{% from 'shared/macros/_info_display.html' import info_section_start, info_section_end, info_section_header, info_section_body_start, info_section_body_end, svg_icon_shield %}
+
 {# 개인정보 읽기 전용 플래그: 법인 계정 + 개인계약 연동 시 #}
 {% set is_personal_readonly = is_corporate and has_person_contract %}
 
@@ -10,15 +14,9 @@
 {% set mil = military | default({}) %}
 
 <section class="form__section" id="military-info">
-    <div class="card">
-        <div class="card__header">
-            <h2 class="card__title">
-                <i class="fas fa-shield-alt"></i>
-                병역정보
-                {% if is_personal_readonly %}<small class="text-muted">(동기화 전용)</small>{% endif %}
-            </h2>
-        </div>
-        <div class="card__body">
+    {{ info_section_start() }}
+        {{ info_section_header('병역정보' ~ (' (동기화 전용)' if is_personal_readonly else ''), svg_icon_shield()) }}
+        {{ info_section_body_start() }}
             <div class="form-grid">
                 <div class="form__group">
                     <label for="military_status" class="form__label">병역사항</label>
@@ -82,6 +80,6 @@
                            {% if is_personal_readonly %}readonly disabled{% endif %}>
                 </div>
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>

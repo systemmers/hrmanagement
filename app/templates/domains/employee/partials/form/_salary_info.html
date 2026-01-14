@@ -3,30 +3,41 @@
     employee: 직원 객체 (수정 모드일 때)
     salary: 급여 정보 객체
     has_person_contract: 승인된 개인계약 존재 여부 (계약 후 수정 불가용)
+
+    Migration (2026-01-13): .card → .info-section
 #}
+{% from 'shared/macros/_info_display.html' import info_section_start, info_section_end, info_section_header_with_action, info_section_body_start, info_section_body_end, svg_icon_currency %}
+
 {# 계약 후 수정 불가 플래그: 승인된 개인계약이 있을 때 #}
 {% set is_contract_readonly = has_person_contract %}
 
 <section class="form__section" id="salary-info">
-    <div class="card">
-        <div class="card__header">
-            <h2 class="card__title">
-                <i class="fas fa-won-sign"></i>
-                급여정보
-                {% if is_contract_readonly %}<small class="text-muted">(계약 확정)</small>{% endif %}
-            </h2>
+    {{ info_section_start() }}
+        <div class="info-section__header">
+            <div class="info-section__title">
+                <div class="info-section__icon">
+                    {{ svg_icon_currency() }}
+                </div>
+                급여정보{% if is_contract_readonly %} <small class="text-muted">(계약 확정)</small>{% endif %}
+            </div>
             {% if not is_contract_readonly %}
-            <button type="button" class="btn btn--outline-primary btn--sm" id="openSalaryCalculatorBtn">
-                <i class="fas fa-calculator"></i>
-                포괄임금 계산기
-            </button>
+            <div class="info-section__actions">
+                <button type="button" class="btn btn--outline-primary btn--sm" id="openSalaryCalculatorBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    포괄임금 계산기
+                </button>
+            </div>
             {% endif %}
         </div>
-        <div class="card__body">
+        {{ info_section_body_start() }}
             <!-- 포괄임금제 요약 (계산기 사용 시 표시) -->
             <div class="comprehensive-salary-summary hidden" id="comprehensiveSalarySummary">
                 <div class="summary-header">
-                    <i class="fas fa-info-circle"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                     <span>포괄임금제 적용</span>
                 </div>
                 <div class="summary-content">
@@ -105,7 +116,9 @@
             <!-- 포괄임금제 상세 필드 (확장 영역) -->
             <div class="comprehensive-salary-details hidden" id="comprehensiveSalaryDetails">
                 <h3 class="section-subtitle">
-                    <i class="fas fa-calculator"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
                     포괄임금제 수당 내역
                 </h3>
                 <div class="form-grid">
@@ -159,8 +172,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>
 
 <!-- 급여 계산기 모달 Include -->

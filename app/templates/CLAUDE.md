@@ -248,3 +248,10 @@ shared/base.html (또는 shared/base_public.html, shared/base_error.html)
 
 **Attachment 도메인 추가 (2026-01-10)**
 - 첨부파일 관련 부분 템플릿 추가
+
+**Profile Header v3.3 마이그레이션 (2026-01-14)**
+- 신규: `shared/partials/_profile_header.html` (2칼럼 레이아웃: 정보 + 명함)
+- 신규: `css/shared/components/profile-header.css` (3개 테마: Corporate/Personal/Employee)
+- 적용: `profile/detail.html`, `mypage/company_info.html`, `personal/company_card_detail.html`
+- Deprecated: `domains/employee/partials/detail/_employee_header.html`
+- Deprecated: `css/domains/employee/header.css`

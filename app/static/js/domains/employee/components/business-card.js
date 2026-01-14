@@ -140,7 +140,12 @@ function handleFile(file, side) {
  * 명함 이미지 업로드
  */
 async function uploadBusinessCards() {
-    const container = document.querySelector('.business-card-container');
+    // profile-header v3.3 또는 레거시 employee-header에서 employeeId 찾기
+    const container = document.querySelector(
+        '.profile-header__column--card[data-employee-id], ' +  // v3.3 신규
+        '.employee-header-card[data-employee-id], ' +          // 레거시 (하위 호환)
+        '.business-card-container[data-employee-id]'           // 레거시 (하위 호환)
+    );
     const employeeId = container ? container.dataset.employeeId : null;
 
     if (!employeeId) {
@@ -190,7 +195,7 @@ async function uploadSingleCard(employeeId, side, file) {
     formData.append('file', file);
     formData.append('side', side);
 
-    const response = await fetch(`/api/employees/${employeeId}/business-card`, {
+    const response = await fetch(`/api/businesscard/employee/${employeeId}`, {
         method: 'POST',
         body: formData
     });
@@ -211,7 +216,12 @@ async function deleteAllBusinessCards() {
         return;
     }
 
-    const container = document.querySelector('.business-card-container');
+    // profile-header v3.3 또는 레거시 employee-header에서 employeeId 찾기
+    const container = document.querySelector(
+        '.profile-header__column--card[data-employee-id], ' +  // v3.3 신규
+        '.employee-header-card[data-employee-id], ' +          // 레거시 (하위 호환)
+        '.business-card-container[data-employee-id]'           // 레거시 (하위 호환)
+    );
     const employeeId = container ? container.dataset.employeeId : null;
 
     if (!employeeId) {
@@ -243,7 +253,7 @@ async function deleteAllBusinessCards() {
  * 단일 명함 이미지 삭제
  */
 async function deleteBusinessCard(employeeId, side) {
-    const response = await fetch(`/api/employees/${employeeId}/business-card/${side}`, {
+    const response = await fetch(`/api/businesscard/employee/${employeeId}/${side}`, {
         method: 'DELETE'
     });
 
@@ -285,11 +295,17 @@ document.addEventListener('click', (e) => {
     const action = target.dataset.action;
 
     switch (action) {
+        case 'open-business-card-modal':
+            openBusinessCardModal();
+            break;
         case 'close-business-card-modal':
             closeBusinessCardModal();
             break;
         case 'upload-business-cards':
             uploadBusinessCards();
+            break;
+        case 'delete-all-business-cards':
+            deleteAllBusinessCards();
             break;
     }
 });

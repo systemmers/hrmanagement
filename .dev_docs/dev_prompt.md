@@ -3,8 +3,6 @@
 
 # git master id
 - --commit --branch-new "hrm-projekt-yymmddnn" --push
-- hrm-projket-20
-- hrm-projket-21
 
 ---
 
@@ -27,7 +25,6 @@
 - 코드 재정의 금지 - 기존 정의된 코드 재사용
 
 ### 네이밍 및 구조 원칙
-- 네이밍, 네이밍 스페이스 준수 - 명확하고 일관된 이름 사용
 - 컨벤션 준수 - 프로젝트 코딩 스타일 가이드 준수
 - 모듈화 - 기능별 독립적인 모듈 구성
 - 규칙적 구조화 유지 - 일관된 디렉토리 및 파일 구조
@@ -122,3 +119,5 @@ lsp
 
 
 http://localhost:5200/styleguide/components/attachment
+
+

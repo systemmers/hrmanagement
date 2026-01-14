@@ -58,11 +58,11 @@
     margin-bottom: var(--space-8);
 }
 
-/* 직원 카드 그리드 */
+/* 직원 카드 그리드 - 8pt 그리드 표준 (24px gap) */
 .employee-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-6);  /* 24px - 명함 그리드와 통일 */
 }
 
 .employee-card {
@@ -300,7 +300,8 @@
     }
 
     .employee-grid {
-        grid-template-columns: repeat(2, 1fr);
+        /* auto-fill이 자동으로 2열 이하로 조정됨 */
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     }
 
     .dashboard-info-section {
@@ -314,6 +315,7 @@
     }
 
     .employee-grid {
+        /* 모바일: 단일 컬럼 */
         grid-template-columns: 1fr;
     }
 }

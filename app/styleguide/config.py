@@ -44,13 +44,12 @@ NAVIGATION = {
             {'id': 'image-upload', 'label': '이미지 업로드', 'icon': 'fa-image', 'description': '사진 업로드'},
             {'id': 'tree-selector', 'label': '트리 선택', 'icon': 'fa-sitemap', 'description': '조직 트리 선택'},
             {'id': 'data-table-advanced', 'label': '고급 테이블', 'icon': 'fa-table', 'description': '고급 데이터 테이블'},
-            # 4순위 - 도메인 특화 컴포넌트 (3개)
+            # 4순위 - 도메인 특화 컴포넌트 (4개)
+            {'id': 'profile-header', 'label': '프로필 헤더', 'icon': 'fa-user-tie', 'description': '계정별 통합 헤더 카드'},
             {'id': 'employee-card', 'label': '직원 카드', 'icon': 'fa-address-card', 'description': '직원 카드형 표시'},
             {'id': 'business-card', 'label': '명함', 'icon': 'fa-id-card-alt', 'description': '3D 플립 명함 카드'},
             {'id': 'attachment', 'label': '첨부서류', 'icon': 'fa-paperclip', 'description': '파일 업로드 및 목록'},
-            # 5순위 - HR Card 마이그레이션 컴포넌트 (6개)
-            {'id': 'info-section', 'label': '정보 섹션', 'icon': 'fa-window-restore', 'description': 'HR Card 섹션 카드'},
-            {'id': 'info-table', 'label': '정보 테이블', 'icon': 'fa-th-list', 'description': '2열 정보 테이블'},
+            # 5순위 - HR Card 마이그레이션 컴포넌트 (4개) - info-section, info-table은 cards.html로 병합
             {'id': 'inline-edit', 'label': '인라인 편집', 'icon': 'fa-pencil-alt', 'description': '인라인 편집 모드'},
             {'id': 'sub-nav', 'label': '서브 네비게이션', 'icon': 'fa-list-ul', 'description': '확장/축소 섹션 네비게이션'},
             {'id': 'sidebar-search', 'label': '사이드바 검색', 'icon': 'fa-search', 'description': '사이드바 내 검색'},

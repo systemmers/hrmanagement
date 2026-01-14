@@ -1,6 +1,6 @@
 {#
     BusinessCard Card Component
-    명함 카드 컴포넌트 (Executive Dark)
+    명함 카드 컴포넌트 (Executive Dark + 이미지 모드)
 
     Design: Design 2 - Executive Dark
     - 상단 중앙 사진 레이아웃
@@ -9,14 +9,78 @@
     - 우측 하단 QR 코드
 
     Variables:
-        employee: Employee 객체
+        employee: Employee 객체 (필수)
         company: Company 객체 (선택)
+        business_card_front: 앞면 Attachment 객체 (선택)
+        business_card_back: 뒷면 Attachment 객체 (선택)
+        can_edit: 편집 권한 (선택, 기본 false)
+        size: 'sm' | 'md' | 'lg' (선택, 기본 'md')
+        mode: 'auto' | 'template' | 'image' (선택, 기본 'auto')
 
     Usage:
         {% include 'domains/businesscard/partials/_card.html' %}
 #}
 
-<div class="bc-wrapper"
+{# 모드 결정: 이미지 있으면 이미지 모드, 없으면 템플릿 모드 #}
+{% set card_mode = mode|default('auto') %}
+{% set has_card_image = business_card_front or business_card_back %}
+{% set use_image_mode = card_mode == 'image' or (card_mode == 'auto' and has_card_image) %}
+{% set card_size = size|default('md') %}
+
+{# 파일 경로 정규화: 상대 경로면 /static/uploads/ 추가 #}
+{% set front_path = business_card_front.file_path if business_card_front else None %}
+{% set back_path = business_card_back.file_path if business_card_back else None %}
+{% if front_path and not front_path.startswith('/static/') %}
+    {% set front_path = '/static/uploads/' ~ front_path %}
+{% endif %}
+{% if back_path and not back_path.startswith('/static/') %}
+    {% set back_path = '/static/uploads/' ~ back_path %}
+{% endif %}
+
+{% if use_image_mode and has_card_image %}
+{# ========================================
+   이미지 모드: 업로드된 명함 이미지 표시
+   ======================================== #}
+<div class="bc-wrapper bc-wrapper--image bc-wrapper--{{ card_size }}"
+     tabindex="0"
+     data-employee-id="{{ employee.id }}"
+     data-href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}">
+    <div class="bc-card">
+        <!-- 명함 앞면 (이미지) -->
+        <div class="bc-face bc-front bc-front--image">
+            {% if business_card_front %}
+            <img src="{{ front_path }}"
+                 alt="{{ employee.name }} 명함 앞면"
+                 class="bc-image">
+            {% else %}
+            <div class="bc-placeholder">
+                <i class="fas fa-id-card"></i>
+                <span>앞면 미등록</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- 명함 뒷면 (이미지) -->
+        <div class="bc-face bc-back bc-back--image">
+            {% if business_card_back %}
+            <img src="{{ back_path }}"
+                 alt="{{ employee.name }} 명함 뒷면"
+                 class="bc-image">
+            {% else %}
+            <div class="bc-placeholder">
+                <i class="fas fa-id-card"></i>
+                <span>뒷면 미등록</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% else %}
+{# ========================================
+   템플릿 모드: Executive Dark 디자인
+   ======================================== #}
+<div class="bc-wrapper bc-wrapper--{{ card_size }}"
      tabindex="0"
      data-employee-id="{{ employee.id }}"
      data-href="{{ url_for('employees.employee_detail', employee_id=employee.id) }}">
@@ -102,5 +166,5 @@
             </div>
         </div>
     </div>
-
 </div>
+{% endif %}

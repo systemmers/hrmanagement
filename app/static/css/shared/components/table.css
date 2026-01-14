@@ -168,6 +168,173 @@ table .badge {
 }
 
 /* ========================================
+   Data Table - 드래그 핸들
+   참조: .dev_docs/demos/hr_card/hr-card.html
+   ======================================== */
+.data-table__th--drag {
+    width: 40px;
+    padding: var(--space-3) var(--space-2);
+    text-align: center;
+}
+
+.data-table__drag-handle {
+    width: 40px;
+    padding: var(--space-2);
+    text-align: center;
+    vertical-align: middle;
+}
+
+.data-table__drag-handle svg {
+    width: 14px;
+    height: 14px;
+    color: var(--color-gray-300);
+    cursor: grab;
+}
+
+.data-table__drag-handle:active svg {
+    cursor: grabbing;
+}
+
+/* 드래그 상태 */
+.data-table__row--dragging {
+    opacity: 0.5;
+    background: var(--color-primary-50);
+}
+
+.data-table__row--drag-over {
+    border-top: 2px solid var(--color-primary-500);
+}
+
+/* ========================================
+   Data Table - 액션 버튼
+   ======================================== */
+.data-table__th--actions {
+    width: 100px;
+    text-align: center;
+    padding: var(--space-3) var(--space-2);
+}
+
+.data-table__actions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: var(--space-0-5);
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.data-table__btn-icon {
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-gray-500);
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.data-table__btn-icon:hover {
+    background: var(--color-gray-100);
+    color: var(--color-gray-700);
+}
+
+.data-table__btn-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* 수정 버튼 */
+.data-table__btn-icon--edit:hover {
+    background: var(--color-primary-50);
+    color: var(--color-primary-600);
+}
+
+/* 삭제 버튼 */
+.data-table__btn-icon--delete:hover {
+    background: var(--color-red-50);
+    color: var(--color-red-600);
+}
+
+/* 첨부파일 버튼 */
+.data-table__btn-icon--attach {
+    color: var(--color-gray-400);
+}
+
+.data-table__btn-icon--attach:hover {
+    background: var(--color-blue-50);
+    color: var(--color-blue-600);
+}
+
+/* 첨부파일 있음 */
+.data-table__btn-icon--attach.has-file {
+    color: var(--color-blue-600);
+    background: var(--color-blue-50);
+}
+
+.data-table__btn-icon--attach.has-file:hover {
+    background: var(--color-blue-600);
+    color: var(--color-pure-white);
+}
+
+/* ========================================
+   Data Table - 첨부파일 컬럼
+   ======================================== */
+.data-table__th--attach {
+    width: 60px;
+    text-align: center;
+    padding: var(--space-3) var(--space-2);
+}
+
+/* 첨부파일 인디케이터 */
+.data-table__attach-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.data-table__attach-indicator--has-file {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-blue-50);
+    color: var(--color-blue-600);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.data-table__attach-indicator--has-file:hover {
+    background: var(--color-blue-600);
+    color: var(--color-pure-white);
+    transform: scale(1.1);
+}
+
+.data-table__attach-indicator--has-file svg {
+    width: 14px;
+    height: 14px;
+}
+
+.data-table__attach-indicator--empty {
+    color: var(--color-gray-300);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.data-table__attach-indicator--empty svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ========================================
    Table Actions
    ======================================== */
 /* 테이블 액션 버튼 컨테이너 (SSOT) */

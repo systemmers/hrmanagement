@@ -313,4 +313,11 @@ export class TemplateGenerator {
 // 전역 접근용 (기존 코드 호환성)
 if (typeof window !== 'undefined') {
     window.TemplateGenerator = TemplateGenerator;
+
+    // escapeHtml 전역 export (SSOT - DRY 원칙)
+    window.HRFormatters = window.HRFormatters || {};
+    window.HRFormatters.escapeHtml = escapeHtml;
 }
+
+// ES6 module export
+export { escapeHtml };

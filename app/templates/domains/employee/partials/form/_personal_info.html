@@ -8,18 +8,17 @@
 
     BEM 네이밍 전환 (2026-01-09)
     표준: .form__section, .card__header, .card__title, .card__body, .form__group, .form__label, .form__input, .form__help
+
+    Migration (2026-01-13): .card → .info-section
 #}
+{% from 'shared/macros/_info_display.html' import info_section_start, info_section_end, info_section_header, info_section_body_start, info_section_body_end, svg_icon_user %}
+
 {# 개인정보 읽기 전용 플래그: 법인 계정 + 개인계약 연동 시 #}
 {% set is_personal_readonly = is_corporate and has_person_contract %}
 <section class="form__section" id="personal-info" aria-labelledby="personal-info-title">
-    <div class="card">
-        <div class="card__header">
-            <h2 id="personal-info-title" class="card__title">
-                <i class="fas fa-user" aria-hidden="true"></i>
-                개인 기본정보
-            </h2>
-        </div>
-        <div class="card__body">
+    {{ info_section_start() }}
+        {{ info_section_header('개인 기본정보', svg_icon_user()) }}
+        {{ info_section_body_start() }}
             {# 프로필 사진 영역 #}
             <div class="image-upload-section">
                 <div class="image-preview image-preview--lg" id="photoPreview">
@@ -27,7 +26,9 @@
                     <img src="{{ employee.photo }}" alt="프로필 사진" id="previewImage">
                     {% else %}
                     <div class="image-placeholder" id="photoPlaceholder">
-                        <i class="fas fa-user"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="48" height="48">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
                         <span>사진 미등록</span>
                     </div>
                     {% endif %}
@@ -45,11 +46,16 @@
                         {% if not is_personal_readonly %}
                         <div class="photo-upload-buttons">
                             <button type="button" class="btn btn--secondary btn--sm" id="selectPhotoBtn">
-                                <i class="fas fa-camera"></i> 사진 선택
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg> 사진 선택
                             </button>
                             {% if employee and employee.photo and not employee.photo.startswith('http') %}
                             <button type="button" class="btn btn--outline-danger btn--sm" id="deletePhotoBtn">
-                                <i class="fas fa-trash"></i> 삭제
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg> 삭제
                             </button>
                             {% endif %}
                         </div>
@@ -68,10 +74,15 @@
                         <input type="hidden" id="photo" name="photo" value="{{ url_for('static', filename='images/face/face_01_m.png') }}">
                         <div class="photo-upload-buttons">
                             <button type="button" class="btn btn--secondary btn--sm" id="selectPhotoBtn">
-                                <i class="fas fa-camera"></i> 사진 선택
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg> 사진 선택
                             </button>
                             <button type="button" class="btn btn--outline-danger btn--sm hidden" id="deletePhotoBtn">
-                                <i class="fas fa-trash"></i> 삭제
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg> 삭제
                             </button>
                         </div>
                         <small class="form__help">JPG, PNG, GIF, WebP (최대 5MB) - 등록 시 함께 저장됩니다</small>
@@ -92,7 +103,9 @@
                             <img src="{{ url_for('static', filename='uploads/business_cards/' ~ business_card_front.file_path.split('/')[-1]) }}" alt="명함 앞면">
                             {% else %}
                             <div class="card-placeholder">
-                                <i class="fas fa-id-card"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="32" height="32">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                                </svg>
                                 <span>앞면</span>
                             </div>
                             {% endif %}
@@ -102,15 +115,21 @@
                                    accept="image/jpeg,image/png,image/gif,image/webp"
                                    class="form__input-file hidden">
                             <button type="button" class="btn btn--secondary btn--sm" id="selectBusinessCardFrontBtn">
-                                <i class="fas fa-upload"></i> 앞면 선택
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg> 앞면 선택
                             </button>
                             {% if action == 'update' and business_card_front %}
                             <button type="button" class="btn btn--outline-danger btn--sm delete-card-btn" data-side="front">
-                                <i class="fas fa-trash"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
                             </button>
                             {% else %}
                             <button type="button" class="btn btn--outline-danger btn--sm delete-card-btn hidden" data-side="front">
-                                <i class="fas fa-trash"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
                             </button>
                             {% endif %}
                         </div>
@@ -122,7 +141,9 @@
                             <img src="{{ url_for('static', filename='uploads/business_cards/' ~ business_card_back.file_path.split('/')[-1]) }}" alt="명함 뒷면">
                             {% else %}
                             <div class="card-placeholder">
-                                <i class="fas fa-id-card"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="32" height="32">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                                </svg>
                                 <span>뒷면</span>
                             </div>
                             {% endif %}
@@ -132,15 +153,21 @@
                                    accept="image/jpeg,image/png,image/gif,image/webp"
                                    class="form__input-file hidden">
                             <button type="button" class="btn btn--secondary btn--sm" id="selectBusinessCardBackBtn">
-                                <i class="fas fa-upload"></i> 뒷면 선택
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg> 뒷면 선택
                             </button>
                             {% if action == 'update' and business_card_back %}
                             <button type="button" class="btn btn--outline-danger btn--sm delete-card-btn" data-side="back">
-                                <i class="fas fa-trash"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
                             </button>
                             {% else %}
                             <button type="button" class="btn btn--outline-danger btn--sm delete-card-btn hidden" data-side="back">
-                                <i class="fas fa-trash"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
                             </button>
                             {% endif %}
                         </div>
@@ -285,7 +312,9 @@
                                {% if is_personal_readonly %}disabled{% endif %}>
                         {% if not is_personal_readonly %}
                         <button type="button" class="btn btn--secondary" id="searchAddressBtn" aria-label="주소 검색">
-                            <i class="fas fa-search" aria-hidden="true"></i> 주소 검색
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg> 주소 검색
                         </button>
                         {% endif %}
                     </div>
@@ -355,7 +384,9 @@
                                {% if is_personal_readonly %}disabled{% endif %}>
                         {% if not is_personal_readonly %}
                         <button type="button" class="btn btn--secondary" id="searchActualAddressBtn" aria-label="실제 거주지 검색">
-                            <i class="fas fa-search" aria-hidden="true"></i> 주소 검색
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg> 주소 검색
                         </button>
                         {% endif %}
                     </div>
@@ -408,6 +439,6 @@
                        value="{{ employee.actual_postal_code if employee and employee.actual_postal_code else '' }}">
 
             </div>
-        </div>
-    </div>
+        {{ info_section_body_end() }}
+    {{ info_section_end() }}
 </section>
