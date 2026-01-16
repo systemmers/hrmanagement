@@ -195,7 +195,7 @@ def register_mutation_routes(bp: Blueprint):
             _handle_business_card_upload(employee_id)
 
             flash(f'직원 및 계정이 등록되었습니다. {result["message"]}', 'success')
-            return redirect(url_for('employees.employee_edit', employee_id=employee_id))
+            return redirect(url_for('employees.employee_detail', employee_id=employee_id))
 
         except Exception as e:
             flash(f'직원 등록 중 오류가 발생했습니다: {str(e)}', 'error')
@@ -347,7 +347,7 @@ def register_mutation_routes(bp: Blueprint):
             my_employee_id = session.get(SessionKeys.EMPLOYEE_ID)
             if my_employee_id != employee_id:
                 flash('본인 정보만 수정할 수 있습니다.', 'warning')
-                return redirect(url_for('employees.employee_edit', employee_id=my_employee_id))
+                return redirect(url_for('employees.employee_detail', employee_id=my_employee_id))
 
         # 관리자/매니저는 자사 소속 직원만 수정 가능
         if user_role in [UserRole.ADMIN, UserRole.MANAGER]:
@@ -399,7 +399,7 @@ def register_mutation_routes(bp: Blueprint):
 
         except Exception as e:
             flash(f'직원 수정 중 오류가 발생했습니다: {str(e)}', 'error')
-            return redirect(url_for('employees.employee_edit', employee_id=employee_id))
+            return redirect(url_for('employees.employee_detail', employee_id=employee_id))
 
     @bp.route('/employees/<int:employee_id>/update/basic', methods=['POST'])
     @login_required
@@ -414,7 +414,7 @@ def register_mutation_routes(bp: Blueprint):
             my_employee_id = session.get(SessionKeys.EMPLOYEE_ID)
             if my_employee_id != employee_id:
                 flash('본인 정보만 수정할 수 있습니다.', 'warning')
-                return redirect(url_for('employees.employee_edit', employee_id=my_employee_id))
+                return redirect(url_for('employees.employee_detail', employee_id=my_employee_id))
 
         if user_role in [UserRole.ADMIN, UserRole.MANAGER]:
             if not verify_employee_access(employee_id):
@@ -476,7 +476,7 @@ def register_mutation_routes(bp: Blueprint):
 
         except Exception as e:
             flash(f'기본정보 수정 중 오류가 발생했습니다: {str(e)}', 'error')
-            return redirect(url_for('employees.employee_edit', employee_id=employee_id))
+            return redirect(url_for('employees.employee_detail', employee_id=employee_id))
 
     @bp.route('/employees/<int:employee_id>/update/history', methods=['POST'])
     @login_required
@@ -488,7 +488,7 @@ def register_mutation_routes(bp: Blueprint):
             my_employee_id = session.get(SessionKeys.EMPLOYEE_ID)
             if my_employee_id != employee_id:
                 flash('본인 정보만 수정할 수 있습니다.', 'warning')
-                return redirect(url_for('employees.employee_edit', employee_id=my_employee_id))
+                return redirect(url_for('employees.employee_detail', employee_id=my_employee_id))
 
         if user_role in [UserRole.ADMIN, UserRole.MANAGER]:
             if not verify_employee_access(employee_id):
@@ -517,7 +517,7 @@ def register_mutation_routes(bp: Blueprint):
 
         except Exception as e:
             flash(f'이력정보 수정 중 오류가 발생했습니다: {str(e)}', 'error')
-            return redirect(url_for('employees.employee_edit', employee_id=employee_id))
+            return redirect(url_for('employees.employee_detail', employee_id=employee_id))
 
     # ========================================
     # 직원 삭제

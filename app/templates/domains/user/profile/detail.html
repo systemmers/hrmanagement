@@ -4,10 +4,15 @@
     법인 직원(corporate)과 개인 계정(personal) 모두 지원
     account_type에 따라 표시되는 섹션이 다름
 
+    모드:
+    - VIEW 모드: employee/profile 조회 (기본)
+    - CREATE 모드: action='create' 전달 시, 신규 직원 등록
+
     컨텍스트 변수:
-    - employee 또는 profile: 프로필 데이터 객체
+    - employee 또는 profile: 프로필 데이터 객체 (CREATE 모드에서는 None)
     - is_corporate: 법인 소속 여부
     - account_type: 'corporate', 'personal', 'corporate_admin'
+    - action: 'create' (신규 등록), 'view' (기본)
     - sections: 사용 가능한 섹션 목록
     - basic_info, organization_info, education_list 등: 섹션별 데이터
 #}
@@ -15,9 +20,11 @@
 
 {# 변수 통합: employee 또는 profile 중 사용 가능한 것 사용 #}
 {% set profile_data = employee if employee is defined else profile %}
-{% set profile_name = profile_data.name if profile_data else '프로필' %}
+{% set profile_name = profile_data.name if profile_data else '신규 직원' %}
+{# CREATE 모드 플래그 #}
+{% set is_create_mode = action is defined and action == 'create' %}
 
-{% block title %}{{ profile_name }} - {{ '인사카드' if page_mode == 'hr_card' else '프로필' }}{% endblock %}
+{% block title %}{% if is_create_mode %}신규 직원 등록{% else %}{{ profile_name }} - {{ '인사카드' if page_mode == 'hr_card' else '프로필' }}{% endif %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/layouts/section-nav.css') }}">
@@ -25,31 +32,52 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/attachment.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/attachment/index.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/profile-header.css') }}">
-{% if page_mode == 'hr_card' %}
+{% if page_mode == 'hr_card' and not is_create_mode %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/businesscard/card.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/business-card.css') }}">
 {% endif %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/card.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/table.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/detail.css') }}">
+{# CREATE 모드용 인라인 편집 CSS #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/inline-edit.css') }}">
+{% if is_create_mode %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/components/tree-selector.css') }}">
+{% endif %}
 {% endblock %}
 
 {% block content %}
 {# 내부 섹션 네비게이션 제거 - 사이드바로 통합 (2026-01-12) #}
 
 {# 계정 타입에 따른 body 클래스 #}
-<div class="detail-page-layout detail-page-layout--no-sidebar-nav" data-account-type="{{ account_type }}">
+<div class="detail-page-layout detail-page-layout--no-sidebar-nav {{ 'create-mode' if is_create_mode else '' }}"
+         data-account-type="{{ account_type }}"
+         {% if is_create_mode %}data-create-mode="true"{% endif %}
+         {% if account_type == 'corporate' and profile_data and profile_data.id %}data-employee-id="{{ profile_data.id }}"{% endif %}
+         {% if account_type == 'personal' and profile_data and profile_data.id %}data-profile-id="{{ profile_data.id }}"{% endif %}>
     {# 메인 콘텐츠 #}
     <div class="detail-main-content">
         {# 페이지 헤더 #}
         <div class="detail-page-header">
-            {% if page_mode == 'hr_card' %}
+            {% if is_create_mode %}
+                <h1 class="detail-page-title">신규 직원 등록</h1>
+            {% elif page_mode == 'hr_card' %}
                 <h1 class="detail-page-title">직원 상세 정보</h1>
             {% else %}
                 <h1 class="detail-page-title">내 프로필</h1>
             {% endif %}
 
             <div class="detail-page-actions">
+                {# CREATE 모드: 등록/취소 버튼 #}
+                {% if is_create_mode %}
+                <a href="{{ url_for('employees.employee_list') }}" class="btn btn--secondary">
+                    <i class="fas fa-times"></i>
+                    <span>취소</span>
+                </a>
+                <button type="button" class="btn btn--primary" data-action="submit-all">
+                    <i class="fas fa-save"></i>
+                    <span>직원 등록</span>
+                </button>
+                {% else %}
                 {# 목록으로 버튼 (인사카드 페이지에서 관리자만) #}
                 {% if page_mode == 'hr_card' and current_user and current_user.role != 'employee' %}
                 <a href="{{ url_for('employees.employee_list') }}" class="btn btn--secondary">
@@ -57,30 +85,20 @@
                     <span>목록으로</span>
                 </a>
                 {% endif %}
-
-                {# 수정 버튼 - 인사카드 모드에서는 직원 수정, 프로필 모드에서는 프로필 수정 #}
-                {% if page_mode == 'hr_card' and profile_data and profile_data.id %}
-                <a href="{{ url_for('employees.employee_edit', employee_id=profile_data.id) }}" class="btn btn--primary">
-                    <i class="fas fa-edit"></i>
-                    <span>수정</span>
-                </a>
-                {% else %}
-                <a href="{{ url_for('profile.edit') }}" class="btn btn--primary">
-                    <i class="fas fa-edit"></i>
-                    <span>수정</span>
-                </a>
                 {% endif %}
 
-                {# 삭제 버튼 (인사카드 페이지에서 관리자만) #}
-                {% if page_mode == 'hr_card' and current_user and current_user.is_admin and account_type != 'corporate_admin' %}
+                {# 수정 버튼 제거 - 인라인 편집으로 대체 (2026-01-16) #}
+
+                {# 삭제 버튼 (인사카드 페이지에서 관리자만, CREATE 모드 제외) #}
+                {% if not is_create_mode and page_mode == 'hr_card' and current_user and current_user.is_admin and account_type != 'corporate_admin' %}
                 <button class="btn btn--danger" data-action="delete-employee" data-employee-id="{{ profile_data.id }}" data-employee-name="{{ profile_name }}">
                     <i class="fas fa-trash"></i>
                     <span>삭제</span>
                 </button>
                 {% endif %}
 
-                {# 프로필 동기화 버튼 (개인계약이 있는 경우 관리자/매니저만) #}
-                {% if page_mode == 'hr_card' and person_contract and current_user and current_user.role in ['admin', 'manager'] %}
+                {# 프로필 동기화 버튼 (개인계약이 있는 경우 관리자/매니저만, CREATE 모드 제외) #}
+                {% if not is_create_mode and page_mode == 'hr_card' and person_contract and current_user and current_user.role in ['admin', 'manager'] %}
                 <button class="btn btn--secondary" id="syncProfileBtn" data-contract-id="{{ person_contract.id }}">
                     <i class="fas fa-sync"></i>
                     <span>프로필 동기화</span>
@@ -89,6 +107,16 @@
             </div>
         </div>
 
+        {% if is_create_mode %}
+        {# ===== CREATE 모드: 신규 직원 등록 폼 ===== #}
+        {# 계정 정보 섹션 (필수) #}
+        {% include 'domains/employee/partials/detail/_create_account_section.html' %}
+
+        {# 기본정보 섹션 #}
+        {% include 'domains/employee/partials/detail/_basic_info.html' %}
+
+        {% else %}
+        {# ===== VIEW/EDIT 모드: 기존 상세 페이지 ===== #}
         {# 직원/프로필 헤더 카드 - Profile Header v3.3 #}
         {# 개인/법인 모두 동일한 헤더 컴포넌트 사용, 테마는 account_type에 따라 자동 적용 #}
         {% include 'shared/partials/_profile_header.html' %}
@@ -108,6 +136,7 @@
         {% if page_mode == 'hr_card' and account_type != 'corporate_admin' %}
             {% include 'domains/employee/partials/detail/_hr_records.html' %}
         {% endif %}
+        {% endif %}
     </div>
 </div>
 
@@ -126,12 +155,30 @@
 {% endblock %}
 
 {% block sidebar_right %}
+{# CREATE 모드에서는 첨부파일 사이드바 숨김 #}
+{% if not is_create_mode %}
 {# 프로필/인사카드 모두 첨부파일 사이드바 표시 #}
 {# 프로필: is_readonly=False (수정/삭제 가능), 인사카드: is_readonly=True (조회만) #}
 {% include 'shared/partials/_attachment_sidebar.html' %}
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
+{% if is_create_mode %}
+{# CREATE 모드: 인라인 편집 매니저 (CREATE 모드로 초기화) #}
+<script type="module">
+    import { initInlineEditCreate } from '{{ url_for('static', filename='js/shared/components/inline-edit-manager.js') }}';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // CREATE 모드로 InlineEditManager 초기화
+        initInlineEditCreate({
+            requiredFields: ['name', 'account_username', 'account_email'],
+            createApiUrl: '{{ url_for('employees.employee_create') }}'
+        });
+    });
+</script>
+{% else %}
+{# VIEW/EDIT 모드: 기존 스크립트 #}
 {# QR코드 라이브러리 (명함 도메인) #}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module" src="{{ url_for('static', filename='js/domains/employee/pages/detail.js') }}"></script>
@@ -142,5 +189,6 @@
 {# 프로필 동기화 스크립트 #}
 {% if person_contract %}
 <script src="{{ url_for('static', filename='js/domains/user/pages/profile-sync.js') }}"></script>
+{% endif %}
 {% endif %}
 {% endblock %}

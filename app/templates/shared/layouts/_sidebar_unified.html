@@ -198,8 +198,8 @@
         </button>
     </div>
 
-    {# 직원 프로필 카드 (직원 상세/수정 페이지에서만) #}
-    {% if employee and request.endpoint in ['employees.employee_detail', 'employees.employee_edit'] %}
+    {# 직원 프로필 카드 (직원 상세 페이지에서만) #}
+    {% if employee and request.endpoint == 'employees.employee_detail' %}
     {% include 'shared/partials/_employee_card_nav.html' %}
     {% endif %}
 

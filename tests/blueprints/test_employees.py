@@ -127,37 +127,6 @@ class TestEmployeeNew:
         assert response.status_code == 200
 
 
-class TestEmployeeEdit:
-    """직원 수정 폼 테스트"""
-
-    def test_edit_employee_form_requires_login(self, client):
-        """수정 폼 로그인 필요 테스트"""
-        response = client.get('/employees/1/edit', follow_redirects=False)
-        assert response.status_code == 302
-
-    def test_edit_employee_form_not_found(self, auth_client_corporate_full):
-        """존재하지 않는 직원 수정 폼 테스트"""
-        response = auth_client_corporate_full.get(
-            '/employees/99999/edit', follow_redirects=True
-        )
-        assert response.status_code == 200  # 리다이렉트 후
-
-    def test_edit_employee_form_renders(
-        self, client, test_user_corporate, test_company, test_employee
-    ):
-        """직원 수정 폼 렌더링 테스트"""
-        with client.session_transaction() as sess:
-            sess[SessionKeys.USER_ID] = test_user_corporate.id
-            sess[SessionKeys.USERNAME] = test_user_corporate.username
-            sess[SessionKeys.ACCOUNT_TYPE] = User.ACCOUNT_CORPORATE
-            sess[SessionKeys.COMPANY_ID] = test_company.id
-            sess[SessionKeys.USER_ROLE] = User.ROLE_ADMIN
-
-        response = client.get(f'/employees/{test_employee.id}/edit')
-        # 멀티테넌시 검증 (organization_id 필요)으로 인해 리다이렉트 발생 가능
-        assert response.status_code in [200, 302]
-
-
 class TestEmployeeCreate:
     """직원 생성 테스트"""
 
