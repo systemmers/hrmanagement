@@ -29,6 +29,8 @@ from .employee_core_service import EmployeeCoreService, employee_core_service
 from .employee_relation_service import EmployeeRelationService, employee_relation_service
 from .employee_account_service import EmployeeAccountService, employee_account_service
 from .profile_relation_service import ProfileRelationService, profile_relation_service
+from .inline_edit_service import InlineEditService, inline_edit_service
+from .validation_service import SectionValidationService, validation_service
 
 
 class EmployeeService:
@@ -139,6 +141,11 @@ class EmployeeService:
     @property
     def classification_repo(self):
         return self.relation.classification_repo
+
+    @property
+    def relation_service(self):
+        """section_api.py 호환용 relation_service alias"""
+        return self.relation
 
     def _get_repositories(self) -> Dict[str, Any]:
         """RelationDataUpdater용 Repository 딕셔너리 반환"""
@@ -450,9 +457,13 @@ __all__ = [
     'EmployeeRelationService',
     'EmployeeAccountService',
     'ProfileRelationService',
+    'InlineEditService',
+    'SectionValidationService',
     'employee_service',
     'employee_core_service',
     'employee_relation_service',
     'employee_account_service',
     'profile_relation_service',
+    'inline_edit_service',
+    'validation_service',
 ]

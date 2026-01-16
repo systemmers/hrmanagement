@@ -3,152 +3,449 @@
     섹션 1-6: 개인정보, 소속정보, 계약정보, 급여정보, 복리후생, 가족정보
 
     Migration (2026-01-13): .info-grid → .info-table (HR Card 스타일가이드)
+    Phase 1 (2026-01-14): 인라인 편집 시스템 적용 (개인 기본정보 섹션)
+    Phase 2 (2026-01-16): CREATE 모드 지원 (employee=None 안전 처리)
 #}
 {% from 'shared/macros/_info_display.html' import section_title, info_section_start, info_section_end, info_section_header, info_section_header_with_action, info_section_body_start, info_section_body_end, info_table_start, info_table_end, info_table_row, info_table_row_start, info_table_row_end, info_table_cell, info_table_cell_custom, svg_icon_user, svg_icon_building, svg_icon_document, svg_icon_currency, svg_icon_heart, svg_icon_users, data_table_th_drag, data_table_td_drag, data_table_th_actions, data_table_actions_full %}
+{% from 'shared/macros/_inline_edit.html' import inline_field, inline_select, inline_phone, inline_email, inline_date, inline_date_with_lunar, inline_row, inline_section_header, inline_section_start, inline_section_end, inline_readonly, inline_currency, inline_address, inline_organization %}
 
-{# 섹션 1: 개인 기본정보 #}
+{# CREATE 모드 안전 처리: employee가 None일 경우 빈 객체처럼 동작 #}
+{% set emp = employee or {} %}
+
+{# 섹션 1: 개인 기본정보 (인라인 편집 적용) #}
 <section id="personal-info" class="content-section">
     {{ section_title('개인 기본정보') }}
-    {{ info_section_start() }}
-        {{ info_section_header_with_action('개인 기본정보', svg_icon_user(), 'btn-edit-personal', '수정') }}
+    {{ inline_section_start('personal') }}
+        {{ inline_section_header('personal', '개인 기본정보', svg_icon_user()) }}
         {{ info_section_body_start() }}
             {{ info_table_start() }}
                 {# FieldRegistry personal_basic 섹션 순서 적용 #}
-                {{ info_table_row('이름', employee.name, '영문 이름', employee.english_name) }}
-                {{ info_table_row('한자 이름', employee.chinese_name, '외국어 이름', employee.foreign_name) }}
+                {# NOTE: 필드명은 Employee 모델 SSOT에 맞춤 (2026-01-16) #}
+                {# Phase 2: CREATE 모드 안전 처리 - employee가 None일 수 있음 #}
+                {{ inline_row('이름', 'name', employee.name if employee else none, '영문 이름', 'english_name', employee.english_name if employee else none, required1=true) }}
+                {{ inline_row('한자 이름', 'chinese_name', employee.chinese_name if employee else none, '외국어 이름', 'foreign_name', employee.foreign_name if employee else none) }}
 
-                {# 생년월일 - 커스텀 값 (음력 배지) #}
-                {{ info_table_row_start() }}
-                    {% call info_table_cell_custom('생년월일') %}
-                        {% if employee.birth_date %}
-                            {{ employee.birth_date }}{% if employee.lunar_birth %} <span class="badge badge--info">음력</span>{% endif %}
-                        {% else %}
-                            <span class="info-table__value--empty">미등록</span>
-                        {% endif %}
-                    {% endcall %}
-                    {{ info_table_cell('나이', (employee.age ~ '세') if employee.age else none) }}
-                {{ info_table_row_end() }}
+                {# 생년월일 - 날짜 필드 + 음력 체크박스 / 나이(읽기전용) #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">생년월일</div>
+                        <div class="info-table__value">
+                            {{ inline_date_with_lunar('birth_date', employee.birth_date if employee else none, 'lunar_birth', employee.lunar_birth if employee else none) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">나이</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('age', (employee.age ~ '세') if employee and employee.age else none) }}
+                        </div>
+                    </div>
+                </div>
 
-                {{ info_table_row('성별', get_gender_label(employee.gender), '국적', get_nationality_label(employee.nationality)) }}
-                {{ info_table_row('주민등록번호', employee.resident_number, '우편번호', employee.postal_code, 'masked') }}
+                {# 성별, 국적 - 드롭다운 #}
+                {{ inline_row('성별', 'gender', employee.gender if employee else none, '국적', 'nationality', employee.nationality if employee else none, options1=field_options.GENDER, options2=field_options.NATIONALITY) }}
 
-                {# 결혼여부 - 커스텀 값 #}
-                {{ info_table_row_start() }}
-                    {% call info_table_cell_custom('결혼여부') %}
-                        {{ get_marital_status_label(employee.marital_status) or '미등록' }}
-                    {% endcall %}
-                    {{ info_table_cell('휴대전화', format_phone(employee.phone)) }}
-                {{ info_table_row_end() }}
+                {# 주민등록번호, 우편번호 #}
+                {{ inline_row('주민등록번호', 'resident_number', employee.resident_number if employee else none, '우편번호', 'postal_code', employee.postal_code if employee else none) }}
 
-                {{ info_table_row('자택전화', format_phone(employee.home_phone) if format_phone is defined and employee.home_phone else employee.home_phone, '이메일', employee.email) }}
+                {# 결혼여부 - 드롭다운, 휴대전화 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">결혼여부</div>
+                        <div class="info-table__value">
+                            {{ inline_select('marital_status', employee.marital_status if employee else none, field_options.MARITAL_STATUS) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">휴대전화</div>
+                        <div class="info-table__value">
+                            {{ inline_phone('phone', employee.phone if employee else none) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# 자택전화, 이메일 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">자택전화</div>
+                        <div class="info-table__value">
+                            {{ inline_phone('home_phone', employee.home_phone if employee else none) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">이메일</div>
+                        <div class="info-table__value">
+                            {{ inline_email('email', employee.email if employee else none) }}
+                        </div>
+                    </div>
+                </div>
 
                 {# 비상연락처 - 2열 (연락처 / 관계) #}
-                {{ info_table_row('비상연락처', employee.emergency_contact, '비상연락처 관계', employee.emergency_relation) }}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">비상연락처</div>
+                        <div class="info-table__value">
+                            {{ inline_phone('emergency_contact', employee.emergency_contact if employee else none) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">비상연락처 관계</div>
+                        <div class="info-table__value">
+                            {{ inline_field('emergency_relation', employee.emergency_relation if employee else none) }}
+                        </div>
+                    </div>
+                </div>
 
                 {# 계좌정보 #}
-                {{ info_table_row('은행명', employee.bank_name, '계좌번호', employee.account_number) }}
-                {{ info_table_row('예금주', employee.account_holder, '취미', employee.hobby) }}
-                {{ info_table_row('특기', employee.specialty, '장애정보', employee.disability_info) }}
+                {{ inline_row('은행명', 'bank_name', employee.bank_name if employee else none, '계좌번호', 'account_number', employee.account_number if employee else none) }}
+                {{ inline_row('예금주', 'account_holder', employee.account_holder if employee else none, '취미', 'hobby', employee.hobby if employee else none) }}
+                {{ inline_row('특기', 'specialty', employee.specialty if employee else none, '장애정보', 'disability_info', employee.disability_info if employee else none) }}
 
-                {# 주소 정보 - 2열 배치 #}
-                {{ info_table_row('주민등록상 주소', employee.address, '상세주소', employee.detailed_address) }}
-                {{ info_table_row('실제 거주지', employee.actual_address, '실제 거주지 상세', employee.actual_detailed_address) }}
+                {# 주소 정보 - 주소검색 버튼 포함 (상세주소는 inline_address 매크로 내부에서 처리) #}
+                {# 실제 거주지가 비어있으면 편집 모드 진입 시 주민등록상 주소로 자동 복사됨 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">주민등록상 주소</div>
+                        <div class="info-table__value">
+                            {{ inline_address('address', employee.address if employee else none, 'detailed_address', employee.detailed_address if employee else none) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">실제 거주지</div>
+                        <div class="info-table__value">
+                            {{ inline_address('actual_address', employee.actual_address if employee else none, 'actual_detailed_address', employee.actual_detailed_address if employee else none) }}
+                        </div>
+                    </div>
+                </div>
             {{ info_table_end() }}
         {{ info_section_body_end() }}
-    {{ info_section_end() }}
+    {{ inline_section_end() }}
 </section>
 
-{# 섹션 2: 소속정보 (인사카드 전용) #}
-{% if page_mode == 'hr_card' %}
+{# 섹션 2: 소속정보 (인사카드 전용, CREATE 모드 제외) - 인라인 편집 적용 #}
+{% if page_mode == 'hr_card' and not is_create_mode %}
 <section id="organization-info" class="content-section">
     {{ section_title('소속정보') }}
-    {{ info_section_start() }}
-        {{ info_section_header_with_action('소속정보', svg_icon_building(), 'btn-edit-organization', '수정') }}
+    {{ inline_section_start('organization') }}
+        {{ inline_section_header('organization', '소속정보', svg_icon_building()) }}
         {{ info_section_body_start() }}
             {{ info_table_start() }}
-                {{ info_table_row('소속 조직', employee.department, '부서명', employee.team or employee.department) }}
-                {{ info_table_row('직위', employee.position, '직급', employee.job_grade) }}
-                {{ info_table_row('직책', employee.job_title, '직무', employee.job_role) }}
-                {{ info_table_row('사번', employee.employee_number or 'EMP-%03d'|format(employee.id), '근무지', employee.work_location or '본사') }}
-                {{ info_table_row('내선번호', employee.internal_phone, '회사 이메일', employee.company_email) }}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">소속 조직</div>
+                        <div class="info-table__value">
+                            {{ inline_organization('organization_id', employee.organization_id if employee else none, (employee.organization.name if employee and employee.organization else (employee.department if employee else none))) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">부서명</div>
+                        <div class="info-table__value">
+                            {{ inline_field('team', (employee.team or employee.department) if employee else none) }}
+                        </div>
+                    </div>
+                </div>
+                {{ inline_row('직위', 'position', employee.position if employee else none, '직급', 'job_grade', employee.job_grade if employee else none, options1=field_options.POSITION, options2=field_options.JOB_GRADE) }}
+                {{ inline_row('직책', 'job_title', employee.job_title if employee else none, '직무', 'job_role', employee.job_role if employee else none, options1=field_options.DUTY) }}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">사번</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('employee_number', (employee.employee_number or 'EMP-%03d'|format(employee.id)) if employee else none) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">근무지</div>
+                        <div class="info-table__value">
+                            {{ inline_field('work_location', (employee.work_location or '본사') if employee else none) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">내선번호</div>
+                        <div class="info-table__value">
+                            {{ inline_phone('internal_phone', employee.internal_phone if employee else none) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">회사 이메일</div>
+                        <div class="info-table__value">
+                            {{ inline_email('company_email', employee.company_email if employee else none) }}
+                        </div>
+                    </div>
+                </div>
             {{ info_table_end() }}
         {{ info_section_body_end() }}
-    {{ info_section_end() }}
+    {{ inline_section_end() }}
 </section>
 {% endif %}
 
-{# 섹션 3: 계약정보 (인사카드 전용) #}
-{% if page_mode == 'hr_card' %}
+{# 섹션 3: 계약정보 (인사카드 전용, CREATE 모드 제외) - 인라인 편집 적용 #}
+{% if page_mode == 'hr_card' and not is_create_mode %}
 <section id="contract-info" class="content-section">
     {{ section_title('계약정보') }}
-    {{ info_section_start() }}
-        {{ info_section_header_with_action('계약정보', svg_icon_document(), 'btn-edit-contract', '수정') }}
+    {{ inline_section_start('contract') }}
+        {{ inline_section_header('contract', '계약정보', svg_icon_document()) }}
         {{ info_section_body_start() }}
             {{ info_table_start() }}
-                {# 입사일 및 재직 상태 #}
-                {{ info_table_row_start() }}
-                    {{ info_table_cell('입사일', employee.hire_date) }}
-                    {% call info_table_cell_custom('재직 상태') %}
-                        <span class="badge {{ get_status_badge_class(employee.status) }}">
-                            {{ get_status_text(employee.status) }}
-                        </span>
-                    {% endcall %}
-                {{ info_table_row_end() }}
+                {# 입사일 및 재직 상태 - 읽기전용 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">입사일</div>
+                        <div class="info-table__value">
+                            {{ inline_date('hire_date', employee.hire_date) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">재직 상태</div>
+                        <div class="info-table__value">
+                            {{ inline_select('status', employee.status, field_options.EMPLOYEE_STATUS) }}
+                        </div>
+                    </div>
+                </div>
 
-                {{ info_table_row('고용형태', get_employment_type_label(employee.employment_type), '재직기간', calculate_tenure(employee.hire_date)) }}
-                {{ info_table_row('계약형태', contract.contract_type if contract else (get_employment_type_label(employee.employment_type) if employee.employment_type else none), '계약기간', contract.contract_period if contract else (employee.contract_period or '무기한')) }}
-                {{ info_table_row('계약시작일', contract.contract_date if contract else employee.hire_date, '직원유형', contract.employee_type if contract else none) }}
-                {{ info_table_row('근무형태', contract.work_type if contract else none, '수습종료일', employee.probation_end) }}
-                {{ info_table_row('근무시간', contract.work_hours if contract and contract.work_hours else '09:00 ~ 18:00', '휴게시간', contract.break_hours if contract and contract.break_hours else '12:00 ~ 13:00') }}
+                {# 고용형태, 재직기간 - 재직기간은 계산값이므로 읽기전용 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">고용형태</div>
+                        <div class="info-table__value">
+                            {{ inline_select('employment_type', employee.employment_type, field_options.EMPLOYMENT_TYPE) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">재직기간</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('tenure', calculate_tenure(employee.hire_date)) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# 계약형태, 계약기간 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">계약형태</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('contract_type', contract.contract_type if contract else (get_employment_type_label(employee.employment_type) if employee.employment_type else none)) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">계약기간</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('contract_period', contract.contract_period if contract else (employee.contract_period or '무기한')) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# 계약시작일, 직원유형 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">계약시작일</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('contract_date', contract.contract_date if contract else employee.hire_date) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">직원유형</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('employee_type', contract.employee_type if contract else none) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# 근무형태, 수습종료일 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">근무형태</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('work_type', contract.work_type if contract else none) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">수습종료일</div>
+                        <div class="info-table__value">
+                            {{ inline_date('probation_end', employee.probation_end) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# 근무시간, 휴게시간 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">근무시간</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('work_hours', contract.work_hours if contract and contract.work_hours else '09:00 ~ 18:00') }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">휴게시간</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('break_hours', contract.break_hours if contract and contract.break_hours else '12:00 ~ 13:00') }}
+                        </div>
+                    </div>
+                </div>
 
                 {% if employee.resignation_date %}
-                {{ info_table_row('퇴사일', employee.resignation_date, none, none) }}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">퇴사일</div>
+                        <div class="info-table__value">
+                            {{ inline_date('resignation_date', employee.resignation_date) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell"></div>
+                </div>
                 {% endif %}
                 {% if employee.data_retention_until %}
-                {{ info_table_row('데이터 보관 만료일', employee.data_retention_until, none, none) }}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">데이터 보관 만료일</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('data_retention_until', employee.data_retention_until) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell"></div>
+                </div>
                 {% endif %}
             {{ info_table_end() }}
         {{ info_section_body_end() }}
-    {{ info_section_end() }}
+    {{ inline_section_end() }}
 </section>
 {% endif %}
 
-{# 섹션 4: 급여정보 (인사카드 전용) #}
-{% if page_mode == 'hr_card' %}
+{# 섹션 4: 급여정보 (인사카드 전용, CREATE 모드 제외) - 인라인 편집 적용 #}
+{% if page_mode == 'hr_card' and not is_create_mode %}
 <section id="salary-info" class="content-section">
     {{ section_title('급여정보') }}
-    {{ info_section_start() }}
-        {{ info_section_header_with_action('급여정보', svg_icon_currency(), 'btn-edit-salary', '수정') }}
+    {{ inline_section_start('salary') }}
+        {{ inline_section_header('salary', '급여정보', svg_icon_currency()) }}
         {{ info_section_body_start() }}
             {{ info_table_start() }}
-                {{ info_table_row('급여형태', salary.salary_type if salary else none, '기본급', ('{:,}'.format(salary.base_salary) ~ '원') if salary else none) }}
-                {{ info_table_row('직책수당', ('{:,}'.format(salary.position_allowance) ~ '원') if salary else none, '식대', ('{:,}'.format(salary.meal_allowance) ~ '원') if salary else none) }}
-                {{ info_table_row('교통비', ('{:,}'.format(salary.transportation_allowance) ~ '원') if salary else none, '총 급여', ('{:,}'.format(salary.total_salary) ~ '원') if salary else none) }}
-                {{ info_table_row('급여지급일', ('매월 ' ~ salary.payment_day ~ '일') if salary else none, '급여지급방법', salary.payment_method if salary else none) }}
+                {# 급여형태, 기본급 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">급여형태</div>
+                        <div class="info-table__value">
+                            {{ inline_select('salary_type', salary.salary_type if salary else none, field_options.SALARY_TYPE) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">기본급</div>
+                        <div class="info-table__value">
+                            {{ inline_currency('base_salary', salary.base_salary if salary else none) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# 직책수당, 식대 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">직책수당</div>
+                        <div class="info-table__value">
+                            {{ inline_currency('position_allowance', salary.position_allowance if salary else none) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">식대</div>
+                        <div class="info-table__value">
+                            {{ inline_currency('meal_allowance', salary.meal_allowance if salary else none) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# 교통비, 총 급여 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">교통비</div>
+                        <div class="info-table__value">
+                            {{ inline_currency('transportation_allowance', salary.transportation_allowance if salary else none) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">총 급여</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('total_salary', ('{:,}'.format(salary.total_salary) ~ '원') if salary and salary.total_salary else none) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# 급여지급일, 급여지급방법 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">급여지급일</div>
+                        <div class="info-table__value">
+                            {{ inline_field('payment_day', salary.payment_day if salary else none, placeholder='예: 25') }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">급여지급방법</div>
+                        <div class="info-table__value">
+                            {{ inline_select('payment_method', salary.payment_method if salary else none, field_options.PAYMENT_METHOD) }}
+                        </div>
+                    </div>
+                </div>
             {{ info_table_end() }}
         {{ info_section_body_end() }}
-    {{ info_section_end() }}
+    {{ inline_section_end() }}
 </section>
 {% endif %}
 
-{# 섹션 5: 연차 및 복리후생 (인사카드 전용) #}
-{% if page_mode == 'hr_card' %}
+{# 섹션 5: 연차 및 복리후생 (인사카드 전용, CREATE 모드 제외) - 인라인 편집 적용 #}
+{% if page_mode == 'hr_card' and not is_create_mode %}
 <section id="benefit-info" class="content-section">
     {{ section_title('연차 및 복리후생') }}
-    {{ info_section_start() }}
-        {{ info_section_header_with_action('연차 및 복리후생' ~ (' (' ~ benefit.year ~ '년)' if benefit else ''), svg_icon_heart(), 'btn-edit-benefit', '수정') }}
+    {{ inline_section_start('benefit') }}
+        {{ inline_section_header('benefit', '연차 및 복리후생' ~ (' (' ~ benefit.year ~ '년)' if benefit else ''), svg_icon_heart()) }}
         {{ info_section_body_start() }}
             {{ info_table_start() }}
-                {{ info_table_row('연차 발생일수', (benefit.annual_leave_granted|string ~ '일') if benefit else none, '연차 사용일수', (benefit.annual_leave_used|string ~ '일') if benefit else none) }}
-                {{ info_table_row('연차 잔여일수', (benefit.annual_leave_remaining|string ~ '일') if benefit else none, '퇴직금 유형', benefit.severance_type if benefit else none) }}
-                {{ info_table_row('퇴직금 적립방법', benefit.severance_method if benefit else none, none, none) }}
+                {# 연차 발생일수, 연차 사용일수 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">연차 발생일수</div>
+                        <div class="info-table__value">
+                            {{ inline_field('annual_leave_granted', benefit.annual_leave_granted if benefit else none, type='number', suffix='일') }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">연차 사용일수</div>
+                        <div class="info-table__value">
+                            {{ inline_field('annual_leave_used', benefit.annual_leave_used if benefit else none, type='number', suffix='일') }}
+                        </div>
+                    </div>
+                </div>
+
+                {# 연차 잔여일수 (계산값), 퇴직금 유형 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">연차 잔여일수</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('annual_leave_remaining', (benefit.annual_leave_remaining|string ~ '일') if benefit else none) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">퇴직금 유형</div>
+                        <div class="info-table__value">
+                            {{ inline_select('severance_type', benefit.severance_type if benefit else none, field_options.SEVERANCE_TYPE) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# 퇴직금 적립방법 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">퇴직금 적립방법</div>
+                        <div class="info-table__value">
+                            {{ inline_select('severance_method', benefit.severance_method if benefit else none, field_options.SEVERANCE_METHOD) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell"></div>
+                </div>
             {{ info_table_end() }}
         {{ info_section_body_end() }}
-    {{ info_section_end() }}
+    {{ inline_section_end() }}
 </section>
 {% endif %}
 
-{# 섹션 6: 가족정보 #}
+{# 섹션 6: 가족정보 (CREATE 모드 제외) #}
+{% if not is_create_mode %}
 <section id="family-info" class="content-section">
     {{ section_title('가족정보') }}
     {{ info_section_start() }}
@@ -198,3 +495,4 @@
         {{ info_section_body_end() }}
     {{ info_section_end() }}
 </section>
+{% endif %}

@@ -193,6 +193,82 @@
     height: 14px;
 }
 
+/* 수정 버튼 */
+.info-section__edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1-5);
+    padding: var(--space-2) var(--space-3-5);
+    background: var(--color-gray-100);
+    color: var(--color-gray-700);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.info-section__edit-btn:hover {
+    background: var(--color-gray-200);
+    color: var(--color-gray-800);
+}
+
+.info-section__edit-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* 저장 버튼 */
+.info-section__save-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1-5);
+    padding: var(--space-2) var(--space-3-5);
+    background: var(--color-success-500);
+    color: var(--color-pure-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.info-section__save-btn:hover {
+    background: var(--color-success-600);
+}
+
+.info-section__save-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* 취소 버튼 */
+.info-section__cancel-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1-5);
+    padding: var(--space-2) var(--space-3-5);
+    background: var(--color-gray-200);
+    color: var(--color-gray-700);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.info-section__cancel-btn:hover {
+    background: var(--color-gray-300);
+}
+
+.info-section__cancel-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
 /* 섹션 본문 - 테이블용 (패딩 없음, 명시적) */
 .info-section__body--table {
     padding: 0;

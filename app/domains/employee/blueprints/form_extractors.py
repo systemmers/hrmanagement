@@ -66,27 +66,48 @@ def extract_employee_from_form(form_data: FormData, employee_id: int = 0) -> Emp
 
 
 def extract_basic_fields_from_form(form_data: FormData) -> Dict[str, Any]:
-    """폼 데이터에서 기본정보 필드만 추출 (Phase 29: 별칭 제거, snake_case 직접 접근)"""
+    """폼 데이터에서 기본정보 필드만 추출
+
+    Phase 29: 별칭 제거, snake_case 직접 접근
+    Phase 0.6 (2026-01-16): 11개 미매핑 필드 추가 (inline_edit_service SSOT 동기화)
+    """
     return {
+        # 기본 정보
         'name': form_data.get('name', ''),
         'photo': form_data.get('photo') or '/static/images/face/face_01_m.png',
         'english_name': form_data.get('english_name'),
         'chinese_name': form_data.get('chinese_name'),
+        'foreign_name': form_data.get('foreign_name'),  # Phase 0.6: 추가
         'birth_date': form_data.get('birth_date'),
         'lunar_birth': _parse_boolean(form_data.get('lunar_birth')),
         'gender': form_data.get('gender'),
+        'marital_status': form_data.get('marital_status'),  # Phase 0.6: 추가
+        # 연락처
         'phone': form_data.get('phone', ''),
         'email': form_data.get('email', ''),
         'mobile_phone': form_data.get('mobile_phone'),
         'home_phone': form_data.get('home_phone'),
+        'emergency_contact': form_data.get('emergency_contact'),  # Phase 0.6: 추가
+        'emergency_relation': form_data.get('emergency_relation'),  # Phase 0.6: 추가
+        # 등록 주소
         'address': form_data.get('address'),
         'detailed_address': form_data.get('detailed_address'),
         'postal_code': form_data.get('postal_code'),
+        # 실거주 주소 (Phase 0.6: 추가)
+        'actual_address': form_data.get('actual_address'),
+        'actual_detailed_address': form_data.get('actual_detailed_address'),
+        'actual_postal_code': form_data.get('actual_postal_code'),
+        # 기타 개인정보
         'resident_number': form_data.get('resident_number'),
         'nationality': form_data.get('nationality'),
         # Phase 28.3: blood_type, religion 삭제됨
         'hobby': form_data.get('hobby'),
         'specialty': form_data.get('specialty'),
+        'disability_info': form_data.get('disability_info'),  # Phase 0.6: 추가
+        # 급여 계좌 정보 (Phase 0.6: 추가)
+        'bank_name': form_data.get('bank_name'),
+        'account_number': form_data.get('account_number'),
+        'account_holder': form_data.get('account_holder'),
     }
 
 

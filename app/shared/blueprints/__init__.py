@@ -29,7 +29,8 @@ def register_blueprints(app):
 
     # User 도메인
     from app.domains.user.blueprints import (
-        auth_bp, mypage_bp, personal_bp, account_bp, notifications_bp, profile_bp
+        auth_bp, mypage_bp, personal_bp, account_bp, notifications_bp, profile_bp,
+        profile_section_api_bp
     )
 
     # Platform 도메인
@@ -78,6 +79,9 @@ def register_blueprints(app):
 
     # 통합 프로필 (/profile/*) - 법인/개인 인터페이스 통합
     app.register_blueprint(profile_bp)
+
+    # 프로필 섹션 API (/api/profiles/*) - 개인 계정 인라인 편집
+    app.register_blueprint(profile_section_api_bp)
 
     # 계정 관리 (/account/*) - 설정, 비밀번호, 공개설정, 탈퇴
     app.register_blueprint(account_bp)

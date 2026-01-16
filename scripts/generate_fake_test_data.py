@@ -1,8 +1,16 @@
 """
 포괄적 테스트 데이터 생성 스크립트
 
-법인 3개, 직원 20명, 개인 20명의 완전한 테스트 데이터를 생성합니다.
-모든 테이블(33개)에 대해 현실적인 가짜 데이터를 생성합니다.
+법인 3개, 직원 60명(각 법인당 20명, 남녀 각 10명), 개인 20명(남녀 각 10명)의 완전한 테스트 데이터를 생성합니다.
+모든 테이블(45개)에 대해 현실적인 가짜 데이터를 생성합니다.
+
+샘플 자료 활용:
+- 로고 이미지: 법인별 할당
+- 얼굴 사진: 직원/개인 계정별 할당
+- 명함 이미지: 직원/개인 계정별 할당
+- 문서 첨부파일: 직원/개인 계정별 할당 (파일명 변경)
+- 사업자등록증: 법인별 할당
+- 주민번호: Excel 파일에서 로드하여 할당
 
 데이터 포함:
 - 기본정보 (법인, 조직, 사용자, 직원, 개인 프로필)
@@ -11,6 +19,8 @@
 - 급여정보 (급여, 연봉이력, 급여지급, 복리후생, 보험)
 - 자산정보 (자산배정, 수상)
 - 계약정보 (계약, 개인-법인 계약, 데이터공유설정)
+- 첨부파일 (로고, 명함, 문서 등)
+- 무결성 검증 리포트
 
 실행 방법:
     python scripts/generate_fake_test_data.py
@@ -21,6 +31,8 @@
 import sys
 import os
 import random
+import shutil
+import pandas as pd
 from datetime import datetime, date, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -34,7 +46,6 @@ from app.domains.company.models import Company, Organization
 from app.domains.contract.models import DataSharingSettings, PersonCorporateContract
 from app.domains.employee.models import (
     Asset,
-    Attachment,
     Attendance,
     Award,
     Benefit,
@@ -49,6 +60,7 @@ from app.domains.employee.models import (
     Insurance,
     Language,
     MilitaryService,
+    Profile,
     ProjectParticipation,
     Promotion,
     Salary,
@@ -56,7 +68,74 @@ from app.domains.employee.models import (
     SalaryPayment,
     Training,
 )
+from app.domains.attachment.models import Attachment
+from app.domains.attachment.constants import AttachmentCategory, OwnerType
 from app.domains.user.models import PersonalProfile, User
+
+
+# ============================================================
+# 샘플 파일 경로 상수
+# ============================================================
+
+SAMPLE_BASE_PATH = r"D:\projects\_operation_docs\dev_docs_hr\sample"
+LOGO_PATH = os.path.join(SAMPLE_BASE_PATH, "img")
+FACE_MALE_PATH = os.path.join(SAMPLE_BASE_PATH, "img", "face", "male")
+FACE_FEMALE_PATH = os.path.join(SAMPLE_BASE_PATH, "img", "face", "female")
+BUSINESS_CARD_PATH = os.path.join(SAMPLE_BASE_PATH, "img", "businesscard_50")
+DOCS_FILE_PATH = r"D:\projects\hrmanagement\.dev_docs\sample\docs_file"
+BUSINESS_REGISTRATION_PATH = os.path.join(SAMPLE_BASE_PATH, "사업자등록증")
+RRN_EXCEL_PATH = os.path.join(SAMPLE_BASE_PATH, "주민번호.xlsx")
+
+
+# ============================================================
+# 샘플 파일 유틸리티 함수
+# ============================================================
+
+def load_resident_numbers():
+    """주민번호.xlsx에서 주민번호 리스트 로드"""
+    try:
+        if not os.path.exists(RRN_EXCEL_PATH):
+            print(f"  [WARNING] 주민번호 Excel 파일 없음: {RRN_EXCEL_PATH}")
+            return []
+        df = pd.read_excel(RRN_EXCEL_PATH)
+        # 컬럼명 확인 후 적절히 매핑
+        if '주민번호' in df.columns:
+            return df['주민번호'].tolist()
+        elif len(df.columns) > 0:
+            # 첫 번째 컬럼 사용
+            return df.iloc[:, 0].tolist()
+        return []
+    except Exception as e:
+        print(f"  [WARNING] 주민번호 Excel 로드 실패: {e}")
+        return []
+
+
+def copy_sample_file(source_path, dest_dir, new_filename):
+    """샘플 파일을 목적지로 복사"""
+    try:
+        if not os.path.exists(source_path):
+            print(f"  [WARNING] 샘플 파일 없음: {source_path}")
+            return None
+        os.makedirs(dest_dir, exist_ok=True)
+        dest_path = os.path.join(dest_dir, new_filename)
+        shutil.copy2(source_path, dest_path)
+        return dest_path
+    except Exception as e:
+        print(f"  [WARNING] 파일 복사 실패: {source_path} -> {dest_path}, {e}")
+        return None
+
+
+def get_relative_path(absolute_path, base_path=None):
+    """절대 경로를 상대 경로로 변환"""
+    try:
+        if base_path is None:
+            # Flask app root_path 사용
+            from flask import current_app
+            base_path = current_app.root_path
+        return os.path.relpath(absolute_path, base_path).replace('\\', '/')
+    except:
+        # 상대 경로 변환 실패 시 파일명만 반환
+        return os.path.basename(absolute_path)
 
 
 # ============================================================
@@ -280,6 +359,63 @@ def generate_serial_number():
 
 
 # ============================================================
+# 문서 첨부파일 생성 함수
+# ============================================================
+
+def create_attachments_for_person(person, person_type='employee', person_id=None):
+    """직원/개인 계정별 첨부파일 생성"""
+    if person_id is None:
+        person_id = person.id if hasattr(person, 'id') else person
+    
+    attachments = []
+    
+    # 문서 파일명 매핑
+    doc_files = [
+        ('김상진_이력서.pdf', '{name}_이력서.pdf', AttachmentCategory.DOCUMENT),
+        ('김상진_주민등록등본.pdf', '{name}_주민등록등본.pdf', AttachmentCategory.DOCUMENT),
+        ('김상진_증명사진.png', '{name}_증명사진.png', AttachmentCategory.PROFILE_PHOTO),
+        ('김상진_경력증명서_KWONPS.pdf', '{name}_경력증명서.pdf', AttachmentCategory.DOCUMENT),
+        ('김상진_졸업증명서.jpg', '{name}_졸업증명서.jpg', AttachmentCategory.DOCUMENT),
+        ('김상진_통장사본.jpg', '{name}_통장사본.jpg', AttachmentCategory.DOCUMENT),
+        ('국민연금 가입자 가입증명_김상진.pdf', '{name}_국민연금_가입증명.pdf', AttachmentCategory.DOCUMENT),
+        ('이력서_김상진_ver01.pdf', '이력서_{name}_ver01.pdf', AttachmentCategory.DOCUMENT),
+        ('이력서_김상진_ver02.pdf', '이력서_{name}_ver02.pdf', AttachmentCategory.DOCUMENT),
+    ]
+    
+    # 필수 문서 (모든 직원/개인)
+    required_docs = doc_files[:3]
+    
+    # 선택 문서 (랜덤 2-5개)
+    optional_docs = doc_files[3:]
+    selected_optional = random.sample(optional_docs, min(random.randint(2, 5), len(optional_docs)))
+    
+    # 파일 복사 및 Attachment 생성
+    person_name = person.name if hasattr(person, 'name') else f"person_{person_id}"
+    for original, template, category in required_docs + selected_optional:
+        new_name = template.format(name=person_name)
+        source_path = os.path.join(DOCS_FILE_PATH, original)
+        if not os.path.exists(source_path):
+            continue
+        
+        dest_dir = os.path.join("uploads", f"{person_type}s", str(person_id))
+        dest_path = copy_sample_file(source_path, dest_dir, new_name)
+        if dest_path:
+            attachment = Attachment(
+                owner_type=OwnerType.EMPLOYEE if person_type == 'employee' else OwnerType.PROFILE,
+                owner_id=person_id,
+                employee_id=person_id if person_type == 'employee' else None,
+                file_name=new_name,
+                file_path=get_relative_path(dest_path),
+                file_type=os.path.splitext(new_name)[1][1:] if os.path.splitext(new_name)[1] else 'pdf',
+                category=category,
+                display_order=len(attachments)
+            )
+            attachments.append(attachment)
+    
+    return attachments
+
+
+# ============================================================
 # 법인 데이터 생성
 # ============================================================
 
@@ -422,6 +558,54 @@ def create_companies(dry_run=False):
             corp_user.set_password('corp1234')
             db.session.add(corp_user)
 
+        # 로고 이미지 할당
+        logo_filename = f"logo ({i}).png"
+        logo_source = os.path.join(LOGO_PATH, logo_filename)
+        if os.path.exists(logo_source):
+            dest_dir = os.path.join("uploads", "companies", str(company.id))
+            new_logo_name = f"company_{i}_logo.png"
+            logo_dest = copy_sample_file(logo_source, dest_dir, new_logo_name)
+            if logo_dest:
+                logo_attachment = Attachment(
+                    owner_type=OwnerType.COMPANY,
+                    owner_id=company.id,
+                    file_name=new_logo_name,
+                    file_path=get_relative_path(logo_dest),
+                    file_type='png',
+                    category=AttachmentCategory.PROFILE_PHOTO,
+                    display_order=0
+                )
+                db.session.add(logo_attachment)
+                print(f"    + 로고 이미지 할당: {new_logo_name}")
+
+        # 사업자등록증 PDF 할당
+        business_reg_files = [
+            '사업자등록증_엠라인스튜디오.pdf',
+            '사업자등록증_한국토지주택공사.pdf',
+            '사업자등록증_.한국파렛트풀주식회사.pdf',
+            '사업자등록증_주식회사비넥츠.pdf',
+            '사업자등록증_주식회사브이런치.pdf'
+        ]
+        if i <= len(business_reg_files):
+            reg_filename = business_reg_files[i - 1]
+            reg_source = os.path.join(BUSINESS_REGISTRATION_PATH, reg_filename)
+            if os.path.exists(reg_source):
+                dest_dir = os.path.join("uploads", "companies", str(company.id))
+                new_reg_name = f"{company.name}_사업자등록증.pdf"
+                reg_dest = copy_sample_file(reg_source, dest_dir, new_reg_name)
+                if reg_dest:
+                    reg_attachment = Attachment(
+                        owner_type=OwnerType.COMPANY,
+                        owner_id=company.id,
+                        file_name=new_reg_name,
+                        file_path=get_relative_path(reg_dest),
+                        file_type='pdf',
+                        category=AttachmentCategory.COMPANY_DOCUMENT,
+                        display_order=1
+                    )
+                    db.session.add(reg_attachment)
+                    print(f"    + 사업자등록증 할당: {new_reg_name}")
+
         created_companies.append(company)
         print(f"  + {data['name']} (ID: {company.id})")
 
@@ -436,8 +620,8 @@ def create_companies(dry_run=False):
 # 직원 데이터 생성 (모든 관련 테이블 포함)
 # ============================================================
 
-def create_employees(companies, count=20, dry_run=False):
-    """직원 20명 생성 (모든 관련 데이터 포함)"""
+def create_employees(companies, employees_per_company=20, dry_run=False):
+    """각 법인당 직원 20명 생성 (남녀 각 10명씩, 모든 관련 데이터 포함)"""
     print("\n[Phase 2] 직원 데이터 생성")
     print("-" * 50)
 
@@ -445,8 +629,12 @@ def create_employees(companies, count=20, dry_run=False):
         print("  [ERROR] 법인이 없습니다.")
         return []
 
-    # 법인별 직원 분배 (7, 7, 6)
-    distribution = [7, 7, 6]
+    # 주민번호 로드
+    resident_numbers = load_resident_numbers()
+    rrn_index = 0
+
+    # 법인별 직원 분배: [20, 20, 20]
+    distribution = [employees_per_company] * len(companies)
     created_employees = []
     emp_index = 1
 
@@ -455,14 +643,15 @@ def create_employees(companies, count=20, dry_run=False):
             break
 
         emp_count = distribution[company_idx]
-        print(f"\n  {company.name}: {emp_count}명 생성")
+        male_count = emp_count // 2
+        female_count = emp_count // 2
+        print(f"\n  {company.name}: {emp_count}명 생성 (남성 {male_count}명, 여성 {female_count}명)")
 
-        for i in range(emp_count):
-            gender = '남' if random.random() < 0.6 else '여'
+        # 남성 직원 생성
+        for male_idx in range(male_count):
+            gender = '남'
             last_name = random.choice(KOREAN_LAST_NAMES)
-            first_name = random.choice(
-                KOREAN_FIRST_NAMES_MALE if gender == '남' else KOREAN_FIRST_NAMES_FEMALE
-            )
+            first_name = random.choice(KOREAN_FIRST_NAMES_MALE)
             name = f"{last_name}{first_name}"
             birth_date = generate_birth_date()
             hire_date = generate_hire_date()
@@ -470,14 +659,60 @@ def create_employees(companies, count=20, dry_run=False):
             position = random.choice(POSITIONS)
 
             if dry_run:
-                print(f"    [DRY] {name} 생성 예정")
+                print(f"    [DRY] {name} (남) 생성 예정")
                 emp_index += 1
                 continue
+
+            # 주민번호 할당
+            if rrn_index < len(resident_numbers):
+                resident_number = str(resident_numbers[rrn_index]).strip()
+                rrn_index += 1
+            else:
+                resident_number = generate_resident_number(birth_date, gender)
+
+            # Profile 생성
+            profile = Profile(
+                name=name,
+                english_name=f"{first_name} {last_name}",
+                birth_date=birth_date,
+                lunar_birth=random.choice([True, False]),
+                gender=gender,
+                mobile_phone=generate_phone(),
+                home_phone=generate_home_phone() if random.random() > 0.5 else None,
+                email=generate_email(name, 'company.co.kr'),
+                postal_code=generate_postal_code(),
+                address=generate_address(),
+                detailed_address=f"테스트아파트 {random.randint(100, 999)}호",
+                resident_number=resident_number,
+                nationality='대한민국',
+                hobby=random.choice(['독서', '운동', '여행', '음악감상', '요리', None]),
+                specialty=random.choice(['프로그래밍', '기획', '디자인', '영업', None]),
+                marital_status=random.choice(['single', 'married']),
+                emergency_contact=generate_phone(),
+                emergency_relation=random.choice(['배우자', '부모', '형제']),
+                actual_postal_code=generate_postal_code(),
+                actual_address=generate_address(),
+                actual_detailed_address=f"실거주아파트 {random.randint(100, 999)}호"
+            )
+            db.session.add(profile)
+            db.session.flush()
+
+            # 얼굴 사진 할당
+            face_index = (company_idx * 10) + male_idx + 1
+            face_filename = f"face_m ({face_index}).png"
+            face_source = os.path.join(FACE_MALE_PATH, face_filename)
+            if os.path.exists(face_source):
+                dest_dir = os.path.join("uploads", "employees", str(emp_index))
+                new_face_name = f"{name}_face.png"
+                face_dest = copy_sample_file(face_source, dest_dir, new_face_name)
+                if face_dest:
+                    profile.photo = new_face_name
 
             # Employee 기본 정보
             employee = Employee(
                 employee_number=generate_employee_number(emp_index),
                 name=name,
+                profile_id=profile.id,
                 department=department,
                 position=position,
                 status='active',
@@ -485,6 +720,7 @@ def create_employees(companies, count=20, dry_run=False):
                 phone=generate_phone(),
                 email=generate_email(name, 'company.co.kr'),
                 organization_id=company.root_organization_id,
+                company_id=company.id,
                 team=random.choice(['A팀', 'B팀', 'C팀', None]),
                 job_title=random.choice(JOB_TITLES),
                 work_location=random.choice(WORK_LOCATIONS),
@@ -499,7 +735,7 @@ def create_employees(companies, count=20, dry_run=False):
                 address=generate_address(),
                 detailed_address=f"테스트아파트 {random.randint(100, 999)}호",
                 postal_code=generate_postal_code(),
-                resident_number=generate_resident_number(birth_date, gender),
+                resident_number=resident_number,
                 nationality='대한민국',
                 blood_type=random.choice(['A', 'B', 'O', 'AB']),
                 religion=random.choice(['무교', '기독교', '불교', '천주교', None]),
@@ -515,13 +751,40 @@ def create_employees(companies, count=20, dry_run=False):
             db.session.add(employee)
             db.session.flush()
 
+            # 명함 이미지 할당
+            card_index = (company_idx * 10) + male_idx + 1
+            card_filename = f"bc_b_{card_index:02d}.png"
+            card_source = os.path.join(BUSINESS_CARD_PATH, card_filename)
+            if os.path.exists(card_source):
+                dest_dir = os.path.join("uploads", "employees", str(employee.id))
+                new_card_name = f"{name}_명함_앞면.png"
+                card_dest = copy_sample_file(card_source, dest_dir, new_card_name)
+                if card_dest:
+                    card_attachment = Attachment(
+                        owner_type=OwnerType.EMPLOYEE,
+                        owner_id=employee.id,
+                        employee_id=employee.id,
+                        file_name=new_card_name,
+                        file_path=get_relative_path(card_dest),
+                        file_type='png',
+                        category=AttachmentCategory.BUSINESS_CARD_FRONT,
+                        display_order=0
+                    )
+                    db.session.add(card_attachment)
+
+            # 문서 첨부파일 생성
+            doc_attachments = create_attachments_for_person(employee, 'employee', employee.id)
+            for att in doc_attachments:
+                db.session.add(att)
+
             # === 1:N 관계 데이터 생성 ===
 
-            # 학력 (1-3개)
+            # 학력 (1-3개) - Profile과 연결
             for edu_idx in range(random.randint(1, 3)):
                 if edu_idx == 0:  # 고등학교
                     edu = Education(
                         employee_id=employee.id,
+                        profile_id=profile.id,
                         school_type='고등학교',
                         school_name=random.choice(HIGH_SCHOOL_NAMES),
                         graduation_date=f"{int(birth_date[:4]) + 18}-02-28",
@@ -530,6 +793,7 @@ def create_employees(companies, count=20, dry_run=False):
                 else:  # 대학교
                     edu = Education(
                         employee_id=employee.id,
+                        profile_id=profile.id,
                         school_type=random.choice(['대학교', '전문대학', '대학원']),
                         school_name=random.choice(SCHOOL_NAMES),
                         major=random.choice(MAJORS),
@@ -542,12 +806,13 @@ def create_employees(companies, count=20, dry_run=False):
                     )
                 db.session.add(edu)
 
-            # 경력 (0-3개)
+            # 경력 (0-3개) - Profile과 연결
             for _ in range(random.randint(0, 3)):
                 start_year = random.randint(2015, 2020)
                 end_year = start_year + random.randint(1, 3)
                 career = Career(
                     employee_id=employee.id,
+                    profile_id=profile.id,
                     company_name=f"(주){random.choice(['테스트', '샘플', '예시', '이전'])}기업",
                     department=random.choice(DEPARTMENTS),
                     position=random.choice(POSITIONS),
@@ -560,10 +825,11 @@ def create_employees(companies, count=20, dry_run=False):
                 )
                 db.session.add(career)
 
-            # 자격증 (0-3개)
+            # 자격증 (0-3개) - Profile과 연결
             for _ in range(random.randint(0, 3)):
                 cert = Certificate(
                     employee_id=employee.id,
+                    profile_id=profile.id,
                     certificate_name=random.choice(CERTIFICATE_NAMES),
                     issuing_organization=random.choice(ISSUING_ORGS),
                     certificate_number=f"CERT-{random.randint(10000, 99999)}",
@@ -573,11 +839,12 @@ def create_employees(companies, count=20, dry_run=False):
                 )
                 db.session.add(cert)
 
-            # 어학 (0-2개)
+            # 어학 (0-2개) - Profile과 연결
             for _ in range(random.randint(0, 2)):
                 lang_name = random.choice(LANGUAGES)
                 lang = Language(
                     employee_id=employee.id,
+                    profile_id=profile.id,
                     language_name=lang_name,
                     exam_name=random.choice(LANGUAGE_EXAMS.get(lang_name, ['기타'])),
                     score=str(random.randint(700, 990)) if lang_name == '영어' else random.choice(['N1', 'N2', '고급', '중급']),
@@ -832,8 +1099,484 @@ def create_employees(companies, count=20, dry_run=False):
             db.session.add(contract)
 
             # employee_sub 계정 생성
-            sub_username = f"emp_{company_idx + 1}_{i + 1}"
-            sub_email = f"emp{company_idx + 1}_{i + 1}@test.com"
+            sub_username = f"emp_{company_idx + 1}_{male_idx + 1}"
+            sub_email = f"emp{company_idx + 1}_{male_idx + 1}@test.com"
+
+            existing_user = User.query.filter(
+                (User.username == sub_username) | (User.email == sub_email)
+            ).first()
+
+            if not existing_user:
+                sub_user = User(
+                    username=sub_username,
+                    email=sub_email,
+                    role='employee',
+                    account_type='employee_sub',
+                    company_id=company.id,
+                    employee_id=employee.id,
+                    is_active=True
+                )
+                sub_user.set_password('emp1234')
+                db.session.add(sub_user)
+
+            created_employees.append(employee)
+            print(f"    + {name} ({employee.employee_number}) - 모든 관련 데이터 생성")
+            emp_index += 1
+
+            # 여성 직원 생성
+        for female_idx in range(female_count):
+            gender = '여'
+            last_name = random.choice(KOREAN_LAST_NAMES)
+            first_name = random.choice(KOREAN_FIRST_NAMES_FEMALE)
+            name = f"{last_name}{first_name}"
+            birth_date = generate_birth_date()
+            hire_date = generate_hire_date()
+            department = random.choice(DEPARTMENTS)
+            position = random.choice(POSITIONS)
+
+            if dry_run:
+                print(f"    [DRY] {name} (여) 생성 예정")
+                emp_index += 1
+                continue
+
+            # 주민번호 할당
+            if rrn_index < len(resident_numbers):
+                resident_number = str(resident_numbers[rrn_index]).strip()
+                rrn_index += 1
+            else:
+                resident_number = generate_resident_number(birth_date, gender)
+
+            # Profile 생성
+            profile = Profile(
+                name=name,
+                english_name=f"{first_name} {last_name}",
+                birth_date=birth_date,
+                lunar_birth=random.choice([True, False]),
+                gender=gender,
+                mobile_phone=generate_phone(),
+                home_phone=generate_home_phone() if random.random() > 0.5 else None,
+                email=generate_email(name, 'company.co.kr'),
+                postal_code=generate_postal_code(),
+                address=generate_address(),
+                detailed_address=f"테스트아파트 {random.randint(100, 999)}호",
+                resident_number=resident_number,
+                nationality='대한민국',
+                hobby=random.choice(['독서', '운동', '여행', '음악감상', '요리', None]),
+                specialty=random.choice(['프로그래밍', '기획', '디자인', '영업', None]),
+                marital_status=random.choice(['single', 'married']),
+                emergency_contact=generate_phone(),
+                emergency_relation=random.choice(['배우자', '부모', '형제']),
+                actual_postal_code=generate_postal_code(),
+                actual_address=generate_address(),
+                actual_detailed_address=f"실거주아파트 {random.randint(100, 999)}호"
+            )
+            db.session.add(profile)
+            db.session.flush()
+
+            # 얼굴 사진 할당
+            face_index = (company_idx * 10) + female_idx + 1
+            face_filename = f"face_f ({face_index}).png"
+            face_source = os.path.join(FACE_FEMALE_PATH, face_filename)
+            if os.path.exists(face_source):
+                dest_dir = os.path.join("uploads", "employees", str(emp_index))
+                new_face_name = f"{name}_face.png"
+                face_dest = copy_sample_file(face_source, dest_dir, new_face_name)
+                if face_dest:
+                    profile.photo = new_face_name
+
+            # Employee 기본 정보
+            employee = Employee(
+                employee_number=generate_employee_number(emp_index),
+                name=name,
+                profile_id=profile.id,
+                department=department,
+                position=position,
+                status='active',
+                hire_date=hire_date,
+                phone=generate_phone(),
+                email=generate_email(name, 'company.co.kr'),
+                organization_id=company.root_organization_id,
+                company_id=company.id,
+                team=random.choice(['A팀', 'B팀', 'C팀', None]),
+                job_title=random.choice(JOB_TITLES),
+                work_location=random.choice(WORK_LOCATIONS),
+                internal_phone=f"{random.randint(100, 999)}",
+                company_email=generate_email(name, f"{company.name.replace('(주)', '').strip()}.co.kr"),
+                english_name=f"{first_name} {last_name}",
+                birth_date=birth_date,
+                lunar_birth=random.choice([True, False]),
+                gender=gender,
+                mobile_phone=generate_phone(),
+                home_phone=generate_home_phone() if random.random() > 0.5 else None,
+                address=generate_address(),
+                detailed_address=f"테스트아파트 {random.randint(100, 999)}호",
+                postal_code=generate_postal_code(),
+                resident_number=resident_number,
+                nationality='대한민국',
+                blood_type=random.choice(['A', 'B', 'O', 'AB']),
+                religion=random.choice(['무교', '기독교', '불교', '천주교', None]),
+                hobby=random.choice(['독서', '운동', '여행', '음악감상', '요리', None]),
+                specialty=random.choice(['프로그래밍', '기획', '디자인', '영업', None]),
+                marital_status=random.choice(['single', 'married']),
+                emergency_contact=generate_phone(),
+                emergency_relation=random.choice(['배우자', '부모', '형제']),
+                actual_postal_code=generate_postal_code(),
+                actual_address=generate_address(),
+                actual_detailed_address=f"실거주아파트 {random.randint(100, 999)}호",
+            )
+            db.session.add(employee)
+            db.session.flush()
+
+            # 명함 이미지 할당
+            card_index = (company_idx * 10) + female_idx + 1
+            card_filename = f"bc_f_{card_index:02d}.png"
+            card_source = os.path.join(BUSINESS_CARD_PATH, card_filename)
+            if os.path.exists(card_source):
+                dest_dir = os.path.join("uploads", "employees", str(employee.id))
+                new_card_name = f"{name}_명함_앞면.png"
+                card_dest = copy_sample_file(card_source, dest_dir, new_card_name)
+                if card_dest:
+                    card_attachment = Attachment(
+                        owner_type=OwnerType.EMPLOYEE,
+                        owner_id=employee.id,
+                        employee_id=employee.id,
+                        file_name=new_card_name,
+                        file_path=get_relative_path(card_dest),
+                        file_type='png',
+                        category=AttachmentCategory.BUSINESS_CARD_FRONT,
+                        display_order=0
+                    )
+                    db.session.add(card_attachment)
+
+            # 문서 첨부파일 생성
+            doc_attachments = create_attachments_for_person(employee, 'employee', employee.id)
+            for att in doc_attachments:
+                db.session.add(att)
+
+            # === 1:N 관계 데이터 생성 ===
+
+            # 학력 (1-3개) - Profile과 연결
+            for edu_idx in range(random.randint(1, 3)):
+                if edu_idx == 0:  # 고등학교
+                    edu = Education(
+                        employee_id=employee.id,
+                        profile_id=profile.id,
+                        school_type='고등학교',
+                        school_name=random.choice(HIGH_SCHOOL_NAMES),
+                        graduation_date=f"{int(birth_date[:4]) + 18}-02-28",
+                        graduation_status='졸업'
+                    )
+                else:  # 대학교
+                    edu = Education(
+                        employee_id=employee.id,
+                        profile_id=profile.id,
+                        school_type=random.choice(['대학교', '전문대학', '대학원']),
+                        school_name=random.choice(SCHOOL_NAMES),
+                        major=random.choice(MAJORS),
+                        degree=random.choice(['학사', '석사', '박사', '전문학사']),
+                        admission_date=f"{int(birth_date[:4]) + 18 + (edu_idx * 4)}-03-01",
+                        graduation_date=f"{int(birth_date[:4]) + 22 + (edu_idx * 4)}-02-28",
+                        graduation_status='졸업',
+                        gpa=f"{random.uniform(3.0, 4.5):.2f}/4.5",
+                        location=random.choice(['서울', '경기', '부산', '대전'])
+                    )
+                db.session.add(edu)
+
+            # 경력 (0-3개) - Profile과 연결
+            for _ in range(random.randint(0, 3)):
+                start_year = random.randint(2015, 2020)
+                end_year = start_year + random.randint(1, 3)
+                career = Career(
+                    employee_id=employee.id,
+                    profile_id=profile.id,
+                    company_name=f"(주){random.choice(['테스트', '샘플', '예시', '이전'])}기업",
+                    department=random.choice(DEPARTMENTS),
+                    position=random.choice(POSITIONS),
+                    job_description=f"{random.choice(['서비스 개발', '프로젝트 관리', '영업 활동', '마케팅'])} 담당",
+                    start_date=f"{start_year}-{random.randint(1, 12):02d}-01",
+                    end_date=f"{end_year}-{random.randint(1, 12):02d}-{random.randint(1, 28):02d}",
+                    salary=random.randint(3000, 6000) * 10000,
+                    resignation_reason=random.choice(['이직', '계약만료', '개인사정', None]),
+                    is_current=False
+                )
+                db.session.add(career)
+
+            # 자격증 (0-3개) - Profile과 연결
+            for _ in range(random.randint(0, 3)):
+                cert = Certificate(
+                    employee_id=employee.id,
+                    profile_id=profile.id,
+                    certificate_name=random.choice(CERTIFICATE_NAMES),
+                    issuing_organization=random.choice(ISSUING_ORGS),
+                    certificate_number=f"CERT-{random.randint(10000, 99999)}",
+                    acquisition_date=generate_past_date(1, 5),
+                    expiry_date=None if random.random() > 0.3 else generate_past_date(-3, -1),
+                    grade=random.choice(['1급', '2급', '전문가', None])
+                )
+                db.session.add(cert)
+
+            # 어학 (0-2개) - Profile과 연결
+            for _ in range(random.randint(0, 2)):
+                lang_name = random.choice(LANGUAGES)
+                lang = Language(
+                    employee_id=employee.id,
+                    profile_id=profile.id,
+                    language_name=lang_name,
+                    exam_name=random.choice(LANGUAGE_EXAMS.get(lang_name, ['기타'])),
+                    score=str(random.randint(700, 990)) if lang_name == '영어' else random.choice(['N1', 'N2', '고급', '중급']),
+                    level=random.choice(['상', '중', '하']),
+                    acquisition_date=generate_past_date(1, 3)
+                )
+                db.session.add(lang)
+
+            # 가족 (0-4명)
+            if random.random() > 0.3:  # 70% 확률로 가족 정보 있음
+                for _ in range(random.randint(1, 4)):
+                    relation = random.choice(FAMILY_RELATIONS)
+                    family = FamilyMember(
+                        employee_id=employee.id,
+                        relation=relation,
+                        name=f"{random.choice(KOREAN_LAST_NAMES)}{random.choice(KOREAN_FIRST_NAMES_MALE + KOREAN_FIRST_NAMES_FEMALE)}",
+                        birth_date=generate_birth_date(1, 80),
+                        occupation=random.choice(['회사원', '공무원', '자영업', '학생', '주부', None]),
+                        contact=generate_phone() if random.random() > 0.5 else None,
+                        is_cohabitant=random.choice([True, False]),
+                        is_dependent=relation in ['자녀', '부', '모']
+                    )
+                    db.session.add(family)
+
+            # 발령/인사이동 (1-3개)
+            current_dept = department
+            current_pos = position
+            for promo_idx in range(random.randint(1, 3)):
+                new_dept = random.choice(DEPARTMENTS)
+                new_pos = random.choice(POSITIONS)
+                promo = Promotion(
+                    employee_id=employee.id,
+                    effective_date=generate_past_date(promo_idx, promo_idx + 1),
+                    promotion_type=random.choice(PROMOTION_TYPES),
+                    from_department=current_dept,
+                    to_department=new_dept,
+                    from_position=current_pos,
+                    to_position=new_pos,
+                    job_role=random.choice(JOB_TITLES),
+                    reason='정기 인사' if promo_idx == 0 else random.choice(['승진', '전보', '조직개편'])
+                )
+                db.session.add(promo)
+                current_dept, current_pos = new_dept, new_pos
+
+            # 인사평가 (최근 3년)
+            current_year = datetime.now().year
+            for year in range(current_year - 2, current_year + 1):
+                evaluation = Evaluation(
+                    employee_id=employee.id,
+                    year=year,
+                    q1_grade=random.choice(EVALUATION_GRADES),
+                    q2_grade=random.choice(EVALUATION_GRADES),
+                    q3_grade=random.choice(EVALUATION_GRADES) if year < current_year else None,
+                    q4_grade=random.choice(EVALUATION_GRADES) if year < current_year else None,
+                    overall_grade=random.choice(EVALUATION_GRADES) if year < current_year else None,
+                    salary_negotiation=f"+{random.randint(0, 10)}%" if year < current_year else None
+                )
+                db.session.add(evaluation)
+
+            # 교육 이력 (2-5개)
+            for _ in range(random.randint(2, 5)):
+                training = Training(
+                    employee_id=employee.id,
+                    training_date=generate_past_date(0, 3),
+                    training_name=random.choice(TRAINING_NAMES),
+                    institution=random.choice(TRAINING_INSTITUTIONS),
+                    hours=random.choice([8, 16, 24, 40, 80]),
+                    completion_status=random.choice(['수료', '이수', '진행중'])
+                )
+                db.session.add(training)
+
+            # 근태 (최근 12개월)
+            for month_offset in range(12):
+                month_date = date.today().replace(day=1) - timedelta(days=30 * month_offset)
+                attendance = Attendance(
+                    employee_id=employee.id,
+                    year=month_date.year,
+                    month=month_date.month,
+                    work_days=random.randint(18, 23),
+                    absent_days=random.randint(0, 2),
+                    late_count=random.randint(0, 3),
+                    early_leave_count=random.randint(0, 2),
+                    annual_leave_used=random.randint(0, 2)
+                )
+                db.session.add(attendance)
+
+            # 인사이력 프로젝트 (1-3개)
+            for _ in range(random.randint(1, 3)):
+                start_date = generate_past_date(0, 2)
+                hr_project = HrProject(
+                    employee_id=employee.id,
+                    project_name=random.choice(PROJECT_NAMES),
+                    start_date=start_date,
+                    end_date=None if random.random() > 0.7 else generate_past_date(0, 1),
+                    duration=f"{random.randint(3, 24)}개월",
+                    role=random.choice(PROJECT_ROLES),
+                    duty=f"{random.choice(['개발', '기획', '관리', '분석'])} 업무",
+                    client=f"{random.choice(['삼성', 'LG', 'SK', 'KT', '현대', '롯데'])}그룹"
+                )
+                db.session.add(hr_project)
+
+            # 경력 프로젝트 참여이력 (0-2개)
+            for _ in range(random.randint(0, 2)):
+                participation = ProjectParticipation(
+                    employee_id=employee.id,
+                    project_name=f"이전회사 {random.choice(PROJECT_NAMES)}",
+                    start_date=generate_past_date(3, 5),
+                    end_date=generate_past_date(2, 3),
+                    role=random.choice(PROJECT_ROLES),
+                    duty=f"{random.choice(['개발', '기획', '관리'])} 담당",
+                    client=f"이전고객사"
+                )
+                db.session.add(participation)
+
+            # 수상 (0-2개)
+            for _ in range(random.randint(0, 2)):
+                award = Award(
+                    employee_id=employee.id,
+                    award_date=generate_past_date(0, 3),
+                    award_name=random.choice(AWARD_NAMES),
+                    institution=company.name
+                )
+                db.session.add(award)
+
+            # 자산 배정 (1-3개)
+            for _ in range(random.randint(1, 3)):
+                item_category, models = random.choice(ASSET_ITEMS)
+                asset = Asset(
+                    employee_id=employee.id,
+                    issue_date=generate_past_date(0, 2),
+                    item_name=item_category,
+                    model=random.choice(models),
+                    serial_number=generate_serial_number(),
+                    status=random.choice(['사용중', '반납', '수리중'])
+                )
+                db.session.add(asset)
+
+            # === 1:1 관계 데이터 생성 ===
+
+            # 병역 (남성만)
+            if gender == '남':
+                military = MilitaryService(
+                    employee_id=employee.id,
+                    military_status=random.choice(['군필', '면제']),
+                    service_type=random.choice(SERVICE_TYPES) if random.random() > 0.2 else None,
+                    branch=random.choice(BRANCHES),
+                    rank=random.choice(RANKS),
+                    enlistment_date=f"{int(birth_date[:4]) + 20}-{random.randint(1, 12):02d}-01" if random.random() > 0.2 else None,
+                    discharge_date=f"{int(birth_date[:4]) + 22}-{random.randint(1, 12):02d}-01" if random.random() > 0.2 else None,
+                    discharge_reason='만기전역'
+                )
+                db.session.add(military)
+
+            # 급여 정보
+            base_salary = random.randint(3000, 8000) * 10000
+            position_allowance = random.randint(10, 50) * 10000
+            meal_allowance = 200000
+            transportation_allowance = 100000
+            total_salary = base_salary + position_allowance + meal_allowance + transportation_allowance
+
+            salary = Salary(
+                employee_id=employee.id,
+                salary_type=random.choice(['연봉제', '월급제']),
+                base_salary=base_salary,
+                position_allowance=position_allowance,
+                meal_allowance=meal_allowance,
+                transportation_allowance=transportation_allowance,
+                total_salary=total_salary,
+                payment_day=25,
+                payment_method='계좌이체',
+                bank_account=generate_bank_account(),
+                annual_salary=total_salary * 12,
+                monthly_salary=total_salary,
+                hourly_wage=int(total_salary / 209),
+                overtime_hours=random.randint(0, 20),
+                night_hours=random.randint(0, 10),
+                holiday_days=random.randint(0, 2)
+            )
+            db.session.add(salary)
+
+            # 연봉 계약 이력 (최근 3년)
+            for year in range(current_year - 2, current_year + 1):
+                annual = base_salary * 12 * (1 + (current_year - year) * 0.05)
+                history = SalaryHistory(
+                    employee_id=employee.id,
+                    contract_year=year,
+                    annual_salary=int(annual),
+                    bonus=int(annual * 0.1),
+                    total_amount=int(annual * 1.1),
+                    contract_period=f"{year}-01-01 ~ {year}-12-31"
+                )
+                db.session.add(history)
+
+            # 급여 지급 이력 (최근 6개월)
+            for month_offset in range(6):
+                payment_date = date.today().replace(day=25) - timedelta(days=30 * month_offset)
+                gross = total_salary
+                insurance_amount = int(gross * 0.09)
+                tax = int(gross * 0.03)
+                deduction = insurance_amount + tax
+                payment = SalaryPayment(
+                    employee_id=employee.id,
+                    payment_date=payment_date.strftime('%Y-%m-%d'),
+                    payment_period=f"{payment_date.year}년 {payment_date.month}월",
+                    base_salary=base_salary,
+                    allowances=position_allowance + meal_allowance + transportation_allowance,
+                    gross_pay=gross,
+                    insurance=insurance_amount,
+                    income_tax=tax,
+                    total_deduction=deduction,
+                    net_pay=gross - deduction
+                )
+                db.session.add(payment)
+
+            # 보험 정보
+            insurance = Insurance(
+                employee_id=employee.id,
+                national_pension=True,
+                health_insurance=True,
+                employment_insurance=True,
+                industrial_accident=True,
+                national_pension_rate=4.5,
+                health_insurance_rate=3.545,
+                long_term_care_rate=0.9182,
+                employment_insurance_rate=0.9
+            )
+            db.session.add(insurance)
+
+            # 복리후생 정보
+            hire_years = (date.today() - datetime.strptime(hire_date, '%Y-%m-%d').date()).days // 365
+            annual_leave = min(15 + hire_years, 25)
+            benefit = Benefit(
+                employee_id=employee.id,
+                year=current_year,
+                annual_leave_granted=annual_leave,
+                annual_leave_used=random.randint(0, annual_leave // 2),
+                annual_leave_remaining=annual_leave - random.randint(0, annual_leave // 2),
+                severance_type='퇴직연금',
+                severance_method='DB형'
+            )
+            db.session.add(benefit)
+
+            # 계약 정보
+            contract = Contract(
+                employee_id=employee.id,
+                contract_type='정규직',
+                contract_date=hire_date,
+                contract_period='무기계약',
+                employee_type='정규직',
+                work_type='주5일'
+            )
+            db.session.add(contract)
+
+            # employee_sub 계정 생성
+            sub_username = f"emp_{company_idx + 1}_{female_idx + 11}"  # 여성은 11번부터 (남성 1-10, 여성 11-20)
+            sub_email = f"emp{company_idx + 1}_{female_idx + 11}@test.com"
 
             existing_user = User.query.filter(
                 (User.username == sub_username) | (User.email == sub_email)
@@ -868,23 +1611,28 @@ def create_employees(companies, count=20, dry_run=False):
 # ============================================================
 
 def create_personal_accounts(count=20, dry_run=False):
-    """개인 계정 20명 생성"""
+    """개인 계정 20명 생성 (남녀 각 10명씩)"""
     print("\n[Phase 3] 개인 계정 데이터 생성")
     print("-" * 50)
 
     created_profiles = []
+    male_count = count // 2
+    female_count = count // 2
 
-    for i in range(1, count + 1):
-        gender = '남' if random.random() < 0.5 else '여'
+    # 주민번호 로드
+    resident_numbers = load_resident_numbers()
+    rrn_index = 0
+
+    # 남성 개인 계정 생성
+    for male_idx in range(male_count):
+        gender = '남'
         last_name = random.choice(KOREAN_LAST_NAMES)
-        first_name = random.choice(
-            KOREAN_FIRST_NAMES_MALE if gender == '남' else KOREAN_FIRST_NAMES_FEMALE
-        )
+        first_name = random.choice(KOREAN_FIRST_NAMES_MALE)
         name = f"{last_name}{first_name}"
         birth_date = generate_birth_date(22, 45)
 
-        username = f"personal{i}"
-        email = f"personal{i}@test.com"
+        username = f"personal_m_{male_idx + 1}"
+        email = f"personal_m_{male_idx + 1}@test.com"
 
         existing = User.query.filter(
             (User.username == username) | (User.email == email)
@@ -897,8 +1645,15 @@ def create_personal_accounts(count=20, dry_run=False):
             continue
 
         if dry_run:
-            print(f"  [DRY] {name} ({username}) 생성 예정")
+            print(f"  [DRY] {name} (남) ({username}) 생성 예정")
             continue
+
+        # 주민번호 할당
+        if rrn_index < len(resident_numbers):
+            resident_number = str(resident_numbers[rrn_index]).strip()
+            rrn_index += 1
+        else:
+            resident_number = generate_resident_number(birth_date, gender)
 
         # User 생성
         user = User(
@@ -912,8 +1667,37 @@ def create_personal_accounts(count=20, dry_run=False):
         db.session.add(user)
         db.session.flush()
 
-        # PersonalProfile 생성
-        profile = PersonalProfile(
+        # Profile 생성 (통합 프로필)
+        profile = Profile(
+            user_id=user.id,
+            name=name,
+            english_name=f"{first_name} {last_name}",
+            birth_date=birth_date,
+            lunar_birth=random.choice([True, False]),
+            gender=gender,
+            mobile_phone=generate_phone(),
+            home_phone=generate_home_phone() if random.random() > 0.5 else None,
+            email=email,
+            postal_code=generate_postal_code(),
+            address=generate_address(),
+            detailed_address=f"개인아파트 {random.randint(100, 999)}호",
+            resident_number=resident_number,
+            nationality='대한민국',
+            hobby=random.choice(['독서', '운동', '여행', '음악감상', '요리', None]),
+            specialty=random.choice(['프로그래밍', '기획', '디자인', '영업', None]),
+            marital_status=random.choice(['single', 'married']),
+            is_public=random.choice([True, False]),
+            emergency_contact=generate_phone(),
+            emergency_relation=random.choice(['배우자', '부모', '형제']),
+            actual_postal_code=generate_postal_code(),
+            actual_address=generate_address(),
+            actual_detailed_address=f"실거주 {random.randint(100, 999)}호"
+        )
+        db.session.add(profile)
+        db.session.flush()
+
+        # PersonalProfile 생성 (기본 정보만)
+        personal_profile = PersonalProfile(
             user_id=user.id,
             name=name,
             english_name=f"{first_name} {last_name}",
@@ -939,13 +1723,50 @@ def create_personal_accounts(count=20, dry_run=False):
             actual_address=generate_address(),
             actual_detailed_address=f"실거주 {random.randint(100, 999)}호"
         )
-        db.session.add(profile)
+        db.session.add(personal_profile)
         db.session.flush()
 
-        # 학력 (1-3개)
+        # 얼굴 사진 할당
+        face_index = 31 + male_idx  # face_m (31) ~ face_m (40)
+        face_filename = f"face_m ({face_index}).png"
+        face_source = os.path.join(FACE_MALE_PATH, face_filename)
+        if os.path.exists(face_source):
+            dest_dir = os.path.join("uploads", "profiles", str(profile.id))
+            new_face_name = f"{name}_face.png"
+            face_dest = copy_sample_file(face_source, dest_dir, new_face_name)
+            if face_dest:
+                profile.photo = new_face_name
+                personal_profile.photo = new_face_name
+
+        # 명함 이미지 할당
+        card_index = 31 + male_idx  # bc_b_31 ~ bc_b_40
+        card_filename = f"bc_b_{card_index:02d}.png"
+        card_source = os.path.join(BUSINESS_CARD_PATH, card_filename)
+        if os.path.exists(card_source):
+            dest_dir = os.path.join("uploads", "profiles", str(profile.id))
+            new_card_name = f"{name}_명함_앞면.png"
+            card_dest = copy_sample_file(card_source, dest_dir, new_card_name)
+            if card_dest:
+                card_attachment = Attachment(
+                    owner_type=OwnerType.PROFILE,
+                    owner_id=profile.id,
+                    file_name=new_card_name,
+                    file_path=get_relative_path(card_dest, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
+                    file_type='png',
+                    category=AttachmentCategory.BUSINESS_CARD_FRONT,
+                    display_order=0
+                )
+                db.session.add(card_attachment)
+
+        # 문서 첨부파일 생성
+        doc_attachments = create_attachments_for_person(profile, 'profile', profile.id)
+        for att in doc_attachments:
+            db.session.add(att)
+
+        # 학력 (1-3개) - Profile과 연결
         for edu_idx in range(random.randint(1, 3)):
             if edu_idx == 0:
-                edu = PersonalEducation(
+                edu = Education(
                     profile_id=profile.id,
                     school_type='고등학교',
                     school_name=random.choice(HIGH_SCHOOL_NAMES),
@@ -953,7 +1774,7 @@ def create_personal_accounts(count=20, dry_run=False):
                     graduation_status='졸업'
                 )
             else:
-                edu = PersonalEducation(
+                edu = Education(
                     profile_id=profile.id,
                     school_type=random.choice(['대학교', '전문대학', '대학원']),
                     school_name=random.choice(SCHOOL_NAMES),
@@ -964,10 +1785,10 @@ def create_personal_accounts(count=20, dry_run=False):
                 )
             db.session.add(edu)
 
-        # 경력 (0-4개)
+        # 경력 (0-4개) - Profile과 연결
         for _ in range(random.randint(0, 4)):
             start_year = random.randint(2015, 2022)
-            career = PersonalCareer(
+            career = Career(
                 profile_id=profile.id,
                 company_name=f"(주){random.choice(['테스트', '샘플', '예시', '이전'])}기업",
                 department=random.choice(DEPARTMENTS),
@@ -978,9 +1799,9 @@ def create_personal_accounts(count=20, dry_run=False):
             )
             db.session.add(career)
 
-        # 자격증 (0-4개)
+        # 자격증 (0-4개) - Profile과 연결
         for _ in range(random.randint(0, 4)):
-            cert = PersonalCertificate(
+            cert = Certificate(
                 profile_id=profile.id,
                 certificate_name=random.choice(CERTIFICATE_NAMES),
                 issuing_organization=random.choice(ISSUING_ORGS),
@@ -988,10 +1809,10 @@ def create_personal_accounts(count=20, dry_run=False):
             )
             db.session.add(cert)
 
-        # 어학 (0-3개)
+        # 어학 (0-3개) - Profile과 연결
         for _ in range(random.randint(0, 3)):
             lang_name = random.choice(LANGUAGES)
-            lang = PersonalLanguage(
+            lang = Language(
                 profile_id=profile.id,
                 language_name=lang_name,
                 exam_name=random.choice(LANGUAGE_EXAMS.get(lang_name, ['기타'])),
@@ -1001,9 +1822,9 @@ def create_personal_accounts(count=20, dry_run=False):
             )
             db.session.add(lang)
 
-        # 병역 (남성만)
+        # 병역 (남성만) - Profile과 연결
         if gender == '남':
-            military = PersonalMilitaryService(
+            military = MilitaryService(
                 profile_id=profile.id,
                 military_status=random.choice(['군필', '면제']),
                 service_type=random.choice(SERVICE_TYPES) if random.random() > 0.2 else None,
@@ -1012,8 +1833,210 @@ def create_personal_accounts(count=20, dry_run=False):
             )
             db.session.add(military)
 
-        created_profiles.append(profile)
-        print(f"  + {name} ({username}) - 모든 관련 데이터 생성")
+        created_profiles.append(personal_profile)
+        print(f"  + {name} (남) ({username}) - 모든 관련 데이터 생성")
+
+    # 여성 개인 계정 생성
+    for female_idx in range(female_count):
+        gender = '여'
+        last_name = random.choice(KOREAN_LAST_NAMES)
+        first_name = random.choice(KOREAN_FIRST_NAMES_FEMALE)
+        name = f"{last_name}{first_name}"
+        birth_date = generate_birth_date(22, 45)
+
+        username = f"personal_f_{female_idx + 1}"
+        email = f"personal_f_{female_idx + 1}@test.com"
+
+        existing = User.query.filter(
+            (User.username == username) | (User.email == email)
+        ).first()
+
+        if existing:
+            print(f"  [SKIP] {username} - 이미 존재")
+            if existing.personal_profile:
+                created_profiles.append(existing.personal_profile)
+            continue
+
+        if dry_run:
+            print(f"  [DRY] {name} (여) ({username}) 생성 예정")
+            continue
+
+        # 주민번호 할당
+        if rrn_index < len(resident_numbers):
+            resident_number = str(resident_numbers[rrn_index]).strip()
+            rrn_index += 1
+        else:
+            resident_number = generate_resident_number(birth_date, gender)
+
+        # User 생성
+        user = User(
+            username=username,
+            email=email,
+            role='employee',
+            account_type='personal',
+            is_active=True
+        )
+        user.set_password('personal1234')
+        db.session.add(user)
+        db.session.flush()
+
+        # Profile 생성 (통합 프로필)
+        profile = Profile(
+            user_id=user.id,
+            name=name,
+            english_name=f"{first_name} {last_name}",
+            birth_date=birth_date,
+            lunar_birth=random.choice([True, False]),
+            gender=gender,
+            mobile_phone=generate_phone(),
+            home_phone=generate_home_phone() if random.random() > 0.5 else None,
+            email=email,
+            postal_code=generate_postal_code(),
+            address=generate_address(),
+            detailed_address=f"개인아파트 {random.randint(100, 999)}호",
+            resident_number=resident_number,
+            nationality='대한민국',
+            hobby=random.choice(['독서', '운동', '여행', '음악감상', '요리', None]),
+            specialty=random.choice(['프로그래밍', '기획', '디자인', '영업', None]),
+            marital_status=random.choice(['single', 'married']),
+            is_public=random.choice([True, False]),
+            emergency_contact=generate_phone(),
+            emergency_relation=random.choice(['배우자', '부모', '형제']),
+            actual_postal_code=generate_postal_code(),
+            actual_address=generate_address(),
+            actual_detailed_address=f"실거주 {random.randint(100, 999)}호"
+        )
+        db.session.add(profile)
+        db.session.flush()
+
+        # PersonalProfile 생성 (기본 정보만)
+        personal_profile = PersonalProfile(
+            user_id=user.id,
+            name=name,
+            english_name=f"{first_name} {last_name}",
+            birth_date=birth_date,
+            lunar_birth=random.choice([True, False]),
+            gender=gender,
+            mobile_phone=generate_phone(),
+            home_phone=generate_home_phone() if random.random() > 0.5 else None,
+            email=email,
+            postal_code=generate_postal_code(),
+            address=generate_address(),
+            detailed_address=f"개인아파트 {random.randint(100, 999)}호",
+            nationality='대한민국',
+            blood_type=random.choice(['A', 'B', 'O', 'AB']),
+            religion=random.choice(['무교', '기독교', '불교', '천주교', None]),
+            hobby=random.choice(['독서', '운동', '여행', '음악감상', '요리', None]),
+            specialty=random.choice(['프로그래밍', '기획', '디자인', '영업', None]),
+            marital_status=random.choice(['single', 'married']),
+            is_public=random.choice([True, False]),
+            emergency_contact=generate_phone(),
+            emergency_relation=random.choice(['배우자', '부모', '형제']),
+            actual_postal_code=generate_postal_code(),
+            actual_address=generate_address(),
+            actual_detailed_address=f"실거주 {random.randint(100, 999)}호"
+        )
+        db.session.add(personal_profile)
+        db.session.flush()
+
+        # 얼굴 사진 할당
+        face_index = 31 + female_idx  # face_f (31) ~ face_f (40)
+        face_filename = f"face_f ({face_index}).png"
+        face_source = os.path.join(FACE_FEMALE_PATH, face_filename)
+        if os.path.exists(face_source):
+            dest_dir = os.path.join("uploads", "profiles", str(profile.id))
+            new_face_name = f"{name}_face.png"
+            face_dest = copy_sample_file(face_source, dest_dir, new_face_name)
+            if face_dest:
+                profile.photo = new_face_name
+                personal_profile.photo = new_face_name
+
+        # 명함 이미지 할당
+        card_index = 31 + female_idx  # bc_f_31 ~ bc_f_40
+        card_filename = f"bc_f_{card_index:02d}.png"
+        card_source = os.path.join(BUSINESS_CARD_PATH, card_filename)
+        if os.path.exists(card_source):
+            dest_dir = os.path.join("uploads", "profiles", str(profile.id))
+            new_card_name = f"{name}_명함_앞면.png"
+            card_dest = copy_sample_file(card_source, dest_dir, new_card_name)
+            if card_dest:
+                card_attachment = Attachment(
+                    owner_type=OwnerType.PROFILE,
+                    owner_id=profile.id,
+                    file_name=new_card_name,
+                    file_path=get_relative_path(card_dest, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
+                    file_type='png',
+                    category=AttachmentCategory.BUSINESS_CARD_FRONT,
+                    display_order=0
+                )
+                db.session.add(card_attachment)
+
+        # 문서 첨부파일 생성
+        doc_attachments = create_attachments_for_person(profile, 'profile', profile.id)
+        for att in doc_attachments:
+            db.session.add(att)
+
+        # 학력 (1-3개) - Profile과 연결
+        for edu_idx in range(random.randint(1, 3)):
+            if edu_idx == 0:
+                edu = Education(
+                    profile_id=profile.id,
+                    school_type='고등학교',
+                    school_name=random.choice(HIGH_SCHOOL_NAMES),
+                    graduation_date=f"{int(birth_date[:4]) + 18}-02-28",
+                    graduation_status='졸업'
+                )
+            else:
+                edu = Education(
+                    profile_id=profile.id,
+                    school_type=random.choice(['대학교', '전문대학', '대학원']),
+                    school_name=random.choice(SCHOOL_NAMES),
+                    major=random.choice(MAJORS),
+                    degree=random.choice(['학사', '석사', '박사', '전문학사']),
+                    graduation_date=f"{int(birth_date[:4]) + 22 + (edu_idx * 4)}-02-28",
+                    graduation_status='졸업'
+                )
+            db.session.add(edu)
+
+        # 경력 (0-4개) - Profile과 연결
+        for _ in range(random.randint(0, 4)):
+            start_year = random.randint(2015, 2022)
+            career = Career(
+                profile_id=profile.id,
+                company_name=f"(주){random.choice(['테스트', '샘플', '예시', '이전'])}기업",
+                department=random.choice(DEPARTMENTS),
+                position=random.choice(POSITIONS),
+                start_date=f"{start_year}-{random.randint(1, 12):02d}-01",
+                end_date=f"{start_year + random.randint(1, 3)}-{random.randint(1, 12):02d}-{random.randint(1, 28):02d}" if random.random() > 0.2 else None,
+                is_current=random.random() > 0.8
+            )
+            db.session.add(career)
+
+        # 자격증 (0-4개) - Profile과 연결
+        for _ in range(random.randint(0, 4)):
+            cert = Certificate(
+                profile_id=profile.id,
+                certificate_name=random.choice(CERTIFICATE_NAMES),
+                issuing_organization=random.choice(ISSUING_ORGS),
+                acquisition_date=generate_past_date(1, 5)
+            )
+            db.session.add(cert)
+
+        # 어학 (0-3개) - Profile과 연결
+        for _ in range(random.randint(0, 3)):
+            lang_name = random.choice(LANGUAGES)
+            lang = Language(
+                profile_id=profile.id,
+                language_name=lang_name,
+                exam_name=random.choice(LANGUAGE_EXAMS.get(lang_name, ['기타'])),
+                score=str(random.randint(700, 990)) if lang_name == '영어' else random.choice(['N1', 'N2', '고급', '중급']),
+                level=random.choice(['상', '중', '하']),
+                acquisition_date=generate_past_date(1, 3)
+            )
+            db.session.add(lang)
+
+        created_profiles.append(personal_profile)
+        print(f"  + {name} (여) ({username}) - 모든 관련 데이터 생성")
 
     if not dry_run and created_profiles:
         db.session.commit()
@@ -1091,6 +2114,392 @@ def create_person_corporate_contracts(companies, dry_run=False):
 
     print(f"\n  총 {len(created_contracts)}개 계약 생성 완료")
     return created_contracts
+
+
+# ============================================================
+# 무결성 검증 함수
+# ============================================================
+
+def verify_foreign_keys():
+    """Foreign Key 제약조건 검증"""
+    errors = []
+    
+    # User.employee_id → Employee.id
+    orphan_users = db.session.query(User).filter(
+        User.employee_id.isnot(None)
+    ).outerjoin(Employee, User.employee_id == Employee.id).filter(
+        Employee.id.is_(None)
+    ).all()
+    for user in orphan_users:
+        errors.append(f"User {user.id}: employee_id={user.employee_id} 참조 불가")
+    
+    # User.company_id → Company.id
+    orphan_company_users = db.session.query(User).filter(
+        User.company_id.isnot(None)
+    ).outerjoin(Company, User.company_id == Company.id).filter(
+        Company.id.is_(None)
+    ).all()
+    for user in orphan_company_users:
+        errors.append(f"User {user.id}: company_id={user.company_id} 참조 불가")
+    
+    # Employee.organization_id → Organization.id
+    orphan_employees = db.session.query(Employee).filter(
+        Employee.organization_id.isnot(None)
+    ).outerjoin(Organization, Employee.organization_id == Organization.id).filter(
+        Organization.id.is_(None)
+    ).all()
+    for emp in orphan_employees:
+        errors.append(f"Employee {emp.id}: organization_id={emp.organization_id} 참조 불가")
+    
+    # Employee.profile_id → Profile.id
+    orphan_profile_employees = db.session.query(Employee).filter(
+        Employee.profile_id.isnot(None)
+    ).outerjoin(Profile, Employee.profile_id == Profile.id).filter(
+        Profile.id.is_(None)
+    ).all()
+    for emp in orphan_profile_employees:
+        errors.append(f"Employee {emp.id}: profile_id={emp.profile_id} 참조 불가")
+    
+    # Profile.user_id → User.id
+    orphan_profiles = db.session.query(Profile).filter(
+        Profile.user_id.isnot(None)
+    ).outerjoin(User, Profile.user_id == User.id).filter(
+        User.id.is_(None)
+    ).all()
+    for profile in orphan_profiles:
+        errors.append(f"Profile {profile.id}: user_id={profile.user_id} 참조 불가")
+    
+    # Attachment.employee_id → Employee.id
+    orphan_attachments = db.session.query(Attachment).filter(
+        Attachment.employee_id.isnot(None)
+    ).outerjoin(Employee, Attachment.employee_id == Employee.id).filter(
+        Employee.id.is_(None)
+    ).all()
+    for att in orphan_attachments:
+        errors.append(f"Attachment {att.id}: employee_id={att.employee_id} 참조 불가")
+    
+    return errors
+
+
+def verify_unique_constraints():
+    """Unique 제약조건 검증"""
+    errors = []
+    
+    from sqlalchemy import func
+    
+    # User.username 중복 체크
+    duplicate_usernames = db.session.query(
+        User.username, func.count(User.id).label('count')
+    ).group_by(User.username).having(func.count(User.id) > 1).all()
+    for username, count in duplicate_usernames:
+        errors.append(f"User.username 중복: {username} ({count}개)")
+    
+    # User.email 중복 체크
+    duplicate_emails = db.session.query(
+        User.email, func.count(User.id).label('count')
+    ).group_by(User.email).having(func.count(User.id) > 1).all()
+    for email, count in duplicate_emails:
+        errors.append(f"User.email 중복: {email} ({count}개)")
+    
+    # Company.business_number 중복 체크
+    duplicate_business_numbers = db.session.query(
+        Company.business_number, func.count(Company.id).label('count')
+    ).group_by(Company.business_number).having(func.count(Company.id) > 1).all()
+    for bn, count in duplicate_business_numbers:
+        errors.append(f"Company.business_number 중복: {bn} ({count}개)")
+    
+    # Employee.employee_number 중복 체크
+    duplicate_employee_numbers = db.session.query(
+        Employee.employee_number, func.count(Employee.id).label('count')
+    ).filter(Employee.employee_number.isnot(None)).group_by(
+        Employee.employee_number
+    ).having(func.count(Employee.id) > 1).all()
+    for en, count in duplicate_employee_numbers:
+        errors.append(f"Employee.employee_number 중복: {en} ({count}개)")
+    
+    # Organization.code 중복 체크
+    duplicate_org_codes = db.session.query(
+        Organization.code, func.count(Organization.id).label('count')
+    ).filter(Organization.code.isnot(None)).group_by(
+        Organization.code
+    ).having(func.count(Organization.id) > 1).all()
+    for code, count in duplicate_org_codes:
+        errors.append(f"Organization.code 중복: {code} ({count}개)")
+    
+    return errors
+
+
+def verify_not_null_constraints():
+    """Not Null 제약조건 검증"""
+    errors = []
+    
+    # User 필수 필드
+    null_username_users = User.query.filter(User.username.is_(None)).all()
+    for user in null_username_users:
+        errors.append(f"User {user.id}: username is NULL")
+    
+    null_email_users = User.query.filter(User.email.is_(None)).all()
+    for user in null_email_users:
+        errors.append(f"User {user.id}: email is NULL")
+    
+    null_password_users = User.query.filter(User.password_hash.is_(None)).all()
+    for user in null_password_users:
+        errors.append(f"User {user.id}: password_hash is NULL")
+    
+    # Company 필수 필드
+    null_name_companies = Company.query.filter(Company.name.is_(None)).all()
+    for company in null_name_companies:
+        errors.append(f"Company {company.id}: name is NULL")
+    
+    null_business_number_companies = Company.query.filter(
+        Company.business_number.is_(None)
+    ).all()
+    for company in null_business_number_companies:
+        errors.append(f"Company {company.id}: business_number is NULL")
+    
+    # Employee 필수 필드
+    null_name_employees = Employee.query.filter(Employee.name.is_(None)).all()
+    for emp in null_name_employees:
+        errors.append(f"Employee {emp.id}: name is NULL")
+    
+    # Profile 필수 필드
+    null_name_profiles = Profile.query.filter(Profile.name.is_(None)).all()
+    for profile in null_name_profiles:
+        errors.append(f"Profile {profile.id}: name is NULL")
+    
+    return errors
+
+
+def verify_data_consistency():
+    """데이터 일관성 검증"""
+    errors = []
+    
+    # 1. User.account_type별 필드 일관성
+    # Personal 계정: company_id, employee_id, parent_user_id 모두 NULL
+    personal_users = User.query.filter_by(account_type='personal').all()
+    for user in personal_users:
+        if user.company_id is not None:
+            errors.append(f"User {user.id} (personal): company_id should be NULL")
+        if user.employee_id is not None:
+            errors.append(f"User {user.id} (personal): employee_id should be NULL")
+        if user.parent_user_id is not None:
+            errors.append(f"User {user.id} (personal): parent_user_id should be NULL")
+    
+    # Corporate 계정: company_id 필수, employee_id NULL
+    corporate_users = User.query.filter_by(account_type='corporate').all()
+    for user in corporate_users:
+        if user.company_id is None:
+            errors.append(f"User {user.id} (corporate): company_id is required")
+        if user.employee_id is not None:
+            errors.append(f"User {user.id} (corporate): employee_id should be NULL")
+    
+    # Employee_sub 계정: company_id, employee_id 모두 필수
+    employee_sub_users = User.query.filter_by(account_type='employee_sub').all()
+    for user in employee_sub_users:
+        if user.company_id is None:
+            errors.append(f"User {user.id} (employee_sub): company_id is required")
+        if user.employee_id is None:
+            errors.append(f"User {user.id} (employee_sub): employee_id is required")
+    
+    # 2. Profile과 User/Employee 연결 일관성
+    # Personal 계정: Profile.user_id 필수
+    for user in personal_users:
+        profile = Profile.query.filter_by(user_id=user.id).first()
+        if not profile:
+            errors.append(f"User {user.id} (personal): Profile missing")
+        else:
+            # PersonalProfile 존재 확인
+            personal_profile = PersonalProfile.query.filter_by(
+                user_id=user.id
+            ).first()
+            if not personal_profile:
+                errors.append(f"User {user.id} (personal): PersonalProfile missing")
+    
+    # Employee: Profile.profile_id 연결 확인
+    employees_with_profile = Employee.query.filter(
+        Employee.profile_id.isnot(None)
+    ).all()
+    for emp in employees_with_profile:
+        profile = Profile.query.get(emp.profile_id)
+        if not profile:
+            errors.append(f"Employee {emp.id}: profile_id={emp.profile_id} 참조 불가")
+    
+    # 3. 이력 정보 일관성
+    # Personal 계정의 이력: employee_id는 NULL, profile_id만 존재
+    for user in personal_users:
+        profile = Profile.query.filter_by(user_id=user.id).first()
+        if profile:
+            # Education, Career, Certificate 등 확인
+            educations = Education.query.filter_by(profile_id=profile.id).all()
+            for edu in educations:
+                if edu.employee_id is not None:
+                    errors.append(
+                        f"Education {edu.id}: personal account should have "
+                        f"employee_id=NULL, got {edu.employee_id}"
+                    )
+    
+    return errors
+
+
+def verify_business_logic():
+    """비즈니스 로직 무결성 검증"""
+    warnings = []
+    
+    # 1. Company.root_organization_id 확인
+    companies = Company.query.all()
+    for company in companies:
+        if company.root_organization_id is None:
+            warnings.append(f"Company {company.id}: root_organization_id is NULL")
+        else:
+            org = Organization.query.get(company.root_organization_id)
+            if org and org.parent_id is not None:
+                warnings.append(
+                    f"Company {company.id}: root_organization_id={company.root_organization_id} "
+                    f"is not a root organization (has parent_id={org.parent_id})"
+                )
+    
+    # 2. Employee.organization_id NULL 체크
+    employees_without_org = Employee.query.filter(
+        Employee.organization_id.is_(None)
+    ).all()
+    if employees_without_org:
+        warnings.append(
+            f"{len(employees_without_org)} employees without organization_id"
+        )
+    
+    # 3. PersonCorporateContract 상태 일관성
+    contracts = PersonCorporateContract.query.all()
+    for contract in contracts:
+        # 활성 계약은 DataSharingSettings 존재해야 함
+        if contract.status == 'active':
+            settings = DataSharingSettings.query.filter_by(
+                contract_id=contract.id
+            ).first()
+            if not settings:
+                warnings.append(
+                    f"Contract {contract.id}: active but no DataSharingSettings"
+                )
+    
+    # 4. Attachment.owner_type과 owner_id 일관성
+    attachments = Attachment.query.all()
+    for att in attachments:
+        if att.owner_type == OwnerType.EMPLOYEE and att.owner_id:
+            emp = Employee.query.get(att.owner_id)
+            if not emp:
+                warnings.append(
+                    f"Attachment {att.id}: owner_type=employee but "
+                    f"owner_id={att.owner_id} not found"
+                )
+        elif att.owner_type == OwnerType.COMPANY and att.owner_id:
+            company = Company.query.get(att.owner_id)
+            if not company:
+                warnings.append(
+                    f"Attachment {att.id}: owner_type=company but "
+                    f"owner_id={att.owner_id} not found"
+                )
+        elif att.owner_type == OwnerType.PROFILE and att.owner_id:
+            profile = Profile.query.get(att.owner_id)
+            if not profile:
+                warnings.append(
+                    f"Attachment {att.id}: owner_type=profile but "
+                    f"owner_id={att.owner_id} not found"
+                )
+    
+    return warnings
+
+
+def verify_database_integrity():
+    """데이터베이스 무결성 종합 검증"""
+    errors = []
+    warnings = []
+    
+    # 1. Foreign Key 제약조건 검증
+    errors.extend(verify_foreign_keys())
+    
+    # 2. Unique 제약조건 검증
+    errors.extend(verify_unique_constraints())
+    
+    # 3. Not Null 제약조건 검증
+    errors.extend(verify_not_null_constraints())
+    
+    # 4. 데이터 일관성 검증
+    errors.extend(verify_data_consistency())
+    
+    # 5. 비즈니스 로직 무결성 검증
+    warnings.extend(verify_business_logic())
+    
+    return errors, warnings
+
+
+def generate_integrity_report(errors, warnings):
+    """무결성 검증 리포트 생성"""
+    report_path = "integrity_report.txt"
+    
+    with open(report_path, 'w', encoding='utf-8') as f:
+        f.write("=" * 70 + "\n")
+        f.write("데이터베이스 무결성 검증 리포트\n")
+        f.write(f"생성일시: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        f.write("=" * 70 + "\n\n")
+        
+        f.write(f"[에러] 총 {len(errors)}건\n")
+        f.write("-" * 70 + "\n")
+        if errors:
+            for i, error in enumerate(errors, 1):
+                f.write(f"{i}. {error}\n")
+        else:
+            f.write("에러 없음\n")
+        
+        f.write(f"\n[경고] 총 {len(warnings)}건\n")
+        f.write("-" * 70 + "\n")
+        if warnings:
+            for i, warning in enumerate(warnings, 1):
+                f.write(f"{i}. {warning}\n")
+        else:
+            f.write("경고 없음\n")
+        
+        f.write("\n" + "=" * 70 + "\n")
+        if not errors and not warnings:
+            f.write("모든 무결성 검증 통과\n")
+        elif not errors:
+            f.write("무결성 검증 완료 (경고 있음)\n")
+        else:
+            f.write("무결성 검증 실패 (에러 발견)\n")
+        f.write("=" * 70 + "\n")
+    
+    print(f"\n무결성 검증 리포트 생성: {report_path}")
+    print(f"  - 에러: {len(errors)}건")
+    print(f"  - 경고: {len(warnings)}건")
+
+
+def run_integrity_checks():
+    """무결성 검증 실행"""
+    print("\n[Phase 6] 데이터베이스 무결성 검증")
+    print("-" * 50)
+    
+    errors, warnings = verify_database_integrity()
+    
+    # 리포트 생성
+    generate_integrity_report(errors, warnings)
+    
+    # 콘솔 출력
+    if errors:
+        print(f"\n[ERROR] {len(errors)}건의 무결성 위반 발견:")
+        for error in errors[:10]:  # 최대 10개만 출력
+            print(f"  - {error}")
+        if len(errors) > 10:
+            print(f"  ... 외 {len(errors) - 10}건 (자세한 내용은 리포트 참조)")
+    
+    if warnings:
+        print(f"\n[WARNING] {len(warnings)}건의 경고:")
+        for warning in warnings[:10]:  # 최대 10개만 출력
+            print(f"  - {warning}")
+        if len(warnings) > 10:
+            print(f"  ... 외 {len(warnings) - 10}건 (자세한 내용은 리포트 참조)")
+    
+    if not errors and not warnings:
+        print("\n[OK] 모든 무결성 검증 통과")
+    
+    return len(errors) == 0
 
 
 # ============================================================
@@ -1207,11 +2616,18 @@ def show_status():
     # PersonalProfile 현황
     total_profile = PersonalProfile.query.count()
     print(f"\n[개인 프로필] 총 {total_profile}개")
-    print(f"  - 학력: {PersonalEducation.query.count()}건")
-    print(f"  - 경력: {PersonalCareer.query.count()}건")
-    print(f"  - 자격증: {PersonalCertificate.query.count()}건")
-    print(f"  - 어학: {PersonalLanguage.query.count()}건")
-    print(f"  - 병역: {PersonalMilitaryService.query.count()}건")
+    
+    # Profile 현황 (통합 프로필)
+    total_unified_profile = Profile.query.count()
+    print(f"\n[통합 프로필] 총 {total_unified_profile}개")
+    personal_profiles = Profile.query.filter(Profile.user_id.isnot(None)).join(
+        User, Profile.user_id == User.id
+    ).filter(User.account_type == 'personal').count()
+    employee_profiles = Profile.query.join(
+        Employee, Profile.id == Employee.profile_id
+    ).count()
+    print(f"  - 개인 계정 프로필: {personal_profiles}개")
+    print(f"  - 직원 프로필: {employee_profiles}개")
 
     # 계약 현황
     contracts = PersonCorporateContract.query.count()
@@ -1232,7 +2648,7 @@ def main():
 
     print("=" * 70)
     print("포괄적 테스트 데이터 생성 스크립트")
-    print("법인 3개, 직원 20명, 개인 20명 + 모든 관련 테이블")
+    print("법인 3개, 직원 60명(각 법인당 20명, 남녀 각 10명), 개인 20명(남녀 각 10명) + 모든 관련 테이블")
     print("=" * 70)
 
     if dry_run:
@@ -1257,13 +2673,17 @@ def main():
         companies = create_companies(dry_run)
 
         # 2. 직원 생성 (모든 관련 데이터 포함)
-        employees = create_employees(companies, count=20, dry_run=dry_run)
+        employees = create_employees(companies, employees_per_company=20, dry_run=dry_run)
 
         # 3. 개인 계정 생성
         profiles = create_personal_accounts(count=20, dry_run=dry_run)
 
         # 4. 개인-법인 계약 생성
         contracts = create_person_corporate_contracts(companies, dry_run=dry_run)
+
+        # 5. 무결성 검증
+        if not dry_run:
+            run_integrity_checks()
 
         # 실행 후 상태
         if not dry_run:

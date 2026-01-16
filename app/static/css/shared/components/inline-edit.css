@@ -14,6 +14,7 @@
     position: relative;
     display: flex;
     align-items: center;
+    width: 100%;
     min-height: var(--info-cell-min-height);
 }
 
@@ -32,17 +33,18 @@
 /* 편집 모드 */
 .inline-edit__edit {
     display: none;
-    flex: 1;
+    width: 100%;
     gap: var(--space-2);
 }
 
-/* 입력 필드 */
+/* 입력 필드 - forms.css 스타일가이드 일관성 */
 .inline-edit__input {
     width: 100%;
-    padding: var(--space-2-5) var(--space-3);
+    padding: var(--space-3);
     border: 1px solid var(--color-gray-300);
     border-radius: var(--radius-md);
     font-size: var(--text-base);
+    font-family: var(--font-family);
     color: var(--color-gray-800);
     background: var(--color-pure-white);
     transition: all var(--transition-fast);
@@ -50,31 +52,55 @@
 
 .inline-edit__input:focus {
     outline: none;
-    border-color: var(--color-primary-500);
-    box-shadow: 0 0 0 3px var(--color-blue-opacity-10);
+    border-color: var(--color-gray-900);
+    box-shadow: var(--shadow-sm);
 }
 
 .inline-edit__input::placeholder {
     color: var(--color-gray-400);
 }
 
-/* Select 필드 */
+.inline-edit__input:disabled,
+.inline-edit__input[readonly] {
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-500);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Select 필드 - forms.css 스타일가이드 일관성 */
 .inline-edit__select {
     width: 100%;
-    padding: var(--space-2-5) var(--space-3);
+    padding: var(--space-3);
+    padding-right: var(--space-8);
     border: 1px solid var(--color-gray-300);
     border-radius: var(--radius-md);
     font-size: var(--text-base);
+    font-family: var(--font-family);
     color: var(--color-gray-800);
     background: var(--color-pure-white);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b6b6b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right var(--space-2) center;
+    background-repeat: no-repeat;
+    background-size: 1.25em 1.25em;
     cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     transition: all var(--transition-fast);
 }
 
 .inline-edit__select:focus {
     outline: none;
-    border-color: var(--color-primary-500);
-    box-shadow: 0 0 0 3px var(--color-blue-opacity-10);
+    border-color: var(--color-gray-900);
+    box-shadow: var(--shadow-sm);
+}
+
+.inline-edit__select:disabled {
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-500);
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
 /* 액션 버튼 영역 */
@@ -149,7 +175,8 @@
 
 .inline-edit--error .inline-edit__input:focus,
 .inline-edit--error .inline-edit__select:focus {
-    box-shadow: 0 0 0 3px var(--color-error-opacity-10);
+    border-color: var(--color-error-500);
+    box-shadow: var(--shadow-sm);
 }
 
 /* 성공 상태 */
@@ -173,3 +200,297 @@
         justify-content: flex-end;
     }
 }
+
+/* ========================================
+   Phase 0.2: 섹션 편집 모드 확장
+   ======================================== */
+
+/* 섹션 레벨 편집 모드 */
+.info-section--editing .inline-edit__view {
+    display: none;
+}
+
+.info-section--editing .inline-edit__edit {
+    display: flex;
+}
+
+/* 읽기전용 필드는 편집 모드에서도 view 표시 유지 */
+.info-section--editing .inline-edit--readonly .inline-edit__view {
+    display: flex;
+}
+
+/* 섹션 저장 중 상태 */
+.info-section--saving {
+    opacity: 0.7;
+    pointer-events: none;
+    position: relative;
+}
+
+.info-section--saving::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-gray-100);
+    opacity: 0.3;
+    z-index: 1;
+}
+
+/* 섹션 에러 상태 */
+.info-section--error {
+    border-color: var(--color-error-500);
+}
+
+/* ========================================
+   필드 상태 클래스
+   ======================================== */
+
+/* 변경된 (dirty) 필드 */
+.inline-edit__input--dirty,
+.inline-edit__select--dirty {
+    border-color: var(--color-warning-400);
+    background-color: var(--color-warning-50);
+}
+
+/* 유효성 검사 실패 필드 */
+.inline-edit__input--invalid,
+.inline-edit__select--invalid {
+    border-color: var(--color-error-500);
+    background-color: var(--color-error-50);
+}
+
+.inline-edit__input--invalid:focus,
+.inline-edit__select--invalid:focus {
+    border-color: var(--color-error-500);
+    box-shadow: var(--shadow-sm);
+}
+
+/* 에러 메시지 */
+.inline-edit__error {
+    display: block;
+    margin-top: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--color-error-600);
+}
+
+/* ========================================
+   섹션 헤더 버튼 가시성 상태
+   (버튼 기본 스타일: info-section.css 참조)
+   ======================================== */
+
+/* 편집 모드에서 버튼 변경 */
+.info-section--editing .info-section__edit-btn {
+    display: none;
+}
+
+.info-section--editing .info-section__save-btn,
+.info-section--editing .info-section__cancel-btn {
+    display: inline-flex;
+}
+
+/* ========================================
+   애니메이션
+   ======================================== */
+
+/* 편집 모드 전환 애니메이션 */
+.info-section {
+    transition: border-color var(--transition-fast),
+                opacity var(--transition-fast);
+}
+
+.inline-edit__view,
+.inline-edit__edit {
+    transition: opacity var(--transition-fast);
+}
+
+/* 저장 중 스피너 (선택적) */
+.info-section--saving .info-section__save-btn::after {
+    content: '';
+    width: 14px;
+    height: 14px;
+    margin-left: var(--space-2);
+    border: 2px solid var(--color-pure-white);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========================================
+   Input Group with Suffix
+   ======================================== */
+
+.inline-edit__input-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.inline-edit__suffix {
+    font-size: var(--text-sm);
+    color: var(--color-gray-600);
+    white-space: nowrap;
+}
+
+/* ========================================
+   주소 검색 필드 스타일
+   ======================================== */
+
+.inline-edit--address .inline-edit__edit {
+    display: none;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.inline-edit__address-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.inline-edit__address-input {
+    flex: 1;
+    background-color: var(--color-gray-50) !important;
+    cursor: pointer;
+}
+
+.inline-edit__address-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.inline-edit__detail-input {
+    margin-top: var(--space-1);
+}
+
+/* ========================================
+   조직 트리 선택기 스타일
+   ======================================== */
+
+.inline-edit--organization .inline-edit__edit {
+    display: none;
+}
+
+.inline-edit__org-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.inline-edit__org-display {
+    flex: 1;
+    background-color: var(--color-gray-50) !important;
+    cursor: pointer;
+}
+
+.inline-edit__org-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* 편집 모드에서 주소/조직 필드 표시 */
+.info-section--editing .inline-edit--address .inline-edit__edit,
+.info-section--editing .inline-edit--organization .inline-edit__edit {
+    display: flex;
+}
+
+/* ========================================
+   날짜 + 음력 체크박스 스타일
+   ======================================== */
+
+.inline-edit--date-lunar .inline-edit__edit {
+    display: none;
+}
+
+.inline-edit__date-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.inline-edit__lunar-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--color-gray-700);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.inline-edit__lunar-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--color-primary-500);
+}
+
+.inline-edit__lunar-label:hover {
+    color: var(--color-gray-900);
+}
+
+/* 편집 모드에서 날짜+음력 필드 표시 */
+.info-section--editing .inline-edit--date-lunar .inline-edit__edit {
+    display: flex;
+}
+
+/* ========================================
+   계정 타입별 인라인 편집 가시성
+   corporate_admin 계정은 인라인 편집 미지원
+   Phase 1: personal 계정 인라인 편집 지원 추가
+   ======================================== */
+
+/* 법인관리자(corporate_admin)는 편집 버튼 숨김 */
+[data-account-type="corporate_admin"] .info-section__edit-btn,
+[data-account-type="corporate_admin"] .info-section__save-btn,
+[data-account-type="corporate_admin"] .info-section__cancel-btn {
+    display: none !important;
+}
+
+/* ========================================
+   Phase 2: CREATE 모드 스타일
+   신규 직원 등록 페이지용
+   - 섹션별 수정 버튼 방식 (기존 EDIT 모드와 동일 UX)
+   ======================================== */
+
+/* CREATE 모드: 섹션 구분 강조 */
+.create-mode .info-section {
+    border-color: var(--color-primary-200);
+}
+
+/* CREATE 모드: 필수 필드 표시 */
+.create-mode .required-mark {
+    color: var(--color-error-500);
+    font-weight: var(--font-semibold);
+}
+
+/* CREATE 모드: 빈 값 플레이스홀더 */
+.create-mode .inline-edit__view--empty {
+    color: var(--color-gray-400);
+    font-style: italic;
+}
+
+/* 폼 헬프 텍스트 */
+.form-help-text {
+    display: block;
+    margin-top: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+}
+
+

@@ -189,3 +189,37 @@
     background-color: var(--color-gray-100);
     border-color: var(--color-gray-300);
 }
+
+/* ========================================
+   Modal Form Grid (Phase 8)
+   행 편집 모달용 폼 레이아웃
+   ======================================== */
+.modal__body .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+}
+
+.modal__body .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+/* 전체 너비 필드 (textarea) */
+.modal__body .form-group:has(textarea) {
+    grid-column: 1 / -1;
+}
+
+/* 필수 표시 */
+.form-required {
+    color: var(--color-error-500);
+    margin-left: var(--space-1);
+}
+
+/* 반응형 - 모바일에서 단일 열 */
+@media (max-width: 640px) {
+    .modal__body .form-grid {
+        grid-template-columns: 1fr;
+    }
+}

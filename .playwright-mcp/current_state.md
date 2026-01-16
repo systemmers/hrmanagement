@@ -1,0 +1,1794 @@
+### Page state
+- Page URL: http://localhost:5200/employees/1
+- Page Title: 임영호 - 인사카드
+- Page Snapshot:
+```yaml
+- generic:
+  - banner [ref=e1]:
+    - generic [ref=e2]:
+      - generic [ref=e3]: HR
+      - heading "인사카드 관리 시스템" [level=1] [ref=e4]
+    - generic [ref=e5]:
+      - generic [ref=e6] [cursor=pointer]:
+        - generic [ref=e7]: A
+        - generic [ref=e8]: admin_testa
+      - link "로그아웃" [ref=e9] [cursor=pointer]:
+        - /url: /auth/logout
+        - generic [ref=e10]: 
+        - generic [ref=e11]: 로그아웃
+  - generic [ref=e13]:
+    - complementary "사이드바" [ref=e14]:
+      - generic [ref=e15]:
+        - heading "인사카드 관리" [level=1] [ref=e16]
+        - paragraph [ref=e17]: 직원 정보 통합 관리 시스템
+      - navigation "메인 메뉴" [ref=e18]:
+        - generic [ref=e19]:
+          - heading "대시보드" [level=2] [ref=e20]
+          - link " 직원 현황" [ref=e21] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e22]: 
+            - generic [ref=e23]: 직원 현황
+        - generic [ref=e24]:
+          - heading "직원 관리" [level=2] [ref=e25]
+          - generic [ref=e26]:
+            - img [ref=e27]
+            - textbox "직원 검색" [ref=e29]:
+              - /placeholder: 직원 검색...
+            - text: 
+            - button "검색" [ref=e30] [cursor=pointer]:
+              - generic [ref=e31]: 
+          - generic [ref=e32]:
+            - generic [ref=e33] [cursor=pointer]:
+              - img "임영호" [ref=e35]
+              - generic [ref=e36]:
+                - generic [ref=e37]: 임영호
+                - generic [ref=e38]: 사원
+              - generic [ref=e40]: 
+            - navigation "섹션 네비게이션" [ref=e41]:
+              - generic [ref=e42]:
+                - generic [ref=e43]: 인사정보
+                - link " 개인 기본정보" [active] [ref=e44] [cursor=pointer]:
+                  - /url: "#personal-info"
+                  - generic [ref=e45]: 
+                  - generic [ref=e46]: 개인 기본정보
+                - link " 소속정보" [ref=e47] [cursor=pointer]:
+                  - /url: "#organization-info"
+                  - generic [ref=e48]: 
+                  - generic [ref=e49]: 소속정보
+                - link " 계약정보" [ref=e50] [cursor=pointer]:
+                  - /url: "#contract-info"
+                  - generic [ref=e51]: 
+                  - generic [ref=e52]: 계약정보
+                - link " 급여정보" [ref=e53] [cursor=pointer]:
+                  - /url: "#salary-info"
+                  - generic [ref=e54]: 
+                  - generic [ref=e55]: 급여정보
+              - generic [ref=e56]:
+                - generic [ref=e57]: 이력 및 경력
+                - link " 학력정보" [ref=e58] [cursor=pointer]:
+                  - /url: "#education-info"
+                  - generic [ref=e59]: 
+                  - generic [ref=e60]: 학력정보
+                - link " 경력정보" [ref=e61] [cursor=pointer]:
+                  - /url: "#career-info"
+                  - generic [ref=e62]: 
+                  - generic [ref=e63]: 경력정보
+                - link " 자격증 및 면허" [ref=e64] [cursor=pointer]:
+                  - /url: "#certificate-info"
+                  - generic [ref=e65]: 
+                  - generic [ref=e66]: 자격증 및 면허
+                - link " 언어능력" [ref=e67] [cursor=pointer]:
+                  - /url: "#language-info"
+                  - generic [ref=e68]: 
+                  - generic [ref=e69]: 언어능력
+                - link " 병역/보훈/장애/수상" [ref=e70] [cursor=pointer]:
+                  - /url: "#military-info"
+                  - generic [ref=e71]: 
+                  - generic [ref=e72]: 병역/보훈/장애/수상
+              - generic [ref=e73]:
+                - generic [ref=e74]: 근무현황 및 인사기록
+                - link " 인사이동 및 고과" [ref=e75] [cursor=pointer]:
+                  - /url: "#personnel-movement"
+                  - generic [ref=e76]: 
+                  - generic [ref=e77]: 인사이동 및 고과
+                - link " 교육 및 비용" [ref=e78] [cursor=pointer]:
+                  - /url: "#attendance-assets"
+                  - generic [ref=e79]: 
+                  - generic [ref=e80]: 교육 및 비용
+          - link " 직원 목록" [ref=e81] [cursor=pointer]:
+            - /url: /employees
+            - generic [ref=e82]: 
+            - generic [ref=e83]: 직원 목록
+          - link " 직원 등록" [ref=e84] [cursor=pointer]:
+            - /url: /employees/new
+            - generic [ref=e85]: 
+            - generic [ref=e86]: 직원 등록
+        - generic [ref=e87]:
+          - heading "계약 관리" [level=2] [ref=e88]
+          - link " 계약 목록" [ref=e89] [cursor=pointer]:
+            - /url: /contracts/company
+            - generic [ref=e90]: 
+            - generic [ref=e91]: 계약 목록
+          - 'link " 계약 설정 : 준비중" [ref=e92] [cursor=pointer]':
+            - /url: "#"
+            - generic [ref=e93]: 
+            - generic [ref=e94]: "계약 설정 : 준비중"
+        - generic [ref=e95]:
+          - heading "법인 관리" [level=2] [ref=e96]
+          - link " 법인 대시보드" [ref=e97] [cursor=pointer]:
+            - /url: /corporate/dashboard
+            - generic [ref=e98]: 
+            - generic [ref=e99]: 법인 대시보드
+          - link " 관리자 프로필" [ref=e100] [cursor=pointer]:
+            - /url: /profile/
+            - generic [ref=e101]: 
+            - generic [ref=e102]: 관리자 프로필
+          - link " 법인 설정" [ref=e103] [cursor=pointer]:
+            - /url: /corporate/settings
+            - generic [ref=e104]: 
+            - generic [ref=e105]: 법인 설정
+          - link " 계정 관리" [ref=e106] [cursor=pointer]:
+            - /url: /corporate/users
+            - generic [ref=e107]: 
+            - generic [ref=e108]: 계정 관리
+        - generic [ref=e109]:
+          - heading " AI 테스트" [level=2] [ref=e110]:
+            - generic [ref=e111]: 
+            - text: AI 테스트
+          - link " 문서 분석 테스트" [ref=e112] [cursor=pointer]:
+            - /url: /ai-test/
+            - generic [ref=e113]: 
+            - generic [ref=e114]: 문서 분석 테스트
+          - link " AI 설정" [ref=e115] [cursor=pointer]:
+            - /url: /ai-test/settings
+            - generic [ref=e116]: 
+            - generic [ref=e117]: AI 설정
+          - link " 데이터 테이블 데모" [ref=e118] [cursor=pointer]:
+            - /url: /examples/data-table
+            - generic [ref=e119]: 
+            - generic [ref=e120]: 데이터 테이블 데모
+          - link " 스타일 가이드" [ref=e121] [cursor=pointer]:
+            - /url: /examples/styleguide
+            - generic [ref=e122]: 
+            - generic [ref=e123]: 스타일 가이드
+      - generic [ref=e125]:
+        - generic [ref=e126]: A
+        - generic [ref=e127]:
+          - generic [ref=e128]: admin_testa
+          - generic [ref=e129]: 시스템 관리자
+    - main "메인 콘텐츠" [ref=e130]:
+      - generic [ref=e132]:
+        - generic [ref=e133]:
+          - heading "직원 상세 정보" [level=1] [ref=e134]
+          - generic [ref=e135]:
+            - link " 목록으로" [ref=e136] [cursor=pointer]:
+              - /url: /employees
+              - generic [ref=e137]: 
+              - generic [ref=e138]: 목록으로
+            - link " 수정" [ref=e139] [cursor=pointer]:
+              - /url: /employees/1/edit
+              - generic [ref=e140]: 
+              - generic [ref=e141]: 수정
+            - button " 삭제" [ref=e142] [cursor=pointer]:
+              - generic [ref=e143]: 
+              - generic [ref=e144]: 삭제
+        - generic [ref=e146]:
+          - generic [ref=e147]:
+            - generic [ref=e148]:
+              - img "임영호 증명사진" [ref=e150]
+              - generic [ref=e151]:
+                - generic [ref=e152]: 임영호
+                - generic [ref=e153]: CHRIS LIM
+                - generic [ref=e154]:
+                  - generic [ref=e155]:
+                    - generic [ref=e156]: 
+                    - generic [ref=e157]: 개발팀
+                  - generic [ref=e158]:
+                    - generic [ref=e159]: 
+                    - generic [ref=e160]: 사원
+                - generic [ref=e161]: 정상
+            - generic [ref=e164]:
+              - generic [ref=e165]:
+                - generic [ref=e166]: 입사일
+                - generic [ref=e167]: 2024-12-01
+              - generic [ref=e168]:
+                - generic [ref=e169]: 재직기간
+                - generic [ref=e170]: 1년 1개월
+              - generic [ref=e171]:
+                - generic [ref=e172]: 연차 잔여
+                - generic [ref=e173]: 15일
+              - generic [ref=e174]:
+                - generic [ref=e175]: 사번
+                - generic [ref=e176]: EMP-001
+          - generic [ref=e177]:
+            - generic [ref=e178]: Business Card
+            - generic [ref=e181] [cursor=pointer]:
+              - img "임영호 명함 앞면" [ref=e183]
+              - img "임영호 명함 뒷면" [ref=e185]
+            - generic [ref=e186]:
+              - button "업로드" [ref=e187] [cursor=pointer]:
+                - generic [ref=e188]: 
+                - text: 업로드
+              - button "삭제" [ref=e189] [cursor=pointer]:
+                - generic [ref=e190]: 
+                - text: 삭제
+        - generic [ref=e191]:
+          - heading "개인 기본정보" [level=2] [ref=e192]
+          - generic [ref=e193]:
+            - generic [ref=e194]:
+              - generic [ref=e195]:
+                - img [ref=e197]
+                - text: 개인 기본정보
+              - button "수정" [ref=e200] [cursor=pointer]:
+                - img [ref=e201]
+                - text: 수정
+            - generic [ref=e204]:
+              - generic [ref=e205]:
+                - generic [ref=e206]:
+                  - generic [ref=e207]:
+                    - text: 이름
+                    - generic [ref=e208]: "*"
+                  - generic [ref=e211]: 임영호
+                - generic [ref=e212]:
+                  - generic [ref=e213]: 영문 이름
+                  - generic [ref=e216]: Chris Lim
+              - generic [ref=e217]:
+                - generic [ref=e218]:
+                  - generic [ref=e219]: 한자 이름
+                  - generic [ref=e222]: 林英豪
+                - generic [ref=e223]:
+                  - generic [ref=e224]: 외국어 이름
+                  - generic [ref=e228]: "-"
+              - generic [ref=e229]:
+                - generic [ref=e230]:
+                  - generic [ref=e231]: 생년월일
+                  - generic [ref=e232]:
+                    - generic [ref=e234]: 1996-10-11
+                    - generic [ref=e235]: 음력
+                - generic [ref=e236]:
+                  - generic [ref=e237]: 나이
+                  - generic [ref=e241]: "-"
+              - generic [ref=e242]:
+                - generic [ref=e243]:
+                  - generic [ref=e244]: 성별
+                  - generic [ref=e247]: 남
+                - generic [ref=e248]:
+                  - generic [ref=e249]: 국적
+                  - generic [ref=e252]: 대한민국
+              - generic [ref=e253]:
+                - generic [ref=e254]:
+                  - generic [ref=e255]: 주민등록번호
+                  - generic [ref=e258]: 961011-1234567
+                - generic [ref=e259]:
+                  - generic [ref=e260]: 우편번호
+                  - generic [ref=e263]: "10842"
+              - generic [ref=e264]:
+                - generic [ref=e265]:
+                  - generic [ref=e266]: 결혼여부
+                  - generic [ref=e270]: "-"
+                - generic [ref=e271]:
+                  - generic [ref=e272]: 휴대전화
+                  - generic [ref=e275]: 010-1234-5678
+              - generic [ref=e276]:
+                - generic [ref=e277]:
+                  - generic [ref=e278]: 자택전화
+                  - generic [ref=e281]: 053-515-8533
+                - generic [ref=e282]:
+                  - generic [ref=e283]: 이메일
+                  - generic [ref=e286]: lim734@company.com
+              - generic [ref=e287]:
+                - generic [ref=e288]:
+                  - generic [ref=e289]: 비상연락처
+                  - generic [ref=e292]: 010-7949-2341
+                - generic [ref=e293]:
+                  - generic [ref=e294]: 비상연락처 관계
+                  - generic [ref=e297]: 형제
+              - generic [ref=e298]:
+                - generic [ref=e299]:
+                  - generic [ref=e300]: 은행명
+                  - generic [ref=e304]: "-"
+                - generic [ref=e305]:
+                  - generic [ref=e306]: 계좌번호
+                  - generic [ref=e310]: "-"
+              - generic [ref=e311]:
+                - generic [ref=e312]:
+                  - generic [ref=e313]: 예금주
+                  - generic [ref=e317]: "-"
+                - generic [ref=e318]:
+                  - generic [ref=e319]: 취미
+                  - generic [ref=e322]: 골프, 요리
+              - generic [ref=e323]:
+                - generic [ref=e324]:
+                  - generic [ref=e325]: 특기
+                  - generic [ref=e328]: 기획
+                - generic [ref=e329]:
+                  - generic [ref=e330]: 장애정보
+                  - generic [ref=e334]: "-"
+              - generic [ref=e335]:
+                - generic [ref=e336]:
+                  - generic [ref=e337]: 주민등록상 주소
+                  - generic [ref=e340]: 서울특별시 영등포구 테헤란로 304
+                - generic [ref=e341]:
+                  - generic [ref=e342]: 상세주소
+                  - generic [ref=e345]: 아파트 326동 1607호
+              - generic [ref=e346]:
+                - generic [ref=e347]:
+                  - generic [ref=e348]: 실제 거주지
+                  - generic [ref=e351]: 서울특별시 영등포구 테헤란로 304
+                - generic [ref=e352]:
+                  - generic [ref=e353]: 실제 거주지 상세
+                  - generic [ref=e356]: 아파트 326동 1607호
+        - generic [ref=e357]:
+          - heading "소속정보" [level=2] [ref=e358]
+          - generic [ref=e359]:
+            - generic [ref=e360]:
+              - generic [ref=e361]:
+                - img [ref=e363]
+                - text: 소속정보
+              - button "수정" [ref=e366] [cursor=pointer]:
+                - img [ref=e367]
+                - text: 수정
+            - generic [ref=e370]:
+              - generic [ref=e371]:
+                - generic [ref=e372]:
+                  - generic [ref=e373]: 소속 조직
+                  - generic [ref=e376]: 개발팀
+                - generic [ref=e377]:
+                  - generic [ref=e378]: 부서명
+                  - generic [ref=e381]: 개발팀
+              - generic [ref=e382]:
+                - generic [ref=e383]:
+                  - generic [ref=e384]: 직위
+                  - generic [ref=e387]: 사원
+                - generic [ref=e388]:
+                  - generic [ref=e389]: 직급
+                  - generic [ref=e392]: L4
+              - generic [ref=e393]:
+                - generic [ref=e394]:
+                  - generic [ref=e395]: 직책
+                  - generic [ref=e399]: "-"
+                - generic [ref=e400]:
+                  - generic [ref=e401]: 직무
+                  - generic [ref=e404]: 시스템운영
+              - generic [ref=e405]:
+                - generic [ref=e406]:
+                  - generic [ref=e407]: 사번
+                  - generic [ref=e410]: EMP-001
+                - generic [ref=e411]:
+                  - generic [ref=e412]: 근무지
+                  - generic [ref=e415]: 부산 지사
+              - generic [ref=e416]:
+                - generic [ref=e417]:
+                  - generic [ref=e418]: 내선번호
+                  - generic [ref=e421]: "1001"
+                - generic [ref=e422]:
+                  - generic [ref=e423]: 회사 이메일
+                  - generic [ref=e426]: lim397@testcorp.co.kr
+        - generic [ref=e427]:
+          - heading "계약정보" [level=2] [ref=e428]
+          - generic [ref=e429]:
+            - generic [ref=e430]:
+              - generic [ref=e431]:
+                - img [ref=e433]
+                - text: 계약정보
+              - button "수정" [ref=e436] [cursor=pointer]:
+                - img [ref=e437]
+                - text: 수정
+            - generic [ref=e440]:
+              - generic [ref=e441]:
+                - generic [ref=e442]:
+                  - generic [ref=e443]: 입사일
+                  - generic [ref=e446]: 2024-12-01
+                - generic [ref=e447]:
+                  - generic [ref=e448]: 재직 상태
+                  - generic [ref=e451]: active
+              - generic [ref=e452]:
+                - generic [ref=e453]:
+                  - generic [ref=e454]: 고용형태
+                  - generic [ref=e458]: "-"
+                - generic [ref=e459]:
+                  - generic [ref=e460]: 재직기간
+                  - generic [ref=e463]: 1년 1개월
+              - generic [ref=e464]:
+                - generic [ref=e465]:
+                  - generic [ref=e466]: 계약형태
+                  - generic [ref=e469]: 파견직
+                - generic [ref=e470]:
+                  - generic [ref=e471]: 계약기간
+                  - generic [ref=e474]: 무기한
+              - generic [ref=e475]:
+                - generic [ref=e476]:
+                  - generic [ref=e477]: 계약시작일
+                  - generic [ref=e480]: 2024-12-01
+                - generic [ref=e481]:
+                  - generic [ref=e482]: 직원유형
+                  - generic [ref=e485]: 인턴
+              - generic [ref=e486]:
+                - generic [ref=e487]:
+                  - generic [ref=e488]: 근무형태
+                  - generic [ref=e491]: 상근
+                - generic [ref=e492]:
+                  - generic [ref=e493]: 수습종료일
+                  - generic [ref=e497]: "-"
+              - generic [ref=e498]:
+                - generic [ref=e499]:
+                  - generic [ref=e500]: 근무시간
+                  - generic [ref=e503]: 09:00 ~ 18:00
+                - generic [ref=e504]:
+                  - generic [ref=e505]: 휴게시간
+                  - generic [ref=e508]: 12:00 ~ 13:00
+        - generic [ref=e509]:
+          - heading "급여정보" [level=2] [ref=e510]
+          - generic [ref=e511]:
+            - generic [ref=e512]:
+              - generic [ref=e513]:
+                - img [ref=e515]
+                - text: 급여정보
+              - button "수정" [ref=e518] [cursor=pointer]:
+                - img [ref=e519]
+                - text: 수정
+            - generic [ref=e522]:
+              - generic [ref=e523]:
+                - generic [ref=e524]:
+                  - generic [ref=e525]: 급여형태
+                  - generic [ref=e528]: 월급제
+                - generic [ref=e529]:
+                  - generic [ref=e530]: 기본급
+                  - generic [ref=e533]: 4,500,000원
+              - generic [ref=e534]:
+                - generic [ref=e535]:
+                  - generic [ref=e536]: 직책수당
+                  - generic [ref=e539]: 120,000원
+                - generic [ref=e540]:
+                  - generic [ref=e541]: 식대
+                  - generic [ref=e544]: 200,000원
+              - generic [ref=e545]:
+                - generic [ref=e546]:
+                  - generic [ref=e547]: 교통비
+                  - generic [ref=e550]: 100,000원
+                - generic [ref=e551]:
+                  - generic [ref=e552]: 총 급여
+                  - generic [ref=e555]: 4,920,000원
+              - generic [ref=e556]:
+                - generic [ref=e557]:
+                  - generic [ref=e558]: 급여지급일
+                  - generic [ref=e561]: "25"
+                - generic [ref=e562]:
+                  - generic [ref=e563]: 급여지급방법
+                  - generic [ref=e566]: 계좌이체
+        - generic [ref=e567]:
+          - heading "연차 및 복리후생" [level=2] [ref=e568]
+          - generic [ref=e569]:
+            - generic [ref=e570]:
+              - generic [ref=e571]:
+                - img [ref=e573]
+                - text: 연차 및 복리후생 (2024년)
+              - button "수정" [ref=e576] [cursor=pointer]:
+                - img [ref=e577]
+                - text: 수정
+            - generic [ref=e580]:
+              - generic [ref=e581]:
+                - generic [ref=e582]:
+                  - generic [ref=e583]: 연차 발생일수
+                  - generic [ref=e586]: 15 일
+                - generic [ref=e587]:
+                  - generic [ref=e588]: 연차 사용일수
+                  - generic [ref=e591]: 4 일
+              - generic [ref=e592]:
+                - generic [ref=e593]:
+                  - generic [ref=e594]: 연차 잔여일수
+                  - generic [ref=e597]: 11일
+                - generic [ref=e598]:
+                  - generic [ref=e599]: 퇴직금 유형
+                  - generic [ref=e602]: DC형
+              - generic [ref=e604]:
+                - generic [ref=e605]: 퇴직금 적립방법
+                - generic [ref=e608]: 퇴직연금
+        - generic [ref=e610]:
+          - heading "가족정보" [level=2] [ref=e611]
+          - generic [ref=e612]:
+            - generic [ref=e613]:
+              - generic [ref=e614]:
+                - img [ref=e616]
+                - text: 가족정보
+              - button "추가" [ref=e619] [cursor=pointer]:
+                - img [ref=e620]
+                - text: 추가
+            - table [ref=e624]:
+              - rowgroup [ref=e625]:
+                - row "관계 성명 생년월일 직업 연락처 동거여부 작업" [ref=e626]:
+                  - columnheader [ref=e627]
+                  - columnheader "관계" [ref=e628]
+                  - columnheader "성명" [ref=e629]
+                  - columnheader "생년월일" [ref=e630]
+                  - columnheader "직업" [ref=e631]
+                  - columnheader "연락처" [ref=e632]
+                  - columnheader "동거여부" [ref=e633]
+                  - columnheader "작업" [ref=e634]
+              - rowgroup [ref=e635]:
+                - row "부 장현우 1961-11-14 프리랜서 010-8934-5776 동거" [ref=e636]:
+                  - cell [ref=e637]:
+                    - img [ref=e638]
+                  - cell "부" [ref=e640]
+                  - cell "장현우" [ref=e641]
+                  - cell "1961-11-14" [ref=e642]
+                  - cell "프리랜서" [ref=e643]
+                  - cell "010-8934-5776" [ref=e644]
+                  - cell "동거" [ref=e645]:
+                    - generic [ref=e646]: 동거
+                  - cell [ref=e647]:
+                    - generic [ref=e648]:
+                      - button "수정" [ref=e649] [cursor=pointer]:
+                        - img [ref=e650]
+                      - button "삭제" [ref=e652] [cursor=pointer]:
+                        - img [ref=e653]
+                - row "모 안서윤 1973-07-08 주부 010-1973-3068 동거" [ref=e655]:
+                  - cell [ref=e656]:
+                    - img [ref=e657]
+                  - cell "모" [ref=e659]
+                  - cell "안서윤" [ref=e660]
+                  - cell "1973-07-08" [ref=e661]
+                  - cell "주부" [ref=e662]
+                  - cell "010-1973-3068" [ref=e663]
+                  - cell "동거" [ref=e664]:
+                    - generic [ref=e665]: 동거
+                  - cell [ref=e666]:
+                    - generic [ref=e667]:
+                      - button "수정" [ref=e668] [cursor=pointer]:
+                        - img [ref=e669]
+                      - button "삭제" [ref=e671] [cursor=pointer]:
+                        - img [ref=e672]
+                - row "배우자 송민서 1997-08-03 회사원 010-9286-7185 동거" [ref=e674]:
+                  - cell [ref=e675]:
+                    - img [ref=e676]
+                  - cell "배우자" [ref=e678]
+                  - cell "송민서" [ref=e679]
+                  - cell "1997-08-03" [ref=e680]
+                  - cell "회사원" [ref=e681]
+                  - cell "010-9286-7185" [ref=e682]
+                  - cell "동거" [ref=e683]:
+                    - generic [ref=e684]: 동거
+                  - cell [ref=e685]:
+                    - generic [ref=e686]:
+                      - button "수정" [ref=e687] [cursor=pointer]:
+                        - img [ref=e688]
+                      - button "삭제" [ref=e690] [cursor=pointer]:
+                        - img [ref=e691]
+        - generic [ref=e693]:
+          - heading "학력정보" [level=2] [ref=e694]
+          - generic [ref=e695]:
+            - generic [ref=e696]:
+              - generic [ref=e697]:
+                - img [ref=e699]
+                - text: 학력정보
+              - button "추가" [ref=e704] [cursor=pointer]:
+                - img [ref=e705]
+                - text: 추가
+            - table [ref=e709]:
+              - rowgroup [ref=e710]:
+                - row "학력구분 학교명 졸업년월 전공 학점 졸업유무 비고 작업" [ref=e711]:
+                  - columnheader [ref=e712]
+                  - columnheader "학력구분" [ref=e713]
+                  - columnheader "학교명" [ref=e714]
+                  - columnheader "졸업년월" [ref=e715]
+                  - columnheader "전공" [ref=e716]
+                  - columnheader "학점" [ref=e717]
+                  - columnheader "졸업유무" [ref=e718]
+                  - columnheader "비고" [ref=e719]
+                  - columnheader "작업" [ref=e720]
+              - rowgroup [ref=e721]:
+                - row "정보 없음 중앙고등학교 2015 상업계 - 졸업 -" [ref=e722]:
+                  - cell [ref=e723]:
+                    - img [ref=e724]
+                  - cell "정보 없음" [ref=e726]
+                  - cell "중앙고등학교" [ref=e727]
+                  - cell "2015" [ref=e728]
+                  - cell "상업계" [ref=e729]
+                  - cell "-" [ref=e730]
+                  - cell "졸업" [ref=e731]:
+                    - generic [ref=e732]: 졸업
+                  - cell "-" [ref=e733]
+                  - cell [ref=e734]:
+                    - generic [ref=e735]:
+                      - button "수정" [ref=e736] [cursor=pointer]:
+                        - img [ref=e737]
+                      - button "첨부파일" [ref=e739] [cursor=pointer]:
+                        - img [ref=e740]
+                      - button "삭제" [ref=e742] [cursor=pointer]:
+                        - img [ref=e743]
+                - row "학사 동국대학교 2019 심리학 3.8/4.5 졸업 -" [ref=e745]:
+                  - cell [ref=e746]:
+                    - img [ref=e747]
+                  - cell "학사" [ref=e749]
+                  - cell "동국대학교" [ref=e750]
+                  - cell "2019" [ref=e751]
+                  - cell "심리학" [ref=e752]
+                  - cell "3.8/4.5" [ref=e753]
+                  - cell "졸업" [ref=e754]:
+                    - generic [ref=e755]: 졸업
+                  - cell "-" [ref=e756]
+                  - cell [ref=e757]:
+                    - generic [ref=e758]:
+                      - button "수정" [ref=e759] [cursor=pointer]:
+                        - img [ref=e760]
+                      - button "첨부파일" [ref=e762] [cursor=pointer]:
+                        - img [ref=e763]
+                      - button "삭제" [ref=e765] [cursor=pointer]:
+                        - img [ref=e766]
+                - row "박사 경북대학교 대학원 2023 산업공학 3.2/4.5 졸업 -" [ref=e768]:
+                  - cell [ref=e769]:
+                    - img [ref=e770]
+                  - cell "박사" [ref=e772]
+                  - cell "경북대학교 대학원" [ref=e773]
+                  - cell "2023" [ref=e774]
+                  - cell "산업공학" [ref=e775]
+                  - cell "3.2/4.5" [ref=e776]
+                  - cell "졸업" [ref=e777]:
+                    - generic [ref=e778]: 졸업
+                  - cell "-" [ref=e779]
+                  - cell [ref=e780]:
+                    - generic [ref=e781]:
+                      - button "수정" [ref=e782] [cursor=pointer]:
+                        - img [ref=e783]
+                      - button "첨부파일" [ref=e785] [cursor=pointer]:
+                        - img [ref=e786]
+                      - button "삭제" [ref=e788] [cursor=pointer]:
+                        - img [ref=e789]
+        - generic [ref=e791]:
+          - heading "경력정보" [level=2] [ref=e792]
+          - generic [ref=e793]:
+            - generic [ref=e794]:
+              - generic [ref=e795]:
+                - img [ref=e797]
+                - text: 경력정보 (입사 전)
+              - button "추가" [ref=e800] [cursor=pointer]:
+                - img [ref=e801]
+                - text: 추가
+            - generic [ref=e803]:
+              - table [ref=e805]:
+                - rowgroup [ref=e806]:
+                  - row "직장명 부서 직위 직급 직책 직무 재직기간 급여유형 연봉/월급 담당업무 작업" [ref=e807]:
+                    - columnheader [ref=e808]
+                    - columnheader "직장명" [ref=e809]
+                    - columnheader "부서" [ref=e810]
+                    - columnheader "직위" [ref=e811]
+                    - columnheader "직급" [ref=e812]
+                    - columnheader "직책" [ref=e813]
+                    - columnheader "직무" [ref=e814]
+                    - columnheader "재직기간" [ref=e815]
+                    - columnheader "급여유형" [ref=e816]
+                    - columnheader "연봉/월급" [ref=e817]
+                    - columnheader "담당업무" [ref=e818]
+                    - columnheader "작업" [ref=e819]
+                - rowgroup [ref=e820]:
+                  - row "(주)크래프톤 재무팀 대리 L1 - UI/UX디자인 2022-01-12 ~ 2024-07-12 연봉제 40,000,000원 앱 관리" [ref=e821]:
+                    - cell [ref=e822]:
+                      - img [ref=e823]
+                    - cell "(주)크래프톤" [ref=e825]
+                    - cell "재무팀" [ref=e826]
+                    - cell "대리" [ref=e827]
+                    - cell "L1" [ref=e828]
+                    - cell "-" [ref=e829]
+                    - cell "UI/UX디자인" [ref=e830]
+                    - cell "2022-01-12 ~ 2024-07-12" [ref=e831]
+                    - cell "연봉제" [ref=e832]
+                    - cell "40,000,000원" [ref=e833]
+                    - cell "앱 관리" [ref=e834]
+                    - cell [ref=e835]:
+                      - generic [ref=e836]:
+                        - button "수정" [ref=e837] [cursor=pointer]:
+                          - img [ref=e838]
+                        - button "첨부파일" [ref=e840] [cursor=pointer]:
+                          - img [ref=e841]
+                        - button "삭제" [ref=e843] [cursor=pointer]:
+                          - img [ref=e844]
+                  - row "(주)스타트업25 개발팀 대리 L2 - 고객상담 2021-12-02 ~ 2024-10-03 연봉제 54,000,000원 시스템 설계" [ref=e846]:
+                    - cell [ref=e847]:
+                      - img [ref=e848]
+                    - cell "(주)스타트업25" [ref=e850]
+                    - cell "개발팀" [ref=e851]
+                    - cell "대리" [ref=e852]
+                    - cell "L2" [ref=e853]
+                    - cell "-" [ref=e854]
+                    - cell "고객상담" [ref=e855]
+                    - cell "2021-12-02 ~ 2024-10-03" [ref=e856]
+                    - cell "연봉제" [ref=e857]
+                    - cell "54,000,000원" [ref=e858]
+                    - cell "시스템 설계" [ref=e859]
+                    - cell [ref=e860]:
+                      - generic [ref=e861]:
+                        - button "수정" [ref=e862] [cursor=pointer]:
+                          - img [ref=e863]
+                        - button "첨부파일" [ref=e865] [cursor=pointer]:
+                          - img [ref=e866]
+                        - button "삭제" [ref=e868] [cursor=pointer]:
+                          - img [ref=e869]
+                  - row "(주)스타트업56 인사팀 대리 L2 - 마케팅기획 2015-12-18 ~ 2016-10-23 연봉제 55,000,000원 시스템 개발" [ref=e871]:
+                    - cell [ref=e872]:
+                      - img [ref=e873]
+                    - cell "(주)스타트업56" [ref=e875]
+                    - cell "인사팀" [ref=e876]
+                    - cell "대리" [ref=e877]
+                    - cell "L2" [ref=e878]
+                    - cell "-" [ref=e879]
+                    - cell "마케팅기획" [ref=e880]
+                    - cell "2015-12-18 ~ 2016-10-23" [ref=e881]
+                    - cell "연봉제" [ref=e882]
+                    - cell "55,000,000원" [ref=e883]
+                    - cell "시스템 개발" [ref=e884]
+                    - cell [ref=e885]:
+                      - generic [ref=e886]:
+                        - button "수정" [ref=e887] [cursor=pointer]:
+                          - img [ref=e888]
+                        - button "첨부파일" [ref=e890] [cursor=pointer]:
+                          - img [ref=e891]
+                        - button "삭제" [ref=e893] [cursor=pointer]:
+                          - img [ref=e894]
+              - generic [ref=e896]:
+                - strong [ref=e897]: "총 경력:"
+                - text: 3개사
+        - generic [ref=e898]:
+          - heading "자격증 및 면허" [level=2] [ref=e899]
+          - generic [ref=e900]:
+            - generic [ref=e901]:
+              - generic [ref=e902]:
+                - img [ref=e904]
+                - text: 자격증 및 면허
+              - button "추가" [ref=e907] [cursor=pointer]:
+                - img [ref=e908]
+                - text: 추가
+            - table [ref=e912]:
+              - rowgroup [ref=e913]:
+                - row "구분 종류 등급/점수 발행처 취득일 비고 작업" [ref=e914]:
+                  - columnheader [ref=e915]
+                  - columnheader "구분" [ref=e916]
+                  - columnheader "종류" [ref=e917]
+                  - columnheader "등급/점수" [ref=e918]
+                  - columnheader "발행처" [ref=e919]
+                  - columnheader "취득일" [ref=e920]
+                  - columnheader "비고" [ref=e921]
+                  - columnheader "작업" [ref=e922]
+              - rowgroup [ref=e923]:
+                - row "자격증 Azure Administrator 2급 한국정보통신진흥협회 2018-11-19 -" [ref=e924]:
+                  - cell [ref=e925]:
+                    - img [ref=e926]
+                  - cell "자격증" [ref=e928]
+                  - cell "Azure Administrator" [ref=e929]
+                  - cell "2급" [ref=e930]
+                  - cell "한국정보통신진흥협회" [ref=e931]
+                  - cell "2018-11-19" [ref=e932]
+                  - cell "-" [ref=e933]
+                  - cell [ref=e934]:
+                    - generic [ref=e935]:
+                      - button "수정" [ref=e936] [cursor=pointer]:
+                        - img [ref=e937]
+                      - button "첨부파일" [ref=e939] [cursor=pointer]:
+                        - img [ref=e940]
+                      - button "삭제" [ref=e942] [cursor=pointer]:
+                        - img [ref=e943]
+                - row "자격증 정보처리산업기사 Professional 한국산업인력공단 2022-02-23 -" [ref=e945]:
+                  - cell [ref=e946]:
+                    - img [ref=e947]
+                  - cell "자격증" [ref=e949]
+                  - cell "정보처리산업기사" [ref=e950]
+                  - cell "Professional" [ref=e951]
+                  - cell "한국산업인력공단" [ref=e952]
+                  - cell "2022-02-23" [ref=e953]
+                  - cell "-" [ref=e954]
+                  - cell [ref=e955]:
+                    - generic [ref=e956]:
+                      - button "수정" [ref=e957] [cursor=pointer]:
+                        - img [ref=e958]
+                      - button "첨부파일" [ref=e960] [cursor=pointer]:
+                        - img [ref=e961]
+                      - button "삭제" [ref=e963] [cursor=pointer]:
+                        - img [ref=e964]
+        - generic [ref=e966]:
+          - heading "언어능력" [level=2] [ref=e967]
+          - generic [ref=e968]:
+            - generic [ref=e969]:
+              - generic [ref=e970]:
+                - img [ref=e972]
+                - text: 언어능력
+              - button "추가" [ref=e975] [cursor=pointer]:
+                - img [ref=e976]
+                - text: 추가
+            - table [ref=e980]:
+              - rowgroup [ref=e981]:
+                - row "언어 수준 시험명 점수 취득일 작업" [ref=e982]:
+                  - columnheader [ref=e983]
+                  - columnheader "언어" [ref=e984]
+                  - columnheader "수준" [ref=e985]
+                  - columnheader "시험명" [ref=e986]
+                  - columnheader "점수" [ref=e987]
+                  - columnheader "취득일" [ref=e988]
+                  - columnheader "작업" [ref=e989]
+              - rowgroup [ref=e990]:
+                - row "영어 - TOEFL 57.0 2024-03-17" [ref=e991]:
+                  - cell [ref=e992]:
+                    - img [ref=e993]
+                  - cell "영어" [ref=e995]
+                  - cell "-" [ref=e996]
+                  - cell "TOEFL" [ref=e997]
+                  - cell "57.0" [ref=e998]
+                  - cell "2024-03-17" [ref=e999]
+                  - cell [ref=e1000]:
+                    - generic [ref=e1001]:
+                      - button "수정" [ref=e1002] [cursor=pointer]:
+                        - img [ref=e1003]
+                      - button "첨부파일" [ref=e1005] [cursor=pointer]:
+                        - img [ref=e1006]
+                      - button "삭제" [ref=e1008] [cursor=pointer]:
+                        - img [ref=e1009]
+                - row "프랑스어 - DELF 89.0 2021-12-09" [ref=e1011]:
+                  - cell [ref=e1012]:
+                    - img [ref=e1013]
+                  - cell "프랑스어" [ref=e1015]
+                  - cell "-" [ref=e1016]
+                  - cell "DELF" [ref=e1017]
+                  - cell "89.0" [ref=e1018]
+                  - cell "2021-12-09" [ref=e1019]
+                  - cell [ref=e1020]:
+                    - generic [ref=e1021]:
+                      - button "수정" [ref=e1022] [cursor=pointer]:
+                        - img [ref=e1023]
+                      - button "첨부파일" [ref=e1025] [cursor=pointer]:
+                        - img [ref=e1026]
+                      - button "삭제" [ref=e1028] [cursor=pointer]:
+                        - img [ref=e1029]
+                - row "스페인어 - DELE 63.0 2018-05-25" [ref=e1031]:
+                  - cell [ref=e1032]:
+                    - img [ref=e1033]
+                  - cell "스페인어" [ref=e1035]
+                  - cell "-" [ref=e1036]
+                  - cell "DELE" [ref=e1037]
+                  - cell "63.0" [ref=e1038]
+                  - cell "2018-05-25" [ref=e1039]
+                  - cell [ref=e1040]:
+                    - generic [ref=e1041]:
+                      - button "수정" [ref=e1042] [cursor=pointer]:
+                        - img [ref=e1043]
+                      - button "첨부파일" [ref=e1045] [cursor=pointer]:
+                        - img [ref=e1046]
+                      - button "삭제" [ref=e1048] [cursor=pointer]:
+                        - img [ref=e1049]
+        - generic [ref=e1051]:
+          - heading "병역정보" [level=2] [ref=e1052]
+          - generic [ref=e1053]:
+            - generic [ref=e1054]:
+              - generic [ref=e1055]:
+                - img [ref=e1057]
+                - text: 병역정보
+              - button "수정" [ref=e1060] [cursor=pointer]:
+                - img [ref=e1061]
+                - text: 수정
+            - generic [ref=e1064]:
+              - generic [ref=e1065]:
+                - generic [ref=e1066]:
+                  - generic [ref=e1067]: 병역구분
+                  - generic [ref=e1070]: 만기전역
+                - generic [ref=e1071]:
+                  - generic [ref=e1072]: 군별
+                  - generic [ref=e1075]: 해군
+              - generic [ref=e1076]:
+                - generic [ref=e1077]:
+                  - generic [ref=e1078]: 복무 시작일
+                  - generic [ref=e1081]: 2015-02-21
+                - generic [ref=e1082]:
+                  - generic [ref=e1083]: 복무 종료일
+                  - generic [ref=e1086]: 2016-09-03
+              - generic [ref=e1087]:
+                - generic [ref=e1088]:
+                  - generic [ref=e1089]: 계급
+                  - generic [ref=e1092]: 이병
+                - generic [ref=e1093]:
+                  - generic [ref=e1094]: 보직
+                  - generic [ref=e1097]: 사회복무요원
+              - generic [ref=e1098]:
+                - generic [ref=e1099]:
+                  - generic [ref=e1100]: 병과
+                  - generic [ref=e1104]: "-"
+                - generic [ref=e1105]:
+                  - generic [ref=e1106]: 면제사유
+                  - generic [ref=e1110]: "-"
+        - generic [ref=e1111]:
+          - heading "수상내역" [level=2] [ref=e1112]
+          - generic [ref=e1113]:
+            - generic [ref=e1114]:
+              - generic [ref=e1115]:
+                - img [ref=e1117]
+                - text: 수상내역
+              - button "추가" [ref=e1120] [cursor=pointer]:
+                - img [ref=e1121]
+                - text: 추가
+            - table [ref=e1125]:
+              - rowgroup [ref=e1126]:
+                - row "수상일 수상명 수여기관 수상내용 비고 작업" [ref=e1127]:
+                  - columnheader [ref=e1128]
+                  - columnheader "수상일" [ref=e1129]
+                  - columnheader "수상명" [ref=e1130]
+                  - columnheader "수여기관" [ref=e1131]
+                  - columnheader "수상내용" [ref=e1132]
+                  - columnheader "비고" [ref=e1133]
+                  - columnheader "작업" [ref=e1134]
+              - rowgroup [ref=e1135]:
+                - row "2022-02-08 혁신상 테스트기업 A - 팀 기여" [ref=e1136]:
+                  - cell [ref=e1137]:
+                    - img [ref=e1138]
+                  - cell "2022-02-08" [ref=e1140]
+                  - cell "혁신상" [ref=e1141]
+                  - cell "테스트기업 A" [ref=e1142]
+                  - cell "-" [ref=e1143]
+                  - cell "팀 기여" [ref=e1144]
+                  - cell [ref=e1145]:
+                    - generic [ref=e1146]:
+                      - button "수정" [ref=e1147] [cursor=pointer]:
+                        - img [ref=e1148]
+                      - button "첨부파일" [ref=e1150] [cursor=pointer]:
+                        - img [ref=e1151]
+                      - button "삭제" [ref=e1153] [cursor=pointer]:
+                        - img [ref=e1154]
+                - row "2022-01-26 Best Employee 테스트기업 A - 혁신 아이디어" [ref=e1156]:
+                  - cell [ref=e1157]:
+                    - img [ref=e1158]
+                  - cell "2022-01-26" [ref=e1160]
+                  - cell "Best Employee" [ref=e1161]
+                  - cell "테스트기업 A" [ref=e1162]
+                  - cell "-" [ref=e1163]
+                  - cell "혁신 아이디어" [ref=e1164]
+                  - cell [ref=e1165]:
+                    - generic [ref=e1166]:
+                      - button "수정" [ref=e1167] [cursor=pointer]:
+                        - img [ref=e1168]
+                      - button "첨부파일" [ref=e1170] [cursor=pointer]:
+                        - img [ref=e1171]
+                      - button "삭제" [ref=e1173] [cursor=pointer]:
+                        - img [ref=e1174]
+        - generic [ref=e1176]:
+          - heading "프로젝트 참여이력" [level=2] [ref=e1177]
+          - generic [ref=e1178]:
+            - generic [ref=e1179]:
+              - generic [ref=e1180]:
+                - img [ref=e1182]
+                - text: 프로젝트 참여이력
+              - button "추가" [ref=e1185] [cursor=pointer]:
+                - img [ref=e1186]
+                - text: 추가
+            - table [ref=e1190]:
+              - rowgroup [ref=e1191]:
+                - row "사업명 참여기간 기간 담당업무 역할/직책 발주처 작업" [ref=e1192]:
+                  - columnheader [ref=e1193]
+                  - columnheader "사업명" [ref=e1194]
+                  - columnheader "참여기간" [ref=e1195]
+                  - columnheader "기간" [ref=e1196]
+                  - columnheader "담당업무" [ref=e1197]
+                  - columnheader "역할/직책" [ref=e1198]
+                  - columnheader "발주처" [ref=e1199]
+                  - columnheader "작업" [ref=e1200]
+              - rowgroup [ref=e1201]:
+                - row " 등록된 프로젝트 참여이력이 없습니다" [ref=e1202]:
+                  - cell " 등록된 프로젝트 참여이력이 없습니다" [ref=e1203]:
+                    - generic [ref=e1204]:
+                      - generic [ref=e1205]: 
+                      - paragraph [ref=e1206]: 등록된 프로젝트 참여이력이 없습니다
+        - heading "계정정보" [level=2] [ref=e1207]
+        - generic [ref=e1209]:
+          - generic [ref=e1210]:
+            - generic [ref=e1211]:
+              - img [ref=e1213]
+              - text: 계정정보
+            - button "수정" [ref=e1216] [cursor=pointer]:
+              - img [ref=e1217]
+              - text: 수정
+          - generic [ref=e1219]:
+            - generic [ref=e1220]:
+              - generic [ref=e1221]:
+                - generic [ref=e1222]:
+                  - generic [ref=e1223]: 상태
+                  - generic [ref=e1227]: 활성
+                - generic [ref=e1228]:
+                  - generic [ref=e1229]: 아이디
+                  - generic [ref=e1232]: emp_0001
+              - generic [ref=e1233]:
+                - generic [ref=e1234]:
+                  - generic [ref=e1235]: 계정 이메일
+                  - generic [ref=e1238]: lim397@testcorp.co.kr
+                - generic [ref=e1239]:
+                  - generic [ref=e1240]: 역할
+                  - generic [ref=e1244]: "-"
+              - generic [ref=e1245]:
+                - generic [ref=e1246]:
+                  - generic [ref=e1247]: 계정 유형
+                  - generic [ref=e1251]: "-"
+                - generic [ref=e1252]:
+                  - generic [ref=e1253]: 생성일
+                  - generic [ref=e1256]: 2025-12-20
+              - generic [ref=e1258]:
+                - generic [ref=e1259]: 마지막 로그인
+                - generic [ref=e1262]: 2026-01-14 07:33
+            - paragraph [ref=e1264]:
+              - img [ref=e1265]
+              - text: 계정 정보 변경은 계정 관리 메뉴에서 가능합니다.
+        - generic [ref=e1267]:
+          - heading "근로계약 및 연봉" [level=2] [ref=e1268]
+          - generic [ref=e1269]:
+            - generic [ref=e1270]:
+              - generic [ref=e1271]:
+                - img [ref=e1273]
+                - text: 근로계약 이력
+              - button "추가" [ref=e1276] [cursor=pointer]:
+                - img [ref=e1277]
+                - text: 추가
+            - table [ref=e1281]:
+              - rowgroup [ref=e1282]:
+                - row "계약일 계약구분 계약기간 시작 계약기간 종료 계약기간 직원구분 근무형태 비고 작업" [ref=e1283]:
+                  - columnheader [ref=e1284]
+                  - columnheader "계약일" [ref=e1285]
+                  - columnheader "계약구분" [ref=e1286]
+                  - columnheader "계약기간 시작" [ref=e1287]
+                  - columnheader "계약기간 종료" [ref=e1288]
+                  - columnheader "계약기간" [ref=e1289]
+                  - columnheader "직원구분" [ref=e1290]
+                  - columnheader "근무형태" [ref=e1291]
+                  - columnheader "비고" [ref=e1292]
+                  - columnheader "작업" [ref=e1293]
+              - rowgroup [ref=e1294]:
+                - row "2024-12-01 정규직 2024-12-01 - 1년 1개월 정규직 전일제 신규입사" [ref=e1295]:
+                  - cell [ref=e1296]:
+                    - img [ref=e1297]
+                  - cell "2024-12-01" [ref=e1299]
+                  - cell "정규직" [ref=e1300]:
+                    - generic [ref=e1301]: 정규직
+                  - cell "2024-12-01" [ref=e1302]
+                  - cell "-" [ref=e1303]
+                  - cell "1년 1개월" [ref=e1304]
+                  - cell "정규직" [ref=e1305]
+                  - cell "전일제" [ref=e1306]
+                  - cell "신규입사" [ref=e1307]
+                  - cell [ref=e1308]:
+                    - generic [ref=e1309]:
+                      - button "수정" [ref=e1310] [cursor=pointer]:
+                        - img [ref=e1311]
+                      - button "첨부파일" [ref=e1313] [cursor=pointer]:
+                        - img [ref=e1314]
+                      - button "삭제" [ref=e1316] [cursor=pointer]:
+                        - img [ref=e1317]
+          - generic [ref=e1319]:
+            - generic [ref=e1320]:
+              - generic [ref=e1321]:
+                - img [ref=e1323]
+                - text: 연봉계약 이력
+              - button "추가" [ref=e1326] [cursor=pointer]:
+                - img [ref=e1327]
+                - text: 추가
+            - table [ref=e1331]:
+              - rowgroup [ref=e1332]:
+                - row "계약연도 연봉 상여금 총액 계약기간 작업" [ref=e1333]:
+                  - columnheader [ref=e1334]
+                  - columnheader "계약연도" [ref=e1335]
+                  - columnheader "연봉" [ref=e1336]
+                  - columnheader "상여금" [ref=e1337]
+                  - columnheader "총액" [ref=e1338]
+                  - columnheader "계약기간" [ref=e1339]
+                  - columnheader "작업" [ref=e1340]
+              - rowgroup [ref=e1341]:
+                - row "2026년 60,984,000원 2,000,000원 61,984,000원 2026-01-01 ~ 2026-12-31" [ref=e1342]:
+                  - cell [ref=e1343]:
+                    - img [ref=e1344]
+                  - cell "2026년" [ref=e1346]
+                  - cell "60,984,000원" [ref=e1347]
+                  - cell "2,000,000원" [ref=e1348]
+                  - cell "61,984,000원" [ref=e1349]:
+                    - strong [ref=e1350]: 61,984,000원
+                  - cell "2026-01-01 ~ 2026-12-31" [ref=e1351]
+                  - cell [ref=e1352]:
+                    - generic [ref=e1353]:
+                      - button "수정" [ref=e1354] [cursor=pointer]:
+                        - img [ref=e1355]
+                      - button "첨부파일" [ref=e1357] [cursor=pointer]:
+                        - img [ref=e1358]
+                      - button "삭제" [ref=e1360] [cursor=pointer]:
+                        - img [ref=e1361]
+                - row "2024년 55,440,000원 0원 58,440,000원 2024-01-01 ~ 2024-12-31" [ref=e1363]:
+                  - cell [ref=e1364]:
+                    - img [ref=e1365]
+                  - cell "2024년" [ref=e1367]
+                  - cell "55,440,000원" [ref=e1368]
+                  - cell "0원" [ref=e1369]
+                  - cell "58,440,000원" [ref=e1370]:
+                    - strong [ref=e1371]: 58,440,000원
+                  - cell "2024-01-01 ~ 2024-12-31" [ref=e1372]
+                  - cell [ref=e1373]:
+                    - generic [ref=e1374]:
+                      - button "수정" [ref=e1375] [cursor=pointer]:
+                        - img [ref=e1376]
+                      - button "첨부파일" [ref=e1378] [cursor=pointer]:
+                        - img [ref=e1379]
+                      - button "삭제" [ref=e1381] [cursor=pointer]:
+                        - img [ref=e1382]
+                - row "2024년 66,528,000원 3,000,000원 66,528,000원 2024-01-01 ~ 2024-12-31" [ref=e1384]:
+                  - cell [ref=e1385]:
+                    - img [ref=e1386]
+                  - cell "2024년" [ref=e1388]
+                  - cell "66,528,000원" [ref=e1389]
+                  - cell "3,000,000원" [ref=e1390]
+                  - cell "66,528,000원" [ref=e1391]:
+                    - strong [ref=e1392]: 66,528,000원
+                  - cell "2024-01-01 ~ 2024-12-31" [ref=e1393]
+                  - cell [ref=e1394]:
+                    - generic [ref=e1395]:
+                      - button "수정" [ref=e1396] [cursor=pointer]:
+                        - img [ref=e1397]
+                      - button "첨부파일" [ref=e1399] [cursor=pointer]:
+                        - img [ref=e1400]
+                      - button "삭제" [ref=e1402] [cursor=pointer]:
+                        - img [ref=e1403]
+          - generic [ref=e1405]:
+            - generic [ref=e1406]:
+              - generic [ref=e1407]:
+                - img [ref=e1409]
+                - text: 급여 지급 이력
+              - button "추가" [ref=e1412] [cursor=pointer]:
+                - img [ref=e1413]
+                - text: 추가
+            - table [ref=e1417]:
+              - rowgroup [ref=e1418]:
+                - row "지급일 지급기간 기본급 수당 총지급액 4대보험 소득세 공제합계 실지급액 비고 작업" [ref=e1419]:
+                  - columnheader [ref=e1420]
+                  - columnheader "지급일" [ref=e1421]
+                  - columnheader "지급기간" [ref=e1422]
+                  - columnheader "기본급" [ref=e1423]
+                  - columnheader "수당" [ref=e1424]
+                  - columnheader "총지급액" [ref=e1425]
+                  - columnheader "4대보험" [ref=e1426]
+                  - columnheader "소득세" [ref=e1427]
+                  - columnheader "공제합계" [ref=e1428]
+                  - columnheader "실지급액" [ref=e1429]
+                  - columnheader "비고" [ref=e1430]
+                  - columnheader "작업" [ref=e1431]
+              - rowgroup [ref=e1432]:
+                - row "2024-06-25 2024년 6월 4,500,000원 420,000원 4,920,000원 442,800원 196,800원 639,600원 4,280,400원 -" [ref=e1433]:
+                  - cell [ref=e1434]:
+                    - img [ref=e1435]
+                  - cell "2024-06-25" [ref=e1437]
+                  - cell "2024년 6월" [ref=e1438]
+                  - cell "4,500,000원" [ref=e1439]
+                  - cell "420,000원" [ref=e1440]
+                  - cell "4,920,000원" [ref=e1441]
+                  - cell "442,800원" [ref=e1442]
+                  - cell "196,800원" [ref=e1443]
+                  - cell "639,600원" [ref=e1444]
+                  - cell "4,280,400원" [ref=e1445]:
+                    - strong [ref=e1446]: 4,280,400원
+                  - cell "-" [ref=e1447]
+                  - cell [ref=e1448]:
+                    - generic [ref=e1449]:
+                      - button "수정" [ref=e1450] [cursor=pointer]:
+                        - img [ref=e1451]
+                      - button "첨부파일" [ref=e1453] [cursor=pointer]:
+                        - img [ref=e1454]
+                      - button "삭제" [ref=e1456] [cursor=pointer]:
+                        - img [ref=e1457]
+                - row "2024-05-25 2024년 5월 4,500,000원 420,000원 4,920,000원 442,800원 196,800원 639,600원 4,280,400원 -" [ref=e1459]:
+                  - cell [ref=e1460]:
+                    - img [ref=e1461]
+                  - cell "2024-05-25" [ref=e1463]
+                  - cell "2024년 5월" [ref=e1464]
+                  - cell "4,500,000원" [ref=e1465]
+                  - cell "420,000원" [ref=e1466]
+                  - cell "4,920,000원" [ref=e1467]
+                  - cell "442,800원" [ref=e1468]
+                  - cell "196,800원" [ref=e1469]
+                  - cell "639,600원" [ref=e1470]
+                  - cell "4,280,400원" [ref=e1471]:
+                    - strong [ref=e1472]: 4,280,400원
+                  - cell "-" [ref=e1473]
+                  - cell [ref=e1474]:
+                    - generic [ref=e1475]:
+                      - button "수정" [ref=e1476] [cursor=pointer]:
+                        - img [ref=e1477]
+                      - button "첨부파일" [ref=e1479] [cursor=pointer]:
+                        - img [ref=e1480]
+                      - button "삭제" [ref=e1482] [cursor=pointer]:
+                        - img [ref=e1483]
+                - row "2024-04-25 2024년 4월 4,500,000원 420,000원 4,920,000원 442,800원 196,800원 639,600원 4,280,400원 -" [ref=e1485]:
+                  - cell [ref=e1486]:
+                    - img [ref=e1487]
+                  - cell "2024-04-25" [ref=e1489]
+                  - cell "2024년 4월" [ref=e1490]
+                  - cell "4,500,000원" [ref=e1491]
+                  - cell "420,000원" [ref=e1492]
+                  - cell "4,920,000원" [ref=e1493]
+                  - cell "442,800원" [ref=e1494]
+                  - cell "196,800원" [ref=e1495]
+                  - cell "639,600원" [ref=e1496]
+                  - cell "4,280,400원" [ref=e1497]:
+                    - strong [ref=e1498]: 4,280,400원
+                  - cell "-" [ref=e1499]
+                  - cell [ref=e1500]:
+                    - generic [ref=e1501]:
+                      - button "수정" [ref=e1502] [cursor=pointer]:
+                        - img [ref=e1503]
+                      - button "첨부파일" [ref=e1505] [cursor=pointer]:
+                        - img [ref=e1506]
+                      - button "삭제" [ref=e1508] [cursor=pointer]:
+                        - img [ref=e1509]
+                - row "2024-03-25 2024년 3월 4,500,000원 420,000원 4,920,000원 442,800원 196,800원 639,600원 4,280,400원 -" [ref=e1511]:
+                  - cell [ref=e1512]:
+                    - img [ref=e1513]
+                  - cell "2024-03-25" [ref=e1515]
+                  - cell "2024년 3월" [ref=e1516]
+                  - cell "4,500,000원" [ref=e1517]
+                  - cell "420,000원" [ref=e1518]
+                  - cell "4,920,000원" [ref=e1519]
+                  - cell "442,800원" [ref=e1520]
+                  - cell "196,800원" [ref=e1521]
+                  - cell "639,600원" [ref=e1522]
+                  - cell "4,280,400원" [ref=e1523]:
+                    - strong [ref=e1524]: 4,280,400원
+                  - cell "-" [ref=e1525]
+                  - cell [ref=e1526]:
+                    - generic [ref=e1527]:
+                      - button "수정" [ref=e1528] [cursor=pointer]:
+                        - img [ref=e1529]
+                      - button "첨부파일" [ref=e1531] [cursor=pointer]:
+                        - img [ref=e1532]
+                      - button "삭제" [ref=e1534] [cursor=pointer]:
+                        - img [ref=e1535]
+                - row "2024-02-25 2024년 2월 4,500,000원 420,000원 4,920,000원 442,800원 196,800원 639,600원 4,280,400원 -" [ref=e1537]:
+                  - cell [ref=e1538]:
+                    - img [ref=e1539]
+                  - cell "2024-02-25" [ref=e1541]
+                  - cell "2024년 2월" [ref=e1542]
+                  - cell "4,500,000원" [ref=e1543]
+                  - cell "420,000원" [ref=e1544]
+                  - cell "4,920,000원" [ref=e1545]
+                  - cell "442,800원" [ref=e1546]
+                  - cell "196,800원" [ref=e1547]
+                  - cell "639,600원" [ref=e1548]
+                  - cell "4,280,400원" [ref=e1549]:
+                    - strong [ref=e1550]: 4,280,400원
+                  - cell "-" [ref=e1551]
+                  - cell [ref=e1552]:
+                    - generic [ref=e1553]:
+                      - button "수정" [ref=e1554] [cursor=pointer]:
+                        - img [ref=e1555]
+                      - button "첨부파일" [ref=e1557] [cursor=pointer]:
+                        - img [ref=e1558]
+                      - button "삭제" [ref=e1560] [cursor=pointer]:
+                        - img [ref=e1561]
+                - row "2024-01-25 2024년 1월 4,500,000원 420,000원 4,920,000원 442,800원 196,800원 639,600원 4,280,400원 -" [ref=e1563]:
+                  - cell [ref=e1564]:
+                    - img [ref=e1565]
+                  - cell "2024-01-25" [ref=e1567]
+                  - cell "2024년 1월" [ref=e1568]
+                  - cell "4,500,000원" [ref=e1569]
+                  - cell "420,000원" [ref=e1570]
+                  - cell "4,920,000원" [ref=e1571]
+                  - cell "442,800원" [ref=e1572]
+                  - cell "196,800원" [ref=e1573]
+                  - cell "639,600원" [ref=e1574]
+                  - cell "4,280,400원" [ref=e1575]:
+                    - strong [ref=e1576]: 4,280,400원
+                  - cell "-" [ref=e1577]
+                  - cell [ref=e1578]:
+                    - generic [ref=e1579]:
+                      - button "수정" [ref=e1580] [cursor=pointer]:
+                        - img [ref=e1581]
+                      - button "첨부파일" [ref=e1583] [cursor=pointer]:
+                        - img [ref=e1584]
+                      - button "삭제" [ref=e1586] [cursor=pointer]:
+                        - img [ref=e1587]
+        - generic [ref=e1589]:
+          - heading "인사이동 및 고과" [level=2] [ref=e1590]
+          - generic [ref=e1591]:
+            - generic [ref=e1592]:
+              - generic [ref=e1593]:
+                - img [ref=e1595]
+                - text: 인사이동 및 승진
+              - button "추가" [ref=e1598] [cursor=pointer]:
+                - img [ref=e1599]
+                - text: 추가
+            - table [ref=e1603]:
+              - rowgroup [ref=e1604]:
+                - row "발령일 발령구분 발령전 발령후 발령전 직급 발령후 직급 직무 발령사유 작업" [ref=e1605]:
+                  - columnheader [ref=e1606]
+                  - columnheader "발령일" [ref=e1607]
+                  - columnheader "발령구분" [ref=e1608]
+                  - columnheader "발령전" [ref=e1609]
+                  - columnheader "발령후" [ref=e1610]
+                  - columnheader "발령전 직급" [ref=e1611]
+                  - columnheader "발령후 직급" [ref=e1612]
+                  - columnheader "직무" [ref=e1613]
+                  - columnheader "발령사유" [ref=e1614]
+                  - columnheader "작업" [ref=e1615]
+              - rowgroup [ref=e1616]:
+                - row "2026-03-03 전보 개발팀 개발팀 사원 대리 시스템운영 정기 승진" [ref=e1617]:
+                  - cell [ref=e1618]:
+                    - img [ref=e1619]
+                  - cell "2026-03-03" [ref=e1621]
+                  - cell "전보" [ref=e1622]:
+                    - generic [ref=e1623]: 전보
+                  - cell "개발팀" [ref=e1624]
+                  - cell "개발팀" [ref=e1625]
+                  - cell "사원" [ref=e1626]
+                  - cell "대리" [ref=e1627]
+                  - cell "시스템운영" [ref=e1628]
+                  - cell "정기 승진" [ref=e1629]
+                  - cell [ref=e1630]:
+                    - generic [ref=e1631]:
+                      - button "수정" [ref=e1632] [cursor=pointer]:
+                        - img [ref=e1633]
+                      - button "첨부파일" [ref=e1635] [cursor=pointer]:
+                        - img [ref=e1636]
+                      - button "삭제" [ref=e1638] [cursor=pointer]:
+                        - img [ref=e1639]
+                - row "2024-12-01 신규임용 - 개발팀 - 사원 시스템운영 신규 입사" [ref=e1641]:
+                  - cell [ref=e1642]:
+                    - img [ref=e1643]
+                  - cell "2024-12-01" [ref=e1645]
+                  - cell "신규임용" [ref=e1646]:
+                    - generic [ref=e1647]: 신규임용
+                  - cell "-" [ref=e1648]
+                  - cell "개발팀" [ref=e1649]
+                  - cell "-" [ref=e1650]
+                  - cell "사원" [ref=e1651]
+                  - cell "시스템운영" [ref=e1652]
+                  - cell "신규 입사" [ref=e1653]
+                  - cell [ref=e1654]:
+                    - generic [ref=e1655]:
+                      - button "수정" [ref=e1656] [cursor=pointer]:
+                        - img [ref=e1657]
+                      - button "첨부파일" [ref=e1659] [cursor=pointer]:
+                        - img [ref=e1660]
+                      - button "삭제" [ref=e1662] [cursor=pointer]:
+                        - img [ref=e1663]
+          - generic [ref=e1665]:
+            - generic [ref=e1666]:
+              - generic [ref=e1667]:
+                - img [ref=e1669]
+                - text: 인사고과 - 정기평가
+              - button "추가" [ref=e1672] [cursor=pointer]:
+                - img [ref=e1673]
+                - text: 추가
+            - table [ref=e1677]:
+              - rowgroup [ref=e1678]:
+                - row "연차 1분기 2분기 3분기 4분기 종합평가 연봉협상 비고 작업" [ref=e1679]:
+                  - columnheader [ref=e1680]
+                  - columnheader "연차" [ref=e1681]
+                  - columnheader "1분기" [ref=e1682]
+                  - columnheader "2분기" [ref=e1683]
+                  - columnheader "3분기" [ref=e1684]
+                  - columnheader "4분기" [ref=e1685]
+                  - columnheader "종합평가" [ref=e1686]
+                  - columnheader "연봉협상" [ref=e1687]
+                  - columnheader "비고" [ref=e1688]
+                  - columnheader "작업" [ref=e1689]
+              - rowgroup [ref=e1690]:
+                - row "2025년 A S - - - - -" [ref=e1691]:
+                  - cell [ref=e1692]:
+                    - img [ref=e1693]
+                  - cell "2025년" [ref=e1695]
+                  - cell "A" [ref=e1696]:
+                    - generic [ref=e1697]: A
+                  - cell "S" [ref=e1698]:
+                    - generic [ref=e1699]: S
+                  - cell "-" [ref=e1700]
+                  - cell "-" [ref=e1701]
+                  - cell "-" [ref=e1702]
+                  - cell "-" [ref=e1703]
+                  - cell "-" [ref=e1704]
+                  - cell [ref=e1705]:
+                    - generic [ref=e1706]:
+                      - button "수정" [ref=e1707] [cursor=pointer]:
+                        - img [ref=e1708]
+                      - button "삭제" [ref=e1710] [cursor=pointer]:
+                        - img [ref=e1711]
+                - row "2024년 D B S C S +2% -" [ref=e1713]:
+                  - cell [ref=e1714]:
+                    - img [ref=e1715]
+                  - cell "2024년" [ref=e1717]
+                  - cell "D" [ref=e1718]:
+                    - generic [ref=e1719]: D
+                  - cell "B" [ref=e1720]:
+                    - generic [ref=e1721]: B
+                  - cell "S" [ref=e1722]:
+                    - generic [ref=e1723]: S
+                  - cell "C" [ref=e1724]:
+                    - generic [ref=e1725]: C
+                  - cell "S" [ref=e1726]:
+                    - strong [ref=e1727]:
+                      - generic [ref=e1728]: S
+                  - cell "+2%" [ref=e1729]
+                  - cell "-" [ref=e1730]
+                  - cell [ref=e1731]:
+                    - generic [ref=e1732]:
+                      - button "수정" [ref=e1733] [cursor=pointer]:
+                        - img [ref=e1734]
+                      - button "삭제" [ref=e1736] [cursor=pointer]:
+                        - img [ref=e1737]
+                - row "2023년 C A S A C +7% -" [ref=e1739]:
+                  - cell [ref=e1740]:
+                    - img [ref=e1741]
+                  - cell "2023년" [ref=e1743]
+                  - cell "C" [ref=e1744]:
+                    - generic [ref=e1745]: C
+                  - cell "A" [ref=e1746]:
+                    - generic [ref=e1747]: A
+                  - cell "S" [ref=e1748]:
+                    - generic [ref=e1749]: S
+                  - cell "A" [ref=e1750]:
+                    - generic [ref=e1751]: A
+                  - cell "C" [ref=e1752]:
+                    - strong [ref=e1753]:
+                      - generic [ref=e1754]: C
+                  - cell "+7%" [ref=e1755]
+                  - cell "-" [ref=e1756]
+                  - cell [ref=e1757]:
+                    - generic [ref=e1758]:
+                      - button "수정" [ref=e1759] [cursor=pointer]:
+                        - img [ref=e1760]
+                      - button "삭제" [ref=e1762] [cursor=pointer]:
+                        - img [ref=e1763]
+          - generic [ref=e1765]:
+            - generic [ref=e1766]:
+              - generic [ref=e1767]:
+                - img [ref=e1769]
+                - text: 교육훈련
+              - button "추가" [ref=e1772] [cursor=pointer]:
+                - img [ref=e1773]
+                - text: 추가
+            - table [ref=e1777]:
+              - rowgroup [ref=e1778]:
+                - row "교육일 교육명 교육기관 교육시간 이수여부 비고 작업" [ref=e1779]:
+                  - columnheader [ref=e1780]
+                  - columnheader "교육일" [ref=e1781]
+                  - columnheader "교육명" [ref=e1782]
+                  - columnheader "교육기관" [ref=e1783]
+                  - columnheader "교육시간" [ref=e1784]
+                  - columnheader "이수여부" [ref=e1785]
+                  - columnheader "비고" [ref=e1786]
+                  - columnheader "작업" [ref=e1787]
+              - rowgroup [ref=e1788]:
+                - row "2023-05-31 애자일 방법론 한국생산성본부 24시간 미수료 -" [ref=e1789]:
+                  - cell [ref=e1790]:
+                    - img [ref=e1791]
+                  - cell "2023-05-31" [ref=e1793]
+                  - cell "애자일 방법론" [ref=e1794]
+                  - cell "한국생산성본부" [ref=e1795]
+                  - cell "24시간" [ref=e1796]
+                  - cell "미수료" [ref=e1797]:
+                    - generic [ref=e1798]: 미수료
+                  - cell "-" [ref=e1799]
+                  - cell [ref=e1800]:
+                    - generic [ref=e1801]:
+                      - button "수정" [ref=e1802] [cursor=pointer]:
+                        - img [ref=e1803]
+                      - button "첨부파일" [ref=e1805] [cursor=pointer]:
+                        - img [ref=e1806]
+                      - button "삭제" [ref=e1808] [cursor=pointer]:
+                        - img [ref=e1809]
+                - row "2022-09-09 데이터 분석 기초 LinkedIn Learning 24시간 수강중 -" [ref=e1811]:
+                  - cell [ref=e1812]:
+                    - img [ref=e1813]
+                  - cell "2022-09-09" [ref=e1815]
+                  - cell "데이터 분석 기초" [ref=e1816]
+                  - cell "LinkedIn Learning" [ref=e1817]
+                  - cell "24시간" [ref=e1818]
+                  - cell "수강중" [ref=e1819]:
+                    - generic [ref=e1820]: 수강중
+                  - cell "-" [ref=e1821]
+                  - cell [ref=e1822]:
+                    - generic [ref=e1823]:
+                      - button "수정" [ref=e1824] [cursor=pointer]:
+                        - img [ref=e1825]
+                      - button "첨부파일" [ref=e1827] [cursor=pointer]:
+                        - img [ref=e1828]
+                      - button "삭제" [ref=e1830] [cursor=pointer]:
+                        - img [ref=e1831]
+        - generic [ref=e1833]:
+          - heading "프로젝트" [level=2] [ref=e1834]
+          - generic [ref=e1835]:
+            - generic [ref=e1836]:
+              - generic [ref=e1837]:
+                - img [ref=e1839]
+                - text: 프로젝트
+              - button "추가" [ref=e1842] [cursor=pointer]:
+                - img [ref=e1843]
+                - text: 추가
+            - table [ref=e1847]:
+              - rowgroup [ref=e1848]:
+                - row "프로젝트명 참여기간 기간 담당업무 역할/직책 발주처 작업" [ref=e1849]:
+                  - columnheader [ref=e1850]
+                  - columnheader "프로젝트명" [ref=e1851]
+                  - columnheader "참여기간" [ref=e1852]
+                  - columnheader "기간" [ref=e1853]
+                  - columnheader "담당업무" [ref=e1854]
+                  - columnheader "역할/직책" [ref=e1855]
+                  - columnheader "발주처" [ref=e1856]
+                  - columnheader "작업" [ref=e1857]
+              - rowgroup [ref=e1858]:
+                - row "모바일 앱 개발 2022-12-02 ~ 2023-11-12 5개월 프로젝트 총괄 QA 협력사" [ref=e1859]:
+                  - cell [ref=e1860]:
+                    - img [ref=e1861]
+                  - cell "모바일 앱 개발" [ref=e1863]
+                  - cell "2022-12-02 ~ 2023-11-12" [ref=e1864]
+                  - cell "5개월" [ref=e1865]
+                  - cell "프로젝트 총괄" [ref=e1866]
+                  - cell "QA" [ref=e1867]
+                  - cell "협력사" [ref=e1868]
+                  - cell [ref=e1869]:
+                    - generic [ref=e1870]:
+                      - button "수정" [ref=e1871] [cursor=pointer]:
+                        - img [ref=e1872]
+                      - button "삭제" [ref=e1874] [cursor=pointer]:
+                        - img [ref=e1875]
+                - row "AI 챗봇 도입 2023-02-08 ~ 2023-05-20 7개월 UI/UX 설계 디자이너 외부고객사" [ref=e1877]:
+                  - cell [ref=e1878]:
+                    - img [ref=e1879]
+                  - cell "AI 챗봇 도입" [ref=e1881]
+                  - cell "2023-02-08 ~ 2023-05-20" [ref=e1882]
+                  - cell "7개월" [ref=e1883]
+                  - cell "UI/UX 설계" [ref=e1884]
+                  - cell "디자이너" [ref=e1885]
+                  - cell "외부고객사" [ref=e1886]
+                  - cell [ref=e1887]:
+                    - generic [ref=e1888]:
+                      - button "수정" [ref=e1889] [cursor=pointer]:
+                        - img [ref=e1890]
+                      - button "삭제" [ref=e1892] [cursor=pointer]:
+                        - img [ref=e1893]
+        - generic [ref=e1895]:
+          - heading "근태 및 비품" [level=2] [ref=e1896]
+          - generic [ref=e1897]:
+            - generic [ref=e1898]:
+              - generic [ref=e1899]:
+                - img [ref=e1901]
+                - text: 근태현황
+              - button "수정" [ref=e1904] [cursor=pointer]:
+                - img [ref=e1905]
+                - text: 수정
+            - generic [ref=e1908]:
+              - generic [ref=e1909]:
+                - generic [ref=e1910]:
+                  - generic [ref=e1911]: 출근일수
+                  - generic [ref=e1913]: 미등록
+                - generic [ref=e1914]:
+                  - generic [ref=e1915]: 결근일수
+                  - generic [ref=e1916]: 0일
+              - generic [ref=e1917]:
+                - generic [ref=e1918]:
+                  - generic [ref=e1919]: 지각횟수
+                  - generic [ref=e1920]: 0회
+                - generic [ref=e1921]:
+                  - generic [ref=e1922]: 조퇴횟수
+                  - generic [ref=e1923]: 회
+              - generic [ref=e1924]:
+                - generic [ref=e1925]:
+                  - generic [ref=e1926]: 연차사용
+                  - generic [ref=e1927]: 일
+                - generic [ref=e1928]:
+                  - generic [ref=e1929]: 연차잔여
+                  - generic [ref=e1930]: 11일
+          - generic [ref=e1931]:
+            - generic [ref=e1932]:
+              - generic [ref=e1933]:
+                - img [ref=e1935]
+                - text: 비품지급
+              - button "추가" [ref=e1938] [cursor=pointer]:
+                - img [ref=e1939]
+                - text: 추가
+            - table [ref=e1943]:
+              - rowgroup [ref=e1944]:
+                - row "지급일 품목 모델/사양 시리얼번호 상태 비고 작업" [ref=e1945]:
+                  - columnheader [ref=e1946]
+                  - columnheader "지급일" [ref=e1947]
+                  - columnheader "품목" [ref=e1948]
+                  - columnheader "모델/사양" [ref=e1949]
+                  - columnheader "시리얼번호" [ref=e1950]
+                  - columnheader "상태" [ref=e1951]
+                  - columnheader "비고" [ref=e1952]
+                  - columnheader "작업" [ref=e1953]
+              - rowgroup [ref=e1954]:
+                - row "2024-12-01 노트북 LG gram 17 204FN0F1RIH7 사용중 -" [ref=e1955]:
+                  - cell [ref=e1956]:
+                    - img [ref=e1957]
+                  - cell "2024-12-01" [ref=e1959]
+                  - cell "노트북" [ref=e1960]
+                  - cell "LG gram 17" [ref=e1961]
+                  - cell "204FN0F1RIH7" [ref=e1962]
+                  - cell "사용중" [ref=e1963]:
+                    - generic [ref=e1964]: 사용중
+                  - cell "-" [ref=e1965]
+                  - cell [ref=e1966]:
+                    - generic [ref=e1967]:
+                      - button "수정" [ref=e1968] [cursor=pointer]:
+                        - img [ref=e1969]
+                      - button "삭제" [ref=e1971] [cursor=pointer]:
+                        - img [ref=e1972]
+                - row "2024-12-01 노트북 MacBook Pro 16\" 5G6FD20OTK6N 분실 -" [ref=e1974]:
+                  - cell [ref=e1975]:
+                    - img [ref=e1976]
+                  - cell "2024-12-01" [ref=e1978]
+                  - cell "노트북" [ref=e1979]
+                  - cell "MacBook Pro 16\"" [ref=e1980]
+                  - cell "5G6FD20OTK6N" [ref=e1981]
+                  - cell "분실" [ref=e1982]:
+                    - generic [ref=e1983]: 분실
+                  - cell "-" [ref=e1984]
+                  - cell [ref=e1985]:
+                    - generic [ref=e1986]:
+                      - button "수정" [ref=e1987] [cursor=pointer]:
+                        - img [ref=e1988]
+                      - button "삭제" [ref=e1990] [cursor=pointer]:
+                        - img [ref=e1991]
+                - row "2024-12-01 노트북 LG gram 17 U3FFVO9Z83KG 반납 -" [ref=e1993]:
+                  - cell [ref=e1994]:
+                    - img [ref=e1995]
+                  - cell "2024-12-01" [ref=e1997]
+                  - cell "노트북" [ref=e1998]
+                  - cell "LG gram 17" [ref=e1999]
+                  - cell "U3FFVO9Z83KG" [ref=e2000]
+                  - cell "반납" [ref=e2001]:
+                    - generic [ref=e2002]: 반납
+                  - cell "-" [ref=e2003]
+                  - cell [ref=e2004]:
+                    - generic [ref=e2005]:
+                      - button "수정" [ref=e2006] [cursor=pointer]:
+                        - img [ref=e2007]
+                      - button "삭제" [ref=e2009] [cursor=pointer]:
+                        - img [ref=e2010]
+      - text:     
+    - complementary [ref=e2012]:
+      - generic [ref=e2014]:
+        - heading "개인 첨부서류" [level=2] [ref=e2015]
+        - button " AI 분석" [ref=e2016] [cursor=pointer]:
+          - generic [ref=e2017]: 
+          - generic [ref=e2018]: AI 분석
+      - generic [ref=e2019]:
+        - generic [ref=e2020]:
+          - generic [ref=e2021]:
+            - generic:
+              - img
+            - textbox "파일명 검색..." [ref=e2022]
+          - combobox [ref=e2023] [cursor=pointer]:
+            - option "모든 유형" [selected]
+            - option "이미지"
+            - option "PDF"
+            - option "문서"
+            - option "기타"
+          - combobox [ref=e2024] [cursor=pointer]:
+            - option "최신순" [selected]
+            - option "오래된순"
+            - option "이름순"
+            - option "크기순"
+          - generic [ref=e2025]:
+            - generic [ref=e2026]: "7"
+            - text: 개 파일
+        - generic [ref=e2027] [cursor=pointer]:
+          - generic [ref=e2029]: 
+          - generic [ref=e2030]: 파일을 드래그하거나 클릭
+          - generic [ref=e2031]: PDF, JPG, PNG (최대 10MB)
+        - generic [ref=e2032]:
+          - generic [ref=e2033]:
+            - img "bc_b_01.png" [ref=e2035]
+            - generic [ref=e2036]:
+              - generic [ref=e2037]: business_card_back
+              - generic [ref=e2038]: bc_b_01.png
+              - generic [ref=e2039]:
+                - generic [ref=e2040]: 2025-12-20
+                - generic [ref=e2041]: 14.7KB
+            - generic [ref=e2042]:
+              - button "" [ref=e2043] [cursor=pointer]:
+                - generic [ref=e2044]: 
+              - link "" [ref=e2045] [cursor=pointer]:
+                - /url: /static/uploads/business_cards/bc_b_01.png
+                - generic [ref=e2046]: 
+              - button "" [ref=e2047] [cursor=pointer]:
+                - generic [ref=e2048]: 
+            - text: ✓
+          - generic [ref=e2049]:
+            - img "bc_f_01.png" [ref=e2051]
+            - generic [ref=e2052]:
+              - generic [ref=e2053]: business_card_front
+              - generic [ref=e2054]: bc_f_01.png
+              - generic [ref=e2055]:
+                - generic [ref=e2056]: 2025-12-20
+                - generic [ref=e2057]: 14.0KB
+            - generic [ref=e2058]:
+              - button "" [ref=e2059] [cursor=pointer]:
+                - generic [ref=e2060]: 
+              - link "" [ref=e2061] [cursor=pointer]:
+                - /url: /static/uploads/business_cards/bc_f_01.png
+                - generic [ref=e2062]: 
+              - button "" [ref=e2063] [cursor=pointer]:
+                - generic [ref=e2064]: 
+            - text: ✓
+          - generic [ref=e2065]:
+            - generic [ref=e2067]: 
+            - generic [ref=e2068]:
+              - generic [ref=e2069]: document
+              - generic [ref=e2070]: 김상진_경력증명서_KWONPS.pdf
+              - generic [ref=e2071]:
+                - generic [ref=e2072]: 2026-01-12
+                - generic [ref=e2073]: 70.1KB
+            - generic [ref=e2074]:
+              - button "" [ref=e2075] [cursor=pointer]:
+                - generic [ref=e2076]: 
+              - link "" [ref=e2077] [cursor=pointer]:
+                - /url: /static/uploads/attachments/employee_1_20260112_164429_608978.pdf
+                - generic [ref=e2078]: 
+              - button "" [ref=e2079] [cursor=pointer]:
+                - generic [ref=e2080]: 
+            - text: ✓
+          - generic [ref=e2081]:
+            - img "sangjin_face_03.jpg" [ref=e2083]
+            - generic [ref=e2084]:
+              - generic [ref=e2085]: profile_photo
+              - generic [ref=e2086]: sangjin_face_03.jpg
+              - generic [ref=e2087]:
+                - generic [ref=e2088]: 2026-01-12
+                - generic [ref=e2089]: 5.4KB
+            - generic [ref=e2090]:
+              - button "" [ref=e2091] [cursor=pointer]:
+                - generic [ref=e2092]: 
+              - link "" [ref=e2093] [cursor=pointer]:
+                - /url: /static/uploads/attachments/employee_1_20260112_164427_534482.jpg
+                - generic [ref=e2094]: 
+              - button "" [ref=e2095] [cursor=pointer]:
+                - generic [ref=e2096]: 
+            - text: ✓
+          - generic [ref=e2097]:
+            - img "bc_f_02.png" [ref=e2099]
+            - generic [ref=e2100]:
+              - generic [ref=e2101]: 기타
+              - generic [ref=e2102]: bc_f_02.png
+              - generic [ref=e2103]:
+                - generic [ref=e2104]: 2026-01-12
+                - generic [ref=e2105]: 15.2KB
+            - generic [ref=e2106]:
+              - button "" [ref=e2107] [cursor=pointer]:
+                - generic [ref=e2108]: 
+              - link "" [ref=e2109] [cursor=pointer]:
+                - /url: /static/uploads/attachments/employee_1_20260112_215958_658092.png
+                - generic [ref=e2110]: 
+              - button "" [ref=e2111] [cursor=pointer]:
+                - generic [ref=e2112]: 
+            - text: ✓
+          - generic [ref=e2113]:
+            - img "pic_01.png" [ref=e2115]
+            - generic [ref=e2116]:
+              - generic [ref=e2117]: 기타
+              - generic [ref=e2118]: pic_01.png
+              - generic [ref=e2119]:
+                - generic [ref=e2120]: 2026-01-12
+                - generic [ref=e2121]: 11.0KB
+            - generic [ref=e2122]:
+              - button "" [ref=e2123] [cursor=pointer]:
+                - generic [ref=e2124]: 
+              - link "" [ref=e2125] [cursor=pointer]:
+                - /url: /static/uploads/corporate/1/employees/1/attachments/기타/1_20260112_221459.png
+                - generic [ref=e2126]: 
+              - button "" [ref=e2127] [cursor=pointer]:
+                - generic [ref=e2128]: 
+            - text: ✓
+          - generic [ref=e2129]:
+            - generic [ref=e2131]: 
+            - generic [ref=e2132]:
+              - generic [ref=e2133]: 이력서
+              - generic [ref=e2134]: 김상진_이력서.pdf
+              - generic [ref=e2135]:
+                - generic [ref=e2136]: 2026-01-12
+                - generic [ref=e2137]: 247.6KB
+            - generic [ref=e2138]:
+              - button "" [ref=e2139] [cursor=pointer]:
+                - generic [ref=e2140]: 
+              - link "" [ref=e2141] [cursor=pointer]:
+                - /url: /static/uploads/attachments/employee_1_20260112_182018_936036.pdf
+                - generic [ref=e2142]: 
+              - button "" [ref=e2143] [cursor=pointer]:
+                - generic [ref=e2144]: 
+            - text: ✓
+    - text:  
+  - text: 
+```

@@ -8,8 +8,23 @@ Employee Relation Service
 - 대시보드 데이터
 
 Phase 3: EmployeeService 분리 - Relation Service
+Phase 8.1: create_* 메서드 필드 필터링 추가
 """
 from typing import Any, Dict, List, Optional, Tuple
+
+
+def _filter_model_fields(model_class, data: Dict) -> Dict:
+    """모델에 정의된 컬럼만 필터링하여 반환
+
+    Args:
+        model_class: SQLAlchemy 모델 클래스
+        data: 입력 데이터 딕셔너리
+
+    Returns:
+        모델 컬럼에 해당하는 필드만 포함된 딕셔너리
+    """
+    allowed_fields = set(model_class.__table__.columns.keys())
+    return {k: v for k, v in data.items() if k in allowed_fields}
 
 from app.domains.employee.models import MilitaryService
 from app.shared.utils.transaction import atomic_transaction
@@ -135,6 +150,11 @@ class EmployeeRelationService:
         return salary_payment_repo
 
     @property
+    def employment_contract_repo(self):
+        from app.extensions import employment_contract_repo
+        return employment_contract_repo
+
+    @property
     def classification_repo(self):
         from app.extensions import classification_repo
         return classification_repo
@@ -252,6 +272,11 @@ class EmployeeRelationService:
     def get_salary_payment_list(self, employee_id: int) -> List[Dict]:
         """급여 지급 목록 조회"""
         models = self.salary_payment_repo.find_by_employee_id(employee_id)
+        return [m.to_dict() for m in models]
+
+    def get_employment_contract_list(self, employee_id: int) -> List[Dict]:
+        """근로계약 이력 목록 조회"""
+        models = self.employment_contract_repo.find_by_employee_id(employee_id)
         return [m.to_dict() for m in models]
 
     def get_attachment_list(self, employee_id: int) -> List[Dict]:
@@ -478,6 +503,7 @@ class EmployeeRelationService:
 
             # 급여 및 첨부파일
             'salary_payment_list': self.get_salary_payment_list(employee_id),
+            'employment_contract_list': self.get_employment_contract_list(employee_id),
             'attachment_list': self.get_attachment_list(employee_id),
         }
 
@@ -535,6 +561,556 @@ class EmployeeRelationService:
             'stats': stats,
             'work_info': work_info,
         }
+
+
+    # ========================================
+    # 개별 항목 CRUD (인라인 편집 API용)
+    # Phase 8: 동적 테이블 섹션
+    # ========================================
+
+    # --- 가족정보 (families) ---
+    def get_family_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """가족 항목 단건 조회"""
+        model = self.family_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_family(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """가족 항목 생성"""
+        from app.domains.employee.models import FamilyMember
+        filtered_data = _filter_model_fields(FamilyMember, data)
+        filtered_data['employee_id'] = employee_id
+        model = FamilyMember(**filtered_data)
+        return self.family_repo.create_model(model, commit=commit).to_dict()
+
+    def update_family(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """가족 항목 수정 (단건 - 인라인 편집 API용)"""
+        model = self.family_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_family(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """가족 항목 삭제 (단건 - 인라인 편집 API용)"""
+        model = self.family_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.family_repo.delete(item_id, commit=commit)
+
+    # --- 학력정보 (educations) ---
+    def get_education_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """학력 항목 단건 조회"""
+        model = self.education_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_education(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """학력 항목 생성"""
+        from app.domains.employee.models import Education
+        filtered_data = _filter_model_fields(Education, data)
+        filtered_data['employee_id'] = employee_id
+        model = Education(**filtered_data)
+        return self.education_repo.create_model(model, commit=commit).to_dict()
+
+    def update_education(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """학력 항목 수정"""
+        model = self.education_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_education(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """학력 항목 삭제"""
+        model = self.education_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.education_repo.delete(item_id, commit=commit)
+
+    # --- 경력정보 (careers) ---
+    def get_career_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """경력 항목 단건 조회"""
+        model = self.career_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_career(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """경력 항목 생성"""
+        from app.domains.employee.models import Career
+        filtered_data = _filter_model_fields(Career, data)
+        filtered_data['employee_id'] = employee_id
+        model = Career(**filtered_data)
+        return self.career_repo.create_model(model, commit=commit).to_dict()
+
+    def update_career(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """경력 항목 수정"""
+        model = self.career_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_career(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """경력 항목 삭제"""
+        model = self.career_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.career_repo.delete(item_id, commit=commit)
+
+    # --- 자격증 (certificates) ---
+    def get_certificate_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """자격증 항목 단건 조회"""
+        model = self.certificate_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_certificate(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """자격증 항목 생성"""
+        from app.domains.employee.models import Certificate
+        filtered_data = _filter_model_fields(Certificate, data)
+        filtered_data['employee_id'] = employee_id
+        model = Certificate(**filtered_data)
+        return self.certificate_repo.create_model(model, commit=commit).to_dict()
+
+    def update_certificate(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """자격증 항목 수정"""
+        model = self.certificate_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_certificate(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """자격증 항목 삭제"""
+        model = self.certificate_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.certificate_repo.delete(item_id, commit=commit)
+
+    # --- 언어능력 (languages) ---
+    def get_language_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """언어능력 항목 단건 조회"""
+        model = self.language_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_language(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """언어능력 항목 생성"""
+        from app.domains.employee.models import Language
+        filtered_data = _filter_model_fields(Language, data)
+        filtered_data['employee_id'] = employee_id
+        model = Language(**filtered_data)
+        return self.language_repo.create_model(model, commit=commit).to_dict()
+
+    def update_language(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """언어능력 항목 수정"""
+        model = self.language_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_language(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """언어능력 항목 삭제"""
+        model = self.language_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.language_repo.delete(item_id, commit=commit)
+
+    # --- 수상내역 (awards) ---
+    def get_award_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """수상내역 항목 단건 조회"""
+        model = self.award_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_award(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """수상내역 항목 생성"""
+        from app.domains.employee.models import Award
+        filtered_data = _filter_model_fields(Award, data)
+        filtered_data['employee_id'] = employee_id
+        model = Award(**filtered_data)
+        return self.award_repo.create_model(model, commit=commit).to_dict()
+
+    def update_award(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """수상내역 항목 수정"""
+        model = self.award_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_award(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """수상내역 항목 삭제"""
+        model = self.award_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.award_repo.delete(item_id, commit=commit)
+
+    # --- 프로젝트 참여 (projects) ---
+    def get_project_list(self, employee_id: int) -> List[Dict]:
+        """프로젝트 참여 목록 조회 (API alias)"""
+        return self.get_project_participation_list(employee_id)
+
+    def get_project_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """프로젝트 참여 항목 단건 조회"""
+        model = self.project_participation_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_project(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """프로젝트 참여 항목 생성"""
+        from app.domains.employee.models import ProjectParticipation
+        filtered_data = _filter_model_fields(ProjectParticipation, data)
+        filtered_data['employee_id'] = employee_id
+        model = ProjectParticipation(**filtered_data)
+        return self.project_participation_repo.create_model(model, commit=commit).to_dict()
+
+    def update_project(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """프로젝트 참여 항목 수정"""
+        model = self.project_participation_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_project(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """프로젝트 참여 항목 삭제"""
+        model = self.project_participation_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.project_participation_repo.delete(item_id, commit=commit)
+
+    # --- HR 릴레이션: 연봉계약 이력 (salary-histories) ---
+    def get_salary_history_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """연봉계약 이력 항목 단건 조회"""
+        model = self.salary_history_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_salary_history(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """연봉계약 이력 항목 생성"""
+        from app.domains.employee.models import SalaryHistory
+        filtered_data = _filter_model_fields(SalaryHistory, data)
+        filtered_data['employee_id'] = employee_id
+        model = SalaryHistory(**filtered_data)
+        return self.salary_history_repo.create_model(model, commit=commit).to_dict()
+
+    def update_salary_history(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """연봉계약 이력 항목 수정"""
+        model = self.salary_history_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_salary_history(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """연봉계약 이력 항목 삭제"""
+        model = self.salary_history_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.salary_history_repo.delete(item_id, commit=commit)
+
+    # --- HR 릴레이션: 급여 지급 이력 (salary-payments) ---
+    def get_salary_payment_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """급여 지급 이력 항목 단건 조회"""
+        model = self.salary_payment_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_salary_payment(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """급여 지급 이력 항목 생성"""
+        from app.domains.employee.models import SalaryPayment
+        filtered_data = _filter_model_fields(SalaryPayment, data)
+        filtered_data['employee_id'] = employee_id
+        model = SalaryPayment(**filtered_data)
+        return self.salary_payment_repo.create_model(model, commit=commit).to_dict()
+
+    def update_salary_payment(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """급여 지급 이력 항목 수정"""
+        model = self.salary_payment_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_salary_payment(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """급여 지급 이력 항목 삭제"""
+        model = self.salary_payment_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.salary_payment_repo.delete(item_id, commit=commit)
+
+    # --- HR 릴레이션: 인사이동/승진 (promotions) ---
+    def get_promotion_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """인사이동/승진 항목 단건 조회"""
+        model = self.promotion_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_promotion(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """인사이동/승진 항목 생성"""
+        from app.domains.employee.models import Promotion
+        filtered_data = _filter_model_fields(Promotion, data)
+        filtered_data['employee_id'] = employee_id
+        model = Promotion(**filtered_data)
+        return self.promotion_repo.create_model(model, commit=commit).to_dict()
+
+    def update_promotion(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """인사이동/승진 항목 수정"""
+        model = self.promotion_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_promotion(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """인사이동/승진 항목 삭제"""
+        model = self.promotion_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.promotion_repo.delete(item_id, commit=commit)
+
+    # --- HR 릴레이션: 인사고과 (evaluations) ---
+    def get_evaluation_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """인사고과 항목 단건 조회"""
+        model = self.evaluation_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_evaluation(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """인사고과 항목 생성"""
+        from app.domains.employee.models import Evaluation
+        filtered_data = _filter_model_fields(Evaluation, data)
+        filtered_data['employee_id'] = employee_id
+        model = Evaluation(**filtered_data)
+        return self.evaluation_repo.create_model(model, commit=commit).to_dict()
+
+    def update_evaluation(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """인사고과 항목 수정"""
+        model = self.evaluation_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_evaluation(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """인사고과 항목 삭제"""
+        model = self.evaluation_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.evaluation_repo.delete(item_id, commit=commit)
+
+    # --- HR 릴레이션: 교육훈련 (trainings) ---
+    def get_training_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """교육훈련 항목 단건 조회"""
+        model = self.training_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_training(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """교육훈련 항목 생성"""
+        from app.domains.employee.models import Training
+        filtered_data = _filter_model_fields(Training, data)
+        filtered_data['employee_id'] = employee_id
+        model = Training(**filtered_data)
+        return self.training_repo.create_model(model, commit=commit).to_dict()
+
+    def update_training(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """교육훈련 항목 수정"""
+        model = self.training_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_training(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """교육훈련 항목 삭제"""
+        model = self.training_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.training_repo.delete(item_id, commit=commit)
+
+    # --- HR 릴레이션: HR 프로젝트 (hr-projects) ---
+    def get_hr_project_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """HR 프로젝트 항목 단건 조회"""
+        model = self.hr_project_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_hr_project(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """HR 프로젝트 항목 생성"""
+        from app.domains.employee.models import HrProject
+        filtered_data = _filter_model_fields(HrProject, data)
+        filtered_data['employee_id'] = employee_id
+        model = HrProject(**filtered_data)
+        return self.hr_project_repo.create_model(model, commit=commit).to_dict()
+
+    def update_hr_project(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """HR 프로젝트 항목 수정"""
+        model = self.hr_project_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_hr_project(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """HR 프로젝트 항목 삭제"""
+        model = self.hr_project_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.hr_project_repo.delete(item_id, commit=commit)
+
+    # --- HR 릴레이션: 비품지급 (assets) ---
+    def get_asset_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """비품지급 항목 단건 조회"""
+        model = self.asset_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_asset(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """비품지급 항목 생성"""
+        from app.domains.employee.models import Asset
+        filtered_data = _filter_model_fields(Asset, data)
+        filtered_data['employee_id'] = employee_id
+        model = Asset(**filtered_data)
+        return self.asset_repo.create_model(model, commit=commit).to_dict()
+
+    def update_asset(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """비품지급 항목 수정"""
+        model = self.asset_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_asset(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """비품지급 항목 삭제"""
+        model = self.asset_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.asset_repo.delete(item_id, commit=commit)
+
+    # --- HR 릴레이션: 근로계약 이력 (employment-contracts) ---
+    def get_employment_contract_by_id(self, item_id: int, employee_id: int) -> Optional[Dict]:
+        """근로계약 이력 항목 단건 조회"""
+        model = self.employment_contract_repo.find_by_id(item_id)
+        if model and model.employee_id == employee_id:
+            return model.to_dict()
+        return None
+
+    def create_employment_contract(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
+        """근로계약 이력 항목 생성"""
+        from app.domains.employee.models import EmploymentContract
+        filtered_data = _filter_model_fields(EmploymentContract, data)
+        filtered_data['employee_id'] = employee_id
+        model = EmploymentContract(**filtered_data)
+        return self.employment_contract_repo.create_model(model, commit=commit).to_dict()
+
+    def update_employment_contract(self, item_id: int, data: Dict, employee_id: int, commit: bool = True) -> Tuple[bool, Optional[str]]:
+        """근로계약 이력 항목 수정"""
+        model = self.employment_contract_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False, '항목을 찾을 수 없습니다.'
+        for key, value in data.items():
+            if hasattr(model, key) and key not in ('id', 'employee_id'):
+                setattr(model, key, value)
+        if commit:
+            from app.extensions import db
+            db.session.commit()
+        return True, None
+
+    def delete_employment_contract(self, item_id: int, employee_id: int, commit: bool = True) -> bool:
+        """근로계약 이력 항목 삭제"""
+        model = self.employment_contract_repo.find_by_id(item_id)
+        if not model or model.employee_id != employee_id:
+            return False
+        return self.employment_contract_repo.delete(item_id, commit=commit)
 
 
 # 싱글톤 인스턴스

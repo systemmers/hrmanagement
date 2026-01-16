@@ -1,0 +1,509 @@
+{#
+    인라인 편집 매크로
+    Phase 0.3: 듀얼 모드 (View + Edit) 매크로
+
+    사용법:
+    {% from "shared/macros/_inline_edit.html" import inline_field, inline_select, inline_row, inline_section_header %}
+
+    참조:
+    - CSS: css/shared/components/inline-edit.css
+    - JS: js/shared/components/inline-edit-manager.js
+#}
+
+{# ========================================
+   기본 인라인 필드 (텍스트, 숫자, 날짜, 이메일)
+   ======================================== #}
+
+{% macro inline_field(name, value, label=none, type='text', placeholder='', readonly=false, required=false, css_class='', suffix='') %}
+<div class="inline-edit{% if css_class %} {{ css_class }}{% endif %}"
+     data-field="{{ name }}"
+     data-original="{{ value|default('', true) }}">
+    {# 보기 모드 #}
+    <span class="inline-edit__view">
+        {% if value %}
+            {{ value }}{% if suffix %} {{ suffix }}{% endif %}
+        {% else %}
+            <span class="inline-edit__value--empty">-</span>
+        {% endif %}
+    </span>
+    {# 편집 모드 #}
+    <div class="inline-edit__edit">
+        {% if suffix %}
+        <div class="inline-edit__input-group">
+        {% endif %}
+            <input type="{{ type }}"
+                   name="{{ name }}"
+                   value="{{ value|default('', true) }}"
+                   class="inline-edit__input"
+                   placeholder="{{ placeholder or label or '' }}"
+                   {% if readonly %}readonly{% endif %}
+                   {% if required %}required{% endif %}>
+        {% if suffix %}
+            <span class="inline-edit__suffix">{{ suffix }}</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{# ========================================
+   Select 드롭다운 필드
+   options: list of Option(value, label) 또는 [{'value': ..., 'label': ...}]
+   ======================================== #}
+
+{% macro inline_select(name, value, options, label=none, readonly=false, required=false, css_class='', empty_label='선택하세요') %}
+<div class="inline-edit{% if css_class %} {{ css_class }}{% endif %}"
+     data-field="{{ name }}"
+     data-original="{{ value|default('', true) }}">
+    {# 보기 모드 - 선택된 옵션의 라벨 표시 #}
+    <span class="inline-edit__view">
+        {% set display_label = none %}
+        {% for opt in options %}
+            {% if opt.value|string == value|string %}
+                {% set display_label = opt.label %}
+            {% endif %}
+        {% endfor %}
+        {% if display_label %}
+            {{ display_label }}
+        {% elif value %}
+            {{ value }}
+        {% else %}
+            <span class="inline-edit__value--empty">-</span>
+        {% endif %}
+    </span>
+    {# 편집 모드 #}
+    <div class="inline-edit__edit">
+        <select name="{{ name }}"
+                class="inline-edit__select"
+                {% if readonly %}disabled{% endif %}
+                {% if required %}required{% endif %}>
+            {% if not required %}
+            <option value="">{{ empty_label }}</option>
+            {% endif %}
+            {% for opt in options %}
+            <option value="{{ opt.value }}"{% if opt.value|string == value|string %} selected{% endif %}>
+                {{ opt.label }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+{% endmacro %}
+
+{# ========================================
+   Textarea 필드 (여러 줄 텍스트)
+   ======================================== #}
+
+{% macro inline_textarea(name, value, label=none, rows=3, placeholder='', readonly=false, required=false, css_class='') %}
+<div class="inline-edit inline-edit--textarea{% if css_class %} {{ css_class }}{% endif %}"
+     data-field="{{ name }}"
+     data-original="{{ value|default('', true) }}">
+    {# 보기 모드 #}
+    <span class="inline-edit__view">
+        {% if value %}
+            {{ value|nl2br }}
+        {% else %}
+            <span class="inline-edit__value--empty">-</span>
+        {% endif %}
+    </span>
+    {# 편집 모드 #}
+    <div class="inline-edit__edit">
+        <textarea name="{{ name }}"
+                  class="inline-edit__input inline-edit__textarea"
+                  rows="{{ rows }}"
+                  placeholder="{{ placeholder or label or '' }}"
+                  {% if readonly %}readonly{% endif %}
+                  {% if required %}required{% endif %}>{{ value|default('', true) }}</textarea>
+    </div>
+</div>
+{% endmacro %}
+
+{# ========================================
+   Checkbox 필드
+   ======================================== #}
+
+{% macro inline_checkbox(name, checked=false, label=none, readonly=false, css_class='') %}
+<div class="inline-edit inline-edit--checkbox{% if css_class %} {{ css_class }}{% endif %}"
+     data-field="{{ name }}"
+     data-original="{{ 'true' if checked else 'false' }}">
+    {# 보기 모드 #}
+    <span class="inline-edit__view">
+        {% if checked %}
+            <i class="fas fa-check-circle text-success"></i>
+        {% else %}
+            <i class="fas fa-times-circle text-muted"></i>
+        {% endif %}
+        {% if label %}{{ label }}{% endif %}
+    </span>
+    {# 편집 모드 #}
+    <div class="inline-edit__edit">
+        <label class="inline-edit__checkbox-label">
+            <input type="checkbox"
+                   name="{{ name }}"
+                   class="inline-edit__checkbox"
+                   {% if checked %}checked{% endif %}
+                   {% if readonly %}disabled{% endif %}>
+            {% if label %}{{ label }}{% endif %}
+        </label>
+    </div>
+</div>
+{% endmacro %}
+
+{# ========================================
+   Info Table 행 - 듀얼 모드 (2열)
+   info_table_row 매크로를 인라인 편집용으로 확장
+   ======================================== #}
+
+{% macro inline_row(label1, name1, value1, label2=none, name2=none, value2=none, type1='text', type2='text', readonly1=false, readonly2=false, required1=false, required2=false, options1=none, options2=none) %}
+<div class="info-table__row{% if not label2 %} info-table__row--full{% endif %}">
+    {# 첫 번째 셀 #}
+    <div class="info-table__cell">
+        <div class="info-table__label">{{ label1 }}{% if required1 %}<span class="required">*</span>{% endif %}</div>
+        <div class="info-table__value">
+            {% if options1 %}
+                {{ inline_select(name1, value1, options1, label=label1, readonly=readonly1, required=required1) }}
+            {% else %}
+                {{ inline_field(name1, value1, label=label1, type=type1, readonly=readonly1, required=required1) }}
+            {% endif %}
+        </div>
+    </div>
+    {# 두 번째 셀 (옵션) #}
+    {% if label2 %}
+    <div class="info-table__cell">
+        <div class="info-table__label">{{ label2 }}{% if required2 %}<span class="required">*</span>{% endif %}</div>
+        <div class="info-table__value">
+            {% if options2 %}
+                {{ inline_select(name2, value2, options2, label=label2, readonly=readonly2, required=required2) }}
+            {% else %}
+                {{ inline_field(name2, value2, label=label2, type=type2, readonly=readonly2, required=required2) }}
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# ========================================
+   인라인 편집 가능한 섹션 헤더
+   편집/저장/취소 버튼 포함
+   ======================================== #}
+
+{% macro inline_section_header(section_id, title, icon_svg=none) %}
+<div class="info-section__header">
+    <div class="info-section__title">
+        {% if icon_svg %}
+        <div class="info-section__icon">
+            {{ icon_svg|safe }}
+        </div>
+        {% endif %}
+        {{ title }}
+    </div>
+    <div class="info-section__actions">
+        {# 편집 버튼 (VIEW 모드) #}
+        <button type="button"
+                class="info-section__edit-btn"
+                data-inline-action="edit"
+                data-section="{{ section_id }}"
+                title="수정">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            수정
+        </button>
+        {# 저장 버튼 (EDITING 모드) #}
+        <button type="button"
+                class="info-section__save-btn"
+                data-inline-action="save"
+                data-section="{{ section_id }}"
+                title="저장">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            저장
+        </button>
+        {# 취소 버튼 (EDITING 모드) #}
+        <button type="button"
+                class="info-section__cancel-btn"
+                data-inline-action="cancel"
+                data-section="{{ section_id }}"
+                title="취소">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            취소
+        </button>
+    </div>
+</div>
+{% endmacro %}
+
+{# ========================================
+   인라인 편집 섹션 wrapper
+   data-section 속성 포함
+   ======================================== #}
+
+{% macro inline_section_start(section_id, css_class='') %}
+<div class="info-section{% if css_class %} {{ css_class }}{% endif %}"
+     data-section="{{ section_id }}"
+     id="section-{{ section_id }}">
+{% endmacro %}
+
+{% macro inline_section_end() %}
+</div>
+{% endmacro %}
+
+{# ========================================
+   날짜 필드 (한국어 포맷)
+   ======================================== #}
+
+{% macro inline_date(name, value, label=none, readonly=false, required=false, css_class='') %}
+<div class="inline-edit{% if css_class %} {{ css_class }}{% endif %}"
+     data-field="{{ name }}"
+     data-original="{{ value|default('', true) }}">
+    {# 보기 모드 - 날짜 형식 표시 #}
+    <span class="inline-edit__view">
+        {% if value %}
+            {{ value }}
+        {% else %}
+            <span class="inline-edit__value--empty">-</span>
+        {% endif %}
+    </span>
+    {# 편집 모드 #}
+    <div class="inline-edit__edit">
+        <input type="date"
+               name="{{ name }}"
+               value="{{ value|default('', true) }}"
+               class="inline-edit__input"
+               {% if readonly %}readonly{% endif %}
+               {% if required %}required{% endif %}>
+    </div>
+</div>
+{% endmacro %}
+
+{# ========================================
+   날짜 필드 + 음력 체크박스 (생년월일용)
+   ======================================== #}
+
+{% macro inline_date_with_lunar(name, value, lunar_name, is_lunar=false, label=none, readonly=false, required=false, css_class='') %}
+<div class="inline-edit inline-edit--date-lunar{% if css_class %} {{ css_class }}{% endif %}"
+     data-field="{{ name }}"
+     data-original="{{ value|default('', true) }}">
+    {# 보기 모드 #}
+    <span class="inline-edit__view">
+        {% if value %}
+            {{ value }}{% if is_lunar %} <span class="badge badge--info">음력</span>{% endif %}
+        {% else %}
+            <span class="inline-edit__value--empty">-</span>
+        {% endif %}
+    </span>
+    {# 편집 모드 #}
+    <div class="inline-edit__edit">
+        <div class="inline-edit__date-group">
+            <input type="date"
+                   name="{{ name }}"
+                   value="{{ value|default('', true) }}"
+                   class="inline-edit__input"
+                   {% if readonly %}readonly{% endif %}
+                   {% if required %}required{% endif %}>
+            <label class="inline-edit__lunar-label">
+                <input type="checkbox"
+                       name="{{ lunar_name }}"
+                       class="inline-edit__lunar-checkbox"
+                       {% if is_lunar %}checked{% endif %}
+                       {% if readonly %}disabled{% endif %}>
+                <span>음력</span>
+            </label>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{# ========================================
+   금액 필드 (숫자 포맷팅)
+   ======================================== #}
+
+{% macro inline_currency(name, value, label=none, readonly=false, required=false, css_class='') %}
+<div class="inline-edit{% if css_class %} {{ css_class }}{% endif %}"
+     data-field="{{ name }}"
+     data-original="{{ value|default('', true) }}"
+     data-type="currency">
+    {# 보기 모드 - 금액 형식 표시 #}
+    <span class="inline-edit__view">
+        {% if value %}
+            {{ '{:,}'.format(value|int) }}원
+        {% else %}
+            <span class="inline-edit__value--empty">-</span>
+        {% endif %}
+    </span>
+    {# 편집 모드 #}
+    <div class="inline-edit__edit">
+        <input type="number"
+               name="{{ name }}"
+               value="{{ value|default('', true) }}"
+               class="inline-edit__input"
+               step="10000"
+               min="0"
+               {% if readonly %}readonly{% endif %}
+               {% if required %}required{% endif %}>
+    </div>
+</div>
+{% endmacro %}
+
+{# ========================================
+   전화번호 필드
+   ======================================== #}
+
+{% macro inline_phone(name, value, label=none, readonly=false, required=false, css_class='') %}
+<div class="inline-edit{% if css_class %} {{ css_class }}{% endif %}"
+     data-field="{{ name }}"
+     data-original="{{ value|default('', true) }}"
+     data-type="phone">
+    {# 보기 모드 #}
+    <span class="inline-edit__view">
+        {% if value %}
+            {{ value }}
+        {% else %}
+            <span class="inline-edit__value--empty">-</span>
+        {% endif %}
+    </span>
+    {# 편집 모드 #}
+    <div class="inline-edit__edit">
+        <input type="tel"
+               name="{{ name }}"
+               value="{{ value|default('', true) }}"
+               class="inline-edit__input"
+               placeholder="010-0000-0000"
+               pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}"
+               {% if readonly %}readonly{% endif %}
+               {% if required %}required{% endif %}>
+    </div>
+</div>
+{% endmacro %}
+
+{# ========================================
+   이메일 필드
+   ======================================== #}
+
+{% macro inline_email(name, value, label=none, readonly=false, required=false, css_class='') %}
+{{ inline_field(name, value, label=label, type='email', placeholder='example@email.com', readonly=readonly, required=required, css_class=css_class) }}
+{% endmacro %}
+
+{# ========================================
+   주소 검색 필드 (Daum Postcode API 연동)
+   편집 모드에서 주소 검색 버튼 표시
+   ======================================== #}
+
+{% macro inline_address(name, value, detail_name=none, detail_value=none, label=none, readonly=false, required=false, css_class='') %}
+<div class="inline-edit inline-edit--address{% if css_class %} {{ css_class }}{% endif %}"
+     data-field="{{ name }}"
+     data-original="{{ value|default('', true) }}"
+     data-type="address">
+    {# 보기 모드 #}
+    <span class="inline-edit__view">
+        {% if value %}
+            {{ value }}{% if detail_value %} {{ detail_value }}{% endif %}
+        {% else %}
+            <span class="inline-edit__value--empty">-</span>
+        {% endif %}
+    </span>
+    {# 편집 모드 #}
+    <div class="inline-edit__edit">
+        <div class="inline-edit__address-group">
+            <input type="text"
+                   name="{{ name }}"
+                   value="{{ value|default('', true) }}"
+                   class="inline-edit__input inline-edit__address-input"
+                   placeholder="주소 검색 버튼을 클릭하세요"
+                   readonly
+                   {% if required %}required{% endif %}>
+            <button type="button"
+                    class="btn btn--sm btn--secondary inline-edit__address-btn"
+                    data-address-search="{{ name }}"
+                    {% if readonly %}disabled{% endif %}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                검색
+            </button>
+        </div>
+        {% if detail_name %}
+        <input type="text"
+               name="{{ detail_name }}"
+               value="{{ detail_value|default('', true) }}"
+               class="inline-edit__input inline-edit__detail-input"
+               placeholder="상세주소"
+               {% if readonly %}readonly{% endif %}>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{# ========================================
+   조직 트리 선택기 필드
+   편집 모드에서 조직 선택 모달 트리거
+   ======================================== #}
+
+{% macro inline_organization(name, value, display_value=none, label=none, readonly=false, required=false, css_class='') %}
+<div class="inline-edit inline-edit--organization{% if css_class %} {{ css_class }}{% endif %}"
+     data-field="{{ name }}"
+     data-original="{{ value|default('', true) }}"
+     data-type="organization">
+    {# 보기 모드 #}
+    <span class="inline-edit__view">
+        {% if display_value %}
+            {{ display_value }}
+        {% elif value %}
+            {{ value }}
+        {% else %}
+            <span class="inline-edit__value--empty">-</span>
+        {% endif %}
+    </span>
+    {# 편집 모드 #}
+    <div class="inline-edit__edit">
+        <div class="inline-edit__org-group">
+            <input type="text"
+                   id="inline_{{ name }}_display"
+                   name="{{ name }}_display"
+                   value="{{ display_value|default('', true) }}"
+                   class="inline-edit__input inline-edit__org-display org-selector-input"
+                   placeholder="조직을 선택하세요"
+                   readonly
+                   {% if required %}required{% endif %}>
+            <input type="hidden"
+                   id="inline_{{ name }}"
+                   name="{{ name }}"
+                   value="{{ value|default('', true) }}"
+                   class="inline-edit__org-id">
+            <button type="button"
+                    class="btn btn--sm btn--secondary inline-edit__org-btn"
+                    data-org-selector="{{ name }}"
+                    {% if readonly %}disabled{% endif %}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+                선택
+            </button>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{# ========================================
+   읽기 전용 표시 필드 (편집 불가)
+   배지나 특수 서식이 필요한 경우
+   ======================================== #}
+
+{% macro inline_readonly(name, value, label=none, badge_type=none, css_class='') %}
+<div class="inline-edit inline-edit--readonly{% if css_class %} {{ css_class }}{% endif %}"
+     data-field="{{ name }}"
+     data-readonly="true">
+    <span class="inline-edit__view">
+        {% if badge_type %}
+            <span class="badge badge--{{ badge_type }}">{{ value or '-' }}</span>
+        {% elif value %}
+            {{ value }}
+        {% else %}
+            <span class="inline-edit__value--empty">-</span>
+        {% endif %}
+    </span>
+</div>
+{% endmacro %}

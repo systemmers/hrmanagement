@@ -225,8 +225,8 @@ class PersonalService:
 
         try:
             with atomic_transaction():
-                self.profile_repo.update_by_user_id(user_id, data, commit=False)
-            return ServiceResult.ok(data=profile.to_dict())
+                updated_profile = self.profile_repo.update_by_user_id(user_id, data, commit=False)
+            return ServiceResult.ok(data=updated_profile.to_dict() if updated_profile else profile.to_dict())
         except Exception as e:
             return ServiceResult.fail(str(e))
 

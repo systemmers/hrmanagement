@@ -1,0 +1,132 @@
+{#
+    신규 직원 등록용 계정 정보 섹션
+
+    CREATE 모드에서만 사용됨
+    필수 필드: 이름, 계정 ID, 이메일
+    Phase 2.1: 섹션별 수정 버튼 방식 적용 (VIEW/EDIT 모드 전환)
+    Phase 2.2: 스타일 일관성 - info-table 구조로 변경 (기존 상세 페이지와 동일)
+#}
+{% from 'shared/macros/_info_display.html' import info_section_body_start, info_section_body_end, info_table_start, info_table_end, svg_icon_user %}
+
+<section class="info-section" data-section="account" id="section-account">
+    <div class="info-section__header">
+        <div class="info-section__title">
+            <div class="info-section__icon">
+                {{ svg_icon_user() }}
+            </div>
+            계정 정보
+            <span class="badge badge--primary">필수</span>
+        </div>
+        <div class="info-section__actions">
+            <button type="button"
+                    class="info-section__edit-btn"
+                    data-inline-action="edit"
+                    data-section="account"
+                    title="수정">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                수정
+            </button>
+            <button type="button"
+                    class="info-section__save-btn"
+                    data-inline-action="save"
+                    data-section="account"
+                    title="완료">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                완료
+            </button>
+            <button type="button"
+                    class="info-section__cancel-btn"
+                    data-inline-action="cancel"
+                    data-section="account"
+                    title="취소">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                취소
+            </button>
+        </div>
+    </div>
+
+    {{ info_section_body_start() }}
+        {{ info_table_start() }}
+            {# 이름, 계정 ID #}
+            <div class="info-table__row">
+                <div class="info-table__cell">
+                    <div class="info-table__label">이름 <span class="required-mark">*</span></div>
+                    <div class="info-table__value">
+                        <div class="inline-edit" data-field="name" data-original="">
+                            <span class="inline-edit__view">
+                                <span class="inline-edit__view--empty">(미입력)</span>
+                            </span>
+                            <div class="inline-edit__edit">
+                                <input type="text"
+                                       name="name"
+                                       class="inline-edit__input"
+                                       placeholder="이름을 입력하세요"
+                                       required
+                                       maxlength="50">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-table__cell">
+                    <div class="info-table__label">계정 ID <span class="required-mark">*</span></div>
+                    <div class="info-table__value">
+                        <div class="inline-edit" data-field="account_username" data-original="">
+                            <span class="inline-edit__view">
+                                <span class="inline-edit__view--empty">(미입력)</span>
+                            </span>
+                            <div class="inline-edit__edit">
+                                <input type="text"
+                                       name="account_username"
+                                       class="inline-edit__input"
+                                       placeholder="영문, 숫자, 밑줄(_)만 사용"
+                                       required
+                                       minlength="4"
+                                       maxlength="50"
+                                       pattern="[a-zA-Z0-9_]+">
+                                <small class="form-help-text">로그인 시 사용할 계정 ID (4~50자, 영문/숫자/_)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# 이메일, 초기 비밀번호 #}
+            <div class="info-table__row">
+                <div class="info-table__cell">
+                    <div class="info-table__label">이메일 <span class="required-mark">*</span></div>
+                    <div class="info-table__value">
+                        <div class="inline-edit" data-field="account_email" data-original="">
+                            <span class="inline-edit__view">
+                                <span class="inline-edit__view--empty">(미입력)</span>
+                            </span>
+                            <div class="inline-edit__edit">
+                                <input type="email"
+                                       name="account_email"
+                                       class="inline-edit__input"
+                                       placeholder="example@company.com"
+                                       required>
+                                <small class="form-help-text">로그인 및 알림에 사용할 이메일</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-table__cell">
+                    <div class="info-table__label">초기 비밀번호</div>
+                    <div class="info-table__value">
+                        <div class="inline-edit inline-edit--readonly" data-readonly="true">
+                            <span class="inline-edit__view">
+                                <span class="text-muted">자동 생성 (첫 로그인 시 변경 필요)</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{ info_table_end() }}
+    {{ info_section_body_end() }}
+</section>

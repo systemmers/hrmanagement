@@ -25,6 +25,9 @@ from .personal import personal_bp
 # Phase 9: 마이그레이션된 Blueprint
 from .profile import profile_bp
 
+# Phase 1: 개인 계정 인라인 편집 API
+from .profile.profile_section_api import profile_section_api_bp
+
 __all__ = [
     'auth_bp',
     'mypage_bp',
@@ -32,4 +35,5 @@ __all__ = [
     'account_bp',
     'personal_bp',
     'profile_bp',
+    'profile_section_api_bp',
 ]

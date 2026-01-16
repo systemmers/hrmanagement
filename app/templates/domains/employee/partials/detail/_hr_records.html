@@ -34,18 +34,34 @@
                         </tr>
                     </thead>
                     <tbody class="data-table__body">
-                        <tr class="data-table__row" data-id="1">
+                        {% if employment_contract_list %}
+                        {% for contract in employment_contract_list|sort(attribute='contract_date', reverse=True) %}
+                        <tr class="data-table__row" data-id="{{ contract.id }}">
                             {{ data_table_td_drag() }}
-                            <td class="data-table__cell">{{ employee.hire_date }}</td>
-                            <td class="data-table__cell"><span class="badge badge--success">정규직</span></td>
-                            <td class="data-table__cell">{{ employee.hire_date }}</td>
-                            <td class="data-table__cell">-</td>
-                            <td class="data-table__cell">{{ calculate_tenure(employee.hire_date) }}</td>
-                            <td class="data-table__cell">정규직</td>
-                            <td class="data-table__cell">전일제</td>
-                            <td class="data-table__cell">신규입사</td>
-                            {{ data_table_actions_full(item_id=1, show_attach=true) }}
+                            <td class="data-table__cell">{{ contract.contract_date or '-' }}</td>
+                            <td class="data-table__cell">
+                                {% if contract.contract_type == '정규직' %}
+                                <span class="badge badge--success">{{ contract.contract_type }}</span>
+                                {% elif contract.contract_type == '계약직' %}
+                                <span class="badge badge--warning">{{ contract.contract_type }}</span>
+                                {% else %}
+                                <span class="badge badge--info">{{ contract.contract_type or '-' }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="data-table__cell">{{ contract.start_date or '-' }}</td>
+                            <td class="data-table__cell">{{ contract.end_date or '-' }}</td>
+                            <td class="data-table__cell">{{ calculate_tenure(contract.start_date) if contract.start_date else '-' }}</td>
+                            <td class="data-table__cell">{{ contract.employee_type or '-' }}</td>
+                            <td class="data-table__cell">{{ contract.work_type or '-' }}</td>
+                            <td class="data-table__cell">{{ contract.note or '-' }}</td>
+                            {{ data_table_actions_full(item_id=contract.id, show_attach=true) }}
                         </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr class="data-table__row data-table__row--empty">
+                            <td class="data-table__cell" colspan="10">등록된 근로계약 이력이 없습니다.</td>
+                        </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>

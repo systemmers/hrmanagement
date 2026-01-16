@@ -38,6 +38,7 @@ project_participation_repo = None
 award_repo = None
 asset_repo = None
 salary_payment_repo = None
+employment_contract_repo = None
 attachment_repo = None
 
 # Contract 도메인 Repository
@@ -72,7 +73,7 @@ def init_extensions(app):
     global salary_repo, benefit_repo, contract_repo, salary_history_repo
     global promotion_repo, evaluation_repo, training_repo, attendance_repo
     global insurance_repo, hr_project_repo, project_participation_repo, award_repo, asset_repo
-    global salary_payment_repo, attachment_repo
+    global salary_payment_repo, employment_contract_repo, attachment_repo
     global user_repo, system_setting_repo, audit_log_repo
     global person_contract_repo
     global sync_log_repo
@@ -112,6 +113,7 @@ def init_extensions(app):
     award_repo = employee_domain.get_award_repo()
     asset_repo = employee_domain.get_asset_repo()
     salary_payment_repo = employee_domain.get_salary_payment_repo()
+    employment_contract_repo = employee_domain.get_employment_contract_repo()
 
     # 1.5. Attachment 도메인 (Phase 31: employee에서 분리)
     from app.domains.attachment import init_repositories as init_attachment_repos

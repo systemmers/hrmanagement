@@ -141,6 +141,7 @@ class Employee(db.Model):
             'phone': self.phone,
             'email': self.email,
             'organization_id': self.organization_id,
+            'company_id': self.company_id,
             'english_name': self.english_name,
             'chinese_name': self.chinese_name,
             'birth_date': self.birth_date,

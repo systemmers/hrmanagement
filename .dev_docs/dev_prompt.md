@@ -20,7 +20,7 @@
 - 중앙화(Centralization) - 공통 로직을 한 곳에서 관리
 - 일반화(Generalization) - 재사용 가능한 범용 코드 작성
 - 코드 중복, 중첩 금지 - DRY(Don't Repeat Yourself) 원칙
-- 코드 재활용 - 기존 컴포넌트 최대한 활용
+- 코드 재활용 - 기존 컴포넌트 최대한 활용   
 - 하드코딩, 인라인 코딩 금지 - 설정 파일 및 상수 활용
 - 코드 재정의 금지 - 기존 정의된 코드 재사용
 
@@ -117,7 +117,5 @@ hooks :
 context fork
 lsp
 
-
-http://localhost:5200/styleguide/components/attachment
 
 

@@ -169,6 +169,26 @@ class FieldOptions:
         Option('호봉제', '호봉제'),
     ]
 
+    # 급여 지급 방법 옵션
+    PAYMENT_METHOD = [
+        Option('계좌이체', '계좌이체'),
+        Option('현금', '현금'),
+    ]
+
+    # 퇴직금 유형 옵션
+    SEVERANCE_TYPE = [
+        Option('퇴직연금', '퇴직연금'),
+        Option('퇴직금', '퇴직금'),
+    ]
+
+    # 퇴직금 적립 방법 옵션
+    SEVERANCE_METHOD = [
+        Option('DB형', 'DB형 (확정급여형)'),
+        Option('DC형', 'DC형 (확정기여형)'),
+        Option('IRP', 'IRP (개인형퇴직연금)'),
+        Option('자체적립', '자체적립'),
+    ]
+
     # ========================================
     # 가족사항 옵션
     # ========================================
@@ -358,6 +378,9 @@ class FieldOptions:
             'GRADUATION_STATUS_OPTIONS': cls.GRADUATION_STATUS,
             # 경력정보
             'SALARY_TYPE_OPTIONS': cls.SALARY_TYPE,
+            'PAYMENT_METHOD_OPTIONS': cls.PAYMENT_METHOD,
+            'SEVERANCE_TYPE_OPTIONS': cls.SEVERANCE_TYPE,
+            'SEVERANCE_METHOD_OPTIONS': cls.SEVERANCE_METHOD,
             # 가족사항
             'FAMILY_RELATION_OPTIONS': cls.FAMILY_RELATION,
             'COHABIT_OPTIONS': cls.COHABIT,

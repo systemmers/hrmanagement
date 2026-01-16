@@ -28,6 +28,7 @@ from .project_participation_repository import ProjectParticipationRepository
 from .award_repository import AwardRepository
 from .asset_repository import AssetRepository
 from .salary_payment_repository import SalaryPaymentRepository
+from .employment_contract_repository import EmploymentContractRepository
 
 
 __all__ = [
@@ -50,6 +51,7 @@ __all__ = [
     'AwardRepository',
     'AssetRepository',
     'SalaryPaymentRepository',
+    'EmploymentContractRepository',
     # 1:1 Relations
     'MilitaryServiceRepository',
     'SalaryRepository',

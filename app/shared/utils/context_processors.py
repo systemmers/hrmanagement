@@ -252,5 +252,13 @@ def register_context_processors(app):
         {% for opt in GENDER_OPTIONS %}
             <option value="{{ opt.value }}" ...>{{ opt.label }}</option>
         {% endfor %}
+
+        또는 field_options 객체 사용:
+        {% for opt in field_options.GENDER %}
+            <option value="{{ opt.value }}" ...>{{ opt.label }}</option>
+        {% endfor %}
         """
-        return FieldOptions.get_all()
+        options = FieldOptions.get_all()
+        # field_options 객체도 함께 제공 (인라인 편집 매크로용)
+        options['field_options'] = FieldOptions
+        return options

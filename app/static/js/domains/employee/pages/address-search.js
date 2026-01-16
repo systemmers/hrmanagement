@@ -97,6 +97,9 @@ function openAddressSearch(addressInput, detailedAddressInput, postalCodeInput =
     }).open();
 }
 
+export { openAddressSearch };
+
 export default {
-    initAddressSearch
+    initAddressSearch,
+    openAddressSearch
 };

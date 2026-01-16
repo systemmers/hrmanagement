@@ -3,36 +3,77 @@
     HR Card 스타일가이드 적용
 
     Migration (2026-01-13): .info-grid → .info-table (HR Card 스타일가이드)
+    Phase 1 (2026-01-14): 인라인 편집 시스템 구조 적용 (읽기전용)
 #}
 {% from 'shared/macros/_info_display.html' import section_title, info_section_start, info_section_end, info_section_header, info_section_header_with_action, info_section_body_start, info_section_body_end, info_table_start, info_table_end, info_table_row, info_table_row_start, info_table_row_end, info_table_cell, info_table_cell_custom, svg_icon_user_circle %}
+{% from 'shared/macros/_inline_edit.html' import inline_readonly, inline_section_header, inline_section_start, inline_section_end %}
 
 {{ section_title('계정정보') }}
 <section id="account-info" class="content-section">
-    {{ info_section_start() }}
-        {{ info_section_header_with_action('계정정보', svg_icon_user_circle(), 'btn-edit-account', '수정') }}
+    {{ inline_section_start('account') }}
+        {{ inline_section_header('account', '계정정보', svg_icon_user_circle()) }}
         {{ info_section_body_start() }}
             {% if user %}
             {{ info_table_start() }}
-                {# 상태 - 커스텀 값 (배지) #}
-                {{ info_table_row_start() }}
-                    {% call info_table_cell_custom('상태') %}
-                        <span class="badge badge--{{ 'success' if user.is_active else 'secondary' }}">
-                            {{ '활성' if user.is_active else '비활성' }}
-                        </span>
-                    {% endcall %}
-                    {{ info_table_cell('아이디', user.username) }}
-                {{ info_table_row_end() }}
+                {# 상태, 아이디 - 읽기전용 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">상태</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('is_active', '활성' if user.is_active else '비활성', badge_type='success' if user.is_active else 'secondary') }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">아이디</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('username', user.username) }}
+                        </div>
+                    </div>
+                </div>
 
-                {{ info_table_row('계정 이메일', user.email, '역할', user.role_display) }}
-                {{ info_table_row('계정 유형', user.account_type_display, '생성일', user.created_at.strftime('%Y-%m-%d') if user.created_at else none) }}
-                {{ info_table_row('마지막 로그인', user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else none, none, none) }}
+                {# 계정 이메일, 역할 - 읽기전용 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">계정 이메일</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('email', user.email) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">역할</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('role', user.role_display) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# 계정 유형, 생성일 - 읽기전용 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">계정 유형</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('account_type', user.account_type_display) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">생성일</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('created_at', user.created_at.strftime('%Y-%m-%d') if user.created_at else none) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# 마지막 로그인 - 읽기전용 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">마지막 로그인</div>
+                        <div class="info-table__value">
+                            {{ inline_readonly('last_login', user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else none) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell"></div>
+                </div>
             {{ info_table_end() }}
-            <p class="text-muted mt-3">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                계정 정보 변경은 계정 관리 메뉴에서 가능합니다.
-            </p>
             {% else %}
             <div class="alert alert--warning">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
@@ -42,5 +83,5 @@
             </div>
             {% endif %}
         {{ info_section_body_end() }}
-    {{ info_section_end() }}
+    {{ inline_section_end() }}
 </section>

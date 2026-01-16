@@ -113,54 +113,10 @@ def view():
     return render_template('domains/user/profile/detail.html', **context)
 
 
-@profile_bp.route('/edit', methods=['GET', 'POST'])
-@unified_profile_required
-def edit():
-    """
-    통합 프로필 수정
-
-    법인 직원과 개인 계정 모두 동일한 템플릿 사용
-    계정 유형에 따라 편집 가능한 섹션이 다름
-    """
-    adapter = g.profile
-
-    if request.method == 'POST':
-        # POST 처리는 각 계정 타입별 서비스로 위임
-        account_type = adapter.get_account_type()
-
-        if account_type == AccountType.CORPORATE:
-            # 법인 직원 수정은 기존 employees 라우트로
-            employee_id = adapter.get_profile_id()
-            return redirect(url_for('employees.employee_edit', employee_id=employee_id))
-        elif account_type == AccountType.PERSONAL:
-            # 개인 프로필 수정
-            return redirect(url_for('personal.profile_edit'))
-        elif account_type == AccountType.CORPORATE_ADMIN:
-            # 법인 관리자 프로필 수정
-            return redirect(url_for('profile.admin_profile_edit'))
-
-    # GET: 수정 폼 표시
-    # 기존 파셜과의 호환성을 위해 항상 'employee' 변수 사용
-    context = adapter.to_template_context(variable_name='employee')
-    context['sections'] = adapter.get_available_sections()
-    context['action'] = 'update'
-
-    # 페이지 모드: 프로필 (개인정보만 표시)
-    context['page_mode'] = 'profile'
-
-    # 첨부파일 목록 조회 (프로필 수정에서도 수정/삭제 가능)
-    # owner_type: 법인 직원은 'employee', 개인은 'profile'
-    profile_id = adapter.get_profile_id()
-    account_type = adapter.get_account_type()
-    owner_type = 'employee' if account_type == AccountType.CORPORATE else 'profile'
-
-    if profile_id:
-        context['attachment_list'] = attachment_service.get_by_owner(owner_type, profile_id)
-    else:
-        context['attachment_list'] = []
-    context['is_readonly'] = False  # 프로필에서는 수정 가능
-
-    return render_template('domains/user/profile/edit.html', **context)
+# ========================================
+# 레거시 라우트 삭제 (2026-01-16)
+# - edit(): 인라인 편집으로 대체
+# ========================================
 
 
 @profile_bp.route('/section/<section_name>')

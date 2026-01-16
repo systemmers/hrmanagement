@@ -8,6 +8,7 @@
     - .info-grid → .info-table
 #}
 {% from 'shared/macros/_info_display.html' import section_title, info_section_start, info_section_end, info_section_header, info_section_header_with_action, info_section_body_start, info_section_body_end, info_table_start, info_table_end, info_table_row, info_table_row_start, info_table_row_end, info_table_cell, info_table_cell_custom, svg_icon_academic, svg_icon_briefcase, svg_icon_badge, svg_icon_globe, svg_icon_shield, svg_icon_star, svg_icon_clipboard, data_table_th_drag, data_table_td_drag, data_table_th_actions, data_table_actions_full %}
+{% from 'shared/macros/_inline_edit.html' import inline_field, inline_select, inline_date, inline_readonly, inline_section_header, inline_section_start, inline_section_end %}
 
 {# 섹션 7: 학력정보 #}
 <section id="education-info" class="content-section">
@@ -230,36 +231,79 @@
     {{ info_section_end() }}
 </section>
 
-{# 섹션 11: 병역정보 (단독 섹션) - info-table 구조 적용 #}
+{# 섹션 11: 병역정보 (단독 섹션) - 인라인 편집 적용 #}
 <section id="military-info" class="content-section">
     {{ section_title('병역정보') }}
-    {{ info_section_start() }}
-        {{ info_section_header_with_action('병역정보', svg_icon_shield(), 'btn-edit-military', '수정') }}
+    {{ inline_section_start('military') }}
+        {{ inline_section_header('military', '병역정보', svg_icon_shield()) }}
         {{ info_section_body_start() }}
             {{ info_table_start() }}
-                {% if military %}
-                {{ info_table_row('병역구분', get_military_status_label(military.status), '군별', get_branch_label(military.branch)) }}
+                {# 병역구분, 군별 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">병역구분</div>
+                        <div class="info-table__value">
+                            {{ inline_select('military_status', military.status if military else none, field_options.MILITARY_STATUS) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">군별</div>
+                        <div class="info-table__value">
+                            {{ inline_select('military_branch', military.branch if military else none, field_options.MILITARY_BRANCH) }}
+                        </div>
+                    </div>
+                </div>
 
-                {# 복무기간 - 커스텀 값 #}
-                {{ info_table_row_start() }}
-                    {% call info_table_cell_custom('복무기간') %}
-                        {% if military.start_date %}{{ military.start_date }} ~ {{ military.end_date or '복무중' }}{% else %}<span class="info-table__value--empty">미등록</span>{% endif %}
-                    {% endcall %}
-                    {{ info_table_cell('계급', military.rank) }}
-                {{ info_table_row_end() }}
+                {# 복무기간 (시작일-종료일), 계급 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">복무 시작일</div>
+                        <div class="info-table__value">
+                            {{ inline_date('military_start_date', military.start_date if military else none) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">복무 종료일</div>
+                        <div class="info-table__value">
+                            {{ inline_date('military_end_date', military.end_date if military else none) }}
+                        </div>
+                    </div>
+                </div>
 
-                {{ info_table_row('보직', military.duty, '병과', military.specialty) }}
-                {% if military.exemption_reason %}
-                {{ info_table_row('면제사유', military.exemption_reason, none, none) }}
-                {% endif %}
-                {% else %}
-                {{ info_table_row('병역구분', none, '군별', none) }}
-                {{ info_table_row('복무기간', none, '계급', none) }}
-                {{ info_table_row('보직', none, '병과', none) }}
-                {% endif %}
+                {# 계급, 보직 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">계급</div>
+                        <div class="info-table__value">
+                            {{ inline_field('military_rank', military.rank if military else none) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">보직</div>
+                        <div class="info-table__value">
+                            {{ inline_field('military_duty', military.duty if military else none) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# 병과, 면제사유 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">병과</div>
+                        <div class="info-table__value">
+                            {{ inline_field('military_specialty', military.specialty if military else none) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">면제사유</div>
+                        <div class="info-table__value">
+                            {{ inline_field('exemption_reason', military.exemption_reason if military else none) }}
+                        </div>
+                    </div>
+                </div>
             {{ info_table_end() }}
         {{ info_section_body_end() }}
-    {{ info_section_end() }}
+    {{ inline_section_end() }}
 </section>
 
 {# 섹션 12: 수상내역 (프로필 공통) #}

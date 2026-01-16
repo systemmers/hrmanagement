@@ -29,6 +29,7 @@ from .project_participation import ProjectParticipation
 from .award import Award
 from .asset import Asset
 from .salary_payment import SalaryPayment
+from .employment_contract import EmploymentContract
 
 
 __all__ = [
@@ -55,6 +56,7 @@ __all__ = [
     'Award',
     'Asset',
     'SalaryPayment',
+    'EmploymentContract',
     # 1:1 Relations
     'MilitaryService',
     'Salary',

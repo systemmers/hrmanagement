@@ -31,6 +31,7 @@ _project_participation_repo = None
 _award_repo = None
 _asset_repo = None
 _salary_payment_repo = None
+_employment_contract_repo = None
 _profile_repo = None
 
 
@@ -42,7 +43,7 @@ def init_repositories():
     global _salary_repo, _benefit_repo, _contract_repo, _salary_history_repo
     global _promotion_repo, _evaluation_repo, _training_repo, _attendance_repo
     global _insurance_repo, _hr_project_repo, _project_participation_repo
-    global _award_repo, _asset_repo, _salary_payment_repo
+    global _award_repo, _asset_repo, _salary_payment_repo, _employment_contract_repo
     global _profile_repo
 
     from .repositories import (
@@ -53,7 +54,7 @@ def init_repositories():
         PromotionRepository, EvaluationRepository, TrainingRepository, AttendanceRepository,
         InsuranceRepository, HrProjectRepository, ProjectParticipationRepository,
         AwardRepository, AssetRepository, SalaryPaymentRepository,
-        ProfileRepository
+        EmploymentContractRepository, ProfileRepository
     )
 
     _employee_repo = EmployeeRepository()
@@ -77,6 +78,7 @@ def init_repositories():
     _award_repo = AwardRepository()
     _asset_repo = AssetRepository()
     _salary_payment_repo = SalaryPaymentRepository()
+    _employment_contract_repo = EmploymentContractRepository()
     _profile_repo = ProfileRepository()
 
 
@@ -166,6 +168,10 @@ def get_asset_repo():
 
 def get_salary_payment_repo():
     return _salary_payment_repo
+
+
+def get_employment_contract_repo():
+    return _employment_contract_repo
 
 
 def get_profile_repo():
