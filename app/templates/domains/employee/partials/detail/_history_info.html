@@ -1,6 +1,7 @@
 {#
     직원 상세 - 이력 및 경력 섹션들
-    섹션 7-13: 학력, 경력, 자격증, 언어능력, 병역, 수상, 프로젝트 참여
+    섹션 7-12: 학력, 경력, 자격증, 언어능력, 수상, 프로젝트 참여
+    Note: 병역정보는 기본정보 섹션으로 통합됨 (Phase 0.7)
 
     Migration (2026-01-13):
     - .card → .info-section
@@ -231,82 +232,7 @@
     {{ info_section_end() }}
 </section>
 
-{# 섹션 11: 병역정보 (단독 섹션) - 인라인 편집 적용 #}
-<section id="military-info" class="content-section">
-    {{ section_title('병역정보') }}
-    {{ inline_section_start('military') }}
-        {{ inline_section_header('military', '병역정보', svg_icon_shield()) }}
-        {{ info_section_body_start() }}
-            {{ info_table_start() }}
-                {# 병역구분, 군별 #}
-                <div class="info-table__row">
-                    <div class="info-table__cell">
-                        <div class="info-table__label">병역구분</div>
-                        <div class="info-table__value">
-                            {{ inline_select('military_status', military.status if military else none, field_options.MILITARY_STATUS) }}
-                        </div>
-                    </div>
-                    <div class="info-table__cell">
-                        <div class="info-table__label">군별</div>
-                        <div class="info-table__value">
-                            {{ inline_select('military_branch', military.branch if military else none, field_options.MILITARY_BRANCH) }}
-                        </div>
-                    </div>
-                </div>
-
-                {# 복무기간 (시작일-종료일), 계급 #}
-                <div class="info-table__row">
-                    <div class="info-table__cell">
-                        <div class="info-table__label">복무 시작일</div>
-                        <div class="info-table__value">
-                            {{ inline_date('military_start_date', military.start_date if military else none) }}
-                        </div>
-                    </div>
-                    <div class="info-table__cell">
-                        <div class="info-table__label">복무 종료일</div>
-                        <div class="info-table__value">
-                            {{ inline_date('military_end_date', military.end_date if military else none) }}
-                        </div>
-                    </div>
-                </div>
-
-                {# 계급, 보직 #}
-                <div class="info-table__row">
-                    <div class="info-table__cell">
-                        <div class="info-table__label">계급</div>
-                        <div class="info-table__value">
-                            {{ inline_field('military_rank', military.rank if military else none) }}
-                        </div>
-                    </div>
-                    <div class="info-table__cell">
-                        <div class="info-table__label">보직</div>
-                        <div class="info-table__value">
-                            {{ inline_field('military_duty', military.duty if military else none) }}
-                        </div>
-                    </div>
-                </div>
-
-                {# 병과, 면제사유 #}
-                <div class="info-table__row">
-                    <div class="info-table__cell">
-                        <div class="info-table__label">병과</div>
-                        <div class="info-table__value">
-                            {{ inline_field('military_specialty', military.specialty if military else none) }}
-                        </div>
-                    </div>
-                    <div class="info-table__cell">
-                        <div class="info-table__label">면제사유</div>
-                        <div class="info-table__value">
-                            {{ inline_field('exemption_reason', military.exemption_reason if military else none) }}
-                        </div>
-                    </div>
-                </div>
-            {{ info_table_end() }}
-        {{ info_section_body_end() }}
-    {{ inline_section_end() }}
-</section>
-
-{# 섹션 12: 수상내역 (프로필 공통) #}
+{# 섹션 11: 수상내역 (프로필 공통) #}
 <section id="award-info" class="content-section">
     {{ section_title('수상내역') }}
     {{ info_section_start() }}
@@ -355,7 +281,7 @@
     {{ info_section_end() }}
 </section>
 
-{# 섹션 13: 프로젝트 참여이력 (모든 계정) #}
+{# 섹션 12: 프로젝트 참여이력 (모든 계정) #}
 <section id="project-participation-info" class="content-section">
     {{ section_title('프로젝트 참여이력') }}
     {{ info_section_start() }}

@@ -167,7 +167,7 @@ class EmployeeForm(FlaskForm):
         Length(max=100, message='계약 기간은 100자 이내여야 합니다.')
     ])
 
-    probation_end = DateField('수습 종료일', validators=[Optional()])
+    probation_end_date = DateField('수습 종료일', validators=[Optional()])
 
     resignation_date = DateField('퇴사일', validators=[Optional()])
 

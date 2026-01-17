@@ -6,6 +6,10 @@ Phase 0.5: 섹션별 인라인 편집 기능을 제공하는 서비스
 - ServiceResult 패턴 사용
 - employee_core_service, employee_relation_service와 협력
 
+Phase 0.8: FieldRegistry 통합
+- STATIC_SECTIONS의 필드 목록을 FieldRegistry에서 동적으로 보완
+- get_section_fields() 메서드 추가
+
 사용법:
     from app.domains.employee.services import inline_edit_service
 
@@ -20,7 +24,7 @@ Phase 0.5: 섹션별 인라인 편집 기능을 제공하는 서비스
     else:
         error_message = result.message
 """
-from typing import Dict, Optional, Any, Tuple
+from typing import Dict, Optional, Any, Tuple, List
 
 from app.shared.base.service_result import ServiceResult
 from app.shared.utils.transaction import atomic_transaction
@@ -40,12 +44,11 @@ class InlineEditService:
             'name': '개인 기본정보',
             'fields': [
                 # 기본 정보
-                'name', 'chinese_name', 'english_name', 'foreign_name',
-                'birth_date', 'lunar_birth', 'gender', 'nationality',
-                'resident_number', 'postal_code',
-                # 연락처
-                'phone', 'mobile_phone', 'home_phone',
-                'email',
+                'name', 'english_name', 'foreign_name',
+                'birth_date', 'is_lunar_birth', 'gender', 'nationality',
+                'resident_number',
+                # 연락처 (mobile_phone이 SSOT)
+                'phone', 'mobile_phone', 'email',
                 # 비상연락처
                 'emergency_contact', 'emergency_relation',
                 # 주소
@@ -53,8 +56,10 @@ class InlineEditService:
                 'actual_address', 'actual_detailed_address',
                 'actual_postal_code',
                 # 기타
-                'marital_status', 'bank_name', 'account_number', 'account_holder',
-                'hobby', 'specialty', 'disability_info', 'photo'
+                'marital_status', 'bank_name', 'account_number',
+                'hobby', 'specialty', 'disability_info', 'photo',
+                # 병역 및 비고 (2026-01-16 통합)
+                'military_status', 'note'
             ]
         },
         'organization': {
@@ -92,13 +97,6 @@ class InlineEditService:
             ],
             'readonly_fields': ['annual_leave_remaining']
         },
-        'military': {
-            'name': '병역정보',
-            'fields': [
-                'military_status', 'military_branch', 'military_rank',
-                'military_start_date', 'military_end_date', 'military_exemption_reason'
-            ]
-        },
         'account': {
             'name': '계정정보',
             'fields': ['username', 'email'],
@@ -110,10 +108,97 @@ class InlineEditService:
         }
     }
 
+    # FieldRegistry 섹션 ID 매핑 (InlineEditService 섹션 -> FieldRegistry 섹션 ID 목록)
+    # Phase 0.8: FieldRegistry 통합을 위한 매핑
+    SECTION_REGISTRY_MAPPING = {
+        'personal': ['personal_basic', 'contact', 'address', 'actual_address', 'personal_extended', 'bank_info', 'military_note'],
+        'organization': ['organization'],
+        'contract': ['contract'],
+        # salary, benefit, account는 별도 모델/로직 사용
+    }
+
     def __init__(self):
         self._employee_repo = None
         self._core_service = None
         self._relation_service = None
+        self._field_registry = None
+
+    @property
+    def field_registry(self):
+        """FieldRegistry lazy 로드"""
+        if self._field_registry is None:
+            from app.shared.constants.field_registry import FieldRegistry
+            self._field_registry = FieldRegistry
+        return self._field_registry
+
+    # ========================================
+    # FieldRegistry 통합 헬퍼 메서드
+    # ========================================
+
+    def get_section_fields_from_registry(
+        self,
+        section: str,
+        account_type: str = 'corporate'
+    ) -> List[str]:
+        """FieldRegistry에서 섹션의 편집 가능한 필드 목록 조회
+
+        Args:
+            section: InlineEditService 섹션 이름
+            account_type: 계정 타입 (corporate, personal, employee_sub)
+
+        Returns:
+            필드명 리스트 (편집 가능한 필드만)
+        """
+        registry_sections = self.SECTION_REGISTRY_MAPPING.get(section, [])
+        if not registry_sections:
+            # 매핑이 없으면 STATIC_SECTIONS fallback
+            return self.STATIC_SECTIONS.get(section, {}).get('fields', [])
+
+        fields = []
+        for registry_section_id in registry_sections:
+            # 편집 가능한 필드만 가져옴 (readonly 제외)
+            editable_fields = self.field_registry.get_editable_field_names(
+                registry_section_id, account_type
+            )
+            fields.extend(editable_fields)
+
+        # 중복 제거하면서 순서 유지
+        seen = set()
+        unique_fields = []
+        for f in fields:
+            if f not in seen:
+                seen.add(f)
+                unique_fields.append(f)
+
+        return unique_fields
+
+    def get_readonly_fields_from_registry(
+        self,
+        section: str,
+        account_type: str = 'corporate'
+    ) -> List[str]:
+        """FieldRegistry에서 섹션의 읽기 전용 필드 목록 조회
+
+        Args:
+            section: InlineEditService 섹션 이름
+            account_type: 계정 타입
+
+        Returns:
+            읽기 전용 필드명 리스트
+        """
+        registry_sections = self.SECTION_REGISTRY_MAPPING.get(section, [])
+        if not registry_sections:
+            # 매핑이 없으면 STATIC_SECTIONS fallback
+            return self.STATIC_SECTIONS.get(section, {}).get('readonly_fields', [])
+
+        readonly_fields = []
+        for registry_section_id in registry_sections:
+            fields = self.field_registry.get_readonly_field_names(
+                registry_section_id, account_type
+            )
+            readonly_fields.extend(fields)
+
+        return list(set(readonly_fields))
 
     # ========================================
     # Lazy Repository/Service 초기화
@@ -442,36 +527,6 @@ class InlineEditService:
         except Exception as e:
             return ServiceResult.from_exception(e)
 
-    def _update_military(
-        self,
-        employee,
-        data: Dict[str, Any]
-    ) -> ServiceResult[Dict]:
-        """병역정보 업데이트
-
-        군필 상태에 따른 조건부 필드 처리
-        """
-        try:
-            with atomic_transaction():
-                # 비대상/면제 시 관련 필드 초기화
-                status = data.get('military_status', employee.military_status)
-                if status in ['비대상', '면제']:
-                    data['military_branch'] = None
-                    data['military_rank'] = None
-                    data['military_start_date'] = None
-                    data['military_end_date'] = None
-
-                fields = self.STATIC_SECTIONS['military']['fields']
-                self._update_employee_fields(employee, data, fields)
-
-            return ServiceResult.ok(
-                data=self._get_section_dict(employee, 'military'),
-                message='병역정보가 저장되었습니다.'
-            )
-
-        except Exception as e:
-            return ServiceResult.from_exception(e)
-
     def _update_account(
         self,
         employee,
@@ -579,21 +634,42 @@ class InlineEditService:
                 if hasattr(employee, field):
                     setattr(employee, field, value)
 
+        # phone <-> mobile_phone 동기화 (mobile_phone이 SSOT)
+        # phone 값이 입력되면 mobile_phone으로 동기화 (빈 값도 처리)
+        if 'phone' in data:
+            value = data['phone'] if data['phone'] else None
+            employee.mobile_phone = value
+        # mobile_phone 값이 입력되면 phone으로도 동기화 (하위 호환성, 빈 값도 처리)
+        if 'mobile_phone' in data:
+            value = data['mobile_phone'] if data['mobile_phone'] else None
+            employee.phone = value
+
     def _get_section_dict(
         self,
         employee,
         section: str
     ) -> Dict[str, Any]:
-        """섹션 필드만 포함하는 Dict 반환"""
+        """섹션 필드만 포함하는 Dict 반환
+
+        NOTE: 읽기 전용 계산 필드(age 등)도 포함하여 클라이언트에서
+              저장 후 즉시 반영할 수 있도록 함
+        """
         section_config = self.STATIC_SECTIONS.get(section, {})
         fields = section_config.get('fields', [])
 
         employee_dict = employee.to_dict()
-        return {
+        result = {
             field: employee_dict.get(field)
             for field in fields
             if field in employee_dict
         }
+
+        # personal 섹션: 읽기 전용 계산 필드 추가 (age)
+        if section == 'personal':
+            if 'age' in employee_dict:
+                result['age'] = employee_dict['age']
+
+        return result
 
     def _apply_rrn_auto_fields(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """주민번호에서 생년월일, 성별 자동 추출

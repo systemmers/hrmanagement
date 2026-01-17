@@ -88,6 +88,15 @@ export const SECTION_CONFIG = {
         name: '계정정보',
         apiPath: 'account',
         type: 'static'
+    },
+    // 법인 관리자 프로필 (단일 API 사용, 섹션별 API 없음)
+    'admin-profile': {
+        name: '프로필 정보',
+        apiPath: 'admin-profile',
+        type: 'static',
+        directApi: true,  // apiBaseUrl을 직접 사용 (섹션 경로 없음)
+        fields: ['name', 'english_name', 'position', 'department',
+                 'mobile_phone', 'office_phone', 'email', 'bio']
     }
 };
 
@@ -661,11 +670,22 @@ export class InlineEditManager {
 
             // API 호출
             const config = this._getSectionConfig(sectionId);
-            const url = `${this.apiBaseUrl}/${this.employeeId}/sections/${config.apiPath}`;
+
+            // directApi 플래그가 있거나 apiBaseUrl이 직접 API인 경우 (corporate_admin)
+            let url;
+            if (config.directApi || this.apiBaseUrl.includes('/api/admin/')) {
+                url = this.apiBaseUrl;
+            } else {
+                url = `${this.apiBaseUrl}/${this.employeeId}/sections/${config.apiPath}`;
+            }
 
             const response = await patch(url, data);
 
             // 성공
+            // VIEW 요소 업데이트 (API 응답 데이터 우선 사용, 없으면 폼 데이터)
+            const updateData = response.data ? { ...data, ...response.data } : data;
+            this._updateViewElements(sectionId, updateData);
+
             this.setState(sectionId, EditState.VIEW);
             this._clearOriginalData(sectionId);
             this.dirtyFields.delete(sectionId);
@@ -728,7 +748,7 @@ export class InlineEditManager {
     }
 
     /**
-     * VIEW 요소 업데이트 (CREATE 모드용)
+     * VIEW 요소 업데이트 (저장 후 즉시 반영)
      * @param {string} sectionId - 섹션 ID
      * @param {Object} data - 폼 데이터
      */
@@ -739,16 +759,27 @@ export class InlineEditManager {
         const fields = section.querySelectorAll('[data-field]');
         fields.forEach(field => {
             const fieldName = field.dataset.field;
-            const value = data[fieldName];
+            let value = data[fieldName];
             const viewElement = field.querySelector('.inline-edit__view');
 
             if (viewElement) {
+                // 주소 필드 특별 처리: address + detailed_address 조합
+                if (fieldName === 'address' || fieldName === 'registered_address') {
+                    const address = data.address || data.registered_address || '';
+                    const detail = data.detailed_address || '';
+                    value = [address, detail].filter(v => v && v.trim()).join(' ');
+                } else if (fieldName === 'actual_address' || fieldName === 'current_address') {
+                    const address = data.actual_address || data.current_address || '';
+                    const detail = data.actual_detailed_address || '';
+                    value = [address, detail].filter(v => v && v.trim()).join(' ');
+                }
+
                 // 값이 있으면 표시, 없으면 플레이스홀더
                 if (value && String(value).trim()) {
                     viewElement.textContent = value;
                     viewElement.classList.remove('inline-edit__view--empty');
                 } else {
-                    viewElement.textContent = '(미입력)';
+                    viewElement.textContent = '-';
                     viewElement.classList.add('inline-edit__view--empty');
                 }
             }
@@ -801,7 +832,8 @@ export class InlineEditManager {
         }
 
         try {
-            const url = `${this.apiBaseUrl}/${this.employeeId}/${config.apiPath}`;
+            // BUG-002 수정: /sections/ 경로 추가 (백엔드 API 패턴과 일치)
+            const url = `${this.apiBaseUrl}/${this.employeeId}/sections/${config.apiPath}`;
             const response = await post(url, data);
 
             this.toast.success(response.message || `${config.name} 추가 완료`);
@@ -829,7 +861,8 @@ export class InlineEditManager {
         }
 
         try {
-            const url = `${this.apiBaseUrl}/${this.employeeId}/${config.apiPath}/${itemId}`;
+            // BUG-002 수정: /sections/ 경로 추가 (백엔드 API 패턴과 일치)
+            const url = `${this.apiBaseUrl}/${this.employeeId}/sections/${config.apiPath}/${itemId}`;
             const response = await patch(url, data);
 
             this.toast.success(response.message || `${config.name} 수정 완료`);
@@ -860,7 +893,8 @@ export class InlineEditManager {
         }
 
         try {
-            const url = `${this.apiBaseUrl}/${this.employeeId}/${config.apiPath}/${itemId}`;
+            // BUG-002 수정: /sections/ 경로 추가 (백엔드 API 패턴과 일치)
+            const url = `${this.apiBaseUrl}/${this.employeeId}/sections/${config.apiPath}/${itemId}`;
             const response = await del(url);
 
             this.toast.success(response.message || `${config.name} 삭제 완료`);
@@ -931,6 +965,7 @@ export class InlineEditManager {
 
         const sectionId = section.dataset.section;
         const fieldName = field.dataset.field;
+        const fieldType = field.dataset.type;
 
         // 주민번호 자동입력 처리
         if (fieldName === 'resident_number' && sectionId === 'personal') {
@@ -940,15 +975,34 @@ export class InlineEditManager {
         // dirty 필드 추가
         const dirtySet = this.dirtyFields.get(sectionId);
         if (dirtySet) {
-            const original = this.originalData.get(sectionId)?.[fieldName];
-            const current = this._getFieldValue(field);
+            // 주소 필드 특별 처리: 상세주소 input 변경도 감지
+            if (fieldType === 'address') {
+                const target = e.target;
+                const isDetailInput = target.classList.contains('inline-edit__detail-input');
+                const trackFieldName = isDetailInput ? target.name : fieldName;
 
-            if (original !== current) {
-                dirtySet.add(fieldName);
-                field.classList.add('inline-edit__input--dirty');
+                // 상세주소 변경 시 해당 필드로 dirty 추적
+                const original = this.originalData.get(sectionId)?.[trackFieldName] || '';
+                const current = target.value || '';
+
+                if (original !== current) {
+                    dirtySet.add(trackFieldName);
+                    target.classList.add('inline-edit__input--dirty');
+                } else {
+                    dirtySet.delete(trackFieldName);
+                    target.classList.remove('inline-edit__input--dirty');
+                }
             } else {
-                dirtySet.delete(fieldName);
-                field.classList.remove('inline-edit__input--dirty');
+                const original = this.originalData.get(sectionId)?.[fieldName];
+                const current = this._getFieldValue(field);
+
+                if (original !== current) {
+                    dirtySet.add(fieldName);
+                    field.classList.add('inline-edit__input--dirty');
+                } else {
+                    dirtySet.delete(fieldName);
+                    field.classList.remove('inline-edit__input--dirty');
+                }
             }
         }
     }
@@ -1068,7 +1122,7 @@ export class InlineEditManager {
         if (!actualAddressField) return;
 
         const actualAddressInput = actualAddressField.querySelector('input[name="actual_address"]');
-        const actualDetailInput = actualAddressField.querySelector('input[name="actual_address_detail"]');
+        const actualDetailInput = actualAddressField.querySelector('input[name="actual_detailed_address"]');
 
         // 실제 거주지가 이미 입력되어 있으면 복사하지 않음
         if (actualAddressInput?.value?.trim()) {
@@ -1080,7 +1134,7 @@ export class InlineEditManager {
         if (!addressField) return;
 
         const address = addressField.querySelector('input[name="address"]')?.value || '';
-        const addressDetail = addressField.querySelector('input[name="address_detail"]')?.value || '';
+        const addressDetail = addressField.querySelector('input[name="detailed_address"]')?.value || '';
 
         // 주민등록상 주소가 없으면 복사하지 않음
         if (!address.trim()) {
@@ -1217,11 +1271,26 @@ export class InlineEditManager {
 
         fields.forEach(field => {
             const fieldName = field.dataset.field;
-            const value = this._getFieldValue(field);
+            const fieldType = field.dataset.type;
 
-            // readonly 필드는 제외
-            if (!field.hasAttribute('readonly') && !field.disabled) {
-                data[fieldName] = value;
+            // 주소 필드 특별 처리: 메인 주소 + 상세주소 모두 수집
+            if (fieldType === 'address') {
+                const addressInput = field.querySelector(`input[name="${fieldName}"]`);
+                const detailInput = field.querySelector('.inline-edit__detail-input');
+
+                if (addressInput) {
+                    data[fieldName] = addressInput.value || '';
+                }
+                if (detailInput && detailInput.name) {
+                    data[detailInput.name] = detailInput.value || '';
+                }
+            } else {
+                const value = this._getFieldValue(field);
+
+                // readonly 필드는 제외
+                if (!field.hasAttribute('readonly') && !field.disabled) {
+                    data[fieldName] = value;
+                }
             }
         });
 

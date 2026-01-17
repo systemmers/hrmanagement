@@ -14,7 +14,6 @@ from .career import Career
 from .certificate import Certificate
 from .family_member import FamilyMember
 from .language import Language
-from .military_service import MilitaryService
 from .salary import Salary
 from .benefit import Benefit
 from .contract import Contract
@@ -58,7 +57,6 @@ __all__ = [
     'SalaryPayment',
     'EmploymentContract',
     # 1:1 Relations
-    'MilitaryService',
     'Salary',
     'Benefit',
     'Contract',

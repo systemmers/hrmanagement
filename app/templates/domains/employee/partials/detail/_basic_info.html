@@ -22,15 +22,16 @@
                 {# FieldRegistry personal_basic 섹션 순서 적용 #}
                 {# NOTE: 필드명은 Employee 모델 SSOT에 맞춤 (2026-01-16) #}
                 {# Phase 2: CREATE 모드 안전 처리 - employee가 None일 수 있음 #}
-                {{ inline_row('이름', 'name', employee.name if employee else none, '영문 이름', 'english_name', employee.english_name if employee else none, required1=true) }}
-                {{ inline_row('한자 이름', 'chinese_name', employee.chinese_name if employee else none, '외국어 이름', 'foreign_name', employee.foreign_name if employee else none) }}
+                {# Phase 3: 이름 필드 불변성 - 등록 후 readonly (2026-01-16) #}
+                {{ inline_row('이름', 'name', employee.name if employee else none, '영문 이름', 'english_name', employee.english_name if employee else none, required1=true, readonly1=(employee and employee.name)) }}
+                {{ inline_row('외국어 이름', 'foreign_name', employee.foreign_name if employee else none, '국적', 'nationality', employee.nationality if employee else none, options2=field_options.NATIONALITY) }}
 
                 {# 생년월일 - 날짜 필드 + 음력 체크박스 / 나이(읽기전용) #}
                 <div class="info-table__row">
                     <div class="info-table__cell">
                         <div class="info-table__label">생년월일</div>
                         <div class="info-table__value">
-                            {{ inline_date_with_lunar('birth_date', employee.birth_date if employee else none, 'lunar_birth', employee.lunar_birth if employee else none) }}
+                            {{ inline_date_with_lunar('birth_date', employee.birth_date if employee else none, 'is_lunar_birth', employee.is_lunar_birth if employee else none) }}
                         </div>
                     </div>
                     <div class="info-table__cell">
@@ -41,64 +42,50 @@
                     </div>
                 </div>
 
-                {# 성별, 국적 - 드롭다운 #}
-                {{ inline_row('성별', 'gender', employee.gender if employee else none, '국적', 'nationality', employee.nationality if employee else none, options1=field_options.GENDER, options2=field_options.NATIONALITY) }}
+                {# 성별, 결혼여부 - 드롭다운 #}
+                {{ inline_row('성별', 'gender', employee.gender if employee else none, '결혼여부', 'marital_status', employee.marital_status if employee else none, options1=field_options.GENDER, options2=field_options.MARITAL_STATUS) }}
 
-                {# 주민등록번호, 우편번호 #}
-                {{ inline_row('주민등록번호', 'resident_number', employee.resident_number if employee else none, '우편번호', 'postal_code', employee.postal_code if employee else none) }}
-
-                {# 결혼여부 - 드롭다운, 휴대전화 #}
+                {# 주민등록번호, 휴대전화 #}
+                {# Phase 3: 주민번호 불변성 - 등록 후 readonly (2026-01-16) #}
                 <div class="info-table__row">
                     <div class="info-table__cell">
-                        <div class="info-table__label">결혼여부</div>
+                        <div class="info-table__label">주민등록번호</div>
                         <div class="info-table__value">
-                            {{ inline_select('marital_status', employee.marital_status if employee else none, field_options.MARITAL_STATUS) }}
+                            {{ inline_field('resident_number', employee.resident_number if employee else none, readonly=(employee and employee.resident_number)) }}
                         </div>
                     </div>
                     <div class="info-table__cell">
                         <div class="info-table__label">휴대전화</div>
                         <div class="info-table__value">
-                            {{ inline_phone('phone', employee.phone if employee else none) }}
+                            {{ inline_phone('mobile_phone', employee.mobile_phone if employee else none) }}
                         </div>
                     </div>
                 </div>
 
-                {# 자택전화, 이메일 #}
+                {# 이메일, 비상연락처 #}
                 <div class="info-table__row">
-                    <div class="info-table__cell">
-                        <div class="info-table__label">자택전화</div>
-                        <div class="info-table__value">
-                            {{ inline_phone('home_phone', employee.home_phone if employee else none) }}
-                        </div>
-                    </div>
                     <div class="info-table__cell">
                         <div class="info-table__label">이메일</div>
                         <div class="info-table__value">
                             {{ inline_email('email', employee.email if employee else none) }}
                         </div>
                     </div>
-                </div>
-
-                {# 비상연락처 - 2열 (연락처 / 관계) #}
-                <div class="info-table__row">
                     <div class="info-table__cell">
                         <div class="info-table__label">비상연락처</div>
                         <div class="info-table__value">
                             {{ inline_phone('emergency_contact', employee.emergency_contact if employee else none) }}
                         </div>
                     </div>
-                    <div class="info-table__cell">
-                        <div class="info-table__label">비상연락처 관계</div>
-                        <div class="info-table__value">
-                            {{ inline_field('emergency_relation', employee.emergency_relation if employee else none) }}
-                        </div>
-                    </div>
                 </div>
 
-                {# 계좌정보 #}
-                {{ inline_row('은행명', 'bank_name', employee.bank_name if employee else none, '계좌번호', 'account_number', employee.account_number if employee else none) }}
-                {{ inline_row('예금주', 'account_holder', employee.account_holder if employee else none, '취미', 'hobby', employee.hobby if employee else none) }}
-                {{ inline_row('특기', 'specialty', employee.specialty if employee else none, '장애정보', 'disability_info', employee.disability_info if employee else none) }}
+                {# 비상연락처 관계, 은행명 #}
+                {{ inline_row('비상연락처 관계', 'emergency_relation', employee.emergency_relation if employee else none, '은행명', 'bank_name', employee.bank_name if employee else none) }}
+
+                {# 계좌번호, 취미 #}
+                {{ inline_row('계좌번호', 'account_number', employee.account_number if employee else none, '취미', 'hobby', employee.hobby if employee else none) }}
+
+                {# 장애정보, 특기 #}
+                {{ inline_row('장애정보', 'disability_info', employee.disability_info if employee else none, '특기', 'specialty', employee.specialty if employee else none) }}
 
                 {# 주소 정보 - 주소검색 버튼 포함 (상세주소는 inline_address 매크로 내부에서 처리) #}
                 {# 실제 거주지가 비어있으면 편집 모드 진입 시 주민등록상 주소로 자동 복사됨 #}
@@ -113,6 +100,22 @@
                         <div class="info-table__label">실제 거주지</div>
                         <div class="info-table__value">
                             {{ inline_address('actual_address', employee.actual_address if employee else none, 'actual_detailed_address', employee.actual_detailed_address if employee else none) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# 병역여부, 비고 #}
+                <div class="info-table__row">
+                    <div class="info-table__cell">
+                        <div class="info-table__label">병역여부</div>
+                        <div class="info-table__value">
+                            {{ inline_select('military_status', employee.military_status if employee else none, field_options.MILITARY_STATUS) }}
+                        </div>
+                    </div>
+                    <div class="info-table__cell">
+                        <div class="info-table__label">비고</div>
+                        <div class="info-table__value">
+                            {{ inline_field('note', employee.note if employee else none) }}
                         </div>
                     </div>
                 </div>
@@ -262,7 +265,7 @@
                     <div class="info-table__cell">
                         <div class="info-table__label">수습종료일</div>
                         <div class="info-table__value">
-                            {{ inline_date('probation_end', employee.probation_end) }}
+                            {{ inline_date('probation_end_date', employee.probation_end_date) }}
                         </div>
                     </div>
                 </div>

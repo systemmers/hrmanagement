@@ -68,7 +68,7 @@
                     <div class="info-table__cell">
                         <div class="info-table__label">마지막 로그인</div>
                         <div class="info-table__value">
-                            {{ inline_readonly('last_login', user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else none) }}
+                            {{ inline_readonly('last_login_at', user.last_login_at.strftime('%Y-%m-%d %H:%M') if user.last_login_at else none) }}
                         </div>
                     </div>
                     <div class="info-table__cell"></div>

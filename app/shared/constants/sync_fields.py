@@ -17,10 +17,10 @@ from typing import Dict, List, Tuple, Set
 BASIC_FIELD_MAPPING: Dict[str, str] = {
     'name': 'name',
     'english_name': 'english_name',
-    'chinese_name': 'chinese_name',
+    # NOTE: chinese_name 제거됨 - Employee.foreign_name 사용 (다른 매핑 필요시 별도 처리)
     'photo': 'photo',
     'birth_date': 'birth_date',
-    'lunar_birth': 'lunar_birth',
+    'is_lunar_birth': 'is_lunar_birth',
     'gender': 'gender',
 }
 
@@ -30,9 +30,9 @@ BASIC_FIELD_MAPPING: Dict[str, str] = {
 
 CONTACT_FIELD_MAPPING: Dict[str, str] = {
     'mobile_phone': 'mobile_phone',
-    'home_phone': 'home_phone',
+    # NOTE: home_phone 제거됨 - 모델에 없음
     'email': 'email',
-    'postal_code': 'postal_code',
+    # NOTE: postal_code 제거됨 - actual_postal_code만 존재 (EXTRA_FIELD_MAPPING에서 관리)
     'address': 'address',
     'detailed_address': 'detailed_address',
 }

@@ -3,7 +3,8 @@
 본 문서는 HR Management 시스템의 모든 API 엔드포인트를 정리한 문서입니다.
 
 **생성일**: 2025-12-16
-**최종 업데이트**: 2026-01-11
+**최종 업데이트**: 2026-01-16
+**Phase**: Phase 4 Complete (Attachment + Required Document System)
 **프로젝트**: D:/projects/hrmanagement
 **Python**: Flask Blueprint 기반 (도메인 중심 아키텍처)
 
@@ -24,8 +25,9 @@
 11. [동기화](#11-동기화)
 12. [계정 설정](#12-계정-설정)
 13. [첨부파일 관리](#13-첨부파일-관리)
-14. [명함 관리](#14-명함-관리)
-15. [기타](#15-기타)
+14. [필수문서 관리](#14-필수문서-관리)
+15. [명함 관리](#15-명함-관리)
+16. [기타](#16-기타)
 
 ---
 
@@ -721,7 +723,7 @@ show_profile_photo: "on"
 
 ### Blueprint: `attachment_bp` (prefix: `/api/attachments`)
 
-> **도메인**: `app/domains/attachment/` (2026-01-10 신규)
+> **도메인**: `app/domains/attachment/` (Phase 4)
 
 #### 13.1 첨부파일 CRUD
 
@@ -770,13 +772,72 @@ category: "document"
 
 ---
 
-## 14. 명함 관리
+## 14. 필수문서 관리
+
+### Blueprint: `attachment_bp` (prefix: `/api/attachments`)
+
+> **도메인**: `app/domains/attachment/` (Phase 4)
+> **서비스**: `required_document_service`
+
+#### 14.1 필수문서 상태 조회
+
+| HTTP | 엔드포인트 | 인증 | 역할 | 설명 |
+|------|-----------|------|------|------|
+| GET | `/api/attachments/required/<owner_type>/<int:owner_id>` | 필수 | - | 필수문서 상태 조회 |
+| GET | `/api/attachments/required/contract/<int:contract_id>` | 필수 | - | 계약별 필수문서 상태 |
+
+**Response 예시** (GET `/api/attachments/required/employee/<int:employee_id>`):
+```json
+{
+  "success": true,
+  "data": {
+    "required_documents": [
+      {
+        "document_type": "id_card",
+        "label": "신분증 사본",
+        "required": true,
+        "submitted": true,
+        "attachment_id": 1,
+        "file_name": "id_card.pdf"
+      },
+      {
+        "document_type": "resume",
+        "label": "이력서",
+        "required": true,
+        "submitted": false,
+        "attachment_id": null,
+        "file_name": null
+      }
+    ],
+    "completion_rate": 50,
+    "total_required": 2,
+    "total_submitted": 1
+  }
+}
+```
+
+**owner_type 값** (필수문서):
+- `employee`: 직원 필수 증빙서류
+- `contract`: 계약 필수 첨부문서
+
+**document_type 값**:
+- `id_card`: 신분증 사본
+- `resume`: 이력서
+- `certificate`: 자격증 사본
+- `diploma`: 졸업증명서
+- `career_certificate`: 경력증명서
+- `bank_account`: 통장 사본
+- `contract_document`: 계약서
+
+---
+
+## 15. 명함 관리
 
 ### Blueprint: `businesscard_bp` (prefix: `/api/businesscard`)
 
-> **도메인**: `app/domains/businesscard/` (2026-01-09 신규)
+> **도메인**: `app/domains/businesscard/`
 
-#### 14.1 명함 CRUD
+#### 15.1 명함 CRUD
 
 | HTTP | 엔드포인트 | 인증 | 역할 | 설명 |
 |------|-----------|------|------|------|
@@ -815,7 +876,7 @@ side: "front"  # front 또는 back
 
 ---
 
-## 15. 기타
+## 16. 기타
 
 ### Blueprint: `main_bp` (no prefix)
 
@@ -913,12 +974,13 @@ side: "front"  # front 또는 back
 
 ## 문서 버전
 
-- **Version**: 1.1
-- **Last Updated**: 2026-01-11
+- **Version**: 1.2
+- **Last Updated**: 2026-01-16
 - **Contributors**: Backend Architect (AI)
 
 ### 변경 이력
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
+| 1.2 | 2026-01-16 | Phase 4 반영: 필수문서 API 섹션 추가, 섹션 번호 재정렬 |
 | 1.1 | 2026-01-11 | 첨부파일/명함 API 추가 |
 | 1.0 | 2025-12-16 | 초기 문서 작성 |

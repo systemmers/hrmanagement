@@ -410,19 +410,21 @@ def admin_profile_edit():
 # 법인 관리자 프로필 API
 # ========================================
 
-@profile_bp.route('/api/admin/profile', methods=['GET'])
+@profile_bp.route('/api/admin/profile', methods=['GET', 'PUT', 'PATCH'])
 @corporate_admin_only
-def api_admin_profile_get():
-    """법인 관리자 프로필 조회 API"""
+def api_admin_profile():
+    """법인 관리자 프로필 조회/수정 API
+
+    GET: 프로필 조회
+    PUT/PATCH: 프로필 수정 (전체/부분 업데이트 모두 지원)
+    """
     adapter = g.profile
 
-    return api_success({'data': adapter.get_basic_info()})
+    # GET: 프로필 조회
+    if request.method == 'GET':
+        return api_success({'data': adapter.get_basic_info()})
 
-
-@profile_bp.route('/api/admin/profile', methods=['PUT'])
-@corporate_admin_only
-def api_admin_profile_update():
-    """법인 관리자 프로필 수정 API"""
+    # PUT/PATCH: 프로필 수정
     user_id = session.get(SessionKeys.USER_ID)
     data = request.get_json()
 
@@ -441,9 +443,9 @@ def api_admin_profile_update():
 
     if success:
         # 업데이트된 프로필 반환
-        adapter = corporate_admin_profile_service.get_adapter(user_id)
+        updated_adapter = corporate_admin_profile_service.get_adapter(user_id)
         return api_success({
-            'data': adapter.get_basic_info() if adapter else None,
+            'data': updated_adapter.get_basic_info() if updated_adapter else None,
             'message': '프로필이 수정되었습니다.'
         })
     else:
@@ -471,7 +473,8 @@ def complete_profile():
     계정 발급(create_account_only) 후 pending_info 상태인 직원이
     로그인하면 이 페이지로 리다이렉션되어 정보를 완성합니다.
 
-    SSOT 원칙: 기존 profile/edit.html 템플릿 재활용
+    인라인 편집 시스템 사용 (2026-01-16)
+    레거시 edit.html 삭제 -> detail.html 사용
     """
     adapter = g.profile
 
@@ -484,14 +487,13 @@ def complete_profile():
     # 기존 어댑터 패턴 활용 (DIP 원칙)
     context = adapter.to_template_context(variable_name='employee')
     context['sections'] = adapter.get_available_sections()
-    context['action'] = 'update'
 
-    # 프로필 완성 모드 표시
-    context['page_mode'] = 'profile_completion'
+    # 프로필 완성 모드 표시 (인라인 편집 사용)
+    context['page_mode'] = 'profile'
     context['is_completion_mode'] = True
 
-    # 안내 메시지
-    context['completion_message'] = '프로필 정보를 완성해주세요. 기본정보, 학력, 경력 등을 입력할 수 있습니다.'
+    # 안내 메시지 (flash로 전달)
+    flash('프로필 정보를 완성해주세요. 각 섹션의 수정 버튼을 클릭하여 정보를 입력할 수 있습니다.', 'info')
 
     # 첨부파일 목록 조회
     # owner_type: 법인 직원은 'employee', 개인은 'profile'
@@ -505,4 +507,4 @@ def complete_profile():
         context['attachment_list'] = []
     context['is_readonly'] = False
 
-    return render_template('domains/user/profile/edit.html', **context)
+    return render_template('domains/user/profile/detail.html', **context)

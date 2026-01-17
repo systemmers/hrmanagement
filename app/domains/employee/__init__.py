@@ -16,7 +16,6 @@ _career_repo = None
 _certificate_repo = None
 _family_member_repo = None
 _language_repo = None
-_military_service_repo = None
 _salary_repo = None
 _benefit_repo = None
 _contract_repo = None
@@ -39,7 +38,7 @@ def init_repositories():
     """도메인 Repository 초기화"""
     global _employee_repo
     global _education_repo, _career_repo, _certificate_repo
-    global _family_member_repo, _language_repo, _military_service_repo
+    global _family_member_repo, _language_repo
     global _salary_repo, _benefit_repo, _contract_repo, _salary_history_repo
     global _promotion_repo, _evaluation_repo, _training_repo, _attendance_repo
     global _insurance_repo, _hr_project_repo, _project_participation_repo
@@ -49,7 +48,7 @@ def init_repositories():
     from .repositories import (
         EmployeeRepository,
         EducationRepository, CareerRepository, CertificateRepository,
-        FamilyMemberRepository, LanguageRepository, MilitaryServiceRepository,
+        FamilyMemberRepository, LanguageRepository,
         SalaryRepository, BenefitRepository, ContractRepository, SalaryHistoryRepository,
         PromotionRepository, EvaluationRepository, TrainingRepository, AttendanceRepository,
         InsuranceRepository, HrProjectRepository, ProjectParticipationRepository,
@@ -63,7 +62,6 @@ def init_repositories():
     _certificate_repo = CertificateRepository()
     _family_member_repo = FamilyMemberRepository()
     _language_repo = LanguageRepository()
-    _military_service_repo = MilitaryServiceRepository()
     _salary_repo = SalaryRepository()
     _benefit_repo = BenefitRepository()
     _contract_repo = ContractRepository()
@@ -104,10 +102,6 @@ def get_family_member_repo():
 
 def get_language_repo():
     return _language_repo
-
-
-def get_military_service_repo():
-    return _military_service_repo
 
 
 def get_classification_repo():

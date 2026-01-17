@@ -99,10 +99,10 @@ js/
 │   │   │   └── employee-service.js
 │   │   ├── pages/
 │   │   │   ├── list.js
-│   │   │   ├── form.js
-│   │   │   ├── detail.js
+│   │   │   ├── detail.js         # 직원 상세/인라인 편집
 │   │   │   ├── validators.js
 │   │   │   ├── dynamic-sections.js
+│   │   │   ├── templates.js      # 관계형 데이터 템플릿
 │   │   │   └── ...
 │   │   └── components/
 │   │       ├── business-card.js
@@ -265,7 +265,7 @@ import { EmployeeService } from '../services/employee-service.js';
 // domains/employee/index.js
 export { EmployeeService } from './services/employee-service.js';
 export * from './pages/list.js';
-export * from './pages/form.js';
+export * from './pages/detail.js';
 ```
 
 ### 기타 규칙

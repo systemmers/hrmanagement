@@ -221,7 +221,7 @@ def register_routes(bp):
 
         if not data['profile']:
             flash('프로필을 먼저 작성해주세요.', 'info')
-            return redirect(url_for('personal.profile_edit'))
+            return redirect(url_for('profile.view'))
 
         return render_template('domains/user/dashboard/base_dashboard.html',
                                account_type=AccountType.PERSONAL,
@@ -242,60 +242,13 @@ def register_routes(bp):
     @bp.route('/profile/edit', methods=['GET', 'POST'])
     @personal_login_required
     def profile_edit():
-        """Profile edit
+        """Profile edit - 레거시 라우트
 
-        GET: Redirect to unified profile edit page
-        POST: Save form data (using form_extractors + relation_updaters)
+        인라인 편집으로 대체됨 (2026-01-16)
+        하위 호환성을 위해 profile.view로 리다이렉트
         """
-        user_id = session.get(SessionKeys.USER_ID)
-
-        # GET request: Redirect to unified profile edit page
-        if request.method == 'GET':
-            return redirect(url_for('profile.edit'), code=301)
-
-        # POST request: Save form data
-        user, profile_obj = personal_service.get_user_with_profile(user_id)
-
-        if not user:
-            flash('사용자 정보를 찾을 수 없습니다.', 'error')
-            return redirect(url_for('main.index'))
-
-        # Create profile if not exists
-        if not profile_obj:
-            profile_obj = personal_service.ensure_profile_exists(user_id, user.username)
-
-        # Handle photo upload (using helper)
-        # Phase 1.3: profile_id 파라미터 추가 - Attachment 레코드 생성용
-        photo_path, photo_error = handle_photo_upload(
-            request.files, user_id, profile_obj.id, profile_obj.photo
-        )
-        if photo_error:
-            flash(photo_error, 'warning')
-
-        # ========================================
-        # Save basic profile data (using form_extractors)
-        # ========================================
-        profile_data = extract_profile_data(request.form, profile_obj)
-        profile_data['photo'] = photo_path
-
-        result = personal_service.update_profile(user_id, profile_data)
-
-        if not result:
-            flash(f'프로필 수정 중 오류가 발생했습니다: {result.message}', 'error')
-            return redirect(url_for('profile.edit'))
-
-        # ========================================
-        # Batch save relation data (using relation_updaters)
-        # Transaction safety: processed in single transaction
-        # ========================================
-        try:
-            update_profile_relations(profile_obj.id, request.form)
-        except Exception as e:
-            current_app.logger.error(f"관계형 데이터 저장 실패: {str(e)}")
-            flash('일부 이력 정보 저장에 실패했습니다.', 'warning')
-
-        flash('프로필이 수정되었습니다.', 'success')
-        return redirect(url_for('profile.view'))
+        # GET/POST 모두 프로필 페이지로 리다이렉트 (인라인 편집 사용)
+        return redirect(url_for('profile.view'), code=301)
 
     # ========================================
     # Education API

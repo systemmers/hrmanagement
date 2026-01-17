@@ -39,16 +39,9 @@ PERSONAL_BASIC_FIELDS = [
         max_length=100,
     ),
     create_field(
-        name='chinese_name',
-        label='한자 이름',  # Phase 28: 한자명 → 한자 이름
-        order=30,
-        field_type=FieldType.TEXT,
-        max_length=100,
-    ),
-    create_field(
         name='foreign_name',
         label='외국어 이름',  # Phase 28: 외국어명 → 외국어 이름
-        order=35,
+        order=30,
         field_type=FieldType.TEXT,
         max_length=100,
         help_text='영문 외 추가 외국어 이름',
@@ -88,7 +81,7 @@ PERSONAL_BASIC_FIELDS = [
         help_text='주민등록번호 입력 시 자동 입력됩니다.',
     ),
     create_field(
-        name='lunar_birth',
+        name='is_lunar_birth',  # Phase 0.7: lunar_birth -> is_lunar_birth
         label='음력 여부',
         order=65,
         field_type=FieldType.CHECKBOX,
@@ -125,7 +118,7 @@ personal_basic_section = create_section(
 # =============================================================================
 CONTACT_FIELDS = [
     create_field(
-        name='mobile_phone',
+        name='mobile_phone',  # SSOT: 휴대전화 필드명
         label='휴대전화',
         order=10,
         field_type=FieldType.TEL,
@@ -133,16 +126,9 @@ CONTACT_FIELDS = [
         max_length=50,
     ),
     create_field(
-        name='home_phone',
-        label='자택전화',
-        order=20,
-        field_type=FieldType.TEL,
-        max_length=50,
-    ),
-    create_field(
         name='email',
         label='이메일',
-        order=30,
+        order=20,
         field_type=FieldType.EMAIL,
         required=True,  # Phase 28: 필수화
         max_length=200,
@@ -150,14 +136,14 @@ CONTACT_FIELDS = [
     create_field(
         name='emergency_contact',
         label='비상연락처',
-        order=40,
+        order=30,
         field_type=FieldType.TEL,
         max_length=50,
     ),
     create_field(
         name='emergency_relation',
         label='비상연락처 관계',
-        order=50,
+        order=40,
         field_type=FieldType.TEXT,
         max_length=50,
     ),
@@ -175,19 +161,13 @@ contact_section = create_section(
 # =============================================================================
 # 주민등록상 주소 섹션 (address)
 # Phase 28: 주소 필수화
+# Phase 0.7: postal_code 삭제
 # =============================================================================
 ADDRESS_FIELDS = [
     create_field(
-        name='postal_code',
-        label='우편번호',
-        order=10,
-        field_type=FieldType.TEXT,
-        max_length=20,
-    ),
-    create_field(
         name='address',
         label='주소',
-        order=20,
+        order=10,
         field_type=FieldType.TEXT,
         required=True,  # Phase 28: 필수화
         max_length=500,
@@ -195,7 +175,7 @@ ADDRESS_FIELDS = [
     create_field(
         name='detailed_address',
         label='상세주소',
-        order=30,
+        order=20,
         field_type=FieldType.TEXT,
         max_length=500,
     ),
@@ -213,6 +193,7 @@ address_section = create_section(
 # =============================================================================
 # 실제 거주 주소 섹션 (actual_address)
 # Phase 28: 실제거주주소 필수화
+# Note: actual_postal_code는 모델에 유지 (실제 거주지용)
 # =============================================================================
 ACTUAL_ADDRESS_FIELDS = [
     create_field(
@@ -305,13 +286,6 @@ BANK_INFO_FIELDS = [
         field_type=FieldType.TEXT,
         max_length=50,
     ),
-    create_field(
-        name='account_holder',
-        label='예금주',
-        order=30,
-        field_type=FieldType.TEXT,
-        max_length=50,
-    ),
 ]
 
 bank_info_section = create_section(
@@ -324,63 +298,32 @@ bank_info_section = create_section(
 
 
 # =============================================================================
-# 병역 정보 섹션 (military)
+# 병역 및 비고 섹션 (military_note)
+# Phase 0.7: MilitaryService 모델 → 기본정보 통합 (간소화)
 # =============================================================================
-MILITARY_FIELDS = [
+MILITARY_NOTE_FIELDS = [
     create_field(
         name='military_status',
-        label='병역구분',
+        label='병역여부',
         order=10,
         field_type=FieldType.SELECT,
         options_category='military_status',
+        help_text='군필/미필/면제(신체)/면제(기타)/해당없음',
     ),
     create_field(
-        name='service_type',
-        label='복무 형태',
+        name='note',
+        label='비고',
         order=20,
-        field_type=FieldType.SELECT,
-        options_category='service_type',
-    ),
-    create_field(
-        name='branch',
-        label='군별',
-        order=30,
-        field_type=FieldType.SELECT,
-        options_category='military_branch',
-    ),
-    create_field(
-        name='rank',
-        label='계급',
-        order=40,
-        field_type=FieldType.TEXT,
-        max_length=50,
-    ),
-    create_field(
-        name='service_start',
-        label='복무 시작일',
-        order=50,
-        field_type=FieldType.DATE,
-    ),
-    create_field(
-        name='service_end',
-        label='복무 종료일',
-        order=60,
-        field_type=FieldType.DATE,
-    ),
-    create_field(
-        name='exemption_reason',
-        label='면제 사유',
-        order=70,
-        field_type=FieldType.TEXT,
-        max_length=200,
+        field_type=FieldType.TEXTAREA,
+        max_length=1000,
     ),
 ]
 
-military_section = create_section(
-    id='military',
-    title='병역사항',
+military_note_section = create_section(
+    id='military_note',
+    title='병역 및 비고',
     icon='bi bi-shield',
-    fields=MILITARY_FIELDS,
+    fields=MILITARY_NOTE_FIELDS,
     order=100,
 )
 
@@ -394,4 +337,4 @@ FieldRegistry.register_section(address_section, domain='profile')
 FieldRegistry.register_section(actual_address_section, domain='profile')
 FieldRegistry.register_section(bank_info_section, domain='profile')  # Phase 28
 FieldRegistry.register_section(personal_extended_section, domain='profile')
-FieldRegistry.register_section(military_section, domain='profile')
+FieldRegistry.register_section(military_note_section, domain='profile')  # Phase 0.7: military → military_note

@@ -204,7 +204,7 @@ class PersonalService:
                 'career_count': profile.careers.count() if profile.careers else 0,
                 'certificate_count': profile.certificates.count() if profile.certificates else 0,
                 'language_count': profile.languages.count() if profile.languages else 0,
-                'has_military': profile.military_services.count() > 0 if profile.military_services else False
+                'has_military': bool(profile.military_status)
             }
 
         return {
@@ -309,35 +309,6 @@ class PersonalService:
     def delete_all_languages(self, profile_id: int) -> int:
         """프로필의 모든 어학 삭제"""
         return profile_relation_service.delete_all_languages(profile_id, 'profile')
-
-    # ========================================
-    # 병역 (MilitaryService) CRUD - 1:1 관계
-    # Phase 9: ProfileRelationService 위임
-    # ========================================
-
-    def get_military(self, profile_id: int) -> Optional[Dict]:
-        """병역 정보 조회"""
-        return profile_relation_service.get_military(profile_id, 'profile')
-
-    def get_military_list(self, profile_id: int) -> List[Dict]:
-        """병역 목록 조회 (1:N 지원)"""
-        return profile_relation_service.get_military_list(profile_id, 'profile')
-
-    def save_military(self, profile_id: int, data: Dict) -> Dict:
-        """병역 정보 저장/수정 (1:1)"""
-        return profile_relation_service.update_or_create_military(profile_id, data, 'profile')
-
-    def add_military(self, profile_id: int, data: Dict) -> Dict:
-        """병역 추가"""
-        return profile_relation_service.add_military(profile_id, data, 'profile')
-
-    def delete_military(self, military_id: int, profile_id: int) -> bool:
-        """병역 삭제 (소유권 확인)"""
-        return profile_relation_service.delete_military(military_id, profile_id, 'profile')
-
-    def delete_all_military(self, profile_id: int) -> int:
-        """프로필의 모든 병역 정보 삭제"""
-        return profile_relation_service.delete_all_military(profile_id, 'profile')
 
     # ========================================
     # 회사 인사카드 (Phase 2)
@@ -472,7 +443,7 @@ class PersonalService:
                 'actual_address': employee.actual_address,
                 'actual_detailed_address': employee.actual_detailed_address,
                 'birth_date': employee.birth_date,
-                'lunar_birth': employee.lunar_birth,
+                'is_lunar_birth': employee.is_lunar_birth,
                 'gender': employee.gender,
                 'marital_status': employee.marital_status,
                 'resident_number': employee.resident_number,
@@ -497,7 +468,7 @@ class PersonalService:
                 'company_email': employee.company_email,
                 'hire_date': employee.hire_date,
                 'status': employee.status,
-                'probation_end': employee.probation_end,
+                'probation_end_date': employee.probation_end_date,
                 'resignation_date': employee.resignation_date,
             }
 

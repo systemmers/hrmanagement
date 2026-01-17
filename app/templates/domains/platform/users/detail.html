@@ -78,7 +78,7 @@
                 </div>
                 <div class="info-item">
                     <dt>마지막 로그인</dt>
-                    <dd>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else '-' }}</dd>
+                    <dd>{{ user.last_login_at.strftime('%Y-%m-%d %H:%M') if user.last_login_at else '-' }}</dd>
                 </div>
             </dl>
         </div>

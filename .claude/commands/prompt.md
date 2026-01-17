@@ -136,7 +136,7 @@ prompt_doc = _dev_operation/_prompt.md
 --c7 : context7
 --figma : figma
 --json : json 출력
---xml : xml 출력력
+--xml : xml 출력
 
 
 - loop # : 루프분석, 분석한 것에 대하여 최소 3번이상 검증

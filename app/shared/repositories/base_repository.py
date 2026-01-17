@@ -325,9 +325,9 @@ class BaseProfileOneToOneRepository(BaseRepository[ModelType]):
     Profile과 1:1 관계를 가진 모델용 Repository입니다.
 
     사용법:
-        class ProfileMilitaryRepository(BaseProfileOneToOneRepository[MilitaryService]):
+        class ProfileInsuranceRepository(BaseProfileOneToOneRepository[Insurance]):
             def __init__(self):
-                super().__init__(MilitaryService)
+                super().__init__(Insurance)
     """
 
     def find_by_profile_id(self, profile_id: int) -> Optional[ModelType]:
@@ -394,9 +394,9 @@ class BaseOneToOneRepository(BaseRepository[ModelType]):
     Employee와 1:1 관계를 가진 모델용 Repository입니다.
 
     사용법:
-        class MilitaryRepository(BaseOneToOneRepository[MilitaryService]):
+        class SalaryRepository(BaseOneToOneRepository[Salary]):
             def __init__(self):
-                super().__init__(MilitaryService)
+                super().__init__(Salary)
     """
 
     def find_by_employee_id(self, employee_id: int) -> Optional[ModelType]:

@@ -26,7 +26,6 @@ def _filter_model_fields(model_class, data: Dict) -> Dict:
     allowed_fields = set(model_class.__table__.columns.keys())
     return {k: v for k, v in data.items() if k in allowed_fields}
 
-from app.domains.employee.models import MilitaryService
 from app.shared.utils.transaction import atomic_transaction
 from app.shared.base import relation_updater, get_relation_config, SUPPORTED_RELATION_TYPES
 
@@ -68,11 +67,6 @@ class EmployeeRelationService:
     def language_repo(self):
         from app.extensions import language_repo
         return language_repo
-
-    @property
-    def military_repo(self):
-        from app.extensions import military_repo
-        return military_repo
 
     @property
     def hr_project_repo(self):
@@ -199,11 +193,6 @@ class EmployeeRelationService:
         """어학 목록 조회"""
         models = self.language_repo.find_by_employee_id(employee_id)
         return [m.to_dict() for m in models]
-
-    def get_military_info(self, employee_id: int) -> Optional[Dict]:
-        """병역 정보 조회"""
-        model = self.military_repo.find_by_employee_id(employee_id)
-        return model.to_dict() if model else None
 
     def get_salary_info(self, employee_id: int) -> Optional[Dict]:
         """급여 정보 조회"""
@@ -337,18 +326,6 @@ class EmployeeRelationService:
         return result > 0 if isinstance(result, int) else bool(result)
 
     # ========================================
-    # 병역 정보 관리
-    # ========================================
-
-    def delete_military_info(self, employee_id: int) -> bool:
-        """병역 정보 삭제"""
-        return self.military_repo.delete_by_employee_id(employee_id)
-
-    def create_military_info(self, military_data) -> Any:
-        """병역 정보 생성"""
-        return self.military_repo.create(military_data)
-
-    # ========================================
     # 관계형 데이터 개별 수정 (RelationDataUpdater 사용)
     # ========================================
 
@@ -374,15 +351,6 @@ class EmployeeRelationService:
         """어학 정보 수정"""
         return self._update_relation('language', employee_id, form_data)
 
-    def update_military(self, employee_id: int, form_data: Dict) -> Tuple[bool, Optional[str]]:
-        """병역 정보 수정 (특수 처리: 1:1 관계)"""
-        try:
-            with atomic_transaction():
-                self._update_military_data(employee_id, form_data)
-            return True, None
-        except Exception as e:
-            return False, str(e)
-
     def update_family(self, employee_id: int, form_data: Dict) -> Tuple[bool, Optional[str]]:
         """가족 정보 수정"""
         return self._update_relation('family', employee_id, form_data)
@@ -402,8 +370,7 @@ class EmployeeRelationService:
     def update_all_related_data(self, employee_id: int, form_data: Dict):
         """모든 관계형 데이터 일괄 업데이트
 
-        RelationDataUpdater를 사용하여 7개 관계 타입을 처리합니다.
-        병역 정보는 1:1 관계이므로 별도 처리합니다.
+        RelationDataUpdater를 사용하여 관계 타입을 처리합니다.
         """
         repos = self._get_repositories()
 
@@ -411,27 +378,6 @@ class EmployeeRelationService:
         for relation_type in SUPPORTED_RELATION_TYPES:
             config = get_relation_config(relation_type, repos)
             relation_updater.update(employee_id, form_data, config)
-
-        # 1:1 관계 (병역) 별도 처리
-        self._update_military_data(employee_id, form_data)
-
-    def _update_military_data(self, employee_id: int, form_data: Dict):
-        """병역 정보 업데이트 (1:1 관계, 특수 처리)"""
-        self.military_repo.delete_by_employee_id(employee_id)
-
-        military_status = form_data.get('military_status')
-        if military_status:
-            military = MilitaryService(
-                employee_id=employee_id,
-                military_status=military_status,
-                branch=form_data.get('military_branch') or None,
-                enlistment_date=form_data.get('military_start_date') or None,
-                discharge_date=form_data.get('military_end_date') or None,
-                rank=form_data.get('military_rank') or None,
-                discharge_reason=form_data.get('military_discharge_reason') or None,
-                specialty=form_data.get('military_specialty') or None
-            )
-            self.military_repo.create(military)
 
     def save_insurance_data(self, employee_id: int, data: Dict, commit: bool = True) -> Dict:
         """4대보험 데이터 저장 (Phase 28: upsert)
@@ -480,7 +426,6 @@ class EmployeeRelationService:
             'certificate_list': self.get_certificate_list(employee_id),
             'family_list': self.get_family_list(employee_id),
             'language_list': self.get_language_list(employee_id),
-            'military': self.get_military_info(employee_id),
 
             # 핵심 기능 데이터
             'salary': self.get_salary_info(employee_id),

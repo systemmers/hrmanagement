@@ -30,13 +30,13 @@ from app.domains.attachment.constants import AttachmentCategory
 # 필터/정렬 파라미터 추출 헬퍼
 # ========================================
 
-# 정렬 필드 매핑 (camelCase -> snake_case)
+# 정렬 필드 매핑 (Phase 0.7: snake_case only)
 SORT_FIELD_MAP = {
     'id': 'id',
     'name': 'name',
     'department': 'department',
     'position': 'position',
-    'hireDate': 'hire_date',
+    'hire_date': 'hire_date',
     'status': 'status'
 }
 
@@ -177,7 +177,7 @@ from .relation_updaters import (
     update_career_data,
     update_certificate_data,
     update_language_data,
-    update_military_data,
+    # Phase 0.7: update_military_data 삭제 (MilitaryService 통합)
     update_hr_project_data,
     update_project_participation_data,
     update_award_data,
@@ -219,7 +219,7 @@ __all__ = [
     'update_career_data',
     'update_certificate_data',
     'update_language_data',
-    'update_military_data',
+    # Phase 0.7: update_military_data 삭제 (MilitaryService 통합)
     'update_hr_project_data',
     'update_project_participation_data',
     'update_award_data',

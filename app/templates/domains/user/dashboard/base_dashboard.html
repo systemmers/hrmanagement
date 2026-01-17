@@ -31,22 +31,14 @@
                 </a>
                 {% endif %}
             {% elif account_type == 'employee_sub' %}
-                <a href="{{ url_for('profile.view') }}" class="btn btn--secondary">
+                <a href="{{ url_for('profile.view') }}" class="btn btn--primary">
                     <i class="fas fa-user"></i>
                     <span>프로필 보기</span>
-                </a>
-                <a href="{{ url_for('profile.edit') }}" class="btn btn--primary">
-                    <i class="fas fa-edit"></i>
-                    <span>정보 수정</span>
                 </a>
             {% else %}
-                <a href="{{ url_for('personal.profile') }}" class="btn btn--secondary">
+                <a href="{{ url_for('profile.view') }}" class="btn btn--primary">
                     <i class="fas fa-user"></i>
                     <span>프로필 보기</span>
-                </a>
-                <a href="{{ url_for('personal.profile_edit') }}" class="btn btn--primary">
-                    <i class="fas fa-edit"></i>
-                    <span>프로필 수정</span>
                 </a>
             {% endif %}
         </div>

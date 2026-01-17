@@ -41,7 +41,7 @@ from app.domains.employee.models import (
     HrProject,
     Insurance,
     Language,
-    MilitaryService,
+    # Phase 0.7: MilitaryService 삭제됨, Employee.military_status로 통합
     ProjectParticipation,
     Promotion,
     Salary,

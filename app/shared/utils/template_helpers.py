@@ -150,9 +150,7 @@ def register_template_utils(app):
             """병역 상태 레이블 변환"""
             return FieldOptions.get_label_with_legacy(FieldOptions.MILITARY_STATUS, status)
 
-        def get_branch_label(branch):
-            """군 구분 레이블 변환"""
-            return FieldOptions.get_label_with_legacy(FieldOptions.MILITARY_BRANCH, branch)
+        # Phase 0.7: get_branch_label 삭제 (MilitaryService 통합으로 MILITARY_BRANCH 불필요)
 
         return {
             # 포맷팅 함수
@@ -177,5 +175,5 @@ def register_template_utils(app):
             'get_language_label': get_language_label,
             'get_level_label': get_level_label,
             'get_military_status_label': get_military_status_label,
-            'get_branch_label': get_branch_label,
+            # Phase 0.7: get_branch_label 삭제
         }

@@ -35,24 +35,32 @@ document.addEventListener('DOMContentLoaded', () => {
  * 지원 계정 타입:
  * - corporate (employee_sub): Employee 모델, /api/employees/{id}/ API 사용
  * - personal: PersonalProfile 모델, /api/profiles/{id}/ API 사용
- * - corporate_admin: CorporateAdminProfile 모델, 인라인 편집 미지원 (기존 폼 사용)
+ * - corporate_admin: CorporateAdminProfile 모델, /api/admin/profile API 사용
  */
 function initInlineEditSystem() {
     // 계정 타입 확인
     const layoutEl = document.querySelector('[data-account-type]');
     const accountType = layoutEl?.dataset.accountType;
 
-    // 법인관리자 계정은 인라인 편집 미지원 (기존 폼 사용)
-    if (accountType === 'corporate_admin') {
-        console.info(`InlineEditSystem: ${accountType} 계정은 인라인 편집을 지원하지 않습니다. 기존 수정 페이지를 사용하세요.`);
-        return;
-    }
-
     let entityId = null;
     let apiBaseUrl = '/api/employees';
 
     // 계정 타입별 ID 및 API 경로 설정
-    if (accountType === 'personal') {
+    if (accountType === 'corporate_admin') {
+        // 법인 관리자: admin_profile_id 사용, /api/admin/profile API (섹션 API 없음)
+        const adminProfileIdEl = document.querySelector('[data-admin-profile-id]');
+        entityId = adminProfileIdEl?.dataset.adminProfileId;
+
+        if (!entityId) {
+            console.warn('InlineEditSystem: admin profile ID를 찾을 수 없습니다.');
+            return;
+        }
+
+        // corporate_admin은 단일 프로필 API 사용 (섹션별 API 없음)
+        apiBaseUrl = '/api/admin/profile';
+        console.log('InlineEditSystem: corporate_admin 계정 - admin profile API 사용');
+
+    } else if (accountType === 'personal') {
         // 개인 계정: profile_id 사용, /api/profiles API
         const profileIdEl = document.querySelector('[data-profile-id]');
         entityId = profileIdEl?.dataset.profileId;

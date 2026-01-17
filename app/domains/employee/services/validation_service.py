@@ -101,14 +101,8 @@ class SectionValidationService:
             'industrial_accident_insurance': {'type': 'boolean'},
             'retirement_pension_type': {'type': 'option', 'options': 'RETIREMENT_PENSION_TYPE'},
         },
-        'military': {
-            'military_status': {'type': 'option', 'options': 'MILITARY_STATUS'},
-            'military_branch': {'type': 'option', 'options': 'MILITARY_BRANCH'},
-            'military_rank': {'type': 'option', 'options': 'MILITARY_RANK'},
-            'military_start_date': {'type': 'date'},
-            'military_end_date': {'type': 'date'},
-            'military_exemption_reason': {'type': 'text', 'max_length': 200},
-        },
+        # Phase 0.7: 병역정보 기본정보로 통합, 단일 필드만 사용
+        # military 섹션 삭제, military_status는 basic 섹션에서 처리
         'account': {
             'username': {'type': 'text', 'max_length': 50},
             'email': {'type': 'email'},
@@ -119,6 +113,9 @@ class SectionValidationService:
             'email': {'type': 'email'},
             'address': {'type': 'text', 'max_length': 200},
             'address_detail': {'type': 'text', 'max_length': 100},
+            # Phase 0.7: 병역/비고 통합
+            'military_status': {'type': 'option', 'options': 'MILITARY_STATUS'},
+            'note': {'type': 'text', 'max_length': 2000},
         },
         # 신규 직원 등록용 (Phase 2)
         'registration': {

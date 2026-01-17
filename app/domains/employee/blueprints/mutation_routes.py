@@ -24,7 +24,8 @@ from app.domains.contract.services.contract_workflow_service import contract_wor
 from .helpers import (
     verify_employee_access, extract_employee_from_form, extract_basic_fields_from_form,
     update_family_data, update_education_data, update_career_data,
-    update_certificate_data, update_language_data, update_military_data,
+    update_certificate_data, update_language_data,
+    # Phase 0.7: update_military_data 삭제 (MilitaryService 통합)
     update_hr_project_data, update_project_participation_data, update_award_data,
     get_business_card_folder, generate_unique_filename
 )
@@ -55,7 +56,7 @@ CONTRACT_PROTECTED_FIELDS = [
     'organization_id', 'department', 'team', 'position', 'job_grade',
     'job_title', 'job_role', 'work_location', 'internal_phone', 'company_email',
     # 계약정보 (status 제외)
-    'hire_date', 'employment_type', 'contract_period', 'probation_end',
+    'hire_date', 'employment_type', 'contract_period', 'probation_end_date',
     # 급여정보
     'base_salary', 'position_allowance', 'meal_allowance', 'transportation_allowance',
     'bonus_rate', 'salary_type', 'bank_name', 'account_number',
@@ -507,7 +508,7 @@ def register_mutation_routes(bp: Blueprint):
             update_career_data(employee_id, request.form)
             update_certificate_data(employee_id, request.form)
             update_language_data(employee_id, request.form)
-            update_military_data(employee_id, request.form)
+            # Phase 0.7: update_military_data 삭제 (병역정보는 기본정보에서 관리)
             update_hr_project_data(employee_id, request.form)
             update_project_participation_data(employee_id, request.form)
             update_award_data(employee_id, request.form)

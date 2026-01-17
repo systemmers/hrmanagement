@@ -2,7 +2,7 @@
 직원 섹션 인라인 편집 API
 
 Phase 0.4: 섹션별 PATCH API
-- 정적 섹션 (personal, organization, contract, salary, benefit, military, attendance, account)
+- 정적 섹션 (personal, organization, contract, salary, benefit, attendance, account)
 - 동적 섹션 (families, educations, careers, certificates, languages, awards 등)
 
 API 엔드포인트:
@@ -49,10 +49,6 @@ STATIC_SECTIONS = {
     'benefit': {
         'name': '연차 및 복리후생',
         'update_method': 'update_benefit_info'
-    },
-    'military': {
-        'name': '병역정보',
-        'update_method': 'update_military_info'
     },
     'attendance': {
         'name': '근태현황',
@@ -342,7 +338,7 @@ def register_section_api_routes(bp: Blueprint):
     # 동적 섹션 (릴레이션) API
     # ========================================
 
-    @bp.route('/api/employees/<int:employee_id>/<relation>', methods=['GET'])
+    @bp.route('/api/employees/<int:employee_id>/sections/<relation>', methods=['GET'])
     @api_login_required
     def get_relation_list(employee_id: int, relation: str):
         """동적 섹션 목록 조회"""
@@ -366,7 +362,7 @@ def register_section_api_routes(bp: Blueprint):
         except Exception as e:
             return api_server_error(str(e))
 
-    @bp.route('/api/employees/<int:employee_id>/<relation>', methods=['POST'])
+    @bp.route('/api/employees/<int:employee_id>/sections/<relation>', methods=['POST'])
     @api_login_required
     def create_relation_item(employee_id: int, relation: str):
         """동적 섹션 항목 추가"""
@@ -406,7 +402,7 @@ def register_section_api_routes(bp: Blueprint):
         except Exception as e:
             return api_server_error(str(e))
 
-    @bp.route('/api/employees/<int:employee_id>/<relation>/<int:item_id>', methods=['GET'])
+    @bp.route('/api/employees/<int:employee_id>/sections/<relation>/<int:item_id>', methods=['GET'])
     @api_login_required
     def get_relation_item(employee_id: int, relation: str, item_id: int):
         """동적 섹션 항목 단건 조회"""
@@ -433,7 +429,7 @@ def register_section_api_routes(bp: Blueprint):
         except Exception as e:
             return api_server_error(str(e))
 
-    @bp.route('/api/employees/<int:employee_id>/<relation>/<int:item_id>', methods=['PATCH'])
+    @bp.route('/api/employees/<int:employee_id>/sections/<relation>/<int:item_id>', methods=['PATCH'])
     @api_login_required
     def update_relation_item(employee_id: int, relation: str, item_id: int):
         """동적 섹션 항목 수정"""
@@ -472,7 +468,7 @@ def register_section_api_routes(bp: Blueprint):
         except Exception as e:
             return api_server_error(str(e))
 
-    @bp.route('/api/employees/<int:employee_id>/<relation>/<int:item_id>', methods=['DELETE'])
+    @bp.route('/api/employees/<int:employee_id>/sections/<relation>/<int:item_id>', methods=['DELETE'])
     @api_login_required
     def delete_relation_item(employee_id: int, relation: str, item_id: int):
         """동적 섹션 항목 삭제"""
@@ -511,7 +507,7 @@ def register_section_api_routes(bp: Blueprint):
     # 순서 변경 API (드래그 앤 드롭)
     # ========================================
 
-    @bp.route('/api/employees/<int:employee_id>/<relation>/order', methods=['PATCH'])
+    @bp.route('/api/employees/<int:employee_id>/sections/<relation>/order', methods=['PATCH'])
     @api_login_required
     def update_relation_order(employee_id: int, relation: str):
         """동적 섹션 항목 순서 변경"""

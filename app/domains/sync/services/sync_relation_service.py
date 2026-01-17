@@ -32,7 +32,6 @@ class SyncRelationService:
         self._career_repo = None
         self._certificate_repo = None
         self._language_repo = None
-        self._military_repo = None
         self._family_repo = None
         self._attachment_repo = None
 
@@ -79,14 +78,6 @@ class SyncRelationService:
             from app.domains.employee.repositories import LanguageRepository
             self._language_repo = LanguageRepository()
         return self._language_repo
-
-    @property
-    def military_repo(self):
-        """지연 초기화된 MilitaryService Repository"""
-        if self._military_repo is None:
-            from app.domains.employee.repositories import MilitaryServiceRepository
-            self._military_repo = MilitaryServiceRepository()
-        return self._military_repo
 
     @property
     def family_repo(self):
@@ -162,14 +153,6 @@ class SyncRelationService:
             result = self._sync_languages(contract_id, profile, employee, sync_type)
             if result['synced']:
                 synced_relations.append('languages')
-                changes.extend(result.get('changes', []))
-                log_ids.extend(result.get('log_ids', []))
-
-        # 병역 동기화
-        if syncable.get('military'):
-            result = self._sync_military(contract_id, profile, employee, sync_type)
-            if result['synced']:
-                synced_relations.append('military')
                 changes.extend(result.get('changes', []))
                 log_ids.extend(result.get('log_ids', []))
 
@@ -406,59 +389,6 @@ class SyncRelationService:
         return {
             'synced': True,
             'changes': [{'entity': 'language', 'count': len(personal_langs)}],
-            'log_ids': [log.id]
-        }
-
-    def _sync_military(
-        self,
-        contract_id: int,
-        profile: Profile,
-        employee: Employee,
-        sync_type: str
-    ) -> Dict[str, Any]:
-        """병역 정보 동기화
-
-        Phase 30: Repository 패턴 적용
-        """
-        from app.domains.employee.models import MilitaryService
-
-        # Profile.military_services는 dynamic 관계
-        personal_military = profile.military_services.first()
-        if not personal_military:
-            return {'synced': False}
-
-        # Phase 30: Repository 사용 - 기존 병역 정보 삭제
-        self.military_repo.delete_by_employee_id(employee.id, commit=False)
-
-        military = MilitaryService(
-            employee_id=employee.id,
-            military_status=getattr(personal_military, 'military_status', None),
-            service_type=getattr(personal_military, 'service_type', None),
-            branch=getattr(personal_military, 'branch', None),
-            rank=getattr(personal_military, 'rank', None),
-            enlistment_date=getattr(personal_military, 'enlistment_date', None),
-            discharge_date=getattr(personal_military, 'discharge_date', None),
-            discharge_reason=getattr(personal_military, 'discharge_reason', None),
-            exemption_reason=getattr(personal_military, 'exemption_reason', None),
-            note=getattr(personal_military, 'note', None),
-        )
-        self.military_repo.create_model(military, commit=False)
-
-        log = self.sync_log_repo.create_log(
-            contract_id=contract_id,
-            sync_type=sync_type,
-            entity_type='military_service',
-            field_name=None,
-            old_value=None,
-            new_value='synced',
-            direction='personal_to_employee',
-            user_id=self._current_user_id,
-            commit=False
-        )
-
-        return {
-            'synced': True,
-            'changes': [{'entity': 'military_service', 'synced': True}],
             'log_ids': [log.id]
         }
 

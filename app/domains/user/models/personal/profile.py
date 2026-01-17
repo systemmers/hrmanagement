@@ -21,7 +21,6 @@ class PersonalProfile(db.Model):
     - Profile.careers -> Career 모델
     - Profile.certificates -> Certificate 모델
     - Profile.languages -> Language 모델
-    - Profile.military_services -> MilitaryService 모델
     - Profile.family_members -> FamilyMember 모델
     - Profile.awards -> Award 모델
     - Profile.project_participations -> ProjectParticipation 모델
@@ -37,21 +36,19 @@ class PersonalProfile(db.Model):
     # 기본 개인정보
     name = db.Column(db.String(100), nullable=False)
     english_name = db.Column(db.String(100), nullable=True)
-    chinese_name = db.Column(db.String(100), nullable=True)
+    foreign_name = db.Column(db.String(100), nullable=True)  # Phase 0.8: 외국어 이름
     photo = db.Column(db.String(500), nullable=True)
 
     # 생년월일 정보
     birth_date = db.Column(db.String(20), nullable=True)
-    lunar_birth = db.Column(db.Boolean, default=False)
+    is_lunar_birth = db.Column(db.Boolean, default=False)  # Phase 0.7: lunar_birth -> is_lunar_birth
     gender = db.Column(db.String(10), nullable=True)
 
     # 연락처 정보
     mobile_phone = db.Column(db.String(50), nullable=True)
-    home_phone = db.Column(db.String(50), nullable=True)
     email = db.Column(db.String(200), nullable=True)
 
     # 주소 정보
-    postal_code = db.Column(db.String(20), nullable=True)
     address = db.Column(db.String(500), nullable=True)
     detailed_address = db.Column(db.String(500), nullable=True)
 
@@ -73,6 +70,10 @@ class PersonalProfile(db.Model):
     # 비상연락처
     emergency_contact = db.Column(db.String(50), nullable=True)
     emergency_relation = db.Column(db.String(50), nullable=True)
+
+    # 병역 및 비고 (Phase 0.7: MilitaryService 모델 → 기본정보 통합)
+    military_status = db.Column(db.String(50), nullable=True)  # 병역여부: 군필/미필/면제/해당없음
+    note = db.Column(db.Text, nullable=True)  # 비고
 
     # 메타 정보
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -133,16 +134,14 @@ class PersonalProfile(db.Model):
             'user_id': self.user_id,
             'name': self.name,
             'english_name': self.english_name,
-            'chinese_name': self.chinese_name,
+            'foreign_name': self.foreign_name,  # Phase 0.8
             'photo': self.photo,
             'birth_date': self.birth_date,
-            'lunar_birth': self.lunar_birth,
+            'is_lunar_birth': self.is_lunar_birth,
             'gender': self.gender,
             'age': self.age,
             'mobile_phone': self.mobile_phone,
-            'home_phone': self.home_phone,
             'email': self.email,
-            'postal_code': self.postal_code,
             'address': self.address,
             'detailed_address': self.detailed_address,
             'full_address': self.full_address,
@@ -161,6 +160,9 @@ class PersonalProfile(db.Model):
             # 비상연락처
             'emergency_contact': self.emergency_contact,
             'emergency_relation': self.emergency_relation,
+            # 병역 및 비고
+            'military_status': self.military_status,
+            'note': self.note,
             'is_public': self.is_public,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,

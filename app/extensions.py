@@ -23,7 +23,6 @@ career_repo = None
 certificate_repo = None
 family_repo = None
 language_repo = None
-military_repo = None
 salary_repo = None
 benefit_repo = None
 contract_repo = None
@@ -69,7 +68,7 @@ def init_extensions(app):
     """
     global employee_repo, classification_repo, organization_repo
     global education_repo, career_repo, certificate_repo
-    global family_repo, language_repo, military_repo
+    global family_repo, language_repo
     global salary_repo, benefit_repo, contract_repo, salary_history_repo
     global promotion_repo, evaluation_repo, training_repo, attendance_repo
     global insurance_repo, hr_project_repo, project_participation_repo, award_repo, asset_repo
@@ -98,7 +97,6 @@ def init_extensions(app):
     certificate_repo = employee_domain.get_certificate_repo()
     family_repo = employee_domain.get_family_member_repo()
     language_repo = employee_domain.get_language_repo()
-    military_repo = employee_domain.get_military_service_repo()
     salary_repo = employee_domain.get_salary_repo()
     benefit_repo = employee_domain.get_benefit_repo()
     contract_repo = employee_domain.get_contract_repo()

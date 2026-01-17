@@ -31,7 +31,7 @@ def create_app(config_name=None):
     # SQLAlchemy 모델 import (테이블 생성 전 필수)
     from .domains.employee.models import (
         Employee, Education, Career, Certificate, FamilyMember,
-        Language, MilitaryService, Salary, Benefit, Contract,
+        Language, Salary, Benefit, Contract,
         SalaryHistory, Promotion, Evaluation, Training, Attendance,
         Insurance, HrProject, ProjectParticipation, Award, Asset, SalaryPayment,
     )

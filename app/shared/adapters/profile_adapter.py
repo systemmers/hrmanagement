@@ -166,7 +166,9 @@ class ProfileAdapter(ABC):
             정렬된 연락처 정보 OrderedDict
         """
         basic = self.get_basic_info()
-        contact_keys = ['mobile_phone', 'home_phone', 'email', 'emergency_contact', 'emergency_relation']
+        # mobile_phone이 SSOT (휴대전화)
+        # Phase 0.7: home_phone 삭제됨
+        contact_keys = ['mobile_phone', 'email', 'emergency_contact', 'emergency_relation']
         contact_data = {k: basic.get(k) for k in contact_keys if k in basic}
         return self._apply_field_order(contact_data, 'contact')
 
@@ -296,16 +298,18 @@ class EmployeeProfileAdapter(ProfileAdapter):
             'id': self.employee.id,
             'name': self.employee.name,
             'english_name': self.employee.english_name,
-            'chinese_name': self.employee.chinese_name,
+            'foreign_name': self.employee.foreign_name,  # 외국어 이름
             'birth_date': self.employee.birth_date,
-            'lunar_birth': self.employee.lunar_birth,
+            'age': self.employee.age,  # 나이 (자동계산)
+            'is_lunar_birth': self.employee.is_lunar_birth,
             'gender': self.employee.gender,
-            'mobile_phone': self.employee.mobile_phone,
-            'home_phone': self.employee.home_phone,
+            'resident_number': self.employee.resident_number,  # 주민등록번호
+            # 휴대전화: mobile_phone이 SSOT, phone은 fallback
+            'phone': self.employee.mobile_phone or self.employee.phone,
+            'mobile_phone': self.employee.mobile_phone or self.employee.phone,
             'email': self.employee.email,
             'address': self.employee.address,
             'detailed_address': self.employee.detailed_address,
-            'postal_code': self.employee.postal_code,
             'photo': self.employee.photo,
             'employee_number': self.employee.employee_number,
             'nationality': self.employee.nationality,
@@ -321,6 +325,12 @@ class EmployeeProfileAdapter(ProfileAdapter):
             # 비상연락처
             'emergency_contact': self.employee.emergency_contact,
             'emergency_relation': self.employee.emergency_relation,
+            # 은행 정보
+            'bank_name': self.employee.bank_name,
+            'account_number': self.employee.account_number,
+            # Phase 0.7: 병역정보 통합, 비고 추가
+            'military_status': self.employee.military_status,
+            'note': self.employee.note,
         }
 
     def get_organization_info(self) -> Optional[Dict[str, Any]]:
@@ -380,9 +390,12 @@ class EmployeeProfileAdapter(ProfileAdapter):
         return [lang.to_dict() for lang in self.employee.languages.all()]
 
     def get_military_info(self) -> Optional[Dict[str, Any]]:
-        """병역 정보 반환"""
-        if self.employee.military_service:
-            return self.employee.military_service.to_dict()
+        """병역 정보 반환
+
+        Phase 0.7: MilitaryService 모델 삭제, Employee.military_status로 통합
+        """
+        if self.employee.military_status:
+            return {'military_status': self.employee.military_status}
         return None
 
     def get_family_list(self) -> List[Dict[str, Any]]:
@@ -476,23 +489,25 @@ class PersonalProfileAdapter(ProfileAdapter):
         self._is_unified = profile.__class__.__name__ == 'Profile'
 
     def get_basic_info(self) -> Dict[str, Any]:
-        """기본 개인정보 반환 - 법인과 동일한 필드 구조"""
+        """기본 개인정보 반환 - 법인과 동일한 필드 구조
+
+        Phase 0.8: age, foreign_name 필드 추가 (FieldRegistry 일관성)
+        """
         return {
             'id': self.profile.id,
             'name': self.profile.name,
             'english_name': self.profile.english_name,
-            'chinese_name': self.profile.chinese_name,
+            'foreign_name': getattr(self.profile, 'foreign_name', None),  # Phase 0.8
             'resident_number': self.profile.resident_number,
             'birth_date': self.profile.birth_date,
-            'lunar_birth': self.profile.lunar_birth,
+            'is_lunar_birth': self.profile.is_lunar_birth,
+            'age': self.profile.age,  # Phase 0.8: 나이 (자동계산)
             'gender': self.profile.gender,
             'mobile_phone': self.profile.mobile_phone,
             'phone': self.profile.mobile_phone,  # 템플릿 호환 필드
-            'home_phone': self.profile.home_phone,
             'email': self.profile.email,
             'address': self.profile.address,
             'detailed_address': self.profile.detailed_address,
-            'postal_code': self.profile.postal_code,
             'photo': self.profile.photo,
             'employee_number': None,  # 개인은 사번 없음
             'nationality': self.profile.nationality,
@@ -509,6 +524,9 @@ class PersonalProfileAdapter(ProfileAdapter):
             'emergency_contact': self.profile.emergency_contact,
             'emergency_relation': self.profile.emergency_relation,
             'is_public': self.profile.is_public,
+            # Phase 0.7: 병역정보 통합, 비고 추가
+            'military_status': self.profile.military_status,
+            'note': self.profile.note,
         }
 
     def get_organization_info(self) -> Optional[Dict[str, Any]]:
@@ -571,13 +589,10 @@ class PersonalProfileAdapter(ProfileAdapter):
     def get_military_info(self) -> Optional[Dict[str, Any]]:
         """병역 정보 반환
 
-        Phase 7: Profile 모델은 military_services, PersonalProfile은 military_service
+        Phase 0.7: MilitaryService 모델 삭제, Profile.military_status로 통합
         """
-        if self._is_unified and hasattr(self.profile, 'military_services'):
-            military = self.profile.military_services.first()
-            return military.to_dict() if military else None
-        elif hasattr(self.profile, 'military_service') and self.profile.military_service:
-            return self.profile.military_service.to_dict()
+        if self.profile.military_status:
+            return {'military_status': self.profile.military_status}
         return None
 
     def is_corporate(self) -> bool:
@@ -633,16 +648,13 @@ class CorporateAdminProfileAdapter(ProfileAdapter):
             'id': self.admin_profile.id,
             'name': self.admin_profile.name,
             'english_name': self.admin_profile.english_name,
-            'chinese_name': None,
             'birth_date': None,
-            'lunar_birth': None,
+            'is_lunar_birth': None,
             'gender': None,
             'mobile_phone': self.admin_profile.mobile_phone,
-            'home_phone': None,
             'email': self.admin_profile.email,
             'address': None,
             'detailed_address': None,
-            'postal_code': None,
             'photo': self.admin_profile.photo,
             'employee_number': None,
             'nationality': None,
@@ -654,6 +666,9 @@ class CorporateAdminProfileAdapter(ProfileAdapter):
             'department': self.admin_profile.department,
             'office_phone': self.admin_profile.office_phone,
             'bio': self.admin_profile.bio,
+            # Phase 0.7: 병역정보 통합
+            'military_status': None,
+            'note': None,
         }
 
     def get_organization_info(self) -> Optional[Dict[str, Any]]:

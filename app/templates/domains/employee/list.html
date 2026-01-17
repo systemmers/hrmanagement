@@ -57,8 +57,8 @@
         <option value="department-desc" {% if request.args.get('sort') == 'department' and request.args.get('order') == 'desc' %}selected{% endif %}>부서 (내림차순)</option>
         <option value="position" {% if request.args.get('sort') == 'position' and request.args.get('order') != 'desc' %}selected{% endif %}>직급 (오름차순)</option>
         <option value="position-desc" {% if request.args.get('sort') == 'position' and request.args.get('order') == 'desc' %}selected{% endif %}>직급 (내림차순)</option>
-        <option value="hireDate" {% if request.args.get('sort') == 'hireDate' and request.args.get('order') != 'desc' %}selected{% endif %}>입사일 (오래된순)</option>
-        <option value="hireDate-desc" {% if request.args.get('sort') == 'hireDate' and request.args.get('order') == 'desc' %}selected{% endif %}>입사일 (최신순)</option>
+        <option value="hire_date" {% if request.args.get('sort') == 'hire_date' and request.args.get('order') != 'desc' %}selected{% endif %}>입사일 (오래된순)</option>
+        <option value="hire_date-desc" {% if request.args.get('sort') == 'hire_date' and request.args.get('order') == 'desc' %}selected{% endif %}>입사일 (최신순)</option>
     </select>
 {% endcall %}
 
@@ -73,7 +73,7 @@
                 <th data-sort="name">이름</th>
                 <th data-sort="department">부서</th>
                 <th data-sort="position">직급</th>
-                <th data-sort="hireDate">입사일</th>
+                <th data-sort="hire_date">입사일</th>
                 <th>전화번호</th>
                 <th>이메일</th>
                 <th data-sort="status">상태</th>

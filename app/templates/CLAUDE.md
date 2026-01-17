@@ -16,8 +16,7 @@ templates/
 │   ├── employee/               # 직원 도메인
 │   │   ├── employees/          # 직원 관리 페이지
 │   │   └── partials/           # 직원 전용 부분 템플릿
-│   │       ├── detail/         # 상세 페이지용
-│   │       └── form/           # 폼 페이지용
+│   │       └── detail/         # 상세 페이지용 (인라인 편집)
 │   ├── platform/               # 플랫폼 도메인
 │   │   ├── admin/              # 관리자 페이지
 │   │   └── ai/                 # AI 테스트
@@ -105,30 +104,15 @@ templates/
 
 ```
 domains/employee/partials/
-├── detail/                     # 상세 페이지용
-│   ├── _basic_info.html
-│   ├── _contract_info.html
-│   ├── _employee_header.html
-│   ├── _hr_records.html
-│   └── _personal_info.html
-└── form/                       # 폼 페이지용
-    ├── _address_info.html
-    ├── _award_info.html
-    ├── _career_info.html
-    ├── _certificate_info.html
-    ├── _contract_info.html
-    ├── _disability_info.html
-    ├── _education_info.html
-    ├── _family_info.html
-    ├── _language_info.html
-    ├── _military_info.html
-    ├── _organization_info.html
-    ├── _personal_info.html
-    ├── _photo_upload.html
-    ├── _position_history_info.html
-    ├── _training_info.html
-    └── _veteran_info.html
+└── detail/                     # 상세 페이지용 (인라인 편집)
+    ├── _basic_info.html        # 기본정보, 소속정보, 계약정보 등
+    ├── _history_info.html      # 학력, 경력, 자격증, 언어능력 등
+    ├── _hr_records.html        # 인사기록 섹션
+    ├── _account_info.html      # 계정정보 섹션
+    └── _create_account_section.html  # 신규 등록용
 ```
+
+> **Note**: 레거시 폼 수정 페이지 (`partials/form/`)는 인라인 편집으로 대체되어 삭제됨 (2026-01-16)
 
 ## 규칙
 
@@ -152,7 +136,7 @@ filename.html     # 독립 페이지
 {% block title %}페이지 제목{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/form.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/domains/employee/detail.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -160,7 +144,7 @@ filename.html     # 독립 페이지
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/domains/employee/pages/form.js') }}"></script>
+<script src="{{ url_for('static', filename='js/domains/employee/pages/detail.js') }}"></script>
 {% endblock %}
 ```
 
@@ -181,10 +165,11 @@ filename.html     # 독립 페이지
 <!-- 공유 부분 템플릿 -->
 {% include 'shared/partials/_profile_summary.html' %}
 {% include 'shared/layouts/_sidebar_unified.html' %}
+{% include 'shared/partials/_profile_header.html' %}
 
 <!-- 도메인 부분 템플릿 -->
 {% include 'domains/employee/partials/detail/_basic_info.html' %}
-{% include 'domains/employee/partials/form/_education_info.html' %}
+{% include 'domains/employee/partials/detail/_history_info.html' %}
 ```
 
 ## 템플릿 상속 계층
@@ -205,10 +190,9 @@ shared/base.html (또는 shared/base_public.html, shared/base_error.html)
 <option value="{{ option.value }}">{{ option.label }}</option>
 {% endfor %}
 
-<!-- FieldRegistry 사용 -->
-{% for field in field_registry.get_ordered_names('personal_basic') %}
-{% include 'domains/employee/partials/form/_field_' + field + '.html' %}
-{% endfor %}
+<!-- FieldRegistry 사용 (인라인 편집) -->
+{% set ordered_fields = field_registry.get_ordered_names('personal_basic') %}
+<!-- 필드 순서 기반 렌더링 -->
 ```
 
 ## 필터 컴포넌트 패턴
@@ -255,3 +239,10 @@ shared/base.html (또는 shared/base_public.html, shared/base_error.html)
 - 적용: `profile/detail.html`, `mypage/company_info.html`, `personal/company_card_detail.html`
 - Deprecated: `domains/employee/partials/detail/_employee_header.html`
 - Deprecated: `css/domains/employee/header.css`
+
+**인라인 편집 마이그레이션 (2026-01-16)**
+- 삭제: `domains/user/profile/edit.html` (레거시 폼 수정 페이지)
+- 삭제: `domains/employee/partials/form/` 디렉토리 전체 (16개 파일)
+- 삭제: `js/domains/employee/pages/form.js` (레거시 폼 스크립트)
+- corporate_admin 계정에 인라인 편집 적용
+- 모든 프로필 수정은 인라인 편집으로 통합

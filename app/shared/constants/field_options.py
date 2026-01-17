@@ -46,6 +46,32 @@ class FieldOptions:
         Option('기타', '기타'),
     ]
 
+    # ========================================
+    # 근무 유형 옵션 (Phase 0.8)
+    # ========================================
+
+    # 근무 유형 옵션
+    WORK_TYPE = [
+        Option('full_time', '풀타임'),
+        Option('part_time', '파트타임'),
+        Option('flexible', '유연근무'),
+        Option('remote', '재택근무'),
+        Option('hybrid', '하이브리드'),
+    ]
+
+    # ========================================
+    # 학교 유형 옵션 (Phase 0.8)
+    # ========================================
+
+    # 학교 유형 옵션
+    SCHOOL_TYPE = [
+        Option('고등학교', '고등학교'),
+        Option('전문대학', '전문대학'),
+        Option('대학교', '대학교'),
+        Option('대학원', '대학원'),
+        Option('기타', '기타'),
+    ]
+
     # 혈액형 옵션
     BLOOD_TYPE = [
         Option('A', 'A형'),
@@ -239,26 +265,13 @@ class FieldOptions:
     # 병역정보 옵션
     # ========================================
 
-    # 병역 상태 옵션
+    # 병역 상태 옵션 (Phase 0.7: 간소화)
     MILITARY_STATUS = [
         Option('군필', '군필'),
-        Option('만기전역', '만기전역'),
-        Option('의가사전역', '의가사전역'),
-        Option('병역면제', '병역면제'),
-        Option('면제', '면제'),
-        Option('복무중', '복무중'),
         Option('미필', '미필'),
+        Option('면제(신체)', '면제(신체)'),
+        Option('면제(기타)', '면제(기타)'),
         Option('해당없음', '해당없음'),
-    ]
-
-    # 군별 옵션
-    MILITARY_BRANCH = [
-        Option('육군', '육군'),
-        Option('해군', '해군'),
-        Option('공군', '공군'),
-        Option('해병대', '해병대'),
-        Option('의무경찰', '의무경찰'),
-        Option('사회복무요원', '사회복무요원'),
     ]
 
     # ========================================
@@ -373,9 +386,11 @@ class FieldOptions:
             'CONTRACT_STATUS_OPTIONS': cls.CONTRACT_STATUS,
             'WORKING_HOURS_OPTIONS': cls.WORKING_HOURS,
             'BREAK_TIME_OPTIONS': cls.BREAK_TIME,
+            'WORK_TYPE_OPTIONS': cls.WORK_TYPE,  # Phase 0.8
             # 학력정보
             'DEGREE_OPTIONS': cls.DEGREE,
             'GRADUATION_STATUS_OPTIONS': cls.GRADUATION_STATUS,
+            'SCHOOL_TYPE_OPTIONS': cls.SCHOOL_TYPE,  # Phase 0.8
             # 경력정보
             'SALARY_TYPE_OPTIONS': cls.SALARY_TYPE,
             'PAYMENT_METHOD_OPTIONS': cls.PAYMENT_METHOD,
@@ -388,8 +403,8 @@ class FieldOptions:
             'LANGUAGE_OPTIONS': cls.LANGUAGE,
             'LANGUAGE_LEVEL_OPTIONS': cls.LANGUAGE_LEVEL,
             # 병역정보
+            # Phase 0.7: MILITARY_BRANCH 삭제, MILITARY_STATUS만 사용
             'MILITARY_STATUS_OPTIONS': cls.MILITARY_STATUS,
-            'MILITARY_BRANCH_OPTIONS': cls.MILITARY_BRANCH,
         }
 
     @classmethod
@@ -443,3 +458,64 @@ class FieldOptions:
     def get_labels_dict(cls, option_list):
         """옵션 리스트를 {value: label} 딕셔너리로 반환"""
         return {opt.value: opt.label for opt in option_list}
+
+    # ========================================
+    # FieldRegistry 통합 (Phase 0.8)
+    # ========================================
+
+    # options_category -> FieldOptions 속성명 매핑
+    OPTIONS_CATEGORY_MAP = {
+        'gender': 'GENDER',
+        'marital_status': 'MARITAL_STATUS',
+        'nationality': 'NATIONALITY',
+        'blood_type': 'BLOOD_TYPE',
+        'employee_status': 'EMPLOYEE_STATUS',
+        'employment_status': 'EMPLOYEE_STATUS',  # 별칭
+        'employment_type': 'EMPLOYMENT_TYPE',
+        'contract_type': 'CONTRACT_TYPE',
+        'contract_status': 'CONTRACT_STATUS',
+        'working_hours': 'WORKING_HOURS',
+        'break_time': 'BREAK_TIME',
+        'work_type': 'WORK_TYPE',
+        'degree': 'DEGREE',
+        'graduation_status': 'GRADUATION_STATUS',
+        'school_type': 'SCHOOL_TYPE',
+        'salary_type': 'SALARY_TYPE',
+        'payment_method': 'PAYMENT_METHOD',
+        'severance_type': 'SEVERANCE_TYPE',
+        'severance_method': 'SEVERANCE_METHOD',
+        'family_relation': 'FAMILY_RELATION',
+        'cohabit': 'COHABIT',
+        'language': 'LANGUAGE',
+        'language_level': 'LANGUAGE_LEVEL',
+        'military_status': 'MILITARY_STATUS',
+    }
+
+    @classmethod
+    def get_by_category(cls, category):
+        """
+        FieldRegistry options_category로 옵션 리스트 조회
+
+        Args:
+            category: FieldRegistry의 options_category 값
+
+        Returns:
+            옵션 리스트 또는 빈 리스트 (DB 동적 옵션의 경우)
+
+        사용 예:
+            options = FieldOptions.get_by_category('gender')
+            # [Option('남', '남성'), Option('여', '여성')]
+        """
+        attr_name = cls.OPTIONS_CATEGORY_MAP.get(category)
+        if attr_name:
+            return getattr(cls, attr_name, [])
+        return []
+
+    @classmethod
+    def has_category(cls, category):
+        """
+        해당 options_category가 FieldOptions에 정의되어 있는지 확인
+
+        DB 동적 옵션(bank, position 등)은 False 반환
+        """
+        return category in cls.OPTIONS_CATEGORY_MAP

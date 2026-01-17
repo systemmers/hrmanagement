@@ -13,7 +13,7 @@ from typing import Dict, List, Optional
 
 from app.types import OwnerType
 from app.shared.base.generic_relation_crud import GenericRelationCRUD, RelationConfig
-from app.domains.employee.models import Education, Career, Certificate, Language, MilitaryService
+from app.domains.employee.models import Education, Career, Certificate, Language
 from app.domains.employee.models import FamilyMember
 from app.domains.employee.models import HrProject
 from app.domains.employee.models import ProjectParticipation
@@ -99,25 +99,6 @@ LANGUAGE_CONFIG = RelationConfig(
     order_by=None
 )
 
-MILITARY_CONFIG = RelationConfig(
-    model=MilitaryService,
-    field_mapping={
-        'branch': 'branch',
-        'rank': 'rank',
-        'exemption_reason': 'exemption_reason',
-        'specialty': 'specialty',
-    },
-    alt_field_mapping={
-        'military_status': ['military_status', 'status'],
-        'service_type': ['service_type', 'duty'],
-        'enlistment_date': ['start_date', 'enlistment_date'],
-        'discharge_date': ['end_date', 'discharge_date'],
-        'discharge_reason': ['discharge_reason', 'discharge_type'],
-        'note': ['notes', 'note'],
-    },
-    order_by=None
-)
-
 FAMILY_CONFIG = RelationConfig(
     model=FamilyMember,
     field_mapping={
@@ -199,7 +180,6 @@ class ProfileRelationService:
         self._career = GenericRelationCRUD(CAREER_CONFIG)
         self._certificate = GenericRelationCRUD(CERTIFICATE_CONFIG)
         self._language = GenericRelationCRUD(LANGUAGE_CONFIG)
-        self._military = GenericRelationCRUD(MILITARY_CONFIG)
         self._family = GenericRelationCRUD(FAMILY_CONFIG)
         self._hr_project = GenericRelationCRUD(HR_PROJECT_CONFIG)
         self._project_participation = GenericRelationCRUD(PROJECT_PARTICIPATION_CONFIG)
@@ -211,7 +191,6 @@ class ProfileRelationService:
         'career': Career,
         'certificate': Certificate,
         'language': Language,
-        'military': MilitaryService,
         'family': FamilyMember,
         'hr_project': HrProject,
         'project_participation': ProjectParticipation,
@@ -299,34 +278,6 @@ class ProfileRelationService:
         return self._language.delete_all(owner_id, owner_type, commit)
 
     # ========================================
-    # 병역 (Military) CRUD
-    # ========================================
-
-    def get_military(self, owner_id: int, owner_type: OwnerType = 'profile') -> Optional[Dict]:
-        """병역 정보 조회 (1:1 관계)"""
-        return self._military.get_one(owner_id, owner_type)
-
-    def get_military_list(self, owner_id: int, owner_type: OwnerType = 'profile') -> List[Dict]:
-        """병역 목록 조회 (1:N 지원)"""
-        return self._military.get_all(owner_id, owner_type)
-
-    def add_military(self, owner_id: int, data: Dict, owner_type: OwnerType = 'profile', commit: bool = True) -> Dict:
-        """병역 추가"""
-        return self._military.add(owner_id, data, owner_type, commit)
-
-    def update_or_create_military(self, owner_id: int, data: Dict, owner_type: OwnerType = 'profile', commit: bool = True) -> Dict:
-        """병역 정보 업데이트 또는 생성 (1:1 관계용)"""
-        return self._military.update_or_create(owner_id, data, owner_type, commit)
-
-    def delete_military(self, military_id: int, owner_id: int, owner_type: OwnerType = 'profile', commit: bool = True) -> bool:
-        """병역 삭제 (소유권 확인)"""
-        return self._military.delete(military_id, owner_id, owner_type, commit)
-
-    def delete_all_military(self, owner_id: int, owner_type: OwnerType = 'profile', commit: bool = True) -> int:
-        """모든 병역 정보 삭제"""
-        return self._military.delete_all(owner_id, owner_type, commit)
-
-    # ========================================
     # 가족 (FamilyMember) CRUD
     # ========================================
 
@@ -406,7 +357,6 @@ class ProfileRelationService:
             'careers': self.get_careers(owner_id, owner_type),
             'certificates': self.get_certificates(owner_id, owner_type),
             'languages': self.get_languages(owner_id, owner_type),
-            'military': self.get_military_list(owner_id, owner_type),
         }
 
     def get_relation_counts(self, owner_id: int, owner_type: OwnerType = 'profile') -> Dict[str, int]:
@@ -416,7 +366,6 @@ class ProfileRelationService:
             'career_count': self._career.count(owner_id, owner_type),
             'certificate_count': self._certificate.count(owner_id, owner_type),
             'language_count': self._language.count(owner_id, owner_type),
-            'military_count': self._military.count(owner_id, owner_type),
         }
 
 

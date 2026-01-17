@@ -53,7 +53,8 @@
          data-account-type="{{ account_type }}"
          {% if is_create_mode %}data-create-mode="true"{% endif %}
          {% if account_type == 'corporate' and profile_data and profile_data.id %}data-employee-id="{{ profile_data.id }}"{% endif %}
-         {% if account_type == 'personal' and profile_data and profile_data.id %}data-profile-id="{{ profile_data.id }}"{% endif %}>
+         {% if account_type == 'personal' and profile_data and profile_data.id %}data-profile-id="{{ profile_data.id }}"{% endif %}
+         {% if account_type == 'corporate_admin' and profile_data and profile_data.id %}data-admin-profile-id="{{ profile_data.id }}"{% endif %}>
     {# 메인 콘텐츠 #}
     <div class="detail-main-content">
         {# 페이지 헤더 #}

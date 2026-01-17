@@ -59,9 +59,9 @@ def unified_profile_required(f):
             # 통합 Profile 모델 조회 (Service 레이어 경유)
             _, profile = personal_service.get_user_with_profile(user_id)
             if not profile:
-                # 프로필이 없으면 프로필 수정 페이지로 리다이렉트
+                # 프로필이 없으면 프로필 페이지로 리다이렉트 (인라인 편집으로 생성)
                 flash('프로필을 먼저 생성해주세요.', 'info')
-                return redirect(url_for('personal.profile_edit'))
+                return redirect(url_for('profile.view'))
 
             g.profile = PersonalProfileAdapter(profile)
             g.is_corporate = False

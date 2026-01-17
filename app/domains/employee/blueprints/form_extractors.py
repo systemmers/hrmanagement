@@ -48,20 +48,21 @@ def extract_employee_from_form(form_data: FormData, employee_id: int = 0) -> Emp
         company_email=form_data.get('company_email'),
         # 확장 필드 - 개인정보 (Phase 29: 직접 접근)
         english_name=form_data.get('english_name'),
-        chinese_name=form_data.get('chinese_name'),
         birth_date=form_data.get('birth_date'),
-        lunar_birth=_parse_boolean(form_data.get('lunar_birth')),
+        is_lunar_birth=_parse_boolean(form_data.get('is_lunar_birth')),
         gender=form_data.get('gender'),
         address=form_data.get('address'),
         detailed_address=form_data.get('detailed_address'),
-        postal_code=form_data.get('postal_code'),
         resident_number=form_data.get('resident_number'),
         mobile_phone=form_data.get('mobile_phone'),
-        home_phone=form_data.get('home_phone'),
         nationality=form_data.get('nationality'),
         # Phase 28.3: blood_type, religion 삭제됨
+        # Phase 0.7: chinese_name, home_phone, postal_code 삭제됨
         hobby=form_data.get('hobby'),
         specialty=form_data.get('specialty'),
+        # 병역 및 비고 (Phase 0.7: MilitaryService → 기본정보 통합)
+        military_status=form_data.get('military_status'),
+        note=form_data.get('note'),
     )
 
 
@@ -70,44 +71,44 @@ def extract_basic_fields_from_form(form_data: FormData) -> Dict[str, Any]:
 
     Phase 29: 별칭 제거, snake_case 직접 접근
     Phase 0.6 (2026-01-16): 11개 미매핑 필드 추가 (inline_edit_service SSOT 동기화)
+    Phase 0.7 (2026-01-16): chinese_name, home_phone, postal_code, account_holder 삭제
+                           military_status, note 추가 (MilitaryService 통합)
     """
     return {
         # 기본 정보
         'name': form_data.get('name', ''),
         'photo': form_data.get('photo') or '/static/images/face/face_01_m.png',
         'english_name': form_data.get('english_name'),
-        'chinese_name': form_data.get('chinese_name'),
-        'foreign_name': form_data.get('foreign_name'),  # Phase 0.6: 추가
+        'foreign_name': form_data.get('foreign_name'),
         'birth_date': form_data.get('birth_date'),
-        'lunar_birth': _parse_boolean(form_data.get('lunar_birth')),
+        'is_lunar_birth': _parse_boolean(form_data.get('is_lunar_birth')),
         'gender': form_data.get('gender'),
-        'marital_status': form_data.get('marital_status'),  # Phase 0.6: 추가
+        'marital_status': form_data.get('marital_status'),
         # 연락처
         'phone': form_data.get('phone', ''),
         'email': form_data.get('email', ''),
         'mobile_phone': form_data.get('mobile_phone'),
-        'home_phone': form_data.get('home_phone'),
-        'emergency_contact': form_data.get('emergency_contact'),  # Phase 0.6: 추가
-        'emergency_relation': form_data.get('emergency_relation'),  # Phase 0.6: 추가
+        'emergency_contact': form_data.get('emergency_contact'),
+        'emergency_relation': form_data.get('emergency_relation'),
         # 등록 주소
         'address': form_data.get('address'),
         'detailed_address': form_data.get('detailed_address'),
-        'postal_code': form_data.get('postal_code'),
-        # 실거주 주소 (Phase 0.6: 추가)
+        # 실거주 주소
         'actual_address': form_data.get('actual_address'),
         'actual_detailed_address': form_data.get('actual_detailed_address'),
         'actual_postal_code': form_data.get('actual_postal_code'),
         # 기타 개인정보
         'resident_number': form_data.get('resident_number'),
         'nationality': form_data.get('nationality'),
-        # Phase 28.3: blood_type, religion 삭제됨
         'hobby': form_data.get('hobby'),
         'specialty': form_data.get('specialty'),
-        'disability_info': form_data.get('disability_info'),  # Phase 0.6: 추가
-        # 급여 계좌 정보 (Phase 0.6: 추가)
+        'disability_info': form_data.get('disability_info'),
+        # 급여 계좌 정보
         'bank_name': form_data.get('bank_name'),
         'account_number': form_data.get('account_number'),
-        'account_holder': form_data.get('account_holder'),
+        # 병역 및 비고 (Phase 0.7: MilitaryService 통합)
+        'military_status': form_data.get('military_status'),
+        'note': form_data.get('note'),
     }
 
 
@@ -117,13 +118,13 @@ def extract_basic_fields_from_form(form_data: FormData) -> Dict[str, Any]:
 # ========================================
 
 def extract_family_list(form_data: FormData) -> List[Dict[str, Any]]:
-    """가족정보 리스트 추출 (Phase 29: 레거시 별칭 제거)"""
+    """가족정보 리스트 추출 (Phase 0.7: 폼 필드명 → 모델 필드명 통일)"""
     items = extract_relation_list(form_data, 'family_', {
         'relation': 'relation',
         'name': 'name',
         'birth_date': 'birth_date',
         'occupation': 'occupation',
-        'phone': 'contact',
+        'contact': 'contact',  # Phase 0.7: phone → contact
         'is_cohabitant': 'is_cohabitant',
     })
 
@@ -157,7 +158,7 @@ def extract_education_list(form_data: FormData) -> List[Dict[str, Any]]:
 
 
 def extract_career_list(form_data: FormData) -> List[Dict[str, Any]]:
-    """경력정보 리스트 추출"""
+    """경력정보 리스트 추출 (Phase 0.7: 폼 필드명 → 모델 필드명 통일)"""
     items = extract_relation_list(form_data, 'career_', {
         'company_name': 'company_name',
         'start_date': 'start_date',
@@ -167,7 +168,7 @@ def extract_career_list(form_data: FormData) -> List[Dict[str, Any]]:
         'job_grade': 'job_grade',
         'job_title': 'job_title',
         'job_role': 'job_role',
-        'duties': 'job_description',
+        'job_description': 'job_description',  # Phase 0.7: duties → job_description
         'salary': 'salary',
         'salary_type': 'salary_type',
         'monthly_salary': 'monthly_salary',
@@ -187,44 +188,26 @@ def extract_career_list(form_data: FormData) -> List[Dict[str, Any]]:
 
 
 def extract_certificate_list(form_data: FormData) -> List[Dict[str, Any]]:
-    """자격증정보 리스트 추출 (Phase 29: 레거시 별칭 제거)"""
+    """자격증정보 리스트 추출 (Phase 0.7: 폼 필드명 → 모델 필드명 통일)"""
     return extract_relation_list(form_data, 'certificate_', {
-        'name': 'certificate_name',
+        'certificate_name': 'certificate_name',  # Phase 0.7: name → certificate_name
         'grade': 'grade',
         'issuing_organization': 'issuing_organization',
-        'number': 'certificate_number',
+        'certificate_number': 'certificate_number',  # Phase 0.7: number → certificate_number
         'acquisition_date': 'acquisition_date',
         'expiry_date': 'expiry_date',
     })
 
 
 def extract_language_list(form_data: FormData) -> List[Dict[str, Any]]:
-    """언어능력정보 리스트 추출 (Phase 29: 레거시 별칭 제거)"""
+    """언어능력정보 리스트 추출 (Phase 0.7: 폼 필드명 → 모델 필드명 통일)"""
     return extract_relation_list(form_data, 'language_', {
-        'language': 'language_name',
+        'language_name': 'language_name',  # Phase 0.7: language → language_name
         'level': 'level',
-        'test_name': 'exam_name',
+        'exam_name': 'exam_name',  # Phase 0.7: test_name → exam_name
         'score': 'score',
-        'test_date': 'acquisition_date',
+        'acquisition_date': 'acquisition_date',  # Phase 0.7: test_date → acquisition_date
     })
-
-
-def extract_military_data(form_data: FormData) -> Optional[Dict[str, Any]]:
-    """병역정보 추출 (1:1 관계, Phase 30: DB 컬럼명 통일)"""
-    military_status = form_data.get('military_status', '').strip()
-    if not military_status:
-        return None
-
-    return {
-        'military_status': military_status,
-        'branch': form_data.get('military_branch') or None,
-        'rank': form_data.get('military_rank') or None,
-        'enlistment_date': form_data.get('military_start_date') or None,
-        'discharge_date': form_data.get('military_end_date') or None,
-        'service_type': form_data.get('military_duty') or None,           # Phase 30: 추가
-        'specialty': form_data.get('military_specialty') or None,         # Phase 30: 추가
-        'exemption_reason': form_data.get('military_exemption_reason') or None,  # Phase 30: discharge_reason → exemption_reason
-    }
 
 
 def extract_hr_project_list(form_data: FormData) -> List[Dict[str, Any]]:
@@ -252,10 +235,10 @@ def extract_project_participation_list(form_data: FormData) -> List[Dict[str, An
 
 
 def extract_award_list(form_data: FormData) -> List[Dict[str, Any]]:
-    """수상정보 리스트 추출 (Phase 30: DB 컬럼명 통일)"""
+    """수상정보 리스트 추출 (Phase 0.7: 폼 필드명 → 모델 필드명 통일)"""
     return extract_relation_list(form_data, 'award_', {
         'date': 'award_date',
         'name': 'award_name',
-        'issuer': 'institution',      # Phase 30: issuer → institution (DB 컬럼명)
+        'institution': 'institution',  # Phase 0.7: issuer → institution
         'note': 'note',
     })

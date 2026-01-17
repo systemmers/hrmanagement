@@ -15,10 +15,11 @@ class Insurance(DictSerializableMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False, unique=True, index=True)
-    national_pension = db.Column(db.Boolean, default=True)
-    health_insurance = db.Column(db.Boolean, default=True)
-    employment_insurance = db.Column(db.Boolean, default=True)
-    industrial_accident = db.Column(db.Boolean, default=True)
+    # Phase 0.7: Boolean fields -> has_ prefix
+    has_national_pension = db.Column(db.Boolean, default=True)
+    has_health_insurance = db.Column(db.Boolean, default=True)
+    has_employment_insurance = db.Column(db.Boolean, default=True)
+    has_industrial_accident = db.Column(db.Boolean, default=True)
     national_pension_rate = db.Column(db.Float, default=4.5)
     health_insurance_rate = db.Column(db.Float, default=3.545)
     long_term_care_rate = db.Column(db.Float, default=0.9182)

@@ -136,7 +136,7 @@ export function getCareerTemplate(index = 0) {
                 </div>
                 <div class="form-group">
                     <label class="form-label">담당업무</label>
-                    <input type="text" name="career_duties[]" class="form-input" placeholder="웹 개발, API 설계">
+                    <input type="text" name="career_job_description[]" class="form-input" placeholder="웹 개발, API 설계">
                 </div>
                 <div class="form-group">
                     <label class="form-label">급여유형</label>
@@ -192,7 +192,7 @@ export function getCertificateTemplate(index = 0) {
             <div class="form-grid">
                 <div class="form-group">
                     <label class="form-label">자격증명</label>
-                    <input type="text" name="certificate_name[]" class="form-input" placeholder="정보처리기사">
+                    <input type="text" name="certificate_certificate_name[]" class="form-input" placeholder="정보처리기사">
                 </div>
                 <div class="form-group">
                     <label class="form-label">발급기관</label>
@@ -262,7 +262,7 @@ export function getFamilyTemplate(index = 0) {
                 </div>
                 <div class="form-group">
                     <label class="form-label">연락처</label>
-                    <input type="tel" name="family_phone[]" class="form-input" placeholder="010-0000-0000">
+                    <input type="tel" name="family_contact[]" class="form-input" placeholder="010-0000-0000">
                 </div>
                 <div class="form-group">
                     <label class="form-label">동거여부</label>
@@ -296,7 +296,7 @@ export function getLanguageTemplate(index = 0) {
             <div class="form-grid">
                 <div class="form-group">
                     <label class="form-label">언어</label>
-                    <select name="language_language[]" class="form-input">
+                    <select name="language_language_name[]" class="form-input">
                         <option value="">선택하세요</option>
                         <option value="영어">영어</option>
                         <option value="일본어">일본어</option>
@@ -322,7 +322,7 @@ export function getLanguageTemplate(index = 0) {
                 </div>
                 <div class="form-group">
                     <label class="form-label">시험명</label>
-                    <input type="text" name="language_test_name[]" class="form-input" placeholder="TOEIC, JLPT 등">
+                    <input type="text" name="language_exam_name[]" class="form-input" placeholder="TOEIC, JLPT 등">
                 </div>
                 <div class="form-group">
                     <label class="form-label">점수/급수</label>
@@ -330,7 +330,7 @@ export function getLanguageTemplate(index = 0) {
                 </div>
                 <div class="form-group">
                     <label class="form-label">취득일</label>
-                    <input type="date" name="language_test_date[]" class="form-input">
+                    <input type="date" name="language_acquisition_date[]" class="form-input">
                 </div>
             </div>
             <button type="button" class="btn-remove" title="삭제">
@@ -406,7 +406,7 @@ export function getAwardTemplate(index = 0) {
                 </div>
                 <div class="form-group">
                     <label class="form-label">수여기관</label>
-                    <input type="text" name="award_issuer[]" class="form-input" placeholder="수여기관">
+                    <input type="text" name="award_institution[]" class="form-input" placeholder="수여기관">
                 </div>
                 <div class="form-group form-group-full">
                     <label class="form-label">비고</label>

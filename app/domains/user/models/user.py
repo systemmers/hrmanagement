@@ -23,7 +23,7 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     is_superadmin = db.Column(db.Boolean, default=False, nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    last_login = db.Column(db.DateTime, nullable=True)
+    last_login_at = db.Column(db.DateTime, nullable=True)  # Phase 0.7: last_login -> last_login_at
 
     # 플랫폼 계정 유형 (Phase 1: Company 모델)
     account_type = db.Column(
@@ -94,7 +94,7 @@ class User(db.Model):
 
     def update_last_login(self):
         """마지막 로그인 시간 업데이트"""
-        self.last_login = datetime.utcnow()
+        self.last_login_at = datetime.utcnow()
         db.session.commit()
 
     def is_admin(self):
@@ -177,7 +177,7 @@ class User(db.Model):
             'parent_user_id': self.parent_user_id,
             'privacy_settings': self.privacy_settings or {},
             'created_at': self.created_at.isoformat() if self.created_at else None,
-            'last_login': self.last_login.isoformat() if self.last_login else None,
+            'last_login_at': self.last_login_at.isoformat() if self.last_login_at else None,
         }
 
     @classmethod

@@ -217,6 +217,19 @@
 /* 읽기전용 필드는 편집 모드에서도 view 표시 유지 */
 .info-section--editing .inline-edit--readonly .inline-edit__view {
     display: flex;
+    /* 편집 모드에서 읽기전용 필드 스타일 (2026-01-16) */
+    width: 100%;
+    padding: var(--space-3);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    background-color: var(--color-gray-50);
+    color: var(--color-gray-500);
+    cursor: not-allowed;
+}
+
+/* 읽기전용 필드 빈 값 스타일 */
+.info-section--editing .inline-edit--readonly .inline-edit__value--empty {
+    color: var(--color-gray-400);
 }
 
 /* 섹션 저장 중 상태 */

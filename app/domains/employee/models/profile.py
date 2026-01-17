@@ -31,21 +31,18 @@ class Profile(db.Model):
     # 기본 개인정보
     name = db.Column(db.String(100), nullable=False)
     english_name = db.Column(db.String(100), nullable=True)
-    chinese_name = db.Column(db.String(100), nullable=True)
     photo = db.Column(db.String(500), nullable=True)
 
     # 생년월일 정보
     birth_date = db.Column(db.String(20), nullable=True)
-    lunar_birth = db.Column(db.Boolean, default=False)
+    is_lunar_birth = db.Column(db.Boolean, default=False)  # Phase 0.7: lunar_birth -> is_lunar_birth
     gender = db.Column(db.String(10), nullable=True)
 
     # 연락처 정보
     mobile_phone = db.Column(db.String(50), nullable=True)
-    home_phone = db.Column(db.String(50), nullable=True)
     email = db.Column(db.String(200), nullable=True)
 
     # 주소 정보
-    postal_code = db.Column(db.String(20), nullable=True)
     address = db.Column(db.String(500), nullable=True)
     detailed_address = db.Column(db.String(500), nullable=True)
 
@@ -67,6 +64,10 @@ class Profile(db.Model):
     # 비상연락처
     emergency_contact = db.Column(db.String(50), nullable=True)
     emergency_relation = db.Column(db.String(50), nullable=True)
+
+    # 병역 및 비고 (Phase 0.7: MilitaryService 모델 → 기본정보 통합)
+    military_status = db.Column(db.String(50), nullable=True)  # 병역여부: 군필/미필/면제/해당없음
+    note = db.Column(db.Text, nullable=True)  # 비고
 
     # 메타 정보
     is_public = db.Column(db.Boolean, default=False)
@@ -109,13 +110,6 @@ class Profile(db.Model):
         'Language',
         primaryjoin='Profile.id == Language.profile_id',
         foreign_keys='Language.profile_id',
-        backref='profile',
-        lazy='dynamic'
-    )
-    military_services = db.relationship(
-        'MilitaryService',
-        primaryjoin='Profile.id == MilitaryService.profile_id',
-        foreign_keys='MilitaryService.profile_id',
         backref='profile',
         lazy='dynamic'
     )
@@ -188,16 +182,13 @@ class Profile(db.Model):
             'user_id': self.user_id,
             'name': self.name,
             'english_name': self.english_name,
-            'chinese_name': self.chinese_name,
             'photo': self.photo,
             'birth_date': self.birth_date,
-            'lunar_birth': self.lunar_birth,
+            'is_lunar_birth': self.is_lunar_birth,
             'gender': self.gender,
             'age': self.age,
             'mobile_phone': self.mobile_phone,
-            'home_phone': self.home_phone,
             'email': self.email,
-            'postal_code': self.postal_code,
             'address': self.address,
             'detailed_address': self.detailed_address,
             'full_address': self.full_address,
@@ -216,6 +207,9 @@ class Profile(db.Model):
             # 비상연락처
             'emergency_contact': self.emergency_contact,
             'emergency_relation': self.emergency_relation,
+            # 병역 및 비고
+            'military_status': self.military_status,
+            'note': self.note,
             'is_public': self.is_public,
             'is_personal': self.is_personal,
             'created_at': self.created_at.isoformat() if self.created_at else None,
@@ -266,15 +260,12 @@ class Profile(db.Model):
             user_id=data.get('user_id'),
             name=data.get('name'),
             english_name=data.get('english_name') or data.get('englishName'),
-            chinese_name=data.get('chinese_name') or data.get('chineseName'),
             photo=data.get('photo'),
             birth_date=data.get('birth_date') or data.get('birthDate'),
-            lunar_birth=data.get('lunar_birth') or data.get('lunarBirth', False),
+            is_lunar_birth=data.get('is_lunar_birth') or data.get('lunar_birth', False),  # Phase 0.7
             gender=data.get('gender'),
             mobile_phone=data.get('mobile_phone') or data.get('mobilePhone'),
-            home_phone=data.get('home_phone') or data.get('homePhone'),
             email=data.get('email'),
-            postal_code=data.get('postal_code') or data.get('postalCode'),
             address=data.get('address'),
             detailed_address=data.get('detailed_address') or data.get('detailedAddress'),
             resident_number=data.get('resident_number') or data.get('residentNumber'),
@@ -289,6 +280,8 @@ class Profile(db.Model):
             actual_detailed_address=data.get('actual_detailed_address') or data.get('actualDetailedAddress'),
             emergency_contact=data.get('emergency_contact') or data.get('emergencyContact'),
             emergency_relation=data.get('emergency_relation') or data.get('emergencyRelation'),
+            military_status=data.get('military_status') or data.get('militaryStatus'),
+            note=data.get('note'),
             is_public=data.get('is_public') or data.get('isPublic', False),
         )
 

@@ -45,13 +45,13 @@ def register_list_routes(bp: Blueprint):
         sort_by = request.args.get('sort', None)
         sort_order = request.args.get('order', 'asc')
 
-        # 정렬 필드 매핑 (camelCase -> snake_case)
+        # 정렬 필드 매핑 (Phase 0.7: snake_case only)
         sort_field_map = {
             'id': 'id',
             'name': 'name',
             'department': 'department',
             'position': 'position',
-            'hireDate': 'hire_date',
+            'hire_date': 'hire_date',
             'status': 'status'
         }
         sort_column = sort_field_map.get(sort_by) if sort_by else None

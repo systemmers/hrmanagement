@@ -183,12 +183,22 @@ def register_context_processors(app):
 
             옵션 우선순위:
             1. 직접 정의된 options
-            2. ClassificationOption 참조 (options_category)
-            3. 빈 리스트
+            2. FieldOptions의 options_category (Phase 0.8 통합)
+            3. ClassificationOption 참조 (DB 동적 옵션)
+            4. 빈 리스트
             """
-            # 직접 정의된 옵션이 있으면 사용
+            # 1. 직접 정의된 옵션이 있으면 사용
             if field.get('options'):
                 return field['options']
+
+            # 2. options_category로 FieldOptions 조회 (Phase 0.8)
+            category = field.get('optionsCategory')
+            if category and FieldOptions.has_category(category):
+                options = FieldOptions.get_by_category(category)
+                return [{'value': opt.value, 'label': opt.label} for opt in options]
+
+            # 3. DB 동적 옵션은 별도 처리 (bank, position 등)
+            # ClassificationOption에서 조회해야 함 - 템플릿에서 별도 처리 필요
 
             return []
 

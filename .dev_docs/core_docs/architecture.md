@@ -1,7 +1,7 @@
 # HR Management System - 아키텍처 문서
 
-> **최종 업데이트**: 2026-01-11
-> **Phase**: 도메인 마이그레이션 Phase 31 완료, Attachment 독립 도메인
+> **최종 업데이트**: 2026-01-16
+> **Phase**: Domain Migration Phase 4 Complete (Attachment + Required Document)
 
 ## 목차
 1. [개요](#개요)
@@ -43,14 +43,14 @@ D:/projects/hrmanagement/
 │   ├── forms.py                 # WTForms 폼 정의
 │   │
 │   ├── domains/                 # 도메인 패키지 (8개 도메인)
-│   │   ├── employee/            # 직원 도메인 (~65개 파일)
-│   │   ├── contract/            # 계약 도메인 (Facade 패턴)
-│   │   ├── company/             # 법인 도메인
-│   │   ├── user/                # 사용자 도메인
-│   │   ├── platform/            # 플랫폼 도메인
-│   │   ├── sync/                # 동기화 도메인 (Facade 패턴)
-│   │   ├── attachment/          # 첨부파일 도메인 (2026-01-10 신규)
-│   │   └── businesscard/        # 명함 도메인 (2026-01-09 신규)
+│   │   ├── employee/            # 직원 도메인 (~70개 파일, 7개 서비스)
+│   │   ├── contract/            # 계약 도메인 (Facade 패턴, 5개 서비스)
+│   │   ├── company/             # 법인 도메인 (4개 서비스)
+│   │   ├── user/                # 사용자 도메인 (5개 서비스)
+│   │   ├── platform/            # 플랫폼 도메인 (3개 서비스)
+│   │   ├── sync/                # 동기화 도메인 (Facade 패턴, 4개 서비스)
+│   │   ├── attachment/          # 첨부파일 도메인 (Phase 4 완료, 2개 서비스)
+│   │   └── businesscard/        # 명함 도메인 (1개 서비스)
 │   │
 │   ├── shared/                  # 공유 자원
 │   │   ├── base/                # 기반 클래스 (ServiceResult, GenericRelationCRUD)
@@ -326,8 +326,9 @@ app/domains/employee/blueprints/
 | **sync** | `SyncBasicService` | 기본 동기화 |
 | **sync** | `SyncRelationService` | 관계형 동기화 |
 | **sync** | `TerminationService` | 퇴직 처리 |
-| **attachment** | `AttachmentService` | 첨부파일 관리 (2026-01-10) |
-| **businesscard** | `BusinessCardService` | 명함 관리 (2026-01-09) |
+| **attachment** | `AttachmentService` | 첨부파일 관리 (SSOT) |
+| **attachment** | `RequiredDocumentService` | 필수문서 관리 (Phase 4) |
+| **businesscard** | `BusinessCardService` | 명함 관리 |
 | **shared** | `AIService` | AI 기능 (Gemini API) |
 | **shared** | `FileStorageService` | 파일 저장 |
 
@@ -1592,10 +1593,10 @@ def create_employee(self, data: dict) -> Employee:
 
 ---
 
-**문서 버전:** 1.3
+**문서 버전:** 1.4
 **작성일:** 2025-12-16
-**최종 수정일:** 2026-01-11
-**Phase:** 도메인 마이그레이션 Phase 31 완료, Attachment 독립 도메인
+**최종 수정일:** 2026-01-16
+**Phase:** Domain Migration Phase 4 Complete
 
 ---
 
@@ -1613,3 +1614,7 @@ def create_employee(self, data: dict) -> Employee:
 |  |  | - Repository Pattern Generic Type 지원 명시 |
 |  |  | - Frontend 도메인 중심 구조로 전면 개편 |
 |  |  | - Company Settings JS 모듈화 반영 (3,094줄 → 9개 모듈) |
+| 1.4 | 2026-01-16 | Phase 4 완료 반영 |
+|  |  | - Employee 서비스 7개로 확장 (inline_edit, validation 추가) |
+|  |  | - Attachment 도메인 RequiredDocumentService 추가 |
+|  |  | - 도메인별 서비스 수 정확화 |

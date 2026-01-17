@@ -137,6 +137,83 @@ class FieldRegistry:
         return section.get_visible_fields(account_type)
 
     @classmethod
+    def get_visible_field_names(
+        cls,
+        section_id: str,
+        account_type: str
+    ) -> List[str]:
+        """
+        특정 계정 타입에서 표시되는 필드 이름 목록
+
+        Args:
+            section_id: 섹션 ID
+            account_type: 계정 타입
+
+        Returns:
+            가시성 필터링된 필드명 리스트
+        """
+        fields = cls.get_visible_fields(section_id, account_type)
+        return [f.name for f in fields]
+
+    @classmethod
+    def get_editable_fields(
+        cls,
+        section_id: str,
+        account_type: str
+    ) -> List[FieldDefinition]:
+        """
+        특정 계정 타입에서 편집 가능한 필드 목록
+        (표시되고 readonly가 아닌 필드)
+
+        Args:
+            section_id: 섹션 ID
+            account_type: 계정 타입
+
+        Returns:
+            편집 가능한 필드 정의 목록
+        """
+        visible_fields = cls.get_visible_fields(section_id, account_type)
+        return [f for f in visible_fields if not f.readonly]
+
+    @classmethod
+    def get_editable_field_names(
+        cls,
+        section_id: str,
+        account_type: str
+    ) -> List[str]:
+        """
+        특정 계정 타입에서 편집 가능한 필드 이름 목록
+
+        Args:
+            section_id: 섹션 ID
+            account_type: 계정 타입
+
+        Returns:
+            편집 가능한 필드명 리스트
+        """
+        fields = cls.get_editable_fields(section_id, account_type)
+        return [f.name for f in fields]
+
+    @classmethod
+    def get_readonly_field_names(
+        cls,
+        section_id: str,
+        account_type: str
+    ) -> List[str]:
+        """
+        특정 계정 타입에서 읽기 전용 필드 이름 목록
+
+        Args:
+            section_id: 섹션 ID
+            account_type: 계정 타입
+
+        Returns:
+            읽기 전용 필드명 리스트 (age, birth_date, gender 등)
+        """
+        visible_fields = cls.get_visible_fields(section_id, account_type)
+        return [f.name for f in visible_fields if f.readonly]
+
+    @classmethod
     def normalize_field_name(cls, section_id: str, name: str) -> str:
         """
         필드명 정규화 (Phase 29: 별칭 변환 제거)

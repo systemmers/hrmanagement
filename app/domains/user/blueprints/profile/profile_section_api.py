@@ -28,8 +28,8 @@ profile_section_api_bp = Blueprint('profile_section_api', __name__, url_prefix='
 # 프론트엔드 필드명 → 모델 필드명 매핑
 # NOTE: hobby, specialty는 모델과 동일한 이름을 사용하므로 매핑 불필요
 FIELD_NAME_MAPPING = {
-    # 기본 정보
-    'is_lunar_birth': 'lunar_birth',
+    # 기본 정보 (Phase 0.7: is_lunar_birth는 이제 DB 필드명과 동일)
+    # 'is_lunar_birth': 'is_lunar_birth',  # 동일하므로 매핑 불필요
     'resident_registration_number': 'resident_number',
     'zipcode': 'postal_code',
     # 비상연락처
@@ -38,6 +38,29 @@ FIELD_NAME_MAPPING = {
     'registered_address': 'address',
     'registered_address_detail': 'detailed_address',
     'actual_address_detail': 'actual_detailed_address',
+    # camelCase → snake_case 매핑 (프론트엔드 호환)
+    'phone': 'mobile_phone',  # 템플릿 input name="phone"
+    'mobilePhone': 'mobile_phone',
+    'homePhone': 'home_phone',
+    'englishName': 'english_name',
+    'chineseName': 'chinese_name',
+    'foreignName': 'foreign_name',
+    'maritalStatus': 'marital_status',
+    'birthDate': 'birth_date',
+    'isLunarBirth': 'is_lunar_birth',
+    'emergencyContact': 'emergency_contact',
+    'emergencyRelation': 'emergency_relation',
+    'bankName': 'bank_name',
+    'accountNumber': 'account_number',
+    'accountHolder': 'account_holder',
+    'disabilityInfo': 'disability_info',
+    'detailedAddress': 'detailed_address',
+    'actualPostalCode': 'actual_postal_code',
+    'actualAddress': 'actual_address',
+    'actualDetailedAddress': 'actual_detailed_address',
+    'postalCode': 'postal_code',
+    'residentNumber': 'resident_number',
+    'residentRegistrationNumber': 'resident_number',
 }
 
 # 정적 섹션 (info-table)
@@ -208,9 +231,13 @@ def update_static_section(profile_id: int, section_name: str):
     if not data:
         return api_error('수정할 데이터가 없습니다.')
 
-    # 허용된 필드만 필터링
+    # BUG-001/003 수정: 매핑 먼저, 필터링 나중
+    # 1. 먼저 필드명 매핑 수행 (camelCase → snake_case)
+    mapped_data = _map_field_names(data)
+
+    # 2. 매핑된 데이터에서 허용 필드만 필터링
     allowed_fields = set(section_config['fields'])
-    filtered_data = {k: v for k, v in data.items() if k in allowed_fields}
+    filtered_data = {k: v for k, v in mapped_data.items() if k in allowed_fields}
 
     if not filtered_data:
         return api_error('수정 가능한 필드가 없습니다.')
@@ -219,9 +246,8 @@ def update_static_section(profile_id: int, section_name: str):
         user_id = session.get(SessionKeys.USER_ID)
 
         if section_name == 'personal':
-            # 개인 기본정보 수정 (필드명 매핑 적용)
-            mapped_data = _map_field_names(filtered_data)
-            result = personal_service.update_profile(user_id, mapped_data)
+            # 개인 기본정보 수정 (이미 매핑된 데이터 사용)
+            result = personal_service.update_profile(user_id, filtered_data)
             if not result.success:
                 return api_error(result.message)
             return api_success({

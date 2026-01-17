@@ -13,7 +13,6 @@ from .career_repository import CareerRepository
 from .certificate_repository import CertificateRepository
 from .family_member_repository import FamilyMemberRepository
 from .language_repository import LanguageRepository
-from .military_service_repository import MilitaryServiceRepository
 from .salary_repository import SalaryRepository
 from .benefit_repository import BenefitRepository
 from .contract_repository import ContractRepository
@@ -53,7 +52,6 @@ __all__ = [
     'SalaryPaymentRepository',
     'EmploymentContractRepository',
     # 1:1 Relations
-    'MilitaryServiceRepository',
     'SalaryRepository',
     'BenefitRepository',
     'ContractRepository',

@@ -30,7 +30,7 @@ class Employee(db.Model):
     # 퇴사 관련 필드
     resignation_date = db.Column(db.Date, nullable=True)  # 퇴직일
     data_retention_until = db.Column(db.Date, nullable=True)  # 데이터 보관 만료일
-    probation_end = db.Column(db.Date, nullable=True)  # 수습종료일
+    probation_end_date = db.Column(db.Date, nullable=True)  # Phase 0.7: probation_end -> probation_end_date
     name = db.Column(db.String(100), nullable=False)
     photo = db.Column(db.String(500), nullable=True)
     department = db.Column(db.String(100), nullable=True)
@@ -62,17 +62,15 @@ class Employee(db.Model):
     internal_phone = db.Column(db.String(50), nullable=True)
     company_email = db.Column(db.String(200), nullable=True)
 
-    # 확장 정보 (17개 필드)
+    # 확장 정보
     english_name = db.Column(db.String(100), nullable=True)
-    chinese_name = db.Column(db.String(100), nullable=True)
+    foreign_name = db.Column(db.String(100), nullable=True)  # 외국어 이름
     birth_date = db.Column(db.String(20), nullable=True)
-    lunar_birth = db.Column(db.Boolean, default=False)
+    is_lunar_birth = db.Column(db.Boolean, default=False)  # Phase 0.7: lunar_birth -> is_lunar_birth
     gender = db.Column(db.String(10), nullable=True)
-    mobile_phone = db.Column(db.String(50), nullable=True)
-    home_phone = db.Column(db.String(50), nullable=True)
+    mobile_phone = db.Column(db.String(50), nullable=True)  # 휴대전화 (SSOT)
     address = db.Column(db.String(500), nullable=True)
     detailed_address = db.Column(db.String(500), nullable=True)
-    postal_code = db.Column(db.String(20), nullable=True)
     resident_number = db.Column(db.String(20), nullable=True)
     nationality = db.Column(db.String(50), nullable=True)
     # blood_type, religion 삭제됨 (Phase 28 마이그레이션)
@@ -89,6 +87,14 @@ class Employee(db.Model):
     # 비상연락처
     emergency_contact = db.Column(db.String(50), nullable=True)
     emergency_relation = db.Column(db.String(50), nullable=True)
+
+    # 은행 정보
+    bank_name = db.Column(db.String(50), nullable=True)  # 은행명
+    account_number = db.Column(db.String(50), nullable=True)  # 계좌번호
+
+    # 병역 및 비고 (Phase 0.7: MilitaryService 모델 → 기본정보 통합)
+    military_status = db.Column(db.String(50), nullable=True)  # 병역여부: 군필/미필/면제/해당없음
+    note = db.Column(db.Text, nullable=True)  # 비고
 
     # 1:N 관계
     educations = db.relationship('Education', backref='employee', lazy='dynamic', cascade='all, delete-orphan')
@@ -109,7 +115,6 @@ class Employee(db.Model):
     attachments = db.relationship('Attachment', backref='employee', lazy='dynamic', cascade='all, delete-orphan')
 
     # 1:1 관계
-    military_service = db.relationship('MilitaryService', backref='employee', uselist=False, cascade='all, delete-orphan')
     salary = db.relationship('Salary', backref='employee', uselist=False, cascade='all, delete-orphan')
     benefit = db.relationship('Benefit', backref='employee', uselist=False, cascade='all, delete-orphan')
     contract = db.relationship('Contract', backref='employee', uselist=False, cascade='all, delete-orphan')
@@ -128,6 +133,30 @@ class Employee(db.Model):
         """템플릿 호환성: employment_type -> contract.employee_type"""
         return self.contract.employee_type if self.contract else None
 
+    @property
+    def age(self) -> Optional[int]:
+        """나이 계산 (birth_date 기반)
+
+        Returns:
+            만 나이 (정수) 또는 None (생년월일 미입력 시)
+        """
+        if not self.birth_date:
+            return None
+        try:
+            # birth_date가 문자열이면 파싱
+            if isinstance(self.birth_date, str):
+                birth = date.fromisoformat(self.birth_date)
+            else:
+                birth = self.birth_date
+            today = date.today()
+            age = today.year - birth.year
+            # 생일이 아직 안 지났으면 1 빼기
+            if (today.month, today.day) < (birth.month, birth.day):
+                age -= 1
+            return age
+        except (ValueError, TypeError):
+            return None
+
     def _collect_raw_data(self) -> dict:
         """원시 필드 데이터 수집 (내부용)"""
         return {
@@ -143,15 +172,14 @@ class Employee(db.Model):
             'organization_id': self.organization_id,
             'company_id': self.company_id,
             'english_name': self.english_name,
-            'chinese_name': self.chinese_name,
+            'foreign_name': self.foreign_name,
             'birth_date': self.birth_date,
-            'lunar_birth': self.lunar_birth,
+            'age': self.age,  # @property 계산값 포함 (Phase 0.8)
+            'is_lunar_birth': self.is_lunar_birth,
             'gender': self.gender,
-            'mobile_phone': self.mobile_phone,
-            'home_phone': self.home_phone,
+            'mobile_phone': self.mobile_phone,  # 휴대전화 (SSOT)
             'address': self.address,
             'detailed_address': self.detailed_address,
-            'postal_code': self.postal_code,
             'resident_number': self.resident_number,
             'nationality': self.nationality,
             # blood_type, religion 삭제됨 (Phase 28)
@@ -166,6 +194,12 @@ class Employee(db.Model):
             # 비상연락처
             'emergency_contact': self.emergency_contact,
             'emergency_relation': self.emergency_relation,
+            # 은행 정보
+            'bank_name': self.bank_name,
+            'account_number': self.account_number,
+            # 병역 및 비고
+            'military_status': self.military_status,
+            'note': self.note,
             # 소속 정보 추가 필드
             'team': self.team,
             # 직급 체계
@@ -180,7 +214,7 @@ class Employee(db.Model):
             'profile_id': self.profile_id,
             'resignation_date': self.resignation_date.isoformat() if self.resignation_date else None,
             'data_retention_until': self.data_retention_until.isoformat() if self.data_retention_until else None,
-            'probation_end': self.probation_end.isoformat() if self.probation_end else None,
+            'probation_end_date': self.probation_end_date.isoformat() if self.probation_end_date else None,
         }
 
     def to_dict(self, ordered: bool = False, account_type: Optional[str] = None) -> dict:
@@ -226,7 +260,7 @@ class Employee(db.Model):
 
     @classmethod
     def from_dict(cls, data):
-        """camelCase/snake_case 딕셔너리에서 모델 생성"""
+        """딕셔너리에서 모델 생성 (Phase 0.7: camelCase 폴백 제거, snake_case only)"""
         return cls(
             id=data.get('id'),
             name=data.get('name'),
@@ -234,48 +268,52 @@ class Employee(db.Model):
             department=data.get('department'),
             position=data.get('position'),
             status=data.get('status'),
-            hire_date=data.get('hire_date') or data.get('hireDate'),
+            hire_date=data.get('hire_date'),
             phone=data.get('phone'),
             email=data.get('email'),
             # 조직 연결
-            organization_id=data.get('organization_id') or data.get('organizationId'),
+            organization_id=data.get('organization_id'),
             # 소속정보 추가 필드
-            employee_number=data.get('employee_number') or data.get('employeeNumber'),
+            employee_number=data.get('employee_number'),
             team=data.get('team'),
             # 직급 체계
-            job_grade=data.get('job_grade') or data.get('jobGrade'),
-            job_title=data.get('job_title') or data.get('jobTitle'),
-            job_role=data.get('job_role') or data.get('jobRole'),
-            work_location=data.get('work_location') or data.get('workLocation'),
-            internal_phone=data.get('internal_phone') or data.get('internalPhone'),
-            company_email=data.get('company_email') or data.get('companyEmail'),
+            job_grade=data.get('job_grade'),
+            job_title=data.get('job_title'),
+            job_role=data.get('job_role'),
+            work_location=data.get('work_location'),
+            internal_phone=data.get('internal_phone'),
+            company_email=data.get('company_email'),
             # 개인정보
-            english_name=data.get('english_name') or data.get('englishName'),
-            chinese_name=data.get('chinese_name') or data.get('chineseName'),
-            birth_date=data.get('birth_date') or data.get('birthDate'),
-            lunar_birth=data.get('lunar_birth') or data.get('lunarBirth', False),
+            english_name=data.get('english_name'),
+            foreign_name=data.get('foreign_name'),
+            birth_date=data.get('birth_date'),
+            is_lunar_birth=data.get('is_lunar_birth', False),
             gender=data.get('gender'),
-            mobile_phone=data.get('mobile_phone') or data.get('mobilePhone'),
-            home_phone=data.get('home_phone') or data.get('homePhone'),
+            mobile_phone=data.get('mobile_phone'),  # 휴대전화 (SSOT)
             address=data.get('address'),
-            detailed_address=data.get('detailed_address') or data.get('detailedAddress'),
-            postal_code=data.get('postal_code') or data.get('postalCode'),
-            resident_number=data.get('resident_number') or data.get('residentNumber'),
+            detailed_address=data.get('detailed_address'),
+            resident_number=data.get('resident_number'),
             nationality=data.get('nationality'),
             # blood_type, religion 삭제됨 (Phase 28)
             hobby=data.get('hobby'),
             specialty=data.get('specialty'),
-            disability_info=data.get('disability_info') or data.get('disabilityInfo'),
-            marital_status=data.get('marital_status') or data.get('maritalStatus'),
+            disability_info=data.get('disability_info'),
+            marital_status=data.get('marital_status'),
             # 실제 거주 주소
-            actual_postal_code=data.get('actual_postal_code') or data.get('actualPostalCode'),
-            actual_address=data.get('actual_address') or data.get('actualAddress'),
-            actual_detailed_address=data.get('actual_detailed_address') or data.get('actualDetailedAddress'),
+            actual_postal_code=data.get('actual_postal_code'),
+            actual_address=data.get('actual_address'),
+            actual_detailed_address=data.get('actual_detailed_address'),
             # 비상연락처
-            emergency_contact=data.get('emergency_contact') or data.get('emergencyContact'),
-            emergency_relation=data.get('emergency_relation') or data.get('emergencyRelation'),
+            emergency_contact=data.get('emergency_contact'),
+            emergency_relation=data.get('emergency_relation'),
+            # 은행 정보
+            bank_name=data.get('bank_name'),
+            account_number=data.get('account_number'),
+            # 병역 및 비고
+            military_status=data.get('military_status'),
+            note=data.get('note'),
             # 수습종료일
-            probation_end=data.get('probation_end') or data.get('probationEnd'),
+            probation_end_date=data.get('probation_end_date'),
         )
 
     def __repr__(self):

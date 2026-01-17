@@ -372,7 +372,7 @@ class EmployeeCoreService:
             department=form_data.get('department', ''),
             position=form_data.get('position', ''),
             status=form_data.get('status', EmployeeStatus.ACTIVE),
-            hire_date=form_data.get('hire_date') or form_data.get('hireDate', ''),
+            hire_date=form_data.get('hire_date', ''),  # Phase 0.7: camelCase 폴백 제거
             phone=form_data.get('phone', ''),
             email=form_data.get('email', ''),
             organization_id=organization_id,

@@ -35,7 +35,7 @@ def extract_profile_data(form_data: FormData, existing_profile=None) -> Dict[str
         'chinese_name': form_data.get('chinese_name', '').strip() or None,
         'resident_number': (form_data.get('resident_number', '') or '').strip() or None,
         'birth_date': form_data.get('birth_date', '').strip() or None,
-        'lunar_birth': _parse_boolean(form_data.get('lunar_birth')),
+        'is_lunar_birth': _parse_boolean(form_data.get('is_lunar_birth')),
         'gender': form_data.get('gender', '').strip() or None,
 
         # Contact info

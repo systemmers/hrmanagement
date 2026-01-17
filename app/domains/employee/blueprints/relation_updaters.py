@@ -18,11 +18,11 @@ from .form_extractors import (
     extract_career_list,
     extract_certificate_list,
     extract_language_list,
-    extract_military_data,
     extract_hr_project_list,
     extract_project_participation_list,
     extract_award_list,
 )
+# Phase 0.7: extract_military_data 삭제 (MilitaryService 통합)
 
 
 class EmployeeRelationUpdater:
@@ -88,14 +88,7 @@ class EmployeeRelationUpdater:
                     self.service.add_language(employee_id, item, self.owner_type, commit=False)
         return True
 
-    def update_military(self, employee_id: int, form_data: FormData) -> bool:
-        """병역정보 업데이트 (트랜잭션 안전)"""
-        with atomic_transaction():
-            data = extract_military_data(form_data)
-            self.service.delete_all_military(employee_id, self.owner_type, commit=False)
-            if data and data.get('military_status'):
-                self.service.add_military(employee_id, data, self.owner_type, commit=False)
-        return True
+    # Phase 0.7: update_military 삭제 (MilitaryService 통합 -> Employee.military_status)
 
     def update_hr_project(self, employee_id: int, form_data: FormData) -> bool:
         """인사이력 프로젝트 업데이트 (트랜잭션 안전)"""
@@ -168,11 +161,7 @@ class EmployeeRelationUpdater:
                 if item.get('language_name'):
                     self.service.add_language(employee_id, item, self.owner_type, commit=False)
 
-            # 병역
-            data = extract_military_data(form_data)
-            self.service.delete_all_military(employee_id, self.owner_type, commit=False)
-            if data and data.get('military_status'):
-                self.service.add_military(employee_id, data, self.owner_type, commit=False)
+            # Phase 0.7: 병역정보는 Employee.military_status로 통합 (별도 처리 불필요)
 
             # 인사이력 프로젝트
             items = extract_hr_project_list(form_data)
@@ -231,13 +220,7 @@ def update_language_data(employee_id: int, form_data: FormData) -> bool:
     return employee_relation_updater.update_language(employee_id, form_data)
 
 
-def update_military_data(employee_id: int, form_data: FormData, commit: bool = True) -> bool:
-    """병역정보 업데이트 (기존 API 호환)
-
-    Note: commit 파라미터는 하위 호환을 위해 유지하지만,
-    내부적으로는 atomic_transaction()에서 트랜잭션 관리
-    """
-    return employee_relation_updater.update_military(employee_id, form_data)
+# Phase 0.7: update_military_data 삭제 (MilitaryService 통합)
 
 
 def update_hr_project_data(employee_id: int, form_data: FormData) -> bool:
